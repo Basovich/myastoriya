@@ -1,0 +1,273 @@
+/* ===== Promotions Page ===== */
+
+/* Hero Banner */
+.hero {
+    position: relative;
+    background: #1a1a1a;
+    border-radius: var(--radius-lg);
+    margin: 16px;
+    overflow: hidden;
+    min-height: 120px;
+    display: flex;
+    align-items: stretch;
+}
+
+.heroOverlay {
+    position: relative;
+    z-index: 2;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.heroTitle {
+    font-size: 28px;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0;
+}
+
+.heroDots {
+    display: flex;
+    gap: 4px;
+    margin-top: 8px;
+
+    span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-accent);
+    }
+}
+
+.heroDecor {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.heroPercent {
+    font-size: 120px;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.08);
+    line-height: 1;
+}
+
+.heroLogo {
+    position: absolute;
+    top: 50%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    opacity: 0.4;
+}
+
+.heroChevrons {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--color-accent);
+    opacity: 0.6;
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    padding: 16px 16px 8px;
+    font-size: 13px;
+}
+
+.breadcrumbLink {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+        color: var(--color-text-primary);
+    }
+}
+
+.breadcrumbSep {
+    color: var(--color-text-muted);
+    margin: 0 8px;
+}
+
+/* Filter Tabs */
+.tabs {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    justify-content: center;
+}
+
+.tab {
+    padding: 10px 28px;
+    border: 1.5px solid var(--color-border-base);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: var(--color-text-primary);
+    }
+}
+
+.tabActive {
+    background: #111;
+    border-color: #111;
+    color: #fff;
+}
+
+/* Promo Grid */
+.promoGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 8px 16px 16px;
+}
+
+.promoCard {
+    display: flex;
+    flex-direction: column;
+}
+
+.promoImageWrap {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background: var(--color-bg-card);
+}
+
+.promoImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.promoMeta {
+    margin-top: 10px;
+}
+
+.promoDate {
+    font-size: 12px;
+    color: var(--color-text-muted);
+
+    strong {
+        color: var(--color-accent);
+        font-weight: 700;
+    }
+}
+
+.promoTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 6px 0 0;
+    line-height: 1.4;
+}
+
+/* Show More */
+.showMore {
+    display: flex;
+    justify-content: center;
+    padding: 16px 16px 40px;
+}
+
+.showMoreBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 32px;
+    border: 1.5px solid var(--color-border-base);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: var(--color-text-primary);
+    }
+}
+
+/* ===== Desktop ===== */
+@media (min-width: 1024px) {
+    .hero {
+        margin: 0 auto;
+        max-width: 1280px;
+        padding: 0 40px;
+        margin: 0 auto;
+        min-height: 160px;
+        border-radius: var(--radius-lg);
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 0;
+        margin-bottom: 0;
+        /* Full-width hero within container */
+        width: calc(100% - 80px);
+        max-width: 1200px;
+    }
+
+    .heroTitle {
+        font-size: 40px;
+    }
+
+    .heroPercent {
+        font-size: 180px;
+    }
+
+    .breadcrumbs {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 20px 40px 8px;
+    }
+
+    .tabs {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 20px 40px;
+    }
+
+    .tab {
+        padding: 12px 36px;
+        font-size: 14px;
+    }
+
+    .promoGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 8px 40px 24px;
+    }
+
+    .promoTitle {
+        font-size: 14px;
+    }
+
+    .showMore {
+        padding: 24px 40px 48px;
+    }
+}

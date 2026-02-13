@@ -1,0 +1,98 @@
+.section {
+    padding: 24px 16px;
+}
+
+.carousel {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.card {
+    min-width: 260px;
+    flex-shrink: 0;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-bg-card);
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+}
+
+.imageWrap {
+    aspect-ratio: 16/10;
+    overflow: hidden;
+}
+
+.cardImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.date {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+}
+
+.title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.allBtn {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+/* ===== Desktop ===== */
+@media (min-width: 1024px) {
+    .section {
+        padding: 48px 40px;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    .carousel {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        overflow-x: visible;
+    }
+
+    .card {
+        min-width: auto;
+    }
+
+    .allBtn {
+        margin-top: 32px;
+    }
+}

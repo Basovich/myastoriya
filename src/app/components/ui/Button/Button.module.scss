@@ -1,0 +1,87 @@
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+/* Primary — red background */
+.primary {
+    background: var(--color-accent);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+
+    &:hover {
+        background: var(--color-accent-hover);
+    }
+}
+
+/* Outline — transparent with border */
+.outline {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1.5px solid var(--color-border-base);
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+
+    &:hover {
+        border-color: var(--color-text-primary);
+    }
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* Icon — circular button */
+.icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    border: 1.5px solid var(--color-border-base);
+    padding: 0;
+    font-size: 18px;
+
+    &:hover {
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+    }
+}
+
+/* Pill — tab filter */
+.pill {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-base);
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+
+    &:hover {
+        border-color: var(--color-text-primary);
+        color: var(--color-text-primary);
+    }
+
+    &.active {
+        background: var(--color-accent);
+        border-color: var(--color-accent);
+        color: #fff;
+    }
+}

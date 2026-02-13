@@ -1,0 +1,338 @@
+/* ===== Mobile-first ===== */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #000000;
+}
+
+/* Secondary nav — hidden on mobile */
+.secondaryNav {
+    display: none;
+}
+
+/* Main bar */
+.mainBar {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mainBarInner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.menuBtn {
+    background: none;
+    border: none;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+}
+
+.logoIcon {
+    display: flex;
+}
+
+.logoText {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    letter-spacing: 0.05em;
+}
+
+/* Desktop-only elements — hidden on mobile */
+.catalogBtn,
+.searchBarDesktop,
+.citySelector,
+.loginLink {
+    display: none;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.actionBtn {
+    position: relative;
+    background: none;
+    border: none;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+        color: var(--color-accent);
+    }
+}
+
+.badge {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    min-width: 16px;
+    height: 16px;
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Mobile search bar */
+.searchBar {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    height: 40px;
+    margin: 0 16px 12px;
+}
+
+.searchIcon {
+    margin-left: 12px;
+    color: #999;
+    flex-shrink: 0;
+}
+
+.searchInput {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0 10px;
+    font-size: 14px;
+    color: #333;
+    background: transparent;
+    font-family: var(--font-sans);
+
+    &::placeholder {
+        color: #aaa;
+    }
+}
+
+.searchBtn {
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+    padding: 0 20px;
+    height: 100%;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: background 0.2s;
+
+    &:hover {
+        background: var(--color-accent-hover);
+    }
+}
+
+/* City selector styles */
+.cityLabel {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cityValue {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Secondary nav link/phone styles */
+.navLinks {
+    display: flex;
+    gap: 24px;
+}
+
+.navLink {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+        color: #fff;
+    }
+}
+
+.navRight {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.navPhone {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+
+    &:hover {
+        color: #fff;
+    }
+}
+
+.langSwitch {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+.loginLink {
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+/* ===== Desktop (1024px+) ===== */
+@media (min-width: 1024px) {
+    .header {
+        background: transparent;
+    }
+
+    /* Secondary nav: dark bar */
+    .secondaryNav {
+        display: block;
+        background: #1a1a1a;
+    }
+
+    .secondaryInner {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 8px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Main bar: white bg */
+    .mainBar {
+        background: #ffffff;
+        padding: 0;
+        gap: 0;
+    }
+
+    .mainBarInner {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 40px;
+        width: 100%;
+        height: 64px;
+        gap: 16px;
+    }
+
+    .menuBtn {
+        display: none;
+    }
+
+    .searchBar {
+        display: none;
+    }
+
+    .logoText {
+        color: #111;
+    }
+
+    .catalogBtn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--color-accent);
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: var(--radius-md);
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background 0.2s;
+        cursor: pointer;
+
+        &:hover {
+            background: var(--color-accent-hover);
+        }
+    }
+
+    .searchBarDesktop {
+        display: flex;
+        align-items: center;
+        background: #f5f5f5;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        height: 42px;
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .citySelector {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        white-space: nowrap;
+    }
+
+    .cityLabel {
+        color: #999;
+    }
+
+    .cityValue {
+        color: #111;
+    }
+
+    .actionBtn {
+        color: #333;
+
+        &:hover {
+            color: var(--color-accent);
+        }
+    }
+
+    .badge {
+        background: var(--color-accent);
+    }
+
+    .loginLink {
+        display: block;
+        color: #333;
+
+        &:hover {
+            color: var(--color-accent);
+        }
+    }
+
+    .actions {
+        gap: 16px;
+    }
+}

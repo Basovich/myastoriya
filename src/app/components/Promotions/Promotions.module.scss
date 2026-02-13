@@ -1,0 +1,114 @@
+.section {
+    padding: 24px 16px;
+}
+
+.carousel {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.card {
+    min-width: 280px;
+    flex-shrink: 0;
+}
+
+.cardImage {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.cardImg {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+}
+
+.cardOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.discountBadge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+}
+
+.discountLabel {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.discountValue {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--color-accent);
+
+    sub {
+        font-size: 18px;
+        font-weight: 600;
+    }
+}
+
+.cardMeta {
+    margin-bottom: 6px;
+}
+
+.date {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+
+    strong {
+        color: var(--color-accent);
+    }
+}
+
+.cardTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* ===== Desktop ===== */
+@media (min-width: 1024px) {
+    .section {
+        padding: 48px 40px;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    .carousel {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        overflow-x: visible;
+    }
+
+    .card {
+        min-width: auto;
+    }
+
+    .cardImg {
+        height: 200px;
+    }
+}

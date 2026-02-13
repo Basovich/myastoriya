@@ -1,0 +1,306 @@
+.footer {
+    background: var(--color-bg);
+    padding: 0 16px 24px;
+}
+
+/* SEO Text */
+.seoSection {
+    padding: 24px 0;
+    border-top: 1px solid var(--color-border-base);
+}
+
+.seoTitle {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: var(--color-text-primary);
+}
+
+.seoText {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* ===== Top Row ===== */
+.topRow {
+    border-top: 1px solid var(--color-border-base);
+    padding: 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* App Section */
+/* .appSection — no mobile-specific styles needed */
+
+.appTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin: 0 0 12px;
+}
+
+.appButtons {
+    display: flex;
+    gap: 10px;
+}
+
+.storeBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-border-base);
+    border-radius: var(--radius-md);
+    color: #fff;
+    text-decoration: none;
+    transition: background 0.2s;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    div {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.storeSub {
+    font-size: 9px;
+    opacity: 0.6;
+}
+
+.storeName {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Social */
+/* .socialSection — no mobile-specific styles needed */
+
+.socialTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin: 0 0 12px;
+}
+
+.socialIcons {
+    display: flex;
+    gap: 12px;
+}
+
+.socialIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-border-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+    }
+}
+
+/* Footer logo — hidden on mobile */
+.footerLogo {
+    display: none;
+}
+
+/* ===== Links Row ===== */
+.linksRow {
+    border-top: 1px solid var(--color-border-base);
+    padding: 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* .linksCol — no mobile-specific styles needed */
+
+.linksTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 12px;
+}
+
+.linksList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.link {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+        color: var(--color-text-primary);
+    }
+}
+
+/* Review Banner */
+.reviewBanner {
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #E30613 0%, #c40510 100%);
+    overflow: hidden;
+    position: relative;
+}
+
+.reviewContent {
+    padding: 24px 20px;
+}
+
+.reviewText {
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    line-height: 1.3;
+    margin: 0;
+}
+
+/* ===== Bottom Row ===== */
+.bottomRow {
+    border-top: 1px solid var(--color-border-base);
+    padding: 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Contact */
+/* .contactSection — no mobile-specific styles needed */
+
+.contactTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 12px;
+}
+
+.contactItem {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin: 0 0 6px;
+}
+
+.addressBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 20px;
+    border: 1.5px solid var(--color-border-base);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    transition: border-color 0.2s;
+
+    &:hover {
+        border-color: var(--color-accent);
+    }
+}
+
+/* Payment */
+/* .paymentSection — no mobile-specific styles needed */
+
+.paymentTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 12px;
+}
+
+.paymentIcons {
+    display: flex;
+    gap: 10px;
+}
+
+.paymentCard {
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Copyright */
+.copyright {
+    padding-top: 20px;
+    border-top: 1px solid var(--color-border-base);
+    text-align: center;
+
+    p {
+        font-size: 11px;
+        color: var(--color-text-muted);
+        margin: 0;
+    }
+}
+
+/* ===== Desktop ===== */
+@media (min-width: 1024px) {
+    .footer {
+        padding: 0 40px 40px;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    .seoSection {
+        padding: 40px 0;
+    }
+
+    /* Top Row: app | social | logo — horizontal */
+    .topRow {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 32px 0;
+    }
+
+    .footerLogo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        color: var(--color-text-primary);
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+    }
+
+    /* Links Row: grid 3 cols */
+    .linksRow {
+        flex-direction: row;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.5fr;
+        gap: 32px;
+        padding: 32px 0;
+    }
+
+    /* Bottom Row: contacts left, payment right */
+    .bottomRow {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 32px 0;
+    }
+
+    .paymentSection {
+        text-align: right;
+    }
+}
