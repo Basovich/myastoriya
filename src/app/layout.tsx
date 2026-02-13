@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import siteData from "@/content/site.json";
+import PasswordGate from "./components/PasswordGate/PasswordGate";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -62,7 +63,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uk">
-      <body className={montserrat.variable}>{children}</body>
+      <body className={montserrat.variable}>
+        <PasswordGate>{children}</PasswordGate>
+      </body>
     </html>
   );
 }
