@@ -266,6 +266,43 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
 ---
 
+## Деплой на Vercel
+
+Проект автоматично деплоїться на **Vercel** при кожному push/merge в гілку `main`.
+
+| Параметр | Значення |
+| --- | --- |
+| **Production URL** | [myastoriya-vadyms-projects-d450dffa.vercel.app](https://myastoriya-vadyms-projects-d450dffa.vercel.app) |
+| **GitHub Repo** | [Basovich/myastoriya](https://github.com/Basovich/myastoriya) |
+| **Trigger** | Push / Merge в `main` |
+| **Framework** | Next.js (auto-detected) |
+| **Build Command** | `npm run build` |
+| **Output** | Static Export (`out/`) |
+
+### Як це працює
+
+1. Ви пушите зміни в `main` → Vercel автоматично запускає білд
+2. Якщо білд успішний → нова версія сайту стає доступною через ~30 секунд
+3. При помилці білду → попередня версія залишається активною
+
+### Ручний деплой (за потреби)
+
+```bash
+# Деплой у production
+npx vercel --prod
+
+# Превʼю-деплой (для тестування)
+npx vercel
+```
+
+### Захист сайту паролем
+
+Сайт захищений клієнтським паролем. При першому відвідуванні зʼявляється промпт для введення пароля. Пароль зберігається в `sessionStorage` (діє до закриття вкладки).
+
+Щоб змінити пароль — відредагуйте `CORRECT_PASSWORD` у `src/app/components/PasswordGate/PasswordGate.tsx`.
+
+---
+
 ## Корисні посилання
 
 - [Next.js App Router](https://nextjs.org/docs/app)
