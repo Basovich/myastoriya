@@ -96,4 +96,10 @@ p {
 button {
   font: inherit;
   cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+input, 
+textarea {
+  font-family: var(--font-sans);
 }

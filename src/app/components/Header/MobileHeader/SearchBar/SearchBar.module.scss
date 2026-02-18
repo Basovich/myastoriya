@@ -28,8 +28,6 @@
     font-size: 14px;
     color: #333333;
     background: transparent;
-    font-family: var(--font-houschka);
-    /* Check global font var usage */
     height: 100%;
 
     &::placeholder {
@@ -49,7 +47,6 @@
     text-transform: uppercase;
     letter-spacing: 0.03em;
     cursor: pointer;
-    font-family: var(--font-houschka);
     transition: background 0.2s;
     white-space: nowrap;
 
