@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Header from "../components/Header/Header";
-import Footer from "../components/Footer/Footer";
+import Header from "@/app/components/Header/Header";
+import Footer from "@/app/components/Footer/Footer";
 import s from "./promotions.module.scss";
 import promoData from "@/content/pages/promotions.json";
 
