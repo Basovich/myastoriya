@@ -1,0 +1,48 @@
+.secondaryNav {
+    display: block;
+    background: #1a1a1a;
+}
+
+.secondaryInner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 8px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navLinks {
+    display: flex;
+    gap: 24px;
+}
+
+.navLink {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+        color: #ffffff;
+    }
+}
+
+.navRight {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.navPhone {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+
+    &:hover {
+        color: #ffffff;
+    }
+}
