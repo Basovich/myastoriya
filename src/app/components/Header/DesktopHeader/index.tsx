@@ -1,7 +1,16 @@
-import TopBar from "@/app/components/Header/MobileHeader/TopBar";
+import TopBar from "@/app/components/Header/DesktopHeader/TopBar";
+import MainBar from "@/app/components/Header/DesktopHeader/MainBar";
+import { type Locale } from "@/i18n/config";
 
-export default function MobileHeader() {
+interface DesktopHeaderProps {
+    lang: Locale;
+}
+
+export default function DesktopHeader({ lang }: DesktopHeaderProps) {
     return (
-        <TopBar />
+        <>
+            <TopBar lang={lang} />
+            <MainBar lang={lang} />
+        </>
     );
 }

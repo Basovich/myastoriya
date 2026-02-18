@@ -1,7 +1,16 @@
 import TopBar from "@/app/components/Header/MobileHeader/TopBar";
+import SearchBar from "@/app/components/Header/MobileHeader/SearchBar";
+import { type Locale } from "@/i18n/config";
 
-export default function MobileHeader() {
+interface MobileHeaderProps {
+    lang: Locale;
+}
+
+export default function MobileHeader({ lang }: MobileHeaderProps) {
     return (
-        <TopBar />
+        <>
+            <TopBar lang={lang} />
+            <SearchBar />
+        </>
     );
 }

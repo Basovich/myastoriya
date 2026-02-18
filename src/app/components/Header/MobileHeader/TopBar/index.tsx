@@ -1,11 +1,20 @@
 import ToggleMenu from "@/app/components/Header/MobileHeader/ToggleMenu";
-import Logo from "@/app/components/Header/MobileHeader/Logo";
+import Logo from "@/app/components/Header/Shared/Logo";
+import Actions from "@/app/components/Header/Shared/Actions";
+import s from "./TopBar.module.scss";
+import { type Locale } from "@/i18n/config";
 
-export default function TopBar() {
+interface TopBarProps {
+    lang: Locale;
+}
+
+export default function TopBar({ lang }: TopBarProps) {
     return (
-        <>
+        <div className={s.topBar}>
             <ToggleMenu />
-            <Logo />
-        </>
+            <Logo lang={lang} className={s.logo} />
+            {/* Mobile Actions don't show login link usually, or do they? Header.tsx had loginLink hidden on mobile */}
+            <Actions showLogin={false} />
+        </div>
     );
 }
