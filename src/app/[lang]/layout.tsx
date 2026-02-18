@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "./globals.css";
+import "../globals.css";
 import siteData from "@/content/site.json";
-import PasswordGate from "./components/PasswordGate/PasswordGate";
+import PasswordGate from "../components/PasswordGate/PasswordGate";
+import { i18n } from "@/i18n/config";
 
 const houschka = localFont({
   src: [
     {
-      path: "../fonts/HouschkaRounded-Bold.woff2",
+      path: "../../fonts/HouschkaRounded-Bold.woff2",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../fonts/HouschkaRounded-ExtraBold.woff2",
+      path: "../../fonts/HouschkaRounded-ExtraBold.woff2",
       weight: "800",
       style: "normal",
     },
@@ -23,12 +24,12 @@ const houschka = localFont({
 const helios = localFont({
   src: [
     {
-      path: "../fonts/Helios-Regular.woff2",
+      path: "../../fonts/Helios-Regular.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../fonts/Helios-Bold.woff2",
+      path: "../../fonts/Helios-Bold.woff2",
       weight: "700",
       style: "normal",
     },
@@ -95,13 +96,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export async function generateStaticParams() {
+  return i18n.locales.map((locale) => ({ lang: locale }));
+}
+
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ lang: string }>;
 }>) {
+  const { lang } = await params;
   return (
-    <html lang="uk" className={`${houschka.variable} ${helios.variable}`}>
+    <html lang={lang} className={`${houschka.variable} ${helios.variable}`}>
       <body>
         <PasswordGate>{children}</PasswordGate>
       </body>

@@ -1,8 +1,15 @@
 import s from "./Footer.module.scss";
 import siteData from "@/content/site.json";
 import homeData from "@/content/pages/home.json";
+import Link from "next/link";
+import { type Locale } from "@/i18n/config";
+import { getLocalizedHref } from "@/utils/i18n-helpers";
 
-export default function Footer() {
+interface FooterProps {
+    lang: Locale;
+}
+
+export default function Footer({ lang }: FooterProps) {
     const { footer, contact, socialLinks } = siteData;
     const { seoText } = homeData;
 
@@ -59,12 +66,12 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <a href="/" className={s.footerLogo}>
+                <Link href={getLocalizedHref("/", lang)} className={s.footerLogo}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--color-accent)">
                         <path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5L10 21h4l1.5-9C17 11 18 9.5 18 7.5 18 4.5 15.5 2 12 2z" />
                     </svg>
                     <span>М&apos;ЯСТОРІЯ</span>
-                </a>
+                </Link>
             </div>
 
             {/* ===== Links Row: site links | legal links | red banner ===== */}
@@ -73,7 +80,7 @@ export default function Footer() {
                     <h3 className={s.linksTitle}>Розділи сайту</h3>
                     <nav className={s.linksList}>
                         {siteLinks.map((link, i) => (
-                            <a key={i} href={link.href} className={s.link}>{link.label}</a>
+                            <Link key={i} href={getLocalizedHref(link.href, lang)} className={s.link}>{link.label}</Link>
                         ))}
                     </nav>
                 </div>
@@ -81,7 +88,7 @@ export default function Footer() {
                 <div className={s.linksCol}>
                     <nav className={s.linksList}>
                         {legalLinks.map((link, i) => (
-                            <a key={i} href={link.href} className={s.link}>{link.label}</a>
+                            <Link key={i} href={getLocalizedHref(link.href, lang)} className={s.link}>{link.label}</Link>
                         ))}
                     </nav>
                 </div>

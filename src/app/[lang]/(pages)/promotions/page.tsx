@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useParams } from "next/navigation";
+import { type Locale } from "@/i18n/config";
 import Header from "@/app/components/Header/Header";
 import Footer from "@/app/components/Footer/Footer";
 import s from "./promotions.module.scss";
@@ -8,10 +10,12 @@ import promoData from "@/content/pages/promotions.json";
 
 export default function PromotionsPage() {
     const [activeTab, setActiveTab] = useState(0);
+    const params = useParams();
+    const lang = (params.lang as Locale) || 'ua';
 
     return (
         <>
-            <Header />
+            <Header lang={lang} />
             <main>
                 {/* Hero Banner */}
                 <section className={s.hero}>
@@ -86,7 +90,7 @@ export default function PromotionsPage() {
                     </button>
                 </div>
             </main>
-            <Footer />
+            <Footer lang={lang} />
         </>
     );
 }

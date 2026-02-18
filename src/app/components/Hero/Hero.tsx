@@ -1,9 +1,18 @@
 import s from "./Hero.module.scss";
-import homeData from "@/content/pages/home.json";
 
-export default function Hero() {
-    const { hero } = homeData;
+interface HeroProps {
+    hero: {
+        badge: string;
+        title: string;
+        ctaButton: {
+            text: string;
+            href: string;
+        };
+        slides: { image: string }[];
+    };
+}
 
+export default function Hero({ hero }: HeroProps) {
     return (
         <section className={s.hero} id="hero">
             <div className={s.slide}>
@@ -25,8 +34,8 @@ export default function Hero() {
                 <div className={s.content}>
                     <span className={s.badge}>{hero.badge}</span>
                     <h1 className={s.title}>{hero.title}</h1>
-                    <a href="#categories" className={s.ctaBtn}>
-                        ДІЗНАТИСЬ БІЛЬШЕ
+                    <a href={hero.ctaButton.href} className={s.ctaBtn}>
+                        {hero.ctaButton.text}
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                             <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                         </svg>

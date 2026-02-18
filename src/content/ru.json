@@ -1,0 +1,27 @@
+{
+    "navigation": {
+        "home": "Главная",
+        "products": "Продукты"
+    },
+    "home": {
+        "hero": {
+            "badge": "Акция, действует прямо сейчас!",
+            "title": "НОВЫЕ БЛЮДА ОТ МЯСТОРИЯ",
+            "ctaButton": {
+                "text": "УЗНАТЬ БОЛЬШЕ",
+                "href": "#products"
+            },
+            "slides": [
+                {
+                    "image": "/images/hero-steak.jpg"
+                },
+                {
+                    "image": "/images/hero-burger.jpg"
+                },
+                {
+                    "image": "/images/hero-grill.jpg"
+                }
+            ]
+        }
+    }
+}

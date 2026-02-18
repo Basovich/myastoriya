@@ -1,0 +1,27 @@
+{
+    "navigation": {
+        "home": "Головна",
+        "products": "Продукти"
+    },
+    "home": {
+        "hero": {
+            "badge": "Акція, діє прямо зараз!",
+            "title": "НОВІ СТРАВИ ВІД М'ЯСТОРІЯ",
+            "ctaButton": {
+                "text": "ДІЗНАТИСЬ БІЛЬШЕ",
+                "href": "#products"
+            },
+            "slides": [
+                {
+                    "image": "/images/hero-steak.jpg"
+                },
+                {
+                    "image": "/images/hero-burger.jpg"
+                },
+                {
+                    "image": "/images/hero-grill.jpg"
+                }
+            ]
+        }
+    }
+}

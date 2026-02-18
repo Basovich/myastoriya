@@ -4,8 +4,14 @@ import Image from "next/image";
 import s from "./Header.module.scss";
 import siteData from "@/content/site.json";
 import Link from "next/link";
+import { type Locale } from "@/i18n/config";
+import { getLocalizedHref } from "@/utils/i18n-helpers";
 
-export default function Header() {
+interface HeaderProps {
+    lang: Locale;
+}
+
+export default function Header({ lang }: HeaderProps) {
     return (
         <header className={s.header} id="header">
             {/* ========== DESKTOP: Secondary nav bar ========== */}
@@ -13,9 +19,9 @@ export default function Header() {
                 <div className={s.secondaryInner}>
                     <div className={s.navLinks}>
                         {siteData.navigation.map((item, i) => (
-                            <a key={i} href={item.href} className={s.navLink}>
+                            <Link key={i} href={getLocalizedHref(item.href, lang)} className={s.navLink}>
                                 {item.label}
-                            </a>
+                            </Link>
                         ))}
                     </div>
                     <div className={s.navRight}>
@@ -25,7 +31,7 @@ export default function Header() {
                             </svg>
                             {siteData.contact.phone}
                         </a>
-                        <span className={s.langSwitch}>UKR</span>
+                        <span className={s.langSwitch}>{lang === 'ua' ? 'UKR' : 'RUS'}</span>
                     </div>
                 </div>
             </nav>
@@ -44,7 +50,7 @@ export default function Header() {
                     </button>
 
                     {/* Logo */}
-                    <Link href="/" className={s.logo}>
+                    <Link href={getLocalizedHref("/", lang)} className={s.logo}>
                         <Image
                             src="/images/logo-white.svg"
                             alt="М'ясторія"
