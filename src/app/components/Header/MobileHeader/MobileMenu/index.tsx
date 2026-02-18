@@ -1,13 +1,14 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useSpring, animated, useTransition } from "react-spring";
+import { useTransition, config, animated } from "react-spring";
 import s from "./MobileMenu.module.scss";
 import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
 import siteData from "@/content/site.json";
 import categoriesData from "@/content/categories.json";
 import { usePathname } from "next/navigation";
+import { useToggleOpenWithAnimation } from "@/hooks/useToggleOpenWithAnimation";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -21,33 +22,20 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
         from: { transform: "translateX(-100%)" },
         enter: { transform: "translateX(0%)" },
         leave: { transform: "translateX(-100%)" },
-        config: { tension: 280, friction: 30 } // Adjust for snappy feel
+        config: { tension: 280, friction: 30 }
     });
 
-    // Accordion State
-    const [isCatalogOpen, setIsCatalogOpen] = useState(false);
-    const catalogListRef = useRef<HTMLDivElement>(null);
+    // Accordion Logic using Custom Hook
+    const {
+        isOpen: isCatalogOpen,
+        handleClick: toggleCatalog,
+        animated: animatedAccordion,
+        style: accordionStyle,
+        ref: catalogListRef
+    } = useToggleOpenWithAnimation();
 
-    // Accordion Animation
-    const [overflow, setOverflow] = useState("hidden");
-    const accordionStyle = useSpring({
-        height: isCatalogOpen ? catalogListRef.current?.scrollHeight || "auto" : 0,
-        opacity: isCatalogOpen ? 1 : 0,
-        overflow: overflow,
-        config: { tension: 250, friction: 30 },
-        onStart: () => {
-            if (!isCatalogOpen) setOverflow("hidden");
-        },
-        onRest: () => {
-            if (isCatalogOpen) setOverflow("visible");
-        }
-    });
-
-    // Icon Rotation
-    const iconStyle = useSpring({
-        transform: isCatalogOpen ? "rotate(180deg)" : "rotate(0deg)",
-        config: { tension: 250, friction: 30 }
-    });
+    // Rename for clarity in JSX
+    const AnimatedDiv = animatedAccordion.div;
 
     // Body scroll lock
     useEffect(() => {
@@ -111,9 +99,9 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
             </div>
 
             {/* Catalog Header */}
-            <div className={s.catalogHeader} onClick={() => setIsCatalogOpen(!isCatalogOpen)}>
+            <div className={s.catalogHeader} onClick={toggleCatalog}>
                 Каталог продукції
-                <animated.div style={iconStyle} className={s.iconWrapper}>
+                <div className={s.iconWrapper} style={{ transform: isCatalogOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
                     <svg
                         width="16"
                         height="16"
@@ -125,11 +113,11 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                     >
                         <polyline points="6 9 12 15 18 9" />
                     </svg>
-                </animated.div>
+                </div>
             </div>
 
             {/* Categories List (Accordion) */}
-            <animated.div style={accordionStyle} className={s.catalogListWrapper}>
+            <AnimatedDiv style={accordionStyle} className={s.catalogListWrapper}>
                 <div className={s.catalogList} ref={catalogListRef}>
                     {categoriesData.map((cat, i) => (
                         <Link key={i} href={getLocalizedHref(cat.href, lang)} className={s.categoryItem} onClick={onClose}>
@@ -145,7 +133,7 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                         </Link>
                     ))}
                 </div>
-            </animated.div>
+            </AnimatedDiv>
 
             {/* Footer */}
             <div className={s.menuFooter}>
