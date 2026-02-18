@@ -7,7 +7,7 @@ export default function Promotions() {
 
     return (
         <section className={s.section} id="promotions">
-            <SectionHeader title={promotions.sectionTitle} showArrows />
+            <SectionHeader title={promotions.sectionTitle} />
             <div className={s.carousel}>
                 {promotions.items.map((promo) => (
                     <div key={promo.id} className={s.card}>

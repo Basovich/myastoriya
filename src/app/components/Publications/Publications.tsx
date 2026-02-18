@@ -8,7 +8,7 @@ export default function Publications() {
 
     return (
         <section className={s.section} id="publications">
-            <SectionHeader title={publications.sectionTitle} showArrows />
+            <SectionHeader title={publications.sectionTitle} />
             <div className={s.carousel}>
                 {publications.items.map((pub) => (
                     <a href="#" key={pub.id} className={s.card}>

@@ -8,7 +8,7 @@ export default function Reviews() {
 
     return (
         <section className={s.section} id="reviews">
-            <SectionHeader title={reviews.sectionTitle} showArrows />
+            <SectionHeader title={reviews.sectionTitle} />
             <div className={s.carousel}>
                 {reviews.items.map((review) => (
                     <div key={review.id} className={s.card}>
