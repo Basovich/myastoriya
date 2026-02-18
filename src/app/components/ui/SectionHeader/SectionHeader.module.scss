@@ -1,68 +1,17 @@
-.header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.titleGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.sectionHeader {
+    margin-bottom: 24px;
 }
 
 .title {
-    font-size: 18px;
-    font-weight: 800;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text-primary);
     text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: var(--color-text-primary);
-    margin: 0;
+    letter-spacing: 0.02em;
 }
 
-.dots {
-    display: flex;
-    gap: 4px;
-
-    span {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--color-accent);
-    }
-}
-
-.arrows {
-    display: flex;
-    gap: 8px;
-}
-
-.arrow {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 1.5px solid var(--color-border-base);
-    background: transparent;
-    color: var(--color-text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: border-color 0.2s;
-
-    &:hover {
-        border-color: var(--color-accent);
-        color: var(--color-accent);
-    }
-}
-
-/* ===== Desktop ===== */
 @media (min-width: 1024px) {
-    .header {
-        margin-bottom: 32px;
-    }
-
     .title {
-        font-size: 24px;
+        font-size: 28px;
     }
 }

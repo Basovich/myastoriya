@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 import s from "./Header.module.scss";
 import siteData from "@/content/site.json";
 
 export default function Header() {
-    const [searchQuery, setSearchQuery] = useState("");
-
     return (
         <header className={s.header} id="header">
-            {/* Secondary nav bar — desktop only */}
+            {/* ========== DESKTOP: Secondary nav bar ========== */}
             <nav className={s.secondaryNav}>
                 <div className={s.secondaryInner}>
                     <div className={s.navLinks}>
@@ -31,26 +29,27 @@ export default function Header() {
                 </div>
             </nav>
 
-            {/* Main header bar */}
+            {/* ========== Main header bar ========== */}
             <div className={s.mainBar}>
                 <div className={s.mainBarInner}>
+                    {/* MOBILE: Hamburger menu button */}
                     <button className={s.menuBtn} aria-label="Меню">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-                            <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-                        </svg>
+                        <img src="/icons/burger-grid.svg" alt="Menu" width="24" height="24" />
                     </button>
 
+                    {/* Logo */}
                     <a href="/" className={s.logo}>
-                        <span className={s.logoIcon}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--color-accent)">
-                                <path d="M12 2C8.5 2 6 4.5 6 7.5c0 2 1 3.5 2.5 4.5L10 21h4l1.5-9C17 11 18 9.5 18 7.5 18 4.5 15.5 2 12 2z" />
-                            </svg>
-                        </span>
-                        <span className={s.logoText}>М&apos;ЯСТОРІЯ</span>
+                        <Image
+                            src="/images/logo-white.svg"
+                            alt="М'ясторія"
+                            width={114}
+                            height={33}
+                            className={s.logoImg}
+                            priority
+                        />
                     </a>
 
-                    {/* Desktop: catalog button */}
+                    {/* DESKTOP: Catalog button */}
                     <a href="#categories" className={s.catalogBtn}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
@@ -59,22 +58,7 @@ export default function Header() {
                         Каталог продукції
                     </a>
 
-                    {/* Desktop: search inline */}
-                    <div className={s.searchBarDesktop}>
-                        <svg className={s.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                        </svg>
-                        <input
-                            type="text"
-                            className={s.searchInput}
-                            placeholder="Я шукаю..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        <button className={s.searchBtn}>ПОШУК</button>
-                    </div>
-
-                    {/* Desktop: city selector */}
+                    {/* DESKTOP: City selector */}
                     <div className={s.citySelector}>
                         <span className={s.cityLabel}>ВАШЕ МІСТО</span>
                         <span className={s.cityValue}>
@@ -85,45 +69,45 @@ export default function Header() {
                         </span>
                     </div>
 
+                    {/* Action icons */}
                     <div className={s.actions}>
+                        {/* Cart */}
                         <button className={s.actionBtn} aria-label="Кошик">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" />
-                                <path d="M16 10a4 4 0 0 1-8 0" />
-                            </svg>
-                            <span className={s.badge}>0</span>
-                        </button>
-                        <button className={s.actionBtn} aria-label="Обране">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                            </svg>
-                            <span className={s.badge}>0</span>
-                        </button>
-                        <button className={s.actionBtn} aria-label="Профіль">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-                            </svg>
+                            <img src="/icons/icon-cart.svg" alt="Cart" width="20" height="20" />
+                            <span className={s.badge}>3</span>
                         </button>
 
-                        {/* Desktop: login link */}
+                        {/* Heart (Favorites) */}
+                        <button className={s.actionBtn} aria-label="Обране">
+                            <img src="/icons/icon-heart.svg" alt="Favorites" width="20" height="20" />
+                            <span className={s.badge}>3</span>
+                        </button>
+
+                        {/* Profile */}
+                        <button className={s.actionBtn} aria-label="Профіль">
+                            <img src="/icons/icon-profile.svg" alt="Profile" width="16" height="18" />
+                        </button>
+
+                        {/* DESKTOP: Login link */}
                         <a href="#" className={s.loginLink}>Вхід</a>
                     </div>
                 </div>
             </div>
 
-            {/* Mobile: search bar below */}
+            {/* MOBILE: Search bar below header */}
             <div className={s.searchBar}>
-                <svg className={s.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-                <input
-                    type="text"
-                    className={s.searchInput}
-                    placeholder="Я шукаю..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button className={s.searchBtn}>ПОШУК</button>
+                <div className={s.searchInputWrapper}>
+                    <svg className={s.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input
+                        type="text"
+                        className={s.searchInput}
+                        placeholder="Я шукаю..."
+                        readOnly
+                    />
+                    <button className={s.searchBtn}>ПОШУК</button>
+                </div>
             </div>
         </header>
     );

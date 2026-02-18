@@ -1,6 +1,6 @@
 .footer {
     background: var(--color-bg);
-    padding: 0 16px 24px;
+    padding: 0 20px 24px;
 }
 
 /* SEO Text */
@@ -14,6 +14,8 @@
     font-weight: 700;
     margin: 0 0 10px;
     color: var(--color-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
 }
 
 .seoText {
@@ -36,10 +38,12 @@
 /* .appSection — no mobile-specific styles needed */
 
 .appTitle {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     color: var(--color-text-secondary);
-    margin: 0 0 12px;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .appButtons {
@@ -54,7 +58,7 @@
     padding: 8px 14px;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--color-border-base);
-    border-radius: var(--radius-md);
+    border-radius: 12px;
     color: #fff;
     text-decoration: none;
     transition: background 0.2s;
@@ -83,10 +87,12 @@
 /* .socialSection — no mobile-specific styles needed */
 
 .socialTitle {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     color: var(--color-text-secondary);
-    margin: 0 0 12px;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .socialIcons {
@@ -133,7 +139,9 @@
     font-size: 14px;
     font-weight: 700;
     color: var(--color-text-primary);
-    margin: 0 0 12px;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .linksList {
@@ -190,7 +198,9 @@
     font-size: 14px;
     font-weight: 700;
     color: var(--color-text-primary);
-    margin: 0 0 12px;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .contactItem {
@@ -206,7 +216,7 @@
     margin-top: 12px;
     padding: 10px 20px;
     border: 1.5px solid var(--color-border-base);
-    border-radius: var(--radius-md);
+    border-radius: 12px;
     color: var(--color-text-primary);
     text-decoration: none;
     font-size: 12px;
@@ -226,7 +236,9 @@
     font-size: 14px;
     font-weight: 700;
     color: var(--color-text-primary);
-    margin: 0 0 12px;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .paymentIcons {
