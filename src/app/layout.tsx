@@ -101,8 +101,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="uk">
-      <body className={`${houschka.variable} ${helios.variable}`}>
+    <html lang="uk" className={`${houschka.variable} ${helios.variable}`}>
+      <body>
         <PasswordGate>{children}</PasswordGate>
       </body>
     </html>
