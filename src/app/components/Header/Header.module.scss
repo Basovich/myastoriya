@@ -31,15 +31,21 @@
     border: none;
     border-radius: 12px;
     color: #ffffff;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    padding: 10px;
     transition: opacity 0.2s;
 
     &:hover {
         opacity: 0.9;
+    }
+
+    img {
+        display: block;
+        width: 18px;
+        height: 18px;
     }
 }
 

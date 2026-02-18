@@ -3,6 +3,7 @@
 import Image from "next/image";
 import s from "./Header.module.scss";
 import siteData from "@/content/site.json";
+import Link from "next/link";
 
 export default function Header() {
     return (
@@ -34,11 +35,16 @@ export default function Header() {
                 <div className={s.mainBarInner}>
                     {/* MOBILE: Hamburger menu button */}
                     <button className={s.menuBtn} aria-label="Меню">
-                        <img src="/icons/burger-grid.svg" alt="Menu" width="24" height="24" />
+                        <Image
+                            src="/icons/burger-grid.svg"
+                            alt="Menu"
+                            width="24"
+                            height="24"
+                        />
                     </button>
 
                     {/* Logo */}
-                    <a href="/" className={s.logo}>
+                    <Link href="/" className={s.logo}>
                         <Image
                             src="/images/logo-white.svg"
                             alt="М'ясторія"
@@ -47,7 +53,7 @@ export default function Header() {
                             className={s.logoImg}
                             priority
                         />
-                    </a>
+                    </Link>
 
                     {/* DESKTOP: Catalog button */}
                     <a href="#categories" className={s.catalogBtn}>
