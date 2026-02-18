@@ -22,8 +22,8 @@ export function useToggleOpenWithAnimation() {
                 overflow: isOpen ? "visible" : "hidden", // Toggle overflow
                 onRest: () => {
                     if (isOpen) {
-                        // Keep visible when fully open
-                        api.start({ overflow: "visible" });
+                        // Keep hidden when fully open per user request
+                        api.start({ overflow: "hidden" });
                     } else {
                         // Keep hidden when closed
                         api.start({ overflow: "hidden" });
