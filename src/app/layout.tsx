@@ -1,14 +1,39 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import siteData from "@/content/site.json";
 import PasswordGate from "./components/PasswordGate/PasswordGate";
 
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin", "cyrillic"],
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800", "900"],
+const houschka = localFont({
+  src: [
+    {
+      path: "../fonts/HouschkaRounded-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../fonts/HouschkaRounded-ExtraBold.woff2",
+      weight: "800",
+      style: "normal",
+    },
+  ],
+  variable: "--font-houschka",
+});
+
+const helios = localFont({
+  src: [
+    {
+      path: "../fonts/Helios-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Helios-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-helios",
 });
 
 export const metadata: Metadata = {
@@ -77,7 +102,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uk">
-      <body className={montserrat.variable}>
+      <body className={`${houschka.variable} ${helios.variable}`}>
         <PasswordGate>{children}</PasswordGate>
       </body>
     </html>
