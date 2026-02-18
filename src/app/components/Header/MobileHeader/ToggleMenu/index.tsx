@@ -4,12 +4,13 @@ import { useState } from "react";
 import s from "./ToggleMenu.module.scss";
 import Image from "next/image";
 
-export default function ToggleMenu() {
-    const [isOpen, setIsOpen] = useState(false);
-    const toggleMenu = () => setIsOpen(!isOpen);
+interface ToggleMenuProps {
+    onClick: () => void;
+}
 
+export default function ToggleMenu({ onClick }: ToggleMenuProps) {
     return (
-        <button className={s.menuBtn} onClick={toggleMenu} aria-label="Меню">
+        <button className={s.menuBtn} onClick={onClick} aria-label="Меню">
             <Image
                 src="/icons/burger-grid.svg"
                 alt="Menu"

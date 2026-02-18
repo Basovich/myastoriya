@@ -1,0 +1,194 @@
+.mobileMenu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 100;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    /* Transformation handled by react-spring */
+}
+
+/* Ensure no conflicts with react-spring style prop */
+.catalogListWrapper {
+    background: #ffffff;
+    /* overflow: hidden; Removed per user request to ensure full content visibility, handled by JS if needed */
+    /* Height handled by react-spring */
+}
+
+.menuHeader {
+    background: #000000;
+    color: #ffffff;
+    padding: 16px 20px;
+}
+
+.topRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    padding: 4px;
+    margin-right: 16px;
+    cursor: pointer;
+}
+
+.logo {
+    margin-right: auto;
+    display: block;
+    width: 114px;
+    height: auto;
+}
+
+.langSwitch {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    gap: 8px;
+
+    a {
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: 1px solid transparent;
+        transition: all 0.2s;
+        text-decoration: none;
+        color: inherit;
+
+        &.active {
+            color: #fff;
+            border-color: #fff;
+        }
+
+        &:hover {
+            color: #fff;
+        }
+    }
+}
+
+.infoRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 14px;
+}
+
+.citySelector {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cityLabel {
+    font-size: 10px;
+    color: #999;
+}
+
+.cityValue {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.phone {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.catalogHeader {
+    background: #000000;
+    color: #ffffff;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    border-top: 1px solid #333;
+}
+
+.iconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.catalogList {
+    padding: 20px;
+}
+
+.categoryItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    text-decoration: none;
+    color: #333333;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        color: var(--color-accent);
+    }
+}
+
+.catIcon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.menuFooter {
+    background: #000000;
+    color: #ffffff;
+    padding: 24px 20px;
+    /* margin-top: auto; Removed to prevent white gap when accordion is closed */
+}
+
+.footerLinks {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.footerLink {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid #333;
+    padding-bottom: 16px;
+
+    &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    &:hover {
+        color: var(--color-accent);
+    }
+}

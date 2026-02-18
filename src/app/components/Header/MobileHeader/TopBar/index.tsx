@@ -6,12 +6,13 @@ import { type Locale } from "@/i18n/config";
 
 interface TopBarProps {
     lang: Locale;
+    onMenuClick: () => void;
 }
 
-export default function TopBar({ lang }: TopBarProps) {
+export default function TopBar({ lang, onMenuClick }: TopBarProps) {
     return (
         <div className={s.topBar}>
-            <ToggleMenu />
+            <ToggleMenu onClick={onMenuClick} />
             <Logo lang={lang} className={s.logo} />
             {/* Mobile Actions don't show login link usually, or do they? Header.tsx had loginLink hidden on mobile */}
             <Actions showLogin={false} />

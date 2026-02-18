@@ -1,0 +1,102 @@
+[
+    {
+        "label": "Літнє меню",
+        "href": "/summer-menu",
+        "icon": "summer-menu"
+    },
+    {
+        "label": "Візьми з собою",
+        "href": "/take-away",
+        "icon": "take-away"
+    },
+    {
+        "label": "Набори для компаній",
+        "href": "/company-sets",
+        "icon": "sets"
+    },
+    {
+        "label": "Гриль меню",
+        "href": "/grill-menu",
+        "icon": "grill-menu"
+    },
+    {
+        "label": "Ресторанне меню",
+        "href": "/restaurant-menu",
+        "icon": "restaurant"
+    },
+    {
+        "label": "Бургери",
+        "href": "/burgers",
+        "icon": "burgers"
+    },
+    {
+        "label": "Дитяче меню",
+        "href": "/kids-menu",
+        "icon": "kids-menu"
+    },
+    {
+        "label": "Власне виробництво",
+        "href": "/own-production",
+        "icon": "own-production"
+    },
+    {
+        "label": "М'ясна продукція",
+        "href": "/meat-products",
+        "icon": "meat-products"
+    },
+    {
+        "label": "Консервація",
+        "href": "/conservation",
+        "icon": "conservation"
+    },
+    {
+        "label": "Сири",
+        "href": "/cheese",
+        "icon": "cheese"
+    },
+    {
+        "label": "Масло",
+        "href": "/butter",
+        "icon": "butter"
+    },
+    {
+        "label": "Соуси",
+        "href": "/sauces",
+        "icon": "sauces"
+    },
+    {
+        "label": "Напої",
+        "href": "/drinks",
+        "icon": "drinks"
+    },
+    {
+        "label": "Хліб і випічка",
+        "href": "/bread",
+        "icon": "bread"
+    },
+    {
+        "label": "Морозиво Gelarty",
+        "href": "/gelarty",
+        "icon": "gelarty"
+    },
+    {
+        "label": "Солодощі",
+        "href": "/sweets",
+        "icon": "sweets"
+    },
+    {
+        "label": "Кава",
+        "href": "/coffee",
+        "icon": "coffee"
+    },
+    {
+        "label": "Мед",
+        "href": "/honey",
+        "icon": "honey"
+    },
+    {
+        "label": "Інше",
+        "href": "/other",
+        "icon": "other"
+    }
+]
