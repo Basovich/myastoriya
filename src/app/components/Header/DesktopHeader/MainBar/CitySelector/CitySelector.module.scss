@@ -1,0 +1,30 @@
+.citySelector {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    cursor: pointer;
+}
+
+.cityLabel {
+    font-size: 11px;
+    color: #999999;
+}
+
+.cityValue {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+
+    svg {
+        stroke-width: 2.5px;
+    }
+}
+
+.citySelector:hover .cityValue {
+    color: var(--color-accent);
+}

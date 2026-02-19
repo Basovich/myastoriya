@@ -56,14 +56,25 @@
 /* Desktop styles override will happen in parent */
 @media (min-width: 1280px) {
     .actionBtn {
-        background: none;
-        color: #333333;
-        width: auto;
-        height: auto;
-        padding: 4px;
+        background: transparent;
+        color: #ffffff;
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        border: 1px solid #3E3E3E;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         &:hover {
-            color: var(--color-accent);
+            border-color: #666;
+            background: #1a1a1a;
+        }
+
+        img {
+            filter: brightness(0) invert(1);
+            /* Make icons white */
         }
     }
 
@@ -76,11 +87,24 @@
     }
 
     .loginLink {
-        display: block;
-        color: #333333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #ffffff;
+        height: 48px;
+        padding: 0 16px;
+        border: 1px solid #3E3E3E;
+        border-radius: 12px;
+        background: transparent;
 
         &:hover {
-            color: var(--color-accent);
+            color: #ffffff;
+            border-color: #666;
+            background: #1a1a1a;
+        }
+
+        .loginIcon {
+            filter: brightness(0) invert(1);
         }
     }
 }

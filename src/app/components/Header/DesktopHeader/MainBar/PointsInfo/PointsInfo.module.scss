@@ -1,0 +1,28 @@
+.pointsInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.label {
+    font-size: 13px;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.valueWrapper {
+    background: #1a1a1a;
+    border: 1px solid #3E3E3E;
+    border-radius: 6px;
+    padding: 2px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+}
+
+.value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+}

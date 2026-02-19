@@ -1,12 +1,13 @@
 .secondaryNav {
     display: block;
-    background: #1a1a1a;
+    background: #111111;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .secondaryInner {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 8px 40px;
+    padding: 10px 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -14,35 +15,44 @@
 
 .navLinks {
     display: flex;
-    gap: 24px;
+    gap: 32px;
 }
 
 .navLink {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
     text-decoration: none;
     transition: color 0.2s;
 
     &:hover {
-        color: #ffffff;
+        color: var(--color-accent);
     }
 }
 
 .navRight {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 32px;
 }
 
 .navPhone {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
     text-decoration: none;
+    transition: color 0.2s;
+    opacity: 0.8;
 
     &:hover {
+        opacity: 1;
         color: #ffffff;
     }
+}
+
+.langSwitchWrapper {
+    opacity: 1;
 }

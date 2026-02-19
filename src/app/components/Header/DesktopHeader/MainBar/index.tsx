@@ -1,7 +1,8 @@
 import s from "./MainBar.module.scss";
 import Logo from "@/app/components/Header/Shared/Logo";
 import Actions from "@/app/components/Header/Shared/Actions";
-import CitySelector from "@/app/components/Header/DesktopHeader/CitySelector";
+import Search from "@/app/components/Header/DesktopHeader/MainBar/Search";
+import CitySelector from "@/app/components/Header/DesktopHeader/MainBar/CitySelector";
 import { type Locale } from "@/i18n/config";
 
 interface MainBarProps {
@@ -16,17 +17,24 @@ export default function MainBar({ lang }: MainBarProps) {
                     <Logo lang={lang} />
                 </div>
 
-                <a href="#categories" className={s.catalogBtn}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
-                        <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
+                <a href="#catalog" className={s.catalogBtn}>
+                    <div className={s.burgerIcon}>
+                        <span></span><span></span><span></span><span></span>
+                    </div>
                     Каталог продукції
                 </a>
 
-                <CitySelector />
+                <div className={s.searchWrapper}>
+                    <Search />
+                </div>
 
-                <Actions showLogin={true} />
+                <div className={s.rightSection}>
+                    <CitySelector />
+
+                    <div className={s.actionsWrapper}>
+                        <Actions showLogin={true} />
+                    </div>
+                </div>
             </div>
         </div>
     );

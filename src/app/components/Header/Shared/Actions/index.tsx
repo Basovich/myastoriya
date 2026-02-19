@@ -10,7 +10,7 @@ export default function Actions({ showLogin = false }: ActionsProps) {
         <div className={s.actions}>
             {/* Cart */}
             <button className={s.actionBtn} aria-label="Кошик">
-                <img src="/icons/icon-cart.svg" alt="Cart" width="20" height="20" />
+                <img src="/icons/icon-cart-new.svg" alt="Cart" width="20" height="20" />
                 <span className={s.badge}>3</span>
             </button>
 
@@ -22,12 +22,15 @@ export default function Actions({ showLogin = false }: ActionsProps) {
 
             {/* Profile */}
             <button className={s.actionBtn} aria-label="Профіль">
-                <img src="/icons/icon-profile.svg" alt="Profile" width="16" height="18" />
+                <img src="/icons/icon-user-badge.svg" alt="Profile" width="20" height="20" />
             </button>
 
             {/* DESKTOP: Login link */}
             {showLogin && (
-                <a href="#" className={s.loginLink}>Вхід</a>
+                <a href="#" className={s.loginLink}>
+                    Вхід
+                    <img src="/icons/icon-user-badge.svg" alt="Profile" width="20" height="20" className={s.loginIcon} />
+                </a>
             )}
         </div>
     );
