@@ -27,9 +27,9 @@ export default async function Home({
         <Hero hero={dict.home.hero} />
         <Categories categories={dict.home.categories} />
         <Products dict={dict.home.products} categories={dict.home.categories.items} />
-        <Promotions dict={dict.home.promotions} />
+        <Promotions dict={dict.home.promotions} lang={lang} />
         <AppPromo />
-        <ComplexDiscounts dict={dict.home.discounts} />
+        <ComplexDiscounts dict={dict.home.discounts} lang={lang} />
         <Publications dict={dict.home.publications} lang={lang} />
         <Reviews dict={dict.home.reviews} />
         <SeoText dict={dict.home.seo} />

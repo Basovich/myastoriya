@@ -1,0 +1,189 @@
+.section {
+    padding: 32px 16px;
+    background-color: #F6F6F6;
+    /* Optional, depending on theme. Figma looked white/grey */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.breadcrumbs {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    a {
+        text-decoration: none;
+        color: #222;
+
+        &:hover {
+            color: #E30613;
+        }
+    }
+
+    .separator {
+        color: #999;
+    }
+
+    .current {
+        color: #999;
+    }
+}
+
+.bannerWrapper {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.tabsWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid #E5E5E5;
+    background-color: transparent;
+    color: #222;
+    min-width: 200px;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: #222;
+    }
+}
+
+.activeTab {
+    background-color: #111;
+    color: #FFF;
+    border-color: #111;
+    cursor: default;
+
+    &:hover {
+        border-color: #111;
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.cardLink {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+.card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #FFF;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.cardImage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+}
+
+.cardImg {
+    object-fit: cover;
+}
+
+.discountBadge {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: #E30613;
+    color: #FFF;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    z-index: 2;
+}
+
+.cardBody {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    /* allow spreading if heights differ */
+}
+
+.date {
+    font-size: 13px;
+    color: #E30613;
+    font-weight: 500;
+}
+
+.cardTitle {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #222;
+    margin: 0;
+}
+
+.loadMoreWrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+
+    button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+/* ===== Responsive ===== */
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+}

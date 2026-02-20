@@ -7,6 +7,7 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Image from "next/image";
+import Link from "next/link";
 
 interface DiscountItem {
     id: number;
@@ -20,10 +21,11 @@ interface ComplexDiscountsProps {
     dict: {
         sectionTitle: string;
         items: DiscountItem[];
-    }
+    };
+    lang: string;
 }
 
-export default function ComplexDiscounts({ dict }: ComplexDiscountsProps) {
+export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) {
     if (!dict || !dict.items || dict.items.length === 0) return null;
 
     return (
@@ -66,15 +68,22 @@ export default function ComplexDiscounts({ dict }: ComplexDiscountsProps) {
                         }}
                         className={s.swiper}
                     >
-                        {dict.items.map((item, idx) => (
-                            <SwiperSlide key={`${item.id}-${idx}`} className={s.card}>
-                                <div className={s.cardImage}>
-                                    <Image src={item.image} alt={item.title} fill className={s.cardImg} />
-                                </div>
-                                <div className={s.cardBody}>
-                                    <span className={s.date}>{item.dateRange}</span>
-                                    <h4 className={s.cardTitle}>{item.title}</h4>
-                                </div>
+                        {dict.items.map((discount: DiscountItem) => (
+                            <SwiperSlide key={discount.id} className={s.slide}>
+                                <Link href={`/${lang}/promotions/${discount.id}`} className={s.cardLink}>
+                                    <div className={s.card}>
+                                        <div className={s.imageWrapper}>
+                                            <Image src={discount.image} alt={discount.title} fill style={{ objectFit: "cover" }} />
+                                        </div>
+                                        <div className={s.content}>
+                                            <h3 className={s.title}>{discount.title}</h3>
+                                            <div className={s.bottomRow}>
+                                                <span className={s.dateRange}>{discount.dateRange}</span>
+                                                {discount.discount && <span className={s.discount}>{discount.discount}</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Link>
                             </SwiperSlide>
                         ))}
                     </Swiper>

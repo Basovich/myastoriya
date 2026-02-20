@@ -3,9 +3,10 @@
 import s from "./Promotions.module.scss";
 import SectionHeader from "../ui/SectionHeader/SectionHeader";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
+import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import Link from "next/link";
 import Image from "next/image";
 
 interface PromotionItem {
@@ -20,10 +21,11 @@ interface PromotionsProps {
     dict: {
         sectionTitle: string;
         items: PromotionItem[];
-    }
+    };
+    lang: string;
 }
 
-export default function Promotions({ dict }: PromotionsProps) {
+export default function Promotions({ dict, lang }: PromotionsProps) {
     if (!dict || !dict.items || dict.items.length === 0) return null;
 
     return (
@@ -65,15 +67,24 @@ export default function Promotions({ dict }: PromotionsProps) {
                     }}
                     className={s.swiper}
                 >
-                    {dict.items.map((promo, idx) => (
-                        <SwiperSlide key={`${promo.id}-${idx}`} className={s.card}>
-                            <div className={s.cardImage}>
-                                <Image src={promo.image} alt={promo.title} fill className={s.cardImg} />
-                            </div>
-                            <div className={s.cardMeta}>
-                                <span className={s.date}>Акція діє до: <strong>{promo.date}</strong></span>
-                            </div>
-                            <p className={s.cardTitle}>{promo.title}</p>
+                    {dict.items.map((item, idx) => (
+                        <SwiperSlide key={`${item.id}-${idx}`} className={s.slide}>
+                            <Link href={`/${lang}/promotions/${item.id}`} className={s.cardLink}>
+                                <div className={s.card}>
+                                    <div className={s.cardImage}>
+                                        <Image src={item.image} alt={item.title} fill className={s.cardImg} />
+                                        {item.discount && (
+                                            <div className={s.discountBadge}>
+                                                -{item.discount}%
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className={s.cardBody}>
+                                        <span className={s.date}>Акція діє до: {item.date}</span>
+                                        <h4 className={s.cardTitle}>{item.title}</h4>
+                                    </div>
+                                </div>
+                            </Link>
                         </SwiperSlide>
                     ))}
                 </Swiper>
