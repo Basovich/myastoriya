@@ -112,8 +112,8 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
                                     <Image src={item.image} alt={item.title} fill className={s.cardImg} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                                 </div>
                                 <div className={s.cardBody}>
-                                    <h3 className={s.cardTitle}>{item.title}</h3>
                                     <span className={s.date}>{item.dateRange}</span>
+                                    <h3 className={s.cardTitle}>{item.title}</h3>
                                 </div>
                             </div>
                         </Link>
@@ -125,12 +125,43 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
                         <Button variant="outline-black" onClick={loadMore}>
                             {dict.showBtn}
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
-                                <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" stroke-width="2" stroke-linecap="round" />
-                                <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" stroke-width="2" stroke-linecap="round" />
+                                <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" strokeWidth="2" strokeLinecap="round" />
+                                <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" strokeWidth="2" strokeLinecap="round" />
                             </svg>
                         </Button>
                     </div>
                 )}
+
+                <div className={s.paginationRow}>
+                    <div className={s.pageNumbers}>
+                        <button className={`${s.pageNum} ${s.activePage}`}>01</button>
+                        <button className={s.pageNum}>02</button>
+                        <button className={s.pageNum}>03</button>
+                        <span className={s.pageDots}>...</span>
+                        <button className={s.pageNum}>10</button>
+                    </div>
+                </div>
+
+                <div className={s.subscribeBanner}>
+                    <div className={s.subscribeBg1}>
+                        <Image src="/images/blog/subscribe-bg1.png" alt="Bg1" fill style={{ objectFit: 'cover' }} />
+                    </div>
+                    <div className={s.subscribeBg2}>
+                        <Image src="/images/blog/subscribe-bg2.png" alt="Bg2" fill style={{ objectFit: 'cover' }} />
+                    </div>
+                    <div className={s.subscribeContent}>
+                        <div className={s.subscribeTextCol}>
+                            <h2 className={s.subscribeTitle}>Підпишіться на нашу розсилку</h2>
+                            <span className={s.subscribeArrows}>»</span>
+                        </div>
+                        <div className={s.subscribeFormCol}>
+                            <div className={s.inputWrapper}>
+                                <input type="email" placeholder="E-mail" className={s.subscribeInput} />
+                                <button className={s.subscribeSubmitBtn}>Підписатись</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     );
