@@ -47,65 +47,87 @@
         "tabs": [
             "Новинки",
             "Популярні страви",
-            "Рекомендуємо"
+            "Рекомендуємо",
+            "Ресторанне меню",
+            "Гриль меню",
+            "Для компанії",
+            "Фірмові напівфабрикати"
         ],
         "items": [
             {
                 "id": 1,
-                "title": "М'ясні палички з сиром",
+                "title": "М`ясні палички з сиром",
                 "weight": "330г / 340г / 200г",
                 "price": 2500,
                 "unit": "упаковка",
                 "badge": "АКЦІЯ",
-                "image": "/images/product-sticks-cheese.jpg"
+                "image": "/images/products/product-sticks-cheese.png"
             },
             {
                 "id": 2,
-                "title": "М'ясні палички в соусі Теріякі",
+                "title": "М`ясні палички в соусі Теріякі",
                 "weight": "330г / 340г / 200г",
                 "price": 2500,
                 "unit": "упаковка",
                 "badge": "NEW",
-                "image": "/images/product-teriyaki.jpg"
+                "image": "/images/products/product-teriyaki.png"
             },
             {
                 "id": 3,
+                "title": "Тартар з відбірної яловичини",
+                "weight": "330г",
+                "price": 2500,
+                "unit": "упаковка",
+                "badge": null,
+                "image": "/images/products/product-tartar.png"
+            },
+            {
+                "id": 4,
+                "title": "Карпачо з відбірної яловичини",
+                "weight": "330г",
+                "price": 2500,
+                "unit": "упаковка",
+                "badge": null,
+                "image": "/images/products/product-carpaccio.png"
+            },
+            {
+                "id": 5,
                 "title": "Мітболи в соусі BBQ",
                 "weight": "330г / 340г / 200г",
                 "price": 2500,
                 "unit": "упаковка",
-                "badge": "АКЦІЯ",
-                "image": "/images/product-meatballs.jpg"
-            },
-            {
-                "id": 4,
-                "title": "Шашлик із баранини в пряному маринаді",
-                "weight": "330г / 340г / 200г",
-                "price": 2500,
-                "unit": "упаковка",
                 "badge": null,
-                "image": "/images/product-shashlik.jpg"
-            },
-            {
-                "id": 5,
-                "title": "Стейк Рібай мармуровий",
-                "weight": "330г / 340г / 200г",
-                "price": 2500,
-                "unit": "упаковка",
-                "badge": "NEW",
-                "image": "/images/product-ribeye.jpg"
+                "image": "/images/products/product-meatballs.png"
             },
             {
                 "id": 6,
-                "title": "Ковбаски мисливські копчені",
+                "title": "Шашлык из баранины в пряном маринаде",
                 "weight": "330г / 340г / 200г",
                 "price": 2500,
                 "unit": "упаковка",
                 "badge": null,
-                "image": "/images/product-sausages.jpg"
+                "image": "/images/products/product-shashlik.png"
+            },
+            {
+                "id": 7,
+                "title": "Томлена курка в соусі азійському",
+                "weight": "330г",
+                "price": 2500,
+                "unit": "упаковка",
+                "badge": null,
+                "image": "/images/products/product-tomlena-az.png"
+            },
+            {
+                "id": 8,
+                "title": "Томлена курка в соусі карі",
+                "weight": "330г",
+                "price": 2500,
+                "unit": "упаковка",
+                "badge": null,
+                "image": "/images/products/product-tomlena-curry.png"
             }
         ],
-        "showMoreButton": "ПОКАЗАТИ ЩЕ"
+        "showMoreButton": "ПОКАЗАТЬ ЕЩЕ"
     },
     "promotions": {
         "sectionTitle": "АКЦІЇ",

@@ -1,5 +1,35 @@
+.wrapper {
+    background-color: #F5F5F5;
+    position: relative;
+    overflow: hidden;
+    padding: 32px 0;
+}
+
+/* Background watermark anchored right */
+.bgLogo {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: auto;
+    height: 120%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    /* Approx opacity if the image itself isn't fully opaque/tinted */
+}
+
 .section {
     padding: 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.tabsWrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin-bottom: 24px;
 }
 
 .tabs {
@@ -8,11 +38,30 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    margin-bottom: 16px;
-    padding-bottom: 4px;
+    flex: 1;
 
     &::-webkit-scrollbar {
         display: none;
+    }
+}
+
+.tabArrow {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: #FFF;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    svg {
+        stroke: #E30613;
+        /* Red arrow */
     }
 }
 
@@ -25,29 +74,51 @@
 .showMore {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 24px;
+
+    button {
+        background-color: transparent;
+        color: #000;
+        border: 1px solid #000;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 600;
+        font-size: 14px;
+    }
 }
 
 /* ===== Desktop ===== */
 @media (min-width: 1024px) {
+    .wrapper {
+        padding: 64px 0;
+    }
+
     .section {
         padding: 24px 40px;
         max-width: 1280px;
         margin: 0 auto;
     }
 
+    .tabsWrapper {
+        margin-bottom: 40px;
+    }
+
     .tabs {
         gap: 10px;
-        overflow-x: visible;
-        flex-wrap: wrap;
+        flex: 0 1 auto;
+    }
+
+    .tabArrow {
+        display: flex;
+        /* Show right arrow on desktop if scroll needed, or keep it always visible based on design */
     }
 
     .grid {
         grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
+        gap: 24px;
     }
 
     .showMore {
-        margin-top: 32px;
+        margin-top: 40px;
     }
 }
