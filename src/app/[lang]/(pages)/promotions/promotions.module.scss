@@ -216,16 +216,10 @@
 @media (min-width: 1024px) {
     .hero {
         margin: 0 auto;
-        max-width: 1280px;
         padding: 0 40px;
         margin: 0 auto;
         min-height: 160px;
         border-radius: var(--radius-lg);
-        margin-left: auto;
-        margin-right: auto;
-        margin-top: 0;
-        margin-bottom: 0;
-        /* Full-width hero within container */
         width: calc(100% - 80px);
         max-width: 1200px;
     }
