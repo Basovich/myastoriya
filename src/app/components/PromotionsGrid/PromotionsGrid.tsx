@@ -56,6 +56,14 @@ export default function PromotionsGrid({ dict, initialItems, lang }: PromotionsG
             <div className={s.container}>
                 <div className={s.bannerWrapper}>
                     <Image src="/images/promotions/promotions-banner.png" alt={dict.title} fill priority style={{ objectFit: 'cover' }} className={s.bannerImg} />
+                    <div className={s.bannerContent}>
+                        <h1 className={s.bannerTitle}>{dict.title}</h1>
+                        <div className={s.bannerDots}>
+                            <span className={s.dot}></span>
+                            <span className={s.dot}></span>
+                            <span className={s.dot}></span>
+                        </div>
+                    </div>
                 </div>
 
                 <div className={s.breadcrumbs}>
