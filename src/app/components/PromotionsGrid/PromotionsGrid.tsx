@@ -20,7 +20,8 @@ interface PromotionsGridProps {
         title: string;
         breadcrumbs: {
             home: string;
-            promotions: string;
+            promotions?: string;
+            complexDiscounts?: string;
         };
         tabs: {
             promotions: string;
@@ -30,23 +31,35 @@ interface PromotionsGridProps {
     };
     initialItems: PromotionItem[];
     lang: string;
+    pageType: 'promotions' | 'complex-discounts';
 }
 
-export default function PromotionsGrid({ dict, initialItems, lang }: PromotionsGridProps) {
-    const [items, setItems] = useState<PromotionItem[]>(initialItems);
+export default function PromotionsGrid({ dict, initialItems, lang, pageType }: PromotionsGridProps) {
+    // Generate 12 mock initial items regardless of what was passed in
+    const twelveInitialItems = Array.from({ length: 12 }).map((_, i) => {
+        const baseItem = initialItems[i % initialItems.length];
+        return { ...baseItem, id: baseItem.id + i * 1000 };
+    });
+
+    const [items, setItems] = useState<PromotionItem[]>(twelveInitialItems);
     const [hasMore, setHasMore] = useState(true);
 
+    // Helper to conditionally drop '/ua'
+    const getRoute = (path: string) => {
+        const basePath = lang === 'ua' ? '' : `/${lang}`;
+        const safePath = path === '/' ? '' : path.startsWith('/') ? path : `/${path}`;
+        return `${basePath}${safePath}` || '/';
+    };
+
     const loadMore = () => {
-        // Mock loading 12 more items by duplicating the current initial list a few times
-        const moreItems = [
-            ...initialItems.map((item) => ({ ...item, id: item.id + 100 })),
-            ...initialItems.map((item) => ({ ...item, id: item.id + 200 }))
-        ];
+        // Load exactly 12 more mock items
+        const moreItems = Array.from({ length: 12 }).map((_, i) => {
+            const baseItem = initialItems[i % initialItems.length];
+            // Use different IDs
+            return { ...baseItem, id: baseItem.id + (i + 12) * 1000 };
+        });
 
-        // Take exactly 12 items to append
-        const newItemsToAppend = moreItems.slice(0, 12);
-
-        setItems((prev) => [...prev, ...newItemsToAppend]);
+        setItems((prev) => [...prev, ...moreItems]);
         // Hide button after loading mock items
         setHasMore(false);
     };
@@ -55,7 +68,7 @@ export default function PromotionsGrid({ dict, initialItems, lang }: PromotionsG
         <section className={s.section}>
             <div className={s.container}>
                 <div className={s.bannerWrapper}>
-                    <Image src="/images/promotions/promotions-banner.png" alt={dict.title} fill priority style={{ objectFit: 'cover' }} className={s.bannerImg} />
+                    <Image src={`/images/promotions/${pageType}-banner.png`} alt={dict.title} fill priority style={{ objectFit: 'cover' }} className={s.bannerImg} />
                     <div className={s.bannerContent}>
                         <h1 className={s.bannerTitle}>{dict.title}</h1>
                         <div className={s.bannerDots}>
@@ -67,27 +80,36 @@ export default function PromotionsGrid({ dict, initialItems, lang }: PromotionsG
                 </div>
 
                 <div className={s.breadcrumbs}>
-                    <Link href={`/${lang}`}>{dict.breadcrumbs.home}</Link>
+                    <Link href={getRoute('/')}>{dict.breadcrumbs.home}</Link>
                     <span className={s.separator}>»</span>
-                    <span className={s.current}>{dict.breadcrumbs.promotions}</span>
+                    <span className={s.current}>{pageType === 'promotions' ? dict.breadcrumbs.promotions : dict.breadcrumbs.complexDiscounts}</span>
                 </div>
 
                 <div className={s.tabsWrapper}>
-                    <div className={`${s.tab} ${s.activeTab}`}>{dict.tabs.promotions}</div>
-                    <Link href={`/${lang}/complex-discounts`} className={s.tab}>{dict.tabs.complexDiscounts}</Link>
+                    {pageType === 'promotions' ? (
+                        <>
+                            <div className={`${s.tab} ${s.activeTab}`}>{dict.tabs.promotions}</div>
+                            <Link href={getRoute('/complex-discounts')} className={s.tab}>{dict.tabs.complexDiscounts}</Link>
+                        </>
+                    ) : (
+                        <>
+                            <Link href={getRoute('/promotions')} className={s.tab}>{dict.tabs.promotions}</Link>
+                            <div className={`${s.tab} ${s.activeTab}`}>{dict.tabs.complexDiscounts}</div>
+                        </>
+                    )}
                 </div>
 
                 <div className={s.grid}>
                     {items.map((item, idx) => (
-                        <Link key={`${item.id}-${idx}`} href={`/${lang}/promotions/${item.id}`} className={s.cardLink}>
+                        <Link key={`${item.id}-${idx}`} href={getRoute(`/${pageType}/${item.id}`)} className={s.cardLink}>
                             <div className={s.card}>
                                 <div className={s.cardImage}>
                                     <Image src={item.image} alt={item.title} fill className={s.cardImg} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
-                                    {item.discount && (
-                                        <div className={s.discountBadge}>
-                                            -{item.discount}%
-                                        </div>
-                                    )}
+                                    {/*{item.discount && (*/}
+                                    {/*    <div className={s.discountBadge}>*/}
+                                    {/*        -{item.discount}%*/}
+                                    {/*    </div>*/}
+                                    {/*)}*/}
                                 </div>
                                 <div className={s.cardBody}>
                                     <span className={s.date}>Акція діє до: {item.date}</span>
@@ -102,8 +124,9 @@ export default function PromotionsGrid({ dict, initialItems, lang }: PromotionsG
                     <div className={s.loadMoreWrapper}>
                         <Button variant="outline-black" onClick={loadMore}>
                             {dict.showBtn}
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="m6 9 6 6 6-6" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                         </Button>
                     </div>

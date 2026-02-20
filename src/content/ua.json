@@ -395,6 +395,18 @@
                 "complexDiscounts": "КОМПЛЕКСНІ ЗНИЖКИ"
             },
             "showBtn": "ПОКАЗАТИ ЩЕ"
+        },
+        "complexDiscountsPage": {
+            "title": "КОМПЛЕКСНІ ЗНИЖКИ",
+            "breadcrumbs": {
+                "home": "Головна",
+                "complexDiscounts": "Комплексні знижки"
+            },
+            "tabs": {
+                "promotions": "АКЦІЇ",
+                "complexDiscounts": "КОМПЛЕКСНІ ЗНИЖКИ"
+            },
+            "showBtn": "ПОКАЗАТИ ЩЕ"
         }
     }
 }

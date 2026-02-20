@@ -28,6 +28,12 @@ interface PromotionsProps {
 export default function Promotions({ dict, lang }: PromotionsProps) {
     if (!dict || !dict.items || dict.items.length === 0) return null;
 
+    const getRoute = (path: string) => {
+        const basePath = lang === 'ua' ? '' : `/${lang}`;
+        const safePath = path.startsWith('/') ? path : `/${path}`;
+        return `${basePath}${safePath}`;
+    };
+
     return (
         <section className={s.section} id="promotions">
             <div className={s.promotionsHeader}>
@@ -69,7 +75,7 @@ export default function Promotions({ dict, lang }: PromotionsProps) {
                 >
                     {dict.items.map((item, idx) => (
                         <SwiperSlide key={`${item.id}-${idx}`} className={s.slide}>
-                            <Link href={`/${lang}/promotions/${item.id}`} className={s.cardLink}>
+                            <Link href={getRoute(`/promotions/${item.id}`)} className={s.cardLink}>
                                 <div className={s.card}>
                                     <div className={s.cardImage}>
                                         <Image src={item.image} alt={item.title} fill className={s.cardImg} />

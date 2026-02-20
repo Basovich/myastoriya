@@ -3,8 +3,8 @@ import PromotionsGrid from "../../components/PromotionsGrid/PromotionsGrid";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 
-// This is the index page for Promotions: /[lang]/promotions
-export default async function PromotionsPage({
+// This is the index page for Complex Discounts: /[lang]/complex-discounts
+export default async function ComplexDiscountsPage({
     params,
 }: {
     params: Promise<{ lang: "ua" | "ru" }>;
@@ -17,10 +17,10 @@ export default async function PromotionsPage({
             <Header lang={lang} />
             <main>
                 <PromotionsGrid
-                    dict={dict.home.promotionsPage}
-                    initialItems={dict.home.promotions.items}
+                    dict={dict.home.complexDiscountsPage}
+                    initialItems={dict.home.discounts.items}
                     lang={lang}
-                    pageType="promotions"
+                    pageType="complex-discounts"
                 />
             </main>
             <Footer lang={lang} />

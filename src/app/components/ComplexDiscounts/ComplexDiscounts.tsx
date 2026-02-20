@@ -28,6 +28,12 @@ interface ComplexDiscountsProps {
 export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) {
     if (!dict || !dict.items || dict.items.length === 0) return null;
 
+    const getRoute = (path: string) => {
+        const basePath = lang === 'ua' ? '' : `/${lang}`;
+        const safePath = path.startsWith('/') ? path : `/${path}`;
+        return `${basePath}${safePath}`;
+    };
+
     return (
         <section className={s.section} id="combo">
             <div className={s.container}>
@@ -70,7 +76,7 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                     >
                         {dict.items.map((discount: DiscountItem) => (
                             <SwiperSlide key={discount.id} className={s.slide}>
-                                <Link href={`/${lang}/promotions/${discount.id}`} className={s.cardLink}>
+                                <Link href={getRoute(`/complex-discounts/${discount.id}`)} className={s.cardLink}>
                                     <div className={s.card}>
                                         <div className={s.imageWrapper}>
                                             <Image src={discount.image} alt={discount.title} fill style={{ objectFit: "cover" }} />

@@ -395,6 +395,18 @@
                 "complexDiscounts": "КОМПЛЕКСНЫЕ СКИДКИ"
             },
             "showBtn": "ПОКАЗАТЬ ЕЩЕ"
+        },
+        "complexDiscountsPage": {
+            "title": "КОМПЛЕКСНЫЕ СКИДКИ",
+            "breadcrumbs": {
+                "home": "Главная",
+                "complexDiscounts": "Комплексные скидки"
+            },
+            "tabs": {
+                "promotions": "АКЦИИ",
+                "complexDiscounts": "КОМПЛЕКСНЫЕ СКИДКИ"
+            },
+            "showBtn": "ПОКАЗАТЬ ЕЩЕ"
         }
     }
 }
