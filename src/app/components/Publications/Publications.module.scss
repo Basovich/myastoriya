@@ -1,5 +1,6 @@
 .section {
     padding: 24px 16px;
+    background-color: #F6F6F6;
 }
 
 .carousel {
@@ -31,8 +32,10 @@
 }
 
 .imageWrap {
+    position: relative;
     aspect-ratio: 16/10;
     overflow: hidden;
+    width: 100%;
 }
 
 .cardImg {
@@ -77,22 +80,29 @@
 @media (min-width: 1024px) {
     .section {
         padding: 48px 40px;
-        max-width: 1280px;
-        margin: 0 auto;
+        max-width: 100%;
     }
 
     .carousel {
+        max-width: 1280px;
+        margin: 0 auto;
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
         overflow-x: visible;
     }
 
-    .card {
-        min-width: auto;
+    .headerWrap {
+        max-width: 1280px;
+        margin: 0 auto;
     }
 
     .allBtn {
-        margin-top: 32px;
+        max-width: 1280px;
+        margin: 32px auto 0;
+    }
+
+    .card {
+        min-width: auto;
     }
 }

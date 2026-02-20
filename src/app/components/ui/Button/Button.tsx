@@ -1,6 +1,6 @@
 import s from "./Button.module.scss";
 
-type ButtonVariant = "primary" | "outline" | "icon" | "pill";
+type ButtonVariant = "primary" | "outline"  | "outline-black" | "icon" | "pill";
 
 interface ButtonProps {
     variant?: ButtonVariant;

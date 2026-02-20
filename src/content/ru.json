@@ -305,19 +305,19 @@
                 {
                     "id": 1,
                     "title": "Бургеры, которые микроволнуют – революционная новинка от «Мястория»",
-                    "image": "/images/publications/pub-1.png",
+                    "image": "/images/products/product-meatballs.png",
                     "dateRange": "С 15 сентября по 12 октября"
                 },
                 {
                     "id": 2,
                     "title": "Бургеры, которые микроволнуют – революционная новинка от «Мястория»",
-                    "image": "/images/publications/pub-2.png",
+                    "image": "/images/products/product-shashlik.png",
                     "dateRange": "С 15 сентября по 12 октября"
                 },
                 {
                     "id": 3,
                     "title": "Бургеры, которые микроволнуют – революционная новинка от «Мястория»",
-                    "image": "/images/publications/pub-3.png",
+                    "image": "/images/products/product-tartar.png",
                     "dateRange": "С 15 сентября по 12 октября"
                 }
             ]
