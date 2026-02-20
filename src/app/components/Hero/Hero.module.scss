@@ -105,35 +105,6 @@
     text-transform: uppercase;
 }
 
-.ctaBtn {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--color-accent);
-    color: white;
-    padding: 14px 28px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-    width: fit-content;
-
-    &:hover {
-        transform: translateX(4px);
-        box-shadow: 0 8px 24px rgba(227, 6, 19, 0.4);
-    }
-
-    svg {
-        transition: transform 0.3s ease;
-    }
-
-    &:hover svg {
-        transform: translateX(2px);
-    }
-}
-
 .navArrow {
     position: absolute;
     top: 50%;
