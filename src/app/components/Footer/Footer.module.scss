@@ -1,40 +1,21 @@
 .footer {
-    background: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    background-color: #141414;
     padding: 40px;
 
     @media (min-width: 1280px) {
-        .footer {
-            padding: 80px calc((100% - 1200px) / 2) 125px;
-        }
+        flex-direction: row;
+        display: grid;
+        grid-template-columns: 3.5fr 6.5fr;
+        gap: 60px;
+        padding: 80px calc((100% - 1200px) / 2) 125px;
     }
 
     @media (min-width: 1360px) {
-        .footer {
-            padding: 80px calc((100% - 1300px) / 2) 125px;
-        }
+        padding: 80px calc((100% - 1300px) / 2) 125px;
     }
-}
-
-/* SEO Text */
-.seoSection {
-    padding: 24px 0;
-    border-top: 1px solid var(--color-border-base);
-}
-
-.seoTitle {
-    font-size: 16px;
-    font-weight: 700;
-    margin: 0 0 10px;
-    color: var(--color-text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-}
-
-.seoText {
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--color-text-secondary);
-    margin: 0;
 }
 
 /* ===== Global Elements ===== */
@@ -191,10 +172,10 @@
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.03em;
-    transition: border-color 0.2s;
+    transition: background-color 0.2s;
 
     &:hover {
-        border-color: var(--color-accent);
+        background-color: rgba(255, 255, 255, 0.1);
     }
 }
 
@@ -210,14 +191,6 @@
 }
 
 /* ===== Two Column Layout Structure (Mobile is Flex Col) ===== */
-.footerContent {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    padding: 24px 0;
-    border-top: 1px solid var(--color-border-base);
-}
-
 .leftColumn {
     display: flex;
     flex-direction: column;
@@ -270,15 +243,6 @@
 /* ===== Desktop ===== */
 @media (min-width: 1024px) {
     .seoSection {
-        padding: 40px 0;
-    }
-
-    .footerContent {
-        flex-direction: row;
-        display: grid;
-        grid-template-columns: 3.5fr 6.5fr;
-        /* Based on Figma sizing roughly 450px left, right side spanning rest */
-        gap: 60px;
         padding: 40px 0;
     }
 
