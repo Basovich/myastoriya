@@ -72,13 +72,14 @@
     letter-spacing: 0.05em;
 
     &:hover {
+        background-color: var(--color-text-primary);
         border-color: var(--color-text-primary);
-        color: var(--color-text-primary);
+        color: #fff;
     }
 
     &.active {
-        background: var(--color-accent);
-        border-color: var(--color-accent);
+        background-color: var(--color-text-primary);
+        border-color: var(--color-text-primary);
         color: #fff;
     }
 }

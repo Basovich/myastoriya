@@ -56,13 +56,20 @@
     border: none;
     cursor: pointer;
     flex-shrink: 0;
-    margin-left: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 
     svg {
         stroke: #E30613;
         /* Red arrow */
     }
+}
+
+.tabArrowRight {
+    margin-left: 12px;
+}
+
+.tabArrowLeft {
+    margin-right: 12px;
 }
 
 .grid {

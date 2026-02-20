@@ -119,6 +119,83 @@
                     "image": "/images/cat-shashlik.png"
                 }
             ]
+        },
+        "products": {
+            "showMoreButton": "ПОКАЗАТЬ ЕЩЕ",
+            "items": [
+                {
+                    "id": 1,
+                    "title": "Мясные палочки с сыром",
+                    "weight": "330г / 340г / 200г",
+                    "price": 2500,
+                    "unit": "упаковка",
+                    "badge": "АКЦИЯ",
+                    "image": "/images/products/product-sticks-cheese.png"
+                },
+                {
+                    "id": 2,
+                    "title": "Мясные палочки в соусе Терияки",
+                    "weight": "330г / 340г / 200г",
+                    "price": 2500,
+                    "unit": "упаковка",
+                    "badge": "NEW",
+                    "image": "/images/products/product-teriyaki.png"
+                },
+                {
+                    "id": 3,
+                    "title": "Тартар из отборной говядины",
+                    "weight": "330г",
+                    "price": 2500,
+                    "unit": "упаковка",
+                    "badge": null,
+                    "image": "/images/products/product-tartar.png"
+                },
+                {
+                    "id": 4,
+                    "title": "Карпаччо из отборной говядины",
+                    "weight": "330г",
+                    "price": 2500,
+                    "unit": "упаковка",
+                    "badge": null,
+                    "image": "/images/products/product-carpaccio.png"
+                },
+                {
+                    "id": 5,
+                    "title": "Митболы в соусе BBQ",
+                    "weight": "330г / 340г / 200г",
+                    "price": 2500,
+                    "unit": "упаковка",
+                    "badge": null,
+                    "image": "/images/products/product-meatballs.png"
+                },
+                {
+                    "id": 6,
+                    "title": "Шашлык из баранины в пряном маринаде",
+                    "weight": "330г / 340г / 200г",
+                    "price": 2500,
+                    "unit": "упаковка",
+                    "badge": null,
+                    "image": "/images/products/product-shashlik.png"
+                },
+                {
+                    "id": 7,
+                    "title": "Томленая курица в азиатском соусе",
+                    "weight": "330г",
+                    "price": 2500,
+                    "unit": "упаковка",
+                    "badge": null,
+                    "image": "/images/products/product-tomlena-az.png"
+                },
+                {
+                    "id": 8,
+                    "title": "Томленая курица в соусе карри",
+                    "weight": "330г",
+                    "price": 2500,
+                    "unit": "упаковка",
+                    "badge": null,
+                    "image": "/images/products/product-tomlena-curry.png"
+                }
+            ]
         }
     }
 }
