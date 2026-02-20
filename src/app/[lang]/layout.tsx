@@ -111,7 +111,7 @@ export default async function RootLayout({
 }>) {
   const { lang } = await params;
   return (
-    <html lang={lang} className={`${houschka.variable} ${helios.variable}`}>
+    <html lang={lang} className={`${houschka.variable} ${helios.variable}`} suppressHydrationWarning>
       <body>
         <ReduxProvider>
           <PasswordGate>{children}</PasswordGate>

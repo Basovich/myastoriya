@@ -1,5 +1,9 @@
 .sectionHeader {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
 }
 
 .title {
@@ -8,9 +12,29 @@
     color: var(--color-text-primary);
     text-transform: uppercase;
     letter-spacing: 0.02em;
+    text-align: center;
+}
+
+.dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--color-accent);
 }
 
 @media (min-width: 1024px) {
+    .sectionHeader {
+        margin-bottom: 40px;
+        gap: 16px;
+    }
+
     .title {
         font-size: 28px;
     }

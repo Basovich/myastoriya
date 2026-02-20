@@ -34,6 +34,91 @@
                     "image": "/images/hero_slide_1.png"
                 }
             ]
+        },
+        "categories": {
+            "sectionTitle": "КАТЕГОРИИ",
+            "items": [
+                {
+                    "title": "Летнее меню",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Возьми с собой",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Наборы для компаний",
+                    "image": "/images/cat-sets.png"
+                },
+                {
+                    "title": "Гриль меню",
+                    "image": "/images/cat-grill.png"
+                },
+                {
+                    "title": "Ресторанное меню",
+                    "image": "/images/cat-restaurant.png"
+                },
+                {
+                    "title": "Бургеры",
+                    "image": "/images/cat-burgers.png"
+                },
+                {
+                    "title": "Детское меню",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Собственное производство",
+                    "image": "/images/cat-branded.png"
+                },
+                {
+                    "title": "Мясная продукция",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Консервация",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Сыры",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Масло",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Соусы",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Напитки",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Хлеб и выпечка",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Мороженое Gelarty",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Сладости",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Кофе",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Мёд",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Шашлык",
+                    "image": "/images/cat-shashlik.png"
+                }
+            ]
         }
     }
 }

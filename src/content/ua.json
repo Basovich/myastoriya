@@ -34,6 +34,91 @@
                     "image": "/images/hero_slide_1.png"
                 }
             ]
+        },
+        "categories": {
+            "sectionTitle": "КАТЕГОРІЇ",
+            "items": [
+                {
+                    "title": "Літнє меню",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Візьми з собою",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Набори для компанії",
+                    "image": "/images/cat-sets.png"
+                },
+                {
+                    "title": "Гриль-меню",
+                    "image": "/images/cat-grill.png"
+                },
+                {
+                    "title": "Ресторанне меню",
+                    "image": "/images/cat-restaurant.png"
+                },
+                {
+                    "title": "Бургери",
+                    "image": "/images/cat-burgers.png"
+                },
+                {
+                    "title": "Дитяче меню",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Власне виробництво",
+                    "image": "/images/cat-branded.png"
+                },
+                {
+                    "title": "М'ясна продукція",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Консервація",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Сири",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Масло",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Соуси",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Напої",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Хліб та випічка",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Морозиво Gelarty",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Солодощі",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Кава",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Мед",
+                    "image": "/images/cat-placeholder.png"
+                },
+                {
+                    "title": "Шашлик",
+                    "image": "/images/cat-shashlik.png"
+                }
+            ]
         }
     }
 }

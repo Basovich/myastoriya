@@ -23,7 +23,7 @@ export default async function Home({
       <Header lang={lang} />
       <main>
         <Hero hero={dict.home.hero} />
-        <Categories />
+        <Categories categories={dict.home.categories} />
         <Products />
         <Promotions />
         <AppPromo />
