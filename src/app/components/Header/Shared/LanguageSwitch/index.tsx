@@ -14,31 +14,36 @@ export default function LanguageSwitch({ lang }: LanguageSwitchProps) {
 
     const getSwitchUrl = (targetLang: 'ua' | 'ru') => {
         if (!pathname) return '/';
-        const segments = pathname.split('/');
+        const segments = pathname.split('/').filter(Boolean);
 
-        if (segments[1] === 'ua' || segments[1] === 'ru') {
-            segments[1] = targetLang;
-        } else {
-            segments.splice(1, 0, targetLang);
+        let newSegments = [...segments];
+
+        // Process if current first segment is a known locale
+        if (segments[0] === 'ua' || segments[0] === 'ru') {
+            newSegments.shift();
         }
 
-        return segments.join('/');
+        // Add target locale if it's not the default
+        if (targetLang !== 'ua') {
+            newSegments.unshift(targetLang);
+        }
+
+        return '/' + newSegments.join('/');
     };
 
     return (
         <div className={s.langSwitch}>
-            <Link
-                href={getSwitchUrl('ua')}
-                className={`${s.langOption} ${lang === 'ua' ? s.active : ''}`}
-            >
-                UKR
-            </Link>
-            <Link
-                href={getSwitchUrl('ru')}
-                className={`${s.langOption} ${lang === 'ru' ? s.active : ''}`}
-            >
-                RUS
-            </Link>
+            {lang === 'ua' ? (
+                <span className={`${s.langOption} ${s.active}`}>UKR</span>
+            ) : (
+                <Link href={getSwitchUrl('ua')} className={s.langOption}>UKR</Link>
+            )}
+
+            {lang === 'ru' ? (
+                <span className={`${s.langOption} ${s.active}`}>RUS</span>
+            ) : (
+                <Link href={getSwitchUrl('ru')} className={s.langOption}>RUS</Link>
+            )}
         </div>
     );
 }
