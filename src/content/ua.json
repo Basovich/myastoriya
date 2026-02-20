@@ -243,6 +243,60 @@
                     "discount": null
                 }
             ]
+        },
+        "discounts": {
+            "sectionTitle": "КОМПЛЕКСНІ ЗНИЖКИ",
+            "items": [
+                {
+                    "id": 1,
+                    "title": "Стейк-бургер з Рібаєм + Бургер з камамбером та журавлинним кулі",
+                    "image": "/images/products/product-sticks-cheese.png",
+                    "dateRange": "З 15 вересня по 12 жовтня",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 2,
+                    "title": "Стейк-бургер з Рібаєм + Бургер з камамбером та журавлинним кулі",
+                    "image": "/images/products/product-teriyaki.png",
+                    "dateRange": "З 15 вересня по 12 жовтня",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 3,
+                    "title": "Стейк-бургер з Рібаєм + Бургер з камамбером та журавлинним кулі",
+                    "image": "/images/products/product-tartar.png",
+                    "dateRange": "З 15 вересня по 12 жовтня",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 4,
+                    "title": "Мітболи в соусі BBQ + Печена картопля",
+                    "image": "/images/products/product-meatballs.png",
+                    "dateRange": "З 15 вересня по 12 жовтня",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 5,
+                    "title": "Карпачо з відбірної яловичини + Салат",
+                    "image": "/images/products/product-carpaccio.png",
+                    "dateRange": "З 15 вересня по 12 жовтня",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 6,
+                    "title": "Шашлык із баранини в пряному маринаді + Овочі гриль",
+                    "image": "/images/products/product-shashlik.png",
+                    "dateRange": "З 15 вересня по 12 жовтня",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 7,
+                    "title": "Стейк-бургер з Рібаєм + Бургер з камамбером та журавлинним кулі",
+                    "image": "/images/products/product-sticks-cheese.png",
+                    "dateRange": "З 15 вересня по 12 жовтня",
+                    "discount": "-15%"
+                }
+            ]
         }
     }
 }

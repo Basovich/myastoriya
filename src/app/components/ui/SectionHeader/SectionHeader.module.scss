@@ -2,8 +2,31 @@
     margin-bottom: 32px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 12px;
+
+    &.center {
+        align-items: center;
+
+        .title {
+            text-align: center;
+        }
+
+        .dots {
+            justify-content: center;
+        }
+    }
+
+    &.left {
+        align-items: flex-start;
+
+        .title {
+            text-align: left;
+        }
+
+        .dots {
+            justify-content: flex-start;
+        }
+    }
 }
 
 .title {
@@ -12,14 +35,12 @@
     color: var(--color-text-primary);
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    text-align: center;
 }
 
 .dots {
     display: flex;
     gap: 8px;
     align-items: center;
-    justify-content: center;
 }
 
 .dot {

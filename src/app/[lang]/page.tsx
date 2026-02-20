@@ -6,6 +6,7 @@ import Categories from "../components/Categories/Categories";
 import Products from "../components/Products/Products";
 import Promotions from "../components/Promotions/Promotions";
 import AppPromo from "../components/AppPromo/AppPromo";
+import ComplexDiscounts from "../components/ComplexDiscounts/ComplexDiscounts";
 import Reviews from "../components/Reviews/Reviews";
 import Publications from "../components/Publications/Publications";
 import Footer from "../components/Footer/Footer";
@@ -27,6 +28,7 @@ export default async function Home({
         <Products dict={dict.home.products} categories={dict.home.categories.items} />
         <Promotions dict={dict.home.promotions} />
         <AppPromo />
+        <ComplexDiscounts dict={dict.home.discounts} />
         <Reviews />
         <Publications />
       </main>

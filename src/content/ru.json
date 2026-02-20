@@ -243,6 +243,60 @@
                     "discount": null
                 }
             ]
+        },
+        "discounts": {
+            "sectionTitle": "КОМПЛЕКСНЫЕ СКИДКИ",
+            "items": [
+                {
+                    "id": 1,
+                    "title": "Стейк-бургер с Рибаем + Бургер с камамбером и клюквенным кули",
+                    "image": "/images/products/product-sticks-cheese.png",
+                    "dateRange": "С 15 сентября по 12 октября",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 2,
+                    "title": "Стейк-бургер с Рибаем + Бургер с камамбером и клюквенным кули",
+                    "image": "/images/products/product-teriyaki.png",
+                    "dateRange": "С 15 сентября по 12 октября",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 3,
+                    "title": "Стейк-бургер с Рибаем + Бургер с камамбером и клюквенным кули",
+                    "image": "/images/products/product-tartar.png",
+                    "dateRange": "С 15 сентября по 12 октября",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 4,
+                    "title": "Митболы в соусе BBQ + Печеный картофель",
+                    "image": "/images/products/product-meatballs.png",
+                    "dateRange": "С 15 сентября по 12 октября",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 5,
+                    "title": "Карпаччо из отборной говядины + Салат",
+                    "image": "/images/products/product-carpaccio.png",
+                    "dateRange": "С 15 сентября по 12 октября",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 6,
+                    "title": "Шашлык из баранины в пряном маринаде + Овощи гриль",
+                    "image": "/images/products/product-shashlik.png",
+                    "dateRange": "С 15 сентября по 12 октября",
+                    "discount": "-15%"
+                },
+                {
+                    "id": 7,
+                    "title": "Стейк-бургер с Рибаем + Бургер с камамбером и клюквенным кули",
+                    "image": "/images/products/product-sticks-cheese.png",
+                    "dateRange": "С 15 сентября по 12 октября",
+                    "discount": "-15%"
+                }
+            ]
         }
     }
 }
