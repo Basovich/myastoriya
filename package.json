@@ -11,12 +11,15 @@
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.8.1",
     "@react-spring/web": "^10.0.3",
+    "@reduxjs/toolkit": "^2.11.2",
     "negotiator": "^1.0.0",
     "next": "16.1.6",
     "postcss": "^8.5.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-redux": "^9.2.0",
     "react-spring": "^10.0.3",
+    "redux-persist": "^6.0.0",
     "sass": "^1.97.3",
     "sass-embedded": "^1.97.3"
   },

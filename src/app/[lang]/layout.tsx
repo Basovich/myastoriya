@@ -100,6 +100,8 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }));
 }
 
+import ReduxProvider from "@/store/ReduxProvider";
+
 export default async function RootLayout({
   children,
   params,
@@ -111,7 +113,9 @@ export default async function RootLayout({
   return (
     <html lang={lang} className={`${houschka.variable} ${helios.variable}`}>
       <body>
-        <PasswordGate>{children}</PasswordGate>
+        <ReduxProvider>
+          <PasswordGate>{children}</PasswordGate>
+        </ReduxProvider>
       </body>
     </html>
   );
