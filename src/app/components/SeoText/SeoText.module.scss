@@ -1,0 +1,82 @@
+.section {
+    padding: 32px 16px 48px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+}
+
+.textContainer {
+    margin-bottom: 24px;
+
+    /* Default state: 3 lines truncated */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.expanded {
+        display: block;
+        -webkit-line-clamp: unset;
+        overflow: visible;
+    }
+}
+
+.text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #444;
+    margin: 0;
+}
+
+.toggleBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid #777;
+    border-radius: 8px;
+    padding: 10px 20px;
+    color: #222;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: #222;
+        background-color: #f7f7f7;
+    }
+
+    .btnText {
+        letter-spacing: 0.05em;
+    }
+}
+
+/* ===== Desktop ===== */
+@media (min-width: 1024px) {
+    .section {
+        padding: 64px 40px 80px;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    .title {
+        font-size: 24px;
+        margin-bottom: 24px;
+    }
+
+    .textContainer {
+        margin-bottom: 32px;
+    }
+
+    .text {
+        font-size: 16px;
+    }
+}

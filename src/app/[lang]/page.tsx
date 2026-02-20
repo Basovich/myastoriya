@@ -9,6 +9,7 @@ import AppPromo from "../components/AppPromo/AppPromo";
 import ComplexDiscounts from "../components/ComplexDiscounts/ComplexDiscounts";
 import Reviews from "../components/Reviews/Reviews";
 import Publications from "../components/Publications/Publications";
+import SeoText from "../components/SeoText/SeoText";
 import Footer from "../components/Footer/Footer";
 
 export default async function Home({
@@ -31,6 +32,7 @@ export default async function Home({
         <ComplexDiscounts dict={dict.home.discounts} />
         <Publications dict={dict.home.publications} lang={lang} />
         <Reviews dict={dict.home.reviews} />
+        <SeoText dict={dict.home.seo} />
       </main>
       <Footer lang={lang} />
     </>
