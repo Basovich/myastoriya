@@ -407,6 +407,20 @@
                 "complexDiscounts": "КОМПЛЕКСНІ ЗНИЖКИ"
             },
             "showBtn": "ПОКАЗАТИ ЩЕ"
+        },
+        "blogPage": {
+            "title": "Блог",
+            "breadcrumbs": {
+                "home": "Головна",
+                "blog": "Блог"
+            },
+            "tabs": {
+                "all": "Всі публікації",
+                "news": "Новини",
+                "recipes": "Рецепти",
+                "events": "Події"
+            },
+            "showBtn": "ПОКАЗАТИ ЩЕ"
         }
     }
 }

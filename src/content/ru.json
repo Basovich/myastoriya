@@ -407,6 +407,20 @@
                 "complexDiscounts": "КОМПЛЕКСНЫЕ СКИДКИ"
             },
             "showBtn": "ПОКАЗАТЬ ЕЩЕ"
+        },
+        "blogPage": {
+            "title": "Блог",
+            "breadcrumbs": {
+                "home": "Главная",
+                "blog": "Блог"
+            },
+            "tabs": {
+                "all": "Все публикации",
+                "news": "Новости",
+                "recipes": "Рецепты",
+                "events": "События"
+            },
+            "showBtn": "ПОКАЗАТЬ ЕЩЕ"
         }
     }
 }

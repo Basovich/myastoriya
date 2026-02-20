@@ -1,0 +1,176 @@
+.section {
+    padding: 32px 16px 80px;
+    background-color: #F6F6F6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.pageTitle {
+    font-size: 40px;
+    font-weight: 800;
+    color: #222;
+    text-transform: uppercase;
+    margin: 0 0 16px 0;
+    line-height: 1.1;
+}
+
+.breadcrumbs {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 32px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    a {
+        text-decoration: none;
+        color: #222;
+
+        &:hover {
+            color: #E30613;
+        }
+    }
+
+    .separator {
+        color: #999;
+    }
+
+    .current {
+        color: #999;
+    }
+}
+
+.tabsWrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #E5E5E5;
+    background-color: #FFF;
+    color: #222;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: #222;
+    }
+}
+
+.activeTab {
+    background-color: #E30613;
+    color: #FFF;
+    border-color: #E30613;
+    cursor: default;
+
+    &:hover {
+        border-color: #E30613;
+    }
+}
+
+/* 
+ * Re-using Publications card style layout 
+ * for consistency with the design requirements.
+ */
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+}
+
+.cardLink {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+}
+
+.card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #FFF;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.cardImage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+}
+
+.cardImg {
+    object-fit: cover;
+}
+
+.cardBody {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+}
+
+.cardTitle {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #222;
+    margin: 0;
+}
+
+.date {
+    font-size: 13px;
+    color: #F8B133;
+    /* Distinct amber color used in Publications */
+    font-weight: 500;
+    margin-top: auto;
+}
+
+.loadMoreWrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+
+    button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+/* ===== Responsive ===== */
+@media (min-width: 640px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+    }
+}
