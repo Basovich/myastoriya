@@ -4,6 +4,7 @@ import Actions from "@/app/components/Header/Shared/Actions";
 import Search from "@/app/components/Header/DesktopHeader/MainBar/Search";
 import CitySelector from "@/app/components/Header/DesktopHeader/MainBar/CitySelector";
 import { type Locale } from "@/i18n/config";
+import Image from "next/image";
 
 interface MainBarProps {
     lang: Locale;
@@ -18,9 +19,7 @@ export default function MainBar({ lang }: MainBarProps) {
                 </div>
 
                 <a href="#catalog" className={s.catalogBtn}>
-                    <div className={s.burgerIcon}>
-                        <span></span><span></span><span></span><span></span>
-                    </div>
+                    <Image src="/icons/icon-category.svg" alt="Categories" width="18" height="18" />
                     Каталог продукції
                 </a>
 
