@@ -1,5 +1,7 @@
 import s from "./ProductCard.module.scss";
 import Image from "next/image";
+import Badge from "../Badge/Badge";
+import Icon from "../Icon/Icon";
 
 interface ProductCardProps {
     title: string;
@@ -21,22 +23,23 @@ export default function ProductCard({
     return (
         <div className={s.card}>
             <div className={s.imageWrap}>
-                <Image 
-                    src={image} 
-                    alt={title} 
-                    className={s.productImg} 
+                <Image
+                    src={image}
+                    alt={title}
+                    className={s.productImg}
                     width={200}
                     height={200}
                 />
                 {badge && (
-                    <span className={`${s.badge} ${badge === "NEW" ? s.badgeNew : s.badgeSale}`}>
+                    <Badge
+                        variant={badge === "NEW" ? "new" : "sale"}
+                        className={s.badge}
+                    >
                         {badge}
-                    </span>
+                    </Badge>
                 )}
                 <button className={s.favorite} aria-label="Додати до обраного">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                    </svg>
+                    <Icon name="favorite" width={18} height={18} />
                 </button>
                 <span className={s.weight}>{weight}</span>
             </div>
@@ -48,9 +51,7 @@ export default function ProductCard({
                         <span className={s.unit}>{unit}</span>
                     </div>
                     <button className={s.addBtn} aria-label="Додати до кошика">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
+                        <Icon name="plus" width={18} height={18} strokeWidth={2.5} />
                     </button>
                 </div>
             </div>

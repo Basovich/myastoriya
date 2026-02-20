@@ -2,11 +2,15 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import Button from "../ui/Button/Button";
 import s from "./PromotionsGrid.module.scss";
+import Button from "../ui/Button/Button";
+import Container from "../ui/Container/Container";
+import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
+import Tabs from "../ui/Tabs/Tabs";
+import Icon from "../ui/Icon/Icon";
+import AppLink from "../ui/AppLink/AppLink";
+import { Locale } from "@/i18n/config";
 
-// Reusing interfaces structurally
 interface PromotionItem {
     id: number;
     title: string;
@@ -36,7 +40,6 @@ interface PromotionsGridProps {
 }
 
 export default function PromotionsGrid({ dict, initialItems, lang, pageType }: PromotionsGridProps) {
-    // Generate 12 mock initial items regardless of what was passed in
     const twelveInitialItems = Array.from({ length: 12 }).map((_, i) => {
         const baseItem = initialItems[i % initialItems.length];
         return { ...baseItem, id: baseItem.id + i * 1000 };
@@ -45,31 +48,48 @@ export default function PromotionsGrid({ dict, initialItems, lang, pageType }: P
     const [items, setItems] = useState<PromotionItem[]>(twelveInitialItems);
     const [hasMore, setHasMore] = useState(true);
 
-    // Helper to conditionally drop '/ua'
-    const getRoute = (path: string) => {
-        const basePath = lang === 'ua' ? '' : `/${lang}`;
-        const safePath = path === '/' ? '' : path.startsWith('/') ? path : `/${path}`;
-        return `${basePath}${safePath}` || '/';
-    };
-
     const loadMore = () => {
-        // Load exactly 12 more mock items
         const moreItems = Array.from({ length: 12 }).map((_, i) => {
             const baseItem = initialItems[i % initialItems.length];
-            // Use different IDs
             return { ...baseItem, id: baseItem.id + (i + 12) * 1000 };
         });
 
         setItems((prev) => [...prev, ...moreItems]);
-        // Hide button after loading mock items
         setHasMore(false);
     };
 
+    const breadcrumbItems = [
+        { label: dict.breadcrumbs.home, href: '/' },
+        { label: pageType === 'promotions' ? dict.breadcrumbs.promotions! : dict.breadcrumbs.complexDiscounts! }
+    ];
+
+    const tabItems = [
+        {
+            id: 'promotions',
+            label: dict.tabs.promotions,
+            href: '/promotions',
+            active: pageType === 'promotions'
+        },
+        {
+            id: 'complex-discounts',
+            label: dict.tabs.complexDiscounts,
+            href: '/complex-discounts',
+            active: pageType === 'complex-discounts'
+        }
+    ];
+
     return (
         <section className={s.section}>
-            <div className={s.container}>
+            <Container>
                 <div className={s.bannerWrapper}>
-                    <Image src={`/images/promotions/${pageType}-banner.png`} alt={dict.title} fill priority style={{ objectFit: 'cover' }} className={s.bannerImg} />
+                    <Image
+                        src={`/images/promotions/${pageType}-banner.png`}
+                        alt={dict.title}
+                        fill
+                        priority
+                        style={{ objectFit: 'cover' }}
+                        className={s.bannerImg}
+                    />
                     <div className={s.bannerContent}>
                         <h1 className={s.bannerTitle}>{dict.title}</h1>
                         <div className={s.bannerDots}>
@@ -80,29 +100,13 @@ export default function PromotionsGrid({ dict, initialItems, lang, pageType }: P
                     </div>
                 </div>
 
-                <div className={s.breadcrumbs}>
-                    <Link href={getRoute('/')}>{dict.breadcrumbs.home}</Link>
-                    <span className={s.separator}>»</span>
-                    <span className={s.current}>{pageType === 'promotions' ? dict.breadcrumbs.promotions : dict.breadcrumbs.complexDiscounts}</span>
-                </div>
+                <Breadcrumbs items={breadcrumbItems} />
 
-                <div className={s.tabsWrapper}>
-                    {pageType === 'promotions' ? (
-                        <>
-                            <div className={`${s.tab} ${s.activeTab}`}>{dict.tabs.promotions}</div>
-                            <Link href={getRoute('/complex-discounts')} className={s.tab}>{dict.tabs.complexDiscounts}</Link>
-                        </>
-                    ) : (
-                        <>
-                            <Link href={getRoute('/promotions')} className={s.tab}>{dict.tabs.promotions}</Link>
-                            <div className={`${s.tab} ${s.activeTab}`}>{dict.tabs.complexDiscounts}</div>
-                        </>
-                    )}
-                </div>
+                <Tabs tabs={tabItems} className={s.tabs} />
 
                 <div className={s.grid}>
                     {items.map((item, idx) => (
-                        <Link key={`${item.id}-${idx}`} href={getRoute(`/${pageType}/${item.id}`)} className={s.cardLink}>
+                        <AppLink key={`${item.id}-${idx}`} href={`/${pageType}/${item.id}`} className={s.cardLink}>
                             <div className={s.card}>
                                 <div className={s.cardImage}>
                                     <Image src={item.image} alt={item.title} fill className={s.cardImg} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
@@ -120,7 +124,7 @@ export default function PromotionsGrid({ dict, initialItems, lang, pageType }: P
                                     <h4 className={s.cardTitle}>{item.title}</h4>
                                 </div>
                             </div>
-                        </Link>
+                        </AppLink>
                     ))}
                 </div>
 
@@ -128,14 +132,11 @@ export default function PromotionsGrid({ dict, initialItems, lang, pageType }: P
                     <div className={s.loadMoreWrapper}>
                         <Button variant="outline-black" onClick={loadMore}>
                             {dict.showBtn}
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
-                                <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" stroke-width="2" stroke-linecap="round" />
-                                <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" stroke-width="2" stroke-linecap="round" />
-                            </svg>
+                            <Icon name="arrow-right" width={18} height={15} className={s.btnIcon} />
                         </Button>
                     </div>
                 )}
-            </div>
+            </Container>
         </section>
     );
 }

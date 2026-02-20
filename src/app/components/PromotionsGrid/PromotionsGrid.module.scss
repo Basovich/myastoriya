@@ -4,35 +4,9 @@
     /* Optional, depending on theme. Figma looked white/grey */
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.breadcrumbs {
-    font-size: 14px;
-    color: #666;
+/* UI Shared Components handled container and breadcrumbs */
+.tabs {
     margin-bottom: 24px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-
-    a {
-        text-decoration: none;
-        color: #222;
-
-        &:hover {
-            color: #E30613;
-        }
-    }
-
-    .separator {
-        color: #999;
-    }
-
-    .current {
-        color: #999;
-    }
 }
 
 .bannerWrapper {
@@ -81,46 +55,7 @@
     /* Brand red color */
 }
 
-.tabsWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 32px;
-}
-
-.tab {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-decoration: none;
-    cursor: pointer;
-    border: 1px solid #E5E5E5;
-    background-color: transparent;
-    color: #222;
-    min-width: 200px;
-    transition: all 0.2s;
-
-    &:hover {
-        border-color: #222;
-    }
-}
-
-.activeTab {
-    background-color: #111;
-    color: #FFF;
-    border-color: #111;
-    cursor: default;
-
-    &:hover {
-        border-color: #111;
-    }
-}
+/* UI Shared Components handled tabs */
 
 .grid {
     display: grid;

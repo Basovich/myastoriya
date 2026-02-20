@@ -37,7 +37,7 @@ export default function Promotions({ dict, lang }: PromotionsProps) {
     return (
         <section className={s.section} id="promotions">
             <div className={s.promotionsHeader}>
-                <SectionHeader title={dict.sectionTitle} />
+                <SectionHeader title={dict.sectionTitle} align="left" />
                 <div className={s.navArrows}>
                     <button className={`promo-prev ${s.arrowBtn}`} aria-label="Previous promotion">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: "rotate(180deg)" }}>

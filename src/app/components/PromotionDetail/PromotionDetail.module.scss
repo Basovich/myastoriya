@@ -5,38 +5,7 @@
     min-height: 80vh;
 }
 
-.container {
-    max-width: 1330px;
-    margin: 0 auto;
-    padding: 0 16px;
-}
-
-.breadcrumbs {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 24px;
-    font-size: 14px;
-    font-weight: 500;
-
-    .link {
-        color: #222;
-        text-decoration: none;
-        transition: color 0.2s;
-
-        &:hover {
-            color: #E6000F;
-        }
-    }
-
-    .separator {
-        color: #999;
-    }
-
-    .current {
-        color: #999;
-    }
-}
+/* Standardized container and breadcrumbs handled by UI components */
 
 .bannerWrapper {
     position: relative;

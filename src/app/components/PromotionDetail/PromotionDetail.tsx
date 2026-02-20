@@ -1,10 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import s from './PromotionDetail.module.scss';
 import ProductCard from '../ui/ProductCard/ProductCard';
-import { getLocalizedHref } from '@/utils/i18n-helpers';
-import { Locale } from '@/i18n/config';
+import Container from '../ui/Container/Container';
+import Breadcrumbs from '../ui/Breadcrumbs/Breadcrumbs';
 
 interface PromotionDetailProps {
     dict: any;
@@ -13,16 +12,16 @@ interface PromotionDetailProps {
 }
 
 export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps) {
+    const breadcrumbItems = [
+        { label: dict.home.promotionsPage.breadcrumbs.home, href: '/' },
+        { label: dict.home.promotionsPage.breadcrumbs.promotions, href: '/promotions' },
+        { label: 'Steak Days щовівторка!' }
+    ];
+
     return (
         <section className={s.section}>
-            <div className={s.container}>
-                <div className={s.breadcrumbs}>
-                    <Link href={getLocalizedHref('/', lang as Locale)} className={s.link}>{dict.home.promotionsPage.breadcrumbs.home}</Link>
-                    <span className={s.separator}>»</span>
-                    <Link href={getLocalizedHref('/promotions', lang as Locale)} className={s.link}>{dict.home.promotionsPage.breadcrumbs.promotions}</Link>
-                    <span className={s.separator}>»</span>
-                    <span className={s.current}>Steak Days щовівторка!</span>
-                </div>
+            <Container>
+                <Breadcrumbs items={breadcrumbItems} />
 
                 <div className={s.bannerWrapper}>
                     <Image
@@ -93,7 +92,7 @@ export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps
                         ))}
                     </div>
                 </div>
-            </div>
+            </Container>
         </section>
     );
 }
