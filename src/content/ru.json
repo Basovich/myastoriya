@@ -5,21 +5,33 @@
     },
     "home": {
         "hero": {
-            "badge": "Акция, действует прямо сейчас!",
-            "title": "НОВЫЕ БЛЮДА ОТ МЯСТОРИЯ",
-            "ctaButton": {
-                "text": "УЗНАТЬ БОЛЬШЕ",
-                "href": "#products"
-            },
             "slides": [
                 {
-                    "image": "/images/hero-steak.jpg"
+                    "badge": "Акция, действует прямо сейчас!",
+                    "title": "НОВЫЕ БЛЮДА ОТ МЯСТОРИЯ",
+                    "ctaButton": {
+                        "text": "УЗНАТЬ БОЛЬШЕ",
+                        "href": "#products"
+                    },
+                    "image": "/images/hero_slide_1.png"
                 },
                 {
-                    "image": "/images/hero-burger.jpg"
+                    "badge": "Новинка",
+                    "title": "ВКУСНЫЕ БУРГЕРЫ УЖЕ В МЕНЮ",
+                    "ctaButton": {
+                        "text": "ЗАКАЗАТЬ СЕЙЧАС",
+                        "href": "#products"
+                    },
+                    "image": "/images/hero_slide_1.png"
                 },
                 {
-                    "image": "/images/hero-grill.jpg"
+                    "badge": "Рекомендуем",
+                    "title": "ИДЕАЛЬНЫЙ СТЕЙК ДЛЯ УЖИНА",
+                    "ctaButton": {
+                        "text": "ВЫБРАТЬ СТЕЙК",
+                        "href": "#products"
+                    },
+                    "image": "/images/hero_slide_1.png"
                 }
             ]
         }

@@ -5,21 +5,33 @@
     },
     "home": {
         "hero": {
-            "badge": "Акція, діє прямо зараз!",
-            "title": "НОВІ СТРАВИ ВІД М'ЯСТОРІЯ",
-            "ctaButton": {
-                "text": "ДІЗНАТИСЬ БІЛЬШЕ",
-                "href": "#products"
-            },
             "slides": [
                 {
-                    "image": "/images/hero-steak.jpg"
+                    "badge": "Акція, діє прямо зараз!",
+                    "title": "НОВІ СТРАВИ ВІД М'ЯСТОРІЯ",
+                    "ctaButton": {
+                        "text": "ДІЗНАТИСЬ БІЛЬШЕ",
+                        "href": "#products"
+                    },
+                    "image": "/images/hero_slide_1.png"
                 },
                 {
-                    "image": "/images/hero-burger.jpg"
+                    "badge": "Новинка",
+                    "title": "СМАЧНІ БУРГЕРИ ВЖЕ В МЕНЮ",
+                    "ctaButton": {
+                        "text": "ЗАМОВИТИ ЗАРАЗ",
+                        "href": "#products"
+                    },
+                    "image": "/images/hero_slide_1.png"
                 },
                 {
-                    "image": "/images/hero-grill.jpg"
+                    "badge": "Рекомендуємо",
+                    "title": "ІДЕАЛЬНИЙ СТЕЙК ДЛЯ ВЕЧЕРІ",
+                    "ctaButton": {
+                        "text": "ОБРАТИ СТЕЙК",
+                        "href": "#products"
+                    },
+                    "image": "/images/hero_slide_1.png"
                 }
             ]
         }
