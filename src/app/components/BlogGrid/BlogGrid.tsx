@@ -74,7 +74,17 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
     return (
         <section className={s.section}>
             <div className={s.container}>
-                <h1 className={s.pageTitle}>{dict.title}</h1>
+                <div className={s.bannerWrapper}>
+                    <Image src={`/images/promotions/blog-banner.png`} alt={dict.title} fill priority style={{ objectFit: 'cover' }} className={s.bannerImg} />
+                    <div className={s.bannerContent}>
+                        <h1 className={s.bannerTitle}>{dict.title}</h1>
+                        <div className={s.bannerDots}>
+                            <span className={s.dot}></span>
+                            <span className={s.dot}></span>
+                            <span className={s.dot}></span>
+                        </div>
+                    </div>
+                </div>
 
                 <div className={s.breadcrumbs}>
                     <Link href={getRoute('/')}>{dict.breadcrumbs.home}</Link>
