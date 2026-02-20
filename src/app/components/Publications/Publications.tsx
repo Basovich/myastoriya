@@ -1,17 +1,17 @@
 import s from "./Publications.module.scss";
-import homeData from "@/content/pages/home.json";
 import SectionHeader from "../ui/SectionHeader/SectionHeader";
 import Button from "../ui/Button/Button";
+import Link from "next/link";
+import { Locale } from "@/i18n/config";
 
-export default function Publications() {
-    const { publications } = homeData;
+export default function Publications({ dict, lang }: { dict: any, lang: Locale }) {
 
     return (
         <section className={s.section} id="publications">
-            <SectionHeader title={publications.sectionTitle} />
+            <SectionHeader title={dict.sectionTitle} align="left" />
             <div className={s.carousel}>
-                {publications.items.map((pub) => (
-                    <a href="#" key={pub.id} className={s.card}>
+                {dict.items.map((pub: any) => (
+                    <Link href={`/${lang}/blog/${pub.id}`} key={pub.id} className={s.card}>
                         <div className={s.imageWrap}>
                             <img src={pub.image} alt={pub.title} className={s.cardImg} />
                         </div>
@@ -19,13 +19,15 @@ export default function Publications() {
                             <span className={s.date}>{pub.dateRange}</span>
                             <h3 className={s.title}>{pub.title}</h3>
                         </div>
-                    </a>
+                    </Link>
                 ))}
             </div>
             <div className={s.allBtn}>
-                <Button variant="outline">
-                    ВСІ ПУБЛІКАЦІЇ →
-                </Button>
+                <Link href={`/${lang}/blog`}>
+                    <Button variant="outline">
+                        {dict.showAllButton}
+                    </Button>
+                </Link>
             </div>
         </section>
     );
