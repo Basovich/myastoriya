@@ -21,7 +21,8 @@
     "react-spring": "^10.0.3",
     "redux-persist": "^6.0.0",
     "sass": "^1.97.3",
-    "sass-embedded": "^1.97.3"
+    "sass-embedded": "^1.97.3",
+    "swiper": "^12.1.2"
   },
   "devDependencies": {
     "@types/negotiator": "^0.6.4",

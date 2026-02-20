@@ -1,6 +1,5 @@
 import s from "./Footer.module.scss";
 import siteData from "@/content/site.json";
-import homeData from "@/content/pages/home.json";
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "@/app/components/Header/Shared/Logo";

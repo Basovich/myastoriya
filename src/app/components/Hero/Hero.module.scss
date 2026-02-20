@@ -6,9 +6,16 @@
     border-radius: 20px;
 }
 
+.swiperContainer {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
 .slide {
     position: relative;
     min-height: 200px;
+    height: 100%;
     display: flex;
     align-items: flex-end;
 }
@@ -27,11 +34,21 @@
     background: linear-gradient(to bottom, transparent 0%, transparent 50%, rgba(0, 0, 0, 0.8) 100%);
 }
 
+.contentOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: flex-end;
+    pointer-events: none;
+}
+
 .content {
     position: relative;
     z-index: 1;
     padding: 24px;
     width: 100%;
+    pointer-events: auto;
 }
 
 .badge {
@@ -68,6 +85,7 @@
 .dots {
     display: flex;
     gap: 8px;
+    pointer-events: auto;
 }
 
 .dotActive {
@@ -75,6 +93,7 @@
     height: 6px;
     border-radius: 50%;
     background: var(--color-accent);
+    cursor: pointer;
 }
 
 .dot {
@@ -82,34 +101,66 @@
     height: 6px;
     border-radius: 50%;
     background: #DADADA;
+    cursor: pointer;
+    opacity: 1;
 }
 
 /* ===== Desktop ===== */
 @media (min-width: 1024px) {
     .hero {
-        margin: 0 40px;
-        max-width: 1200px;
-        margin-left: auto;
-        margin-right: auto;
-        border-radius: var(--radius-xl);
+        margin: 0;
+        max-width: 100%;
+        border-radius: 0;
     }
 
     .slide {
         min-height: 420px;
     }
 
+    .overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%),
+            linear-gradient(to top, rgba(0, 0, 0, 0.4) 0%, transparent 30%);
+        /* Subtle bottom gradient for arrows/dots */
+    }
+
+    .contentOverlay {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        /* Center vertically for Desktop */
+        justify-content: flex-start;
+        pointer-events: none;
+    }
+
     .content {
-        padding: 48px;
+        padding: 0 40px;
+        /* Aligns with header padding */
+        width: 100%;
+        pointer-events: auto;
     }
 
     .badge {
-        font-size: 13px;
+        font-family: var(--font-helios);
+        font-size: 14px;
+        font-weight: 400;
+        margin-bottom: 24px;
+        opacity: 0.8;
     }
 
     .title {
-        font-size: 42px;
-        margin-bottom: 24px;
-        max-width: 500px;
+        font-family: var(--font-houschka);
+        font-size: 62px;
+        font-weight: 800;
+        margin-bottom: 32px;
+        max-width: 650px;
+        line-height: 1.15;
     }
 
     .ctaBtn {
@@ -118,14 +169,16 @@
         gap: 8px;
         background: transparent;
         color: #fff;
-        border: 1.5px solid #fff;
-        padding: 12px 28px;
-        border-radius: var(--radius-md);
-        font-size: 13px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 16px 32px;
+        border-radius: 4px;
+        /* Using sharp/slight radius like in design */
+        font-size: 14px;
         font-weight: 700;
         letter-spacing: 0.05em;
         text-decoration: none;
-        margin-bottom: 24px;
+        margin-bottom: 0;
+        /* Reset bottom margin, dots handle spacing */
         transition: all 0.2s;
         cursor: pointer;
 
@@ -142,36 +195,59 @@
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        z-index: 2;
+        z-index: 11;
         width: 44px;
         height: 44px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.15);
-        border: none;
+        background: transparent;
+        /* No inner fill in Figma */
+        border: 1px solid rgba(255, 255, 255, 0.4);
         color: #fff;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: all 0.2s;
+        pointer-events: auto;
 
         &:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #fff;
         }
     }
 
     .navLeft {
-        left: 16px;
+        left: 40px;
+        /* Aligned roughly with container edge or inside window edge */
     }
 
     .navRight {
-        right: 16px;
+        right: 40px;
     }
 
-    .dots {
-        gap: 8px;
+    /* Native Swiper Pagination Styling */
+    :global(.swiper-pagination) {
+        position: absolute;
+        bottom: 40px !important;
+        /* Offset from bottom */
+        left: 50% !important;
+        transform: translateX(-50%);
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        z-index: 11;
+        pointer-events: auto;
     }
 
-    .dotActive,
-    .dot {
-        width: 10px;
-        height: 10px;
+    :global(.swiper-pagination-bullet) {
+        width: 8px !important;
+        height: 8px !important;
+        background: #fff !important;
+        opacity: 1 !important;
+        margin: 0 !important;
+        border-radius: 50% !important;
+        cursor: pointer;
+    }
+
+    :global(.swiper-pagination-bullet-active) {
+        background: #E30613 !important;
+        /* Exact red from Figma */
     }
 }
