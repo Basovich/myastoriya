@@ -63,7 +63,7 @@
 /* Nav Arrows */
 .navArrow {
     position: absolute;
-    top: calc(50% - 10px);
+    top: calc(50% - 32px);
     /* Adjust based on new height */
     transform: translateY(-50%);
     background: transparent;
@@ -106,8 +106,8 @@
     }
 
     .circle {
-        width: 140px;
-        height: 140px;
+        width: 178px;
+        height: 178px;
     }
 
     .label {
@@ -115,14 +115,14 @@
     }
 
     .navLeft {
-        left: -50px;
+        left: -25px;
     }
 
     .navRight {
-        right: -50px;
+        right: -25px;
     }
 
     .navArrow {
-        top: calc(50% - 10px);
+        top: calc(50% - 32px);
     }
 }
