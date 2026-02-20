@@ -64,7 +64,15 @@
     display: flex;
     align-items: center;
     gap: 32px;
-    margin-left: auto;
+}
+
+.centerBlock {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 32px;
+    margin: 0 40px;
 }
 
 .actionsWrapper {

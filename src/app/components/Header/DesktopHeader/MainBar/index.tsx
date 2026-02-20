@@ -18,18 +18,20 @@ export default function MainBar({ lang }: MainBarProps) {
                     <Logo lang={lang} />
                 </div>
 
-                <a href="#catalog" className={s.catalogBtn}>
-                    <Image src="/icons/icon-category.svg" alt="Categories" width="18" height="18" />
-                    Каталог продукції
-                </a>
+                <div className={s.centerBlock}>
+                    <a href="#catalog" className={s.catalogBtn}>
+                        <Image src="/icons/icon-category.svg" alt="Categories" width="18" height="18" />
+                        Каталог продукції
+                    </a>
 
-                <div className={s.searchWrapper}>
-                    <Search />
+                    <div className={s.searchWrapper}>
+                        <Search />
+                    </div>
+
+                    <CitySelector />
                 </div>
 
                 <div className={s.rightSection}>
-                    <CitySelector />
-
                     <div className={s.actionsWrapper}>
                         <Actions showLogin={true} />
                     </div>
