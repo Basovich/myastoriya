@@ -6,15 +6,15 @@ const locales = ['ua', 'ru'];
 
 export function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
+    const search = request.nextUrl.search;
 
-    // 1. Redirect /ua to /
+    // 1. Redirect /ua to / (clean URL for default locale)
     if (pathname === '/ua' || pathname.startsWith('/ua/')) {
-        return NextResponse.redirect(
-            new URL(
-                pathname.replace(/^\/ua/, ''),
-                request.url
-            )
-        );
+        const cleanPath = pathname.replace(/^\/ua/, '') || '/';
+        // Only redirect if we are not at root already (to avoid potential internal loops)
+        if (pathname !== cleanPath) {
+            return NextResponse.redirect(new URL(`${cleanPath}${search}`, request.url));
+        }
     }
 
     // 2. Check if there is any supported locale in the pathname
@@ -23,9 +23,9 @@ export function middleware(request: NextRequest) {
     );
 
     if (pathnameIsMissingLocale) {
-        // Rewrite to /ua (default)
+        // Rewrite to /ua (default) internally
         return NextResponse.rewrite(
-            new URL(`/ua${pathname}${request.nextUrl.search}`, request.url)
+            new URL(`/ua${pathname}${search}`, request.url)
         );
     }
 }

@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import s from './PromotionDetail.module.scss';
 import ProductCard from '../ui/ProductCard/ProductCard';
+import { getLocalizedHref } from '@/utils/i18n-helpers';
+import { Locale } from '@/i18n/config';
 
 interface PromotionDetailProps {
     dict: any;
@@ -15,12 +17,12 @@ export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps
         <section className={s.section}>
             <div className={s.container}>
                 <div className={s.breadcrumbs}>
-                    <Link href={`/ ${lang} `} className={s.link}>{dict.home.promotionsPage.breadcrumbs.home}</Link>
+                    <Link href={getLocalizedHref('/', lang as Locale)} className={s.link}>{dict.home.promotionsPage.breadcrumbs.home}</Link>
                     <span className={s.separator}>»</span>
-                    <Link href={`/ ${lang} /promotions`} className={s.link}>{dict.home.promotionsPage.breadcrumbs.promotions}</Link >
+                    <Link href={getLocalizedHref('/promotions', lang as Locale)} className={s.link}>{dict.home.promotionsPage.breadcrumbs.promotions}</Link>
                     <span className={s.separator}>»</span>
                     <span className={s.current}>Steak Days щовівторка!</span>
-                </div >
+                </div>
 
                 <div className={s.bannerWrapper}>
                     <Image
@@ -91,7 +93,7 @@ export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps
                         ))}
                     </div>
                 </div>
-            </div >
-        </section >
+            </div>
+        </section>
     );
 }
