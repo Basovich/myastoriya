@@ -7,7 +7,9 @@
     width: 100%;
 
     :global(.swiper) {
-        padding-bottom: 8px;
+        padding: 5px 20px 20px;
+        margin-left: -20px;
+        margin-right: -20px;
         /* For shadow */
     }
 }
@@ -28,23 +30,29 @@
         width: 44px;
         height: 44px;
         border-radius: 50%;
-        background-color: #f7f7f7;
+        background-color: #ffffff;
         color: #e30613;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: none;
+        cursor: pointer;
+
+        svg {
+            stroke: #e30613;
+        }
 
         &:hover {
-            background-color: #e30613;
-            color: #fff;
+            background-color: #fcebeb;
         }
 
         &:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            background-color: #f7f7f7;
-            color: #999;
+            background-color: #ffffff;
+            color: #e30613;
         }
     }
 }
@@ -57,6 +65,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.10);
 }
 
 .cardHeader {
@@ -67,8 +76,8 @@
 }
 
 .avatar {
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     overflow: hidden;
     background: #eee;
@@ -86,7 +95,13 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
+}
+
+.nameRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .name {
@@ -103,15 +118,25 @@
 .stars {
     display: flex;
     gap: 4px;
+
+    svg path {
+        stroke: #e30613;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
 }
 
 .starFilled {
-    color: #e30613;
+    path {
+        fill: #e30613;
+    }
 }
 
 .starEmpty {
-    color: transparent;
-    stroke: #e30613;
+    path {
+        fill: transparent;
+    }
 }
 
 .text {
@@ -125,23 +150,16 @@
 .readMoreBtn {
     margin-top: 12px;
     color: #e30613;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     align-self: flex-start;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-
-    &::after {
-        content: "";
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-right: 2px solid currentColor;
-        border-bottom: 2px solid currentColor;
-        transform: rotate(45deg);
-        margin-top: -4px;
-    }
+    gap: 6px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
 }
 
 .cta {
