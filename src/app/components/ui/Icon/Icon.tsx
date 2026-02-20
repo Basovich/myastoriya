@@ -8,6 +8,7 @@ interface IconProps {
     width?: number | string;
     height?: number | string;
     strokeWidth?: number | string;
+    style?: React.CSSProperties;
 }
 
 const icons: Record<IconName, (props: any) => React.ReactNode> = {
@@ -47,9 +48,10 @@ export default function Icon({
     width = 18,
     height = 18,
     strokeWidth,
+    style,
 }: IconProps) {
     const IconComponent = icons[name];
     if (!IconComponent) return null;
 
-    return <IconComponent className={className} width={width} height={height} strokeWidth={strokeWidth} />;
+    return <IconComponent className={className} width={width} height={height} strokeWidth={strokeWidth} style={style} />;
 }

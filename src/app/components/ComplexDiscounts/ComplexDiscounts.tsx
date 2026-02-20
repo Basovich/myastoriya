@@ -2,6 +2,8 @@
 
 import s from "./ComplexDiscounts.module.scss";
 import SectionHeader from "../ui/SectionHeader/SectionHeader";
+import Container from "../ui/Container/Container";
+import Icon from "../ui/Icon/Icon";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
@@ -36,19 +38,15 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
 
     return (
         <section className={s.section} id="combo">
-            <div className={s.container}>
+            <Container>
                 <div className={s.headerRow}>
                     <SectionHeader title={dict.sectionTitle} align="left" />
                     <div className={s.navArrows}>
                         <button className={`combo-prev ${s.arrowBtn}`} aria-label="Previous combo">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: "rotate(180deg)" }}>
-                                <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
-                            </svg>
+                            <Icon name="arrow-right" style={{ transform: "rotate(180deg)" }} />
                         </button>
                         <button className={`combo-next ${s.arrowBtn}`} aria-label="Next combo">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
-                            </svg>
+                            <Icon name="arrow-right" />
                         </button>
                     </div>
                 </div>
@@ -78,15 +76,17 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                             <SwiperSlide key={discount.id} className={s.slide}>
                                 <Link href={getRoute(`/complex-discounts/${discount.id}`)} className={s.cardLink}>
                                     <div className={s.card}>
-                                        <div className={s.imageWrapper}>
-                                            <Image src={discount.image} alt={discount.title} fill style={{ objectFit: "cover" }} />
+                                        <div className={s.cardImage}>
+                                            <Image src={discount.image} alt={discount.title} fill className={s.cardImg} />
+                                            {discount.discount && (
+                                                <div className={s.discountBadge}>
+                                                    <span>{discount.discount}</span>
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className={s.content}>
-                                            <h3 className={s.title}>{discount.title}</h3>
-                                            <div className={s.bottomRow}>
-                                                <span className={s.dateRange}>{discount.dateRange}</span>
-                                                {discount.discount && <span className={s.discount}>{discount.discount}</span>}
-                                            </div>
+                                        <div className={s.cardBody}>
+                                            <span className={s.date}>{discount.dateRange}</span>
+                                            <h3 className={s.cardTitle}>{discount.title}</h3>
                                         </div>
                                     </div>
                                 </Link>
@@ -94,7 +94,7 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                         ))}
                     </Swiper>
                 </div>
-            </div>
+            </Container>
         </section>
     );
 }
