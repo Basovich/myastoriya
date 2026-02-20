@@ -11,8 +11,9 @@ interface PromotionItem {
     id: number;
     title: string;
     image: string;
-    date: string;
-    discount: string | null;
+    date?: string;
+    dateRange?: string;
+    discount?: string | null;
 }
 
 interface PromotionsGridProps {
@@ -105,14 +106,17 @@ export default function PromotionsGrid({ dict, initialItems, lang, pageType }: P
                             <div className={s.card}>
                                 <div className={s.cardImage}>
                                     <Image src={item.image} alt={item.title} fill className={s.cardImg} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
-                                    {/*{item.discount && (*/}
-                                    {/*    <div className={s.discountBadge}>*/}
-                                    {/*        -{item.discount}%*/}
-                                    {/*    </div>*/}
-                                    {/*)}*/}
                                 </div>
                                 <div className={s.cardBody}>
-                                    <span className={s.date}>Акція діє до: {item.date}</span>
+                                    <div className={s.date}>
+                                        <span className={s.dateLabel}>
+                                            {pageType === 'promotions' ? 'Акція діє до:' : 'Комплексна знижка діє:'}
+                                        </span>
+                                        {' '}
+                                        <span className={s.dateValue}>
+                                            {pageType === 'promotions' ? item.date || '' : (item.dateRange || item.date || '')}
+                                        </span>
+                                    </div>
                                     <h4 className={s.cardTitle}>{item.title}</h4>
                                 </div>
                             </div>
@@ -125,8 +129,8 @@ export default function PromotionsGrid({ dict, initialItems, lang, pageType }: P
                         <Button variant="outline-black" onClick={loadMore}>
                             {dict.showBtn}
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
-                                <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" stroke-width="2" stroke-linecap="round"/>
-                                <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" stroke-width="2" stroke-linecap="round" />
+                                <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" stroke-width="2" stroke-linecap="round" />
                             </svg>
                         </Button>
                     </div>

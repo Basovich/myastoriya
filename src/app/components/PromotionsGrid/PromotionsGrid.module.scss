@@ -187,8 +187,15 @@
 
 .date {
     font-size: 13px;
-    color: #E30613;
     font-weight: 500;
+}
+
+.dateLabel {
+    color: #999;
+}
+
+.dateValue {
+    color: #E30613;
 }
 
 .cardTitle {
