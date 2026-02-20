@@ -2,74 +2,83 @@
     padding: 24px 16px;
 }
 
-.carousel {
+.promotionsHeader {
     display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
 
-    &::-webkit-scrollbar {
-        display: none;
+.navArrows {
+    display: none;
+    /* Hidden on mobile by default since Swipe handles it */
+    gap: 8px;
+}
+
+.arrowBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: #FFF;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s;
+
+    svg {
+        stroke: #E30613;
+        /* Red arrow */
+    }
+
+    &:hover {
+        background-color: #f9f9f9;
+    }
+
+    /* Swiper disabled state class */
+    &:disabled,
+    &[disabled],
+    &:global(.swiper-button-disabled) {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }
 
+.carouselWrapper {
+    width: 100%;
+}
+
+.swiper {
+    padding-bottom: 15px;
+    /* Spacing for custom shadows or overflow */
+    overflow: visible;
+    /* Allows mobile users to see next item peeking */
+}
+
 .card {
-    min-width: 280px;
-    flex-shrink: 0;
+    height: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .cardImage {
     border-radius: 18px;
     overflow: hidden;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     position: relative;
+    width: 100%;
+    aspect-ratio: 1188 / 824;
+    /* Original aspect ratio of promo Figma banners */
 }
 
 .cardImg {
-    width: 100%;
-    height: 160px;
     object-fit: cover;
-    display: block;
-}
-
-.cardOverlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.4);
-}
-
-.discountBadge {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #fff;
-}
-
-.discountLabel {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    opacity: 0.8;
-}
-
-.discountValue {
-    font-size: 56px;
-    font-weight: 900;
-    line-height: 1;
-    color: var(--color-accent);
-
-    sub {
-        font-size: 18px;
-        font-weight: 600;
-    }
 }
 
 .cardMeta {
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .date {
@@ -82,7 +91,7 @@
 }
 
 .cardTitle {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--color-text-primary);
     line-height: 1.4;
@@ -97,18 +106,16 @@
         margin: 0 auto;
     }
 
-    .carousel {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        overflow-x: visible;
+    .promotionsHeader {
+        margin-bottom: 32px;
     }
 
-    .card {
-        min-width: auto;
+    .navArrows {
+        display: flex;
     }
 
-    .cardImg {
-        height: 200px;
+    .swiper {
+        overflow: hidden;
+        /* Hide overflow on desktop to match a cleaner grid look */
     }
 }

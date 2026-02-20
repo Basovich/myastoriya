@@ -1,4 +1,5 @@
 import s from "./ProductCard.module.scss";
+import Image from "next/image";
 
 interface ProductCardProps {
     title: string;
@@ -20,7 +21,13 @@ export default function ProductCard({
     return (
         <div className={s.card}>
             <div className={s.imageWrap}>
-                <img src={image} alt={title} className={s.productImg} />
+                <Image 
+                    src={image} 
+                    alt={title} 
+                    className={s.productImg} 
+                    width={200}
+                    height={200}
+                />
                 {badge && (
                     <span className={`${s.badge} ${badge === "NEW" ? s.badgeNew : s.badgeSale}`}>
                         {badge}

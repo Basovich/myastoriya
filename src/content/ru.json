@@ -13,7 +13,7 @@
                         "text": "УЗНАТЬ БОЛЬШЕ",
                         "href": "#products"
                     },
-                    "image": "/images/hero_slide_1.png"
+                    "image": "/images/products/product-sticks-cheese.png"
                 },
                 {
                     "badge": "Новинка",
@@ -22,7 +22,7 @@
                         "text": "ЗАКАЗАТЬ СЕЙЧАС",
                         "href": "#products"
                     },
-                    "image": "/images/hero_slide_1.png"
+                    "image": "/images/products/product-teriyaki.png"
                 },
                 {
                     "badge": "Рекомендуем",
@@ -31,7 +31,7 @@
                         "text": "ВЫБРАТЬ СТЕЙК",
                         "href": "#products"
                     },
-                    "image": "/images/hero_slide_1.png"
+                    "image": "/images/products/product-tartar.png"
                 }
             ]
         },
@@ -194,6 +194,53 @@
                     "unit": "упаковка",
                     "badge": null,
                     "image": "/images/products/product-tomlena-curry.png"
+                }
+            ]
+        },
+        "promotions": {
+            "sectionTitle": "АКЦИИ",
+            "items": [
+                {
+                    "id": 1,
+                    "title": "Вкусные и сочные бургеры, которые микроволнуют — революционная новинка от «Мястория»",
+                    "image": "/images/products/product-sticks-cheese.png",
+                    "date": "01.12.2025",
+                    "discount": "300"
+                },
+                {
+                    "id": 2,
+                    "title": "Бесплатная доставка при заказе от 1000 грн",
+                    "image": "/images/products/product-teriyaki.png",
+                    "date": "31.12.2025",
+                    "discount": null
+                },
+                {
+                    "id": 3,
+                    "title": "Стейк-бургер с Рибаем + Бургер с камамбером и клюквенным кули",
+                    "image": "/images/products/product-tartar.png",
+                    "date": "12.10.2025",
+                    "discount": null
+                },
+                {
+                    "id": 4,
+                    "title": "Вкусные и сочные бургеры, которые микроволнуют — революционная новинка от «Мястория»",
+                    "image": "/images/products/product-sticks-cheese.png",
+                    "date": "01.12.2025",
+                    "discount": "300"
+                },
+                {
+                    "id": 5,
+                    "title": "Бесплатная доставка при заказе от 1000 грн",
+                    "image": "/images/products/product-teriyaki.png",
+                    "date": "31.12.2025",
+                    "discount": null
+                },
+                {
+                    "id": 6,
+                    "title": "Стейк-бургер с Рибаем + Бургер с камамбером и клюквенным кули",
+                    "image": "/images/products/product-tartar.png",
+                    "date": "12.10.2025",
+                    "discount": null
                 }
             ]
         }
