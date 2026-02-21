@@ -12,33 +12,45 @@
     padding: 20px;
 }
 
-.modal {
+/* Wrapper that react-modal applies className to — acts as positioning context */
+.modalWrapper {
     position: relative;
-    background: #ffffff;
-    border-radius: 16px;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     width: 100%;
     max-width: 400px;
     max-height: 90vh;
-    overflow-y: auto;
-    padding: 40px 32px 32px;
-    outline: none;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
 
+/* Close button — sits ABOVE the white card */
 .closeBtn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
     background: none;
     border: none;
-    color: #999;
+    color: #ffffff;
     cursor: pointer;
     padding: 4px;
+    margin-bottom: 12px;
+    align-self: flex-end;
     transition: color 0.2s;
 
-    &:hover {
-        color: #333;
+    &:hover,
+    &:focus {
+        color: #E6000F;
+        outline: none;
     }
+}
+
+/* The actual white card */
+.modal {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-height: calc(90vh - 60px);
+    overflow-y: auto;
+    padding: 40px 32px 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
 }
 
 /* Shared form styles */
@@ -244,5 +256,23 @@
 
     &:hover {
         text-decoration: underline;
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .overlay {
+        padding: 16px;
+        align-items: flex-start;
+        padding-top: 60px;
+    }
+
+    .modalWrapper {
+        max-height: calc(100vh - 80px);
+    }
+
+    .modal {
+        padding: 32px 20px 24px;
+        max-height: calc(100vh - 140px);
     }
 }

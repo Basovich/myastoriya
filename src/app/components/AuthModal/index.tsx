@@ -18,7 +18,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     const handleClose = () => {
         onClose();
-        // Reset to login view after short delay so transition looks clean
         setTimeout(() => setView('login'), 300);
     };
 
@@ -26,29 +25,33 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         <Modal
             isOpen={isOpen}
             onRequestClose={handleClose}
-            className={s.modal}
+            className={s.modalWrapper}
             overlayClassName={s.overlay}
             ariaHideApp={false}
             closeTimeoutMS={200}
         >
+            {/* Close button — positioned OUTSIDE the white card */}
             <button className={s.closeBtn} onClick={handleClose} aria-label="Закрити">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                     <line x1="18" y1="6" x2="6" y2="18" />
                     <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
             </button>
 
-            {view === 'login' ? (
-                <LoginForm
-                    onSwitchToRegister={() => setView('register')}
-                    onSuccess={handleClose}
-                />
-            ) : (
-                <RegisterForm
-                    onSwitchToLogin={() => setView('login')}
-                    onSuccess={handleClose}
-                />
-            )}
+            {/* Modal card */}
+            <div className={s.modal}>
+                {view === 'login' ? (
+                    <LoginForm
+                        onSwitchToRegister={() => setView('register')}
+                        onSuccess={handleClose}
+                    />
+                ) : (
+                    <RegisterForm
+                        onSwitchToLogin={() => setView('login')}
+                        onSuccess={handleClose}
+                    />
+                )}
+            </div>
         </Modal>
     );
 }

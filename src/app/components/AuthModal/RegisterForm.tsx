@@ -54,6 +54,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -64,6 +65,12 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
     const handleFormSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setError('');
+
+        if (password !== confirmPassword) {
+            setError('Паролі не збігаються');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -220,6 +227,18 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         required
                     />
                     <label className={s.inputLabel}>Пароль*</label>
+                </div>
+
+                <div className={s.field}>
+                    <input
+                        type="password"
+                        className={s.input}
+                        placeholder="Повторити пароль"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                    />
+                    <label className={s.inputLabel}>Повторити пароль*</label>
                 </div>
 
                 {error && <div className={s.error}>{error}</div>}
