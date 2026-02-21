@@ -1,0 +1,84 @@
+.authBtn {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    background: #272727;
+    border: none;
+    border-radius: 12px;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+    gap: 8px;
+    overflow: hidden;
+
+    &:hover {
+        opacity: 0.9;
+    }
+}
+
+.icon {
+    filter: brightness(0) invert(1);
+    flex-shrink: 0;
+}
+
+.avatar {
+    width: 24px;
+    height: 24px;
+    background: var(--color-accent, #E6000F);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+/* Hide text label on mobile (only icon) */
+.label {
+    display: none;
+}
+
+/* Desktop styles */
+@media (min-width: 1280px) {
+    .authBtn {
+        width: auto;
+        height: 48px;
+        padding: 0 16px;
+        background: transparent;
+        border: 1px solid #3E3E3E;
+        border-radius: 12px;
+        gap: 8px;
+
+        &:hover {
+            border-color: #666;
+            background: #1a1a1a;
+        }
+    }
+
+    .label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #ffffff;
+        white-space: nowrap;
+    }
+
+    .loggedIn {
+        .label {
+            display: none;
+            /* only show avatar letter, not text */
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+        }
+    }
+}

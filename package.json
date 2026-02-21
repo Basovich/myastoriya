@@ -17,6 +17,7 @@
     "postcss": "^8.5.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-modal": "^3.16.3",
     "react-redux": "^9.2.0",
     "react-spring": "^10.0.3",
     "redux-persist": "^6.0.0",
@@ -29,6 +30,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-modal": "^3.16.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "typescript": "^5"

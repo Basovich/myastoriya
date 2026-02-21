@@ -14,6 +14,7 @@ import createTransform from 'redux-persist/es/createTransform';
 
 import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
+import authReducer from './slices/authSlice';
 
 // 30 Days in milliseconds
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
@@ -38,19 +39,20 @@ const expireTransform = createTransform(
         return outboundState;
     },
     // define which reducers this transform gets called for.
-    { whitelist: ['cart', 'wishlist'] }
+    { whitelist: ['cart', 'wishlist', 'auth'] }
 );
 
 const persistConfig = {
     key: 'myastoriya-root',
     storage,
-    whitelist: ['cart', 'wishlist'], // Things to persist
+    whitelist: ['cart', 'wishlist', 'auth'], // Things to persist
     transforms: [expireTransform]
 };
 
 const rootReducer = combineReducers({
     cart: cartReducer,
     wishlist: wishlistReducer,
+    auth: authReducer,
 });
 
 const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(persistConfig, rootReducer);

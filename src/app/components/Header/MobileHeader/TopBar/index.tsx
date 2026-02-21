@@ -14,8 +14,7 @@ export default function TopBar({ lang, onMenuClick }: TopBarProps) {
         <div className={s.topBar}>
             <ToggleMenu onClick={onMenuClick} />
             <Logo lang={lang} className={s.logo} />
-            {/* Mobile Actions don't show login link usually, or do they? Header.tsx had loginLink hidden on mobile */}
-            <Actions showLogin={false} />
+            <Actions />
         </div>
     );
 }

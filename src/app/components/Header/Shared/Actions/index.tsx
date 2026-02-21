@@ -1,12 +1,9 @@
 import s from "./Actions.module.scss";
 import Image from "next/image";
 import { useAppSelector } from "@/store/hooks";
+import AuthButton from "@/app/components/Header/Shared/AuthButton";
 
-interface ActionsProps {
-    showLogin?: boolean;
-}
-
-export default function Actions({ showLogin = false }: ActionsProps) {
+export default function Actions() {
     const cartItems = useAppSelector((state) => state.cart.items);
     const wishlistItems = useAppSelector((state) => state.wishlist.items);
 
@@ -31,13 +28,8 @@ export default function Actions({ showLogin = false }: ActionsProps) {
                 )}
             </button>
 
-            {/* DESKTOP: Login link */}
-            {showLogin && (
-                <a href="#" className={s.loginLink}>
-                    Вхід
-                    <Image src="/icons/icon-profile.svg" alt="Profile" width="20" height="20" className={s.loginIcon} />
-                </a>
-            )}
+            {/* Auth Button (Login / Profile) */}
+            <AuthButton />
         </div>
     );
 }

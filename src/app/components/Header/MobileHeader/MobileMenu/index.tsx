@@ -98,57 +98,60 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                 </div>
             </div>
 
-            {/* Catalog Header */}
-            <div className={s.catalogHeader} onClick={toggleCatalog}>
-                Каталог продукції
-                <div className={s.iconWrapper} style={{ transform: isCatalogOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className={s.catalogIcon}
-                    >
-                        <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                </div>
-            </div>
-
-            {/* Categories List (Accordion) */}
-            <AnimatedDiv style={accordionStyle} className={s.catalogListWrapper}>
-                <div className={s.catalogList} ref={catalogListRef}>
-                    {categoriesData.map((cat, i) => (
-                        <Link key={i} href={getLocalizedHref(cat.href, lang)} className={s.categoryItem} onClick={onClose}>
-                            <Image
-                                src={`/icons/categories/${cat.icon}.svg`}
-                                alt=""
-                                width={24}
-                                height={24}
-                                className={s.catIcon}
-                                onError={(e) => { e.currentTarget.style.display = 'none' }}
-                            />
-                            {cat.label}
-                        </Link>
-                    ))}
-                </div>
-            </AnimatedDiv>
-
-            {/* Footer */}
-            <div className={s.menuFooter}>
-                <nav className={s.footerLinks}>
-                    {siteData.navigation.map((item, i) => (
-                        <Link
-                            key={i}
-                            href={item.label === "Акції" ? getLocalizedHref(item.href, lang) : "#"}
-                            className={s.footerLink}
-                            onClick={item.label === "Акції" ? onClose : undefined}
+            {/* Scrollable content area */}
+            <div className={s.menuBody}>
+                {/* Catalog Header */}
+                <div className={s.catalogHeader} onClick={toggleCatalog}>
+                    Каталог продукції
+                    <div className={s.iconWrapper} style={{ transform: isCatalogOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className={s.catalogIcon}
                         >
-                            {item.label}
-                        </Link>
-                    ))}
-                </nav>
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </div>
+                </div>
+
+                {/* Categories List (Accordion) */}
+                <AnimatedDiv style={accordionStyle} className={s.catalogListWrapper}>
+                    <div className={s.catalogList} ref={catalogListRef}>
+                        {categoriesData.map((cat, i) => (
+                            <Link key={i} href={getLocalizedHref(cat.href, lang)} className={s.categoryItem} onClick={onClose}>
+                                <Image
+                                    src={`/icons/categories/${cat.icon}.svg`}
+                                    alt=""
+                                    width={24}
+                                    height={24}
+                                    className={s.catIcon}
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                                />
+                                {cat.label}
+                            </Link>
+                        ))}
+                    </div>
+                </AnimatedDiv>
+
+                {/* Footer */}
+                <div className={s.menuFooter}>
+                    <nav className={s.footerLinks}>
+                        {siteData.navigation.map((item, i) => (
+                            <Link
+                                key={i}
+                                href={item.label === "Акції" ? getLocalizedHref(item.href, lang) : "#"}
+                                className={s.footerLink}
+                                onClick={item.label === "Акції" ? onClose : undefined}
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                    </nav>
+                </div>
             </div>
         </animated.div>
     ) : null);

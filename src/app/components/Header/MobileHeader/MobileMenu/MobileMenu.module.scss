@@ -4,25 +4,18 @@
     left: 0;
     width: 100%;
     height: 100vh;
+    height: 100dvh;
     background: #ffffff;
     z-index: 100;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    /* Transformation handled by react-spring */
-}
-
-/* Ensure no conflicts with react-spring style prop */
-.catalogListWrapper {
-    background: #ffffff;
-    /* overflow: hidden; Removed per user request to ensure full content visibility, handled by JS if needed */
-    /* Height handled by react-spring */
 }
 
 .menuHeader {
     background: #000000;
     color: #ffffff;
     padding: 16px 20px;
+    flex-shrink: 0;
 }
 
 .topRow {
@@ -112,9 +105,17 @@
     font-weight: 600;
 }
 
+/* Scrollable content area */
+.menuBody {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
 .catalogHeader {
-    background: #000000;
-    color: #ffffff;
+    background: #ffffff;
+    color: #222;
     padding: 16px 20px;
     display: flex;
     align-items: center;
@@ -123,7 +124,8 @@
     font-weight: 700;
     font-size: 14px;
     text-transform: uppercase;
-    border-top: 1px solid #333;
+    border-bottom: 1px solid #e5e5e5;
+    flex-shrink: 0;
 }
 
 .iconWrapper {
@@ -132,8 +134,17 @@
     justify-content: center;
 }
 
+.catalogIcon {
+    color: #222;
+}
+
+.catalogListWrapper {
+    background: #ffffff;
+    overflow: hidden;
+}
+
 .catalogList {
-    padding: 20px;
+    padding: 0 20px;
 }
 
 .categoryItem {
@@ -166,13 +177,16 @@
     background: #000000;
     color: #ffffff;
     padding: 24px 20px;
-    /* margin-top: auto; Removed to prevent white gap when accordion is closed */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
 
 .footerLinks {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 0;
 }
 
 .footerLink {
@@ -181,11 +195,10 @@
     font-size: 14px;
     font-weight: 600;
     border-bottom: 1px solid #333;
-    padding-bottom: 16px;
+    padding: 16px 0;
 
     &:last-child {
         border-bottom: none;
-        padding-bottom: 0;
     }
 
     &:hover {

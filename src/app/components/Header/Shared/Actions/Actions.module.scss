@@ -43,17 +43,7 @@
     pointer-events: none;
 }
 
-.loginLink {
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: color 0.2s;
-    display: none;
-    /* hidden by default, shown via prop usage or override */
-}
-
-/* Desktop styles override will happen in parent */
+/* Desktop styles */
 @media (min-width: 1280px) {
     .actionBtn {
         background: transparent;
@@ -74,7 +64,6 @@
 
         img {
             filter: brightness(0) invert(1);
-            /* Make icons white */
         }
     }
 
@@ -84,27 +73,5 @@
 
     .actions {
         gap: 16px;
-    }
-
-    .loginLink {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #ffffff;
-        height: 48px;
-        padding: 0 16px;
-        border: 1px solid #3E3E3E;
-        border-radius: 12px;
-        background: transparent;
-
-        &:hover {
-            color: #ffffff;
-            border-color: #666;
-            background: #1a1a1a;
-        }
-
-        .loginIcon {
-            filter: brightness(0) invert(1);
-        }
     }
 }

@@ -33,7 +33,7 @@ export default function MainBar({ lang }: MainBarProps) {
 
                 <div className={s.rightSection}>
                     <div className={s.actionsWrapper}>
-                        <Actions showLogin={true} />
+                        <Actions />
                     </div>
                 </div>
             </div>
