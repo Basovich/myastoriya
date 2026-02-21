@@ -8,12 +8,12 @@ import s from './AuthModal.module.scss';
 const VERIFICATION_CODE = '7535'; // Stub code
 
 // Stub API functions — ready for real API integration
-async function registerAPI(data: { name: string; email: string; phone: string; password: string }) {
+async function registerAPI(data: { name: string; phone: string; password: string }) {
     // TODO: Replace with actual API call
     // Example: const res = await fetch('/api/auth/register', { method: 'POST', body: JSON.stringify(data) });
     return new Promise<void>((resolve, reject) => {
         setTimeout(() => {
-            if (data.email && data.phone && data.password) {
+            if (data.phone && data.password) {
                 resolve();
             } else {
                 reject(new Error('Заповніть усі поля'));
@@ -51,7 +51,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
 
     // Form fields
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -74,7 +73,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         setLoading(true);
 
         try {
-            await registerAPI({ name, email, phone, password });
+            await registerAPI({ name, phone, password });
             await sendVerificationCode(phone);
             setStep('verify');
         } catch (err: any) {
@@ -112,7 +111,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         try {
             const isValid = await verifyCode(phone, fullCode);
             if (isValid) {
-                dispatch(login({ email, phone, name }));
+                dispatch(login({ email: `${phone.replace(/\D/g, '').slice(-4)}@myastoriya.ua`, phone, name }));
                 onSuccess();
             } else {
                 setError('Невірний код. Спробуйте ще раз.');
@@ -179,7 +178,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
 
     return (
         <>
-            <h2 className={s.title}>Реєстрація</h2>
+            <h2 className={s.title}>Реєстрація в кабінеті</h2>
             <form className={s.form} onSubmit={handleFormSubmit}>
                 <div className={s.field}>
                     <input
@@ -191,18 +190,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         required
                     />
                     <label className={s.inputLabel}>Ім&apos;я*</label>
-                </div>
-
-                <div className={s.field}>
-                    <input
-                        type="email"
-                        className={s.input}
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                    <label className={s.inputLabel}>Email*</label>
                 </div>
 
                 <div className={s.field}>
@@ -244,15 +231,19 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                 {error && <div className={s.error}>{error}</div>}
 
                 <button type="submit" className={s.submitBtn} disabled={loading}>
-                    {loading ? 'Зачекайте...' : 'ЗАРЕЄСТРУВАТИСЯ'}
+                    {loading ? 'Зачекайте...' : 'ЗАРЕЄСТРУВАТИСЬ'}
                 </button>
 
                 <div className={s.switchText}>
-                    Вже є акаунт?{' '}
                     <button type="button" className={s.switchLink} onClick={onSwitchToLogin}>
-                        Увійти
+                        Вхід
                     </button>
                 </div>
+
+                <button type="button" className={s.googleBtn}>
+                    <span className={s.googleIcon}>G</span>
+                    РЕЄСТРАЦІЯ ЧЕРЕЗ GOOGLE
+                </button>
             </form>
         </>
     );
