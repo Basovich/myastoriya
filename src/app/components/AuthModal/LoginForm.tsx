@@ -28,7 +28,7 @@ async function loginAPI(phone: string, password: string) {
 const loginSchema = Yup.object({
     phone: Yup.string()
         .required('Обов\'язкове поле')
-        .matches(/^\d{12}$/, 'Введіть повний номер: +38 (0XX) XXX XX XX'),
+        .matches(/^380\d{9}$/, 'Введіть повний номер: +38 (0XX) XXX XX XX'),
     password: Yup.string()
         .required('Обов\'язкове поле')
         .min(4, 'Мінімум 4 символи'),
@@ -75,7 +75,10 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
                         name="phone"
                         autoComplete="off"
                         readOnly
-                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
+                        onFocus={(e) => {
+                            e.currentTarget.removeAttribute('readOnly');
+                            formik.setFieldTouched('phone', false);
+                        }}
                         className={`${s.input} ${formik.touched.phone && formik.errors.phone ? s.inputError : ''}`}
                         placeholder="+38 (0__) ___ __ __"
                         value={phoneFormatted}
@@ -95,7 +98,10 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
                         name="password"
                         autoComplete="off"
                         readOnly
-                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
+                        onFocus={(e) => {
+                            e.currentTarget.removeAttribute('readOnly');
+                            formik.setFieldTouched('password', false);
+                        }}
                         className={`${s.input} ${formik.touched.password && formik.errors.password ? s.inputError : ''}`}
                         placeholder="Пароль"
                         value={formik.values.password}

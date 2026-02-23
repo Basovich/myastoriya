@@ -44,7 +44,7 @@ const registerSchema = Yup.object({
         .min(2, 'Мінімум 2 символи'),
     phone: Yup.string()
         .required('Обов\'язкове поле')
-        .matches(/^\d{12}$/, 'Введіть повний номер: +38 (0XX) XXX XX XX'),
+        .matches(/^380\d{9}$/, 'Введіть повний номер: +38 (0XX) XXX XX XX'),
     password: Yup.string()
         .required('Обов\'язкове поле')
         .min(6, 'Мінімум 6 символів'),
@@ -201,7 +201,10 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         name="name"
                         autoComplete="off"
                         readOnly
-                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
+                        onFocus={(e) => {
+                            e.currentTarget.removeAttribute('readOnly');
+                            formik.setFieldTouched('name', false);
+                        }}
                         className={`${s.input} ${formik.touched.name && formik.errors.name ? s.inputError : ''}`}
                         placeholder="Ім'я"
                         value={formik.values.name}
@@ -221,7 +224,10 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         name="phone"
                         autoComplete="off"
                         readOnly
-                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
+                        onFocus={(e) => {
+                            e.currentTarget.removeAttribute('readOnly');
+                            formik.setFieldTouched('phone', false);
+                        }}
                         className={`${s.input} ${formik.touched.phone && formik.errors.phone ? s.inputError : ''}`}
                         placeholder="+38 (0__) ___ __ __"
                         value={phoneFormatted}
@@ -241,7 +247,10 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         name="password"
                         autoComplete="off"
                         readOnly
-                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
+                        onFocus={(e) => {
+                            e.currentTarget.removeAttribute('readOnly');
+                            formik.setFieldTouched('password', false);
+                        }}
                         className={`${s.input} ${formik.touched.password && formik.errors.password ? s.inputError : ''}`}
                         placeholder="Пароль"
                         value={formik.values.password}
@@ -261,7 +270,10 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         name="confirmPassword"
                         autoComplete="off"
                         readOnly
-                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
+                        onFocus={(e) => {
+                            e.currentTarget.removeAttribute('readOnly');
+                            formik.setFieldTouched('confirmPassword', false);
+                        }}
                         className={`${s.input} ${formik.touched.confirmPassword && formik.errors.confirmPassword ? s.inputError : ''}`}
                         placeholder="Повторити пароль"
                         value={formik.values.confirmPassword}
