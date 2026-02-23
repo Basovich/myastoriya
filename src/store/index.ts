@@ -16,8 +16,8 @@ import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
 import authReducer from './slices/authSlice';
 
-// 30 Days in milliseconds
-const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+// 1 Minute for testing
+const THIRTY_DAYS = 1 * 60 * 1000;
 
 // Transform to handle expiration of persisted state
 const expireTransform = createTransform(

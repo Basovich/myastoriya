@@ -25,18 +25,8 @@
     flex-shrink: 0;
 }
 
-.avatar {
-    width: 24px;
-    height: 24px;
+.loggedIn {
     background: var(--color-accent, #E6000F);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    color: #fff;
-    flex-shrink: 0;
 }
 
 /* Hide text label on mobile (only icon) */
@@ -70,15 +60,12 @@
     }
 
     .loggedIn {
-        .label {
-            display: none;
-            /* only show avatar letter, not text */
-        }
+        background: var(--color-accent, #E6000F);
+        border-color: transparent;
 
-        .avatar {
-            width: 28px;
-            height: 28px;
-            font-size: 14px;
+        &:hover {
+            opacity: 0.85;
+            background: var(--color-accent, #E6000F);
         }
     }
 }

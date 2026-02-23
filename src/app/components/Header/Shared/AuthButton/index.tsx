@@ -20,7 +20,7 @@ export default function AuthButton() {
                 aria-label={isAuthenticated ? 'Профіль' : 'Вхід'}
             >
                 {isAuthenticated ? (
-                    <span className={s.avatar}>{firstLetter}</span>
+                    <Image src="/icons/icon-profile.svg" alt="Profile" width={20} height={20} className={s.icon} />
                 ) : (
                     <>
                         <span className={s.label}>
