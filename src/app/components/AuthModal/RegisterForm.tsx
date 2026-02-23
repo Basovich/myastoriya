@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useRef, FormEvent, KeyboardEvent } from 'react';
+import { useState, useRef, KeyboardEvent } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import s from './AuthModal.module.scss';
@@ -10,7 +12,6 @@ const VERIFICATION_CODE = '7535'; // Stub code
 // Stub API functions — ready for real API integration
 async function registerAPI(data: { name: string; phone: string; password: string }) {
     // TODO: Replace with actual API call
-    // Example: const res = await fetch('/api/auth/register', { method: 'POST', body: JSON.stringify(data) });
     return new Promise<void>((resolve, reject) => {
         setTimeout(() => {
             if (data.phone && data.password) {
@@ -24,7 +25,6 @@ async function registerAPI(data: { name: string; phone: string; password: string
 
 async function sendVerificationCode(phone: string) {
     // TODO: Replace with actual API call
-    // Example: const res = await fetch('/api/auth/send-code', { method: 'POST', body: JSON.stringify({ phone }) });
     return new Promise<void>((resolve) => {
         setTimeout(resolve, 300);
     });
@@ -32,11 +32,25 @@ async function sendVerificationCode(phone: string) {
 
 async function verifyCode(phone: string, code: string) {
     // TODO: Replace with actual API call
-    // Example: const res = await fetch('/api/auth/verify-code', { method: 'POST', body: JSON.stringify({ phone, code }) });
     return new Promise<boolean>((resolve) => {
         setTimeout(() => resolve(code === VERIFICATION_CODE), 300);
     });
 }
+
+const registerSchema = Yup.object({
+    name: Yup.string()
+        .required('Обов\'язкове поле')
+        .min(2, 'Мінімум 2 символи'),
+    phone: Yup.string()
+        .required('Обов\'язкове поле')
+        .matches(/^\+?\d{10,13}$/, 'Невірний формат телефону'),
+    password: Yup.string()
+        .required('Обов\'язкове поле')
+        .min(6, 'Мінімум 6 символів'),
+    confirmPassword: Yup.string()
+        .required('Обов\'язкове поле')
+        .oneOf([Yup.ref('password')], 'Паролі не збігаються'),
+});
 
 interface RegisterFormProps {
     onSwitchToLogin: () => void;
@@ -48,40 +62,31 @@ type Step = 'form' | 'verify';
 export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFormProps) {
     const dispatch = useAppDispatch();
     const [step, setStep] = useState<Step>('form');
-
-    // Form fields
-    const [name, setName] = useState('');
-    const [phone, setPhone] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [apiError, setApiError] = useState('');
+    const [verifyLoading, setVerifyLoading] = useState(false);
 
     // Verification code
     const [code, setCode] = useState(['', '', '', '']);
     const codeRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-    const handleFormSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        setError('');
-
-        if (password !== confirmPassword) {
-            setError('Паролі не збігаються');
-            return;
-        }
-
-        setLoading(true);
-
-        try {
-            await registerAPI({ name, phone, password });
-            await sendVerificationCode(phone);
-            setStep('verify');
-        } catch (err: any) {
-            setError(err.message || 'Помилка реєстрації');
-        } finally {
-            setLoading(false);
-        }
-    };
+    const formik = useFormik({
+        initialValues: {
+            name: '',
+            phone: '',
+            password: '',
+            confirmPassword: '',
+        },
+        validationSchema: registerSchema,
+        onSubmit: async (values, { setStatus }) => {
+            try {
+                await registerAPI({ name: values.name, phone: values.phone, password: values.password });
+                await sendVerificationCode(values.phone);
+                setStep('verify');
+            } catch (err: any) {
+                setStatus(err.message || 'Помилка реєстрації');
+            }
+        },
+    });
 
     const handleCodeChange = (index: number, value: string) => {
         if (value.length > 1) value = value.slice(-1);
@@ -91,7 +96,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         newCode[index] = value;
         setCode(newCode);
 
-        // Auto-focus next input
         if (value && index < 3) {
             codeRefs.current[index + 1]?.focus();
         }
@@ -104,30 +108,34 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
     };
 
     const handleVerify = async () => {
-        setError('');
-        setLoading(true);
+        setApiError('');
+        setVerifyLoading(true);
         const fullCode = code.join('');
 
         try {
-            const isValid = await verifyCode(phone, fullCode);
+            const isValid = await verifyCode(formik.values.phone, fullCode);
             if (isValid) {
-                dispatch(login({ email: `${phone.replace(/\D/g, '').slice(-4)}@myastoriya.ua`, phone, name }));
+                dispatch(login({
+                    email: `${formik.values.phone.replace(/\D/g, '').slice(-4)}@myastoriya.ua`,
+                    phone: formik.values.phone,
+                    name: formik.values.name,
+                }));
                 onSuccess();
             } else {
-                setError('Невірний код. Спробуйте ще раз.');
+                setApiError('Невірний код. Спробуйте ще раз.');
                 setCode(['', '', '', '']);
                 codeRefs.current[0]?.focus();
             }
         } catch (err: any) {
-            setError(err.message || 'Помилка перевірки');
+            setApiError(err.message || 'Помилка перевірки');
         } finally {
-            setLoading(false);
+            setVerifyLoading(false);
         }
     };
 
     const handleResend = async () => {
-        setError('');
-        await sendVerificationCode(phone);
+        setApiError('');
+        await sendVerificationCode(formik.values.phone);
         setCode(['', '', '', '']);
         codeRefs.current[0]?.focus();
     };
@@ -138,7 +146,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                 <h2 className={s.title}>Підтвердження</h2>
                 <p className={s.verifyText}>
                     Ми надіслали SMS-код на номер<br />
-                    <strong>{phone}</strong>
+                    <strong>{formik.values.phone}</strong>
                 </p>
 
                 <div className={s.codeInputGroup}>
@@ -158,15 +166,15 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                     ))}
                 </div>
 
-                {error && <div className={s.error}>{error}</div>}
+                {apiError && <div className={s.error}>{apiError}</div>}
 
                 <button
                     type="button"
                     className={s.submitBtn}
                     onClick={handleVerify}
-                    disabled={loading || code.some((d) => !d)}
+                    disabled={verifyLoading || code.some((d) => !d)}
                 >
-                    {loading ? 'Перевірка...' : 'ПІДТВЕРДИТИ'}
+                    {verifyLoading ? 'Перевірка...' : 'ПІДТВЕРДИТИ'}
                 </button>
 
                 <button type="button" className={s.resendLink} onClick={handleResend}>
@@ -179,59 +187,75 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
     return (
         <>
             <h2 className={s.title}>Реєстрація в кабінеті</h2>
-            <form className={s.form} onSubmit={handleFormSubmit}>
+            <form className={s.form} onSubmit={formik.handleSubmit} noValidate>
                 <div className={s.field}>
                     <input
                         type="text"
-                        className={s.input}
+                        name="name"
+                        className={`${s.input} ${formik.touched.name && formik.errors.name ? s.inputError : ''}`}
                         placeholder="Ім'я"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
+                        value={formik.values.name}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                     />
                     <label className={s.inputLabel}>Ім&apos;я*</label>
+                    {formik.touched.name && formik.errors.name && (
+                        <span className={s.fieldError}>{formik.errors.name}</span>
+                    )}
                 </div>
 
                 <div className={s.field}>
                     <input
                         type="tel"
-                        className={s.input}
+                        name="phone"
+                        className={`${s.input} ${formik.touched.phone && formik.errors.phone ? s.inputError : ''}`}
                         placeholder="Телефон"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
+                        value={formik.values.phone}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                     />
                     <label className={s.inputLabel}>Телефон*</label>
+                    {formik.touched.phone && formik.errors.phone && (
+                        <span className={s.fieldError}>{formik.errors.phone}</span>
+                    )}
                 </div>
 
                 <div className={s.field}>
                     <input
                         type="password"
-                        className={s.input}
+                        name="password"
+                        className={`${s.input} ${formik.touched.password && formik.errors.password ? s.inputError : ''}`}
                         placeholder="Пароль"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                     />
                     <label className={s.inputLabel}>Пароль*</label>
+                    {formik.touched.password && formik.errors.password && (
+                        <span className={s.fieldError}>{formik.errors.password}</span>
+                    )}
                 </div>
 
                 <div className={s.field}>
                     <input
                         type="password"
-                        className={s.input}
+                        name="confirmPassword"
+                        className={`${s.input} ${formik.touched.confirmPassword && formik.errors.confirmPassword ? s.inputError : ''}`}
                         placeholder="Повторити пароль"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
+                        value={formik.values.confirmPassword}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                     />
                     <label className={s.inputLabel}>Повторити пароль*</label>
+                    {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                        <span className={s.fieldError}>{formik.errors.confirmPassword}</span>
+                    )}
                 </div>
 
-                {error && <div className={s.error}>{error}</div>}
+                {formik.status && <div className={s.error}>{formik.status}</div>}
 
-                <button type="submit" className={s.submitBtn} disabled={loading}>
-                    {loading ? 'Зачекайте...' : 'ЗАРЕЄСТРУВАТИСЬ'}
+                <button type="submit" className={s.submitBtn} disabled={formik.isSubmitting}>
+                    {formik.isSubmitting ? 'Зачекайте...' : 'ЗАРЕЄСТРУВАТИСЬ'}
                 </button>
 
                 <div className={s.switchText}>

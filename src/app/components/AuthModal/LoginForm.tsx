@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import s from './AuthModal.module.scss';
@@ -8,10 +9,8 @@ import s from './AuthModal.module.scss';
 // Stub API function — ready for real API integration
 async function loginAPI(phone: string, password: string) {
     // TODO: Replace with actual API call
-    // Example: const res = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ phone, password }) });
     return new Promise<{ email: string; phone: string; name: string }>((resolve, reject) => {
         setTimeout(() => {
-            // Stub: accept any credentials for now
             if (phone && password) {
                 resolve({
                     email: `${phone.replace(/\D/g, '').slice(-4)}@myastoriya.ua`,
@@ -25,6 +24,15 @@ async function loginAPI(phone: string, password: string) {
     });
 }
 
+const loginSchema = Yup.object({
+    phone: Yup.string()
+        .required('Обов\'язкове поле')
+        .matches(/^\+?\d{10,13}$/, 'Невірний формат телефону'),
+    password: Yup.string()
+        .required('Обов\'язкове поле')
+        .min(4, 'Мінімум 4 символи'),
+});
+
 interface LoginFormProps {
     onSwitchToRegister: () => void;
     onSuccess: () => void;
@@ -32,61 +40,66 @@ interface LoginFormProps {
 
 export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormProps) {
     const dispatch = useAppDispatch();
-    const [phone, setPhone] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
-
-        try {
-            const user = await loginAPI(phone, password);
-            dispatch(login(user));
-            onSuccess();
-        } catch (err: any) {
-            setError(err.message || 'Помилка входу');
-        } finally {
-            setLoading(false);
-        }
-    };
+    const formik = useFormik({
+        initialValues: {
+            phone: '',
+            password: '',
+        },
+        validationSchema: loginSchema,
+        onSubmit: async (values, { setStatus }) => {
+            try {
+                const user = await loginAPI(values.phone, values.password);
+                dispatch(login(user));
+                onSuccess();
+            } catch (err: any) {
+                setStatus(err.message || 'Помилка входу');
+            }
+        },
+    });
 
     return (
         <>
             <h2 className={s.title}>Вхід до кабінету</h2>
-            <form className={s.form} onSubmit={handleSubmit}>
+            <form className={s.form} onSubmit={formik.handleSubmit} noValidate>
                 <div className={s.field}>
                     <input
                         type="tel"
-                        className={s.input}
+                        name="phone"
+                        className={`${s.input} ${formik.touched.phone && formik.errors.phone ? s.inputError : ''}`}
                         placeholder="Телефон"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
+                        value={formik.values.phone}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                     />
                     <label className={s.inputLabel}>Телефон*</label>
+                    {formik.touched.phone && formik.errors.phone && (
+                        <span className={s.fieldError}>{formik.errors.phone}</span>
+                    )}
                 </div>
 
                 <div className={s.field}>
                     <input
                         type="password"
-                        className={s.input}
+                        name="password"
+                        className={`${s.input} ${formik.touched.password && formik.errors.password ? s.inputError : ''}`}
                         placeholder="Пароль"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                     />
                     <label className={s.inputLabel}>Пароль*</label>
+                    {formik.touched.password && formik.errors.password && (
+                        <span className={s.fieldError}>{formik.errors.password}</span>
+                    )}
                 </div>
 
                 <a href="#" className={s.forgotLink}>Забули пароль?</a>
 
-                {error && <div className={s.error}>{error}</div>}
+                {formik.status && <div className={s.error}>{formik.status}</div>}
 
-                <button type="submit" className={s.submitBtn} disabled={loading}>
-                    {loading ? 'Зачекайте...' : 'УВІЙТИ'}
+                <button type="submit" className={s.submitBtn} disabled={formik.isSubmitting}>
+                    {formik.isSubmitting ? 'Зачекайте...' : 'УВІЙТИ'}
                 </button>
 
                 <div className={s.switchText}>

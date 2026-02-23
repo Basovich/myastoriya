@@ -103,6 +103,17 @@
     }
 }
 
+.inputError {
+    border-color: #E6000F !important;
+}
+
+.fieldError {
+    font-size: 11px;
+    color: #E6000F;
+    margin-top: 4px;
+    display: block;
+}
+
 .inputLabel {
     position: absolute;
     left: 16px;
