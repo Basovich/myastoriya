@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import s from './AuthModal.module.scss';
+import useScrollLock from '@/hooks/useScrollLock';
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -15,6 +16,15 @@ type ModalView = 'login' | 'register';
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [view, setView] = useState<ModalView>('login');
+    const { disableScroll, enableScroll } = useScrollLock();
+
+    useEffect(() => {
+        if (isOpen) {
+            disableScroll();
+        } else {
+            enableScroll();
+        }
+    }, [isOpen, disableScroll, enableScroll]);
 
     const handleClose = () => {
         onClose();
