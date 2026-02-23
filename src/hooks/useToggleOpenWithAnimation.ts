@@ -8,37 +8,46 @@ export function useToggleOpenWithAnimation() {
     }
 
     const ref = useRef<HTMLDivElement>(null);
-    // Using api instead of just style to allow imperative animation
-    const [style, api] = useSpring(() => ({
-        height: "0px",
-        overflow: "hidden", // Start hidden
-        config: { tension: 120, friction: 24, clamp: true }
-    }), []);
+    
+    const [style, api] = useSpring(() => (
+        {
+            height: 0,
+            opacity: 0,
+            config: { tension: 170, friction: 26, clamp: false }
+        }
+    ), []);
+
+    const AnimatedDiv = animated.div;
 
     useEffect(() => {
-        if (ref.current !== null) {
-            api.start({
-                height: (isOpen ? ref.current.offsetHeight : 0) + "px", // Use offsetHeight for accurate content measurement
-                overflow: isOpen ? "visible" : "hidden", // Toggle overflow
-                onRest: () => {
-                    if (isOpen) {
-                        // Keep hidden when fully open per user request
-                        api.start({ overflow: "hidden" });
-                    } else {
-                        // Keep hidden when closed
-                        api.start({ overflow: "hidden" });
-                    }
-                }
-            });
+        if (ref.current) {
+            const element = ref.current;
+            const contentHeight = element.scrollHeight; // Use scrollHeight instead of offsetHeight
+            
+            if (isOpen) {
+                api.start({
+                    height: contentHeight,
+                    opacity: 1,
+                });
+            } else {
+                api.start({
+                    height: 0,
+                    opacity: 0,
+                });
+            }
         }
-    }, [api, ref, isOpen]);
+    }, [isOpen, api]);
 
     return {
         isOpen,
-        setIsOpen, // Allow external control if needed (e.g. closing on link click)
+        setIsOpen,
         handleClick,
-        animated,
-        style,
+        animated: { div: AnimatedDiv },
+        style: {
+            height: style.height,
+            overflow: "hidden" as const,
+            opacity: style.opacity,
+        },
         ref,
     };
 }
