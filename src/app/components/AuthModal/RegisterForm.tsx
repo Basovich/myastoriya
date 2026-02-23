@@ -187,18 +187,22 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
     return (
         <>
             <h2 className={s.title}>Реєстрація в кабінеті</h2>
-            <form className={s.form} onSubmit={formik.handleSubmit} noValidate>
+            <form className={s.form} onSubmit={formik.handleSubmit} noValidate autoComplete="off">
                 <div className={s.field}>
                     <input
+                        id="reg-name"
                         type="text"
                         name="name"
+                        autoComplete="off"
+                        readOnly
+                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
                         className={`${s.input} ${formik.touched.name && formik.errors.name ? s.inputError : ''}`}
                         placeholder="Ім'я"
                         value={formik.values.name}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    <label className={s.inputLabel}>Ім&apos;я*</label>
+                    <label htmlFor="reg-name" className={s.inputLabel}>Ім&apos;я*</label>
                     {formik.touched.name && formik.errors.name && (
                         <span className={s.fieldError}>{formik.errors.name}</span>
                     )}
@@ -206,15 +210,19 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
 
                 <div className={s.field}>
                     <input
+                        id="reg-phone"
                         type="tel"
                         name="phone"
+                        autoComplete="off"
+                        readOnly
+                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
                         className={`${s.input} ${formik.touched.phone && formik.errors.phone ? s.inputError : ''}`}
                         placeholder="Телефон"
                         value={formik.values.phone}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    <label className={s.inputLabel}>Телефон*</label>
+                    <label htmlFor="reg-phone" className={s.inputLabel}>Телефон*</label>
                     {formik.touched.phone && formik.errors.phone && (
                         <span className={s.fieldError}>{formik.errors.phone}</span>
                     )}
@@ -222,15 +230,19 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
 
                 <div className={s.field}>
                     <input
+                        id="reg-password"
                         type="password"
                         name="password"
+                        autoComplete="off"
+                        readOnly
+                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
                         className={`${s.input} ${formik.touched.password && formik.errors.password ? s.inputError : ''}`}
                         placeholder="Пароль"
                         value={formik.values.password}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    <label className={s.inputLabel}>Пароль*</label>
+                    <label htmlFor="reg-password" className={s.inputLabel}>Пароль*</label>
                     {formik.touched.password && formik.errors.password && (
                         <span className={s.fieldError}>{formik.errors.password}</span>
                     )}
@@ -238,15 +250,19 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
 
                 <div className={s.field}>
                     <input
+                        id="reg-confirm-password"
                         type="password"
                         name="confirmPassword"
+                        autoComplete="off"
+                        readOnly
+                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
                         className={`${s.input} ${formik.touched.confirmPassword && formik.errors.confirmPassword ? s.inputError : ''}`}
                         placeholder="Повторити пароль"
                         value={formik.values.confirmPassword}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    <label className={s.inputLabel}>Повторити пароль*</label>
+                    <label htmlFor="reg-confirm-password" className={s.inputLabel}>Повторити пароль*</label>
                     {formik.touched.confirmPassword && formik.errors.confirmPassword && (
                         <span className={s.fieldError}>{formik.errors.confirmPassword}</span>
                     )}

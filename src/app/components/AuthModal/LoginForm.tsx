@@ -61,18 +61,22 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
     return (
         <>
             <h2 className={s.title}>Вхід до кабінету</h2>
-            <form className={s.form} onSubmit={formik.handleSubmit} noValidate>
+            <form className={s.form} onSubmit={formik.handleSubmit} noValidate autoComplete="off">
                 <div className={s.field}>
                     <input
+                        id="login-phone"
                         type="tel"
                         name="phone"
+                        autoComplete="off"
+                        readOnly
+                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
                         className={`${s.input} ${formik.touched.phone && formik.errors.phone ? s.inputError : ''}`}
                         placeholder="Телефон"
                         value={formik.values.phone}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    <label className={s.inputLabel}>Телефон*</label>
+                    <label htmlFor="login-phone" className={s.inputLabel}>Телефон*</label>
                     {formik.touched.phone && formik.errors.phone && (
                         <span className={s.fieldError}>{formik.errors.phone}</span>
                     )}
@@ -80,15 +84,19 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
 
                 <div className={s.field}>
                     <input
+                        id="login-password"
                         type="password"
                         name="password"
+                        autoComplete="off"
+                        readOnly
+                        onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
                         className={`${s.input} ${formik.touched.password && formik.errors.password ? s.inputError : ''}`}
                         placeholder="Пароль"
                         value={formik.values.password}
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    <label className={s.inputLabel}>Пароль*</label>
+                    <label htmlFor="login-password" className={s.inputLabel}>Пароль*</label>
                     {formik.touched.password && formik.errors.password && (
                         <span className={s.fieldError}>{formik.errors.password}</span>
                     )}
