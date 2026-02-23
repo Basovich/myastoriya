@@ -15,8 +15,7 @@ export default function LanguageSwitch({ lang }: LanguageSwitchProps) {
     const getSwitchUrl = (targetLang: 'ua' | 'ru') => {
         if (!pathname) return '/';
         const segments = pathname.split('/').filter(Boolean);
-
-        let newSegments = [...segments];
+        const newSegments = [...segments];
 
         // Process if current first segment is a known locale
         if (segments[0] === 'ua' || segments[0] === 'ru') {
