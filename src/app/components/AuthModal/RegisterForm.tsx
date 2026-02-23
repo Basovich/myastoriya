@@ -5,6 +5,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
+import { usePhoneMask } from '@/hooks/usePhoneMask';
 import s from './AuthModal.module.scss';
 
 const VERIFICATION_CODE = '7535'; // Stub code
@@ -43,7 +44,7 @@ const registerSchema = Yup.object({
         .min(2, 'Мінімум 2 символи'),
     phone: Yup.string()
         .required('Обов\'язкове поле')
-        .matches(/^\+?\d{10,13}$/, 'Невірний формат телефону'),
+        .matches(/^\d{12}$/, 'Введіть повний номер: +38 (0XX) XXX XX XX'),
     password: Yup.string()
         .required('Обов\'язкове поле')
         .min(6, 'Мінімум 6 символів'),
@@ -87,6 +88,11 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
             }
         },
     });
+
+    const { formatted: phoneFormatted, handleChange: handlePhoneChange } = usePhoneMask(
+        formik.values.phone,
+        (raw) => formik.setFieldValue('phone', raw),
+    );
 
     const handleCodeChange = (index: number, value: string) => {
         if (value.length > 1) value = value.slice(-1);
@@ -217,10 +223,10 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         readOnly
                         onFocus={(e) => e.currentTarget.removeAttribute('readOnly')}
                         className={`${s.input} ${formik.touched.phone && formik.errors.phone ? s.inputError : ''}`}
-                        placeholder="Телефон"
-                        value={formik.values.phone}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
+                        placeholder="+38 (0__) ___ __ __"
+                        value={phoneFormatted}
+                        onChange={handlePhoneChange}
+                        onBlur={() => formik.setFieldTouched('phone', true)}
                     />
                     <label htmlFor="reg-phone" className={s.inputLabel}>Телефон*</label>
                     {formik.touched.phone && formik.errors.phone && (
