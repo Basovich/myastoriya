@@ -5,7 +5,7 @@
     width: 100%;
     height: 100vh;
     height: 100dvh;
-    background: #ffffff;
+    background:  rgba(0, 0, 0, 0.2);
     z-index: 100;
     display: flex;
     flex-direction: column;
@@ -70,7 +70,7 @@
 
 .infoRow {
     display: flex;
-    align-items: flex-start;
+    align-items: flex-center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 16px;
@@ -108,9 +108,8 @@
 /* Scrollable content area */
 .menuBody {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
 }
 
 .catalogHeader {
@@ -140,7 +139,7 @@
 
 .catalogListWrapper {
     background: #ffffff;
-    overflow: hidden;
+    /* overflow and max-height are controlled via react-spring inline styles */
 }
 
 .catalogList {
@@ -177,7 +176,7 @@
     background: #000000;
     color: #ffffff;
     padding: 24px 20px;
-    flex: 1;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
 }

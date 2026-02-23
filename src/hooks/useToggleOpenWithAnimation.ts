@@ -1,42 +1,30 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { animated, useSpring } from "@react-spring/web";
 
 export function useToggleOpenWithAnimation() {
     const [isOpen, setIsOpen] = useState(false);
-    const handleClick = () => {
-        setIsOpen(!isOpen);
-    }
 
     const ref = useRef<HTMLDivElement>(null);
-    
-    const [style, api] = useSpring(() => (
-        {
-            height: 0,
-            opacity: 0,
-            config: { tension: 170, friction: 26, clamp: false }
-        }
-    ), []);
+
+    const [style, api] = useSpring(() => ({
+        from: { maxHeight: "0px", opacity: 0 },
+        config: { tension: 170, friction: 26, clamp: true },
+    }), []);
 
     const AnimatedDiv = animated.div;
 
+    // Drive the spring from state — no stale closure possible
     useEffect(() => {
-        if (ref.current) {
-            const element = ref.current;
-            const contentHeight = element.scrollHeight; // Use scrollHeight instead of offsetHeight
-            
-            if (isOpen) {
-                api.start({
-                    height: contentHeight,
-                    opacity: 1,
-                });
-            } else {
-                api.start({
-                    height: 0,
-                    opacity: 0,
-                });
-            }
+        if (isOpen) {
+            api.start({ maxHeight: "2000px", opacity: 1 });
+        } else {
+            api.start({ maxHeight: "0px", opacity: 0 });
         }
     }, [isOpen, api]);
+
+    const handleClick = () => {
+        setIsOpen((prev) => !prev);
+    };
 
     return {
         isOpen,
@@ -44,7 +32,7 @@ export function useToggleOpenWithAnimation() {
         handleClick,
         animated: { div: AnimatedDiv },
         style: {
-            height: style.height,
+            maxHeight: style.maxHeight,
             overflow: "hidden" as const,
             opacity: style.opacity,
         },
