@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import s from "./TopBar.module.scss";
 import siteData from "@/content/site.json";
 import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
+import { useAppSelector } from "@/store/hooks";
 
 import LanguageSwitch from "@/app/components/Header/Shared/LanguageSwitch";
 import PointsInfo from "@/app/components/Header/DesktopHeader/MainBar/PointsInfo";
@@ -21,6 +24,8 @@ const TOP_NAV_ITEMS = [
 ];
 
 export default function TopBar({ lang }: TopBarProps) {
+    const { isAuthenticated } = useAppSelector((state) => state.auth);
+
     return (
         <nav className={s.secondaryNav}>
             <div className={s.secondaryInner}>
@@ -36,7 +41,7 @@ export default function TopBar({ lang }: TopBarProps) {
                 </div>
 
                 <div className={s.navRight}>
-                    <PointsInfo />
+                    {isAuthenticated && <PointsInfo />}
                     <a href={`tel:${siteData.contact.phone.replace(/\s+/g, '')}`} className={s.navPhone}>
                         <img src="/icons/icon-phone-outline.svg" alt="Phone" width="16" height="16" />
                         {siteData.contact.phone}
