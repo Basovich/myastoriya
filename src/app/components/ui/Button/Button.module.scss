@@ -21,8 +21,10 @@
     border-radius: var(--radius-md);
     font-size: 14px;
 
-    &:hover {
-        background: var(--color-accent-hover);
+    @media (any-hover: hover) {
+        &:hover {
+            background: var(--color-accent-hover);
+        }
     }
 }
 
@@ -36,9 +38,11 @@
     font-weight: 700;
     border-radius: 10px;
 
-    &:hover {
-        border-color: var(--color-accent);
-        background-color: var(--color-accent);
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: var(--color-accent);
+            background-color: var(--color-accent);
+        }
     }
 }
 
@@ -51,10 +55,12 @@
     font-size: 14px;
     font-weight: 600;
 
-    &:hover {
-        border-color: var(--color-text-primary);
-        background-color: var(--color-text-primary);
-        color: #fff;
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: var(--color-text-primary);
+            background-color: var(--color-text-primary);
+            color: #fff;
+        }
     }
 }
 
@@ -69,9 +75,11 @@
     padding: 0;
     font-size: 18px;
 
-    &:hover {
-        border-color: var(--color-accent);
-        color: var(--color-accent);
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
     }
 }
 
@@ -87,10 +95,12 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
 
-    &:hover {
-        background-color: var(--color-text-primary);
-        border-color: var(--color-text-primary);
-        color: #fff;
+    @media (any-hover: hover) {
+        &:hover {
+            background-color: var(--color-text-primary);
+            border-color: var(--color-text-primary);
+            color: #fff;
+        }
     }
 
     &.active {

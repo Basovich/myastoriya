@@ -19,8 +19,10 @@
     flex-shrink: 0;
     transition: opacity 0.2s;
 
-    &:hover {
-        opacity: 0.9;
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.9;
+        }
     }
 }
 
@@ -57,9 +59,11 @@
         align-items: center;
         justify-content: center;
 
-        &:hover {
-            border-color: #666;
-            background: #1a1a1a;
+        @media (any-hover: hover) {
+            &:hover {
+                border-color: #666;
+                background: #1a1a1a;
+            }
         }
 
         img {

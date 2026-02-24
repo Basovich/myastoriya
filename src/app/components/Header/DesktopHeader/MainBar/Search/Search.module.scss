@@ -49,7 +49,9 @@
     height: 36px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
-    &:hover {
-        opacity: 0.9;
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.9;
+        }
     }
 }

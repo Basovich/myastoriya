@@ -18,8 +18,10 @@
     color: #222;
     white-space: nowrap;
 
-    &:hover {
-        background: #f5f5f5;
+    @media (any-hover: hover) {
+        &:hover {
+            background: #f5f5f5;
+        }
     }
 }
 
@@ -28,8 +30,4 @@
         background: #222;
         color: #fff;
     }
-}
-
-.underline {
-    /* TODO: Implement underline variant */
 }

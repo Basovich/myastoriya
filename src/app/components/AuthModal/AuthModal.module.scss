@@ -35,10 +35,13 @@
     align-self: flex-end;
     transition: color 0.2s;
 
-    &:hover,
-    &:focus {
-        color: #E6000F;
-        outline: none;
+    @media (any-hover: hover) {
+
+        &:hover,
+        &:focus {
+            color: #E6000F;
+            outline: none;
+        }
     }
 }
 
@@ -142,8 +145,10 @@
     align-self: flex-start;
     margin-top: 12px;
 
-    &:hover {
-        text-decoration: underline;
+    @media (any-hover: hover) {
+        &:hover {
+            text-decoration: underline;
+        }
     }
 }
 
@@ -162,8 +167,10 @@
     margin-top: 22px;
     transition: background 0.2s;
 
-    &:hover {
-        background: #cc000d;
+    @media (any-hover: hover) {
+        &:hover {
+            background: #cc000d;
+        }
     }
 
     &:disabled {
@@ -193,8 +200,10 @@
     border: none;
     padding: 0;
 
-    &:hover {
-        color: #1a6dd4;
+    @media (any-hover: hover) {
+        &:hover {
+            color: #1a6dd4;
+        }
     }
 }
 
@@ -260,8 +269,10 @@
     background: none;
     border: none;
 
-    &:hover {
-        text-decoration: underline;
+    @media (any-hover: hover) {
+        &:hover {
+            text-decoration: underline;
+        }
     }
 }
 

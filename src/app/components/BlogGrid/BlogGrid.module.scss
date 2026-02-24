@@ -65,8 +65,10 @@
         text-decoration: none;
         color: #222;
 
-        &:hover {
-            color: #E30613;
+        @media (any-hover: hover) {
+            &:hover {
+                color: #E30613;
+            }
         }
     }
 
@@ -102,8 +104,10 @@
     color: #222;
     transition: all 0.2s;
 
-    &:hover {
-        border-color: #222;
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #222;
+        }
     }
 }
 
@@ -113,8 +117,10 @@
     border-color: #111;
     cursor: default;
 
-    &:hover {
-        border-color: #111;
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #111;
+        }
     }
 }
 
@@ -146,9 +152,11 @@
     overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
 
-    &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    @media (any-hover: hover) {
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
     }
 }
 
@@ -243,8 +251,10 @@
     transition: all 0.2s;
     border: none;
 
-    &:hover {
-        background: rgba(0, 0, 0, 0.05);
+    @media (any-hover: hover) {
+        &:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
     }
 }
 
@@ -252,8 +262,10 @@
     background: #000;
     color: #FFF;
 
-    &:hover {
-        background: #000;
+    @media (any-hover: hover) {
+        &:hover {
+            background: #000;
+        }
     }
 }
 
@@ -373,8 +385,10 @@
     cursor: pointer;
     transition: background-color 0.2s;
 
-    &:hover {
-        background-color: #cc000d;
+    @media (any-hover: hover) {
+        &:hover {
+            background-color: #cc000d;
+        }
     }
 }
 

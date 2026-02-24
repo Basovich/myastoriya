@@ -15,8 +15,10 @@
     gap: 8px;
     overflow: hidden;
 
-    &:hover {
-        opacity: 0.9;
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.9;
+        }
     }
 }
 
@@ -45,9 +47,11 @@
         border-radius: 12px;
         gap: 8px;
 
-        &:hover {
-            border-color: #666;
-            background: #1a1a1a;
+        @media (any-hover: hover) {
+            &:hover {
+                border-color: #666;
+                background: #1a1a1a;
+            }
         }
     }
 
@@ -63,9 +67,11 @@
         background: var(--color-accent, #E6000F);
         border-color: transparent;
 
-        &:hover {
-            opacity: 0.85;
-            background: var(--color-accent, #E6000F);
+        @media (any-hover: hover) {
+            &:hover {
+                opacity: 0.85;
+                background: var(--color-accent, #E6000F);
+            }
         }
     }
 }

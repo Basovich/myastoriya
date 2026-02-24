@@ -44,8 +44,10 @@
             stroke: #e30613;
         }
 
-        &:hover {
-            background-color: #fcebeb;
+        @media (any-hover: hover) {
+            &:hover {
+                background-color: #fcebeb;
+            }
         }
 
         &:disabled {

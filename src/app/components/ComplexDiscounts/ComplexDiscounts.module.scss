@@ -29,8 +29,10 @@
     transition: all 0.2s;
     color: #E30613;
 
-    &:hover {
-        background-color: #fcebeb;
+    @media (any-hover: hover) {
+        &:hover {
+            background-color: #fcebeb;
+        }
     }
 
     &:disabled,

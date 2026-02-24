@@ -50,7 +50,9 @@
     transition: background 0.2s;
     white-space: nowrap;
 
-    &:hover {
-        background: #cc000d;
+    @media (any-hover: hover) {
+        &:hover {
+            background: #cc000d;
+        }
     }
 }

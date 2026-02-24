@@ -18,9 +18,11 @@
     transition: background 0.2s, border-color 0.2s;
     cursor: pointer;
 
-    &:hover {
-        background: #f5f5f5;
-        border-color: #ccc;
+    @media (any-hover: hover) {
+        &:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
     }
 
     &:disabled {

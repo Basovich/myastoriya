@@ -13,8 +13,10 @@
     transition: opacity 0.2s;
     cursor: pointer;
 
-    &:hover {
-        opacity: 0.9;
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.9;
+        }
     }
 
     /* Icon style if passing SVG directly or managing via CSS */

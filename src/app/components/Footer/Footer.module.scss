@@ -61,15 +61,17 @@
     align-items: center;
     gap: 8px;
     padding: 10px 20px 16px;
-    background: transparent;
+    background-color: transparent;
     border: 1px solid var(--color-border-base);
     border-radius: 12px;
     color: #fff;
     text-decoration: none;
-    transition: background 0.2s;
+    transition: background-color 0.2s;
 
-    &:hover {
-        background: rgba(255, 255, 255, 0.1);
+    @media (any-hover: hover) {
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
     }
 
     div {
@@ -100,17 +102,19 @@
     width: 74px;
     height: 74px;
     border-radius: 12px;
-    background: transparent;
+    background-color: transparent;
     border: 1px solid var(--color-border-base);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--color-text-primary);
     text-decoration: none;
-    transition: all 0.2s;
+    transition: background-color 0.2s;
 
-    &:hover {
-        background: rgba(255, 255, 255, 0.1);
+    @media (any-hover: hover) {
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
     }
 }
 
@@ -130,8 +134,10 @@
     text-decoration: none;
     transition: color 0.2s;
 
-    &:hover {
-        color: var(--color-text-primary);
+    @media (any-hover: hover) {
+        &:hover {
+            color: var(--color-text-primary);
+        }
     }
 }
 
@@ -141,8 +147,10 @@
     width: 100%;
     transition: opacity 0.2s;
 
-    &:hover {
-        opacity: 0.95;
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.95;
+        }
     }
 }
 
@@ -174,8 +182,10 @@
     letter-spacing: 0.03em;
     transition: background-color 0.2s;
 
-    &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+    @media (any-hover: hover) {
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
     }
 }
 

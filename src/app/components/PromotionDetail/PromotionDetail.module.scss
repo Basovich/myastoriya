@@ -173,9 +173,11 @@
     transition: transform 0.2s, box-shadow 0.2s;
     border: 1px solid #EBEBEB;
 
-    &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+    @media (any-hover: hover) {
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+        }
     }
 }
 

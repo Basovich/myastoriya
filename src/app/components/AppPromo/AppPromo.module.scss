@@ -103,9 +103,11 @@
     transition: background-color 0.2s, border-color 0.2s;
     background: transparent;
 
-    &:hover {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.4);
+    @media (any-hover: hover) {
+        &:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
     }
 
     img {

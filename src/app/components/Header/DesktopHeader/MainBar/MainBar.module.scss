@@ -36,9 +36,11 @@
     cursor: pointer;
     flex-shrink: 0;
 
-    &:hover {
-        border-color: #666;
-        background: #1a1a1a;
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #666;
+            background: #1a1a1a;
+        }
     }
 }
 

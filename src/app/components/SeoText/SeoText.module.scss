@@ -16,6 +16,7 @@
     /* Default state: 3 lines truncated */
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -23,6 +24,7 @@
     &.expanded {
         display: block;
         -webkit-line-clamp: unset;
+        line-clamp: unset;
         overflow: visible;
     }
 }
@@ -49,9 +51,11 @@
     cursor: pointer;
     transition: all 0.2s;
 
-    &:hover {
-        border-color: #222;
-        background-color: #f7f7f7;
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #222;
+            background-color: #f7f7f7;
+        }
     }
 
     .btnText {
