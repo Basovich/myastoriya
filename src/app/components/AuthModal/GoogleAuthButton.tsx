@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { AuthUser } from '@/store/slices/authSlice';
 import s from './GoogleAuthButton.module.scss';
 
 interface GoogleAuthButtonProps {
-    onSuccess?: (userData: any) => void;
+    onSuccess?: (userData: AuthUser) => void;
 }
 
 export default function GoogleAuthButton({ onSuccess }: GoogleAuthButtonProps) {
@@ -12,18 +13,16 @@ export default function GoogleAuthButton({ onSuccess }: GoogleAuthButtonProps) {
 
     const handleGoogleAuth = async () => {
         setIsLoading(true);
-        // TODO: Real Google Authentication integration will be added later
         console.log('Google Auth Clicked');
 
         try {
-            // Mock delay
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             if (onSuccess) {
                 onSuccess({
                     name: 'Google User',
                     email: 'google@example.com',
-                    provider: 'google'
+                    phone: '+380XXXXXXXXX',
                 });
             }
         } catch (error) {

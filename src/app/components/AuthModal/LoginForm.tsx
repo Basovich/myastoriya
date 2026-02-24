@@ -56,8 +56,9 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
                 const user = await loginAPI(values.phone, values.password);
                 dispatch(login(user));
                 onSuccess();
-            } catch (err: any) {
-                setStatus(err.message || 'Помилка входу');
+            } catch (err) {
+                const errorMessage = err instanceof Error ? err.message : 'Помилка входу';
+                setStatus(errorMessage);
             }
         },
     });
