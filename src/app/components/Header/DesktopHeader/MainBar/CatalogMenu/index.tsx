@@ -10,6 +10,7 @@ interface Category {
     id: string;
     title: string;
     icon?: string;
+    bgImage?: string;
     subcategories?: { title: string; href: string; icon?: string }[];
 }
 
@@ -18,6 +19,7 @@ const CATALOG_DATA: Category[] = [
         id: "summer",
         title: "Літнє меню",
         icon: "/icons/icon-category.svg",
+        bgImage: "/images/catalog-bg.png",
         subcategories: [
             { title: "Окрошка", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Салат з полуницею", href: "#", icon: "/icons/icon-category.svg" },
@@ -28,6 +30,7 @@ const CATALOG_DATA: Category[] = [
         id: "takeaway",
         title: "Візьми з собою",
         icon: "/icons/icon-category.svg",
+        bgImage: "/images/catalog-bg.png",
         subcategories: [
             { title: "Ланч бокси", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Кава з собою", href: "#", icon: "/icons/icon-category.svg" },
@@ -38,6 +41,7 @@ const CATALOG_DATA: Category[] = [
         id: "sets",
         title: "Набори для компаній",
         icon: "/icons/icon-category.svg",
+        bgImage: "/images/cat-sets.png",
         subcategories: [
             { title: "М'ясний сет", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Сет закусок", href: "#", icon: "/icons/icon-category.svg" },
@@ -48,6 +52,7 @@ const CATALOG_DATA: Category[] = [
         id: "grill",
         title: "Гриль меню",
         icon: "/icons/icon-category.svg",
+        bgImage: "/images/cat-grill.png",
         subcategories: [
             { title: "Шашлик", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Люля-кебаб", href: "#", icon: "/icons/icon-category.svg" },
@@ -58,6 +63,7 @@ const CATALOG_DATA: Category[] = [
         id: "brand-steaks",
         title: "Стейки від бренд-шефа",
         icon: "/icons/icon-cow.svg",
+        bgImage: "/images/catalog-bg.png",
         subcategories: [
             { title: "Стейки сухої витримки", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Стейки вологої витримки", href: "#", icon: "/icons/icon-category.svg" },
@@ -70,6 +76,7 @@ const CATALOG_DATA: Category[] = [
         id: "restaurant",
         title: "Ресторанне меню",
         icon: "/icons/icon-category.svg",
+        bgImage: "/images/cat-restaurant.png",
         subcategories: [
             { title: "Перші страви", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Салати", href: "#", icon: "/icons/icon-category.svg" },
@@ -80,6 +87,7 @@ const CATALOG_DATA: Category[] = [
         id: "burgers",
         title: "Бургери",
         icon: "/icons/icon-category.svg",
+        bgImage: "/images/cat-burgers.png",
         subcategories: [
             { title: "Чізбургер", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Фірмовий бургер", href: "#", icon: "/icons/icon-category.svg" },
@@ -90,6 +98,7 @@ const CATALOG_DATA: Category[] = [
         id: "kids",
         title: "Дитяче меню",
         icon: "/icons/icon-category.svg",
+        bgImage: "/images/catalog-bg.png",
         subcategories: [
             { title: "Нагетси", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Макарони", href: "#", icon: "/icons/icon-category.svg" },
@@ -100,6 +109,7 @@ const CATALOG_DATA: Category[] = [
         id: "production",
         title: "Власне виробництво",
         icon: "/icons/icon-category.svg",
+        bgImage: "/images/catalog-bg.png",
         subcategories: [
             { title: "Пельмені", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Вареники", href: "#", icon: "/icons/icon-category.svg" },
@@ -110,6 +120,7 @@ const CATALOG_DATA: Category[] = [
         id: "meat",
         title: "М'ясна продукція",
         icon: "/icons/icon-cow.svg",
+        bgImage: "/images/catalog-bg.png",
         subcategories: [
             { title: "Яловичина", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Свинина", href: "#", icon: "/icons/icon-category.svg" },
@@ -120,6 +131,7 @@ const CATALOG_DATA: Category[] = [
         id: "preservation",
         title: "Консервація",
         icon: "/icons/icon-category.svg",
+        bgImage: "/images/catalog-bg.png",
         subcategories: [
             { title: "Огірки", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Помідори", href: "#", icon: "/icons/icon-category.svg" },
@@ -130,6 +142,7 @@ const CATALOG_DATA: Category[] = [
         id: "cheese",
         title: "Сири",
         icon: "/icons/icon-lamb.svg",
+        bgImage: "/images/catalog-bg.png",
         subcategories: [
             { title: "М'які сири", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Тверді сири", href: "#", icon: "/icons/icon-category.svg" },
@@ -139,6 +152,7 @@ const CATALOG_DATA: Category[] = [
         id: "oil",
         title: "Масло",
         icon: "/icons/icon-category.svg",
+        bgImage: "/images/catalog-bg.png",
         subcategories: [
             { title: "Вершкове масло", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Масло з травами", href: "#", icon: "/icons/icon-category.svg" },
@@ -148,6 +162,7 @@ const CATALOG_DATA: Category[] = [
         id: "sauces",
         title: "Соуси",
         icon: "/icons/icon-skewer.svg",
+        bgImage: "/images/catalog-bg.png",
         subcategories: [
             { title: "Гострі соуси", href: "#", icon: "/icons/icon-category.svg" },
             { title: "Томатні соуси", href: "#", icon: "/icons/icon-category.svg" },
@@ -210,9 +225,9 @@ export default function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                 </div>
 
                 <div className={s.content}>
-                    <div className={s.bgImageWrapper}>
+                    <div className={s.bgImageWrapper} key={activeCategory.id}>
                         <Image
-                            src="/images/catalog-bg.png"
+                            src={activeCategory.bgImage || "/images/catalog-bg.png"}
                             alt="Background"
                             fill
                             className={s.bgImage}
