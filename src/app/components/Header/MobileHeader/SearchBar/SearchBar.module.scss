@@ -26,8 +26,7 @@
     outline: none;
 
     &:focus-visible {
-        box-shadow: 0 0 0 1px #333;
-        border-radius: 4px;
+        outline: none;
     }
 
     padding: 0 10px;
@@ -47,7 +46,7 @@
     border: none;
     border-radius: 10px;
     height: 100%;
-    padding: 0 24px;
+    padding: 6px 24px 0;
     font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
