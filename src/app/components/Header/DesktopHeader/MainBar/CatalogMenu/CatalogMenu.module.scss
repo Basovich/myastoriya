@@ -21,7 +21,7 @@
 }
 
 .sidebar {
-    width: 344px;
+    width: calc((100vw - 830px) / 2);
     background: #F6F6F6;
     padding: 24px 0;
     overflow-y: auto;
@@ -37,18 +37,21 @@
     cursor: pointer;
     transition: all 0.2s;
 
-    &:hover,
+    @media (any-hover: hover) {
+      &:hover {
+          background: #fff;
+
+          .catTitle {
+              font-weight: 700;
+          }
+      }
+    }
+
     &.active {
         background: #fff;
 
         .catTitle {
-            color: #E6000F;
             font-weight: 700;
-        }
-
-        .icon {
-            filter: none;
-            opacity: 1;
         }
     }
 }
@@ -56,13 +59,13 @@
 .categoryLink {
     display: flex;
     align-items: center;
-    padding: 12px 32px 12px 110px;
-    /* Aligned with design */
+    padding: 12px 32px 12px calc((100vw - 1280px) / 2);
     gap: 12px;
 }
 
 .iconWrapper {
     width: 20px;
+    min-width: 20px;
     height: 20px;
     display: flex;
     align-items: center;
@@ -140,10 +143,32 @@
     text-decoration: none;
     font-size: 16px;
     transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 
-    &:hover {
-        color: #E6000F;
+    @media (any-hover: hover) {
+      &:hover {
+          font-weight: 700;
+      }
     }
+}
+
+.subIconWrapper {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.subIcon {
+    opacity: 0.6;
+    transition: all 0.2s;
+}
+
+.subTitleText {
+    white-space: nowrap;
 }
 
 .closeBtn {

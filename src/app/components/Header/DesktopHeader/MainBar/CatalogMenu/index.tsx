@@ -10,35 +10,149 @@ interface Category {
     id: string;
     title: string;
     icon?: string;
-    subcategories?: { title: string; href: string }[];
+    subcategories?: { title: string; href: string; icon?: string }[];
 }
 
 const CATALOG_DATA: Category[] = [
-    { id: "summer", title: "Літнє меню" },
-    { id: "takeaway", title: "Візьми з собою" },
-    { id: "sets", title: "Набори для компаній" },
-    { id: "grill", title: "Гриль меню" },
+    {
+        id: "summer",
+        title: "Літнє меню",
+        icon: "/icons/icon-category.svg",
+        subcategories: [
+            { title: "Окрошка", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Салат з полуницею", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Лимонад", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "takeaway",
+        title: "Візьми з собою",
+        icon: "/icons/icon-category.svg",
+        subcategories: [
+            { title: "Ланч бокси", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Кава з собою", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Сендвічі", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "sets",
+        title: "Набори для компаній",
+        icon: "/icons/icon-category.svg",
+        subcategories: [
+            { title: "М'ясний сет", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Сет закусок", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Гриль сет", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "grill",
+        title: "Гриль меню",
+        icon: "/icons/icon-category.svg",
+        subcategories: [
+            { title: "Шашлик", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Люля-кебаб", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Риба на грилі", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
     {
         id: "brand-steaks",
         title: "Стейки від бренд-шефа",
         icon: "/icons/icon-cow.svg",
         subcategories: [
-            { title: "Стейки сухої витримки", href: "#" },
-            { title: "Стейки вологої витримки", href: "#" },
-            { title: "Альтернативні стейки (гриль)", href: "#" },
-            { title: "М'ясо на грилі", href: "#" },
-            { title: "Овочі гриль", href: "#" },
+            { title: "Стейки сухої витримки", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Стейки вологої витримки", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Альтернативні стейки (гриль)", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "М'ясо на грилі", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Овочі гриль", href: "#", icon: "/icons/icon-category.svg" },
         ]
     },
-    { id: "restaurant", title: "Ресторанне меню" },
-    { id: "burgers", title: "Бургери" },
-    { id: "kids", title: "Дитяче меню" },
-    { id: "production", title: "Власне виробництво" },
-    { id: "meat", title: "М'ясна продукція", icon: "/icons/icon-cow.svg" },
-    { id: "preservation", title: "Консервація" },
-    { id: "cheese", title: "Сири", icon: "/icons/icon-lamb.svg" },
-    { id: "oil", title: "Масло" },
-    { id: "sauces", title: "Соуси", icon: "/icons/icon-skewer.svg" },
+    {
+        id: "restaurant",
+        title: "Ресторанне меню",
+        icon: "/icons/icon-category.svg",
+        subcategories: [
+            { title: "Перші страви", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Салати", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Гарніри", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "burgers",
+        title: "Бургери",
+        icon: "/icons/icon-category.svg",
+        subcategories: [
+            { title: "Чізбургер", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Фірмовий бургер", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Гострий бургер", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "kids",
+        title: "Дитяче меню",
+        icon: "/icons/icon-category.svg",
+        subcategories: [
+            { title: "Нагетси", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Макарони", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Дитяче пюре", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "production",
+        title: "Власне виробництво",
+        icon: "/icons/icon-category.svg",
+        subcategories: [
+            { title: "Пельмені", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Вареники", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Котлети", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "meat",
+        title: "М'ясна продукція",
+        icon: "/icons/icon-cow.svg",
+        subcategories: [
+            { title: "Яловичина", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Свинина", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Курятина", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "preservation",
+        title: "Консервація",
+        icon: "/icons/icon-category.svg",
+        subcategories: [
+            { title: "Огірки", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Помідори", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Соуси у банках", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "cheese",
+        title: "Сири",
+        icon: "/icons/icon-lamb.svg",
+        subcategories: [
+            { title: "М'які сири", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Тверді сири", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "oil",
+        title: "Масло",
+        icon: "/icons/icon-category.svg",
+        subcategories: [
+            { title: "Вершкове масло", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Масло з травами", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
+    {
+        id: "sauces",
+        title: "Соуси",
+        icon: "/icons/icon-skewer.svg",
+        subcategories: [
+            { title: "Гострі соуси", href: "#", icon: "/icons/icon-category.svg" },
+            { title: "Томатні соуси", href: "#", icon: "/icons/icon-category.svg" },
+        ]
+    },
 ];
 
 interface CatalogMenuProps {
@@ -107,13 +221,12 @@ export default function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                     </div>
 
                     <div className={s.subContent}>
-                        <h2 className={s.currentTitle}>{activeCategory.title}</h2>
                         {activeCategory.subcategories && (
                             <ul className={s.subList}>
                                 {activeCategory.subcategories.map((sub, i) => (
                                     <li key={i} className={s.subItem}>
                                         <Link href={sub.href} className={s.subLink}>
-                                            {sub.title}
+                                            <span className={s.subTitleText}>{sub.title}</span>
                                         </Link>
                                     </li>
                                 ))}
