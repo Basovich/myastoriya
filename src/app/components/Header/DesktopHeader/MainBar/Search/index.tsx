@@ -103,9 +103,9 @@ export default function Search() {
                                         </div>
                                     </div>
                                 ))}
-                                <div className={s.showAll} onClick={handleSearch}>
-                                    Показати все результати <span className={s.arrow}>→</span>
-                                </div>
+                                <button className={s.showAll} onClick={handleSearch}>
+                                    Показати всі результати
+                                </button>
                             </div>
                         ) : (
                             <div className={s.noResults}>
