@@ -24,6 +24,12 @@
     flex: 1;
     border: none;
     outline: none;
+
+    &:focus-visible {
+        box-shadow: 0 0 0 1px #333;
+        border-radius: 4px;
+    }
+
     padding: 0 10px;
     font-size: 14px;
     color: #333333;

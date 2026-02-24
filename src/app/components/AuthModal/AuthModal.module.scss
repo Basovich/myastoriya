@@ -16,6 +16,12 @@
 .modalWrapper {
     position: relative;
     outline: none;
+
+    &:focus-visible {
+        outline: 2px solid #E6000F;
+        outline-offset: 2px;
+    }
+
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -36,12 +42,15 @@
     transition: color 0.2s;
 
     @media (any-hover: hover) {
-
-        &:hover,
-        &:focus {
+        &:hover {
             color: #E6000F;
             outline: none;
         }
+    }
+
+    &:focus-visible {
+        color: #E6000F;
+        outline: none;
     }
 }
 
@@ -93,7 +102,7 @@
     outline: none;
     transition: border-color 0.2s;
 
-    &:focus {
+    &:focus-visible {
         border-color: #333;
     }
 
@@ -101,7 +110,7 @@
         color: transparent;
     }
 
-    &:focus+.inputLabel,
+    &:focus-visible+.inputLabel,
     &:not(:placeholder-shown)+.inputLabel {
         top: 6px;
         font-size: 10px;
@@ -256,7 +265,7 @@
     outline: none;
     transition: border-color 0.2s;
 
-    &:focus {
+    &:focus-visible {
         border-color: #333;
     }
 }
