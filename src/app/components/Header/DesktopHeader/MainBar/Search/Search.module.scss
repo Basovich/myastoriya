@@ -9,7 +9,7 @@
     height: 48px;
     transition: background 0.2s, box-shadow 0.2s;
 
-    &:focus-within {
+    &:focus-visible {
         box-shadow: 0 0 0 2px var(--color-accent, #E6000F);
     }
 }

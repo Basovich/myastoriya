@@ -1,6 +1,10 @@
 .section {
     background-color: #F6F6F6;
     padding: 32px 0;
+
+    @media (min-width: 1024px) {
+        padding: 60px 0;
+    }
 }
 
 .headerRow {
@@ -8,11 +12,19 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 32px;
+    }
 }
 
 .navArrows {
     display: none;
     gap: 8px;
+
+    @media (min-width: 1024px) {
+        display: flex;
+    }
 }
 
 .arrowBtn {
@@ -50,6 +62,10 @@
 .swiper {
     padding-bottom: 15px;
     overflow: visible;
+
+    @media (min-width: 1024px) {
+        overflow: hidden;
+    }
 }
 
 .card {
@@ -126,27 +142,8 @@
     line-height: 1.4;
     color: #222;
     margin: 0;
-}
 
-/* ===== Desktop ===== */
-@media (min-width: 1024px) {
-    .section {
-        padding: 60px 0;
-    }
-
-    .headerRow {
-        margin-bottom: 32px;
-    }
-
-    .navArrows {
-        display: flex;
-    }
-
-    .swiper {
-        overflow: hidden;
-    }
-
-    .cardTitle {
+    @media (min-width: 1024px) {
         font-size: 18px;
     }
 }

@@ -1,8 +1,16 @@
 .hero {
     width: 100%;
-    height: 522px;
+    height: 280px;
     position: relative;
     overflow: hidden;
+
+    @media (min-width: 481px) {
+        height: 360px;
+    }
+
+    @media (min-width: 769px) {
+        height: 522px;
+    }
 
     :global(.swiper-pagination) {
         display: flex;
@@ -73,8 +81,16 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 40px calc((100% - 900px) / 2);
+    padding: 16px;
     z-index: 2;
+
+    @media (min-width: 481px) {
+        padding: 24px;
+    }
+
+    @media (min-width: 769px) {
+        padding: 40px calc((100% - 900px) / 2);
+    }
 }
 
 .content {
@@ -82,27 +98,55 @@
     color: white;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
+
+    @media (min-width: 481px) {
+        gap: 16px;
+    }
+
+    @media (min-width: 769px) {
+        gap: 20px;
+    }
 }
 
 .badge {
     display: inline-block;
     color: #FFF;
-    font-size: 14px;
+    font-size: 0.75rem;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: 8px;
     width: fit-content;
+
+    @media (min-width: 481px) {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
 }
 
 .title {
-    font-size: clamp(1.75rem, 5vw, 3.5rem);
+    font-size: clamp(1.25rem, 4vw, 2rem);
     font-weight: 900;
     line-height: 1.2;
     margin: 0;
     text-transform: uppercase;
+
+    @media (min-width: 769px) {
+        font-size: clamp(1.75rem, 5vw, 3.5rem);
+    }
+}
+
+.ctaBtn {
+    padding: 12px 20px;
+    font-size: 0.75rem;
+
+    @media (min-width: 769px) {
+        /* Reset or add desktop styles if missing */
+        padding: 14px 32px;
+        font-size: 1rem;
+    }
 }
 
 .navArrow {
@@ -121,6 +165,12 @@
     justify-content: center;
     transition: all 0.3s ease;
     z-index: 10;
+    display: none;
+    /* Hide arrows on mobile by default */
+
+    @media (min-width: 769px) {
+        display: flex;
+    }
 
     @media (any-hover: hover) {
         &:hover {
@@ -135,52 +185,17 @@
 }
 
 .navLeft {
-    left: calc((100% - 1280px) / 2);
+    left: 16px;
+
+    @media (min-width: 769px) {
+        left: calc((100% - 1280px) / 2);
+    }
 }
 
 .navRight {
-    right: calc((100% - 1280px) / 2);
-}
+    right: 16px;
 
-// Responsive
-@media (max-width: 768px) {
-    .hero {
-        height: 360px;
-    }
-
-    .contentOverlay {
-        padding: 24px;
-    }
-
-    .content {
-        gap: 16px;
-    }
-
-    .title {
-        font-size: clamp(1.25rem, 4vw, 2rem);
-    }
-
-    .ctaBtn {
-        padding: 12px 20px;
-        font-size: 0.75rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero {
-        height: 280px;
-    }
-
-    .contentOverlay {
-        padding: 16px;
-    }
-
-    .badge {
-        font-size: 0.75rem;
-        padding: 6px 12px;
-    }
-
-    .content {
-        gap: 12px;
+    @media (min-width: 769px) {
+        right: calc((100% - 1280px) / 2);
     }
 }

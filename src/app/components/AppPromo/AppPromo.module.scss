@@ -2,6 +2,18 @@
     padding: 16px;
     background-color: #f5f5f5;
     /* Matches previous section's background color visually */
+
+    @media (min-width: 1024px) {
+        padding: 48px 40px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 120px calc((100% - 1200px) / 2) 50px;
+    }
+
+    @media (min-width: 1360px) {
+        padding: 120px calc((100% - 1280px) / 2) 50px;
+    }
 }
 
 .banner {
@@ -12,6 +24,12 @@
     position: relative;
     display: flex;
     flex-direction: column;
+
+    @media (min-width: 1024px) {
+        min-height: 220px;
+        flex-direction: row;
+        border-radius: 20px;
+    }
 }
 
 .imageWrap {
@@ -25,6 +43,13 @@
 
     @media (min-width: 768px) {
         width: 60%;
+    }
+
+    @media (min-width: 1024px) {
+        width: 60%;
+        /* Fade the left edge of the image into the dark banner background */
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%);
+        mask-image: linear-gradient(to right, transparent 0%, black 15%);
     }
 }
 
@@ -44,6 +69,14 @@
 
     /* Small gradient so text is readable over image on mobile */
     background: linear-gradient(to right, rgba(11, 11, 11, 1) 0%, rgba(11, 11, 11, 0.85) 50%, rgba(11, 11, 11, 0) 100%);
+
+    @media (min-width: 1024px) {
+        padding: 48px 60px;
+        min-height: 220px;
+        background: none;
+        /* Desktop image sits cleanly on the right */
+        width: 100%;
+    }
 }
 
 .textRightBox {
@@ -62,6 +95,13 @@
 .redArrows {
     display: flex;
     align-items: center;
+
+    @media (min-width: 1024px) {
+        svg {
+            width: 32px;
+            height: 32px;
+        }
+    }
 }
 
 .titles {
@@ -77,6 +117,10 @@
     margin: 0;
     line-height: 1;
     letter-spacing: 0.5px;
+
+    @media (min-width: 1024px) {
+        font-size: 22px;
+    }
 }
 
 .mainTitle {
@@ -86,6 +130,10 @@
     margin: 0;
     line-height: 1;
     letter-spacing: 0.5px;
+
+    @media (min-width: 1024px) {
+        font-size: 32px;
+    }
 }
 
 .buttons {
@@ -112,60 +160,5 @@
 
     img {
         object-fit: contain;
-    }
-}
-
-/* ===== Desktop ===== */
-@media (min-width: 1024px) {
-    .section {
-        padding: 48px 40px;
-    }
-
-    .banner {
-        min-height: 220px;
-        flex-direction: row;
-        border-radius: 20px;
-    }
-
-    .contentOverlay {
-        padding: 48px 60px;
-        min-height: 220px;
-        background: none;
-        /* Desktop image sits cleanly on the right */
-        width: 100%;
-    }
-
-    .imageWrap {
-        width: 60%;
-        /* Fade the left edge of the image into the dark banner background */
-        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%);
-        mask-image: linear-gradient(to right, transparent 0%, black 15%);
-    }
-
-    .subtitle {
-        font-size: 22px;
-    }
-
-    .mainTitle {
-        font-size: 32px;
-    }
-
-    .redArrows {
-        svg {
-            width: 32px;
-            height: 32px;
-        }
-    }
-}
-
-@media (min-width: 1280px) {
-    .section {
-        padding: 120px calc((100% - 1200px) / 2) 50px;
-    }
-}
-
-@media (min-width: 1360px) {
-    .section {
-        padding: 120px calc((100% - 1280px) / 2) 50px;
     }
 }

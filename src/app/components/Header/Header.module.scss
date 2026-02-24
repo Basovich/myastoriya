@@ -8,28 +8,22 @@
 
     @media (min-width: 1280px) {
         padding-bottom: 0;
+        background: transparent;
     }
 }
 
 .mobileOnly {
     display: block;
+
+    @media (min-width: 1280px) {
+        display: none;
+    }
 }
 
 .desktopOnly {
     display: none;
-}
 
-/* ===== Desktop (1280px+) ===== */
-@media (min-width: 1280px) {
-    .header {
-        background: transparent;
-    }
-
-    .mobileOnly {
-        display: none;
-    }
-
-    .desktopOnly {
+    @media (min-width: 1280px) {
         display: block;
     }
 }

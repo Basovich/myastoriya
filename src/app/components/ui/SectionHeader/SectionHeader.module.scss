@@ -4,6 +4,11 @@
     flex-direction: column;
     gap: 12px;
 
+    @media (min-width: 1024px) {
+        margin-bottom: 40px;
+        gap: 16px;
+    }
+
     &.center {
         align-items: center;
 
@@ -34,6 +39,10 @@
     color: var(--color-text-primary);
     text-transform: uppercase;
     letter-spacing: 0.02em;
+
+    @media (min-width: 1024px) {
+        font-size: 28px;
+    }
 }
 
 .dots {
@@ -47,15 +56,4 @@
     height: 10px;
     border-radius: 50%;
     background-color: var(--color-accent);
-}
-
-@media (min-width: 1024px) {
-    .sectionHeader {
-        margin-bottom: 40px;
-        gap: 16px;
-    }
-
-    .title {
-        font-size: 28px;
-    }
 }

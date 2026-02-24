@@ -1,5 +1,11 @@
 .section {
     padding: 32px 16px 48px;
+
+    @media (min-width: 1024px) {
+        padding: 64px 40px 80px;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
 }
 
 .title {
@@ -8,6 +14,11 @@
     color: #222;
     margin-bottom: 16px;
     text-transform: uppercase;
+
+    @media (min-width: 1024px) {
+        font-size: 24px;
+        margin-bottom: 24px;
+    }
 }
 
 .textContainer {
@@ -27,6 +38,10 @@
         line-clamp: unset;
         overflow: visible;
     }
+
+    @media (min-width: 1024px) {
+        margin-bottom: 32px;
+    }
 }
 
 .text {
@@ -34,6 +49,10 @@
     line-height: 1.6;
     color: #444;
     margin: 0;
+
+    @media (min-width: 1024px) {
+        font-size: 16px;
+    }
 }
 
 .toggleBtn {
@@ -60,27 +79,5 @@
 
     .btnText {
         letter-spacing: 0.05em;
-    }
-}
-
-/* ===== Desktop ===== */
-@media (min-width: 1024px) {
-    .section {
-        padding: 64px 40px 80px;
-        max-width: 1280px;
-        margin: 0 auto;
-    }
-
-    .title {
-        font-size: 24px;
-        margin-bottom: 24px;
-    }
-
-    .textContainer {
-        margin-bottom: 32px;
-    }
-
-    .text {
-        font-size: 16px;
     }
 }

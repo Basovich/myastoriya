@@ -3,6 +3,10 @@
     position: relative;
     overflow: hidden;
     padding: 32px 0;
+
+    @media (min-width: 1024px) {
+        padding: 64px 0;
+    }
 }
 
 /* Background watermark anchored right */
@@ -23,6 +27,12 @@
     padding: 16px;
     position: relative;
     z-index: 1;
+
+    @media (min-width: 1024px) {
+        padding: 24px 0;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
 }
 
 .tabsWrapper {
@@ -30,6 +40,10 @@
     align-items: center;
     position: relative;
     margin-bottom: 24px;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 40px;
+    }
 }
 
 .tabs {
@@ -42,6 +56,11 @@
 
     &::-webkit-scrollbar {
         display: none;
+    }
+
+    @media (min-width: 1024px) {
+        gap: 10px;
+        flex: 0 1 auto;
     }
 }
 
@@ -62,6 +81,11 @@
         stroke: #E30613;
         /* Red arrow */
     }
+
+    @media (min-width: 1024px) {
+        display: flex;
+        /* Show right arrow on desktop if scroll needed, or keep it always visible based on design */
+    }
 }
 
 .tabArrowRight {
@@ -76,6 +100,11 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+    }
 }
 
 .showMore {
@@ -92,40 +121,8 @@
         font-weight: 600;
         font-size: 14px;
     }
-}
 
-/* ===== Desktop ===== */
-@media (min-width: 1024px) {
-    .wrapper {
-        padding: 64px 0;
-    }
-
-    .section {
-        padding: 24px 0;
-        max-width: 1280px;
-        margin: 0 auto;
-    }
-
-    .tabsWrapper {
-        margin-bottom: 40px;
-    }
-
-    .tabs {
-        gap: 10px;
-        flex: 0 1 auto;
-    }
-
-    .tabArrow {
-        display: flex;
-        /* Show right arrow on desktop if scroll needed, or keep it always visible based on design */
-    }
-
-    .grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 24px;
-    }
-
-    .showMore {
+    @media (min-width: 1024px) {
         margin-top: 40px;
     }
 }

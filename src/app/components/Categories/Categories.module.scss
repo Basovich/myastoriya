@@ -3,6 +3,11 @@
     position: relative;
     max-width: 1280px;
     margin: 0 auto;
+
+    @media (min-width: 1024px) {
+        padding: 60px 0;
+        /* Align perfectly with max-width */
+    }
 }
 
 .sliderWrapper {
@@ -43,6 +48,11 @@
         transform: scale(1.05);
         box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
     }
+
+    @media (min-width: 1024px) {
+        width: 178px;
+        height: 178px;
+    }
 }
 
 .circleImg {
@@ -58,6 +68,10 @@
     text-align: center;
     line-height: 1.2;
     max-width: 140px;
+
+    @media (min-width: 1024px) {
+        font-size: 16px;
+    }
 }
 
 /* Nav Arrows */
@@ -88,41 +102,24 @@
     &:hover:not(.swiper-button-disabled) {
         transform: translateY(-50%) scale(1.05);
     }
+
+    @media (min-width: 1024px) {
+        top: calc(50% - 32px);
+    }
 }
 
 .navLeft {
     left: -30px;
+
+    @media (min-width: 1024px) {
+        left: -15px;
+    }
 }
 
 .navRight {
     right: -30px;
-}
 
-/* ===== Desktop ===== */
-@media (min-width: 1024px) {
-    .section {
-        padding: 60px 0;
-        /* Align perfectly with max-width */
-    }
-
-    .circle {
-        width: 178px;
-        height: 178px;
-    }
-
-    .label {
-        font-size: 16px;
-    }
-
-    .navLeft {
-        left: -15px;
-    }
-
-    .navRight {
+    @media (min-width: 1024px) {
         right: -15px;
-    }
-
-    .navArrow {
-        top: calc(50% - 32px);
     }
 }

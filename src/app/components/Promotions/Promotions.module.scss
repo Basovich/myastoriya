@@ -1,5 +1,11 @@
 .section {
     padding: 24px 16px;
+
+    @media (min-width: 1024px) {
+        padding: 48px 0;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
 }
 
 .promotionsHeader {
@@ -7,12 +13,20 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 32px;
+    }
 }
 
 .navArrows {
     display: none;
     /* Hidden on mobile by default since Swipe handles it */
     gap: 8px;
+
+    @media (min-width: 1024px) {
+        display: flex;
+    }
 }
 
 .arrowBtn {
@@ -56,6 +70,11 @@
     /* Spacing for custom shadows or overflow */
     overflow: visible;
     /* Allows mobile users to see next item peeking */
+
+    @media (min-width: 1024px) {
+        overflow: hidden;
+        /* Hide overflow on desktop to match a cleaner grid look */
+    }
 }
 
 .card {
@@ -97,26 +116,4 @@
     color: var(--color-text-primary);
     line-height: 1.4;
     margin: 0;
-}
-
-/* ===== Desktop ===== */
-@media (min-width: 1024px) {
-    .section {
-        padding: 48px 0;
-        max-width: 1280px;
-        margin: 0 auto;
-    }
-
-    .promotionsHeader {
-        margin-bottom: 32px;
-    }
-
-    .navArrows {
-        display: flex;
-    }
-
-    .swiper {
-        overflow: hidden;
-        /* Hide overflow on desktop to match a cleaner grid look */
-    }
 }

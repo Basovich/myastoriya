@@ -15,30 +15,7 @@
     gap: 8px;
     overflow: hidden;
 
-    @media (any-hover: hover) {
-        &:hover {
-            opacity: 0.9;
-        }
-    }
-}
-
-.icon {
-    filter: brightness(0) invert(1);
-    flex-shrink: 0;
-}
-
-.loggedIn {
-    background: var(--color-accent, #E6000F);
-}
-
-/* Hide text label on mobile (only icon) */
-.label {
-    display: none;
-}
-
-/* Desktop styles */
-@media (min-width: 1280px) {
-    .authBtn {
+    @media (min-width: 1280px) {
         width: auto;
         height: 48px;
         padding: 0 16px;
@@ -55,15 +32,22 @@
         }
     }
 
-    .label {
-        display: block;
-        font-size: 13px;
-        font-weight: 600;
-        color: #ffffff;
-        white-space: nowrap;
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.9;
+        }
     }
+}
 
-    .loggedIn {
+.icon {
+    filter: brightness(0) invert(1);
+    flex-shrink: 0;
+}
+
+.loggedIn {
+    background: var(--color-accent, #E6000F);
+
+    @media (min-width: 1280px) {
         background: var(--color-accent, #E6000F);
         border-color: transparent;
 
@@ -73,5 +57,18 @@
                 background: var(--color-accent, #E6000F);
             }
         }
+    }
+}
+
+/* Hide text label on mobile (only icon) */
+.label {
+    display: none;
+
+    @media (min-width: 1280px) {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #ffffff;
+        white-space: nowrap;
     }
 }

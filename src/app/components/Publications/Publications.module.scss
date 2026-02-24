@@ -1,6 +1,11 @@
 .section {
     padding: 24px 16px;
     background-color: #F6F6F6;
+
+    @media (min-width: 1024px) {
+        padding: 48px 40px;
+        max-width: 100%;
+    }
 }
 
 .carousel {
@@ -12,6 +17,22 @@
 
     &::-webkit-scrollbar {
         display: none;
+    }
+
+    @media (min-width: 1024px) {
+        max-width: 1280px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        overflow-x: visible;
+    }
+}
+
+.headerWrap {
+    @media (min-width: 1024px) {
+        max-width: 1280px;
+        margin: 0 auto;
     }
 }
 
@@ -25,6 +46,10 @@
     overflow: hidden;
     background: var(--color-bg-card);
     transition: transform 0.2s;
+
+    @media (min-width: 1024px) {
+        min-width: auto;
+    }
 
     @media (any-hover: hover) {
         &:hover {
@@ -76,35 +101,9 @@
     display: flex;
     justify-content: center;
     margin-top: 24px;
-}
 
-/* ===== Desktop ===== */
-@media (min-width: 1024px) {
-    .section {
-        padding: 48px 40px;
-        max-width: 100%;
-    }
-
-    .carousel {
-        max-width: 1280px;
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        overflow-x: visible;
-    }
-
-    .headerWrap {
-        max-width: 1280px;
-        margin: 0 auto;
-    }
-
-    .allBtn {
+    @media (min-width: 1024px) {
         max-width: 1280px;
         margin: 32px auto 0;
-    }
-
-    .card {
-        min-width: auto;
     }
 }

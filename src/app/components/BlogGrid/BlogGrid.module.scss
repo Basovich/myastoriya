@@ -134,6 +134,15 @@
     grid-template-columns: 1fr;
     gap: 24px;
     margin-bottom: 48px;
+
+    @media (min-width: 640px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+    }
 }
 
 .cardLink {
@@ -204,20 +213,6 @@
         display: flex;
         align-items: center;
         gap: 8px;
-    }
-}
-
-/* ===== Responsive ===== */
-@media (min-width: 640px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 32px;
     }
 }
 
@@ -306,18 +301,30 @@
     z-index: 2;
     mask-image: linear-gradient(to right, transparent, black 10%);
     -webkit-mask-image: linear-gradient(to right, transparent, black 10%);
+    display: none;
+
+    @media (min-width: 769px) {
+        display: block;
+    }
 }
 
 .subscribeContent {
     position: relative;
     z-index: 3;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-start;
+    justify-content: flex-start;
     width: 100%;
-    padding: 24px 60px;
-    flex-wrap: wrap;
+    padding: 32px 24px;
+    flex-direction: column;
     gap: 24px;
+
+    @media (min-width: 769px) {
+        padding: 24px 60px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
 }
 
 .subscribeTextCol {
@@ -347,6 +354,11 @@
 
 .subscribeFormCol {
     flex-shrink: 0;
+    width: 100%;
+
+    @media (min-width: 769px) {
+        width: auto;
+    }
 }
 
 .inputWrapper {
@@ -355,8 +367,12 @@
     background: #FFF;
     border-radius: 10px;
     padding: 4px;
-    width: 386px;
+    width: 100%;
     max-width: 100%;
+
+    @media (min-width: 769px) {
+        width: 386px;
+    }
 }
 
 .subscribeInput {
@@ -394,21 +410,5 @@
         &:hover {
             background-color: #cc000d;
         }
-    }
-}
-
-@media (max-width: 768px) {
-    .subscribeContent {
-        padding: 32px 24px;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .inputWrapper {
-        width: 100%;
-    }
-
-    .subscribeBg2 {
-        display: none;
     }
 }
