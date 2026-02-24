@@ -1,0 +1,60 @@
+.profileContainer {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    min-height: 60vh;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 32px;
+    text-transform: uppercase;
+}
+
+.content {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.infoRow {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.label {
+    font-weight: 600;
+    color: #666;
+    min-width: 100px;
+}
+
+.value {
+    color: #000;
+    font-weight: 700;
+}
+
+.notAuthenticated {
+    text-align: center;
+    padding: 40px;
+}
+
+.loginBtn {
+    background: #E6000F;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    text-transform: uppercase;
+}

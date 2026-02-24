@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAppSelector } from '@/store/hooks';
 import s from './AuthButton.module.scss';
@@ -8,15 +9,24 @@ import AuthModal from '@/app/components/AuthModal';
 
 export default function AuthButton() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const router = useRouter();
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
     const firstLetter = user?.email?.charAt(0)?.toUpperCase() || '?';
+
+    const handleAuthClick = () => {
+        if (isAuthenticated) {
+            router.push('/personal/profile/');
+        } else {
+            setIsModalOpen(true);
+        }
+    };
 
     return (
         <>
             <button
                 className={`${s.authBtn} ${isAuthenticated ? s.loggedIn : ''}`}
-                onClick={() => setIsModalOpen(true)}
+                onClick={handleAuthClick}
                 aria-label={isAuthenticated ? 'Профіль' : 'Вхід'}
             >
                 {isAuthenticated ? (

@@ -17,7 +17,12 @@ export function middleware(request: NextRequest) {
         }
     }
 
-    // 2. Check if there is any supported locale in the pathname
+    // 2. Redirect /personal to /personal/profile/
+    if (pathname === '/personal' || pathname === '/personal/') {
+        return NextResponse.redirect(new URL('/personal/profile/', request.url));
+    }
+
+    // 3. Check if there is any supported locale in the pathname
     const pathnameIsMissingLocale = locales.every(
         (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
     );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useFormik } from 'formik';
+import { useRouter } from 'next/navigation';
 import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
@@ -42,6 +43,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormProps) {
     const dispatch = useAppDispatch();
+    const router = useRouter();
 
     const formik = useFormik({
         initialValues: {
@@ -134,6 +136,7 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
                 <GoogleAuthButton onSuccess={(user) => {
                     console.log('Logged in via Google:', user);
                     dispatch(login(user));
+                    router.push('/personal/profile/');
                     onSuccess();
                 }} />
             </form>

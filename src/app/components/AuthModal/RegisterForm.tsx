@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, KeyboardEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
@@ -63,6 +64,7 @@ type Step = 'form' | 'verify';
 
 export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFormProps) {
     const dispatch = useAppDispatch();
+    const router = useRouter();
     const [step, setStep] = useState<Step>('form');
     const [apiError, setApiError] = useState('');
     const [verifyLoading, setVerifyLoading] = useState(false);
@@ -302,6 +304,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                 <GoogleAuthButton onSuccess={(user) => {
                     console.log('Registered via Google:', user);
                     dispatch(login(user));
+                    router.push('/personal/profile/');
                     onSuccess();
                 }} />
             </form>
