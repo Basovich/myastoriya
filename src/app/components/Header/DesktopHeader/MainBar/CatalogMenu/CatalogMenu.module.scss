@@ -1,0 +1,163 @@
+.overlay {
+    position: absolute;
+    top: 133px;
+    /* Height of header */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 133px);
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+}
+
+.menuWrapper {
+    width: 100%;
+    height: 507px;
+    background: #fff;
+    display: flex;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar {
+    width: 344px;
+    background: #F6F6F6;
+    padding: 24px 0;
+    overflow-y: auto;
+}
+
+.categoryList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.categoryItem {
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover,
+    &.active {
+        background: #fff;
+
+        .catTitle {
+            color: #E6000F;
+            font-weight: 700;
+        }
+
+        .icon {
+            filter: none;
+            opacity: 1;
+        }
+    }
+}
+
+.categoryLink {
+    display: flex;
+    align-items: center;
+    padding: 12px 32px 12px 110px;
+    /* Aligned with design */
+    gap: 12px;
+}
+
+.iconWrapper {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon {
+    filter: grayscale(1) brightness(0.5);
+    opacity: 0.3;
+}
+
+.catTitle {
+    font-size: 14px;
+    color: #000;
+    white-space: nowrap;
+}
+
+.content {
+    flex: 1;
+    position: relative;
+    background: #000;
+    overflow: hidden;
+}
+
+.bgImageWrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 755px;
+    /* Matches Figma rectangle */
+    height: 100%;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0) 60%);
+    }
+}
+
+.bgImage {
+    object-fit: cover;
+}
+
+.subContent {
+    position: relative;
+    z-index: 2;
+    padding: 40px 60px;
+    height: 100%;
+    color: #fff;
+}
+
+.currentTitle {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.subList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.subLink {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.2s;
+
+    &:hover {
+        color: #E6000F;
+    }
+}
+
+.closeBtn {
+    position: absolute;
+    top: 24px;
+    right: 40px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 1;
+    }
+}

@@ -30,11 +30,6 @@
     border-radius: 12px;
     font-size: 14px;
     font-weight: 700;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: all 0.2s;
-    cursor: pointer;
-    flex-shrink: 0;
 
     @media (any-hover: hover) {
         &:hover {
