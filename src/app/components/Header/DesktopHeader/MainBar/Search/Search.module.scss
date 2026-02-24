@@ -2,62 +2,163 @@
     display: flex;
     align-items: center;
     background: #ffffff;
+    border: 1px solid transparent;
     border-radius: 12px;
-    padding: 6px 6px 6px 16px;
+    height: 48px;
+    padding: 0 4px 0 16px;
     width: 100%;
     max-width: 400px;
-    height: 48px;
-    transition: background 0.2s, box-shadow 0.2s;
+    position: relative;
+    z-index: 101;
+    transition: all 0.2s;
 
-    &:focus-visible {
+    &.active {
         box-shadow: 0 0 0 2px var(--color-accent, #E6000F);
     }
+
+    &.error {
+        border-color: #E6000F;
+    }
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
 }
 
 .iconWrapper {
     display: flex;
     align-items: center;
-    justify-content: center;
     margin-right: 12px;
-    opacity: 0.3;
+    opacity: 0.5;
 }
 
 .input {
     flex: 1;
     border: none;
-    background: transparent;
-    font-size: 14px;
-    color: #333333;
     outline: none;
-
-    &:focus-visible {
-        /* Add a subtle indicator if needed, or keep it consistent with the design */
-        box-shadow: 0 0 0 1px #333;
-        border-radius: 4px;
-    }
+    font-size: 14px;
+    color: #333;
+    padding: 0;
+    background: transparent;
 
     &::placeholder {
-        color: #999999;
+        color: #999;
+    }
+
+    &:focus-visible {
+        outline: none;
     }
 }
 
 .searchBtn {
-    background: var(--color-accent, #E6000F);
+    background: #E6000F;
+    color: #ffffff;
     border: none;
     border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 13px;
+    height: 40px;
+    padding: 0 20px;
+    font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
-    color: #ffffff;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
-    height: 36px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: background 0.2s;
+    white-space: nowrap;
 
-    @media (any-hover: hover) {
-        &:hover {
-            opacity: 0.9;
-        }
+    &:hover {
+        background: #cc000d;
     }
+}
+
+.dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    padding: 12px 0;
+}
+
+.resultsList {
+    display: flex;
+    flex-direction: column;
+}
+
+.resultItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+        background: #f5f5f5;
+    }
+}
+
+.resultImage {
+    width: 50px;
+    height: 38px;
+    border-radius: 6px;
+    background: #eee;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.imagePlaceholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #eee 25%, #f5f5f5 50%, #eee 75%);
+}
+
+.resultInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.resultName {
+    font-size: 13px;
+    font-weight: 600;
+    color: #222;
+}
+
+.resultPrice {
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+}
+
+.showAll {
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #222;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border-top: 1px solid #eee;
+    margin-top: 8px;
+
+    &:hover {
+        color: #E6000F;
+    }
+}
+
+.noResults {
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
 }
