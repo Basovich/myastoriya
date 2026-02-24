@@ -25,6 +25,15 @@
     background: #F6F6F6;
     padding: 24px 0;
     overflow-y: auto;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+
+    &::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari and Opera */
+    }
 }
 
 .categoryList {
@@ -38,13 +47,13 @@
     transition: all 0.2s;
 
     @media (any-hover: hover) {
-      &:hover {
-          background: #fff;
+        &:hover {
+            background: #fff;
 
-          .catTitle {
-              font-weight: 700;
-          }
-      }
+            .catTitle {
+                font-weight: 700;
+            }
+        }
     }
 
     &.active {
@@ -139,18 +148,19 @@
 }
 
 .subLink {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: fit-content;
     color: #fff;
     text-decoration: none;
     font-size: 16px;
     transition: color 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 12px;
 
     @media (any-hover: hover) {
-      &:hover {
-          font-weight: 700;
-      }
+        &:hover {
+            font-weight: 700;
+        }
     }
 }
 
