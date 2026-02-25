@@ -5,7 +5,6 @@ import { useRouter, useParams } from "next/navigation";
 import s from "./Search.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Image from "next/image";
-import Logo from "@/app/components/Header/Shared/Logo";
 import Link from "next/link";
 
 const MOCK_PRODUCTS = [
@@ -162,13 +161,12 @@ export default function Search() {
                         <div className={s.topBar}>
                             <div className={s.topBarContainer}>
                                 <div className={s.logoSide}>
-                                    <Logo lang={lang as any} />
+                                    <Link href="/" className={s.overlayLogoLink}>
+                                        <img src="/images/logo-black.svg" alt="М'ясторія" width={114} height={33} />
+                                    </Link>
                                 </div>
                                 <div className={s.separator} />
                                 <div className={s.inputWrapper}>
-                                    <div className={s.inputIcon}>
-                                        <img src="/icons/icon-search.svg" alt="Search" width="20" height="20" />
-                                    </div>
                                     <input
                                         type="text"
                                         placeholder="Я шукаю..."
@@ -185,15 +183,15 @@ export default function Search() {
                                             </svg>
                                         </button>
                                     )}
-                                    <div className={s.inputSeparator} />
-                                    <button className={s.searchBtnRound} onClick={handleSearch}>
-                                        <img src="/icons/icon-search.svg" alt="Search" width="20" height="20" />
-                                    </button>
                                 </div>
                                 <button className={s.closeOverlayBtn} onClick={() => setIsActive(false)}>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M18 6L6 18M6 6L18 18" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
+                                </button>
+                                <div className={s.rightSeparator} />
+                                <button className={s.searchBtnIcon} onClick={handleSearch}>
+                                    <img src="/icons/icon-search.svg" alt="Search" width="22" height="22" />
                                 </button>
                             </div>
                         </div>
