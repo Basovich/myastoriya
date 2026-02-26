@@ -3,6 +3,7 @@ import ProductCard from "../ui/ProductCard/ProductCard";
 import Button from "../ui/Button/Button";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
+import CategoryCircles, { CategoryCircleItem } from "../ui/CategoryCircles/CategoryCircles";
 import { Locale } from "@/i18n/config";
 
 interface Product {
@@ -37,6 +38,15 @@ export default function SearchContent({
         { label: "Результат" }
     ];
 
+    const searchCategories: CategoryCircleItem[] = [
+        { name: "Сезонне меню", image: "/images/categories/category-1.png", href: "#" },
+        { name: "Ресторанне меню", image: "/images/categories/category-2.png", href: "#" },
+        { name: "Бургери", image: "/images/categories/category-3.png", href: "#" },
+        { name: "Піца", image: "/images/categories/category-4.png", href: "#" },
+        { name: "Смакуй одразу", image: "/images/categories/category-5.png", href: "#" },
+        { name: "Набори для компаній", image: "/images/categories/category-6.png", href: "#" },
+    ];
+
     return (
         <div className={s.container}>
             <HeroBanner
@@ -46,6 +56,11 @@ export default function SearchContent({
 
             <div className={s.contentWrapper}>
                 <Breadcrumbs items={breadcrumbItems} />
+
+                <CategoryCircles
+                    title="РЕЗУЛЬТАТ ПОШУКУ ПО КАТЕГОРІЯМ"
+                    items={searchCategories}
+                />
 
                 <div className={s.filtersWrapper}>
                     <div className={s.filters}>
