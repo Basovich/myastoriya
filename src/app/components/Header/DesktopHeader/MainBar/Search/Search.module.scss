@@ -592,6 +592,17 @@
     font-weight: 500;
 }
 
+.noResults {
+    display: flex;
+    justify-content: center;
+    background: #fff;
+    padding: 60px 40px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #000;
+    border-top: 1px solid #EBEBEB;
+}
+
 .emptyPrompt {
     padding: 20px 0;
     color: #999;
