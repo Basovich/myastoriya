@@ -62,22 +62,6 @@ export default function SearchContent({
                     items={searchCategories}
                 />
 
-                <div className={s.filtersWrapper}>
-                    <div className={s.filters}>
-                        {categories.map((cat) => (
-                            <Button
-                                key={cat}
-                                variant="pill"
-                                active={activeCategory === cat}
-                                onClick={() => onCategoryChange(cat)}
-                                className={s.filterBtn}
-                            >
-                                {cat}
-                            </Button>
-                        ))}
-                    </div>
-                </div>
-
                 <div className={s.resultsGrid}>
                     {results.length > 0 ? (
                         results.map((product) => (
