@@ -22,8 +22,6 @@ export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps
     return (
         <section className={s.section}>
             <Container>
-                <Breadcrumbs items={breadcrumbItems} />
-
                 <HeroBanner image="/images/promotions/promo-hero-bg2.png">
                     <div className={s.timerBlock}>
                         <div className={s.timerHeader}>До кінця акції залишилось:</div>
@@ -50,6 +48,10 @@ export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps
                         </div>
                     </div>
                 </HeroBanner>
+
+                <div className={s.breadcrumbsWrapper}>
+                    <Breadcrumbs items={breadcrumbItems} />
+                </div>
 
                 <div className={s.contentLayout}>
                     <div className={s.textContent}>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Button from "../ui/Button/Button";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
+import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import s from "./BlogGrid.module.scss";
 
 // Reusing interfaces from existing Content
@@ -54,6 +55,11 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
         return `${basePath}${safePath}` || '/';
     };
 
+    const breadcrumbItems = [
+        { label: dict.breadcrumbs.home, href: getRoute('/') },
+        { label: dict.breadcrumbs.blog }
+    ];
+
     const loadMore = () => {
         // Load exactly 12 more mock items
         const moreItems = Array.from({ length: 12 }).map((_, i) => {
@@ -80,10 +86,8 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
                     image="/images/promotions/blog-banner.png"
                 />
 
-                <div className={s.breadcrumbs}>
-                    <Link href={getRoute('/')}>{dict.breadcrumbs.home}</Link>
-                    <span className={s.separator}>»</span>
-                    <span className={s.current}>{dict.breadcrumbs.blog}</span>
+                <div className={s.breadcrumbsWrapper}>
+                    <Breadcrumbs items={breadcrumbItems} />
                 </div>
 
                 <div className={s.tabsWrapper}>
