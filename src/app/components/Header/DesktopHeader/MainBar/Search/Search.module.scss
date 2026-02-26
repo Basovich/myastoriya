@@ -188,16 +188,10 @@
     transform: translateY(-50%);
     background: transparent;
     border: none;
-    cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    &:hover {
-        opacity: 1;
-    }
+    transition: opacity 0.2s;
 }
 
 .rightSeparator {
