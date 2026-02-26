@@ -4,6 +4,7 @@ import s from './PromotionDetail.module.scss';
 import ProductCard from '../ui/ProductCard/ProductCard';
 import Container from '../ui/Container/Container';
 import Breadcrumbs from '../ui/Breadcrumbs/Breadcrumbs';
+import HeroBanner from '../ui/HeroBanner/HeroBanner';
 
 interface PromotionDetailProps {
     dict: any;
@@ -23,14 +24,7 @@ export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps
             <Container>
                 <Breadcrumbs items={breadcrumbItems} />
 
-                <div className={s.bannerWrapper}>
-                    <Image
-                        src="/images/promotions/promo-hero-bg2.png"
-                        alt="Promotion Banner"
-                        fill
-                        className={s.bannerImg}
-                    />
-
+                <HeroBanner image="/images/promotions/promo-hero-bg2.png">
                     <div className={s.timerBlock}>
                         <div className={s.timerHeader}>До кінця акції залишилось:</div>
                         <div className={s.timerValues}>
@@ -55,7 +49,7 @@ export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps
                             </div>
                         </div>
                     </div>
-                </div>
+                </HeroBanner>
 
                 <div className={s.contentLayout}>
                     <div className={s.textContent}>

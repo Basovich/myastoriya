@@ -9,6 +9,7 @@ import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import Tabs from "../ui/Tabs/Tabs";
 import Icon from "../ui/Icon/Icon";
 import AppLink from "../ui/AppLink/AppLink";
+import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import { Locale } from "@/i18n/config";
 
 interface PromotionItem {
@@ -81,24 +82,10 @@ export default function PromotionsGrid({ dict, initialItems, lang, pageType }: P
     return (
         <section className={s.section}>
             <Container>
-                <div className={s.bannerWrapper}>
-                    <Image
-                        src={`/images/promotions/${pageType}-banner.png`}
-                        alt={dict.title}
-                        fill
-                        priority
-                        style={{ objectFit: 'cover' }}
-                        className={s.bannerImg}
-                    />
-                    <div className={s.bannerContent}>
-                        <h1 className={s.bannerTitle}>{dict.title}</h1>
-                        <div className={s.bannerDots}>
-                            <span className={s.dot}></span>
-                            <span className={s.dot}></span>
-                            <span className={s.dot}></span>
-                        </div>
-                    </div>
-                </div>
+                <HeroBanner
+                    title={dict.title}
+                    image={`/images/promotions/${pageType}-banner.png`}
+                />
 
                 <Breadcrumbs items={breadcrumbItems} />
 

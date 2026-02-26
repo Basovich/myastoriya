@@ -1,6 +1,7 @@
 import s from "./SearchContent.module.scss";
 import ProductCard from "../ui/ProductCard/ProductCard";
 import Button from "../ui/Button/Button";
+import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import { Locale } from "@/i18n/config";
 import Image from "next/image";
 
@@ -43,11 +44,10 @@ export default function SearchContent({
                 <span className={s.current}>Результат</span>
             </nav>
 
-            <header className={s.header}>
-                <h1 className={s.title}>
-                    <span className={s.prefix}>ТЕКСТ ПОШУКУ:</span> {query.toUpperCase()}
-                </h1>
-            </header>
+            <HeroBanner
+                prefix="ТЕКСТ ПОШУКУ:"
+                title={query}
+            />
 
             <div className={s.filtersWrapper}>
                 <div className={s.filters}>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "../ui/Button/Button";
+import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import s from "./BlogGrid.module.scss";
 
 // Reusing interfaces from existing Content
@@ -74,17 +75,10 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
     return (
         <section className={s.section}>
             <div className={s.container}>
-                <div className={s.bannerWrapper}>
-                    <Image src={`/images/promotions/blog-banner.png`} alt={dict.title} fill priority style={{ objectFit: 'cover' }} className={s.bannerImg} />
-                    <div className={s.bannerContent}>
-                        <h1 className={s.bannerTitle}>{dict.title}</h1>
-                        <div className={s.bannerDots}>
-                            <span className={s.dot}></span>
-                            <span className={s.dot}></span>
-                            <span className={s.dot}></span>
-                        </div>
-                    </div>
-                </div>
+                <HeroBanner
+                    title={dict.title}
+                    image="/images/promotions/blog-banner.png"
+                />
 
                 <div className={s.breadcrumbs}>
                     <Link href={getRoute('/')}>{dict.breadcrumbs.home}</Link>
