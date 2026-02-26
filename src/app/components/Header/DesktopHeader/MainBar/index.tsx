@@ -37,7 +37,7 @@ export default function MainBar({ lang }: MainBarProps) {
                         ) : (
                             <Image src="/icons/icon-category.svg" alt="Categories" width="18" height="18" />
                         )}
-                        Каталог продукції
+                        <span className={s.catalogBtnInner}>Каталог продукції</span>
                     </button>
 
                     <div className={s.searchWrapper}>
