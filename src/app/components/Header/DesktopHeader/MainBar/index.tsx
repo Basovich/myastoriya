@@ -41,7 +41,7 @@ export default function MainBar({ lang }: MainBarProps) {
                     </button>
 
                     <div className={s.searchWrapper}>
-                        <Search />
+                        <Search lang={lang} />
                     </div>
 
                     <CitySelector />

@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import s from "./Search.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Image from "next/image";
-import Link from "next/link";
+import Logo from "@/app/components/Header/Shared/Logo";
+import {Locale} from "@/i18n/config";
 
 const MOCK_PRODUCTS = [
     { id: 1, name: "Стейк Рібай Dry-aged гриль - М'ясторія", price: 1260, weight: "330г / 340г / 200г", image: "/images/products/product-shashlik.png" },
@@ -40,7 +41,7 @@ const MOCK_FEATURED = [
     }
 ];
 
-export default function Search() {
+export default function Search({lang} :  {lang: Locale}) {
     const [query, setQuery] = useState("");
     const [isActive, setIsActive] = useState(false);
     const [results, setResults] = useState<typeof MOCK_PRODUCTS>([]);
@@ -52,8 +53,6 @@ export default function Search() {
     const [dragOffset, setDragOffset] = useState(0);
     const [hasError, setHasError] = useState(false);
     const router = useRouter();
-    const params = useParams();
-    const lang = params?.lang || "uk";
     const containerRef = useRef<HTMLDivElement>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
@@ -149,7 +148,7 @@ export default function Search() {
         <div className={`${s.searchContainer} ${isActive ? s.active : ""}`} ref={containerRef}>
             <div className={s.headerSearch} onClick={handleInputFocus}>
                 <div className={s.iconWrapper}>
-                    <img src="/icons/icon-search.svg" alt="Search" width="20" height="20" />
+                    <Image src="/icons/icon-search.svg" alt="Search" width="20" height="20" />
                 </div>
                 <div className={s.placeholderText}>Я шукаю...</div>
                 <button className={s.headerSearchBtn}>пошук</button>
@@ -161,9 +160,7 @@ export default function Search() {
                         <div className={s.topBar}>
                             <div className={s.topBarContainer}>
                                 <div className={s.logoSide}>
-                                    <Link href="/" className={s.overlayLogoLink}>
-                                        <img src="/images/logo-black.svg" alt="М'ясторія" width={114} height={33} />
-                                    </Link>
+                                    <Logo lang={lang} theme="black" />
                                 </div>
                                 <div className={s.separator} />
                                 <div className={s.inputWrapper}>
@@ -176,13 +173,6 @@ export default function Search() {
                                         onChange={handleInputChange}
                                         onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                                     />
-                                    {query && (
-                                        <button className={s.clearBtn} onClick={() => setQuery("")}>
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M18 6L6 18M6 6L18 18" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        </button>
-                                    )}
                                 </div>
                                 <button className={s.closeOverlayBtn} onClick={() => setIsActive(false)}>
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -190,8 +180,8 @@ export default function Search() {
                                     </svg>
                                 </button>
                                 <div className={s.rightSeparator} />
-                                <button className={s.searchBtnIcon} onClick={handleSearch}>
-                                    <img src="/icons/icon-search.svg" alt="Search" width="22" height="22" />
+                                <button className={s.searchBtnIcon} onClick={handleSearch} aria-label="Search">
+                                    <Image src="/icons/icon-search-red.svg" alt="Search" width="22" height="22" />
                                 </button>
                             </div>
                         </div>
@@ -211,10 +201,10 @@ export default function Search() {
 
                             <div className={s.colDishes}>
                                 <div className={s.colTitleWrapper}>
-                                    <h3 className={s.colTitle}>Страви</h3>
                                     <div className={s.titleIcon}>
-                                        <img src="/icons/icon-search.svg" alt="Search" width="16" height="16" />
+                                        <Image src="/icons/icon-search.svg" alt="Search" width="16" height="16" />
                                     </div>
+                                    <h3 className={s.colTitle}>Страви</h3>
                                 </div>
                                 <div className={s.dishListContainer}>
                                     <div className={s.dishList}>

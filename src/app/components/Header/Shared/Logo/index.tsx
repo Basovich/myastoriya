@@ -7,13 +7,14 @@ import s from "./Logo.module.scss";
 interface LogoProps {
     lang: Locale;
     className?: string;
+    theme?: string;
 }
 
-export default function Logo({ lang, className }: LogoProps) {
+export default function Logo({ lang, className, theme = 'white' }: LogoProps) {
     return (
         <Link href={getLocalizedHref("/", lang)} className={`${s.logo} ${className || ''}`}>
             <Image
-                src="/images/logo-white.svg"
+                src={theme === 'black' ? "/images/logo-black.svg" : "/images/logo-white.svg"}
                 alt="М'ясторія"
                 width={114}
                 height={33}
