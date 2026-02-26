@@ -130,11 +130,32 @@
     outline: none;
     font-size: 24px;
     font-weight: 500;
-    padding: 0;
+    padding: 0 40px;
     color: #000;
 
     &::placeholder {
         color: #DADADA;
+    }
+}
+
+.loaderSmall {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #E6000F;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    position: absolute;
+    right: 60px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
     }
 }
 
@@ -176,31 +197,6 @@
 
     &:hover {
         opacity: 1;
-    }
-}
-
-.closeOverlayBtn {
-    margin-left: 24px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    opacity: 0.5;
-    transition: opacity 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    @media (any-hover: hover) {
-        &:hover {
-            opacity: 1;
-        }
-    }
-
-    &:focus-visible {
-        outline: 2px solid #E6000F;
-        border-radius: 6px;
     }
 }
 
@@ -246,15 +242,17 @@
 }
 
 .contentBody {
-    max-width: 1280px;
+    width: 100%;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 280px 1fr 380px;
+    grid-template-columns: 281px 1fr 380px;
     border-top: 1px solid #EBEBEB;
+    position: relative;
+    background: #fff;
+    padding: 0 calc((100% - 1280px) / 2);
 }
 
 .colCategories {
-    background: #F6F6F6;
     padding: 40px 30px;
     border-right: 1px solid #EBEBEB;
 }
@@ -310,26 +308,30 @@
 .colTitleWrapper {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
-    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #E2E2E2;
+    margin-bottom: 32px;
 }
 
 .titleIcon {
-    opacity: 0.3;
+    width: 20px;
+    height: 20px;
 }
 
 .colTitle {
-    font-size: 14px;
-    font-weight: 700;
     color: #000;
-    margin-bottom: 0;
-    text-transform: uppercase;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
 }
 
 .categoryList {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 28px 0 0 0;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -344,11 +346,6 @@
             color: #E6000F;
         }
     }
-}
-
-.activeLink {
-    color: #E6000F !important;
-    font-weight: 700;
 }
 
 .dishList {
@@ -564,6 +561,7 @@
 .suggestionsContainer {
     position: relative;
     min-height: 400px;
+    margin-top: 26px;
 }
 
 .sliderWrapper {
