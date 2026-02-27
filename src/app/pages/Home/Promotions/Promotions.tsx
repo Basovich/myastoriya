@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import s from "./Promotions.module.scss";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -9,6 +10,7 @@ import 'swiper/css/navigation';
 import Link from "next/link";
 import Image from "next/image";
 import clsx from "clsx";
+import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 
 interface PromotionItem {
     id: number;
@@ -27,6 +29,9 @@ interface PromotionsProps {
 }
 
 export default function Promotions({ dict, lang }: PromotionsProps) {
+    const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
+    const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
+
     if (!dict || !dict.items || dict.items.length === 0) return null;
 
     const getRoute = (path: string) => {
@@ -40,16 +45,16 @@ export default function Promotions({ dict, lang }: PromotionsProps) {
             <div className={s.promotionsHeader}>
                 <SectionHeader title={dict.sectionTitle} align="left" />
                 <div className={s.navArrows}>
-                    <button className={clsx('promo-prev', s.arrowBtn)} aria-label="Previous promotion">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: "rotate(180deg)" }}>
-                            <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                    <button className={clsx('promo-next', s.arrowBtn)} aria-label="Next promotion">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
+                    <SliderArrow
+                        direction="left"
+                        ref={setPrevEl}
+                        className={s.navArrowComp}
+                    />
+                    <SliderArrow
+                        direction="right"
+                        ref={setNextEl}
+                        className={s.navArrowComp}
+                    />
                 </div>
             </div>
 
@@ -57,8 +62,8 @@ export default function Promotions({ dict, lang }: PromotionsProps) {
                 <Swiper
                     modules={[Navigation]}
                     navigation={{
-                        nextEl: '.promo-next',
-                        prevEl: '.promo-prev',
+                        nextEl,
+                        prevEl,
                     }}
                     spaceBetween={12}
                     slidesPerView={1.2}

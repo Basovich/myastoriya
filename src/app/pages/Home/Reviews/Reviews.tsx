@@ -5,11 +5,14 @@ import clsx from "clsx";
 import s from "./Reviews.module.scss";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import Button from "../../../components/ui/Button/Button";
+import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 
 export default function Reviews({ dict }: { dict: any }) {
+    const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
+    const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
     const [expanded, setExpanded] = useState<Record<number, boolean>>({});
 
     const toggleExpand = (id: number) => {
@@ -21,24 +24,24 @@ export default function Reviews({ dict }: { dict: any }) {
             <div className={s.headerWrap}>
                 <SectionHeader title={dict.sectionTitle} align="left" />
                 <div className={s.sliderNav}>
-                    <button className={clsx(s.navBtn, 'reviews-prev')}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: "rotate(180deg)" }}>
-                            <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                    <button className={clsx(s.navBtn, 'reviews-next')}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
+                    <SliderArrow
+                        direction="left"
+                        ref={setPrevEl}
+                        className={s.navArrowComp}
+                    />
+                    <SliderArrow
+                        direction="right"
+                        ref={setNextEl}
+                        className={s.navArrowComp}
+                    />
                 </div>
             </div>
             <div className={s.carousel}>
                 <Swiper
                     modules={[Navigation]}
                     navigation={{
-                        prevEl: ".reviews-prev",
-                        nextEl: ".reviews-next",
+                        prevEl,
+                        nextEl,
                     }}
                     spaceBetween={16}
                     slidesPerView={"auto"}

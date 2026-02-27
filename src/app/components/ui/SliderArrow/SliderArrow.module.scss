@@ -1,0 +1,67 @@
+.navArrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    z-index: 10;
+    flex-shrink: 0;
+    outline: none;
+
+    &:any-hover {
+        transform: scale(1.05);
+
+        circle {
+            fill: #f5f5f5;
+        }
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 2px rgba(227, 6, 19, 0.4);
+        border-radius: 50%;
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
+
+.navRight {
+    .arrowIcon {
+        transform: rotate(180deg);
+    }
+}
+
+.arrowIcon {
+    width: 56px;
+    height: 56px;
+    display: block;
+
+    circle {
+        transition: fill 0.2s ease;
+    }
+}
+
+@media (min-width: 1024px) {
+    .arrowIcon {
+        width: 56px;
+        height: 56px;
+    }
+}
+
+@media (max-width: 768px) {
+    .arrowIcon {
+        width: 44px;
+        height: 44px;
+    }
+}

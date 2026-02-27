@@ -5,6 +5,7 @@ import clsx from "clsx";
 import s from "./Products.module.scss";
 import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import Button from "../../../components/ui/Button/Button";
+import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import Image from "next/image";
 
 interface Category {
@@ -58,14 +59,15 @@ export default function Products({ dict, categories }: ProductsProps) {
             />
             <section className={s.section} id="products">
                 <div className={s.tabsWrapper}>
-                    <button className={clsx(s.tabArrow, s.tabArrowLeft)} aria-label="Прокрутити вкладки вліво" onClick={() => {
-                        const tabsContainer = document.querySelector(`.${s.tabs}`);
-                        if (tabsContainer) tabsContainer.scrollBy({ left: -200, behavior: 'smooth' });
-                    }}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: "rotate(180deg)" }}>
-                            <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
+                    <SliderArrow
+                        direction="left"
+                        className={s.tabArrow}
+                        onClick={() => {
+                            const tabsContainer = document.querySelector(`.${s.tabs}`);
+                            if (tabsContainer) tabsContainer.scrollBy({ left: -200, behavior: 'smooth' });
+                        }}
+                        ariaLabel="Прокрутити вкладки вліво"
+                    />
                     <div className={s.tabs}>
                         {categories.map((cat, i) => (
                             <Button
@@ -78,14 +80,15 @@ export default function Products({ dict, categories }: ProductsProps) {
                             </Button>
                         ))}
                     </div>
-                    <button className={clsx(s.tabArrow, s.tabArrowRight)} aria-label="Прокрутити вкладки вправо" onClick={() => {
-                        const tabsContainer = document.querySelector(`.${s.tabs}`);
-                        if (tabsContainer) tabsContainer.scrollBy({ left: 200, behavior: 'smooth' });
-                    }}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
+                    <SliderArrow
+                        direction="right"
+                        className={s.tabArrow}
+                        onClick={() => {
+                            const tabsContainer = document.querySelector(`.${s.tabs}`);
+                            if (tabsContainer) tabsContainer.scrollBy({ left: 200, behavior: 'smooth' });
+                        }}
+                        ariaLabel="Прокрутити вкладки вправо"
+                    />
                 </div>
 
                 <div className={s.grid}>
@@ -110,7 +113,7 @@ export default function Products({ dict, categories }: ProductsProps) {
                         </svg>
                     </Button>
                 </div>
-            </section>
-        </div>
+            </section >
+        </div >
     );
 }

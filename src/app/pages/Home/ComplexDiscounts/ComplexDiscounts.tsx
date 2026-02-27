@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import s from "./ComplexDiscounts.module.scss";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import Container from "../../../components/ui/Container/Container";
@@ -11,6 +12,7 @@ import 'swiper/css/navigation';
 import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
+import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 
 interface DiscountItem {
     id: number;
@@ -29,6 +31,9 @@ interface ComplexDiscountsProps {
 }
 
 export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) {
+    const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
+    const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
+
     if (!dict || !dict.items || dict.items.length === 0) return null;
 
     const getRoute = (path: string) => {
@@ -43,12 +48,16 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                 <div className={s.headerRow}>
                     <SectionHeader title={dict.sectionTitle} align="left" />
                     <div className={s.navArrows}>
-                        <button className={clsx('combo-prev', s.arrowBtn)} aria-label="Previous combo">
-                            <Icon name="arrow-right" style={{ transform: "rotate(180deg)" }} />
-                        </button>
-                        <button className={clsx('combo-next', s.arrowBtn)} aria-label="Next combo">
-                            <Icon name="arrow-right" />
-                        </button>
+                        <SliderArrow
+                            direction="left"
+                            ref={setPrevEl}
+                            className={s.navArrowComp}
+                        />
+                        <SliderArrow
+                            direction="right"
+                            ref={setNextEl}
+                            className={s.navArrowComp}
+                        />
                     </div>
                 </div>
 
@@ -56,8 +65,8 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                     <Swiper
                         modules={[Navigation]}
                         navigation={{
-                            nextEl: '.combo-next',
-                            prevEl: '.combo-prev',
+                            nextEl,
+                            prevEl,
                         }}
                         spaceBetween={12}
                         slidesPerView={1.2}
