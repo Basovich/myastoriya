@@ -54,8 +54,8 @@ export default function Hero({ hero }: HeroProps) {
                                 <Button href={slide.ctaButton.href} variant="outline" className={s.ctaButton}>
                                     <span className={s.ctaButtonInner}>{slide.ctaButton.text}</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
-                                        <path d="M9.98565 0.999945L16.3141 7.32837L9.98565 13.6568" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                                        <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M9.98565 0.999945L16.3141 7.32837L9.98565 13.6568" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                                        <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                                     </svg>
                                 </Button>
                             )}
@@ -103,8 +103,8 @@ export default function Hero({ hero }: HeroProps) {
                                         <Button href={slide.ctaButton.href} variant="outline" className={s.ctaButton}>
                                             <span className={s.ctaButtonInner}>{slide.ctaButton.text}</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
-                                                <path d="M9.98565 0.999945L16.3141 7.32837L9.98565 13.6568" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                                                <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                                <path d="M9.98565 0.999945L16.3141 7.32837L9.98565 13.6568" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                                                <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                                             </svg>
                                         </Button>
                                     )}

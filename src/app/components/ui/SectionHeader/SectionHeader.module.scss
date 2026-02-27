@@ -1,44 +1,12 @@
-.sectionHeader {
-    margin-bottom: 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-
-    @media (min-width: 1024px) {
-        margin-bottom: 40px;
-        gap: 16px;
-    }
-
-    &.center {
-        align-items: center;
-
-        .title {
-            text-align: center;
-        }
-
-        .dots {
-            justify-content: center;
-        }
-    }
-
-    &.left {
-        align-items: flex-start;
-
-        .title {
-            text-align: left;
-        }
-
-        .dots {
-            justify-content: flex-start;
-        }
-    }
-}
-
 .title {
-    font-size: 20px;
-    color: var(--color-text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
+    color: #000;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 800;
+
+    @media (min-width: 768px) {
+        font-size: 22px;
+    }
 
     @media (min-width: 1024px) {
         font-size: 28px;
@@ -47,13 +15,14 @@
 
 .dots {
     display: flex;
-    gap: 8px;
+    gap: 4px;
     align-items: center;
+    margin-top: 6px;
 }
 
 .dot {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background-color: var(--color-accent);
 }

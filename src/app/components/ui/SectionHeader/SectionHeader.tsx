@@ -4,21 +4,21 @@ import s from "./SectionHeader.module.scss";
 interface SectionHeaderProps {
     title: string;
     withDots?: boolean;
-    align?: 'center' | 'left';
-    className?: string;
+    classNameTitle?: string;
+    classNameDots?: string;
 }
 
-export default function SectionHeader({ title, withDots = true, align = 'center', className }: SectionHeaderProps) {
+export default function SectionHeader({ title, withDots = true, classNameTitle, classNameDots }: SectionHeaderProps) {
     return (
-        <div className={clsx(s.sectionHeader, s[align], className)}>
-            <h2 className={s.title}>{title}</h2>
+        <>
+            <h2 className={clsx(s.title, classNameTitle)}>{title}</h2>
             {withDots && (
-                <div className={s.dots}>
+                <div className={clsx(s.dots, classNameDots)}>
                     <span className={s.dot}></span>
                     <span className={s.dot}></span>
                     <span className={s.dot}></span>
                 </div>
             )}
-        </div>
+        </>
     );
 }

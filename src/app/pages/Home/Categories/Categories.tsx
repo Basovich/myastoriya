@@ -34,6 +34,22 @@ export default function Categories({ categories }: CategoriesProps) {
             <SectionHeader title={categories.sectionTitle} />
 
             <div className={s.sliderWrapper}>
+                <div className={s.sliderNav}>
+                    <SliderArrow
+                        direction="left"
+                        className={s.navArrow}
+                        onClick={() => { }}
+                        ariaLabel="Попередній"
+                        ref={setPrevEl}
+                    />
+                    <SliderArrow
+                        direction="right"
+                        className={s.navArrow}
+                        onClick={() => { }}
+                        ariaLabel="Наступний"
+                        ref={setNextEl}
+                    />
+                </div>
                 <Swiper
                     modules={[Navigation]}
                     navigation={{
@@ -43,10 +59,9 @@ export default function Categories({ categories }: CategoriesProps) {
                     loop={false}
                     className={clsx(s.swiperContainer, "categories-swiper")}
                     breakpoints={{
-                        0: { slidesPerView: 3, spaceBetween: 10 },
-                        500: { slidesPerView: 4, spaceBetween: 12 },
-                        768: { slidesPerView: 5, spaceBetween: 16 },
-                        1024: { slidesPerView: 6, spaceBetween: 16 },
+                        0: { slidesPerView: 3.6, spaceBetween: 10 },
+                        600: { slidesPerView: 6, spaceBetween: 16 },
+                        1280: { slidesPerView: 6, spaceBetween: 32 },
                     }}
                 >
                     {categories.items.map((cat, i) => (
@@ -60,21 +75,6 @@ export default function Categories({ categories }: CategoriesProps) {
                         </SwiperSlide>
                     ))}
                 </Swiper>
-
-                <SliderArrow
-                    direction="left"
-                    className={s.navArrow}
-                    onClick={() => { }} // Swiper handles this via ref if provided, but here we used setPrevEl
-                    ariaLabel="Попередній"
-                    ref={setPrevEl}
-                />
-                <SliderArrow
-                    direction="right"
-                    className={s.navArrow}
-                    onClick={() => { }}
-                    ariaLabel="Наступний"
-                    ref={setNextEl}
-                />
             </div>
         </section>
     );
