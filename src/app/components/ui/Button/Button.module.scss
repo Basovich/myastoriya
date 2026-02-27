@@ -1,16 +1,19 @@
 .btn {
     display: inline-flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 14px;
     width: fit-content;
-    font-weight: 700;
     border: none;
     text-decoration: none;
+    color: #FFF;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
     text-transform: uppercase;
-    letter-spacing: 0.02em;
     white-space: nowrap;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s linear, color 0.2s linear, border-color 0.2s linear;
 
     &:focus-visible {
         outline: 2px solid #333;

@@ -52,10 +52,10 @@ export default function Hero({ hero }: HeroProps) {
                             <h1 className={s.title}>{slide.title}</h1>
                             {slide.ctaButton && (
                                 <Button href={slide.ctaButton.href} variant="outline" className={s.ctaButton}>
-                                    {slide.ctaButton.text}
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                        <line x1="5" y1="12" x2="19" y2="12" />
-                                        <polyline points="12 5 19 12 12 19" />
+                                    <span className={s.ctaButtonInner}>{slide.ctaButton.text}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                        <path d="M9.98565 0.999945L16.3141 7.32837L9.98565 13.6568" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                        <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="white" stroke-width="2" stroke-linecap="round"/>
                                     </svg>
                                 </Button>
                             )}
@@ -66,7 +66,6 @@ export default function Hero({ hero }: HeroProps) {
         );
     }
 
-    // Множество слайдів — рендерим слайдер
     return (
         <section className={s.hero} id="hero">
             <Swiper
@@ -101,11 +100,11 @@ export default function Hero({ hero }: HeroProps) {
                                     <span className={s.badge}>{slide.badge}</span>
                                     <h1 className={s.title}>{slide.title}</h1>
                                     {slide.ctaButton && (
-                                        <Button href={slide.ctaButton.href} variant="outline">
-                                            {slide.ctaButton.text}
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                <line x1="5" y1="12" x2="19" y2="12" />
-                                                <polyline points="12 5 19 12 12 19" />
+                                        <Button href={slide.ctaButton.href} variant="outline" className={s.ctaButton}>
+                                            <span className={s.ctaButtonInner}>{slide.ctaButton.text}</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                                <path d="M9.98565 0.999945L16.3141 7.32837L9.98565 13.6568" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                                <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="white" stroke-width="2" stroke-linecap="round"/>
                                             </svg>
                                         </Button>
                                     )}
