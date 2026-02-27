@@ -3,8 +3,8 @@
 import { useState } from "react";
 import clsx from "clsx";
 import s from "./Reviews.module.scss";
-import SectionHeader from "../ui/SectionHeader/SectionHeader";
-import Button from "../ui/Button/Button";
+import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
+import Button from "../../../components/ui/Button/Button";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";

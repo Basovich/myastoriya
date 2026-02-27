@@ -1,6 +1,6 @@
 import s from "./Publications.module.scss";
-import SectionHeader from "../ui/SectionHeader/SectionHeader";
-import Button from "../ui/Button/Button";
+import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
+import Button from "../../../components/ui/Button/Button";
 import Link from "next/link";
 import Image from "next/image";
 import { Locale } from "@/i18n/config";

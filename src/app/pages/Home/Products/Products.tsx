@@ -3,8 +3,8 @@
 import { useState, useMemo } from "react";
 import clsx from "clsx";
 import s from "./Products.module.scss";
-import ProductCard from "../ui/ProductCard/ProductCard";
-import Button from "../ui/Button/Button";
+import ProductCard from "../../../components/ui/ProductCard/ProductCard";
+import Button from "../../../components/ui/Button/Button";
 import Image from "next/image";
 
 interface Category {

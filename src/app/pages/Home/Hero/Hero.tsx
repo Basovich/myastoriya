@@ -9,7 +9,7 @@ import "swiper/css/pagination";
 import clsx from "clsx";
 import s from "./Hero.module.scss";
 import Image from "next/image";
-import Button from "../ui/Button/Button";
+import Button from "../../../components/ui/Button/Button";
 
 interface SlideContent {
     image: string;

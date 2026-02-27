@@ -1,9 +1,9 @@
 "use client";
 
 import s from "./ComplexDiscounts.module.scss";
-import SectionHeader from "../ui/SectionHeader/SectionHeader";
-import Container from "../ui/Container/Container";
-import Icon from "../ui/Icon/Icon";
+import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
+import Container from "../../../components/ui/Container/Container";
+import Icon from "../../../components/ui/Icon/Icon";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';

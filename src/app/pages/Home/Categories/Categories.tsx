@@ -7,7 +7,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import clsx from "clsx";
 import s from "./Categories.module.scss";
-import SectionHeader from "../ui/SectionHeader/SectionHeader";
+import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import Image from "next/image";
 
 interface Category {

@@ -1,7 +1,7 @@
 "use client";
 
 import s from "./Promotions.module.scss";
-import SectionHeader from "../ui/SectionHeader/SectionHeader";
+import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
