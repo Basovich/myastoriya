@@ -98,26 +98,15 @@
     color: white;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-
-    @media (min-width: 481px) {
-        gap: 16px;
-    }
-
-    @media (min-width: 769px) {
-        gap: 20px;
-    }
 }
 
 .badge {
     display: inline-block;
     color: #FFF;
-    font-size: 0.75rem;
+    font-size: 12px;
     font-style: normal;
-    font-weight: 400;
+    font-weight: 700;
     line-height: normal;
-    padding: 6px 12px;
-    border-radius: 8px;
     width: fit-content;
 
     @media (min-width: 481px) {
@@ -127,20 +116,18 @@
 }
 
 .title {
-    font-size: clamp(1.25rem, 4vw, 2rem);
-    font-weight: 900;
-    line-height: 1.2;
-    margin: 0;
+    color: #FFF;
+    font-size: 26px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 107.692%;
     text-transform: uppercase;
-
-    @media (min-width: 769px) {
-        font-size: clamp(1.75rem, 5vw, 3.5rem);
-    }
+    margin-top: 10px;
+    max-width: 225px;
 }
 
 .ctaBtn {
-    padding: 12px 20px;
-    font-size: 0.75rem;
+    display: none;
 
     @media (min-width: 769px) {
         /* Reset or add desktop styles if missing */

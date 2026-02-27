@@ -29,7 +29,6 @@ interface HeroProps {
 export default function Hero({ hero }: HeroProps) {
     if (!hero || !hero.slides || hero.slides.length === 0) return null;
 
-    // Якщо тільки один слайд — рендерим без слайдера
     if (hero.slides.length === 1) {
         const slide = hero.slides[0];
         return (
@@ -51,7 +50,7 @@ export default function Hero({ hero }: HeroProps) {
                             <span className={s.badge}>{slide.badge}</span>
                             <h1 className={s.title}>{slide.title}</h1>
                             {slide.ctaButton && (
-                                <Button href={slide.ctaButton.href} variant="outline">
+                                <Button href={slide.ctaButton.href} variant="outline" className={s.ctaButton}>
                                     {slide.ctaButton.text}
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                         <line x1="5" y1="12" x2="19" y2="12" />
