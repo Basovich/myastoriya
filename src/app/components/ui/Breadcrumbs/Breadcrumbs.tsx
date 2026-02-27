@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import AppLink from "../AppLink/AppLink";
 import s from "./Breadcrumbs.module.scss";
 
@@ -8,11 +9,12 @@ interface BreadcrumbItem {
 
 interface BreadcrumbsProps {
     items: BreadcrumbItem[];
+    className?: string;
 }
 
-export default function Breadcrumbs({ items }: BreadcrumbsProps) {
+export default function Breadcrumbs({ items, className }: BreadcrumbsProps) {
     return (
-        <nav className={s.breadcrumbs}>
+        <nav className={clsx(s.breadcrumbs, className)}>
             {items.map((item, index) => (
                 <div key={index} className={s.item}>
                     {item.href ? (

@@ -6,6 +6,7 @@ import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
+import clsx from 'clsx';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 
@@ -83,7 +84,7 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
                             e.currentTarget.removeAttribute('readOnly');
                             formik.setFieldTouched('phone', false);
                         }}
-                        className={`${s.input} ${formik.touched.phone && formik.errors.phone ? s.inputError : ''}`}
+                        className={clsx(s.input, formik.touched.phone && formik.errors.phone && s.inputError)}
                         placeholder="+38 (0__) ___ __ __"
                         value={phoneFormatted}
                         onChange={handlePhoneChange}
@@ -106,7 +107,7 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
                             e.currentTarget.removeAttribute('readOnly');
                             formik.setFieldTouched('password', false);
                         }}
-                        className={`${s.input} ${formik.touched.password && formik.errors.password ? s.inputError : ''}`}
+                        className={clsx(s.input, formik.touched.password && formik.errors.password && s.inputError)}
                         placeholder="Пароль"
                         value={formik.values.password}
                         onChange={formik.handleChange}

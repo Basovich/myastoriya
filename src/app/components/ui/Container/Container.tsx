@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import s from "./Container.module.scss";
 
 interface ContainerProps {
@@ -8,11 +9,11 @@ interface ContainerProps {
 
 export default function Container({
     children,
-    className = "",
+    className,
     as: Component = "div"
 }: ContainerProps) {
     return (
-        <Component className={`${s.container} ${className}`}>
+        <Component className={clsx(s.container, className)}>
             {children}
         </Component>
     );

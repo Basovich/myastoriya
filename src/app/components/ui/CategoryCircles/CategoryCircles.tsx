@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import s from "./CategoryCircles.module.scss";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,12 +19,12 @@ interface CategoryCirclesProps {
 export default function CategoryCircles({
     title,
     items,
-    className = ""
+    className
 }: CategoryCirclesProps) {
     if (!items || items.length === 0) return null;
 
     return (
-        <div className={`${s.wrapper} ${className}`}>
+        <div className={clsx(s.wrapper, className)}>
             {title && <h2 className={s.title}>{title}</h2>}
 
             <div className={s.grid}>

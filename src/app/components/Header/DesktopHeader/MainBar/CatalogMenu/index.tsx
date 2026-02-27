@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import clsx from "clsx";
 import s from "./CatalogMenu.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 
@@ -210,7 +211,7 @@ export default function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                         {CATALOG_DATA.map((cat) => (
                             <li
                                 key={cat.id}
-                                className={`${s.categoryItem} ${activeCategory.id === cat.id ? s.active : ""}`}
+                                className={clsx(s.categoryItem, activeCategory.id === cat.id && s.active)}
                                 onMouseEnter={() => setActiveCategory(cat)}
                             >
                                 <div className={s.categoryLink}>

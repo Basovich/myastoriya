@@ -10,6 +10,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import Image from "next/image";
 import Link from "next/link";
+import clsx from "clsx";
 
 interface DiscountItem {
     id: number;
@@ -42,10 +43,10 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                 <div className={s.headerRow}>
                     <SectionHeader title={dict.sectionTitle} align="left" />
                     <div className={s.navArrows}>
-                        <button className={`combo-prev ${s.arrowBtn}`} aria-label="Previous combo">
+                        <button className={clsx('combo-prev', s.arrowBtn)} aria-label="Previous combo">
                             <Icon name="arrow-right" style={{ transform: "rotate(180deg)" }} />
                         </button>
-                        <button className={`combo-next ${s.arrowBtn}`} aria-label="Next combo">
+                        <button className={clsx('combo-next', s.arrowBtn)} aria-label="Next combo">
                             <Icon name="arrow-right" />
                         </button>
                     </div>

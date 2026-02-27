@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import s from "./HeroBanner.module.scss";
 import Image from "next/image";
 import React from "react";
@@ -14,11 +15,11 @@ export default function HeroBanner({
     title,
     prefix,
     image = "/images/promotions/promotions-banner.png",
-    className = "",
+    className,
     children
 }: HeroBannerProps) {
     return (
-        <div className={`${s.bannerWrapper} ${className}`}>
+        <div className={clsx(s.bannerWrapper, className)}>
             <Image
                 src={image}
                 alt={title || "Banner"}

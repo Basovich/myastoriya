@@ -6,6 +6,7 @@ import Link from "next/link";
 import Button from "../ui/Button/Button";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
+import clsx from "clsx";
 import s from "./BlogGrid.module.scss";
 
 // Reusing interfaces from existing Content
@@ -94,7 +95,7 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
                     {tabs.map(tab => (
                         <button
                             key={tab.id}
-                            className={`${s.tab} ${activeTab === tab.id ? s.activeTab : ''}`}
+                            className={clsx(s.tab, activeTab === tab.id && s.activeTab)}
                             onClick={() => setActiveTab(tab.id)}
                         >
                             {tab.label}
@@ -132,7 +133,7 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
 
                 <div className={s.paginationRow}>
                     <div className={s.pageNumbers}>
-                        <button className={`${s.pageNum} ${s.activePage}`}>01</button>
+                        <button className={clsx(s.pageNum, s.activePage)}>01</button>
                         <button className={s.pageNum}>02</button>
                         <button className={s.pageNum}>03</button>
                         <span className={s.pageDots}>...</span>

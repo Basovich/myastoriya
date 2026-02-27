@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import Link from "next/link";
 import s from "./Tabs.module.scss";
 
@@ -19,13 +20,13 @@ export default function Tabs({
     tabs,
     onChange,
     variant = "pills",
-    className = "",
+    className,
 }: TabsProps) {
     return (
-        <div className={`${s.tabsWrapper} ${s[variant]} ${className}`}>
+        <div className={clsx(s.tabsWrapper, s[variant], className)}>
             {tabs.map((tab) => {
                 const isActive = tab.active;
-                const classes = `${s.tab} ${isActive ? s.active : ""}`;
+                const classes = clsx(s.tab, isActive && s.active);
 
                 if (tab.href) {
                     return (

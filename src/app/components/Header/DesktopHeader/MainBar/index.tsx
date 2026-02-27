@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import clsx from "clsx";
 import s from "./MainBar.module.scss";
 import Logo from "@/app/components/Header/Shared/Logo";
 import Actions from "@/app/components/Header/Shared/Actions";
@@ -27,12 +28,12 @@ export default function MainBar({ lang }: MainBarProps) {
                 <div className={s.centerBlock}>
                     <button
                         onClick={() => setIsCatalogOpen(!isCatalogOpen)}
-                        className={`${s.catalogBtn} ${isCatalogOpen ? s.active : ""}`}
+                        className={clsx(s.catalogBtn, isCatalogOpen && s.active)}
                     >
                         {isCatalogOpen ? (
                             <svg xmlns="http://www.w3.org/2000/svg" width="26" height="15" viewBox="0 0 26 15" fill="none">
-                                <path d="M18.9851 13.6568L12.6566 7.32837L18.9851 0.999945" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                                <path d="M6.32843 1.00019L12.6568 7.32861L6.32843 13.657" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M18.9851 13.6568L12.6566 7.32837L18.9851 0.999945" stroke="white" stroke-width="2" stroke-linecap="round" />
+                                <path d="M6.32843 1.00019L12.6568 7.32861L6.32843 13.657" stroke="white" stroke-width="2" stroke-linecap="round" />
                             </svg>
                         ) : (
                             <Image src="/icons/icon-category.svg" alt="Categories" width="18" height="18" />

@@ -8,6 +8,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import Link from "next/link";
 import Image from "next/image";
+import clsx from "clsx";
 
 interface PromotionItem {
     id: number;
@@ -39,12 +40,12 @@ export default function Promotions({ dict, lang }: PromotionsProps) {
             <div className={s.promotionsHeader}>
                 <SectionHeader title={dict.sectionTitle} align="left" />
                 <div className={s.navArrows}>
-                    <button className={`promo-prev ${s.arrowBtn}`} aria-label="Previous promotion">
+                    <button className={clsx('promo-prev', s.arrowBtn)} aria-label="Previous promotion">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: "rotate(180deg)" }}>
                             <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
                         </svg>
                     </button>
-                    <button className={`promo-next ${s.arrowBtn}`} aria-label="Next promotion">
+                    <button className={clsx('promo-next', s.arrowBtn)} aria-label="Next promotion">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
                         </svg>

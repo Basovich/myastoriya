@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import clsx from "clsx";
 import s from "./Products.module.scss";
 import ProductCard from "../ui/ProductCard/ProductCard";
 import Button from "../ui/Button/Button";
@@ -57,7 +58,7 @@ export default function Products({ dict, categories }: ProductsProps) {
             />
             <section className={s.section} id="products">
                 <div className={s.tabsWrapper}>
-                    <button className={`${s.tabArrow} ${s.tabArrowLeft}`} aria-label="Прокрутити вкладки вліво" onClick={() => {
+                    <button className={clsx(s.tabArrow, s.tabArrowLeft)} aria-label="Прокрутити вкладки вліво" onClick={() => {
                         const tabsContainer = document.querySelector(`.${s.tabs}`);
                         if (tabsContainer) tabsContainer.scrollBy({ left: -200, behavior: 'smooth' });
                     }}>
@@ -77,7 +78,7 @@ export default function Products({ dict, categories }: ProductsProps) {
                             </Button>
                         ))}
                     </div>
-                    <button className={`${s.tabArrow} ${s.tabArrowRight}`} aria-label="Прокрутити вкладки вправо" onClick={() => {
+                    <button className={clsx(s.tabArrow, s.tabArrowRight)} aria-label="Прокрутити вкладки вправо" onClick={() => {
                         const tabsContainer = document.querySelector(`.${s.tabs}`);
                         if (tabsContainer) tabsContainer.scrollBy({ left: 200, behavior: 'smooth' });
                     }}>

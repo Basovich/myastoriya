@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import s from "./Badge.module.scss";
 
 type BadgeVariant = "new" | "sale" | "hot";
@@ -11,10 +12,10 @@ interface BadgeProps {
 export default function Badge({
     children,
     variant = "new",
-    className = "",
+    className,
 }: BadgeProps) {
     return (
-        <span className={`${s.badge} ${s[variant]} ${className}`}>
+        <span className={clsx(s.badge, s[variant], className)}>
             {children}
         </span>
     );

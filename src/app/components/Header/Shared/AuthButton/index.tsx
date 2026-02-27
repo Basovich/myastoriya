@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAppSelector } from '@/store/hooks';
+import clsx from 'clsx';
 import s from './AuthButton.module.scss';
 import AuthModal from '@/app/components/AuthModal';
 
@@ -25,7 +26,7 @@ export default function AuthButton() {
     return (
         <>
             <button
-                className={`${s.authBtn} ${isAuthenticated ? s.loggedIn : ''}`}
+                className={clsx(s.authBtn, isAuthenticated && s.loggedIn)}
                 onClick={handleAuthClick}
                 aria-label={isAuthenticated ? 'Профіль' : 'Вхід'}
             >

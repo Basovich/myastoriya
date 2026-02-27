@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
+import clsx from 'clsx';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 
@@ -208,7 +209,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                             e.currentTarget.removeAttribute('readOnly');
                             formik.setFieldTouched('name', false);
                         }}
-                        className={`${s.input} ${formik.touched.name && formik.errors.name ? s.inputError : ''}`}
+                        className={clsx(s.input, formik.touched.name && formik.errors.name && s.inputError)}
                         placeholder="Ім'я"
                         value={formik.values.name}
                         onChange={formik.handleChange}
@@ -231,7 +232,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                             e.currentTarget.removeAttribute('readOnly');
                             formik.setFieldTouched('phone', false);
                         }}
-                        className={`${s.input} ${formik.touched.phone && formik.errors.phone ? s.inputError : ''}`}
+                        className={clsx(s.input, formik.touched.phone && formik.errors.phone && s.inputError)}
                         placeholder="+38 (0__) ___ __ __"
                         value={phoneFormatted}
                         onChange={handlePhoneChange}
@@ -254,7 +255,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                             e.currentTarget.removeAttribute('readOnly');
                             formik.setFieldTouched('password', false);
                         }}
-                        className={`${s.input} ${formik.touched.password && formik.errors.password ? s.inputError : ''}`}
+                        className={clsx(s.input, formik.touched.password && formik.errors.password && s.inputError)}
                         placeholder="Пароль"
                         value={formik.values.password}
                         onChange={formik.handleChange}
@@ -277,7 +278,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                             e.currentTarget.removeAttribute('readOnly');
                             formik.setFieldTouched('confirmPassword', false);
                         }}
-                        className={`${s.input} ${formik.touched.confirmPassword && formik.errors.confirmPassword ? s.inputError : ''}`}
+                        className={clsx(s.input, formik.touched.confirmPassword && formik.errors.confirmPassword && s.inputError)}
                         placeholder="Повторити пароль"
                         value={formik.values.confirmPassword}
                         onChange={formik.handleChange}

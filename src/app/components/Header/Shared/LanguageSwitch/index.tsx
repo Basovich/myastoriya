@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import clsx from "clsx";
 import s from "./LanguageSwitch.module.scss";
 import { type Locale } from "@/i18n/config";
 
@@ -33,13 +34,13 @@ export default function LanguageSwitch({ lang }: LanguageSwitchProps) {
     return (
         <div className={s.langSwitch}>
             {lang === 'ua' ? (
-                <span className={`${s.langOption} ${s.active}`}>UKR</span>
+                <span className={clsx(s.langOption, s.active)}>UKR</span>
             ) : (
                 <Link href={getSwitchUrl('ua')} className={s.langOption}>UKR</Link>
             )}
 
             {lang === 'ru' ? (
-                <span className={`${s.langOption} ${s.active}`}>RUS</span>
+                <span className={clsx(s.langOption, s.active)}>RUS</span>
             ) : (
                 <Link href={getSwitchUrl('ru')} className={s.langOption}>RUS</Link>
             )}

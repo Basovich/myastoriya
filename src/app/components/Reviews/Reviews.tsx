@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import clsx from "clsx";
 import s from "./Reviews.module.scss";
 import SectionHeader from "../ui/SectionHeader/SectionHeader";
 import Button from "../ui/Button/Button";
@@ -20,12 +21,12 @@ export default function Reviews({ dict }: { dict: any }) {
             <div className={s.headerWrap}>
                 <SectionHeader title={dict.sectionTitle} align="left" />
                 <div className={s.sliderNav}>
-                    <button className={`${s.navBtn} reviews-prev`}>
+                    <button className={clsx(s.navBtn, 'reviews-prev')}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: "rotate(180deg)" }}>
                             <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
                         </svg>
                     </button>
-                    <button className={`${s.navBtn} reviews-next`}>
+                    <button className={clsx(s.navBtn, 'reviews-next')}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
                         </svg>

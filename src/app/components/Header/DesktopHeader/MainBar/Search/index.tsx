@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import clsx from "clsx";
 import s from "./Search.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Image from "next/image";
@@ -155,7 +156,7 @@ export default function Search({ lang }: { lang: Locale }) {
     }, [isActive, disableScroll, enableScroll]);
 
     return (
-        <div className={`${s.searchContainer} ${isActive ? s.active : ""}`} ref={containerRef}>
+        <div className={clsx(s.searchContainer, isActive && s.active)} ref={containerRef}>
             <div className={s.headerSearch} onClick={handleInputFocus}>
                 <div className={s.iconWrapper}>
                     <Image src="/icons/icon-search.svg" alt="Search" width="20" height="20" />
@@ -256,7 +257,7 @@ export default function Search({ lang }: { lang: Locale }) {
                                                     <>
                                                         {featuredProposals.length > 1 ? (
                                                             <div
-                                                                className={`${s.sliderWrapper} ${isDragging ? s.dragging : ""}`}
+                                                                className={clsx(s.sliderWrapper, isDragging && s.dragging)}
                                                                 onMouseDown={handleDragStart}
                                                                 onMouseMove={handleDragMove}
                                                                 onMouseUp={handleDragEnd}
