@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import clsx from "clsx";
 import s from "./SearchBar.module.scss";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 const MOCK_PRODUCTS = [
     { id: 1, name: "Трюфельный стейк Dry-aged", price: 1260, image: "/images/products/steak-1.jpg" },
@@ -19,6 +20,7 @@ export default function SearchBar() {
     const [hasError, setHasError] = useState(false);
     const router = useRouter();
     const params = useParams();
+    const { disableScroll, enableScroll } = useScrollLock();
     const lang = params?.lang || "uk";
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -37,6 +39,7 @@ export default function SearchBar() {
     const handleInputFocus = () => {
         setIsActive(true);
         setHasError(false);
+        disableScroll();
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +52,7 @@ export default function SearchBar() {
         } else if (value.trim() === "") {
             setResults([]);
         } else {
-            setResults([]); // Will show "not found" state
+            setResults([]);
         }
     };
 
@@ -58,6 +61,7 @@ export default function SearchBar() {
         const handleClickOutside = (event: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
                 setIsActive(false);
+                enableScroll();
             }
         };
 
@@ -67,7 +71,7 @@ export default function SearchBar() {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [isActive]);
+    }, [enableScroll, isActive]);
 
     return (
         <>
