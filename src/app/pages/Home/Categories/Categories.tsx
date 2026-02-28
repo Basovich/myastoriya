@@ -31,7 +31,7 @@ export default function Categories({ categories }: CategoriesProps) {
 
     return (
         <section className={s.section} id="categories">
-            <SectionHeader title={categories.sectionTitle} />
+            <SectionHeader title={categories.sectionTitle} classNameDots={s.classNameWrapper} />
 
             <div className={s.sliderWrapper}>
                 <div className={s.sliderNav}>
@@ -60,8 +60,9 @@ export default function Categories({ categories }: CategoriesProps) {
                     className={clsx(s.swiperContainer, "categories-swiper")}
                     breakpoints={{
                         0: { slidesPerView: 3.6, spaceBetween: 10 },
-                        600: { slidesPerView: 6, spaceBetween: 16 },
-                        1280: { slidesPerView: 6, spaceBetween: 32 },
+                        600: { slidesPerView: 5, spaceBetween: 16 },
+                        1024: { slidesPerView: 6, spaceBetween: 16 },
+                        1280: { slidesPerView: 6, spaceBetween: 0 },
                     }}
                 >
                     {categories.items.map((cat, i) => (

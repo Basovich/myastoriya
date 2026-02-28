@@ -173,7 +173,7 @@ a.ctaButton {
 
     @media (any-hover: hover) {
         &:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: #fff;
             transform: translateY(-50%) scale(1.1);
         }
     }
@@ -199,6 +199,7 @@ a.ctaButton {
     right: 16px;
 
     @media (min-width: 1280px) {
+        transform: rotateY(180deg) translateY(-25px);
         right: calc((100% - 1200px) / 2);
     }
 

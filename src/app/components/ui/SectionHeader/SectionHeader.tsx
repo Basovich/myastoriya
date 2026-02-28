@@ -4,14 +4,14 @@ import s from "./SectionHeader.module.scss";
 interface SectionHeaderProps {
     title: string;
     withDots?: boolean;
-    align?: 'left' | 'center' | 'right';
+    classNameWrapper?: string;
     classNameTitle?: string;
     classNameDots?: string;
 }
 
-export default function SectionHeader({ title, withDots = true, align = 'center', classNameTitle, classNameDots }: SectionHeaderProps) {
+export default function SectionHeader({ title, withDots = true, classNameWrapper, classNameTitle, classNameDots }: SectionHeaderProps) {
     return (
-        <div className={clsx(s.wrapper, align && s[align])}>
+        <div className={clsx(s.wrapper, classNameWrapper)}>
             <h2 className={clsx(s.title, classNameTitle)}>{title}</h2>
             {withDots && (
                 <div className={clsx(s.dots, classNameDots)}>
