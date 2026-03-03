@@ -1,6 +1,7 @@
 import s from "./ProductCard.module.scss";
 import Image from "next/image";
 import Badge from "../Badge/Badge";
+import WishButton from "../WishButton/WishButton";
 import Icon from "../Icon/Icon";
 
 interface ProductCardProps {
@@ -38,9 +39,7 @@ export default function ProductCard({
                         {badge}
                     </Badge>
                 )}
-                <button className={s.favorite} aria-label="Додати до обраного">
-                    <Icon name="favorite" width={18} height={18} />
-                </button>
+                <WishButton className={s.favorite} />
                 <span className={s.weight}>{weight}</span>
             </div>
             <div className={s.info}>
