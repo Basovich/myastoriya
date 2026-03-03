@@ -2,14 +2,26 @@
 
 import { useState } from "react";
 import s from "./Reviews.module.scss";
+import Image from "next/image";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import Button from "../../../components/ui/Button/Button";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
+import type { Review } from "@/i18n/types";
 
-export default function Reviews({ dict }: { dict: any }) {
+interface ReviewsProps {
+  dict: {
+    sectionTitle: string;
+    leaveReviewButton: string;
+    readMoreText: string;
+    collapseText: string;
+    items: Review[];
+  };
+}
+
+export default function Reviews({ dict }: ReviewsProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
     const [expanded, setExpanded] = useState<Record<number, boolean>>({});
@@ -51,12 +63,12 @@ export default function Reviews({ dict }: { dict: any }) {
                         },
                     }}
                 >
-                    {dict.items.map((review: any) => (
+                    {dict.items.map((review) => (
                         <SwiperSlide key={review.id} style={{ height: "auto" }}>
                             <div className={s.card}>
                                 <div className={s.cardHeader}>
                                     <div className={s.avatar}>
-                                        <img src={review.avatar} alt={review.name} className={s.avatarImg} />
+                                        <Image src={review.avatar} alt={review.name} className={s.avatarImg} loading='lazy' />
                                     </div>
                                     <div className={s.author}>
                                         <div className={s.nameRow}>
