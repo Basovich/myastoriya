@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import clsx from "clsx";
 import s from "./Reviews.module.scss";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import Button from "../../../components/ui/Button/Button";
@@ -22,7 +21,7 @@ export default function Reviews({ dict }: { dict: any }) {
     return (
         <section className={s.section} id="reviews">
             <div className={s.headerWrap}>
-                <SectionHeader title={dict.sectionTitle} align="left" />
+                <SectionHeader title={dict.sectionTitle} />
                 <div className={s.sliderNav}>
                     <SliderArrow
                         direction="left"

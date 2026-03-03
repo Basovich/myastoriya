@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import clsx from "clsx";
 import s from "./Products.module.scss";
 import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import Button from "../../../components/ui/Button/Button";

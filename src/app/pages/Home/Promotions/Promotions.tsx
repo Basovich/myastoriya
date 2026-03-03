@@ -4,12 +4,11 @@ import { useState } from "react";
 import s from "./Promotions.module.scss";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Link from "next/link";
 import Image from "next/image";
-import clsx from "clsx";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 
 interface PromotionItem {
@@ -43,7 +42,7 @@ export default function Promotions({ dict, lang }: PromotionsProps) {
     return (
         <section className={s.section} id="promotions">
             <div className={s.promotionsHeader}>
-                <SectionHeader title={dict.sectionTitle} align="left" />
+                <SectionHeader title={dict.sectionTitle} />
                 <div className={s.navArrows}>
                     <SliderArrow
                         direction="left"

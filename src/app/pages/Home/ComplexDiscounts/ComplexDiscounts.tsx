@@ -4,14 +4,12 @@ import { useState } from "react";
 import s from "./ComplexDiscounts.module.scss";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import Container from "../../../components/ui/Container/Container";
-import Icon from "../../../components/ui/Icon/Icon";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Image from "next/image";
 import Link from "next/link";
-import clsx from "clsx";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 
 interface DiscountItem {
@@ -46,7 +44,7 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
         <section className={s.section} id="combo">
             <Container>
                 <div className={s.headerRow}>
-                    <SectionHeader title={dict.sectionTitle} align="left" />
+                    <SectionHeader title={dict.sectionTitle} />
                     <div className={s.navArrows}>
                         <SliderArrow
                             direction="left"

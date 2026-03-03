@@ -10,7 +10,7 @@ export default function Publications({ dict, lang }: { dict: any, lang: Locale }
     return (
         <section className={s.section} id="publications">
             <div className={s.headerWrap}>
-                <SectionHeader title={dict.sectionTitle} align="left" />
+                <SectionHeader title={dict.sectionTitle} />
             </div>
             <div className={s.carousel}>
                 {dict.items.map((pub: any) => (

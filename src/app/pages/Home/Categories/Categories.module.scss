@@ -58,6 +58,14 @@
     gap: 16px;
     text-decoration: none;
     width: 100%;
+    
+    @media (any-hover: hover) {
+      &:hover {
+        .label {
+            color: var(--color-accent-hover, #FF1A2A);
+        }
+      }
+    }
 }
 
 .circle {
@@ -87,11 +95,6 @@
         width: 178px;
         height: 178px;
     }
-
-    .item:hover & {
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
 }
 
 .circleImg {
@@ -107,6 +110,7 @@
     text-align: center;
     line-height: 1.2;
     max-width: 140px;
+    transition: color 0.2s ease;
 
     @media (min-width: 768px) {
         font-size: 16px;
