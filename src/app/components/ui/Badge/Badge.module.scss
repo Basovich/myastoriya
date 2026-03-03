@@ -1,21 +1,21 @@
 .badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #fff;
     display: inline-block;
+    padding: 6px 12px 4px;
+    height: 20px;
+    border-radius: 6px;
+    color: #FFF;
+    font-family: var(--font-houschka), var(--font-sans), sans-serif;
+    font-size: 8px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 120%;
+    text-transform: uppercase;
 }
 
 .new {
-    background-color: #27AE60;
+    background-color: #0582FF;
 }
 
 .sale {
-    background-color: #E30613;
-}
-
-.hot {
-    background-color: #F2994A;
+    background-color: #E3051B;
 }

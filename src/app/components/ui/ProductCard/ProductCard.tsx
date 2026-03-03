@@ -27,8 +27,8 @@ export default function ProductCard({
                     src={image}
                     alt={title}
                     className={s.productImg}
-                    width={200}
-                    height={200}
+                    width={162}
+                    height={120}
                 />
                 {badge && (
                     <Badge

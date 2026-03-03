@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import s from "./Badge.module.scss";
 
-type BadgeVariant = "new" | "sale" | "hot";
+type BadgeVariant = "new" | "sale";
 
 interface BadgeProps {
     children: React.ReactNode;

@@ -1,5 +1,5 @@
 .wrapper {
-    background-color: #F5F5F5;
+    background-color: #F6F6F6;
     position: relative;
     overflow: hidden;
     padding: 32px 0;
@@ -9,7 +9,6 @@
     }
 }
 
-/* Background watermark anchored right */
 .bgLogo {
     position: absolute;
     right: 0;
@@ -20,11 +19,10 @@
     z-index: 0;
     pointer-events: none;
     opacity: 0.5;
-    /* Approx opacity if the image itself isn't fully opaque/tinted */
 }
 
 .section {
-    padding: 16px;
+    padding: 0;
     position: relative;
     z-index: 1;
 
@@ -39,7 +37,8 @@
     display: flex;
     align-items: center;
     position: relative;
-    margin-bottom: 24px;
+    margin-bottom: 30px;
+    padding: 0 0 0 20px;
 
     @media (min-width: 1024px) {
         margin-bottom: 40px;
@@ -47,44 +46,56 @@
 }
 
 .tabs {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
     flex: 1;
-
-    &::-webkit-scrollbar {
-        display: none;
-    }
+    min-width: 0;
 
     @media (min-width: 1024px) {
-        gap: 10px;
         flex: 0 1 auto;
     }
 }
 
+.tabSlide {
+    width: auto !important;
+}
+
+.tabButton {
+    background-color: #fff;
+    padding-top: 10px;
+    max-height: 32px;
+    border: 0;
+    color: #262626;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: initial;
+}
+
 .tabArrow {
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background-color: #FFF;
     border: none;
     cursor: pointer;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 10px 0 rgba(54, 54, 54, 0.20);
+    position: absolute;
+    top: 0;
 
-    svg {
-        stroke: #E30613;
-        /* Red arrow */
+    &:disabled {
+        display: none;
     }
 
-    @media (min-width: 1024px) {
-        display: flex;
-        /* Show right arrow on desktop if scroll needed, or keep it always visible based on design */
+    &.left {
+        left: 20px;
+    }
+
+    &.right {
+        right: 20px;
     }
 }
 
@@ -100,6 +111,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
+    padding: 0 20px;
 
     @media (min-width: 1024px) {
         grid-template-columns: repeat(4, 1fr);

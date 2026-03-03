@@ -1,6 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import clsx from "clsx";
 import s from "./Products.module.scss";
 import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import Button from "../../../components/ui/Button/Button";
@@ -33,8 +38,10 @@ interface ProductsProps {
 
 export default function Products({ dict, categories }: ProductsProps) {
     const [activeTab, setActiveTab] = useState(0);
+    const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
+    const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
-    // Filter simulation: For different tabs, we rearrange or slice the array 
+    // Filter simulation: For different tabs, we rearrange or slice the array
     // to give the visual impression of server-side or actual category filtering
     const visibleProducts = useMemo(() => {
         if (!dict?.items) return [];
@@ -48,7 +55,7 @@ export default function Products({ dict, categories }: ProductsProps) {
     if (!dict || !categories) return null;
 
     return (
-        <div className={s.wrapper}>
+        <section className={s.wrapper}>
             <Image
                 src="/images/products/products-bg-logo.svg"
                 alt="Background logo watermark"
@@ -56,37 +63,42 @@ export default function Products({ dict, categories }: ProductsProps) {
                 height={1011}
                 className={s.bgLogo}
             />
-            <section className={s.section} id="products">
+            <div className={s.section} id="products">
                 <div className={s.tabsWrapper}>
                     <SliderArrow
                         direction="left"
-                        className={s.tabArrow}
-                        onClick={() => {
-                            const tabsContainer = document.querySelector(`.${s.tabs}`);
-                            if (tabsContainer) tabsContainer.scrollBy({ left: -200, behavior: 'smooth' });
-                        }}
+                        className={clsx(s.tabArrow, s.left)}
+                        onClick={() => { }}
                         ariaLabel="Прокрутити вкладки вліво"
+                        ref={setPrevEl}
                     />
-                    <div className={s.tabs}>
+                    <Swiper
+                        modules={[Navigation]}
+                        navigation={{ prevEl, nextEl }}
+                        loop={false}
+                        slidesPerView="auto"
+                        spaceBetween={8}
+                        className={clsx(s.tabs, "products-tabs-swiper")}
+                    >
                         {categories.map((cat, i) => (
-                            <Button
-                                key={i}
-                                variant="pill"
-                                active={activeTab === i}
-                                onClick={() => setActiveTab(i)}
-                            >
-                                {cat.title}
-                            </Button>
+                            <SwiperSlide key={i} className={s.tabSlide}>
+                                <Button
+                                    variant="pill"
+                                    active={activeTab === i}
+                                    onClick={() => setActiveTab(i)}
+                                    className={s.tabButton}
+                                >
+                                    {cat.title}
+                                </Button>
+                            </SwiperSlide>
                         ))}
-                    </div>
+                    </Swiper>
                     <SliderArrow
                         direction="right"
-                        className={s.tabArrow}
-                        onClick={() => {
-                            const tabsContainer = document.querySelector(`.${s.tabs}`);
-                            if (tabsContainer) tabsContainer.scrollBy({ left: 200, behavior: 'smooth' });
-                        }}
+                        className={clsx(s.tabArrow, s.right)}
+                        onClick={() => { }}
                         ariaLabel="Прокрутити вкладки вправо"
+                        ref={setNextEl}
                     />
                 </div>
 
@@ -112,7 +124,7 @@ export default function Products({ dict, categories }: ProductsProps) {
                         </svg>
                     </Button>
                 </div>
-            </section >
-        </div >
+            </div>
+        </section>
     );
 }
