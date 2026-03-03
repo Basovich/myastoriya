@@ -7,7 +7,6 @@ interface WishButtonProps {
     active?: boolean;
     onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     className?: string;
-    size?: "sm" | "md";
     ariaLabel?: string;
 }
 
@@ -15,13 +14,12 @@ export default function WishButton({
     active = false,
     onClick,
     className,
-    size = "sm",
     ariaLabel = "Додати до обраного",
 }: WishButtonProps) {
     return (
         <button
             type="button"
-            className={clsx(s.btn, s[size], active && s.active, className)}
+            className={clsx(s.btn, active && s.active, className)}
             onClick={onClick}
             aria-label={ariaLabel}
             aria-pressed={active}

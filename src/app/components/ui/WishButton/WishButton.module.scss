@@ -2,54 +2,61 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: none;
     background: #fff;
     cursor: pointer;
     flex-shrink: 0;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    color: #333;
+    transition: background-color 0.2s ease;
 
     @media (any-hover: hover) {
         &:hover {
-            transform: scale(1.08);
+            background-color: #E6000F;
+
+            svg {
+                stroke: #fff;
+            }
         }
     }
 
     &:focus-visible {
-        outline: 2px solid #E30613;
+        outline: 2px solid #E6000F;
         outline-offset: 2px;
     }
 
     &.active {
-        color: #E30613;
+        background-color: #E6000F;
 
         svg {
-            fill: #E30613;
-            stroke: #E30613;
+            stroke: #fff;
         }
     }
-}
 
-/* Sizes */
-.sm {
-    width: 32px;
-    height: 32px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
-
-    svg {
-        width: 16px;
-        height: 16px;
+    @media (min-width: 768px) {
+        width: 36px;
+        height: 36px;
     }
-}
 
-.md {
-    width: 44px;
-    height: 44px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+    @media (min-width: 1280px) {
+        width: 48px;
+        height: 48px;
+    }
 
     svg {
-        width: 22px;
-        height: 22px;
+        width: 14px;
+        height: 14px;
+        transition: stroke 0.2s ease;
+
+        @media (min-width: 768px) {
+            width: 18px;
+            height: 18px;
+        }
+
+        @media (min-width: 1280px) {
+            width: 24px;
+            height: 24px;
+        }
     }
 }
