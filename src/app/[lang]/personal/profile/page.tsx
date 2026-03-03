@@ -1,25 +1,10 @@
 'use client';
 
 import { useAppSelector } from '@/store/hooks';
-import Link from 'next/link';
 import s from './Profile.module.scss';
 
 export default function ProfilePage() {
-    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-
-    if (!isAuthenticated) {
-        return (
-            <div className={s.profileContainer}>
-                <div className={s.notAuthenticated}>
-                    <h1 className={s.title}>Особистий кабінет</h1>
-                    <p>Будь ласка, увійдіть, щоб переглянути свій профіль.</p>
-                    <Link href="/" className={s.loginBtn}>
-                        На головну
-                    </Link>
-                </div>
-            </div>
-        );
-    }
+    const { user } = useAppSelector((state) => state.auth);
 
     return (
         <div className={s.profileContainer}>

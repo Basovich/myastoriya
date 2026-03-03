@@ -59,6 +59,7 @@ export default function Actions() {
             <AuthModal
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}
+                onSuccess={() => router.push(`/${lang}/personal/favorites/`)}
             />
         </>
     );

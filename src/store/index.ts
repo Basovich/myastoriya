@@ -16,30 +16,23 @@ import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
 import authReducer from './slices/authSlice';
 
-// 1 Minute for testing
-const THIRTY_DAYS = 1 * 60 * 1000;
+const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
-// Transform to handle expiration of persisted state
+// Auth session expiration transform — applies only to the auth slice.
+// Wishlist and cart are intentionally NOT expired, so they persist indefinitely.
 const expireTransform = createTransform(
-    // transform state on its way to being serialized and persisted.
-    (inboundState: any, key) => {
-        return {
-            ...inboundState,
-            _persistedAt: Date.now(), // update timestamp on save
-        };
-    },
-    // transform state being rehydrated
-    (outboundState: any, key) => {
+    (inboundState: any) => ({
+        ...inboundState,
+        _persistedAt: Date.now(),
+    }),
+    (outboundState: any) => {
         const persistedAt = outboundState?._persistedAt;
         if (persistedAt && Date.now() - persistedAt > THIRTY_DAYS) {
-            // Data has expired
-            // Simplest way for arrays is returning empty for these specific slices, or returning undefined
-            return { items: [] } as any;
+            return { user: null, isAuthenticated: false } as any;
         }
         return outboundState;
     },
-    // define which reducers this transform gets called for.
-    { whitelist: ['cart', 'wishlist', 'auth'] }
+    { whitelist: ['auth'] }
 );
 
 const persistConfig = {
