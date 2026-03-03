@@ -14,7 +14,7 @@ export default function Actions() {
         <div className={s.actions}>
             {/* Cart */}
             <button className={s.actionBtn} aria-label="Кошик">
-                <Image src="/icons/shopping-bag.png" alt="Cart" width="20" height="20" />
+                <Image src="/icons/shopping-bag.svg" alt="Cart" width="20" height="20" />
                 {totalCartItems > 0 && (
                     <span className={s.badge}>{totalCartItems}</span>
                 )}

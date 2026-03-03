@@ -78,6 +78,7 @@ export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps
                         {dict.home.products.items.slice(0, 8).map((item: any) => (
                             <ProductCard
                                 key={item.id}
+                                id={item.id}
                                 title={item.title}
                                 weight={item.weight}
                                 price={item.price}

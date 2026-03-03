@@ -2,27 +2,44 @@
 
 import clsx from "clsx";
 import s from "./WishButton.module.scss";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { toggleWishlistAsync } from "@/store/slices/wishlistSlice";
 
 interface WishButtonProps {
-    active?: boolean;
-    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    productId: string;
     className?: string;
     ariaLabel?: string;
 }
 
 export default function WishButton({
-    active = false,
-    onClick,
+    productId,
     className,
-    ariaLabel = "Додати до обраного",
+    ariaLabel,
 }: WishButtonProps) {
+    const dispatch = useAppDispatch();
+    const isActive = useAppSelector((state) =>
+        state.wishlist.items.includes(productId)
+    );
+    const isLoading = useAppSelector((state) =>
+        state.wishlist.loadingIds?.includes(productId) ?? false
+    );
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!isLoading) {
+            dispatch(toggleWishlistAsync(productId));
+        }
+    };
+
     return (
         <button
             type="button"
-            className={clsx(s.btn, active && s.active, className)}
-            onClick={onClick}
-            aria-label={ariaLabel}
-            aria-pressed={active}
+            className={clsx(s.btn, isActive && s.active, isLoading && s.loading, className)}
+            onClick={handleClick}
+            aria-label={ariaLabel ?? (isActive ? "Видалити з обраного" : "Додати до обраного")}
+            aria-pressed={isActive}
+            disabled={isLoading}
         >
             <svg
                 viewBox="0 0 24 24"

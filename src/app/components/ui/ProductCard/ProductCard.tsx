@@ -1,3 +1,5 @@
+"use client";
+
 import s from "./ProductCard.module.scss";
 import Image from "next/image";
 import Badge from "../Badge/Badge";
@@ -5,6 +7,7 @@ import WishButton from "../WishButton/WishButton";
 import Icon from "../Icon/Icon";
 
 interface ProductCardProps {
+    id: number | string;
     title: string;
     weight: string;
     price: number;
@@ -14,6 +17,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({
+    id,
     title,
     weight,
     price,
@@ -39,7 +43,7 @@ export default function ProductCard({
                         {badge}
                     </Badge>
                 )}
-                <WishButton className={s.favorite} />
+                <WishButton productId={String(id)} className={s.favorite} />
                 <span className={s.weight}>{weight}</span>
             </div>
             <div className={s.info}>

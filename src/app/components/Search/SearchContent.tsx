@@ -1,6 +1,5 @@
 import s from "./SearchContent.module.scss";
 import ProductCard from "../ui/ProductCard/ProductCard";
-import Button from "../ui/Button/Button";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import CategoryCircles, { CategoryCircleItem } from "../ui/CategoryCircles/CategoryCircles";
@@ -67,6 +66,7 @@ export default function SearchContent({
                         results.map((product) => (
                             <ProductCard
                                 key={product.id}
+                                id={product.id}
                                 title={product.title}
                                 weight={product.weight}
                                 price={product.price}

@@ -106,6 +106,7 @@ export default function Products({ dict, categories }: ProductsProps) {
                     {visibleProducts.map((product) => (
                         <ProductCard
                             key={product.id}
+                            id={product.id}
                             title={product.title}
                             weight={product.weight}
                             price={product.price}
