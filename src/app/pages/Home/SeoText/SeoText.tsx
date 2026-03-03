@@ -4,7 +4,16 @@ import { useState } from "react";
 import clsx from "clsx";
 import s from "./SeoText.module.scss";
 
-export default function SeoText({ dict }: { dict: any }) {
+interface SeoTextProps {
+  dict: {
+    title: string;
+    text: string;
+    showBtn: string;
+    hideBtn: string;
+  };
+}
+
+export default function SeoText({ dict }: SeoTextProps) {
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
