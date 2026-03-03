@@ -13,7 +13,7 @@
                         "text": "УЗНАТЬ БОЛЬШЕ",
                         "href": "#products"
                     },
-                    "image": "/images/products/product-sticks-cheese.png"
+                    "image": "/images/products/hero-slide-1.png"
                 },
                 {
                     "badge": "Новинка",
@@ -22,7 +22,7 @@
                         "text": "ЗАКАЗАТЬ СЕЙЧАС",
                         "href": "#products"
                     },
-                    "image": "/images/products/product-teriyaki.png"
+                    "image": "/images/products/hero-slide-2.png"
                 },
                 {
                     "badge": "Рекомендуем",
@@ -31,7 +31,7 @@
                         "text": "ВЫБРАТЬ СТЕЙК",
                         "href": "#products"
                     },
-                    "image": "/images/products/product-tartar.png"
+                    "image": "/images/products/hero-slide-3.png"
                 }
             ]
         },

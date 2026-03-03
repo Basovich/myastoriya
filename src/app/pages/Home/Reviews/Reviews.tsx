@@ -68,7 +68,7 @@ export default function Reviews({ dict }: ReviewsProps) {
                             <div className={s.card}>
                                 <div className={s.cardHeader}>
                                     <div className={s.avatar}>
-                                        <Image src={review.avatar} alt={review.name} className={s.avatarImg} loading='lazy' />
+                                        <Image src={review.avatar} alt={review.name} className={s.avatarImg} width={56} height={56} loading='lazy' />
                                     </div>
                                     <div className={s.author}>
                                         <div className={s.nameRow}>
