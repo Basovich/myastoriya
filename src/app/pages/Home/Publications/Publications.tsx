@@ -4,8 +4,18 @@ import Button from "../../../components/ui/Button/Button";
 import Link from "next/link";
 import Image from "next/image";
 import { Locale } from "@/i18n/config";
+import type { Publication } from "@/i18n/types";
 
-export default function Publications({ dict, lang }: { dict: any, lang: Locale }) {
+interface PublicationsProps {
+  dict: {
+    sectionTitle: string;
+    showAllButton: string;
+    items: Publication[];
+  };
+  lang: Locale;
+}
+
+export default function Publications({ dict, lang }: PublicationsProps) {
 
     return (
         <section className={s.section} id="publications">
@@ -13,7 +23,7 @@ export default function Publications({ dict, lang }: { dict: any, lang: Locale }
                 <SectionHeader title={dict.sectionTitle} />
             </div>
             <div className={s.carousel}>
-                {dict.items.map((pub: any) => (
+                {dict.items.map((pub) => (
                     <Link href={`/${lang}/blog/${pub.id}`} key={pub.id} className={s.card}>
                         <div className={s.imageWrap}>
                             <Image src={pub.image} alt={pub.title} fill className={s.cardImg} />
