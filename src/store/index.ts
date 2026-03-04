@@ -16,18 +16,18 @@ import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
 import authReducer from './slices/authSlice';
 
+const ONE_MINUTE = 60 * 1000;
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
 // Auth session expiration transform — applies only to the auth slice.
-// Wishlist and cart are intentionally NOT expired, so they persist indefinitely.
-const expireTransform = createTransform(
+const authExpireTransform = createTransform(
     (inboundState: any) => ({
         ...inboundState,
         _persistedAt: Date.now(),
     }),
     (outboundState: any) => {
         const persistedAt = outboundState?._persistedAt;
-        if (persistedAt && Date.now() - persistedAt > THIRTY_DAYS) {
+        if (persistedAt && Date.now() - persistedAt > ONE_MINUTE) {
             return { user: null, isAuthenticated: false } as any;
         }
         return outboundState;
@@ -35,11 +35,28 @@ const expireTransform = createTransform(
     { whitelist: ['auth'] }
 );
 
+// General expiration transform for cart and wishlist
+// Expires after 30 days
+const generalExpireTransform = createTransform(
+    (inboundState: any) => ({
+        ...inboundState,
+        _persistedAt: Date.now(),
+    }),
+    (outboundState: any) => {
+        const persistedAt = outboundState?._persistedAt;
+        if (persistedAt && Date.now() - persistedAt > THIRTY_DAYS) {
+            return undefined;
+        }
+        return outboundState;
+    },
+    { whitelist: ['cart', 'wishlist'] }
+);
+
 const persistConfig = {
     key: 'myastoriya-root',
     storage,
     whitelist: ['cart', 'wishlist', 'auth'], // Things to persist
-    transforms: [expireTransform]
+    transforms: [authExpireTransform, generalExpireTransform]
 };
 
 const rootReducer = combineReducers({
