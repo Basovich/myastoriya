@@ -30,13 +30,13 @@ export default function Publications({ dict, lang }: PublicationsProps) {
                         </div>
                         <div className={s.info}>
                             <span className={s.date}>{pub.dateRange}</span>
-                            <h3 className={s.title}>{pub.title}</h3>
+                            <h3 className={s.title} title={pub.title}>{pub.title}</h3>
                         </div>
                     </Link>
                 ))}
             </div>
             <div className={s.allBtn}>
-                <Button variant="outline-black" href={`/${lang}/blog`} className={s.blogLink}>
+                <Button variant="outline-black" href={`${lang === 'ua' ? '/' : 'ru/'}blog`} className={s.blogLink}>
                     <span className={s.blogLinkText}>{dict.showAllButton}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                         <path d="M9.98565 1.00019L16.3141 7.32861L9.98565 13.657" stroke="black" strokeWidth="2" strokeLinecap="round"/>
