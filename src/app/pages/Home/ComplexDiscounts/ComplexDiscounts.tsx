@@ -3,7 +3,6 @@
 import { useState } from "react";
 import s from "./ComplexDiscounts.module.scss";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
-import Container from "../../../components/ui/Container/Container";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
@@ -42,67 +41,68 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
 
     return (
         <section className={s.section} id="combo">
-            <Container>
-                <div className={s.headerRow}>
-                    <SectionHeader title={dict.sectionTitle} />
-                    <div className={s.navArrows}>
-                        <SliderArrow
-                            direction="left"
-                            ref={setPrevEl}
-                            className={s.navArrowComp}
-                        />
-                        <SliderArrow
-                            direction="right"
-                            ref={setNextEl}
-                            className={s.navArrowComp}
-                        />
-                    </div>
+            <div className={s.headerRow}>
+                <SectionHeader title={dict.sectionTitle} />
+                <div className={s.navArrows}>
+                    <SliderArrow
+                        direction="left"
+                        ref={setPrevEl}
+                        className={s.navArrowComp}
+                    />
+                    <SliderArrow
+                        direction="right"
+                        ref={setNextEl}
+                        className={s.navArrowComp}
+                    />
                 </div>
-
-                <div className={s.carouselWrapper}>
-                    <Swiper
-                        modules={[Navigation]}
-                        navigation={{
-                            nextEl,
-                            prevEl,
-                        }}
-                        spaceBetween={12}
-                        slidesPerView={1.2}
-                        breakpoints={{
-                            640: {
-                                slidesPerView: 2,
-                                spaceBetween: 16
-                            },
-                            1024: {
-                                slidesPerView: 3,
-                                spaceBetween: 24
-                            }
-                        }}
-                        className={s.swiper}
-                    >
-                        {dict.items.map((discount: DiscountItem) => (
-                            <SwiperSlide key={discount.id} className={s.slide}>
-                                <Link href={getRoute(`/complex-discounts/${discount.id}`)} className={s.cardLink}>
-                                    <div className={s.card}>
-                                        <div className={s.cardImage}>
-                                            <Image src={discount.image} alt={discount.title} fill className={s.cardImg} />
-                                            {discount.discount && (
-                                                <div className={s.discountBadge}>
-                                                    <span>{discount.discount}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className={s.cardBody}>
-                                            <span className={s.date}>{discount.dateRange}</span>
-                                            <h3 className={s.cardTitle}>{discount.title}</h3>
-                                        </div>
+            </div>
+            <div className={s.carouselWrapper}>
+                <Swiper
+                    modules={[Navigation]}
+                    navigation={{
+                        nextEl,
+                        prevEl,
+                    }}
+                    spaceBetween={12}
+                    slidesPerView={1.2}
+                    breakpoints={{
+                        640: {
+                            slidesPerView: 2,
+                            spaceBetween: 16
+                        },
+                        1024: {
+                            slidesPerView: 3,
+                            spaceBetween: 20
+                        },
+                        1280: {
+                            slidesPerView: 2.4,
+                            spaceBetween: 20
+                        }
+                    }}
+                    className={s.swiper}
+                >
+                    {dict.items.map((discount: DiscountItem) => (
+                        <SwiperSlide key={discount.id} className={s.slide}>
+                            <Link href={getRoute(`/complex-discounts/${discount.id}`)} className={s.cardLink}>
+                                <div className={s.card}>
+                                    <div className={s.cardImage}>
+                                        <Image src={discount.image} alt={discount.title} fill className={s.cardImg} />
+                                        {discount.discount && (
+                                            <div className={s.discountBadge}>
+                                                <span>{discount.discount}</span>
+                                            </div>
+                                        )}
                                     </div>
-                                </Link>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
-                </div>
-            </Container>
+                                    <div className={s.cardBody}>
+                                        <span className={s.date}>{discount.dateRange}</span>
+                                        <h3 className={s.cardTitle}>{discount.title}</h3>
+                                    </div>
+                                </div>
+                            </Link>
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
+            </div>
         </section>
     );
 }

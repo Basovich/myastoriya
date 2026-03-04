@@ -116,3 +116,7 @@ button {
   -moz-user-select: none;
   -ms-user-select: none;
 }
+
+.swiper .swiper-slide {
+  height: auto;
+}
