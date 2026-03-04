@@ -68,7 +68,17 @@
             border-color: var(--color-text-primary);
             background-color: var(--color-text-primary);
             color: #fff;
+
+            path,
+            line {
+                stroke: #fff;
+            }
         }
+    }
+
+    path,
+    line {
+        transition: stroke .2s linear;
     }
 }
 

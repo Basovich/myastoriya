@@ -14,7 +14,7 @@
 
     @media (any-hover: hover) {
         &:hover {
-            background: var(--color-accent);
+            background-color: var(--color-accent);
             transform: scale(1.05);
         }
     }

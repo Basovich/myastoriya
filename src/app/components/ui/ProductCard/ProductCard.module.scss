@@ -10,7 +10,6 @@
 .imageWrap {
     position: relative;
     aspect-ratio: 1.39;
-    /* Match 614x440 image aspect ratio */
     overflow: hidden;
 }
 
@@ -67,6 +66,11 @@
     flex-direction: column;
     gap: 26px;
     flex: 1;
+
+    @media (min-width: 1280px) {
+        padding: 20px;
+        gap: 46px;
+    }
 }
 
 .title {
@@ -126,8 +130,4 @@
     font-style: normal;
     font-weight: 400;
     line-height: 133.333%;
-
-    @media (min-width: 1280px) {
-        margin-top: 10px;
-    }
 }

@@ -9,11 +9,12 @@
     background: #fff;
     cursor: pointer;
     flex-shrink: 0;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 
     @media (any-hover: hover) {
         &:hover {
             background-color: #E6000F;
+            transform: scale(1.05);
 
             svg {
                 stroke: #fff;

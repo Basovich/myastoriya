@@ -118,10 +118,11 @@ export default function Products({ dict, categories }: ProductsProps) {
                 </div>
 
                 <div className={s.showMore}>
-                    <Button variant="pill">
-                        {dict.showMoreButton}
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: "8px" }}>
-                            <path d="M5 12h14" /><path d="M12 5l7 7-7 7" />
+                    <Button variant="outline-black" className={s.showMoreBtn}>
+                        <span className={s.showMoreBtnText}>{dict.showMoreButton}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                            <path d="M9.98565 1.00019L16.3141 7.32861L9.98565 13.657" stroke="black" strokeWidth="2" strokeLinecap="round"/>
+                            <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" strokeWidth="2" strokeLinecap="round"/>
                         </svg>
                     </Button>
                 </div>

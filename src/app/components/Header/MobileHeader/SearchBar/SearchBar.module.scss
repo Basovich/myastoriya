@@ -7,6 +7,10 @@
     border: 1px solid transparent;
     border-radius: 12px;
 
+    @media (min-width: 768px) {
+        margin: 0 40px;
+    }
+
     &.active {
         background: #fff;
     }
