@@ -1,9 +1,12 @@
 .footer {
     display: flex;
     flex-direction: column;
-    gap: 40px;
     background-color: #141414;
-    padding: 40px;
+    padding: 40px 20px 60px;
+
+    @media (min-width: 768px) {
+        padding: 60px 40px 100px;
+    }
 
     @media (min-width: 1280px) {
         flex-direction: row;
@@ -14,6 +17,10 @@
     }
 
     @media (min-width: 1360px) {
+        padding: 80px calc((100% - 1280px) / 2) 125px;
+    }
+
+    @media (min-width: 1440px) {
         padding: 80px calc((100% - 1300px) / 2) 125px;
     }
 }
@@ -24,27 +31,33 @@
 .linksTitle,
 .contactTitle,
 .paymentTitle {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--color-text-secondary);
-    margin: 0 0 16px;
-    letter-spacing: 0.05em;
-}
-
-.appTitle,
-.socialTitle {
     color: #FFF;
-    font-size: 12px;
+    font-size: 16px;
     font-style: normal;
-    font-weight: 400;
+    font-weight: 700;
     line-height: normal;
-    opacity: 0.6;
 }
 
-.linksTitle,
-.contactTitle,
-.paymentTitle {
-    color: var(--color-text-primary);
+.contactTitle {
+    margin-bottom: 12px;
+}
+
+.socialSection {
+    &.mobile {
+        display: block;
+
+        @media (min-width: 1280px) {
+            display: none;
+        }
+    }
+
+    &.desktop {
+        display: none;
+
+        @media (min-width: 1280px) {
+            display: block;
+        }
+    }
 }
 
 .linksTitle {
@@ -54,15 +67,16 @@
 .appButtons {
     display: flex;
     gap: 10px;
+    margin-top: 16px;
 }
 
 .storeBtn {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px 16px;
-    background-color: transparent;
-    border: 1px solid var(--color-border-base);
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 10px 20px;
+    background-color: #141414;
+    border: 1px solid #565656;
     border-radius: 12px;
     color: #fff;
     text-decoration: none;
@@ -96,6 +110,7 @@
 .socialIcons {
     display: flex;
     gap: 12px;
+    margin-top: 18px;
 }
 
 .socialIcon {
@@ -140,15 +155,22 @@
 }
 
 .link {
-    font-size: 13px;
-    color: var(--color-text-secondary);
-    text-decoration: none;
-    transition: color 0.2s;
+    color: #FFF;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 250%;
+    opacity: 0.8;
+    transition: opacity 0.2s;
 
     @media (any-hover: hover) {
         &:hover {
-            color: var(--color-text-primary);
+            opacity: 1;
         }
+    }
+
+    @media (min-width: 1280px) {
+        line-height: 215%;
     }
 }
 
@@ -163,18 +185,33 @@
             opacity: 0.95;
         }
     }
+
+    @media (min-width: 1024px) {
+        margin: 24px 0;
+    }
 }
 
 .reviewImage {
+    display: block;
     width: 100%;
     height: auto;
     border-radius: 16px;
-    display: block;
+    object-fit: cover;
+    overflow: hidden;
+
+    @media (min-width: 768px) {
+        max-height: 300px;
+        object-position: top center;
+    }
 }
 
 .contactItem {
-    font-size: 13px;
-    color: var(--color-text-secondary);
+    color: #FFF;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+    opacity: 0.8;
     margin: 0 0 8px;
 }
 
@@ -182,14 +219,18 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    height: 46px;
     margin-top: 12px;
     padding: 10px 20px;
-    border: 1px solid var(--color-border-base);
-    border-radius: 12px;
-    color: var(--color-text-primary);
-    text-decoration: none;
+    border: 1px solid #FFF;
+    border-radius: 10px;
+    color: #FFF;
     font-size: 12px;
+    font-style: normal;
     font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
+    text-decoration: none;
     letter-spacing: 0.03em;
     transition: background-color 0.2s;
 
@@ -197,6 +238,21 @@
         &:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
+    }
+
+    .addressBtnNext {
+        color: #FFF;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        text-transform: uppercase;
+        padding-top: 4px;
+    }
+
+    .addressBtnIcon {
+        width: 18px;
+        height: auto;
     }
 }
 
@@ -215,7 +271,11 @@
 .leftColumn {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 18px;
+
+    @media (min-width: 1024px) {
+        gap: 40px;
+    }
 
     @media (min-width: 1280px) {
         gap: 62px;
@@ -230,9 +290,9 @@
 .linksGrid {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 12px;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 768px) {
         flex-direction: row;
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -243,7 +303,7 @@
 .rightColumn {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 24px;
 
     @media (min-width: 1024px) {
         gap: 30px;
@@ -251,11 +311,11 @@
 }
 
 .rightTopRow {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+    display: none;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
+        display: flex;
+        gap: 24px;
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
@@ -274,9 +334,28 @@
     }
 }
 
-.paymentSection {
+.contactSection {
+    padding-bottom: 34px;
+    border-bottom: 1px solid #4F4F4F;
+
     @media (min-width: 1024px) {
+        border: 0;
+        padding-bottom: 0;
+    }
+}
+
+.paymentSection {
+    padding-bottom: 24px;
+    border-bottom: 1px solid #4F4F4F;
+
+    @media (min-width: 1024px) {
+        border: 0;
+        padding-bottom: 0;
+    }
+
+    @media (min-width: 1280px) {
         text-align: right;
+        margin-top: auto;
     }
 }
 
