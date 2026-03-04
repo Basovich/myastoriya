@@ -74,6 +74,10 @@ export default function Promotions({ dict, lang }: PromotionsProps) {
                         1024: {
                             slidesPerView: 3,
                             spaceBetween: 20
+                        },
+                        1280: {
+                            slidesPerView: 2.4,
+                            spaceBetween: 20
                         }
                     }}
                     className={s.swiper}
@@ -91,7 +95,10 @@ export default function Promotions({ dict, lang }: PromotionsProps) {
                                         )}
                                     </div>
                                     <div className={s.cardBody}>
-                                        <span className={s.date}>Акція діє до: {item.date}</span>
+                                        <span className={s.date}>
+                                            Акція діє до: {' '}
+                                            <strong>{item.date}</strong>
+                                        </span>
                                         <h4 className={s.cardTitle}>{item.title}</h4>
                                     </div>
                                 </div>
