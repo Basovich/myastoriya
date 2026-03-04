@@ -55,9 +55,9 @@ export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps
 
                 <div className={s.contentLayout}>
                     <div className={s.textContent}>
-                        <h1 className={s.title}>
+                        <p className={s.title}>
                             Улюблені стейки – зі знижкою щовівторка!
-                        </h1>
+                        </p>
                         <div className={s.description}>
                             <p>Щовівторка даруємо 20% знижки на всі стейки з нашого гриль меню.</p>
                             <p>Це чудова нагода скуштувати улюблений стейк сухої чи вологої витримки або стейк від Бренд Шефа за ще приємнішою ціною. Акція діє лише офлайн у ресторанах «М'ясторія».</p>

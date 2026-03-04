@@ -8,41 +8,40 @@ export default function AppPromo() {
     return (
         <section className={s.section} id="apppromo">
             <div className={s.banner}>
-                {/* Background Image Container */}
-                <div className={s.imageWrap}>
-                    <Image
-                        src="/images/app-promo-bg.png"
-                        alt="App Promo Background"
-                        fill
-                        className={s.bgImage}
-                        priority
+                <picture className={s.imageWrap}>
+                    <source media="(min-width: 768px)"
+                            srcSet="/images/app_promo/appPromoBGDesktop.png"
                     />
-                </div>
-
-                {/* Content Overlay */}
+                    <Image
+                        src="/images/app_promo/appPromoBGMobile.png"
+                        alt="App Promo Background"
+                        className={s.bgImage}
+                        fill
+                        loading="lazy"
+                    />
+                </picture>
                 <div className={s.contentOverlay}>
-                    <div className={s.textRightBox}>
-                        <div className={s.titleRow}>
-                            <span className={s.redArrows}>
-                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 17L17 12L12 7" stroke="#E30613" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                                    <path d="M5 17L10 12L5 7" stroke="#E30613" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </span>
-                            <div className={s.titles}>
-                                <h2 className={s.subtitle}>ПРИЛОЖЕНИЕ</h2>
-                                <h1 className={s.mainTitle}>“МЯСТОРИЯ”</h1>
-                            </div>
+                    <div className={s.titleRow}>
+                        <Image
+                            src="/icons/app_promo_arrows.svg"
+                            alt=""
+                            className={s.redArrows}
+                            loading="lazy"
+                            width={20}
+                            height={20}
+                        />
+                        <div className={s.titles}>
+                            <p className={s.subtitle}>ПРИЛОЖЕНИЕ</p>
+                            <p className={s.mainTitle}>“МЯСТОРИЯ”</p>
                         </div>
-
-                        <div className={s.buttons}>
-                            <a href={appPromo.googlePlay} className={s.storeBtn}>
-                                <Image src="/icons/google_play.svg" alt="Google Play" width={130} height={40} />
-                            </a>
-                            <a href={appPromo.appStore} className={s.storeBtn}>
-                                <Image src="/icons/apple_store.svg" alt="Apple Store" width={124} height={40} />
-                            </a>
-                        </div>
+                    </div>
+                    <div className={s.buttons}>
+                        <a href={appPromo.googlePlay} className={s.storeBtn}>
+                            <Image src="/icons/google_play.svg" className={s.google} alt="Google Play" width={74} height={14} />
+                        </a>
+                        <a href={appPromo.appStore} className={s.storeBtn}>
+                            <Image src="/icons/apple_store.svg" className={s.apple} alt="Apple Store" width={71} height={16} />
+                        </a>
                     </div>
                 </div>
             </div>
