@@ -25,6 +25,11 @@
     top: 16px;
     left: 12px;
     z-index: 2;
+
+    @media (min-width: 1280px) {
+        top: 20px;
+        left: 20px;
+    }
 }
 
 .favorite {
@@ -46,6 +51,14 @@
     line-height: 133.333%;
     padding: 6px 8px 4px;
     border-radius: 4px;
+
+    @media (min-width: 768px) {
+        font-size: 14px;
+    }
+
+    @media (min-width: 768px) {
+        font-size: 16px;
+    }
 }
 
 .info {
@@ -69,6 +82,14 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     letter-spacing: 0.01em;
+
+    @media (min-width: 768px) {
+        font-size: 14px;
+    }
+
+    @media (min-width: 768px) {
+        font-size: 18px;
+    }
 }
 
 .priceRow {
@@ -89,38 +110,24 @@
     font-style: normal;
     font-weight: 700;
     line-height: normal;
+
+    @media (min-width: 768px) {
+        font-size: 20px;
+    }
+
+    @media (min-width: 1280px) {
+        font-size: 26px;
+    }
 }
 
 .unit {
-    color: var(--color-text-secondary);
+    color: #BEBEBE;
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
     line-height: 133.333%;
-}
 
-.addBtn {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #000;
-    border: none;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    @media (any-hover: hover) {
-        &:hover {
-            background: var(--color-accent);
-            transform: scale(1.05);
-        }
-    }
-
-    svg {
-        width: 18px;
-        height: 18px;
+    @media (min-width: 1280px) {
+        margin-top: 10px;
     }
 }

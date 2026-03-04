@@ -4,6 +4,7 @@ import s from "./ProductCard.module.scss";
 import Image from "next/image";
 import Badge from "../Badge/Badge";
 import WishButton from "../WishButton/WishButton";
+import AddToCartButton from "../AddToCartButton/AddToCartButton";
 
 interface ProductCardProps {
     id: number | string;
@@ -52,9 +53,7 @@ export default function ProductCard({
                         <span className={s.price}>{price.toLocaleString("uk-UA")} ₴</span>
                         <span className={s.unit}>{unit}</span>
                     </div>
-                    <button className={s.addBtn} aria-label="Додати до кошика">
-                        <Image src="icons/icon-plus.svg"  width={12} height={12} alt="Додати до кошика" />
-                    </button>
+                    <AddToCartButton productId={String(id)} />
                 </div>
             </div>
         </div>

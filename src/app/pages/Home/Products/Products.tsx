@@ -29,7 +29,7 @@ interface ProductItem {
 
 interface ProductsProps {
     dict: {
-        tabs?: string[]; // Legacy fallback
+        tabs?: string[];
         items: ProductItem[];
         showMoreButton: string;
     };
@@ -75,7 +75,7 @@ export default function Products({ dict, categories }: ProductsProps) {
                     <Swiper
                         modules={[Navigation]}
                         navigation={{ prevEl, nextEl }}
-                        loop={false}
+                        loop={true}
                         slidesPerView="auto"
                         spaceBetween={8}
                         className={clsx(s.tabs, "products-tabs-swiper")}
