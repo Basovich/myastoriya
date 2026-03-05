@@ -90,7 +90,7 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
                         onChange={handlePhoneChange}
                         onBlur={() => formik.setFieldTouched('phone', true)}
                     />
-                    <label htmlFor="login-phone" className={s.inputLabel}>Телефон*</label>
+                    <label htmlFor="login-phone" className={s.inputLabel}>Телефон<span className={s.required}>*</span></label>
                     {formik.touched.phone && formik.errors.phone && (
                         <span className={s.fieldError}>{formik.errors.phone}</span>
                     )}
@@ -113,7 +113,7 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    <label htmlFor="login-password" className={s.inputLabel}>Пароль*</label>
+                    <label htmlFor="login-password" className={s.inputLabel}>Пароль<span className={s.required}>*</span></label>
                     {formik.touched.password && formik.errors.password && (
                         <span className={s.fieldError}>{formik.errors.password}</span>
                     )}

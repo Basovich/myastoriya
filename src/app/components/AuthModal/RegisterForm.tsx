@@ -215,7 +215,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    <label htmlFor="reg-name" className={s.inputLabel}>Ім&apos;я*</label>
+                    <label htmlFor="reg-name" className={s.inputLabel}>Ім&apos;я<span className={s.required}>*</span></label>
                     {formik.touched.name && formik.errors.name && (
                         <span className={s.fieldError}>{formik.errors.name}</span>
                     )}
@@ -238,7 +238,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         onChange={handlePhoneChange}
                         onBlur={() => formik.setFieldTouched('phone', true)}
                     />
-                    <label htmlFor="reg-phone" className={s.inputLabel}>Телефон*</label>
+                    <label htmlFor="reg-phone" className={s.inputLabel}>Телефон<span className={s.required}>*</span></label>
                     {formik.touched.phone && formik.errors.phone && (
                         <span className={s.fieldError}>{formik.errors.phone}</span>
                     )}
@@ -261,7 +261,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    <label htmlFor="reg-password" className={s.inputLabel}>Пароль*</label>
+                    <label htmlFor="reg-password" className={s.inputLabel}>Пароль<span className={s.required}>*</span></label>
                     {formik.touched.password && formik.errors.password && (
                         <span className={s.fieldError}>{formik.errors.password}</span>
                     )}
@@ -284,7 +284,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                     />
-                    <label htmlFor="reg-confirm-password" className={s.inputLabel}>Повторити пароль*</label>
+                    <label htmlFor="reg-confirm-password" className={s.inputLabel}>Повторити пароль<span className={s.required}>*</span></label>
                     {formik.touched.confirmPassword && formik.errors.confirmPassword && (
                         <span className={s.fieldError}>{formik.errors.confirmPassword}</span>
                     )}
