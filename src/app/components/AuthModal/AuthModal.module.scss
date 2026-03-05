@@ -7,17 +7,13 @@
     background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 16px;
-    /* Reduced from 20px but added in mobile-first logic */
+    padding: 60px 16px 16px;
     align-items: flex-start;
-    padding-top: 60px;
 
     @media (min-width: 481px) {
         padding: 20px;
         align-items: center;
-        padding-top: 20px;
     }
 }
 
@@ -25,21 +21,20 @@
 .modalWrapper {
     position: relative;
     outline: none;
-
-    &:focus-visible {
-        outline: 2px solid #E6000F;
-        outline-offset: 2px;
-    }
-
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     max-height: calc(100vh - 80px);
 
     @media (min-width: 481px) {
         max-height: 90vh;
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E6000F;
+        outline-offset: 2px;
     }
 }
 
@@ -48,22 +43,28 @@
     background: none;
     border: none;
     color: #ffffff;
-    cursor: pointer;
     padding: 4px;
     margin-bottom: 0;
     align-self: flex-end;
+    outline: none;
     transition: color 0.2s;
 
     @media (any-hover: hover) {
         &:hover {
             color: #E6000F;
-            outline: none;
         }
     }
 
     &:focus-visible {
         color: #E6000F;
-        outline: none;
+    }
+
+    @media (min-width: 768px) {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        right: -40px;
+        top: 0;
     }
 }
 
@@ -174,7 +175,7 @@
 
     @media (any-hover: hover) {
         &:hover {
-            text-decoration: underline;
+            color: #E6000F;
         }
     }
 }
@@ -229,7 +230,7 @@
 
     @media (any-hover: hover) {
         &:hover {
-            color: #1a6dd4;
+            color: #E6000F;
         }
     }
 }

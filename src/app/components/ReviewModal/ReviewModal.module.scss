@@ -59,6 +59,14 @@
         outline-offset: 2px;
         border-radius: 4px;
     }
+
+    @media (min-width: 768px) {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        right: -40px;
+        top: 0;
+    }
 }
 
 .modal {
@@ -77,15 +85,17 @@
 }
 
 .title {
+    color: #000;
     font-size: 16px;
+    font-style: normal;
     font-weight: 800;
-    text-align: center;
+    line-height: 133%;
     text-transform: uppercase;
-    color: #000000;
-    line-height: 1.4;
-    margin-bottom: 20px;
+    text-align: center;
+    max-width: 215px;
+    margin: 0 auto 22px;
 
-    @media (min-width: 481px) {
+    @media (min-width: 1280px) {
         font-size: 18px;
         margin-bottom: 24px;
     }
@@ -109,12 +119,12 @@
 
 .input {
     width: 100%;
-    height: 48px;
+    height: 46px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 14px 16px 6px;
-    font-size: 14px;
-    color: #333;
+    font-size: 12px;
+    color: #000;
     background: #fff;
     outline: none;
     transition: border-color 0.2s;
@@ -127,20 +137,20 @@
         border-color: #333;
     }
 
-    &:focus-visible+.inputLabel,
-    &:not(:placeholder-shown)+.inputLabel {
+    &:focus-visible + .inputLabel,
+    &:not(:placeholder-shown) + .inputLabel {
         top: 6px;
         font-size: 10px;
-        color: #999;
+        color: #828282;
     }
 }
 
 .inputLabel {
     position: absolute;
     left: 16px;
-    top: 14px;
+    top: 12px;
     font-size: 14px;
-    color: #999;
+    color: #828282;
     pointer-events: none;
     transition: all 0.2s ease;
 }
@@ -254,8 +264,8 @@
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 12px 16px;
-    font-size: 14px;
-    color: #333;
+    font-size: 12px;
+    color: #000;
     background: #fff;
     outline: none;
     resize: vertical;
@@ -318,10 +328,16 @@
 }
 
 .successTitle {
-    font-size: 20px;
-    font-weight: 800;
     color: #000;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
     text-transform: uppercase;
+
+    @media (min-width: 1280px) {
+      font-size: 18px;
+    }
 }
 
 .successText {
@@ -335,14 +351,15 @@
     width: 100%;
     height: 46px;
     background: #e3051b;
-    color: #ffffff;
     border: none;
     border-radius: 8px;
+    padding-top: 2px;
+    color: #FFF;
     font-size: 14px;
+    font-style: normal;
     font-weight: 700;
+    line-height: 142.857%;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    cursor: pointer;
     transition: background 0.2s;
     margin-top: 4px;
 
