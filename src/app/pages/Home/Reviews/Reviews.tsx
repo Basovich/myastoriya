@@ -6,6 +6,7 @@ import Image from "next/image";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import Button from "../../../components/ui/Button/Button";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
+import ReviewModal from "../../../components/ReviewModal";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
@@ -13,19 +14,20 @@ import type { Review } from "@/i18n/types";
 import clsx from "clsx";
 
 interface ReviewsProps {
-  dict: {
-    sectionTitle: string;
-    leaveReviewButton: string;
-    readMoreText: string;
-    collapseText: string;
-    items: Review[];
-  };
+    dict: {
+        sectionTitle: string;
+        leaveReviewButton: string;
+        readMoreText: string;
+        collapseText: string;
+        items: Review[];
+    };
 }
 
 export default function Reviews({ dict }: ReviewsProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
     const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
     const toggleExpand = (id: number) => {
         setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
@@ -101,7 +103,7 @@ export default function Reviews({ dict }: ReviewsProps) {
                                                 <button className={s.readMoreBtn} onClick={() => toggleExpand(review.id)}>
                                                     {isExpanded ? dict.collapseText : dict.readMoreText}
                                                     <svg style={{ transform: isExpanded ? 'rotate(180deg)' : 'none' }} xmlns="http://www.w3.org/2000/svg" width="14" height="8" viewBox="0 0 14 8" fill="none">
-                                                        <path d="M0.799805 0.799805L6.7998 6.7998L12.7998 0.799805" stroke="#E3051B" strokeWidth="1.6" strokeLinecap="round"/>
+                                                        <path d="M0.799805 0.799805L6.7998 6.7998L12.7998 0.799805" stroke="#E3051B" strokeWidth="1.6" strokeLinecap="round" />
                                                     </svg>
                                                 </button>
                                             )}
@@ -114,10 +116,15 @@ export default function Reviews({ dict }: ReviewsProps) {
                 ))}
             </Swiper>
             <div className={s.cta}>
-                <Button variant="outline-black" className={s.button}>
+                <Button variant="outline-black" className={s.button} onClick={() => setIsReviewModalOpen(true)}>
                     <span className={s.buttonInner}>{dict.leaveReviewButton}</span>
                 </Button>
             </div>
+
+            <ReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+            />
         </section>
     );
 }
