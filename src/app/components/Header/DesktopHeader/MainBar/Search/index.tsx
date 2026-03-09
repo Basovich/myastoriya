@@ -7,6 +7,9 @@ import s from "./Search.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import Image from "next/image";
 import Logo from "@/app/components/Header/Shared/Logo";
+import WishButton from "@/app/components/ui/WishButton/WishButton";
+import AddToCartButton from "@/app/components/ui/AddToCartButton/AddToCartButton";
+import Badge from "@/app/components/ui/Badge/Badge";
 import { Locale } from "@/i18n/config";
 
 const MOCK_PRODUCTS = [
@@ -30,7 +33,7 @@ const MOCK_FEATURED = [
         price: 1800,
         weight: "300г / 350г",
         image: "/images/product-ribeye.jpg",
-        badge: "новинка"
+        badge: "акція"
     },
     {
         id: 103,
@@ -38,7 +41,7 @@ const MOCK_FEATURED = [
         price: 350,
         weight: "500г",
         image: "/images/product-shashlik.jpg",
-        badge: "популярне"
+        badge: "new"
     }
 ];
 
@@ -283,15 +286,11 @@ export default function Search({ lang }: { lang: Locale }) {
                                                                                         fill
                                                                                         draggable={false}
                                                                                     />
-                                                                                    {product.badge && <div className={s.featuredBadge}>{product.badge}</div>}
+                                                                                    {product.badge && <Badge variant={product.badge === "new" ? "new" : "sale"} className={s.featuredBadge}>{product.badge}</Badge>}
                                                                                     <div className={s.featuredWeightOverlay}>
                                                                                         {product.weight}
                                                                                     </div>
-                                                                                    <button className={s.wishBtn}>
-                                                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                            <path d="M20.84 4.60999C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.3879 3.14052 17.6725 2.99817 16.95 2.99817C16.2275 2.99817 15.5121 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.60999L12 5.66999L10.94 4.60999C9.9083 3.5783 8.50903 2.9987 7.05 2.9987C5.59096 2.9987 4.1917 3.5783 3.16 4.60999C2.1283 5.64169 1.54871 7.04096 1.54871 8.49999C1.54871 9.95903 2.1283 11.3583 3.16 12.39L12 21.23L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.9379 22.4518 9.22248 22.4518 8.49999C22.4518 7.77751 22.3095 7.06209 22.0329 6.39464C21.7563 5.72718 21.351 5.12077 20.84 4.60999V4.60999Z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                                                        </svg>
-                                                                                    </button>
+                                                                                    <WishButton productId={String(product.id)} className={s.wishBtn} />
                                                                                 </div>
                                                                                 <div className={s.featuredInfo}>
                                                                                     <div className={s.featuredName}>{product.name}</div>
@@ -300,11 +299,7 @@ export default function Search({ lang }: { lang: Locale }) {
                                                                                             <div className={s.featuredPriceValue}>{product.price} ₴</div>
                                                                                             <div className={s.featuredPriceUnit}>упаковка</div>
                                                                                         </div>
-                                                                                        <button className={s.addToCartBtn}>
-                                                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                                <path d="M12 5V19M5 12H19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                                                            </svg>
-                                                                                        </button>
+                                                                                        <AddToCartButton productId={String(product.id)} className={s.addToCartBtn} />
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -321,15 +316,11 @@ export default function Search({ lang }: { lang: Locale }) {
                                                                         fill
                                                                         draggable={false}
                                                                     />
-                                                                    {featuredProposals[0].badge && <div className={s.featuredBadge}>{featuredProposals[0].badge}</div>}
+                                                                    {featuredProposals[0].badge && <Badge variant={featuredProposals[0].badge === "new" ? "new" : "sale"} className={s.featuredBadge}>{featuredProposals[0].badge}</Badge>}
                                                                     <div className={s.featuredWeightOverlay}>
                                                                         {featuredProposals[0].weight}
                                                                     </div>
-                                                                    <button className={s.wishBtn}>
-                                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                            <path d="M20.84 4.60999C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.3879 3.14052 17.6725 2.99817 16.95 2.99817C16.2275 2.99817 15.5121 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.60999L12 5.66999L10.94 4.60999C9.9083 3.5783 8.50903 2.9987 7.05 2.9987C5.59096 2.9987 4.1917 3.5783 3.16 4.60999C2.1283 5.64169 1.54871 7.04096 1.54871 8.49999C1.54871 9.95903 2.1283 11.3583 3.16 12.39L12 21.23L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.9379 22.4518 9.22248 22.4518 8.49999C22.4518 7.77751 22.3095 7.06209 22.0329 6.39464C21.7563 5.72718 21.351 5.12077 20.84 4.60999V4.60999Z" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                                        </svg>
-                                                                    </button>
+                                                                    <WishButton productId={String(featuredProposals[0].id)} className={s.wishBtn} />
                                                                 </div>
                                                                 <div className={s.featuredInfo}>
                                                                     <div className={s.featuredName}>{featuredProposals[0].name}</div>
@@ -338,11 +329,7 @@ export default function Search({ lang }: { lang: Locale }) {
                                                                             <div className={s.featuredPriceValue}>{featuredProposals[0].price} ₴</div>
                                                                             <div className={s.featuredPriceUnit}>упаковка</div>
                                                                         </div>
-                                                                        <button className={s.addToCartBtn}>
-                                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                <path d="M12 5V19M5 12H19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                                            </svg>
-                                                                        </button>
+                                                                        <AddToCartButton productId={String(featuredProposals[0].id)} className={s.addToCartBtn} />
                                                                     </div>
                                                                 </div>
                                                             </div>
