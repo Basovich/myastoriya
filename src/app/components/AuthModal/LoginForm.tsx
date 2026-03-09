@@ -39,10 +39,11 @@ const loginSchema = Yup.object({
 
 interface LoginFormProps {
     onSwitchToRegister: () => void;
+    onForgotPassword: () => void;
     onSuccess: () => void;
 }
 
-export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormProps) {
+export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSuccess }: LoginFormProps) {
     const dispatch = useAppDispatch();
     const router = useRouter();
 
@@ -119,7 +120,7 @@ export default function LoginForm({ onSwitchToRegister, onSuccess }: LoginFormPr
                     )}
                 </div>
 
-                <a href="#" className={s.forgotLink}>Забули пароль?</a>
+                <button type="button" className={s.forgotLink} onClick={onForgotPassword}>Забули пароль?</button>
 
                 {formik.status && <div className={s.error}>{formik.status}</div>}
 

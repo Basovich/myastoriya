@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
+import ForgotPasswordForm from './ForgotPasswordForm';
+import ResetPasswordForm from './ResetPasswordForm';
 import s from './AuthModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 
@@ -13,10 +15,11 @@ interface AuthModalProps {
     onSuccess?: () => void;
 }
 
-type ModalView = 'login' | 'register';
+type ModalView = 'login' | 'register' | 'forgot-password' | 'reset-password';
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     const [view, setView] = useState<ModalView>('login');
+    const [forgotPhone, setForgotPhone] = useState('');
     const { disableScroll, enableScroll } = useScrollLock();
 
     useEffect(() => {
@@ -52,15 +55,33 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 </svg>
             </button>
             <div className={s.modal}>
-                {view === 'login' ? (
+                {view === 'login' && (
                     <LoginForm
                         onSwitchToRegister={() => setView('register')}
+                        onForgotPassword={() => setView('forgot-password')}
                         onSuccess={handleSuccess}
                     />
-                ) : (
+                )}
+                {view === 'register' && (
                     <RegisterForm
                         onSwitchToLogin={() => setView('login')}
                         onSuccess={handleSuccess}
+                    />
+                )}
+                {view === 'forgot-password' && (
+                    <ForgotPasswordForm
+                        onVerified={(phone) => {
+                            setForgotPhone(phone);
+                            setView('reset-password');
+                        }}
+                        onBack={() => setView('login')}
+                    />
+                )}
+                {view === 'reset-password' && (
+                    <ResetPasswordForm
+                        phone={forgotPhone}
+                        onSuccess={handleSuccess}
+                        onBack={() => setView('forgot-password')}
                     />
                 )}
             </div>
