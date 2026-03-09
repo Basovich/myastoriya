@@ -46,7 +46,10 @@ export default function MainBar({
     useEffect(() => {
         if (!isMenuOpen) return;
         const handleClick = (e: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+            const target = e.target as Node;
+            const isInsideModal = target instanceof Element && !!target.closest('.ReactModalPortal');
+
+            if (menuRef.current && !menuRef.current.contains(target) && !isInsideModal) {
                 onMenuClose?.();
             }
         };
@@ -131,7 +134,6 @@ export default function MainBar({
                                 href={`tel:${siteData.contact.phone.replace(/\s+/g, '')}`}
                                 className={s.scrolledMenuPhone}
                             >
-                                <img src="/icons/icon-phone-outline.svg" alt="Phone" width={14} height={14} />
                                 {siteData.contact.phone}
                             </a>
                             <LanguageSwitch lang={lang} />
