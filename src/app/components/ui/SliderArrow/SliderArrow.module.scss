@@ -28,7 +28,7 @@
     }
 
     @media (any-hover: hover) {
-      &:hover {
+      &:hover:not(:disabled) {
           box-shadow: 0 14px 20px 0 rgba(93, 93, 93, 0.4);
       }
     }
