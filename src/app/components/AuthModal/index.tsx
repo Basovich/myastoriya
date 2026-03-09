@@ -25,8 +25,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     useEffect(() => {
         if (isOpen) {
             disableScroll();
-        } else {
-            enableScroll();
+            return () => enableScroll();
         }
     }, [isOpen, disableScroll, enableScroll]);
 

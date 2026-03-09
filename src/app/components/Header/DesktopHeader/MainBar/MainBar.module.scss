@@ -54,21 +54,166 @@
     }
 }
 
-.burgerGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    width: 16px;
-    height: 16px;
+.burgerBtn {
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0;
+    border-radius: 6px;
+    transition: opacity 0.2s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+    }
+}
+
+.burgerIcon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 18px;
 
     span {
+        display: block;
+        width: 100%;
+        height: 2px;
         background: #ffffff;
-        border-radius: 1px;
+        border-radius: 2px;
+        transition: transform 0.25s ease, opacity 0.25s ease, width 0.25s ease;
+        transform-origin: center;
+    }
+}
+
+// When burger is active — animate to X
+.active .burgerIcon {
+    span:nth-child(1) {
+        transform: translateY(6px) rotate(45deg);
+    }
+
+    span:nth-child(2) {
+        opacity: 0;
+        width: 0;
+    }
+
+    span:nth-child(3) {
+        transform: translateY(-6px) rotate(-45deg);
+    }
+}
+
+.scrolledMenu {
+    overflow: hidden;
+    max-height: 0;
+    background: #111111;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    transition: max-height 0.35s ease, opacity 0.35s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.scrolledMenuOpen {
+    max-height: 60px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.scrolledMenuInner {
+    margin: 0 auto;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    @media (min-width: 1280px) {
+        max-width: 1200px;
+    }
+
+    @media (min-width: 1360px) {
+        max-width: 1280px;
+    }
+
+    @media (min-width: 1400px) {
+        max-width: 1300px;
+    }
+}
+
+.scrolledMenuLinks {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.scrolledMenuLink {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.2s;
+    white-space: nowrap;
+
+    @media (any-hover: hover) {
+        &:hover {
+            color: var(--color-accent);
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+}
+
+.scrolledMenuRight {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-shrink: 0;
+}
+
+.scrolledMenuPhone {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    text-decoration: none;
+    opacity: 0.8;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    img {
+        filter: brightness(0) invert(1);
+        flex-shrink: 0;
     }
 }
 
 .searchWrapper {
-    min-width: 370px;
+    min-width: 320px;
+
+    @media (min-width: 1440px) {
+        min-width: 370px;
+    }
 }
 
 .rightSection {

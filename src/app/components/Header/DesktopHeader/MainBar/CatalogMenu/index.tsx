@@ -193,12 +193,8 @@ export default function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
     useEffect(() => {
         if (isOpen) {
             disableScroll();
-        } else {
-            enableScroll();
+            return () => enableScroll();
         }
-        return () => {
-            enableScroll();
-        };
     }, [isOpen, disableScroll, enableScroll]);
 
     if (!isOpen) return null;

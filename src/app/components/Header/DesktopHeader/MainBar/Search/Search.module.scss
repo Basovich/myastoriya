@@ -601,3 +601,12 @@
     color: #999;
     font-size: 14px;
 }
+
+.resultsWrapper {
+    transition: opacity 0.2s;
+
+    &.loadingStyles {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+}

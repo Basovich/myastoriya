@@ -1,0 +1,32 @@
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.stickyWrapper {
+    width: 100%;
+    z-index: 100;
+}
+
+.stickyWrapper.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    animation: slideDown 0.3s ease forwards;
+}
+
+.placeholder {
+    display: none;
+}
+
+.placeholder.visible {
+    display: block;
+}

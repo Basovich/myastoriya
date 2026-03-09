@@ -138,23 +138,43 @@ export default function Search({ lang }: { lang: Locale }) {
         setDragOffset(0);
     };
 
+    // 1. Handle click outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+            const target = event.target as Node;
+            const isInsideModal = target instanceof Element && !!target.closest('.ReactModalPortal');
+
+            if (
+                containerRef.current &&
+                !containerRef.current.contains(target) &&
+                !isInsideModal
+            ) {
                 setIsActive(false);
             }
         };
 
         if (isActive) {
             document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isActive]);
+
+    // 2. Handle scroll lock based on isActive
+    useEffect(() => {
+        if (isActive) {
             disableScroll();
         } else {
             setShowOverlay(false);
             enableScroll();
         }
+
+        // Cleanup function for when component unmounts while active
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-            enableScroll();
+            if (isActive) {
+                enableScroll();
+            }
         };
     }, [isActive, disableScroll, enableScroll]);
 
@@ -203,8 +223,8 @@ export default function Search({ lang }: { lang: Locale }) {
                         </div>
 
                         {showOverlay && (
-                            isLoading ? null : (
-                                results.length === 0 ? (
+                            <div className={clsx(s.resultsWrapper, isLoading && s.loadingStyles)}>
+                                {results.length === 0 && !isLoading ? (
                                     <div className={s.noResults}>
                                         {lang === 'ua' ? 'Товарів не знайдено' : 'Товаров не найдено'}
                                     </div>
@@ -352,8 +372,8 @@ export default function Search({ lang }: { lang: Locale }) {
                                             </div>
                                         </div>
                                     </div>
-                                )
-                            )
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

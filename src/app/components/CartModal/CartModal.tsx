@@ -16,8 +16,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
     useEffect(() => {
         if (isOpen) {
             disableScroll();
-        } else {
-            enableScroll();
+            return () => enableScroll();
         }
     }, [isOpen, disableScroll, enableScroll]);
 

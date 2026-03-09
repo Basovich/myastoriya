@@ -48,8 +48,7 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
     useEffect(() => {
         if (isOpen) {
             disableScroll();
-        } else {
-            enableScroll();
+            return () => enableScroll();
         }
     }, [isOpen, disableScroll, enableScroll]);
 

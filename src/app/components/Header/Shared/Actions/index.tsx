@@ -7,9 +7,11 @@ import s from './Actions.module.scss';
 import { useAppSelector } from '@/store/hooks';
 import AuthButton from '@/app/components/Header/Shared/AuthButton';
 import AuthModal from '@/app/components/AuthModal';
+import CartModal from '@/app/components/CartModal/CartModal';
 
 export default function Actions() {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [isCartModalOpen, setIsCartModalOpen] = useState(false);
     const router = useRouter();
     const params = useParams();
     const lang = params?.lang as string || 'ua';
@@ -33,7 +35,7 @@ export default function Actions() {
         <>
             <div className={s.actions}>
                 {/* Cart */}
-                <button className={s.actionBtn} aria-label="Кошик">
+                <button className={s.actionBtn} aria-label="Кошик" onClick={() => setIsCartModalOpen(true)}>
                     <Image src="/icons/shopping-bag.svg" alt="Cart" width="20" height="20" />
                     {totalCartItems > 0 && (
                         <span className={s.badge}>{totalCartItems}</span>
@@ -60,6 +62,10 @@ export default function Actions() {
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}
                 onSuccess={() => router.push(`/${lang}/personal/favorites/`)}
+            />
+            <CartModal
+                isOpen={isCartModalOpen}
+                onClose={() => setIsCartModalOpen(false)}
             />
         </>
     );
