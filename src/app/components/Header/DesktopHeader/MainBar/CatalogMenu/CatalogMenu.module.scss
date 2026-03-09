@@ -1,10 +1,10 @@
 .overlay {
     position: absolute;
-    top: 133px;
-    /* Height of header */
+    top: 100%;
     left: 0;
     width: 100%;
-    height: calc(100vh - 133px);
+    height: calc(100vh - 80px);
+    /* 80px is minimum header height, visual overlay can overflow safely */
     background: rgba(0, 0, 0, 0.4);
     z-index: 100;
     display: flex;
