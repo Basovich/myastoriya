@@ -141,6 +141,10 @@
     border-color: #E6000F !important;
 }
 
+.inputVerified {
+    border-color: #2a9d5c !important;
+}
+
 .fieldError {
     font-size: 11px;
     color: #E6000F;
@@ -257,54 +261,102 @@
     margin-top: -8px;
 }
 
-/* Phone verification step */
-.verifySection {
+/* Inline SMS verification block */
+.smsBlock {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.timerText {
+    font-size: 12px;
+    color: #666;
     text-align: center;
 }
 
-.verifyText {
-    font-size: 13px;
-    color: #666;
-    line-height: 1.5;
+.timerCount {
+    color: #E6000F;
+    font-weight: 700;
 }
 
-.codeInputGroup {
+.smsInputRow {
     display: flex;
-    gap: 8px;
-    justify-content: center;
-}
-
-.codeInput {
-    width: 48px;
-    height: 56px;
+    height: 48px;
     border: 1px solid #E0E0E0;
     border-radius: 8px;
-    text-align: center;
-    font-size: 20px;
-    font-weight: 700;
-    color: #333;
-    outline: none;
+    overflow: hidden;
     transition: border-color 0.2s;
 
-    &:focus-visible {
+    &:focus-within {
         border-color: #333;
     }
 }
 
-.resendLink {
-    font-size: 12px;
-    color: #2F80ED;
-    text-decoration: none;
-    cursor: pointer;
-    background: none;
+.smsInput {
+    flex: 1;
+    min-width: 0;
     border: none;
+    outline: none;
+    padding: 2px 14px 0;
+    font-size: 14px;
+    color: #333;
+    background: #fff;
+
+    &::placeholder {
+        color: #999;
+    }
+
+    &:disabled {
+        background: #f5f5f5;
+        color: #bbb;
+        cursor: not-allowed;
+    }
+
+    &:focus-visible {
+        outline: none;
+    }
+}
+
+.smsSendBtn {
+    flex-shrink: 0;
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 0 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
 
     @media (any-hover: hover) {
         &:hover {
-            text-decoration: underline;
+            background: #222;
         }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E6000F;
+        outline-offset: -2px;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.verifiedBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #2a9d5c;
+    font-weight: 500;
+    margin-top: 4px;
+
+    svg {
+        margin-top: -4px;
     }
 }
