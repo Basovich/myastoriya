@@ -4,6 +4,8 @@ import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 import * as Yup from 'yup';
 import clsx from 'clsx';
+import { useAppDispatch } from '@/store/hooks';
+import { login } from '@/store/slices/authSlice';
 import s from './AuthModal.module.scss';
 
 // Stub API call — replace with real endpoint
@@ -36,6 +38,7 @@ interface ResetPasswordFormProps {
 
 export default function ResetPasswordForm({ phone, onSuccess, onBack }: ResetPasswordFormProps) {
     const router = useRouter();
+    const dispatch = useAppDispatch();
     const formik = useFormik({
         initialValues: {
             password: '',
@@ -45,6 +48,11 @@ export default function ResetPasswordForm({ phone, onSuccess, onBack }: ResetPas
         onSubmit: async (values, { setStatus }) => {
             try {
                 await resetPasswordAPI(phone, values.password);
+                dispatch(login({
+                    phone,
+                    email: `${phone.slice(-4)}@myastoriya.ua`,
+                    name: 'Користувач',
+                }));
                 onSuccess();
                 router.push('/personal/profile/');
             } catch (err) {
