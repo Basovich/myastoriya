@@ -31,7 +31,7 @@ export default function Categories({ categories }: CategoriesProps) {
 
     return (
         <section className={s.section} id="categories">
-            <SectionHeader title={categories.sectionTitle} classNameDots={s.classNameWrapper} />
+            <SectionHeader title={categories.sectionTitle} classNameWrapper={s.classNameWrapper} />
 
             <div className={s.sliderWrapper}>
                 <div className={s.sliderNav}>
