@@ -5,6 +5,7 @@ import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import CategoryCircles, { CategoryCircleItem } from "../ui/CategoryCircles/CategoryCircles";
 import { Locale } from "@/i18n/config";
 import Image from "next/image";
+import SectionHeader from "../ui/SectionHeader/SectionHeader";
 
 interface Product {
     id: number;
@@ -54,15 +55,17 @@ export default function SearchContent({
                 <HeroBanner
                     prefix="ТЕКСТ ПОШУКУ:"
                     title={query}
+                    className={s.heroBanner}
                 />
 
                 <div className={s.contentWrapper}>
-                    <Breadcrumbs items={breadcrumbItems} />
+                    <Breadcrumbs items={breadcrumbItems} className={s.breadcrumbs} />
 
                     <CategoryCircles
                         title="РЕЗУЛЬТАТ ПОШУКУ ПО КАТЕГОРІЯМ"
                         items={searchCategories}
                     />
+                    <SectionHeader title="З ЦИМ ТОВАРОМ КУПУЮТЬ" classNameWrapper={s.productsSectionTitle} />
                 </div>
             </div>
 

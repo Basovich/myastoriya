@@ -10,18 +10,9 @@
     gap: 16px;
 }
 
-.title {
-    font-size: 24px;
-    font-weight: 800;
-    color: #000;
-    text-transform: uppercase;
-    line-height: 1.2;
-    letter-spacing: 0.02em;
+.sectionHeaderWrapper {
     margin: 0;
-
-    @media (min-width: 768px) {
-        font-size: 32px;
-    }
+    flex: 1;
 }
 
 .sliderNav {

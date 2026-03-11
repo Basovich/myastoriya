@@ -10,6 +10,7 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import SliderArrow from "../SliderArrow/SliderArrow";
+import SectionHeader from "../SectionHeader/SectionHeader";
 
 export interface CategoryCircleItem {
     name: string;
@@ -36,7 +37,7 @@ export default function CategoryCircles({
     return (
         <div className={clsx(s.wrapper, className)}>
             <div className={s.header}>
-                {title && <h2 className={s.title}>{title}</h2>}
+                {title && <SectionHeader title={title} withDots={false} classNameWrapper={s.sectionHeaderWrapper} />}
 
                 <div className={s.sliderNav}>
                     <SliderArrow
