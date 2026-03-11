@@ -1,5 +1,3 @@
-// "use client";
-
 import { use } from "react";
 import Header from "@/app/components/Header/Header";
 import {Locale} from "@/i18n/config";
