@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { use, useState, useEffect } from "react";
 import Header from "@/app/components/Header/Header";
 import {Locale} from "@/i18n/config";
-import SearchContent from "@/app/components/Search/SearchContent";
+import SearchContent from "@/app/pages/Search/SearchContent/SearchContent";
 import Footer from "@/app/components/Footer/Footer";
 
 const MOCK_RESULTS = [

@@ -9,8 +9,23 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import SliderArrow from "../SliderArrow/SliderArrow";
-import SectionHeader from "../SectionHeader/SectionHeader";
+import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
+import SectionHeader from "@/app/components/ui/SectionHeader/SectionHeader";
+
+const searchCategories: CategoryCircleItem[] = [
+    { name: "Сезонне меню", image: "/images/cat-grill.png", href: "#" },
+    { name: "Ресторанне меню", image: "/images/cat-restaurant.png", href: "#" },
+    { name: "Бургери", image: "/images/cat-burgers.png", href: "#" },
+    { name: "Шашлик", image: "/images/cat-shashlik.png", href: "#" },
+    { name: "Смакуй одразу", image: "/images/cat-sets.png", href: "#" },
+    { name: "Набори для компаній", image: "/images/cat-branded.png", href: "#" },
+    { name: "Сезонне меню", image: "/images/cat-grill.png", href: "#" },
+    { name: "Ресторанне меню", image: "/images/cat-restaurant.png", href: "#" },
+    { name: "Бургери", image: "/images/cat-burgers.png", href: "#" },
+    { name: "Шашлик", image: "/images/cat-shashlik.png", href: "#" },
+    { name: "Смакуй одразу", image: "/images/cat-sets.png", href: "#" },
+    { name: "Набори для компаній", image: "/images/cat-branded.png", href: "#" },
+];
 
 export interface CategoryCircleItem {
     name: string;
@@ -20,25 +35,22 @@ export interface CategoryCircleItem {
 
 interface CategoryCirclesProps {
     title?: string;
-    items: CategoryCircleItem[];
     className?: string;
 }
 
 export default function CategoryCircles({
     title,
-    items,
     className
 }: CategoryCirclesProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
-    if (!items || items.length === 0) return null;
+    if (!searchCategories || searchCategories.length === 0) return null;
 
     return (
         <div className={clsx(s.wrapper, className)}>
             <div className={s.header}>
                 {title && <SectionHeader title={title} withDots={false} classNameWrapper={s.sectionHeaderWrapper} />}
-
                 <div className={s.sliderNav}>
                     <SliderArrow
                         direction="left"
@@ -64,12 +76,13 @@ export default function CategoryCircles({
                 className={s.swiperContainer}
                 breakpoints={{
                     0: { slidesPerView: 3.5, spaceBetween: 10 },
-                    600: { slidesPerView: 4.5, spaceBetween: 16 },
-                    1024: { slidesPerView: 6, spaceBetween: 16 },
-                    1280: { slidesPerView: 6, spaceBetween: 24 },
+                    768: { slidesPerView: 7, spaceBetween: 16 },
+                    1024: { slidesPerView: 9, spaceBetween: 16 },
+                    1280: { slidesPerView: 10, spaceBetween: 16 },
+                    1440: { slidesPerView: 12, spaceBetween: 16 },
                 }}
             >
-                {items.map((item, index) => (
+                {searchCategories.map((item, index) => (
                     <SwiperSlide key={index} className={s.slide}>
                         <Link href={item.href} className={s.item}>
                             <div className={s.circle}>

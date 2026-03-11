@@ -4,7 +4,7 @@
 
 .topSection {
     background-color: #fff;
-    padding: 18px 0 0;
+    padding: 18px 0;
     margin: 0 auto;
 
     @media (min-width: 768px) {
@@ -16,6 +16,7 @@
     }
 }
 
+.sectionTitle,
 nav.breadcrumbs,
 div.heroBanner {
     width: calc(100% - 32px);
@@ -48,14 +49,22 @@ div.heroBanner {
     background-color: #F6F6F6;
     position: relative;
     overflow: hidden;
-    padding: 40px 16px 60px;
+    padding: 20px 16px 40px;
 
     @media (min-width: 768px) {
-        padding: 40px 24px 80px;
+        padding: 30px 40px 40px;
     }
 
     @media (min-width: 1280px) {
-        padding: 40px 40px 100px;
+        padding: 40px calc((100% - 1200px) / 2);
+    }
+
+    @media (min-width: 1360px) {
+        padding: 60px calc((100% - 1280px) / 2) 60px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 80px calc((100% - 1300px) / 2) 80px;
     }
 }
 
@@ -77,7 +86,6 @@ div.heroBanner {
 
 
 .productsInner {
-    max-width: 1200px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
@@ -93,18 +101,17 @@ div.heroBanner {
 
 .resultsGrid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-    margin-bottom: 40px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
 
     @media (min-width: 768px) {
         grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
+        gap: 20px;
     }
 
-    @media (min-width: 1280px) {
+    @media (min-width: 1024px) {
         grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
+        gap: 24px;
     }
 }
 
