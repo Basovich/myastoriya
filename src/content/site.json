@@ -25,7 +25,7 @@
         },
         {
             "label": "Акції",
-            "href": "/promotions"
+            "href": "/actions"
         },
         {
             "label": "Доставка та Оплата",
@@ -83,7 +83,7 @@
             },
             {
                 "label": "Акції",
-                "href": "/promotions"
+                "href": "/actions"
             },
             {
                 "label": "Доставка та Оплата",

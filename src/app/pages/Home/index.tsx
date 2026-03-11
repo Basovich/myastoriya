@@ -2,7 +2,7 @@ import Header from "@/app/components/Header/Header";
 import Hero from "@/app/pages/Home/Hero/Hero";
 import Categories from "@/app/pages/Home/Categories/Categories";
 import Products from "@/app/pages/Home/Products/Products";
-import Promotions from "@/app/pages/Home/Promotions/Promotions";
+import Actions from "@/app/pages/Home/Actions/Actions";
 import AppPromo from "@/app/pages/Home/AppPromo/AppPromo";
 import ComplexDiscounts from "@/app/pages/Home/ComplexDiscounts/ComplexDiscounts";
 import Publications from "@/app/pages/Home/Publications/Publications";
@@ -25,7 +25,7 @@ export default function HomePage({ dict, lang }: HomePageProps) {
                 <Hero hero={dict.home.hero} />
                 <Categories categories={dict.home.categories} />
                 <Products dict={dict.home.products} categories={dict.home.categories.items} />
-                <Promotions dict={dict.home.promotions} lang={lang} />
+                <Actions dict={dict.home.actions} lang={lang} />
                 <AppPromo />
                 <ComplexDiscounts dict={dict.home.discounts} lang={lang} />
                 <Publications dict={dict.home.publications} lang={lang} />

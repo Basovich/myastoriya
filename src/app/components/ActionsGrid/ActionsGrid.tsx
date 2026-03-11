@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import s from "./PromotionsGrid.module.scss";
+import s from "./ActionsGrid.module.scss";
 import Button from "../ui/Button/Button";
 import Container from "../ui/Container/Container";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
@@ -12,7 +12,7 @@ import AppLink from "../ui/AppLink/AppLink";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import { Locale } from "@/i18n/config";
 
-interface PromotionItem {
+interface ActionItem {
     id: number;
     title: string;
     image: string;
@@ -21,7 +21,7 @@ interface PromotionItem {
     discount?: string | null;
 }
 
-interface PromotionsGridProps {
+interface ActionsGridProps {
     dict: {
         title: string;
         breadcrumbs: {
@@ -35,18 +35,18 @@ interface PromotionsGridProps {
         };
         showBtn: string;
     };
-    initialItems: PromotionItem[];
+    initialItems: ActionItem[];
     lang: string;
     pageType: 'promotions' | 'complex-discounts';
 }
 
-export default function PromotionsGrid({ dict, initialItems, lang, pageType }: PromotionsGridProps) {
+export default function ActionsGrid({ dict, initialItems, lang, pageType }: ActionsGridProps) {
     const twelveInitialItems = Array.from({ length: 12 }).map((_, i) => {
         const baseItem = initialItems[i % initialItems.length];
         return { ...baseItem, id: baseItem.id + i * 1000 };
     });
 
-    const [items, setItems] = useState<PromotionItem[]>(twelveInitialItems);
+    const [items, setItems] = useState<ActionItem[]>(twelveInitialItems);
     const [hasMore, setHasMore] = useState(true);
 
     const loadMore = () => {
@@ -68,7 +68,7 @@ export default function PromotionsGrid({ dict, initialItems, lang, pageType }: P
         {
             id: 'promotions',
             label: dict.tabs.promotions,
-            href: '/promotions',
+            href: '/actions',
             active: pageType === 'promotions'
         },
         {

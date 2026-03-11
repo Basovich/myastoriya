@@ -1,10 +1,10 @@
 import { getDictionary } from "@/i18n/get-dictionary";
-import PromotionsGrid from "../../components/PromotionsGrid/PromotionsGrid";
+import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 
-// This is the index page for Promotions: /[lang]/promotions
-export default async function PromotionsPage({
+// This is the index page for Actions: /[lang]/actions
+export default async function ActionsPage({
     params,
 }: {
     params: Promise<{ lang: "ua" | "ru" }>;
@@ -16,9 +16,9 @@ export default async function PromotionsPage({
         <>
             <Header lang={lang} />
             <main>
-                <PromotionsGrid
-                    dict={dict.home.promotionsPage}
-                    initialItems={dict.home.promotions.items}
+                <ActionsGrid
+                    dict={dict.home.actionsPage}
+                    initialItems={dict.home.actions.items}
                     lang={lang}
                     pageType="promotions"
                 />

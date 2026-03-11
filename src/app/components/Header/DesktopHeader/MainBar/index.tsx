@@ -17,7 +17,7 @@ import siteData from "@/content/site.json";
 
 export const TOP_NAV_ITEMS = [
     { label: "Заклади", href: "/restaurants" },
-    { label: "Акції", href: "/promotions" },
+    { label: "Акції", href: "/actions" },
     { label: "Доставка та Оплата", href: "/delivery" },
     { label: "Блог", href: "/blog" },
     { label: "Франшиза", href: "/franchise" },

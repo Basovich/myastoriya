@@ -1,21 +1,21 @@
 import React from 'react';
 import Image from 'next/image';
-import s from './PromotionDetail.module.scss';
+import s from './ActionDetail.module.scss';
 import ProductCard from '../ui/ProductCard/ProductCard';
 import Container from '../ui/Container/Container';
 import Breadcrumbs from '../ui/Breadcrumbs/Breadcrumbs';
 import HeroBanner from '../ui/HeroBanner/HeroBanner';
 
-interface PromotionDetailProps {
+interface ActionDetailProps {
     dict: any;
     lang: string;
     id: string;
 }
 
-export default function PromotionDetail({ dict, lang, id }: PromotionDetailProps) {
+export default function ActionDetail({ dict, lang, id }: ActionDetailProps) {
     const breadcrumbItems = [
         { label: dict.home.promotionsPage.breadcrumbs.home, href: '/' },
-        { label: dict.home.promotionsPage.breadcrumbs.promotions, href: '/promotions' },
+        { label: dict.home.promotionsPage.breadcrumbs.promotions, href: '/actions' },
         { label: 'Steak Days щовівторка!' }
     ];
 

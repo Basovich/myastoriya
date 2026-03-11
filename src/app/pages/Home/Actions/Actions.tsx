@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import s from "./Promotions.module.scss";
+import s from "./Actions.module.scss";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
@@ -11,7 +11,7 @@ import Link from "next/link";
 import Image from "next/image";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 
-interface PromotionItem {
+interface ActionItem {
     id: number;
     title: string;
     image: string;
@@ -19,15 +19,15 @@ interface PromotionItem {
     discount?: string | null;
 }
 
-interface PromotionsProps {
+interface ActionsProps {
     dict: {
         sectionTitle: string;
-        items: PromotionItem[];
+        items: ActionItem[];
     };
     lang: string;
 }
 
-export default function Promotions({ dict, lang }: PromotionsProps) {
+export default function Actions({ dict, lang }: ActionsProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
@@ -40,7 +40,7 @@ export default function Promotions({ dict, lang }: PromotionsProps) {
     };
 
     return (
-        <section className={s.section} id="promotions">
+        <section className={s.section} id="actions">
             <div className={s.promotionsHeader}>
                 <SectionHeader title={dict.sectionTitle} />
                 <div className={s.navArrows}>
@@ -84,7 +84,7 @@ export default function Promotions({ dict, lang }: PromotionsProps) {
                 >
                     {dict.items.map((item, idx) => (
                         <SwiperSlide key={`${item.id}-${idx}`} className={s.slide}>
-                            <Link href={getRoute(`/promotions/${item.id}`)} className={s.cardLink}>
+                            <Link href={getRoute(`/actions/${item.id}`)} className={s.cardLink}>
                                 <div className={s.card}>
                                     <div className={s.cardImage}>
                                         <Image src={item.image} alt={item.title} fill className={s.cardImg} />

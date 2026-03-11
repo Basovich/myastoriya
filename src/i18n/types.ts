@@ -96,7 +96,7 @@ export interface HomeDict {
     showMoreButton: string;
     items: Product[];
   };
-  promotions: {
+  actions: {
     sectionTitle: string;
     items: Promotion[];
   };
@@ -121,6 +121,15 @@ export interface HomeDict {
     text: string;
     showBtn: string;
     hideBtn: string;
+  };
+  actionsPage: {
+    title: string;
+    breadcrumbs: PromotionsPageBreadcrumbs;
+    tabs: {
+      promotions: string;
+      complexDiscounts: string;
+    };
+    showBtn: string;
   };
   promotionsPage: {
     title: string;

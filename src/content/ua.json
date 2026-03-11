@@ -197,7 +197,7 @@
                 }
             ]
         },
-        "promotions": {
+        "actions": {
             "sectionTitle": "АКЦІЇ",
             "items": [
                 {
@@ -384,7 +384,7 @@
             "showBtn": "ПОКАЗАТИ ЩЕ",
             "hideBtn": "СКРИТИ"
         },
-        "promotionsPage": {
+        "actionsPage": {
             "title": "АКЦІЇ",
             "breadcrumbs": {
                 "home": "Головна",
