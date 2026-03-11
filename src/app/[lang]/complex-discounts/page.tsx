@@ -1,5 +1,5 @@
 import { getDictionary } from "@/i18n/get-dictionary";
-import PromotionsGrid from "../../components/PromotionsGrid/PromotionsGrid";
+import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 
@@ -16,7 +16,7 @@ export default async function ComplexDiscountsPage({
         <>
             <Header lang={lang} />
             <main>
-                <PromotionsGrid
+                <ActionsGrid
                     dict={dict.home.complexDiscountsPage}
                     initialItems={dict.home.discounts.items}
                     lang={lang}

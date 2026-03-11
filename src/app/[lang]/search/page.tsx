@@ -8,14 +8,14 @@ import Footer from "@/app/components/Footer/Footer";
 import { Locale } from "@/i18n/config";
 
 const MOCK_RESULTS = [
-    { id: 1, title: "Стейк Рібай Dry-aged гриль - М'ясторія", price: 1260, weight: "330г / 340г / 200г", unit: "упаковка", badge: "SALE", image: "/images/products/product-shashlik.png" },
-    { id: 2, title: "Стейк Рібай на кістці Dry-aged гриль - М'ясторія", price: 4200, weight: "330г / 340г / 200г", unit: "упаковка", badge: null, image: "/images/products/product-meatballs.png" },
-    { id: 3, title: "Стейк Рібай Dry-aged гриль - М'ясторія", price: 5500, weight: "330г / 340г / 200г", unit: "упаковка", badge: "NEW", image: "/images/products/product-sticks-cheese.png" },
-    { id: 4, title: "Тартар з відбірної яловичини", price: 2500, weight: "200г", unit: "упаковка", badge: null, image: "/images/product-ribeye.jpg" },
-    { id: 5, title: "Карпачо з відбірної яловичини", price: 2500, weight: "200г", unit: "упаковка", badge: null, image: "/images/product-shashlik.jpg" },
-    { id: 6, title: "М'ясні палички з сиром", price: 2500, weight: "330г", unit: "упаковка", badge: "HOT", image: "/images/product-sticks-cheese.jpg" },
-    { id: 7, title: "Стейк Ті-боун витриманий", price: 3200, weight: "500г", unit: "упаковка", badge: null, image: "/images/products/product-meatballs.png" },
-    { id: 8, title: "Філе-міньйон гриль", price: 1500, weight: "250г", unit: "упаковка", badge: "SALE", image: "/images/products/product-shashlik.png" },
+    { id: 1, title: "М'ясні палички з сиром", price: 2500, weight: "330г / 340г / 200г", unit: "упаковка", badge: "АКЦІЯ", image: "/images/products/product-shashlik.png" },
+    { id: 2, title: "М'ясні палички в соусі Теріякі", price: 2500, weight: "330г / 340г / 200г", unit: "упаковка", badge: "NEW", image: "/images/products/product-meatballs.png" },
+    { id: 3, title: "Тартар з відбірної яловичини", price: 2500, weight: "330г", unit: "упаковка", badge: null, image: "/images/products/product-sticks-cheese.png" },
+    { id: 4, title: "Карпачо з відбірної яловичини", price: 2500, weight: "330г", unit: "упаковка", badge: null, image: "/images/product-ribeye.jpg" },
+    { id: 5, title: "Мітболи в соусі BBQ", price: 2500, weight: "200г", unit: "упаковка", badge: null, image: "/images/product-shashlik.jpg" },
+    { id: 6, title: "Шашлик з баранини в пряному маринаді", price: 2500, weight: "330г", unit: "упаковка", badge: null, image: "/images/product-sticks-cheese.jpg" },
+    { id: 7, title: "Томлена курка в соусі азійському", price: 2500, weight: "330г", unit: "упаковка", badge: null, image: "/images/products/product-meatballs.png" },
+    { id: 8, title: "Томлена курка в соусі карі", price: 2500, weight: "330г", unit: "упаковка", badge: null, image: "/images/products/product-shashlik.png" },
 ];
 
 const CATEGORIES = ["Всі", "Сира продукція", "Готова продукція", "Стейки", "Бургери", "Набори"];
@@ -40,7 +40,7 @@ export default function SearchPage({ params }: { params: Promise<{ lang: string 
     return (
         <>
             <Header lang={lang as Locale} />
-            <main style={{ minHeight: "100vh", backgroundColor: "#fff" }}>
+            <main style={{ minHeight: "100vh" }}>
                 <SearchContent
                     lang={lang as Locale}
                     query={query}

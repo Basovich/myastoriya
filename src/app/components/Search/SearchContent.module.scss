@@ -1,12 +1,88 @@
 .container {
     width: 100%;
+}
+
+.topSection {
+    background-color: #fff;
+    padding: 20px 16px 0;
     max-width: 1280px;
     margin: 0 auto;
-    padding: 20px 16px 60px;
+
+    @media (min-width: 768px) {
+        padding: 40px 24px 0;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 30px 40px 0;
+    }
 }
 
 .contentWrapper {
     margin-top: 24px;
+}
+
+.productsSection {
+    background-color: #F6F6F6;
+    position: relative;
+    overflow: hidden;
+    padding: 40px 16px 60px;
+
+    @media (min-width: 768px) {
+        padding: 40px 24px 80px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 40px 40px 100px;
+    }
+}
+
+.bgLogo {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: auto;
+    height: 120%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+
+    @media (min-width: 768px) {
+        height: 70%;
+    }
+}
+
+
+.productsInner {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.resultsGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+    @media (min-width: 1280px) {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+}
+
+.noResults {
+    text-align: center;
+    padding: 60px 0;
+    font-size: 18px;
+    color: #222;
+    opacity: 0.6;
 }
 
 .filtersWrapper {
@@ -31,21 +107,6 @@
     font-size: 14px !important;
 }
 
-.resultsGrid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-    margin-bottom: 40px;
-}
-
-.noResults {
-    text-align: center;
-    padding: 60px 0;
-    font-size: 18px;
-    color: #222;
-    opacity: 0.6;
-}
-
 .pagination {
     display: flex;
     justify-content: center;
@@ -55,36 +116,4 @@
     padding: 12px 32px !important;
     font-size: 14px !important;
     font-weight: 600 !important;
-}
-
-/* Tablet (768px+) */
-@media screen and (min-width: 768px) {
-    .container {
-        padding: 40px 24px 80px;
-    }
-
-    .title {
-        font-size: 32px;
-    }
-
-    .resultsGrid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
-    }
-}
-
-/* Desktop (1280px+) */
-@media screen and (min-width: 1280px) {
-    .container {
-        padding: 30px 40px 100px;
-    }
-
-    .title {
-        font-size: 40px;
-    }
-
-    .resultsGrid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-    }
 }
