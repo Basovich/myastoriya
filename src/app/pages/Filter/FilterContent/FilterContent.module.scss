@@ -1,0 +1,520 @@
+.container {
+    min-height: 100vh;
+    background: #fff;
+}
+
+// ─── Banner ────────────────────────────────────────────────────────────────
+
+.topSection {
+    width: 100%;
+}
+
+.heroBanner {
+    // Inherits from HeroBanner component
+}
+
+// ─── Breadcrumbs ───────────────────────────────────────────────────────────
+
+.breadcrumbsSection {
+    background: #fff;
+}
+
+.breadcrumbsInner {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 14px 16px;
+
+    @media (min-width: 768px) {
+        padding: 16px 24px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 16px 40px;
+    }
+}
+
+.breadcrumbs {
+    // Additional overrides if needed
+}
+
+// ─── Category pills ────────────────────────────────────────────────────────
+
+.categoriesSection {
+    background: #fff;
+    padding: 12px 0 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+    @media (min-width: 1280px) {
+        padding: 16px 0 20px;
+    }
+}
+
+.categoriesInner {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 16px;
+
+    @media (min-width: 768px) {
+        padding: 0 24px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 0 40px;
+    }
+}
+
+.pillsScroll {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 2px;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    @media (min-width: 1280px) {
+        flex-wrap: wrap;
+    }
+}
+
+.pill {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #000;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.pillActive {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+}
+
+// ─── Main section ──────────────────────────────────────────────────────────
+
+.mainSection {
+    background: #F5F5F5;
+    position: relative;
+    overflow: hidden;
+}
+
+.bgLogo {
+    position: absolute;
+    right: -100px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.04;
+    pointer-events: none;
+    user-select: none;
+    display: none;
+
+    @media (min-width: 1280px) {
+        display: block;
+    }
+}
+
+.mainInner {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 24px 16px;
+    display: flex;
+    gap: 0;
+
+    @media (min-width: 768px) {
+        padding: 28px 24px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 32px 40px;
+        gap: 32px;
+    }
+}
+
+// ─── Sidebar (desktop only) ────────────────────────────────────────────────
+
+.sidebar {
+    display: none;
+
+    @media (min-width: 1280px) {
+        display: block;
+        flex-shrink: 0;
+        width: 280px;
+        background: #fff;
+        border-radius: 18px;
+        padding: 24px 20px;
+        align-self: flex-start;
+        position: sticky;
+        top: 90px;
+    }
+}
+
+// ─── Results column ────────────────────────────────────────────────────────
+
+.results {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+// ─── Toolbar ───────────────────────────────────────────────────────────────
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.filterBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #000;
+    cursor: pointer;
+    transition: border-color 0.15s;
+
+    @media (min-width: 1280px) {
+        display: none;
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #000;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.filterDot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #E3051B;
+    flex-shrink: 0;
+}
+
+.viewToggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+
+    @media (min-width: 1280px) {
+        display: flex;
+    }
+}
+
+.viewBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1.5px solid transparent;
+    background: none;
+    color: rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            color: #000;
+            background: rgba(0, 0, 0, 0.05);
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.viewBtnActive {
+    color: #000;
+    border-color: rgba(0, 0, 0, 0.2);
+    background: #fff;
+}
+
+.sortWrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sortLabel {
+    display: none;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+
+    @media (min-width: 1280px) {
+        display: block;
+    }
+}
+
+.sortSelectWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.sortSelect {
+    height: 36px;
+    padding: 0 32px 0 12px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: border-color 0.15s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #000;
+        }
+    }
+
+    &:focus-visible {
+        border-color: #E3051B;
+    }
+}
+
+.sortArrow {
+    position: absolute;
+    right: 10px;
+    pointer-events: none;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+// ─── Product list ──────────────────────────────────────────────────────────
+
+.productList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    @media (min-width: 768px) {
+        gap: 16px;
+    }
+}
+
+.noResults {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.4);
+}
+
+// ─── Pagination ────────────────────────────────────────────────────────────
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 0;
+
+    @media (min-width: 768px) {
+        gap: 8px;
+    }
+}
+
+.pageNavBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+
+    &:disabled {
+        opacity: 0.35;
+        cursor: default;
+    }
+
+    @media (any-hover: hover) {
+        &:not(:disabled):hover {
+            border-color: #000;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.pageBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #000;
+            color: #000;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.pageBtnActive {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+}
+
+// ─── Show more ─────────────────────────────────────────────────────────────
+
+.showMoreWrap {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 8px;
+}
+
+.showMoreBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #000;
+    cursor: pointer;
+    transition: border-color 0.15s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #000;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+// ─── Related / Ordered sections ────────────────────────────────────────────
+
+.relatedSection {
+    background: #fff;
+    padding: 40px 0;
+
+    @media (min-width: 1280px) {
+        padding: 60px 0;
+    }
+}
+
+.orderedSection {
+    background: #F5F5F5;
+    padding: 40px 0;
+
+    @media (min-width: 1280px) {
+        padding: 60px 0;
+    }
+}
+
+.relatedInner {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 16px;
+
+    @media (min-width: 768px) {
+        padding: 0 24px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 0 40px;
+    }
+}
+
+.sectionTitle {
+    margin-bottom: 24px;
+
+    @media (min-width: 1280px) {
+        margin-bottom: 32px;
+    }
+}
+
+.relatedGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (min-width: 1280px) {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+}
