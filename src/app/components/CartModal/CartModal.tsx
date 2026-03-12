@@ -6,7 +6,7 @@ import Image from 'next/image';
 import s from './CartModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { addToCart, updateQuantity, removeFromCart, clearCart } from '@/store/slices/cartSlice';
+import { addToCart, updateQuantity, removeFromCart } from '@/store/slices/cartSlice';
 import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from './products_mock';
 import clsx from 'clsx';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -61,10 +61,6 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
         dispatch(removeFromCart(id));
     };
 
-    const handleClearCart = () => {
-        dispatch(clearCart());
-    };
-
     const handleAddToCart = (id: string) => {
         dispatch(addToCart({ id, quantity: 1 }));
     };
@@ -95,8 +91,8 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
             <div className={s.modal}>
                 <div className={s.modalHeader}>
                     <h2 className={s.title}>
-                        <svg className={s.headerIcon} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 6V5C6 3.89543 6.89543 3 8 3H12C13.1046 3 14 3.89543 14 5V6M4 6H16L15.3 16.5C15.2 17.8 14.1 18.8 12.8 18.8H7.2C5.9 18.8 4.8 17.8 4.7 16.5L4 6Z" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
+                            <path d="M3.57532 5.99551C2.82203 10.329 9.95312 11.0512 9.57446 5.99551M3.57532 4.10525C2.82203 -0.228233 9.95312 -0.950481 9.57446 4.10525M0.578125 4.55101H12.5781V12.1346C12.5781 12.9324 11.9066 13.5791 11.0781 13.5791H2.07812C1.2497 13.5791 0.578125 12.9324 0.578125 12.1346V4.55101Z" stroke="black" stroke-width="1.15789" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         Ваш кошик
                     </h2>
