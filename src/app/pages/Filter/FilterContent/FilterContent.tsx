@@ -4,6 +4,7 @@ import { useState } from 'react';
 import s from './FilterContent.module.scss';
 import HeroBanner from '../../../components/ui/HeroBanner/HeroBanner';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs/Breadcrumbs';
+import CategoryCircles from '@/app/components/ui/CategoryCircles/CategoryCircles';
 import Image from 'next/image';
 import FilterProductRow from '@/app/pages/Filter/FilterProductRow/FilterProductRow';
 import FilterSidebar from '@/app/pages/Filter/FilterSidebar/FilterSidebar';
@@ -37,15 +38,6 @@ const MOCK_RESULTS: Product[] = [
 const MOCK_RELATED: Product[] = MOCK_RESULTS.slice(0, 4);
 const MOCK_ORDERED: Product[] = MOCK_RESULTS.slice(0, 4);
 
-const CATEGORY_PILLS = [
-    { label: 'Гриль меню', active: false },
-    { label: 'Бургери', active: true },
-    { label: 'Набори для компанії', active: false },
-    { label: 'Шашлик', active: false },
-    { label: 'Меню ресторана', active: false },
-    { label: 'Фірмова продукція', active: false },
-];
-
 const SORT_OPTIONS = [
     'По популярності',
     'Спочатку дешевші',
@@ -66,47 +58,24 @@ export default function FilterContent({ category }: FilterContentProps) {
 
     const breadcrumbItems = [
         { label: 'Головна', href: '/' },
-        { label: 'Готова продукція', href: '/catalog' },
-        { label: category || 'Каталог' },
+        { label: 'Готова продукція' },
     ];
 
     return (
         <>
             <div className={s.container}>
-                {/* Banner */}
                 <div className={s.topSection}>
                     <HeroBanner
-                        prefix="ГОТОВА ПРОДУКЦІЯ"
-                        title=""
+                        prefix=""
+                        title="ГОТОВА ПРОДУКЦІЯ"
                         className={s.heroBanner}
                     />
-                </div>
-
-                {/* Breadcrumbs */}
-                <div className={s.breadcrumbsSection}>
-                    <div className={s.breadcrumbsInner}>
-                        <Breadcrumbs items={breadcrumbItems} className={s.breadcrumbs} />
+                    <div className={s.categoriesSection}>
+                        <CategoryCircles
+                            headerLeft={<Breadcrumbs items={breadcrumbItems} className={s.breadcrumbs} />}
+                        />
                     </div>
                 </div>
-
-                {/* Category pills */}
-                <div className={s.categoriesSection}>
-                    <div className={s.categoriesInner}>
-                        <div className={s.pillsScroll}>
-                            {CATEGORY_PILLS.map(cat => (
-                                <button
-                                    key={cat.label}
-                                    type="button"
-                                    className={`${s.pill} ${cat.active ? s.pillActive : ''}`}
-                                >
-                                    {cat.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Main content: sidebar + results */}
                 <div className={s.mainSection}>
                     <Image
                         src="/images/products/products-bg-logo.svg"

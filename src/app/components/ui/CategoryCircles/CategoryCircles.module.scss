@@ -18,10 +18,10 @@
     width: calc(100% - 32px);
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 24px;
 
     @media (min-width: 768px) {
         width: calc(100% - 80px);
+        margin-bottom: 20px;
     }
 
     @media (min-width: 1280px) {
@@ -39,15 +39,23 @@
 }
 
 .sectionHeaderWrapper {
-    margin: 0;
     flex: 1;
+    margin-bottom: 20px;
+
+    @media (min-width: 768px) {
+        margin-bottom: 0;
+    }
 }
 
 .sliderNav {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
+    display: none;
+
+    @media (min-width: 1024px) {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
 }
 
 .navArrow {
@@ -63,6 +71,7 @@
 .swiperContainer {
     width: 100%;
     padding-left: 16px;
+    padding-right: 16px;
 
     @media (min-width: 768px) {
         padding-left: 40px;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import s from "./CategoryCircles.module.scss";
 import Image from "next/image";
@@ -16,15 +16,15 @@ const searchCategories: CategoryCircleItem[] = [
     { name: "Сезонне меню", image: "/images/cat-grill.png", href: "#" },
     { name: "Ресторанне меню", image: "/images/cat-restaurant.png", href: "#" },
     { name: "Бургери", image: "/images/cat-burgers.png", href: "#" },
-    { name: "Шашлик", image: "/images/cat-shashlik.png", href: "#" },
+    { name: "Піца", image: "/images/cat-shashlik.png", href: "#" },
     { name: "Смакуй одразу", image: "/images/cat-sets.png", href: "#" },
     { name: "Набори для компаній", image: "/images/cat-branded.png", href: "#" },
-    { name: "Сезонне меню", image: "/images/cat-grill.png", href: "#" },
-    { name: "Ресторанне меню", image: "/images/cat-restaurant.png", href: "#" },
-    { name: "Бургери", image: "/images/cat-burgers.png", href: "#" },
-    { name: "Шашлик", image: "/images/cat-shashlik.png", href: "#" },
-    { name: "Смакуй одразу", image: "/images/cat-sets.png", href: "#" },
-    { name: "Набори для компаній", image: "/images/cat-branded.png", href: "#" },
+    { name: "Гриль меню", image: "/images/cat-grill.png", href: "#" },
+    { name: "Дитяче меню", image: "/images/cat-restaurant.png", href: "#" },
+    { name: "Власне виробництво", image: "/images/cat-burgers.png", href: "#" },
+    { name: "М'ясна продукція", image: "/images/cat-shashlik.png", href: "#" },
+    { name: "Консервація", image: "/images/cat-sets.png", href: "#" },
+    { name: "Сир", image: "/images/cat-branded.png", href: "#" },
 ];
 
 export interface CategoryCircleItem {
@@ -36,11 +36,13 @@ export interface CategoryCircleItem {
 interface CategoryCirclesProps {
     title?: string;
     className?: string;
+    headerLeft?: React.ReactNode;
 }
 
 export default function CategoryCircles({
     title,
-    className
+    className,
+    headerLeft
 }: CategoryCirclesProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
@@ -50,7 +52,11 @@ export default function CategoryCircles({
     return (
         <div className={clsx(s.wrapper, className)}>
             <div className={s.header}>
-                {title && <SectionHeader title={title} withDots={false} classNameWrapper={s.sectionHeaderWrapper} />}
+                {title ? (
+                    <SectionHeader title={title} withDots={false} classNameWrapper={s.sectionHeaderWrapper} />
+                ) : headerLeft ? (
+                    headerLeft
+                ) : null}
                 <div className={s.sliderNav}>
                     <SliderArrow
                         direction="left"
@@ -68,7 +74,6 @@ export default function CategoryCircles({
                     />
                 </div>
             </div>
-
             <Swiper
                 modules={[Navigation]}
                 navigation={{ prevEl, nextEl }}
@@ -76,6 +81,7 @@ export default function CategoryCircles({
                 className={s.swiperContainer}
                 breakpoints={{
                     0: { slidesPerView: 3.5, spaceBetween: 10 },
+                    430: { slidesPerView: 4.5, spaceBetween: 10 },
                     768: { slidesPerView: 7, spaceBetween: 16 },
                     1024: { slidesPerView: 9, spaceBetween: 16 },
                     1280: { slidesPerView: 10, spaceBetween: 16 },

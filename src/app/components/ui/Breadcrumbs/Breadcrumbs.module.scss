@@ -1,11 +1,15 @@
 .breadcrumbs {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 24px;
-    font-size: 14px;
-    color: #222;
+    display: none;
+
+    @media (min-width: 768px) {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+        font-size: 14px;
+        color: #222;
+    }
 }
 
 .item {

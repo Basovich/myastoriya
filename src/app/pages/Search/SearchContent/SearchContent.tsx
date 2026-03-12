@@ -4,7 +4,7 @@ import s from "./SearchContent.module.scss";
 import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import HeroBanner from "../../../components/ui/HeroBanner/HeroBanner";
 import Breadcrumbs from "../../../components/ui/Breadcrumbs/Breadcrumbs";
-import CategoryCircles from "@/app/pages/Search/CategoryCircles/CategoryCircles";
+import CategoryCircles from "@/app/components/ui/CategoryCircles/CategoryCircles";
 import Image from "next/image";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import {useSearchParams} from "next/navigation";
@@ -42,22 +42,18 @@ export default function SearchContent() {
 
     return (
         <div className={s.container}>
-            {/* White background section: banner + categories */}
             <div className={s.topSection}>
                 <HeroBanner
                     prefix="ТЕКСТ ПОШУКУ:"
                     title={query}
                     className={s.heroBanner}
                 />
-
                 <div className={s.contentWrapper}>
                     <Breadcrumbs items={breadcrumbItems} className={s.breadcrumbs} />
                     <CategoryCircles title='РЕЗУЛЬТАТ ПОШУКУ ПО КАТЕГОРІЯМ' />
                     <SectionHeader title="З ЦИМ ТОВАРОМ КУПУЮТЬ" classNameWrapper={s.sectionTitle} />
                 </div>
             </div>
-
-            {/* Grey background section: products grid */}
             <div className={s.productsSection}>
                 <Image
                     src="/images/products/products-bg-logo.svg"
