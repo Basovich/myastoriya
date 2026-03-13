@@ -1,0 +1,55 @@
+.sortWrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sortLabel {
+    display: none;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+
+    @media (min-width: 1280px) {
+        display: block;
+    }
+}
+
+.sortSelectWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.sortSelect {
+    height: 36px;
+    padding: 0 32px 0 12px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: border-color 0.15s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #000;
+        }
+    }
+
+    &:focus-visible {
+        border-color: #E3051B;
+    }
+}
+
+.sortArrow {
+    position: absolute;
+    right: 10px;
+    pointer-events: none;
+    color: rgba(0, 0, 0, 0.5);
+}

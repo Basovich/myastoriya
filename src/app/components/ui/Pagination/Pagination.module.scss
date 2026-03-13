@@ -1,0 +1,75 @@
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 0;
+
+    @media (min-width: 768px) {
+        gap: 8px;
+    }
+}
+
+.pageNavBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+
+    &:disabled {
+        opacity: 0.35;
+        cursor: default;
+    }
+
+    @media (any-hover: hover) {
+        &:not(:disabled):hover {
+            border-color: #000;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.pageBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #000;
+            color: #000;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.pageBtnActive {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+}

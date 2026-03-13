@@ -1,0 +1,36 @@
+.optionPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    border-radius: 100px;
+    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    color: #000;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+    line-height: 1;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #000;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.optionPillActive {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+}
+
+.checkIcon {
+    flex-shrink: 0;
+}

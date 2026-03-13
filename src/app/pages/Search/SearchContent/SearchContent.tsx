@@ -4,7 +4,7 @@ import s from "./SearchContent.module.scss";
 import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import HeroBanner from "../../../components/ui/HeroBanner/HeroBanner";
 import Breadcrumbs from "../../../components/ui/Breadcrumbs/Breadcrumbs";
-import CategoryCircles from "@/app/components/ui/CategoryCircles/CategoryCircles";
+import CategoryCircles from "@/app/components/CategoryCircles/CategoryCircles";
 import Image from "next/image";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import {useSearchParams} from "next/navigation";

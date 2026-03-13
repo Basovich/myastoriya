@@ -9,7 +9,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
+import SliderArrow from "../ui/SliderArrow/SliderArrow";
 import SectionHeader from "@/app/components/ui/SectionHeader/SectionHeader";
 
 const searchCategories: CategoryCircleItem[] = [

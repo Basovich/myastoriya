@@ -4,13 +4,17 @@ import { useState } from 'react';
 import s from './FilterContent.module.scss';
 import HeroBanner from '../../../components/ui/HeroBanner/HeroBanner';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs/Breadcrumbs';
-import CategoryCircles from '@/app/components/ui/CategoryCircles/CategoryCircles';
+import CategoryCircles from '@/app/components/CategoryCircles/CategoryCircles';
 import Image from 'next/image';
 import FilterProductRow from '@/app/pages/Filter/FilterProductRow/FilterProductRow';
 import FilterSidebar from '@/app/pages/Filter/FilterSidebar/FilterSidebar';
 import FilterModal from '@/app/pages/Filter/FilterModal/FilterModal';
 import ProductCard from '../../../components/ui/ProductCard/ProductCard';
 import SectionHeader from '../../../components/ui/SectionHeader/SectionHeader';
+import Pagination from '@/app/components/ui/Pagination/Pagination';
+import ViewToggle, { ViewType } from '@/app/components/ui/ViewToggle/ViewToggle';
+import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
+import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
 
 interface Product {
     id: number;
@@ -55,6 +59,7 @@ export default function FilterContent({ category }: FilterContentProps) {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [activePage, setActivePage] = useState(1);
     const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
+    const [view, setView] = useState<ViewType>('list');
 
     const breadcrumbItems = [
         { label: 'Головна', href: '/' },
@@ -111,47 +116,16 @@ export default function FilterContent({ category }: FilterContentProps) {
                                 </button>
 
                                 {/* View toggles */}
-                                <div className={s.viewToggle}>
-                                    <button id="view-grid-btn" type="button" className={s.viewBtn} aria-label="Сітка">
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                                            <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                                            <rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                                            <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                                        </svg>
-                                    </button>
-                                    <button id="view-list-btn" type="button" className={`${s.viewBtn} ${s.viewBtnActive}`} aria-label="Список">
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <rect x="1" y="1" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.5"/>
-                                            <path d="M8 3H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                                            <rect x="1" y="6.5" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.5"/>
-                                            <path d="M8 8.5H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                                            <rect x="1" y="12" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.5"/>
-                                            <path d="M8 14H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                                        </svg>
-                                    </button>
-                                </div>
+                                <ViewToggle view={view} onViewChange={setView} className={s.viewToggle} />
 
                                 {/* Sort dropdown */}
-                                <div className={s.sortWrap}>
-                                    <span className={s.sortLabel}>Сортування:</span>
-                                    <div className={s.sortSelectWrap}>
-                                        <select
-                                            id="sort-select"
-                                            className={s.sortSelect}
-                                            value={sortBy}
-                                            onChange={e => setSortBy(e.target.value)}
-                                            aria-label="Сортування"
-                                        >
-                                            {SORT_OPTIONS.map(opt => (
-                                                <option key={opt} value={opt}>{opt}</option>
-                                            ))}
-                                        </select>
-                                        <svg className={s.sortArrow} width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                    </div>
-                                </div>
+                                <SortSelect
+                                    label="Сортування:"
+                                    value={sortBy}
+                                    options={SORT_OPTIONS}
+                                    onChange={setSortBy}
+                                    className={s.sortWrap}
+                                />
                             </div>
 
                             {/* Product list */}
@@ -177,54 +151,16 @@ export default function FilterContent({ category }: FilterContentProps) {
                             </div>
 
                             {/* Pagination */}
-                            <div className={s.pagination}>
-                                <button
-                                    id="pagination-prev"
-                                    type="button"
-                                    className={s.pageNavBtn}
-                                    onClick={() => setActivePage(p => Math.max(1, p - 1))}
-                                    disabled={activePage === 1}
-                                    aria-label="Попередня сторінка"
-                                >
-                                    <svg width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M7 1L1 6.5L7 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                </button>
-                                {Array.from({ length: TOTAL_PAGES }, (_, i) => i + 1).map(page => (
-                                    <button
-                                        key={page}
-                                        id={`pagination-page-${page}`}
-                                        type="button"
-                                        className={`${s.pageBtn} ${activePage === page ? s.pageBtnActive : ''}`}
-                                        onClick={() => setActivePage(page)}
-                                        aria-label={`Сторінка ${page}`}
-                                        aria-current={activePage === page ? 'page' : undefined}
-                                    >
-                                        {String(page).padStart(2, '0')}
-                                    </button>
-                                ))}
-                                <button
-                                    id="pagination-next"
-                                    type="button"
-                                    className={s.pageNavBtn}
-                                    onClick={() => setActivePage(p => Math.min(TOTAL_PAGES, p + 1))}
-                                    disabled={activePage === TOTAL_PAGES}
-                                    aria-label="Наступна сторінка"
-                                >
-                                    <svg width="8" height="13" viewBox="0 0 8 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 1L7 6.5L1 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                </button>
-                            </div>
+                            <Pagination
+                                currentPage={activePage}
+                                totalPages={TOTAL_PAGES}
+                                onPageChange={setActivePage}
+                                className={s.pagination}
+                            />
 
                             {/* Show more button */}
                             <div className={s.showMoreWrap}>
-                                <button id="show-more-btn" type="button" className={s.showMoreBtn}>
-                                    показать еще
-                                    <svg width="10" height="15" viewBox="0 0 10 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 1L9 7.5L1 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                </button>
+                                <ShowMoreButton />
                             </div>
                         </div>
                     </div>
