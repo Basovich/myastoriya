@@ -92,74 +92,76 @@ export default function FilterContent({ category }: FilterContentProps) {
                     />
 
                     <div className={s.mainInner}>
-                        <aside className={s.sidebar}>
-                            <FilterSidebar />
-                        </aside>
-
-                        {/* Results column */}
-                        <div className={s.results}>
-                            {/* Toolbar */}
-                            <div className={s.toolbar}>
-                                {/* Sort dropdown - Moved to the left */}
-                                <SortSelect
-                                    label="Сортувати:"
-                                    value={sortBy}
-                                    options={SORT_OPTIONS}
-                                    onChange={setSortBy}
-                                    className={s.sortWrap}
-                                />
-
-                                {/* Mobile filter button */}
-                                <button
-                                    id="filter-btn"
-                                    type="button"
-                                    className={s.filterBtn}
-                                    onClick={() => setIsFilterOpen(true)}
-                                >
-                                    <svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M1 1H15M4 7H12M7 13H9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                    Фільтр
-                                    <span className={s.filterDot} />
-                                </button>
-
-                                {/* View toggles */}
-                                <ViewToggle view={view} onViewChange={setView} className={s.viewToggle} />
-                            </div>
-
-                            {/* Product list */}
-                            <div className={s.productList}>
-                                {MOCK_RESULTS.length > 0 ? (
-                                    MOCK_RESULTS.map(product => (
-                                        <FilterProductRow
-                                            key={product.id}
-                                            id={product.id}
-                                            title={product.title}
-                                            weight={product.weight}
-                                            price={product.price}
-                                            oldPrice={product.oldPrice}
-                                            unit={product.unit}
-                                            badge={product.badge}
-                                            image={product.image}
-                                            description={product.description}
-                                        />
-                                    ))
-                                ) : (
-                                    <div className={s.noResults}>Товарів не знайдено</div>
-                                )}
-                            </div>
-
-                            {/* Pagination */}
-                            <Pagination
-                                currentPage={activePage}
-                                totalPages={TOTAL_PAGES}
-                                onPageChange={setActivePage}
-                                className={s.pagination}
+                        {/* Toolbar - Full width on top */}
+                        <div className={s.toolbar}>
+                            {/* Sort dropdown */}
+                            <SortSelect
+                                label="Сортувати:"
+                                value={sortBy}
+                                options={SORT_OPTIONS}
+                                onChange={setSortBy}
+                                className={s.sortWrap}
                             />
 
-                            {/* Show more button */}
-                            <div className={s.showMoreWrap}>
-                                <ShowMoreButton />
+                            {/* Mobile filter button */}
+                            <button
+                                id="filter-btn"
+                                type="button"
+                                className={s.filterBtn}
+                                onClick={() => setIsFilterOpen(true)}
+                            >
+                                <svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 1H15M4 7H12M7 13H9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                Фільтр
+                                <span className={s.filterDot} />
+                            </button>
+
+                            {/* View toggles */}
+                            <ViewToggle view={view} onViewChange={setView} className={s.viewToggle} />
+                        </div>
+
+                        <div className={s.contentLayout}>
+                            <aside className={s.sidebar}>
+                                <FilterSidebar />
+                            </aside>
+
+                            {/* Results column */}
+                            <div className={s.results}>
+                                {/* Product list */}
+                                <div className={s.productList}>
+                                    {MOCK_RESULTS.length > 0 ? (
+                                        MOCK_RESULTS.map(product => (
+                                            <FilterProductRow
+                                                key={product.id}
+                                                id={product.id}
+                                                title={product.title}
+                                                weight={product.weight}
+                                                price={product.price}
+                                                oldPrice={product.oldPrice}
+                                                unit={product.unit}
+                                                badge={product.badge}
+                                                image={product.image}
+                                                description={product.description}
+                                            />
+                                        ))
+                                    ) : (
+                                        <div className={s.noResults}>Товарів не знайдено</div>
+                                    )}
+                                </div>
+
+                                {/* Pagination */}
+                                <Pagination
+                                    currentPage={activePage}
+                                    totalPages={TOTAL_PAGES}
+                                    onPageChange={setActivePage}
+                                    className={s.pagination}
+                                />
+
+                                {/* Show more button */}
+                                <div className={s.showMoreWrap}>
+                                    <ShowMoreButton />
+                                </div>
                             </div>
                         </div>
                     </div>
