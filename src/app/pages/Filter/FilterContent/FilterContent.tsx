@@ -43,10 +43,10 @@ const MOCK_RELATED: Product[] = MOCK_RESULTS.slice(0, 4);
 const MOCK_ORDERED: Product[] = MOCK_RESULTS.slice(0, 4);
 
 const SORT_OPTIONS = [
-    'По популярності',
-    'Спочатку дешевші',
-    'Спочатку дорожчі',
-    'Новинки',
+    'За замовчуванням',
+    'За популярністю',
+    'від дешевих до дорогих',
+    'від дорогих до дешевих',
 ];
 
 const TOTAL_PAGES = 6;
@@ -92,7 +92,6 @@ export default function FilterContent({ category }: FilterContentProps) {
                     />
 
                     <div className={s.mainInner}>
-                        {/* Desktop sidebar */}
                         <aside className={s.sidebar}>
                             <FilterSidebar />
                         </aside>
@@ -101,6 +100,15 @@ export default function FilterContent({ category }: FilterContentProps) {
                         <div className={s.results}>
                             {/* Toolbar */}
                             <div className={s.toolbar}>
+                                {/* Sort dropdown - Moved to the left */}
+                                <SortSelect
+                                    label="Сортувати:"
+                                    value={sortBy}
+                                    options={SORT_OPTIONS}
+                                    onChange={setSortBy}
+                                    className={s.sortWrap}
+                                />
+
                                 {/* Mobile filter button */}
                                 <button
                                     id="filter-btn"
@@ -117,15 +125,6 @@ export default function FilterContent({ category }: FilterContentProps) {
 
                                 {/* View toggles */}
                                 <ViewToggle view={view} onViewChange={setView} className={s.viewToggle} />
-
-                                {/* Sort dropdown */}
-                                <SortSelect
-                                    label="Сортування:"
-                                    value={sortBy}
-                                    options={SORT_OPTIONS}
-                                    onChange={setSortBy}
-                                    className={s.sortWrap}
-                                />
                             </div>
 
                             {/* Product list */}

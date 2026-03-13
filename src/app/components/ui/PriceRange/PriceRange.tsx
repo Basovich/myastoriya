@@ -52,6 +52,32 @@ export default function PriceRange({
                 </div>
             )}
 
+            <div className={s.priceInputs}>
+                <div className={s.priceInputWrap}>
+                    <span className={s.priceLabel}>От</span>
+                    <input
+                        type="number"
+                        className={s.priceInput}
+                        value={from}
+                        min={min}
+                        max={to - step}
+                        onChange={handleFromChange}
+                    />
+                </div>
+                <div className={s.priceInputWrap}>
+                    <span className={s.priceLabel}>До</span>
+                    <input
+                        type="number"
+                        className={s.priceInput}
+                        value={to}
+                        min={from + step}
+                        max={max}
+                        onChange={handleToChange}
+                    />
+                </div>
+                <button type="button" className={s.okBtn}>OK</button>
+            </div>
+
             <div className={s.sliderWrap}>
                 <div className={s.sliderTrack}>
                     <div
@@ -80,32 +106,6 @@ export default function PriceRange({
                         onChange={handleToChange}
                     />
                 </div>
-            </div>
-
-            <div className={s.priceInputs}>
-                <div className={s.priceInputWrap}>
-                    <label className={s.priceLabel}>Від</label>
-                    <input
-                        type="number"
-                        className={s.priceInput}
-                        value={from}
-                        min={min}
-                        max={to - step}
-                        onChange={handleFromChange}
-                    />
-                </div>
-                <div className={s.priceInputWrap}>
-                    <label className={s.priceLabel}>До</label>
-                    <input
-                        type="number"
-                        className={s.priceInput}
-                        value={to}
-                        min={from + step}
-                        max={max}
-                        onChange={handleToChange}
-                    />
-                </div>
-                <button type="button" className={s.okBtn}>ок</button>
             </div>
         </div>
     );

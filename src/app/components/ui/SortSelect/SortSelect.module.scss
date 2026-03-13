@@ -2,6 +2,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    position: relative;
+    z-index: 10;
 }
 
 .sortLabel {
@@ -21,35 +23,104 @@
     align-items: center;
 }
 
-.sortSelect {
+.sortSelectBtn {
     height: 36px;
-    padding: 0 32px 0 12px;
+    padding: 0 32px 0 16px;
     border-radius: 8px;
-    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    border: none;
     background: #fff;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     color: #000;
     cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
+    display: flex;
+    align-items: center;
+    position: relative;
+    transition: background-color 0.2s;
     outline: none;
-    transition: border-color 0.15s;
 
     @media (any-hover: hover) {
         &:hover {
-            border-color: #000;
+            background: #f5f5f5;
         }
     }
 
     &:focus-visible {
-        border-color: #E3051B;
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
     }
+    
+    &.isOpen {
+        .sortArrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+    }
+}
+
+.sortValue {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sortArrow {
     position: absolute;
-    right: 10px;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     pointer-events: none;
-    color: rgba(0, 0, 0, 0.5);
+    color: #000;
+    transition: transform 0.2s;
+}
+
+.sortDropdown {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: max-content;
+    min-width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdownPlaceholder {
+    padding: 10px 16px;
+    font-size: 14px;
+    color: #E3051B;
+    font-weight: 400;
+    background: #F8F8F8;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.optionsList {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.optionItem {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #000;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            background: #F5F5F5;
+            color: #E3051B;
+        }
+    }
+
+    &.optionSelected {
+        color: #E3051B;
+        font-weight: 700;
+    }
 }

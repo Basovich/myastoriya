@@ -110,38 +110,47 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .priceInputWrap {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: center;
     flex: 1;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 10px 12px;
+    position: relative;
+    background: #fff;
+    transition: border-color 0.2s;
+
+    &:focus-within {
+        border-color: #E3051B;
+    }
 }
 
 .priceLabel {
+    position: absolute;
+    top: -6px;
+    left: 10px;
+    background: #fff;
+    padding: 0 4px;
     font-size: 11px;
     color: rgba(0, 0, 0, 0.5);
     font-weight: 400;
+    line-height: 1;
 }
 
 .priceInput {
     width: 100%;
-    height: 36px;
-    border: 1px solid #E0E0E0;
-    border-radius: 8px;
-    padding: 0 10px;
+    border: none;
+    padding: 0;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     color: #000;
-    background: #fff;
+    background: transparent;
     outline: none;
-    transition: border-color 0.2s;
-
-    &:focus-visible {
-        border-color: #E3051B;
-    }
+    line-height: 1;
 
     // Remove number arrows
     &::-webkit-outer-spin-button,
@@ -151,26 +160,28 @@
     }
     &[type='number'] {
         -moz-appearance: textfield;
+        appearance: textfield;
     }
 }
 
 .okBtn {
-    align-self: flex-end;
-    height: 36px;
+    align-self: stretch;
     padding: 0 14px;
-    border: 1px solid #E0E0E0;
+    border: 1px solid rgba(0, 0, 0, 0.5);
     border-radius: 8px;
     background: #fff;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     color: #000;
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     @media (any-hover: hover) {
         &:hover {
-            background: #f5f5f5;
-            border-color: #ccc;
+            border-color: #000;
         }
     }
 
@@ -179,3 +190,4 @@
         outline-offset: 2px;
     }
 }
+
