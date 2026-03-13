@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import s from './FilterSidebar.module.scss';
 import FilterGroup from '@/app/components/ui/FilterGroup/FilterGroup';
+import FilterCheckbox from '@/app/components/ui/FilterCheckbox/FilterCheckbox';
 import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
 import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
@@ -113,13 +114,13 @@ export default function FilterSidebar({ onApply, onClose }: FilterSidebarProps) 
 
             <FilterGroup title="ТИП М'ЯСА">
                 {MEAT_TYPES.map(option => (
-                    <FilterPill
+                    <FilterCheckbox
                         key={option}
                         active={filters.meatType.includes(option)}
                         onClick={() => toggleOption('meatType', option)}
                     >
                         {option}
-                    </FilterPill>
+                    </FilterCheckbox>
                 ))}
             </FilterGroup>
 
