@@ -15,6 +15,7 @@ import Pagination from '@/app/components/ui/Pagination/Pagination';
 import ViewToggle, { ViewType } from '@/app/components/ui/ViewToggle/ViewToggle';
 import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
 import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
+import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
 
 interface Product {
     id: number;
@@ -47,6 +48,21 @@ const SORT_OPTIONS = [
     'За популярністю',
     'від дешевих до дорогих',
     'від дорогих до дешевих',
+];
+
+const FAQ_DATA = [
+    {
+        question: 'Доставка преміальних стейків Україною?',
+        answer: 'Для того, щоб посмакувати стейки щойно з гриля від наших шефів, немає кращого місця ніж фірмові магазини-ресторани «М\'ясторія» у Києві. Проте ви можете замовити відбірні стейки та свіжу мармурову яловичину в будь-яку точку України та приготувати улюблені страви вдома. Адже ми доставляємо сиру продукцію в охолодженому вигляді всією країною!'
+    },
+    {
+        question: 'Новинки у лінійці «Томлене м\'ясо» від «М\'ясторія»?',
+        answer: 'В нашій новій лінійці представлені унікальні рецепти томленого м\'яса, які готуються за низьких температур протягом багатьох годин. Це дозволяє зберегти максимум смаку та користі.'
+    },
+    {
+        question: 'Як правильно готувати мармурову яловичину?',
+        answer: 'Рекомендуємо смажити м\'ясо на добре розігрітій сковороді або грилі, попередньо давши йому "відпочити" при кімнатній температурі.'
+    }
 ];
 
 const TOTAL_PAGES = 6;
@@ -206,6 +222,13 @@ export default function FilterContent({ category }: FilterContentProps) {
                                 />
                             ))}
                         </div>
+                    </div>
+                </div>
+
+                {/* FAQ */}
+                <div className={s.faqSection}>
+                    <div className={s.relatedInner}>
+                        <FaqAccordion items={FAQ_DATA} />
                     </div>
                 </div>
             </div>

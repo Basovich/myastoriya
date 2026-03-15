@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import anime from 'animejs';
 import s from './FilterGroup.module.scss';
 
 interface FilterGroupProps {
@@ -17,12 +18,29 @@ export default function FilterGroup({
     className = '',
 }: FilterGroupProps) {
     const [isOpen, setIsOpen] = useState(initialOpen);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const innerRef = useRef<HTMLDivElement>(null);
+
+    const toggleOpen = () => {
+        setIsOpen(!isOpen);
+    };
+
+    useEffect(() => {
+        if (!contentRef.current || !innerRef.current) return;
+        
+        anime({
+            targets: contentRef.current,
+            height: isOpen ? innerRef.current.scrollHeight : 0,
+            duration: 350,
+            easing: 'easeInOutQuad'
+        });
+    }, [isOpen]);
 
     return (
         <div className={`${s.filterGroup} ${className}`}>
             <button
                 className={s.groupHeader}
-                onClick={() => setIsOpen(v => !v)}
+                onClick={toggleOpen}
                 aria-expanded={isOpen}
                 type="button"
             >
@@ -38,11 +56,15 @@ export default function FilterGroup({
                     <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             </button>
-            {isOpen && (
-                <div className={s.groupOptions}>
+            <div 
+                className={s.groupOptionsWrap} 
+                ref={contentRef}
+                style={{ height: initialOpen ? 'auto' : 0, overflow: 'hidden' }}
+            >
+                <div className={s.groupOptions} ref={innerRef}>
                     {children}
                 </div>
-            )}
+            </div>
             <div className={s.divider} />
         </div>
     );

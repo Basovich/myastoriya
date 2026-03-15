@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useTransition, animated, config } from '@react-spring/web';
 import s from './FilterModal.module.scss';
 import FilterSidebar from '@/app/pages/Filter/FilterSidebar/FilterSidebar';
 
@@ -22,11 +23,28 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
         };
     }, [isOpen]);
 
-    if (!isOpen) return null;
+    // Transition for the overlay (fade) and drawer (slide up)
+    const transitions = useTransition(isOpen, {
+        from: { opacity: 0, transform: 'translateY(100%)' },
+        enter: { opacity: 1, transform: 'translateY(0%)' },
+        leave: { opacity: 0, transform: 'translateY(100%)' },
+        config: { ...config.stiff, clamp: true }
+    });
 
-    return (
-        <div className={s.overlay} onClick={onClose} role="dialog" aria-modal="true" aria-label="Фільтри">
-            <div className={s.drawer} onClick={e => e.stopPropagation()}>
+    return transitions((style, item) => item ? (
+        <animated.div 
+            className={s.overlay} 
+            onClick={onClose} 
+            role="dialog" 
+            aria-modal="true" 
+            aria-label="Фільтри"
+            style={{ opacity: style.opacity }}
+        >
+            <animated.div 
+                className={s.drawer} 
+                onClick={e => e.stopPropagation()}
+                style={{ transform: style.transform }}
+            >
                 <div className={s.header}>
                     <h2 className={s.title}>Фільтр</h2>
                     <button
@@ -43,7 +61,7 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
                 <div className={s.body}>
                     <FilterSidebar onClose={onClose} />
                 </div>
-            </div>
-        </div>
-    );
+            </animated.div>
+        </animated.div>
+    ) : null);
 }

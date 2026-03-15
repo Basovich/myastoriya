@@ -201,7 +201,7 @@ div.heroBanner {
 }
 
 .orderedSection {
-    background: #F5F5F5;
+    background: #fff;
     padding: 40px 0;
 
     @media (min-width: 1280px) {
@@ -243,5 +243,14 @@ div.heroBanner {
     @media (min-width: 1280px) {
         grid-template-columns: repeat(4, 1fr);
         gap: 20px;
+    }
+}
+
+.faqSection {
+    background: #F5F5F5;
+    padding: 40px 0;
+
+    @media (min-width: 1280px) {
+        padding: 60px 0;
     }
 }

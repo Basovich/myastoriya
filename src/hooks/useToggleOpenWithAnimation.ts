@@ -1,15 +1,18 @@
 import { useRef, useState, useEffect } from "react";
 import { animated, useSpring } from "@react-spring/web";
 
-export function useToggleOpenWithAnimation() {
-    const [isOpen, setIsOpen] = useState(false);
+export function useToggleOpenWithAnimation(initialOpen = false) {
+    const [isOpen, setIsOpen] = useState(initialOpen);
 
     const ref = useRef<HTMLDivElement>(null);
 
     const [style, api] = useSpring(() => ({
-        from: { maxHeight: "0px", opacity: 0 },
+        from: { 
+            maxHeight: initialOpen ? "2000px" : "0px", 
+            opacity: initialOpen ? 1 : 0 
+        },
         config: { tension: 170, friction: 26, clamp: true },
-    }), []);
+    }), [initialOpen]);
 
     const AnimatedDiv = animated.div;
 
