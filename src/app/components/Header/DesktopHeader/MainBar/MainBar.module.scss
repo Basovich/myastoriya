@@ -1,6 +1,7 @@
 .mainBar {
     background: #000000;
     padding: 0;
+    position: relative;
 }
 
 .mainBarInner {
@@ -41,6 +42,8 @@
     border-radius: 12px;
     font-size: 14px;
     font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
 
     @media (any-hover: hover) {
         &:hover {
@@ -51,6 +54,16 @@
 
     .catalogBtnInner {
         padding-top: 4px;
+    }
+
+    &.active {
+        border-color: var(--color-accent, #E6000F);
+        background: #1a1a1a;
+        z-index: 101;
+
+        .catalogBtnInner {
+            color: var(--color-accent, #E6000F);
+        }
     }
 }
 

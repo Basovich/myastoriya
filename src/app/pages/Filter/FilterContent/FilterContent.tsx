@@ -145,21 +145,34 @@ export default function FilterContent({ category }: FilterContentProps) {
                             {/* Results column */}
                             <div className={s.results}>
                                 {/* Product list */}
-                                <div className={s.productList}>
+                                <div className={`${s.productList} ${view === 'grid' ? s.productListGrid : ''}`}>
                                     {MOCK_RESULTS.length > 0 ? (
                                         MOCK_RESULTS.map(product => (
-                                            <FilterProductRow
-                                                key={product.id}
-                                                id={product.id}
-                                                title={product.title}
-                                                weight={product.weight}
-                                                price={product.price}
-                                                oldPrice={product.oldPrice}
-                                                unit={product.unit}
-                                                badge={product.badge}
-                                                image={product.image}
-                                                description={product.description}
-                                            />
+                                            view === 'grid' ? (
+                                                <ProductCard
+                                                    key={product.id}
+                                                    id={product.id}
+                                                    title={product.title}
+                                                    weight={product.weight}
+                                                    price={product.price}
+                                                    unit={product.unit}
+                                                    badge={product.badge}
+                                                    image={product.image}
+                                                />
+                                            ) : (
+                                                <FilterProductRow
+                                                    key={product.id}
+                                                    id={product.id}
+                                                    title={product.title}
+                                                    weight={product.weight}
+                                                    price={product.price}
+                                                    oldPrice={product.oldPrice}
+                                                    unit={product.unit}
+                                                    badge={product.badge}
+                                                    image={product.image}
+                                                    description={product.description}
+                                                />
+                                            )
                                         ))
                                     ) : (
                                         <div className={s.noResults}>Товарів не знайдено</div>

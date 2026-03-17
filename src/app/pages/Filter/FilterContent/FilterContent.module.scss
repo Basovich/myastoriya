@@ -175,6 +175,17 @@ div.heroBanner {
     }
 }
 
+.productListGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    @media (min-width: 1280px) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+}
+
 .noResults {
     text-align: center;
     padding: 60px 20px;
