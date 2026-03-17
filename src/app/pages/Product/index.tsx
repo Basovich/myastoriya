@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import styles from './Product.module.scss';
 import Container from '@/app/components/ui/Container/Container';

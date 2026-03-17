@@ -1,5 +1,3 @@
-@import "src/app/styles/mixins";
-
 .productPage {
     padding-top: 20px;
     padding-bottom: 80px;
@@ -183,8 +181,10 @@
         border-bottom-color: var(--color-accent);
     }
 
-    @include any-hover {
-        opacity: 1;
+    @media (any-hover: hover) {
+      &:hover {
+          opacity: 1;
+      }
     }
 
     &:focus-visible {
@@ -261,8 +261,10 @@
         }
     }
 
-    @include any-hover {
-        border-color: var(--color-accent);
+    @media (any-hover: hover) {
+      &:hover {
+          border-color: var(--color-accent);
+      }
     }
 }
 
