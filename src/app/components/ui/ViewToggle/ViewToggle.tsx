@@ -24,11 +24,11 @@ export default function ViewToggle({
                 onClick={() => onViewChange('grid')}
                 aria-label="Сітка"
             >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                    <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                    <rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                    <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0.8" y="0.8" width="7.4" height="7.4" rx="1.2" stroke="currentColor" strokeWidth="1.6"/>
+                    <rect x="11.8" y="0.8" width="7.4" height="7.4" rx="1.2" stroke="currentColor" strokeWidth="1.6"/>
+                    <rect x="0.8" y="11.8" width="7.4" height="7.4" rx="1.2" stroke="currentColor" strokeWidth="1.6"/>
+                    <rect x="11.8" y="11.8" width="7.4" height="7.4" rx="1.2" stroke="currentColor" strokeWidth="1.6"/>
                 </svg>
             </button>
             <button
@@ -37,13 +37,9 @@ export default function ViewToggle({
                 onClick={() => onViewChange('list')}
                 aria-label="Список"
             >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="1" y="1" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M8 3H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                    <rect x="1" y="6.5" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M8 8.5H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                    <rect x="1" y="12" width="4" height="4" rx="0.5" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M8 14H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0.8" y="0.8" width="18.4" height="7.4" rx="1.2" stroke="currentColor" strokeWidth="1.6"/>
+                    <rect x="0.8" y="11.8" width="18.4" height="7.4" rx="1.2" stroke="currentColor" strokeWidth="1.6"/>
                 </svg>
             </button>
         </div>
