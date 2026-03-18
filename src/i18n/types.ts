@@ -150,6 +150,26 @@ export interface HomeDict {
     showBtn: string;
   };
   blogPage: BlogPageDict;
+  careersPage: CareersPageDict;
+}
+
+export interface CareersPageDict {
+  title: string;
+  breadcrumbs: {
+    home: string;
+    careers: string;
+  };
+  hero: {
+    title: string;
+    subtitle: string;
+  };
+  form: {
+    button: string;
+  };
+  about: {
+    title: string;
+    text: string;
+  };
 }
 
 export interface Dictionary {
