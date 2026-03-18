@@ -11,6 +11,7 @@ interface ButtonProps {
     className?: string;
     type?: "button" | "submit";
     ariaLabel?: string;
+    disabled?: boolean;
 }
 
 export default function Button({
@@ -22,19 +23,20 @@ export default function Button({
     className = "",
     type = "button",
     ariaLabel,
+    disabled
 }: ButtonProps) {
     const classes = `${s.btn} ${s[variant]} ${active ? s.active : ""} ${className}`.trim();
 
     if (href) {
         return (
-            <a href={href} className={classes} aria-label={ariaLabel}>
+            <a href={href} className={classes} aria-label={ariaLabel} {...(disabled && { disabled: true})}>
                 {children}
             </a>
         );
     }
 
     return (
-        <button type={type} className={classes} onClick={onClick} aria-label={ariaLabel}>
+        <button type={type} className={classes} onClick={onClick} aria-label={ariaLabel} {...(disabled && { disabled: true})}>
             {children}
         </button>
     );

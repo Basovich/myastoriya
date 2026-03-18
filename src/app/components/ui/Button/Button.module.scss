@@ -133,7 +133,7 @@
     display: flex;
     width: fit-content;
     height: 46px;
-    background-color: #E3051B;
+    background-color: var(--color-accent);
     color: #FFF;
     font-size: 14px;
     font-style: normal;
@@ -146,7 +146,12 @@
 
     @media (any-hover: hover) {
         &:hover {
-            background-color: #b71a20;
+            background: var(--color-accent-hover);
         }
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 }

@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import s from './AuthModal.module.scss';
+import Button from "@/app/components/ui/Button/Button";
 
 // Stub API call — replace with real endpoint
 async function resetPasswordAPI(phone: string, password: string): Promise<void> {
@@ -127,9 +128,13 @@ export default function ResetPasswordForm({ phone, onSuccess, onBack }: ResetPas
 
                 {formik.status && <div className={s.error}>{formik.status}</div>}
 
-                <button type="submit" className={s.submitBtn} disabled={formik.isSubmitting}>
+                <Button type="submit"
+                        className={s.submitBtn}
+                        disabled={formik.isSubmitting}
+                        variant='red'
+                >
                     {formik.isSubmitting ? 'Зачекайте...' : 'Зберегти'}
-                </button>
+                </Button>
 
                 <div className={s.switchText}>
                     <button type="button" className={s.switchLink} onClick={onBack}>

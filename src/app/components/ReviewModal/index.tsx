@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import clsx from 'clsx';
 import useScrollLock from '@/hooks/useScrollLock';
 import s from './ReviewModal.module.scss';
+import Button from "@/app/components/ui/Button/Button";
 
 interface ReviewModalProps {
     isOpen: boolean;
@@ -197,9 +198,13 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                                 </div>
                             )}
 
-                            <button type="submit" className={s.submitBtn} disabled={formik.isSubmitting}>
+                            <Button type="submit"
+                                    className={s.submitBtn}
+                                    disabled={formik.isSubmitting}
+                                    variant='red'
+                            >
                                 {formik.isSubmitting ? 'Надсилаємо...' : 'Відправити'}
-                            </button>
+                            </Button>
                         </form>
                     </>
                 )}

@@ -10,6 +10,7 @@ import { usePhoneMask } from '@/hooks/usePhoneMask';
 import clsx from 'clsx';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
+import Button from "@/app/components/ui/Button/Button";
 
 const COUNTDOWN_SECONDS = 60;
 const PHONE_REGEX = /^380\d{9}$/;
@@ -396,9 +397,13 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
 
                 {formik.status && <div className={s.error}>{formik.status}</div>}
 
-                <button type="submit" className={s.submitBtn} disabled={formik.isSubmitting}>
+                <Button type="submit"
+                        className={s.submitBtn}
+                        disabled={formik.isSubmitting}
+                        variant='red'
+                >
                     {formik.isSubmitting ? 'Зачекайте...' : 'ЗАРЕЄСТРУВАТИСЬ'}
-                </button>
+                </Button>
 
                 <div className={s.switchText}>
                     <button type="button" className={s.switchLink} onClick={onSwitchToLogin}>

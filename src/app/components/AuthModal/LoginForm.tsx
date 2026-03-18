@@ -9,6 +9,7 @@ import { usePhoneMask } from '@/hooks/usePhoneMask';
 import clsx from 'clsx';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
+import Button from "@/app/components/ui/Button/Button";
 
 // Stub API function — ready for real API integration
 async function loginAPI(phone: string, password: string) {
@@ -124,9 +125,13 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSucc
 
                 {formik.status && <div className={s.error}>{formik.status}</div>}
 
-                <button type="submit" className={s.submitBtn} disabled={formik.isSubmitting}>
+                <Button type="submit"
+                        className={s.submitBtn}
+                        disabled={formik.isSubmitting}
+                        variant='red'
+                >
                     {formik.isSubmitting ? 'Зачекайте...' : 'УВІЙТИ'}
-                </button>
+                </Button>
 
                 <div className={s.switchText}>
                     <button type="button" className={s.switchLink} onClick={onSwitchToRegister}>

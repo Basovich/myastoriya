@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import clsx from 'clsx';
 import s from './AuthModal.module.scss';
+import Button from "@/app/components/ui/Button/Button";
 
 const COUNTDOWN_SECONDS = 60;
 const PHONE_REGEX = /^380\d{9}$/;
@@ -259,13 +260,14 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
                     )}
                 </div>
 
-                <button
+                <Button
                     type="submit"
                     className={s.submitBtn}
                     disabled={!phoneVerified}
+                    variant='red'
                 >
                     Відновити
-                </button>
+                </Button>
 
                 <div className={s.switchText}>
                     <button type="button" className={s.switchLink} onClick={onBack}>

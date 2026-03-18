@@ -349,33 +349,11 @@
 
 .submitBtn {
     width: 100%;
-    height: 46px;
-    background: #e3051b;
-    border: none;
-    border-radius: 8px;
-    padding-top: 2px;
-    color: #FFF;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 142.857%;
-    text-transform: uppercase;
-    transition: background 0.2s;
     margin-top: 4px;
 
     @media (any-hover: hover) {
         &:hover {
             background: #cc0018;
         }
-    }
-
-    &:focus-visible {
-        outline: 2px solid #e3051b;
-        outline-offset: 2px;
-    }
-
-    &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
     }
 }
