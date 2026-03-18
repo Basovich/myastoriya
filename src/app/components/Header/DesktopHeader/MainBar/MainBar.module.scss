@@ -55,16 +55,6 @@
     .catalogBtnInner {
         padding-top: 4px;
     }
-
-    &.active {
-        border-color: var(--color-accent, #E6000F);
-        background: #1a1a1a;
-        z-index: 101;
-
-        .catalogBtnInner {
-            color: var(--color-accent, #E6000F);
-        }
-    }
 }
 
 .burgerBtn {

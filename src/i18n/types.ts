@@ -167,7 +167,6 @@ export interface CareersPageDict {
     button: string;
   };
   about: {
-    title: string;
     text: string;
   };
 }

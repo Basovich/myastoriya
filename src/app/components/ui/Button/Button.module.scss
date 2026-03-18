@@ -127,3 +127,26 @@
         color: #fff;
     }
 }
+
+/* Red — large red CTA button */
+.red {
+    display: flex;
+    width: fit-content;
+    height: 46px;
+    background-color: #E3051B;
+    color: #FFF;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 142%;
+    text-transform: uppercase;
+    padding: 14px 32px 11px;
+    border-radius: 8px;
+    letter-spacing: 0.05em;
+
+    @media (any-hover: hover) {
+        &:hover {
+            background-color: #b71a20;
+        }
+    }
+}
