@@ -150,8 +150,19 @@ export interface HomeDict {
     showBtn: string;
   };
   blogPage: BlogPageDict;
+  blogPostPage: BlogPostPageDict;
   careersPage: CareersPageDict;
   applicantFormPage: ApplicantFormPageDict;
+  contactsPage: ContactsPageDict;
+}
+
+export interface BlogPostPageDict {
+  breadcrumbs: {
+    home: string;
+    blog: string;
+  };
+  shareText: string;
+  recommendedProductsTitle: string;
 }
 
 export interface ApplicantFormPageDict {
@@ -199,6 +210,27 @@ export interface CareersPageDict {
   };
   about: {
     text: string;
+  };
+}
+
+export interface ContactsPageDict {
+  title: string;
+  breadcrumbs: {
+    home: string;
+    contacts: string;
+  };
+  sections: {
+    callCenter: string;
+    restaurants: string;
+    meatBar: string;
+  };
+  labels: {
+    workingHours: string;
+    phone: string;
+    email: string;
+    address: string;
+    restaurantAddress: string;
+    buildRoute: string;
   };
 }
 

@@ -1,6 +1,6 @@
 import s from "./Button.module.scss";
 
-type ButtonVariant = "primary" | "outline"  | "outline-black" | "icon" | "pill" | "red";
+type ButtonVariant = "primary" | "outline"  | "outline-black" | "icon" | "pill" | "red" | "black";
 
 interface ButtonProps {
     variant?: ButtonVariant;
@@ -12,6 +12,7 @@ interface ButtonProps {
     type?: "button" | "submit";
     ariaLabel?: string;
     disabled?: boolean;
+    [key: string]: any;
 }
 
 export default function Button({
@@ -23,20 +24,21 @@ export default function Button({
     className = "",
     type = "button",
     ariaLabel,
-    disabled
+    disabled,
+    ...props
 }: ButtonProps) {
     const classes = `${s.btn} ${s[variant]} ${active ? s.active : ""} ${className}`.trim();
 
     if (href) {
         return (
-            <a href={href} className={classes} aria-label={ariaLabel} {...(disabled && { disabled: true})}>
+            <a href={href} className={classes} aria-label={ariaLabel} {...(disabled && { disabled: true})} {...props}>
                 {children}
             </a>
         );
     }
 
     return (
-        <button type={type} className={classes} onClick={onClick} aria-label={ariaLabel} {...(disabled && { disabled: true})}>
+        <button type={type} className={classes} onClick={onClick} aria-label={ariaLabel} {...(disabled && { disabled: true})} {...props}>
             {children}
         </button>
     );

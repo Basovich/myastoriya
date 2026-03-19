@@ -155,3 +155,20 @@
         cursor: not-allowed;
     }
 }
+
+/* Black — filled black button */
+.black {
+    background: #000;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: none;
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+}

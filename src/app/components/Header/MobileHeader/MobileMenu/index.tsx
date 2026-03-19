@@ -140,16 +140,21 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                 {/* Footer */}
                 <div className={s.menuFooter}>
                     <nav className={s.footerLinks}>
-                        {siteData.navigation.map((item, i) => (
-                            <Link
-                                key={i}
-                                href={item.label === "Акції" ? getLocalizedHref(item.href, lang) : "#"}
-                                className={s.footerLink}
-                                onClick={item.label === "Акції" ? onClose : undefined}
-                            >
-                                {item.label}
-                            </Link>
-                        ))}
+                        {siteData.navigation.map((item, i) => {
+                            const isPlaceholder = item.href === "#";
+                            const href = isPlaceholder ? "#" : getLocalizedHref(item.href, lang);
+                            
+                            return (
+                                <Link
+                                    key={i}
+                                    href={href}
+                                    className={s.footerLink}
+                                    onClick={!isPlaceholder ? onClose : undefined}
+                                >
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
                     </nav>
                 </div>
             </div>

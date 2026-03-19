@@ -98,13 +98,13 @@ export default function Footer({ lang }: FooterProps) {
                         <p className={s.contactItem}>{contact.phone}</p>
                         <p className={s.contactItem}>{contact.email}</p>
                         <p className={s.contactItem}>Час роботи: {contact.workingHours}</p>
-                        <a href="#" className={s.addressBtn}>
+                        <Link href={getLocalizedHref("/contacts", lang)} className={s.addressBtn}>
                             <span className={s.addressBtnNext}>АДРЕСИ РЕСТОРАНІВ</span>
                             <svg className={s.addressBtnIcon} xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                                 <path d="M9.98565 0.999701L16.3141 7.32812L9.98565 13.6565" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                                 <line x1="15" y1="7.17187" x2="1" y2="7.17187" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                             </svg>
-                        </a>
+                        </Link>
                     </div>
 
                     <div className={s.paymentSection}>

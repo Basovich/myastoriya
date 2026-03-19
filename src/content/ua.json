@@ -467,6 +467,34 @@
                     "invalidPhone": "Введіть повний номер: +38 (0XX) XXX XX XX"
                 }
             }
+        },
+        "contactsPage": {
+            "title": "КОНТАКТИ",
+            "breadcrumbs": {
+                "home": "Головна",
+                "contacts": "Контакти"
+            },
+            "sections": {
+                "callCenter": "Колцентр М'ясторія (доставка замовлень)",
+                "restaurants": "Контакти ресторанів М'ясторія",
+                "meatBar": "Контакти ресторанів Meat Bar"
+            },
+            "labels": {
+                "workingHours": "Графік роботи:",
+                "phone": "Телефон",
+                "email": "e-mail",
+                "address": "Адреса офісу",
+                "restaurantAddress": "Адреса",
+                "buildRoute": "Побудувати маршрут на карті"
+            }
+        },
+        "blogPostPage": {
+            "breadcrumbs": {
+                "home": "Головна",
+                "blog": "Блог"
+            },
+            "shareText": "Поділитися в",
+            "recommendedProductsTitle": "Товари для рецепта"
         }
     }
 }
