@@ -5,6 +5,7 @@ import { usePhoneMask } from '@/hooks/usePhoneMask';
 import clsx from 'clsx';
 import s from './AuthModal.module.scss';
 import Button from "@/app/components/ui/Button/Button";
+import InputField from '@/app/components/ui/InputField';
 
 const COUNTDOWN_SECONDS = 60;
 const PHONE_REGEX = /^380\d{9}$/;
@@ -171,31 +172,27 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
             >
                 {/* Phone */}
                 <div className={s.field}>
-                    <input
+                    <InputField
                         id="forgot-phone"
                         type="tel"
                         autoComplete="off"
                         readOnly
                         onFocus={(e) => {
-                            e.currentTarget.removeAttribute('readOnly');
+                            e.currentTarget.removeAttribute('readonly');
                             setPhoneTouched(false);
                         }}
-                        className={clsx(
-                            s.input,
-                            showPhoneError && s.inputError,
-                            phoneVerified && s.inputVerified,
-                        )}
-                        placeholder="+38 (0__) ___ __ __"
+                        className={phoneVerified ? s.inputVerified : undefined}
+                        label="Телефон"
+                        required
                         value={phoneFormatted}
                         onChange={handlePhoneChange}
                         onBlur={() => {
                             setPhoneTouched(true);
                             validatePhone();
                         }}
+                        error={!phoneVerified ? phoneError : undefined}
+                        touched={phoneTouched}
                     />
-                    <label htmlFor="forgot-phone" className={s.inputLabel}>
-                        Телефон<span className={s.required}>*</span>
-                    </label>
 
                     {/* Verified badge */}
                     {phoneVerified && (
@@ -206,10 +203,6 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
                             </svg>
                             Номер підтверджено
                         </span>
-                    )}
-
-                    {!phoneVerified && showPhoneError && (
-                        <span className={s.fieldError}>{phoneError}</span>
                     )}
 
                     {/* SMS block */}

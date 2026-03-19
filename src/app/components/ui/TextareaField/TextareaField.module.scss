@@ -1,0 +1,87 @@
+.fieldWrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.textarea {
+    width: 100%;
+    border: 1px solid #c4c4c4;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 16px;
+    color: #333;
+    background-color: transparent;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+    resize: vertical;
+    min-height: 120px;
+
+    &::placeholder {
+        color: transparent;
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #aaa;
+        }
+    }
+
+    &:focus-visible {
+        border-color: #000;
+    }
+
+    &:focus-visible + .label,
+    &:not(:placeholder-shown) + .label {
+        top: -9px;
+        font-size: 12px;
+        color: #666;
+        background: #fff;
+        padding: 0 4px;
+        left: 12px;
+    }
+}
+
+.textareaError {
+    border-color: #E6000F;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #E6000F;
+        }
+    }
+
+    &:focus-visible {
+        border-color: #E6000F;
+    }
+
+    & + .label {
+        color: #E6000F;
+    }
+}
+
+.label {
+    position: absolute;
+    left: 16px;
+    top: 14px;
+    font-size: 16px;
+    color: #888;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}
+
+.asterisk {
+    color: #E6000F;
+}
+
+.errorText {
+    font-size: 12px;
+    color: #E6000F;
+    margin-top: 4px;
+    padding-left: 4px;
+}

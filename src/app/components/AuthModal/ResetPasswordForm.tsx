@@ -8,6 +8,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import s from './AuthModal.module.scss';
 import Button from "@/app/components/ui/Button/Button";
+import InputField from '@/app/components/ui/InputField';
 
 // Stub API call — replace with real endpoint
 async function resetPasswordAPI(phone: string, password: string): Promise<void> {
@@ -69,62 +70,44 @@ export default function ResetPasswordForm({ phone, onSuccess, onBack }: ResetPas
             <form className={s.form} onSubmit={formik.handleSubmit} noValidate autoComplete="off">
 
                 {/* New password */}
-                <div className={s.field}>
-                    <input
-                        id="reset-password"
-                        type="password"
-                        name="password"
-                        autoComplete="new-password"
-                        readOnly
-                        onFocus={(e) => {
-                            e.currentTarget.removeAttribute('readOnly');
-                            formik.setFieldTouched('password', false);
-                        }}
-                        className={clsx(
-                            s.input,
-                            formik.touched.password && formik.errors.password && s.inputError,
-                        )}
-                        placeholder="Новий пароль"
-                        value={formik.values.password}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                    <label htmlFor="reset-password" className={s.inputLabel}>
-                        Новий пароль<span className={s.required}>*</span>
-                    </label>
-                    {formik.touched.password && formik.errors.password && (
-                        <span className={s.fieldError}>{formik.errors.password}</span>
-                    )}
-                </div>
+                <InputField
+                    id="reset-password"
+                    type="password"
+                    name="password"
+                    autoComplete="new-password"
+                    readOnly
+                    onFocus={(e) => {
+                        e.currentTarget.removeAttribute('readonly');
+                        formik.setFieldTouched('password', false);
+                    }}
+                    label="Новий пароль"
+                    required
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.password}
+                    touched={formik.touched.password}
+                />
 
                 {/* Confirm password */}
-                <div className={s.field}>
-                    <input
-                        id="reset-confirm-password"
-                        type="password"
-                        name="confirmPassword"
-                        autoComplete="new-password"
-                        readOnly
-                        onFocus={(e) => {
-                            e.currentTarget.removeAttribute('readOnly');
-                            formik.setFieldTouched('confirmPassword', false);
-                        }}
-                        className={clsx(
-                            s.input,
-                            formik.touched.confirmPassword && formik.errors.confirmPassword && s.inputError,
-                        )}
-                        placeholder="Підтвердити пароль"
-                        value={formik.values.confirmPassword}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                    <label htmlFor="reset-confirm-password" className={s.inputLabel}>
-                        Підтвердити пароль<span className={s.required}>*</span>
-                    </label>
-                    {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-                        <span className={s.fieldError}>{formik.errors.confirmPassword}</span>
-                    )}
-                </div>
+                <InputField
+                    id="reset-confirm-password"
+                    type="password"
+                    name="confirmPassword"
+                    autoComplete="new-password"
+                    readOnly
+                    onFocus={(e) => {
+                        e.currentTarget.removeAttribute('readonly');
+                        formik.setFieldTouched('confirmPassword', false);
+                    }}
+                    label="Підтвердити пароль"
+                    required
+                    value={formik.values.confirmPassword}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.confirmPassword}
+                    touched={formik.touched.confirmPassword}
+                />
 
                 {formik.status && <div className={s.error}>{formik.status}</div>}
 

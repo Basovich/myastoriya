@@ -10,6 +10,7 @@ import clsx from 'clsx';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 import Button from "@/app/components/ui/Button/Button";
+import InputField from '@/app/components/ui/InputField';
 
 // Stub API function — ready for real API integration
 async function loginAPI(phone: string, password: string) {
@@ -75,51 +76,43 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSucc
         <>
             <h2 className={s.title}>Вхід до кабінету</h2>
             <form className={s.form} onSubmit={formik.handleSubmit} noValidate autoComplete="off">
-                <div className={s.field}>
-                    <input
-                        id="login-phone"
-                        type="tel"
-                        name="phone"
-                        autoComplete="off"
-                        readOnly
-                        onFocus={(e) => {
-                            e.currentTarget.removeAttribute('readOnly');
-                            formik.setFieldTouched('phone', false);
-                        }}
-                        className={clsx(s.input, formik.touched.phone && formik.errors.phone && s.inputError)}
-                        placeholder="+38 (0__) ___ __ __"
-                        value={phoneFormatted}
-                        onChange={handlePhoneChange}
-                        onBlur={() => formik.setFieldTouched('phone', true)}
-                    />
-                    <label htmlFor="login-phone" className={s.inputLabel}>Телефон<span className={s.required}>*</span></label>
-                    {formik.touched.phone && formik.errors.phone && (
-                        <span className={s.fieldError}>{formik.errors.phone}</span>
-                    )}
-                </div>
+                <InputField
+                    id="login-phone"
+                    type="tel"
+                    name="phone"
+                    autoComplete="off"
+                    readOnly
+                    onFocus={(e) => {
+                        e.currentTarget.removeAttribute('readonly');
+                        formik.setFieldTouched('phone', false);
+                    }}
+                    label="Телефон"
+                    required
+                    value={phoneFormatted}
+                    onChange={handlePhoneChange}
+                    onBlur={() => formik.setFieldTouched('phone', true)}
+                    error={formik.errors.phone}
+                    touched={formik.touched.phone}
+                />
 
-                <div className={s.field}>
-                    <input
-                        id="login-password"
-                        type="password"
-                        name="password"
-                        autoComplete="off"
-                        readOnly
-                        onFocus={(e) => {
-                            e.currentTarget.removeAttribute('readOnly');
-                            formik.setFieldTouched('password', false);
-                        }}
-                        className={clsx(s.input, formik.touched.password && formik.errors.password && s.inputError)}
-                        placeholder="Пароль"
-                        value={formik.values.password}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                    <label htmlFor="login-password" className={s.inputLabel}>Пароль<span className={s.required}>*</span></label>
-                    {formik.touched.password && formik.errors.password && (
-                        <span className={s.fieldError}>{formik.errors.password}</span>
-                    )}
-                </div>
+                <InputField
+                    id="login-password"
+                    type="password"
+                    name="password"
+                    autoComplete="off"
+                    readOnly
+                    onFocus={(e) => {
+                        e.currentTarget.removeAttribute('readonly');
+                        formik.setFieldTouched('password', false);
+                    }}
+                    label="Пароль"
+                    required
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.password}
+                    touched={formik.touched.password}
+                />
 
                 <button type="button" className={s.forgotLink} onClick={onForgotPassword}>Забули пароль?</button>
 

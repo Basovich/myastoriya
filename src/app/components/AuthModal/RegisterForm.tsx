@@ -11,6 +11,7 @@ import clsx from 'clsx';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 import Button from "@/app/components/ui/Button/Button";
+import InputField from '@/app/components/ui/InputField';
 
 const COUNTDOWN_SECONDS = 60;
 const PHONE_REGEX = /^380\d{9}$/;
@@ -232,52 +233,46 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
             <form className={s.form} onSubmit={formik.handleSubmit} noValidate autoComplete="off">
 
                 {/* Name */}
-                <div className={s.field}>
-                    <input
-                        id="reg-name"
-                        type="text"
-                        name="name"
-                        autoComplete="off"
-                        readOnly
-                        onFocus={(e) => {
-                            e.currentTarget.removeAttribute('readOnly');
-                            formik.setFieldTouched('name', false);
-                        }}
-                        className={clsx(s.input, formik.touched.name && formik.errors.name && s.inputError)}
-                        placeholder="Ім'я"
-                        value={formik.values.name}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                    <label htmlFor="reg-name" className={s.inputLabel}>Ім&apos;я<span className={s.required}>*</span></label>
-                    {formik.touched.name && formik.errors.name && (
-                        <span className={s.fieldError}>{formik.errors.name}</span>
-                    )}
-                </div>
+                <InputField
+                    id="reg-name"
+                    type="text"
+                    name="name"
+                    autoComplete="off"
+                    readOnly
+                    onFocus={(e) => {
+                        e.currentTarget.removeAttribute('readonly');
+                        formik.setFieldTouched('name', false);
+                    }}
+                    label="Ім'я"
+                    required
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.name}
+                    touched={formik.touched.name}
+                />
 
                 {/* Phone */}
                 <div className={s.field}>
-                    <input
+                    <InputField
                         id="reg-phone"
                         type="tel"
                         name="phone"
                         autoComplete="off"
                         readOnly
                         onFocus={(e) => {
-                            e.currentTarget.removeAttribute('readOnly');
+                            e.currentTarget.removeAttribute('readonly');
                             formik.setFieldTouched('phone', false);
                         }}
-                        className={clsx(
-                            s.input,
-                            isPhoneFieldError && s.inputError,
-                            phoneVerified && s.inputVerified,
-                        )}
-                        placeholder="+38 (0__) ___ __ __"
+                        className={phoneVerified ? s.inputVerified : undefined}
+                        label="Телефон"
+                        required
                         value={phoneFormatted}
                         onChange={handlePhoneChange}
                         onBlur={() => formik.setFieldTouched('phone', true)}
+                        error={!phoneVerified ? formik.errors.phone : undefined}
+                        touched={formik.touched.phone}
                     />
-                    <label htmlFor="reg-phone" className={s.inputLabel}>Телефон<span className={s.required}>*</span></label>
 
                     {/* Verification badge */}
                     {phoneVerified && (
@@ -290,10 +285,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         </span>
                     )}
 
-                    {/* Inline error (only if not verified) */}
-                    {!phoneVerified && isPhoneFieldError && (
-                        <span className={s.fieldError}>{formik.errors.phone}</span>
-                    )}
 
                     {/* SMS block — shown when phone is complete and not yet verified */}
                     {phoneComplete && !phoneVerified && (
@@ -348,52 +339,44 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                 </div>
 
                 {/* Password */}
-                <div className={s.field}>
-                    <input
-                        id="reg-password"
-                        type="password"
-                        name="password"
-                        autoComplete="off"
-                        readOnly
-                        onFocus={(e) => {
-                            e.currentTarget.removeAttribute('readOnly');
-                            formik.setFieldTouched('password', false);
-                        }}
-                        className={clsx(s.input, formik.touched.password && formik.errors.password && s.inputError)}
-                        placeholder="Пароль"
-                        value={formik.values.password}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                    <label htmlFor="reg-password" className={s.inputLabel}>Пароль<span className={s.required}>*</span></label>
-                    {formik.touched.password && formik.errors.password && (
-                        <span className={s.fieldError}>{formik.errors.password}</span>
-                    )}
-                </div>
+                <InputField
+                    id="reg-password"
+                    type="password"
+                    name="password"
+                    autoComplete="off"
+                    readOnly
+                    onFocus={(e) => {
+                        e.currentTarget.removeAttribute('readonly');
+                        formik.setFieldTouched('password', false);
+                    }}
+                    label="Пароль"
+                    required
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.password}
+                    touched={formik.touched.password}
+                />
 
                 {/* Confirm password */}
-                <div className={s.field}>
-                    <input
-                        id="reg-confirm-password"
-                        type="password"
-                        name="confirmPassword"
-                        autoComplete="off"
-                        readOnly
-                        onFocus={(e) => {
-                            e.currentTarget.removeAttribute('readOnly');
-                            formik.setFieldTouched('confirmPassword', false);
-                        }}
-                        className={clsx(s.input, formik.touched.confirmPassword && formik.errors.confirmPassword && s.inputError)}
-                        placeholder="Повторити пароль"
-                        value={formik.values.confirmPassword}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                    <label htmlFor="reg-confirm-password" className={s.inputLabel}>Повторити пароль<span className={s.required}>*</span></label>
-                    {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-                        <span className={s.fieldError}>{formik.errors.confirmPassword}</span>
-                    )}
-                </div>
+                <InputField
+                    id="reg-confirm-password"
+                    type="password"
+                    name="confirmPassword"
+                    autoComplete="off"
+                    readOnly
+                    onFocus={(e) => {
+                        e.currentTarget.removeAttribute('readonly');
+                        formik.setFieldTouched('confirmPassword', false);
+                    }}
+                    label="Повторити пароль"
+                    required
+                    value={formik.values.confirmPassword}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.confirmPassword}
+                    touched={formik.touched.confirmPassword}
+                />
 
                 {formik.status && <div className={s.error}>{formik.status}</div>}
 

@@ -8,6 +8,8 @@ import clsx from 'clsx';
 import useScrollLock from '@/hooks/useScrollLock';
 import s from './ReviewModal.module.scss';
 import Button from "@/app/components/ui/Button/Button";
+import InputField from '@/app/components/ui/InputField';
+import TextareaField from '@/app/components/ui/TextareaField';
 
 interface ReviewModalProps {
     isOpen: boolean;
@@ -122,24 +124,19 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
 
                         <form className={s.form} onSubmit={formik.handleSubmit} noValidate>
                             {/* Name field */}
-                            <div className={s.field}>
-                                <input
-                                    id="review-name"
-                                    type="text"
-                                    name="name"
-                                    className={clsx(s.input, formik.touched.name && formik.errors.name && s.inputError)}
-                                    placeholder="Ім'я"
-                                    value={formik.values.name}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                />
-                                <label htmlFor="review-name" className={s.inputLabel}>
-                                    Ім&apos;я<span className={s.required}>*</span>
-                                </label>
-                                {formik.touched.name && formik.errors.name && (
-                                    <span className={s.fieldError}>{formik.errors.name}</span>
-                                )}
-                            </div>
+                            <InputField
+                                id="review-name"
+                                type="text"
+                                name="name"
+                                label="Ім'я"
+                                required
+                                value={formik.values.name}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                onFocus={() => formik.setFieldTouched('name', false)}
+                                error={formik.errors.name}
+                                touched={formik.touched.name}
+                            />
 
                             {/* Rating categories */}
                             <div className={s.ratingsBlock}>
@@ -173,21 +170,18 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                             </div>
 
                             {/* Review textarea */}
-                            <div className={s.field}>
-                                <textarea
-                                    id="review-text"
-                                    name="review"
-                                    className={clsx(s.textarea, formik.touched.review && formik.errors.review && s.inputError)}
-                                    placeholder="Напишіть своє враження про М'ясторію"
-                                    value={formik.values.review}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    rows={4}
-                                />
-                                {formik.touched.review && formik.errors.review && (
-                                    <span className={s.fieldError}>{formik.errors.review}</span>
-                                )}
-                            </div>
+                            <TextareaField
+                                id="review-text"
+                                name="review"
+                                label="Напишіть своє враження про М'ясторію"
+                                value={formik.values.review}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                onFocus={() => formik.setFieldTouched('review', false)}
+                                error={formik.errors.review}
+                                touched={formik.touched.review}
+                                rows={4}
+                            />
 
                             {formik.status && (
                                 <div className={s.errorBox}>

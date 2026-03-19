@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import clsx from 'clsx';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import Button from '@/app/components/ui/Button/Button';
+import InputField from '@/app/components/ui/InputField';
+import TextareaField from '@/app/components/ui/TextareaField';
 import { ApplicantFormPageDict } from '@/i18n/types';
 import s from './ApplicantForm.module.scss';
-import Icon from '@/app/components/ui/Icon/Icon';
 import CustomSelect from '@/app/components/ui/CustomSelect';
 
 interface ApplicantFormProps {
@@ -47,7 +47,6 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
         validationSchema,
         onSubmit: async (values, { setSubmitting, resetForm }) => {
             try {
-                // Here we would normally submit to the API
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 setIsSubmitted(true);
                 resetForm();
@@ -81,62 +80,53 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
         <form className={s.form} onSubmit={formik.handleSubmit} noValidate>
             <div className={s.grid}>
                 {/* Full Name */}
-                <div className={s.field}>
-                    <input
-                        id="fullName"
-                        type="text"
-                        name="fullName"
-                        className={clsx(s.input, formik.touched.fullName && formik.errors.fullName && s.inputError)}
-                        placeholder=" "
-                        value={formik.values.fullName}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                    <label className={s.inputLabel} htmlFor="fullName">{dict.fullName}*</label>
-                    {formik.touched.fullName && formik.errors.fullName && (
-                        <span className={s.fieldError}>{formik.errors.fullName}</span>
-                    )}
-                </div>
+                <InputField
+                    id="fullName"
+                    type="text"
+                    name="fullName"
+                    label={dict.fullName}
+                    required
+                    value={formik.values.fullName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    onFocus={() => formik.setFieldTouched('fullName', false)}
+                    error={formik.errors.fullName}
+                    touched={formik.touched.fullName}
+                />
 
                 {/* DOB */}
-                <div className={s.field}>
-                    <input
-                        id="dob"
-                        type="text"
-                        name="dob"
-                        className={clsx(s.input, formik.touched.dob && formik.errors.dob && s.inputError)}
-                        placeholder=" "
-                        value={formik.values.dob}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                    <label className={s.inputLabel} htmlFor="dob">{dict.dob}*</label>
-                    {formik.touched.dob && formik.errors.dob && (
-                        <span className={s.fieldError}>{formik.errors.dob}</span>
-                    )}
-                </div>
+                <InputField
+                    id="dob"
+                    type="text"
+                    name="dob"
+                    label={dict.dob}
+                    required
+                    value={formik.values.dob}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    onFocus={() => formik.setFieldTouched('dob', false)}
+                    error={formik.errors.dob}
+                    touched={formik.touched.dob}
+                />
 
                 {/* Phone */}
-                <div className={s.field}>
-                    <input
-                        id="phone"
-                        type="tel"
-                        name="phone"
-                        className={clsx(s.input, formik.touched.phone && formik.errors.phone && s.inputError)}
-                        placeholder=" "
-                        value={phoneFormatted}
-                        onChange={handlePhoneChange}
-                        onBlur={() => formik.setFieldTouched('phone', true)}
-                    />
-                    <label className={s.inputLabel} htmlFor="phone">{dict.phone}*</label>
-                    {formik.touched.phone && formik.errors.phone && (
-                        <span className={s.fieldError}>{formik.errors.phone}</span>
-                    )}
-                </div>
+                <InputField
+                    id="phone"
+                    type="tel"
+                    name="phone"
+                    label={dict.phone}
+                    required
+                    value={phoneFormatted}
+                    onChange={handlePhoneChange}
+                    onBlur={() => formik.setFieldTouched('phone', true)}
+                    onFocus={() => formik.setFieldTouched('phone', false)}
+                    error={formik.errors.phone}
+                    touched={formik.touched.phone}
+                />
 
                 {/* Desired Position */}
                 <div className={s.groupField}>
-                    <h3 className={s.groupTitle}>{dict.desiredPosition}*:</h3>
+                    <h3 className={s.groupTitle}>{dict.desiredPosition}:</h3>
                     <CustomSelect
                         value={formik.values.desiredPosition}
                         options={[
@@ -157,15 +147,6 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                 {/* Has Experience */}
                 <div className={s.groupField}>
                     <h3 className={s.groupTitle}>{dict.hasExperience}?</h3>
-                    
-                    {/* The design mock mistakenly included a select box here before the radio buttons, but we implement the logic based on the text. If the user wants the exact look, we can put it back. Let's put the Select back to match design exactly even if redundant, and also the Radios. Or just the Select. I'll just use the Select to match the previous field. But wait, the screenshot has Radios! I'll use Radios like the screenshot. */}
-                    <CustomSelect
-                        value=""
-                        options={[]}
-                        onChange={() => {}}
-                        placeholder={dict.options.chooseVariant}
-                    />
-
                     <div className={s.radioGroup}>
                         <label className={s.radioLabel}>
                             <input
@@ -192,7 +173,6 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                             {dict.options.no}
                         </label>
                     </div>
-
                     {formik.touched.hasExperience && formik.errors.hasExperience && (
                         <span className={s.fieldError}>{formik.errors.hasExperience}</span>
                     )}
@@ -217,26 +197,24 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                 </div>
 
                 {/* Additional Info */}
-                <div className={s.groupField}>
-                    <h3 className={s.groupTitle}>{dict.additionalInfo}:</h3>
-                    <div className={s.fileInputWrapper}>
-                        <textarea
-                            id="additionalInfo"
-                            name="additionalInfo"
-                            className={s.textarea}
-                            value={formik.values.additionalInfo}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                        />
-                    </div>
-                </div>
+                <TextareaField
+                    id="additionalInfo"
+                    name="additionalInfo"
+                    label={dict.additionalInfo}
+                    value={formik.values.additionalInfo}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    onFocus={() => formik.setFieldTouched('additionalInfo', false)}
+                    error={formik.errors.additionalInfo}
+                    touched={formik.touched.additionalInfo}
+                />
 
                 <div className={s.requiredNote}>
                     <span className={s.redAsterisk}>*</span> — поля, що є обов&apos;язковими до заповнення
                 </div>
 
                 {/* Consent */}
-                <div className={clsx(s.field, s.fullWidth)}>
+                <div className={s.fullWidth}>
                     <label className={s.checkboxLabel}>
                         <input
                             type="checkbox"
