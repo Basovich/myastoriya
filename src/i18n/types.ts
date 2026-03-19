@@ -151,6 +151,37 @@ export interface HomeDict {
   };
   blogPage: BlogPageDict;
   careersPage: CareersPageDict;
+  applicantFormPage: ApplicantFormPageDict;
+}
+
+export interface ApplicantFormPageDict {
+  title: string;
+  breadcrumbs: {
+    home: string;
+    careers: string;
+    apply: string;
+  };
+  form: {
+    fullName: string;
+    dob: string;
+    phone: string;
+    desiredPosition: string;
+    hasExperience: string;
+    location: string;
+    additionalInfo: string;
+    consent: string;
+    submitText: string;
+    options: {
+      chooseVariant: string;
+      yes: string;
+      no: string;
+      kyiv: string;
+    };
+    errors: {
+      required: string;
+      invalidPhone: string;
+    };
+  };
 }
 
 export interface CareersPageDict {

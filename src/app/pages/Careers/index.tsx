@@ -36,7 +36,7 @@ export default function CareersPage({ dict, lang }: CareersPageProps) {
                     <p className={s.text}>{careersPage.about.text}</p>
                     <Button
                         variant="red"
-                        href={getLocalizedHref("#", lang)}
+                        href={getLocalizedHref("/careers/apply", lang)}
                         className={s.button}
                     >
                         {careersPage.form.button}
