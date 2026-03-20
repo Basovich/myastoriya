@@ -6,6 +6,7 @@ import Link from "next/link";
 import Button from "../ui/Button/Button";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
+import Pagination from "../ui/Pagination/Pagination";
 import clsx from "clsx";
 import s from "./BlogGrid.module.scss";
 
@@ -48,6 +49,8 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
     const [items, setItems] = useState<PublicationItem[]>(twelveInitialItems);
     const [hasMore, setHasMore] = useState(true);
     const [activeTab, setActiveTab] = useState<TabType>('all');
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = 10; // Mock total pages
 
     // Helper to conditionally drop '/ua'
     const getRoute = (path: string) => {
@@ -132,13 +135,14 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
                 )}
 
                 <div className={s.paginationRow}>
-                    <div className={s.pageNumbers}>
-                        <button className={clsx(s.pageNum, s.activePage)}>01</button>
-                        <button className={s.pageNum}>02</button>
-                        <button className={s.pageNum}>03</button>
-                        <span className={s.pageDots}>...</span>
-                        <button className={s.pageNum}>10</button>
-                    </div>
+                    <Pagination 
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={(page) => {
+                            setCurrentPage(page);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                    />
                 </div>
 
                 <div className={s.subscribeBanner}>
