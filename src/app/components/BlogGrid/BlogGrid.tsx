@@ -7,7 +7,7 @@ import Button from "../ui/Button/Button";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import Pagination from "../ui/Pagination/Pagination";
-import clsx from "clsx";
+import Tabs from "../ui/Tabs/Tabs";
 import s from "./BlogGrid.module.scss";
 
 // Reusing interfaces from existing Content
@@ -35,11 +35,12 @@ interface BlogGridProps {
     };
     initialItems: PublicationItem[];
     lang: string;
+    activeCategory?: TabType;
 }
 
 type TabType = 'all' | 'news' | 'recipes' | 'events';
 
-export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
+export default function BlogGrid({ dict, initialItems, lang, activeCategory = 'all' }: BlogGridProps) {
     // Generate 12 mock initial items regardless of what was passed in
     const twelveInitialItems = Array.from({ length: 12 }).map((_, i) => {
         const baseItem = initialItems[i % initialItems.length];
@@ -48,7 +49,6 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
 
     const [items, setItems] = useState<PublicationItem[]>(twelveInitialItems);
     const [hasMore, setHasMore] = useState(true);
-    const [activeTab, setActiveTab] = useState<TabType>('all');
     const [currentPage, setCurrentPage] = useState(1);
     const totalPages = 10; // Mock total pages
 
@@ -75,11 +75,11 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
         setHasMore(false);
     };
 
-    const tabs = [
-        { id: 'all' as TabType, label: dict.tabs.all },
-        { id: 'news' as TabType, label: dict.tabs.news },
-        { id: 'recipes' as TabType, label: dict.tabs.recipes },
-        { id: 'events' as TabType, label: dict.tabs.events },
+    const tabsData = [
+        { id: 'all', label: dict.tabs.all, href: getRoute('/blog'), active: activeCategory === 'all' },
+        { id: 'news', label: dict.tabs.news, href: getRoute('/blog/news'), active: activeCategory === 'news' },
+        { id: 'recipes', label: dict.tabs.recipes, href: getRoute('/blog/recipes'), active: activeCategory === 'recipes' },
+        { id: 'events', label: dict.tabs.events, href: getRoute('/blog/events'), active: activeCategory === 'events' },
     ];
 
     return (
@@ -95,15 +95,7 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
                 </div>
 
                 <div className={s.tabsWrapper}>
-                    {tabs.map(tab => (
-                        <button
-                            key={tab.id}
-                            className={clsx(s.tab, activeTab === tab.id && s.activeTab)}
-                            onClick={() => setActiveTab(tab.id)}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
+                    <Tabs tabs={tabsData} className={s.tabs} />
                 </div>
 
                 <div className={s.grid}>

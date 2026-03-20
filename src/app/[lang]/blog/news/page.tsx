@@ -4,7 +4,7 @@ import { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import BlogGrid from "@/app/components/BlogGrid/BlogGrid";
 
-export default async function BlogPage({ params }: { params: Promise<{ lang: Locale }> }) {
+export default async function NewsPage({ params }: { params: Promise<{ lang: Locale }> }) {
     const { lang } = await params;
     const dict = await getDictionary(lang);
 
@@ -16,6 +16,7 @@ export default async function BlogPage({ params }: { params: Promise<{ lang: Loc
                 dict={dict.home.blogPage}
                 initialItems={dict.home.publications.items}
                 lang={lang}
+                activeCategory="news"
             />
 
             <Footer lang={lang} />
