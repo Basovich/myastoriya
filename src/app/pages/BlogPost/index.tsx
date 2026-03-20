@@ -30,7 +30,36 @@ interface BlogPostPageProps {
 
 export default function BlogPostPage({ dict, lang, postId }: BlogPostPageProps) {
     const t = dict.home.blogPostPage;
-    const post = blogData.posts.find(p => p.id === postId || p.slug === postId);
+    let post = blogData.posts.find(p => String(p.id) === postId || String(p.slug) === postId);
+    
+    // Fallback logic for unmatched blog posts to use generic content
+    if (!post) {
+        const genericPost = blogData.posts[0];
+        const fallbacks = dict.home.publications?.items || [];
+        const parsedId = Number(postId);
+        // BlogGrid generates mock IDs matching initialItems matching pattern baseId + i * 1000
+        const baseId = isNaN(parsedId) ? 1 : (parsedId > 1000 ? parsedId % 1000 : parsedId);
+        
+        // Sometimes id might be 0 after modulo if the id is exactly 1000
+        const safeBaseId = baseId === 0 ? 1 : baseId;
+        
+        let pubItem = fallbacks.find((item: any) => item.id === safeBaseId);
+        if (!pubItem && fallbacks.length > 0) {
+            pubItem = fallbacks[0];
+        }
+
+        if (pubItem) {
+            post = {
+                ...genericPost,
+                id: postId,
+                title: { [lang]: pubItem.title } as any,
+                featuredImage: pubItem.image,
+                date: pubItem.dateRange || genericPost.date,
+            };
+        } else {
+            post = { ...genericPost, id: postId };
+        }
+    }
     
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);

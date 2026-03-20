@@ -121,8 +121,8 @@ export default function BlogGrid({ dict, initialItems, lang }: BlogGridProps) {
 
                 {hasMore && (
                     <div className={s.loadMoreWrapper}>
-                        <Button variant="outline-black" onClick={loadMore}>
-                            {dict.showBtn}
+                        <Button variant="outline-black" onClick={loadMore} className={s.loadMoreBtn}>
+                            <span className={s.loadMoreBtnText}>{dict.showBtn}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                                 <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" strokeWidth="2" strokeLinecap="round" />
                                 <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" strokeWidth="2" strokeLinecap="round" />

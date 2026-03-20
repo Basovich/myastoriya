@@ -10,22 +10,38 @@ import ProductTabs from './ProductTabs';
 import ProductModifications from './ProductModifications';
 import ProductReviews from './ProductReviews';
 import RelatedProducts from './RelatedProducts';
+import uaData from '@/content/ua.json';
+import ruData from '@/content/ru.json';
 
-const Product: React.FC<{ params: Promise<{ lang: string }> }> = ({ params }) => {
+const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = ({ params }) => {
+    const { lang, slug } = React.use(params);
+    
+    // Find the generic fallback data based on slug if it exists in the home page products list
+    const parsedId = Number(slug);
+    const baseId = isNaN(parsedId) ? 1 : (parsedId > 1000 ? parsedId % 1000 : parsedId);
+    const safeBaseId = baseId === 0 ? 1 : baseId;
+    
+    const dict = lang === 'ru' ? ruData : uaData;
+    const list = dict.home?.products?.items || [];
+    let matchedItem = list.find((i: any) => i.id === safeBaseId);
+    
+    if (!matchedItem && list.length > 0) {
+        matchedItem = list[0];
+    }
     // In a real app, we would fetch product data based on slug
     const product = {
-        id: "1",
-        name: "Стейк Рібай USA",
+        id: slug || "1",
+        name: matchedItem ? matchedItem.title : "Стейк Рібай USA",
         category: "Ресторанне меню",
-        price: 850,
+        price: matchedItem ? matchedItem.price : 850,
         oldPrice: 1060,
         discount: "-20%",
-        badge: "Steak Days щовівторка!",
+        badge: matchedItem?.badge || "Steak Days щовівторка!",
         description: "По классической американской технологии Стриплойн USA создается из самого ценного мяса передней части говяжьей полутуши. Мясо с тонким краем, срезается в поясничной части от 13 ребра до костреца. Причем животные откармливаются только на лучших кормах, с продуманным рационом, получая качественный уход на протяжении всего периода. Уже это становится залогом великолепного вкуса! Обратите внимание, при откорме не используются гормоны роста, ГМО или антибиотики.",
         images: [
-            "/images/product/product-main.png",
-            "/images/product/product-main.png",
-            "/images/product/product-main.png",
+            matchedItem ? matchedItem.image : "/images/product/product-main.png",
+            matchedItem ? matchedItem.image : "/images/product/product-main.png",
+            matchedItem ? matchedItem.image : "/images/product/product-main.png",
         ],
         characteristics: {
             "Вага": "350г",

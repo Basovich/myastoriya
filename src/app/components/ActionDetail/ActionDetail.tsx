@@ -10,13 +10,31 @@ interface ActionDetailProps {
     dict: any;
     lang: string;
     id: string;
+    pageType?: 'promotions' | 'complex-discounts';
 }
 
-export default function ActionDetail({ dict, lang, id }: ActionDetailProps) {
+export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }: ActionDetailProps) {
+    const list = pageType === 'promotions' ? dict.home.actions.items : dict.home.discounts.items;
+    const parsedId = Number(id);
+    const baseId = isNaN(parsedId) ? 1 : (parsedId > 1000 ? parsedId % 1000 : parsedId);
+    const safeBaseId = baseId === 0 ? 1 : baseId;
+    
+    let item = list?.find((i: any) => i.id === safeBaseId);
+    if (!item && list?.length > 0) {
+        item = list[0];
+    }
+    
+    const title = item ? item.title : 'Steak Days щовівторка!';
+    
     const breadcrumbItems = [
         { label: dict.home.promotionsPage.breadcrumbs.home, href: '/' },
-        { label: dict.home.promotionsPage.breadcrumbs.promotions, href: '/actions' },
-        { label: 'Steak Days щовівторка!' }
+        { 
+            label: pageType === 'promotions' 
+                ? dict.home.promotionsPage.breadcrumbs.promotions 
+                : dict.home.complexDiscountsPage.breadcrumbs.complexDiscounts, 
+            href: pageType === 'promotions' ? '/actions' : '/complex-discounts' 
+        },
+        { label: title }
     ];
 
     return (
@@ -56,7 +74,7 @@ export default function ActionDetail({ dict, lang, id }: ActionDetailProps) {
                 <div className={s.contentLayout}>
                     <div className={s.textContent}>
                         <p className={s.title}>
-                            Улюблені стейки – зі знижкою щовівторка!
+                            {title}
                         </p>
                         <div className={s.description}>
                             <p>Щовівторка даруємо 20% знижки на всі стейки з нашого гриль меню.</p>
