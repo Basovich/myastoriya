@@ -4,6 +4,7 @@
     justify-content: center;
     gap: 6px;
     padding: 8px 0;
+    flex-wrap: wrap;
 
     @media (min-width: 768px) {
         gap: 8px;
@@ -72,4 +73,13 @@
     background: #000;
     border-color: #000;
     color: #fff;
+}
+
+.ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+    width: 20px;
 }

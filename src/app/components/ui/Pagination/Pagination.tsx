@@ -18,6 +18,21 @@ export default function Pagination({
 }: PaginationProps) {
     if (totalPages <= 1) return null;
 
+    const getVisiblePages = (current: number, total: number) => {
+        if (total <= 5) {
+            return Array.from({ length: total }, (_, i) => i + 1);
+        }
+        if (current <= 3) {
+            return [1, 2, 3, 4, '...', total];
+        }
+        if (current >= total - 2) {
+            return [1, '...', total - 3, total - 2, total - 1, total];
+        }
+        return [1, '...', current - 1, current, current + 1, '...', total];
+    };
+
+    const visiblePages = getVisiblePages(currentPage, totalPages);
+
     return (
         <div className={`${s.pagination} ${className}`}>
             <button
@@ -32,18 +47,23 @@ export default function Pagination({
                 </svg>
             </button>
             
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                    key={page}
-                    type="button"
-                    className={`${s.pageBtn} ${currentPage === page ? s.pageBtnActive : ''}`}
-                    onClick={() => onPageChange(page)}
-                    aria-label={`Сторінка ${page}`}
-                    aria-current={currentPage === page ? 'page' : undefined}
-                >
-                    {String(page).padStart(2, '0')}
-                </button>
-            ))}
+            {visiblePages.map((page, idx) => {
+                if (page === '...') {
+                    return <span key={`ellipsis-${idx}`} className={s.ellipsis}>...</span>;
+                }
+                return (
+                    <button
+                        key={page}
+                        type="button"
+                        className={`${s.pageBtn} ${currentPage === page ? s.pageBtnActive : ''}`}
+                        onClick={() => onPageChange(page as number)}
+                        aria-label={`Сторінка ${page}`}
+                        aria-current={currentPage === page ? 'page' : undefined}
+                    >
+                        {String(page).padStart(2, '0')}
+                    </button>
+                );
+            })}
             
             <button
                 type="button"
