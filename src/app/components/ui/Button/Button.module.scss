@@ -59,9 +59,10 @@
     background-color: #0000;
     border: 1px solid #000;
     border-radius: 8px;
-    padding: 12px 24px;
+    padding: 12px 24px 10px;
     font-size: 14px;
     font-weight: 600;
+    text-transform: uppercase;
 
     @media (any-hover: hover) {
         &:hover {
@@ -160,11 +161,11 @@
 .black {
     background: #000;
     color: #fff;
-    padding: 12px 24px;
+    padding: 12px 24px 10px;
     border-radius: 12px;
     font-size: 14px;
     font-weight: 600;
-    text-transform: none;
+    text-transform: uppercase;
 
     @media (any-hover: hover) {
         &:hover {

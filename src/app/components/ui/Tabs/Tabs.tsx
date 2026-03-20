@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import Link from "next/link";
+import Button from "../Button/Button";
 import s from "./Tabs.module.scss";
 
 interface Tab {
@@ -26,25 +26,26 @@ export default function Tabs({
         <div className={clsx(s.tabsWrapper, s[variant], className)}>
             {tabs.map((tab) => {
                 const isActive = tab.active;
-                const classes = clsx(s.tab, isActive && s.active);
+                const buttonVariant = isActive ? "black" : "outline-black";
 
                 if (tab.href) {
                     return (
-                        <Link key={tab.id} href={tab.href} className={classes}>
+                        <Button key={tab.id} href={tab.href} variant={buttonVariant} className={s.tab}>
                             {tab.label}
-                        </Link>
+                        </Button>
                     );
                 }
 
                 return (
-                    <button
+                    <Button
                         key={tab.id}
                         type="button"
-                        className={classes}
+                        variant={buttonVariant}
                         onClick={() => onChange?.(tab.id)}
+                        className={s.tab}
                     >
                         {tab.label}
-                    </button>
+                    </Button>
                 );
             })}
         </div>
