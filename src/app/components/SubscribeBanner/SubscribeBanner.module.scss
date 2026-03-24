@@ -1,0 +1,203 @@
+.subscribeBanner {
+    position: relative;
+    width: 100%;
+    min-height: 164px;
+    background-color: #2F2F2F;
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    align-items: stretch;
+}
+
+.subscribeBg1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 1;
+    }
+}
+
+.subscribeContent {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 32px 24px;
+    flex-direction: column;
+    gap: 24px;
+
+    @media (min-width: 768px) {
+        padding: 24px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    @media (min-width: 1280px) {
+        padding-left: 52px;
+        padding-right: 52px;
+    }
+}
+
+.subscribeTextCol {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.subscribeTitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #FFF;
+    text-transform: uppercase;
+    margin: 0;
+    max-width: 260px;
+    line-height: 1.3;
+
+    @media (min-width: 1024px) {
+        font-size: 28px;
+    }
+}
+
+.subscribeArrows {
+    min-width: 18px;
+    height: auto;
+    align-self: flex-start;
+
+    @media (min-width: 1280px) {
+        min-width: 27px;
+    }
+
+    &.bigArrows {
+        min-width: 28px;
+        height: auto;
+        align-self: flex-end;
+
+        @media (min-width: 1280px) {
+            min-width: 48px;
+        }
+    }
+}
+
+.subscribeFormCol {
+    flex-shrink: 0;
+    width: 100%;
+
+    @media (min-width: 768px) {
+        width: auto;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+}
+
+.inputWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+        background: #FFF;
+        border-radius: 10px;
+        padding: 4px;
+        flex: 1 1;
+        gap: 0;
+        border: 1px solid transparent;
+        transition: border-color 0.2s;
+    }
+    
+    @media (min-width: 1024px) {
+      min-width: 386px;
+    }
+
+    &.hasError {
+        @media (min-width: 768px) {
+            border-color: var(--color-accent, #E30613);
+        }
+    }
+}
+
+.subscribeInput {
+    width: 100%;
+    height: 48px;
+    border: 1px solid transparent;
+    background: #FFF;
+    border-radius: 8px;
+    padding: 0 16px;
+    font-size: 14px;
+    color: #000;
+    outline: none;
+    transition: border-color 0.2s;
+
+    @media (min-width: 768px) {
+        flex: 1;
+        height: auto;
+        background: transparent;
+        border-radius: 0;
+        border: none;
+    }
+
+    &.hasError {
+        @media (max-width: 767px) {
+            border-color: var(--color-accent, #E30613);
+        }
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 1px #333;
+        border-radius: 8px;
+        
+        @media (min-width: 768px) {
+            border-radius: 4px;
+            box-shadow: none; /* remove focus inner border to avoid clutter */
+        }
+    }
+
+    &::placeholder {
+        color: #999;
+    }
+}
+
+
+
+.subscribeSubmitBtn {
+    height: 48px;
+    width: 100%;
+    font-size: 12px;
+
+    @media (min-width: 768px) {
+        width: auto;
+        height: 36px;
+    }
+}
+
+.errorText,
+.successText {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    position: absolute;
+    top: calc(100% + 4px);
+}

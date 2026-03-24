@@ -8,6 +8,7 @@ import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import Pagination from "../ui/Pagination/Pagination";
 import Tabs from "../ui/Tabs/Tabs";
+import SubscribeBanner from "../SubscribeBanner/SubscribeBanner";
 import s from "./BlogGrid.module.scss";
 
 // Reusing interfaces from existing Content
@@ -137,26 +138,10 @@ export default function BlogGrid({ dict, initialItems, lang, activeCategory = 'a
                     />
                 </div>
 
-                <div className={s.subscribeBanner}>
-                    <div className={s.subscribeBg1}>
-                        <Image src="/images/blog/subscribe-bg1.png" alt="Bg1" fill style={{ objectFit: 'cover' }} />
-                    </div>
-                    <div className={s.subscribeBg2}>
-                        <Image src="/images/blog/subscribe-bg2.png" alt="Bg2" fill style={{ objectFit: 'cover' }} />
-                    </div>
-                    <div className={s.subscribeContent}>
-                        <div className={s.subscribeTextCol}>
-                            <h2 className={s.subscribeTitle}>Підпишіться на нашу розсилку</h2>
-                            <span className={s.subscribeArrows}>»</span>
-                        </div>
-                        <div className={s.subscribeFormCol}>
-                            <div className={s.inputWrapper}>
-                                <input type="email" placeholder="E-mail" className={s.subscribeInput} />
-                                <button className={s.subscribeSubmitBtn}>Підписатись</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <SubscribeBanner 
+                    image="/images/blog/subscribe-bg1.png"
+                    title="Підпишіться на нашу розсилку"
+                />
             </div>
         </section>
     );

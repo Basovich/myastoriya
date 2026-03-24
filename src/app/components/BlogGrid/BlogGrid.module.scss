@@ -1,9 +1,28 @@
 .section {
-    padding: 32px 16px 80px;
+    padding: 32px 16px 72px;
+
+    @media (min-width: 768px) {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    @media (min-width: 1280px) {
+        padding-left: calc((100% - 1200px) / 2);
+        padding-right: calc((100% - 1200px) / 2);
+    }
+
+    @media (min-width: 1360px) {
+        padding-left: calc((100% - 1280px) / 2);
+        padding-right: calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: calc((100% - 1300px) / 2);
+        padding-right: calc((100% - 1300px) / 2);
+    }
 }
 
 .container {
-    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -89,27 +108,6 @@
     flex-wrap: wrap;
 }
 
-.tab {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid #E5E5E5;
-    background-color: #FFF;
-    color: #222;
-    transition: all 0.2s;
-
-    @media (any-hover: hover) {
-        &:hover {
-            border-color: #222;
-        }
-    }
-}
-
 .activeTab {
     background-color: #111;
     color: #FFF;
@@ -140,7 +138,11 @@
 
     @media (min-width: 1024px) {
         grid-template-columns: repeat(3, 1fr);
-        gap: 32px;
+        gap: 24px 16px;
+    }
+
+    @media (min-width: 1280px) {
+        gap: 48px 16px;
     }
 }
 
@@ -165,6 +167,10 @@
         &:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+            .cardTitle {
+                color: #E30613;
+            }
         }
     }
 }
@@ -172,7 +178,7 @@
 .cardImage {
     position: relative;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    height: 250px;
 }
 
 .cardImg {
@@ -193,15 +199,13 @@
 }
 
 .cardTitle {
-    font-size: 14px;
+    color: #000;
+    font-size: 16px;
+    font-style: normal;
     font-weight: 700;
-    line-height: 1.4;
-    color: #222;
+    line-height: 137.5% ;
     margin: 0;
-
-    @media (min-width: 1280px) {
-        font-size: 16px;
-    }
+    transition: color 0.2s;
 }
 
 .date {
@@ -221,6 +225,10 @@
     display: flex;
     justify-content: center;
     margin-top: 48px;
+    
+    @media (min-width: 1280px) {
+        margin-top: 64px;
+    }
 }
 
 .loadMoreBtn {
@@ -241,6 +249,11 @@
     justify-content: center;
     margin-top: 20px;
     margin-bottom: 40px;
+
+    @media (min-width: 1280px) {
+        margin-top: 30px;
+        margin-bottom: 72px;
+    }
 }
 
 .breadcrumbsWrapper {
@@ -294,144 +307,4 @@
     padding: 0 4px;
 }
 
-/* ===== Subscribe Banner ===== */
-.subscribeBanner {
-    position: relative;
-    width: 100%;
-    min-height: 164px;
-    background-color: #2F2F2F;
-    border-radius: 14px;
-    overflow: hidden;
-    display: flex;
-    align-items: stretch;
-}
-
-.subscribeBg1 {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
-
-.subscribeBg2 {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 65%;
-    height: 100%;
-    z-index: 2;
-    mask-image: linear-gradient(to right, transparent, black 10%);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 10%);
-    display: none;
-
-    @media (min-width: 769px) {
-        display: block;
-    }
-}
-
-.subscribeContent {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: 100%;
-    padding: 32px 24px;
-    flex-direction: column;
-    gap: 24px;
-
-    @media (min-width: 769px) {
-        padding: 24px 60px;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-    }
-}
-
-.subscribeTextCol {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.subscribeTitle {
-    font-family: 'Houschka Rounded', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: #FFF;
-    text-transform: uppercase;
-    margin: 0;
-    max-width: 330px;
-    line-height: 1.25;
-}
-
-.subscribeArrows {
-    font-family: 'Houschka Rounded', sans-serif;
-    font-size: 40px;
-    font-weight: 700;
-    color: #E6000F;
-    margin-top: -8px;
-}
-
-.subscribeFormCol {
-    flex-shrink: 0;
-    width: 100%;
-
-    @media (min-width: 769px) {
-        width: auto;
-    }
-}
-
-.inputWrapper {
-    display: flex;
-    align-items: center;
-    background: #FFF;
-    border-radius: 10px;
-    padding: 4px;
-    width: 100%;
-    max-width: 100%;
-
-    @media (min-width: 769px) {
-        width: 386px;
-    }
-}
-
-.subscribeInput {
-    flex: 1;
-    border: none;
-    background: transparent;
-    padding: 0 16px;
-    font-size: 14px;
-    color: #000;
-    outline: none;
-
-    &:focus-visible {
-        box-shadow: 0 0 0 1px #333;
-        border-radius: 4px;
-    }
-
-    &::placeholder {
-        color: #999;
-    }
-}
-
-.subscribeSubmitBtn {
-    background-color: #E6000F;
-    color: #FFF;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 24px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    @media (any-hover: hover) {
-        &:hover {
-            background-color: #cc000d;
-        }
-    }
-}
+/* End of Pagination */
