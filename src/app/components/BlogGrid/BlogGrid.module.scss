@@ -180,28 +180,41 @@
 }
 
 .cardBody {
-    padding: 24px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
     flex: 1;
+
+    @media (min-width: 1280px) {
+        padding: 20px;
+        gap: 12px;
+    }
 }
 
 .cardTitle {
-    font-size: 20px;
+    font-size: 14px;
     font-weight: 700;
     line-height: 1.4;
     color: #222;
     margin: 0;
+
+    @media (min-width: 1280px) {
+        font-size: 16px;
+    }
 }
 
 .date {
     color: #828282;
     font-feature-settings: 'liga' off, 'clig' off;
-    font-size: 14px;
+    font-size: 12px;
     font-style: normal;
     font-weight: 400;
     line-height: 120%;
+
+    @media (min-width: 1280px) {
+        font-size: 14px;
+    }
 }
 
 .loadMoreWrapper {
@@ -226,8 +239,8 @@
 .paginationRow {
     display: flex;
     justify-content: center;
-    margin-top: 40px;
-    margin-bottom: 60px;
+    margin-top: 20px;
+    margin-bottom: 40px;
 }
 
 .breadcrumbsWrapper {
