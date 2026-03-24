@@ -1,13 +1,13 @@
 import React from 'react';
-import Image from 'next/image';
 import s from './ActionDetail.module.scss';
 import ProductCard from '../ui/ProductCard/ProductCard';
 import Container from '../ui/Container/Container';
 import Breadcrumbs from '../ui/Breadcrumbs/Breadcrumbs';
 import HeroBanner from '../ui/HeroBanner/HeroBanner';
+import { type Dictionary } from '@/i18n/types';
 
 interface ActionDetailProps {
-    dict: any;
+    dict: Dictionary;
     lang: string;
     id: string;
     pageType?: 'promotions' | 'complex-discounts';
@@ -18,14 +18,14 @@ export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }
     const parsedId = Number(id);
     const baseId = isNaN(parsedId) ? 1 : (parsedId > 1000 ? parsedId % 1000 : parsedId);
     const safeBaseId = baseId === 0 ? 1 : baseId;
-    
-    let item = list?.find((i: any) => i.id === safeBaseId);
+
+    let item = list?.find((i) => i.id === safeBaseId);
     if (!item && list?.length > 0) {
         item = list[0];
     }
-    
+
     const title = item ? item.title : 'Steak Days щовівторка!';
-    
+
     const breadcrumbItems = [
         { label: dict.home.promotionsPage.breadcrumbs.home, href: '/' },
         { 
@@ -78,11 +78,11 @@ export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }
                         </p>
                         <div className={s.description}>
                             <p>Щовівторка даруємо 20% знижки на всі стейки з нашого гриль меню.</p>
-                            <p>Це чудова нагода скуштувати улюблений стейк сухої чи вологої витримки або стейк від Бренд Шефа за ще приємнішою ціною. Акція діє лише офлайн у ресторанах «М'ясторія».</p>
+                            <p>Це чудова нагода скуштувати улюблений стейк сухої чи вологої витримки або стейк від Бренд Шефа за ще приємнішою ціною. Акція діє лише офлайн у ресторанах «М&#39;ясторія».</p>
 
                             <h3>Умови:</h3>
                             <ul>
-                                <li>в акції беруть участь усі товари з категорій «Стейки від Бренд Шефа», «Стейки сухої витримки», «Стейки вологої витримки», а також позиції з категорії «М'ясо на грилі»: Рібай су-від, Філе Міньйон су-від;</li>
+                                <li>в акції беруть участь усі товари з категорій «Стейки від Бренд Шефа», «Стейки сухої витримки», «Стейки вологої витримки», а також позиції з категорії «М&#39;ясо на грилі»: Рібай су-від, Філе Міньйон су-від;</li>
                                 <li>розмір знижки 20%;</li>
                                 <li>Акція діє кожен вівторок з 05.08.2025 до 30.11.2025 (включно).</li>
                             </ul>
@@ -93,7 +93,7 @@ export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }
                 <div className={s.productsSection}>
                     <h2 className={s.productsTitle}>Товари, що беруть участь у акції</h2>
                     <div className={s.productsGrid}>
-                        {dict.home.products.items.slice(0, 8).map((item: any) => (
+                        {dict.home.products.items.slice(0, 8).map((item) => (
                             <ProductCard
                                 key={item.id}
                                 id={item.id}
