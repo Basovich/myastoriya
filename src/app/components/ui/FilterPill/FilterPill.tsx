@@ -2,6 +2,7 @@
 
 import React from 'react';
 import s from './FilterPill.module.scss';
+import clsx from 'clsx';
 
 interface FilterPillProps {
     children: React.ReactNode;
@@ -19,7 +20,7 @@ export default function FilterPill({
     return (
         <button
             type="button"
-            className={`${s.optionPill} ${active ? s.optionPillActive : ''} ${className}`}
+            className={clsx(s.optionPill, active && s.optionPillActive, className)}
             onClick={onClick}
         >
             {children}

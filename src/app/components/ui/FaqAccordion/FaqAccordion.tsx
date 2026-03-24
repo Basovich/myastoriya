@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import anime from 'animejs';
 import s from './FaqAccordion.module.scss';
+import clsx from 'clsx';
 
 interface FaqItem {
     question: string;
@@ -34,7 +35,7 @@ function FaqItemComponent({ item }: { item: FaqItem }) {
     }, [isOpen]);
 
     return (
-        <div className={`${s.faqItem} ${isOpen ? s.isOpen : ''}`}>
+        <div className={clsx(s.faqItem, isOpen && s.isOpen)}>
             <button 
                 className={s.faqQuestion} 
                 onClick={toggleOpen}
@@ -62,7 +63,7 @@ function FaqItemComponent({ item }: { item: FaqItem }) {
 
 export default function FaqAccordion({ items, className = '' }: FaqAccordionProps) {
     return (
-        <div className={`${s.faqWrap} ${className}`}>
+        <div className={clsx(s.faqWrap, className)}>
             {items.map((item, index) => (
                 <FaqItemComponent key={index} item={item} />
             ))}

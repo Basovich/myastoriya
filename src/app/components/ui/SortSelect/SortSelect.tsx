@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import s from './SortSelect.module.scss';
+import clsx from 'clsx';
 
 interface SortSelectProps {
     value: string;
@@ -38,12 +39,12 @@ export default function SortSelect({
     };
 
     return (
-        <div className={`${s.sortWrap} ${className}`} ref={dropdownRef}>
+        <div className={clsx(s.sortWrap, className)} ref={dropdownRef}>
             {label && <span className={s.sortLabel}>{label}</span>}
             <div className={s.sortSelectWrap}>
                 <button
                     type="button"
-                    className={`${s.sortSelectBtn} ${isOpen ? s.isOpen : ''}`}
+                    className={clsx(s.sortSelectBtn, isOpen && s.isOpen)}
                     onClick={() => setIsOpen(!isOpen)}
                     aria-expanded={isOpen}
                     aria-haspopup="listbox"
@@ -61,7 +62,7 @@ export default function SortSelect({
                             {options.map((opt) => (
                                 <li
                                     key={opt}
-                                    className={`${s.optionItem} ${value === opt ? s.optionSelected : ''}`}
+                                    className={clsx(s.optionItem, value === opt && s.optionSelected)}
                                     onClick={() => handleSelect(opt)}
                                     role="option"
                                     aria-selected={value === opt}

@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import clsx from "clsx";
 
 import s from "./BlogPost.module.scss";
 import { type Locale } from "@/i18n/config";
@@ -135,7 +135,7 @@ export default function BlogPostPage({ dict, lang, postId }: BlogPostPageProps) 
                                     return (
                                         <p 
                                             key={idx} 
-                                            className={`${s.paragraph} ${section.bold ? s.bold : ""}`}
+                                            className={clsx(s.paragraph, section.bold && s.bold)}
                                         >
                                             {section.value}
                                         </p>

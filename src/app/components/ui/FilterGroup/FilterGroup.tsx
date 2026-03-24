@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import anime from 'animejs';
 import s from './FilterGroup.module.scss';
+import clsx from 'clsx';
 
 interface FilterGroupProps {
     title: string;
@@ -37,7 +38,7 @@ export default function FilterGroup({
     }, [isOpen]);
 
     return (
-        <div className={`${s.filterGroup} ${className}`}>
+        <div className={clsx(s.filterGroup, className)}>
             <button
                 className={s.groupHeader}
                 onClick={toggleOpen}
@@ -46,7 +47,7 @@ export default function FilterGroup({
             >
                 <span className={s.groupTitle}>{title}</span>
                 <svg
-                    className={`${s.arrow} ${isOpen ? s.arrowOpen : ''}`}
+                    className={clsx(s.arrow, isOpen && s.arrowOpen)}
                     width="12"
                     height="7"
                     viewBox="0 0 12 7"

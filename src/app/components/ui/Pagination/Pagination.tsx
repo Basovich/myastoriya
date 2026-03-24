@@ -35,7 +35,7 @@ export default function Pagination({
     const visiblePages = getVisiblePages(currentPage, totalPages);
 
     return (
-        <div className={`${s.pagination} ${className}`}>
+        <div className={clsx(s.pagination, className)}>
             <button
                 type="button"
                 className={s.pageNavBtn}
@@ -66,7 +66,7 @@ export default function Pagination({
                     <button
                         key={page}
                         type="button"
-                        className={`${s.pageBtn} ${currentPage === page ? s.pageBtnActive : ''}`}
+                        className={clsx(s.pageBtn, currentPage === page && s.pageBtnActive)}
                         onClick={() => onPageChange(page as number)}
                         aria-label={`Сторінка ${page}`}
                         aria-current={currentPage === page ? 'page' : undefined}

@@ -16,6 +16,7 @@ import ViewToggle, { ViewType } from '@/app/components/ui/ViewToggle/ViewToggle'
 import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
 import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
 import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
+import clsx from 'clsx';
 
 interface Product {
     id: number;
@@ -145,7 +146,7 @@ export default function FilterContent({ category }: FilterContentProps) {
                             {/* Results column */}
                             <div className={s.results}>
                                 {/* Product list */}
-                                <div className={`${s.productList} ${view === 'grid' ? s.productListGrid : ''}`}>
+                                <div className={clsx(s.productList, view === 'grid' && s.productListGrid)}>
                                     {MOCK_RESULTS.length > 0 ? (
                                         MOCK_RESULTS.map(product => (
                                             view === 'grid' ? (

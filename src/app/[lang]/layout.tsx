@@ -4,6 +4,7 @@ import "../globals.css";
 import siteData from "@/content/site.json";
 import PasswordGate from "../components/PasswordGate/PasswordGate";
 import { i18n } from "@/i18n/config";
+import clsx from "clsx";
 
 const houschka = localFont({
   src: [
@@ -111,7 +112,7 @@ export default async function RootLayout({
 }>) {
   const { lang } = await params;
   return (
-    <html lang={lang} className={`${houschka.variable} ${helios.variable}`} suppressHydrationWarning>
+    <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <body>
         <ReduxProvider>
           <PasswordGate>{children}</PasswordGate>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import s from './ViewToggle.module.scss';
+import clsx from 'clsx';
 
 export type ViewType = 'grid' | 'list';
 
@@ -17,10 +18,10 @@ export default function ViewToggle({
     className = '',
 }: ViewToggleProps) {
     return (
-        <div className={`${s.viewToggle} ${className}`}>
+        <div className={clsx(s.viewToggle, className)}>
             <button
                 type="button"
-                className={`${s.viewBtn} ${view === 'grid' ? s.viewBtnActive : ''}`}
+                className={clsx(s.viewBtn, view === 'grid' && s.viewBtnActive)}
                 onClick={() => onViewChange('grid')}
                 aria-label="Сітка"
             >
@@ -33,7 +34,7 @@ export default function ViewToggle({
             </button>
             <button
                 type="button"
-                className={`${s.viewBtn} ${view === 'list' ? s.viewBtnActive : ''}`}
+                className={clsx(s.viewBtn, view === 'list' && s.viewBtnActive)}
                 onClick={() => onViewChange('list')}
                 aria-label="Список"
             >

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import s from './ShowMoreButton.module.scss';
+import clsx from 'clsx';
 
 interface ShowMoreButtonProps {
     onClick?: () => void;
@@ -19,7 +20,7 @@ export default function ShowMoreButton({
     return (
         <button
             type="button"
-            className={`${s.showMoreBtn} ${fullWidth ? s.fullWidth : ''} ${className}`}
+            className={clsx(s.showMoreBtn, fullWidth && s.fullWidth, className)}
             onClick={onClick}
         >
             {label}
