@@ -1,9 +1,6 @@
-"use client";
-
 import React from "react";
 import Image from "next/image";
 import s from "./NotFoundBlock.module.scss";
-import Container from "../ui/Container/Container";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import Button from "../ui/Button/Button";
 import { type Dictionary } from "@/i18n/types";
@@ -22,37 +19,35 @@ export default function NotFoundBlock({ dict }: NotFoundBlockProps) {
 
     return (
         <section className={s.section}>
-            <Container>
-                <div className={s.breadcrumbsWrapper}>
-                    <Breadcrumbs items={breadcrumbItems} />
+            <div className={s.breadcrumbsWrapper}>
+                <Breadcrumbs items={breadcrumbItems} />
+            </div>
+
+            <div className={s.content}>
+                <div className={s.imageWrapper}>
+                    <Image
+                        src="/images/404.webp"
+                        alt="404"
+                        width={544}
+                        height={348}
+                        className={s.image}
+                        priority
+                    />
                 </div>
-                
-                <div className={s.content}>
-                    <div className={s.imageWrapper}>
-                        <Image
-                            src="/images/404.webp"
-                            alt="404"
-                            width={544}
-                            height={348}
-                            className={s.image}
-                            priority
-                        />
-                    </div>
-                    
-                    <h1 className={s.title}>{notFoundPage.title}</h1>
-                    
-                    <p className={s.text}>
-                        {notFoundPage.text}
-                    </p>
-                    <p className={s.text}>
-                        {notFoundPage.subtext}
-                    </p>
-                    
-                    <Button href="/" variant="red" className={s.button}>
-                        {notFoundPage.button}
-                    </Button>
-                </div>
-            </Container>
+
+                <h1 className={s.title}>{notFoundPage.title}</h1>
+
+                <p className={s.text}>
+                    {notFoundPage.text}
+                </p>
+                <p className={s.text}>
+                    {notFoundPage.subtext}
+                </p>
+
+                <Button href="/" variant="red" className={s.button}>
+                    {notFoundPage.button}
+                </Button>
+            </div>
         </section>
     );
 }

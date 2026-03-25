@@ -1,15 +1,28 @@
 .section {
-    padding-top: 24px;
-    padding-bottom: 80px;
+    padding: 24px 16px 80px;
 
-    @media (min-width: 1024px) {
-        padding-top: 32px;
-        padding-bottom: 120px;
+    @media (min-width: 768px) {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 32px calc((100% - 1200px) / 2) 120px;
+    }
+
+    @media (min-width: 1360px) {
+        padding: 32px calc((100% - 1280px) / 2) 120px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 32px calc((100% - 1300px) / 2) 120px;
     }
 }
 
 .breadcrumbsWrapper {
-    margin-bottom: 32px;
+    @media (min-width: 768px) {
+        margin-bottom: 32px;
+    }
 
     @media (min-width: 1024px) {
         margin-bottom: 60px;
