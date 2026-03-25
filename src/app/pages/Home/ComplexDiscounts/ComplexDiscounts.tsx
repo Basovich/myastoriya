@@ -33,11 +33,7 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
 
     if (!dict || !dict.items || dict.items.length === 0) return null;
 
-    const getRoute = (path: string) => {
-        const basePath = lang === 'ua' ? '' : `/${lang}`;
-        const safePath = path.startsWith('/') ? path : `/${path}`;
-        return `${basePath}${safePath}`;
-    };
+
 
     return (
         <section className={s.section} id="combo">

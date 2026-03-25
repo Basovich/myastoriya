@@ -53,15 +53,10 @@ export default function BlogGrid({ dict, initialItems, lang, activeCategory = 'a
     const [currentPage, setCurrentPage] = useState(1);
     const totalPages = 10; // Mock total pages
 
-    // Helper to conditionally drop '/ua'
-    const getRoute = (path: string) => {
-        const basePath = lang === 'ua' ? '' : `/${lang}`;
-        const safePath = path === '/' ? '' : path.startsWith('/') ? path : `/${path}`;
-        return `${basePath}${safePath}` || '/';
-    };
+    // removed getRoute as AppLink automatically handles localization
 
     const breadcrumbItems = [
-        { label: dict.breadcrumbs.home, href: getRoute('/') },
+        { label: dict.breadcrumbs.home, href: '/' },
         { label: dict.breadcrumbs.blog }
     ];
 
@@ -77,10 +72,10 @@ export default function BlogGrid({ dict, initialItems, lang, activeCategory = 'a
     };
 
     const tabsData = [
-        { id: 'all', label: dict.tabs.all, href: getRoute('/blog'), active: activeCategory === 'all' },
-        { id: 'news', label: dict.tabs.news, href: getRoute('/blog/news'), active: activeCategory === 'news' },
-        { id: 'recipes', label: dict.tabs.recipes, href: getRoute('/blog/recipes'), active: activeCategory === 'recipes' },
-        { id: 'events', label: dict.tabs.events, href: getRoute('/blog/events'), active: activeCategory === 'events' },
+        { id: 'all', label: dict.tabs.all, href: '/blog', active: activeCategory === 'all' },
+        { id: 'news', label: dict.tabs.news, href: '/blog/news', active: activeCategory === 'news' },
+        { id: 'recipes', label: dict.tabs.recipes, href: '/blog/recipes', active: activeCategory === 'recipes' },
+        { id: 'events', label: dict.tabs.events, href: '/blog/events', active: activeCategory === 'events' },
     ];
 
     return (

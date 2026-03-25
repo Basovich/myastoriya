@@ -1,4 +1,5 @@
 import s from "./Button.module.scss";
+import AppLink from "../AppLink/AppLink";
 
 type ButtonVariant = "primary" | "outline"  | "outline-black" | "icon" | "pill" | "red" | "black";
 
@@ -36,9 +37,9 @@ export default function Button(props: ButtonProps) {
     if (props.href) {
         const { href, ...anchorProps } = rest as Omit<AsAnchor, keyof CommonProps>;
         return (
-            <a href={href} className={classes} aria-label={ariaLabel} {...anchorProps}>
+            <AppLink href={href} className={classes} ariaLabel={ariaLabel ?? undefined} {...anchorProps}>
                 {children}
-            </a>
+            </AppLink>
         );
     }
 
