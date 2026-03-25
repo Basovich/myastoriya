@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import clsx from "clsx";
 import s from "./CategoryCircles.module.scss";
 import Image from "next/image";
-import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
@@ -90,7 +90,7 @@ export default function CategoryCircles({
             >
                 {searchCategories.map((item, index) => (
                     <SwiperSlide key={index} className={s.slide}>
-                        <Link href={item.href} className={s.item}>
+                        <AppLink href={item.href} className={s.item}>
                             <div className={s.circle}>
                                 <Image
                                     src={item.image}
@@ -101,7 +101,7 @@ export default function CategoryCircles({
                                 />
                             </div>
                             <span className={s.name}>{item.name}</span>
-                        </Link>
+                        </AppLink>
                     </SwiperSlide>
                 ))}
             </Swiper>

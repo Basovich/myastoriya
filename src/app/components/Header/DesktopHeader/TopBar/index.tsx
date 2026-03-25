@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import s from "./TopBar.module.scss";
 import siteData from "@/content/site.json";
 import { type Locale } from "@/i18n/config";
@@ -33,9 +33,9 @@ export default function TopBar({ lang }: TopBarProps) {
 
                     <div className={s.navLinks}>
                         {TOP_NAV_ITEMS.map((item, i) => (
-                            <Link key={i} href={getLocalizedHref(item.href, lang)} className={s.navLink}>
+                            <AppLink key={i} href={item.href} className={s.navLink}>
                                 {item.label}
-                            </Link>
+                            </AppLink>
                         ))}
                     </div>
                 </div>

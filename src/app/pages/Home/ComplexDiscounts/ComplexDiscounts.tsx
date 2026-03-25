@@ -8,7 +8,7 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Image from "next/image";
-import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 
 interface DiscountItem {
@@ -83,7 +83,7 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                 >
                     {dict.items.map((discount: DiscountItem) => (
                         <SwiperSlide key={discount.id} className={s.slide}>
-                            <Link href={getRoute(`/complex-discounts/${discount.id}`)} className={s.cardLink}>
+                            <AppLink href={`/complex-discounts/${discount.id}`} className={s.cardLink}>
                                 <div className={s.card}>
                                     <div className={s.cardImage}>
                                         <Image src={discount.image} alt={discount.title} fill className={s.cardImg} />
@@ -98,7 +98,7 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                                         <h3 className={s.cardTitle}>{discount.title}</h3>
                                     </div>
                                 </div>
-                            </Link>
+                            </AppLink>
                         </SwiperSlide>
                     ))}
                 </Swiper>

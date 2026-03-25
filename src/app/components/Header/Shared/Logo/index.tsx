@@ -1,4 +1,4 @@
-import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
@@ -13,7 +13,7 @@ interface LogoProps {
 
 export default function Logo({ lang, className, theme = 'white' }: LogoProps) {
     return (
-        <Link href={getLocalizedHref("/", lang)} className={clsx(s.logo, className)}>
+        <AppLink href="/" className={clsx(s.logo, className)}>
             <Image
                 src={theme === 'black' ? "/images/logo-black.svg" : "/images/logo-white.svg"}
                 alt="М'ясторія"
@@ -22,6 +22,6 @@ export default function Logo({ lang, className, theme = 'white' }: LogoProps) {
                 className={s.logoImg}
                 priority
             />
-        </Link>
+        </AppLink>
     );
 }

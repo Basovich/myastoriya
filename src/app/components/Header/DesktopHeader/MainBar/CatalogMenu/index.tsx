@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import clsx from "clsx";
 import s from "./CatalogMenu.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -237,9 +237,9 @@ export default function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                             <ul className={s.subList}>
                                 {activeCategory.subcategories.map((sub, i) => (
                                     <li key={i} className={s.subItem}>
-                                        <Link href={sub.href} className={s.subLink}>
+                                        <AppLink href={sub.href} className={s.subLink}>
                                             <span className={s.subTitleText}>{sub.title}</span>
-                                        </Link>
+                                        </AppLink>
                                     </li>
                                 ))}
                             </ul>

@@ -1,7 +1,7 @@
 import s from "./Publications.module.scss";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import Button from "../../../components/ui/Button/Button";
-import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import { Locale } from "@/i18n/config";
 import type { Publication } from "@/i18n/types";
@@ -24,7 +24,7 @@ export default function Publications({ dict, lang }: PublicationsProps) {
             </div>
             <div className={s.carousel}>
                 {dict.items.map((pub) => (
-                    <Link href={`/${lang}/blog/${pub.id}`} key={pub.id} className={s.card}>
+                    <AppLink href={`/blog/${pub.id}`} key={pub.id} className={s.card}>
                         <div className={s.imageWrap}>
                             <Image src={pub.image} alt={pub.title} fill className={s.cardImg} />
                         </div>
@@ -32,7 +32,7 @@ export default function Publications({ dict, lang }: PublicationsProps) {
                             <span className={s.date}>{pub.dateRange}</span>
                             <h3 className={s.title} title={pub.title}>{pub.title}</h3>
                         </div>
-                    </Link>
+                    </AppLink>
                 ))}
             </div>
             <div className={s.allBtn}>

@@ -11,7 +11,7 @@ import CatalogMenu from "@/app/components/Header/DesktopHeader/MainBar/CatalogMe
 import LanguageSwitch from "@/app/components/Header/Shared/LanguageSwitch";
 import { type Locale } from "@/i18n/config";
 import Image from "next/image";
-import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
 import siteData from "@/content/site.json";
 
@@ -119,14 +119,14 @@ export default function MainBar({
                     <div className={s.scrolledMenuInner}>
                         <div className={s.scrolledMenuLinks}>
                             {TOP_NAV_ITEMS.map((item, i) => (
-                                <Link
+                                <AppLink
                                     key={i}
-                                    href={getLocalizedHref(item.href, lang)}
+                                    href={item.href}
                                     className={s.scrolledMenuLink}
                                     onClick={onMenuClose}
                                 >
                                     {item.label}
-                                </Link>
+                                </AppLink>
                             ))}
                         </div>
                         <div className={s.scrolledMenuRight}>

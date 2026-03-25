@@ -1,6 +1,6 @@
 import s from "./Footer.module.scss";
 import siteData from "@/content/site.json";
-import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import Logo from "@/app/components/Header/Shared/Logo";
 import { type Locale } from "@/i18n/config";
@@ -39,12 +39,12 @@ export default function Footer({ lang }: FooterProps) {
                     <div className={s.linksGrid}>
                         <nav className={s.linksList}>
                             {siteLinks.map((link, i) => (
-                                <Link key={i} href={getLocalizedHref(link.href, lang)} className={s.link}>{link.label}</Link>
+                                <AppLink key={i} href={link.href} className={s.link}>{link.label}</AppLink>
                             ))}
                         </nav>
                         <nav className={s.linksList}>
                             {legalLinks.map((link, i) => (
-                                <Link key={i} href={getLocalizedHref(link.href, lang)} className={s.link}>{link.label}</Link>
+                                <AppLink key={i} href={link.href} className={s.link}>{link.label}</AppLink>
                             ))}
                         </nav>
                     </div>
@@ -98,13 +98,13 @@ export default function Footer({ lang }: FooterProps) {
                         <p className={s.contactItem}>{contact.phone}</p>
                         <p className={s.contactItem}>{contact.email}</p>
                         <p className={s.contactItem}>Час роботи: {contact.workingHours}</p>
-                        <Link href={getLocalizedHref("/contacts", lang)} className={s.addressBtn}>
+                        <AppLink href="/contacts" className={s.addressBtn}>
                             <span className={s.addressBtnNext}>АДРЕСИ РЕСТОРАНІВ</span>
                             <svg className={s.addressBtnIcon} xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                                 <path d="M9.98565 0.999701L16.3141 7.32812L9.98565 13.6565" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                                 <line x1="15" y1="7.17187" x2="1" y2="7.17187" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                             </svg>
-                        </Link>
+                        </AppLink>
                     </div>
 
                     <div className={s.paymentSection}>

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import { useTransition, animated } from "react-spring";
 import s from "./MobileMenu.module.scss";
@@ -122,7 +123,7 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                 <AnimatedDiv style={accordionStyle} className={s.catalogListWrapper}>
                     <div className={s.catalogList} ref={catalogListRef}>
                         {categoriesData.map((cat, i) => (
-                            <Link key={i} href={getLocalizedHref(cat.href, lang)} className={s.categoryItem} onClick={onClose}>
+                            <AppLink key={i} href={cat.href} className={s.categoryItem} onClick={onClose}>
                                 <Image
                                     src={`/icons/categories/${cat.icon}.svg`}
                                     alt=""
@@ -132,7 +133,7 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                                     onError={(e) => { e.currentTarget.style.display = 'none' }}
                                 />
                                 {cat.label}
-                            </Link>
+                            </AppLink>
                         ))}
                     </div>
                 </AnimatedDiv>
@@ -142,17 +143,17 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                     <nav className={s.footerLinks}>
                         {siteData.navigation.map((item, i) => {
                             const isPlaceholder = item.href === "#";
-                            const href = isPlaceholder ? "#" : getLocalizedHref(item.href, lang);
+                            const href = isPlaceholder ? "#" : item.href;
                             
                             return (
-                                <Link
+                                <AppLink
                                     key={i}
                                     href={href}
                                     className={s.footerLink}
                                     onClick={!isPlaceholder ? onClose : undefined}
                                 >
                                     {item.label}
-                                </Link>
+                                </AppLink>
                             );
                         })}
                     </nav>

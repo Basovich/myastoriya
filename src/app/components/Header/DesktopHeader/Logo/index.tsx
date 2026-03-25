@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from 'next/image';
 
 export default function Logo() {
@@ -23,8 +23,8 @@ export default function Logo() {
     }
 
     return (
-        <Link href="/">
+        <AppLink href="/">
             {logoContent}
-        </Link>
+        </AppLink>
     );
 }

@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
-import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 
@@ -84,7 +84,7 @@ export default function Actions({ dict, lang }: ActionsProps) {
                 >
                     {dict.items.map((item, idx) => (
                         <SwiperSlide key={`${item.id}-${idx}`} className={s.slide}>
-                            <Link href={getRoute(`/actions/${item.id}`)} className={s.cardLink}>
+                            <AppLink href={`/actions/${item.id}`} className={s.cardLink}>
                                 <div className={s.card}>
                                     <div className={s.cardImage}>
                                         <Image src={item.image} alt={item.title} fill className={s.cardImg} />
@@ -102,7 +102,7 @@ export default function Actions({ dict, lang }: ActionsProps) {
                                         <h4 className={s.cardTitle}>{item.title}</h4>
                                     </div>
                                 </div>
-                            </Link>
+                            </AppLink>
                         </SwiperSlide>
                     ))}
                 </Swiper>

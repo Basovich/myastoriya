@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Button from "../ui/Button/Button";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
@@ -101,7 +101,7 @@ export default function BlogGrid({ dict, initialItems, lang, activeCategory = 'a
 
                 <div className={s.grid}>
                     {items.map((item, idx) => (
-                        <Link key={`${item.id}-${idx}`} href={getRoute(`/blog/${item.id}`)} className={s.cardLink}>
+                        <AppLink key={`${item.id}-${idx}`} href={`/blog/${item.id}`} className={s.cardLink}>
                             <div className={s.card}>
                                 <div className={s.cardImage}>
                                     <Image src={item.image} alt={item.title} fill className={s.cardImg} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
@@ -111,7 +111,7 @@ export default function BlogGrid({ dict, initialItems, lang, activeCategory = 'a
                                     <h3 className={s.cardTitle}>{item.title}</h3>
                                 </div>
                             </div>
-                        </Link>
+                        </AppLink>
                     ))}
                 </div>
 
