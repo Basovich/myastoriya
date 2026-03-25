@@ -154,6 +154,18 @@ export interface HomeDict {
   careersPage: CareersPageDict;
   applicantFormPage: ApplicantFormPageDict;
   contactsPage: ContactsPageDict;
+  notFoundPage: NotFoundPageDict;
+}
+
+export interface NotFoundPageDict {
+  title: string;
+  text: string;
+  subtext: string;
+  button: string;
+  breadcrumbs: {
+    home: string;
+    notFound: string;
+  };
 }
 
 export interface BlogPostPageDict {
