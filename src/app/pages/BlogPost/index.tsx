@@ -139,8 +139,9 @@ export default function BlogPostPage({ dict, lang, postId }: BlogPostPageProps) 
                                         <div key={idx} className={s.bodyImage}>
                                             <Image 
                                                 src={section.value} 
-                                                alt="" 
-                                                fill 
+                                                alt=""
+                                                width={320}
+                                                height={240}
                                             />
                                         </div>
                                     );
