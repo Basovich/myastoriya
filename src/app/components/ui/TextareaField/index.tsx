@@ -12,7 +12,7 @@ interface TextareaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaElement>
     touched?: boolean;
 }
 
-export default function TextareaField({
+export default function Index({
     id,
     label,
     required = false,

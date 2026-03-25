@@ -7,10 +7,9 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import clsx from "clsx";
-
 import s from "./BlogPost.module.scss";
 import { type Locale } from "@/i18n/config";
-import { type Dictionary } from "@/i18n/types";
+import { type Dictionary, type Publication } from "@/i18n/types";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import Header from "@/app/components/Header/Header";
@@ -21,6 +20,14 @@ import SliderArrow from "@/app/components/ui/SliderArrow/SliderArrow";
 import SectionHeader from "@/app/components/ui/SectionHeader/SectionHeader";
 import blogData from "@/content/blog.json";
 import homeData from "@/content/pages/home.json";
+
+type BlogPost = (typeof blogData.posts)[number];
+
+interface ContentSection {
+    type: string;
+    value: string;
+    bold?: boolean;
+}
 
 interface BlogPostPageProps {
     dict: Dictionary;
@@ -43,7 +50,7 @@ export default function BlogPostPage({ dict, lang, postId }: BlogPostPageProps) 
         // Sometimes id might be 0 after modulo if the id is exactly 1000
         const safeBaseId = baseId === 0 ? 1 : baseId;
         
-        let pubItem = fallbacks.find((item: any) => item.id === safeBaseId);
+        let pubItem = fallbacks.find((item: Publication) => item.id === safeBaseId);
         if (!pubItem && fallbacks.length > 0) {
             pubItem = fallbacks[0];
         }
@@ -52,7 +59,7 @@ export default function BlogPostPage({ dict, lang, postId }: BlogPostPageProps) 
             post = {
                 ...genericPost,
                 id: postId,
-                title: { [lang]: pubItem.title } as any,
+                title: { [lang]: pubItem.title } as BlogPost["title"],
                 featuredImage: pubItem.image,
                 date: pubItem.dateRange || genericPost.date,
             };
@@ -130,7 +137,7 @@ export default function BlogPostPage({ dict, lang, postId }: BlogPostPageProps) 
                         <h1 className={s.postTitle}>{post.title[lang]}</h1>
 
                         <div className={s.postBody}>
-                            {post.content[lang].map((section: any, idx: number) => {
+                            {post.content[lang].map((section: ContentSection, idx: number) => {
                                 if (section.type === "text") {
                                     return (
                                         <p 

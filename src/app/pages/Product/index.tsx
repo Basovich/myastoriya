@@ -23,7 +23,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
     
     const dict = lang === 'ru' ? ruData : uaData;
     const list = dict.home?.products?.items || [];
-    let matchedItem = list.find((i: any) => i.id === safeBaseId);
+    let matchedItem = list.find((i) => i.id === safeBaseId);
     
     if (!matchedItem && list.length > 0) {
         matchedItem = list[0];

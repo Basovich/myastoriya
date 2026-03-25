@@ -4,7 +4,6 @@ import {Locale} from "@/i18n/config";
 import SearchContent from "@/app/pages/Search/SearchContent/SearchContent";
 import Footer from "@/app/components/Footer/Footer";
 
-
 export default function Search({ params }: { params: Promise<{ lang: string }> }) {
     const { lang } = use(params);
 

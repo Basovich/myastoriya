@@ -5,6 +5,7 @@ import { Locale } from "@/i18n/config";
 import { Dictionary } from "@/i18n/types";
 import s from "./ApplicantFormPage.module.scss";
 import ApplicantForm from "@/app/components/ApplicantForm/ApplicantForm";
+import Image from "next/image";
 
 interface ApplicantFormPageProps {
     dict: Dictionary;
@@ -28,10 +29,12 @@ export default function ApplicantFormPage({ dict, lang }: ApplicantFormPageProps
                 />
                 <section className={s.container}>
                     <div className={s.imageWrapper}>
-                        <img 
+                        <Image
                             src="/images/careers/careers_form.webp" 
                             alt={applicantFormPageDict.title} 
-                            className={s.formImage} 
+                            className={s.formImage}
+                            width={320}
+                            height={180}
                         />
                     </div>
                     <h1 className={s.title}>{applicantFormPageDict.title}</h1>

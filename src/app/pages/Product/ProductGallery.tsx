@@ -6,6 +6,7 @@ import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import Image from "next/image";
 import styles from './Product.module.scss';
 
 interface ProductGalleryProps {
@@ -25,7 +26,12 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ images, discount }) => 
                 {images.map((image, index) => (
                     <SwiperSlide key={index}>
                         <div className={styles.slideImage}>
-                            <img src={image} alt={`Product image ${index + 1}`} />
+                            <Image
+                                src={image}
+                                alt={`Product image ${index + 1}`}
+                                width={320}
+                                height={160}
+                            />
                         </div>
                     </SwiperSlide>
                 ))}

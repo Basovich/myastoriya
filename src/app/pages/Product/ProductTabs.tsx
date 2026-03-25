@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
 import styles from './Product.module.scss';
+import Image from "next/image";
 
 interface ProductTabsProps {
     description: string;
@@ -17,7 +18,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
         { id: 'description', label: 'Опис', icon: '/images/product/tab-description.svg' },
         { id: 'characteristics', label: 'Характеристики', icon: '/images/product/tab-characteristics.svg' },
         { id: 'delivery', label: 'Доставка', icon: '/images/product/tab-delivery.svg' },
-    ];
+    ] as const;
 
     return (
         <div className={styles.tabsWrapper}>
@@ -26,9 +27,9 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                     <button
                         key={tab.id}
                         className={clsx(styles.tabButton, activeTab === tab.id && styles.active)}
-                        onClick={() => setActiveTab(tab.id as any)}
+                        onClick={() => setActiveTab(tab.id)}
                     >
-                        <img src={tab.icon} alt={tab.label} />
+                        <Image src={tab.icon} alt={tab.label} width={24} height={24} />
                         <span>{tab.label}</span>
                     </button>
                 ))}

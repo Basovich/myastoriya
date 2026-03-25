@@ -7,7 +7,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import s from './AuthModal.module.scss';
 import Button from "@/app/components/ui/Button/Button";
-import InputField from '@/app/components/ui/InputField';
+import InputField from '@/app/components/ui/Index';
 
 // Stub API call — replace with real endpoint
 async function resetPasswordAPI(phone: string, password: string): Promise<void> {

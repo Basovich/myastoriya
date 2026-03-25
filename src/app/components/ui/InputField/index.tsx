@@ -12,7 +12,7 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
     touched?: boolean;
 }
 
-export default function InputField({
+export default function Index({
     id,
     label,
     required = false,

@@ -1,22 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styles from "./PasswordGate.module.scss";
 
 const CORRECT_PASSWORD = "7535";
 const STORAGE_KEY = "myastoriya_auth";
 
 export default function PasswordGate({ children }: { children: React.ReactNode }) {
-    const [isAuthorized, setIsAuthorized] = useState(false);
-    const [isChecking, setIsChecking] = useState(true);
-
-    useEffect(() => {
-        const saved = sessionStorage.getItem(STORAGE_KEY);
-        if (saved === "true") {
-            setIsAuthorized(true);
-        }
-        setIsChecking(false);
-    }, []);
+    const [isAuthorized, setIsAuthorized] = useState(() => {
+        if (typeof window === "undefined") return false;
+        return sessionStorage.getItem(STORAGE_KEY) === "true";
+    });
 
     const handleSubmit = () => {
         const input = prompt("Введіть пароль для доступу до сайту:");
@@ -27,8 +21,6 @@ export default function PasswordGate({ children }: { children: React.ReactNode }
             alert("Невірний пароль!");
         }
     };
-
-    if (isChecking) return null;
 
     if (!isAuthorized) {
         return (
