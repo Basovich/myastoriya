@@ -1,12 +1,39 @@
 .section {
-    padding: 32px 16px;
-    background-color: #F6F6F6;
-    /* Optional, depending on theme. Figma looked white/grey */
+    padding: 32px 16px 52px;
+    background-color: #fff;
+
+    @media (min-width: 768px) {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    @media (min-width: 1280px) {
+        padding-left: calc((100% - 1200px) / 2);
+        padding-right: calc((100% - 1200px) / 2);
+        padding-bottom: 100px;
+    }
+
+    @media (min-width: 1360px) {
+        padding-left: calc((100% - 1280px) / 2);
+        padding-right: calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: calc((100% - 1300px) / 2);
+        padding-right: calc((100% - 1300px) / 2);
+    }
 }
 
-/* UI Shared Components handled container and breadcrumbs */
 .tabs {
     margin-bottom: 24px;
+
+    @media (min-width: 1280px) {
+        margin-bottom: 38px;
+    }
+}
+
+.tabBtn {
+    max-width: 210px;
 }
 
 .bannerWrapper {
@@ -71,6 +98,11 @@
         grid-template-columns: repeat(3, 1fr);
         gap: 24px;
     }
+
+    @media (min-width: 1280px) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 42px 24px;
+    }
 }
 
 .cardLink {
@@ -85,28 +117,38 @@
     display: flex;
     flex-direction: column;
     background: #FFF;
-    border-radius: 12px;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s, box-shadow 0.2s;
 
     @media (any-hover: hover) {
         &:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            .cardTitle {
+                color: #E30613;
+            }
+
+            .cardImg {
+                transform: scale(1.05);
+            }
         }
     }
 }
 
 .cardImage {
-    position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+
+    @media (min-width: 1280px) {
+        height: 232px;
+    }
 }
 
 .cardImg {
+    height: 100%;
+    width: 100%;
     object-fit: cover;
+    transition: transform 0.2s;
 }
 
 .discountBadge {
@@ -123,12 +165,11 @@
 }
 
 .cardBody {
-    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     flex: 1;
-    /* allow spreading if heights differ */
+    margin-top: 12px;
 }
 
 .date {
@@ -145,11 +186,16 @@
 }
 
 .cardTitle {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     line-height: 1.4;
     color: #222;
     margin: 0;
+    transition: color 0.2s;
+
+    @media (min-width: 1280px) {
+        font-size: 16px;
+    }
 }
 
 .loadMoreWrapper {
@@ -157,9 +203,21 @@
     justify-content: center;
     margin-top: 40px;
 
-    button {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    @media (min-width: 1280px) {
+        margin-top: 80px;
+    }
+
+    .loadMoreBtn {
+        height: 46px;
+        padding: 10px 24px;
+
+        .loadMoreBtnText {
+            padding-top: 2px;
+        }
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
     }
 }

@@ -14,6 +14,7 @@ interface TabsProps {
     onChange?: (id: string) => void;
     variant?: "pills" | "underline";
     className?: string;
+    classNameBtn?: string;
 }
 
 export default function Tabs({
@@ -21,6 +22,7 @@ export default function Tabs({
     onChange,
     variant = "pills",
     className,
+    classNameBtn
 }: TabsProps) {
     return (
         <div className={clsx(s.tabsWrapper, s[variant], className)}>
@@ -30,7 +32,7 @@ export default function Tabs({
 
                 if (tab.href) {
                     return (
-                        <Button key={tab.id} href={tab.href} variant={buttonVariant} className={s.tab}>
+                        <Button key={tab.id} href={tab.href} variant={buttonVariant} className={clsx(s.tab, classNameBtn)}>
                             {tab.label}
                         </Button>
                     );
@@ -42,7 +44,7 @@ export default function Tabs({
                         type="button"
                         variant={buttonVariant}
                         onClick={() => onChange?.(tab.id)}
-                        className={s.tab}
+                        className={clsx(s.tab, classNameBtn)}
                     >
                         {tab.label}
                     </Button>
