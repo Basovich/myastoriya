@@ -27,10 +27,10 @@ export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }
     const title = item ? item.title : 'Steak Days щовівторка!';
 
     const breadcrumbItems = [
-        { label: dict.home.promotionsPage.breadcrumbs.home, href: '/' },
+        { label: dict.home.actionsPage.breadcrumbs.home, href: '/' },
         { 
             label: pageType === 'promotions' 
-                ? dict.home.promotionsPage.breadcrumbs.promotions 
+                ? dict.home.actionsPage.breadcrumbs.promotions 
                 : dict.home.complexDiscountsPage.breadcrumbs.complexDiscounts, 
             href: pageType === 'promotions' ? '/actions' : '/complex-discounts' 
         },
