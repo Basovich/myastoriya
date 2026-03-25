@@ -9,7 +9,7 @@ import { usePhoneMask } from '@/hooks/usePhoneMask';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 import Button from "@/app/components/ui/Button/Button";
-import InputField from '@/app/components/ui/Index';
+import InputField from '@/app/components/ui/InputField';
 
 // Stub API function — ready for real API integration
 async function loginAPI(phone: string, password: string) {

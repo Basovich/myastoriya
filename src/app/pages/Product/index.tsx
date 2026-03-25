@@ -76,10 +76,10 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
             }
         ],
         relatedProducts: [
-            { id: "p1", name: "Стейк Нью-Йорк", price: 780, image: "/images/product/product-main.png" },
-            { id: "p2", name: "Стейк Філе Міньйон", price: 920, image: "/images/product/product-main.png" },
-            { id: "p3", name: "Бургер Класичний", price: 350, image: "/images/product/product-main.png" },
-            { id: "p4", name: "Салат Цезар", price: 280, image: "/images/product/product-main.png" },
+            { id: "p1", title: "Стейк Нью-Йорк", price: 780, weight: "350г", unit: "упаковка", image: "/images/product/product-main.png" },
+            { id: "p2", title: "Стейк Філе Міньйон", price: 920, weight: "300г", unit: "упаковка", image: "/images/product/product-main.png" },
+            { id: "p3", title: "Бургер Класичний", price: 350, weight: "250г", unit: "упаковка", image: "/images/product/product-main.png" },
+            { id: "p4", title: "Салат Цезар", price: 280, weight: "200г", unit: "упаковка", image: "/images/product/product-main.png" },
         ]
     };
 
