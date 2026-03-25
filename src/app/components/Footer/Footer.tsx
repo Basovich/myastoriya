@@ -4,7 +4,6 @@ import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import Logo from "@/app/components/Header/Shared/Logo";
 import { type Locale } from "@/i18n/config";
-import { getLocalizedHref } from "@/utils/i18n-helpers";
 import clsx from "clsx";
 
 interface FooterProps {

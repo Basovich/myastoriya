@@ -4,7 +4,6 @@ import AppLink from "@/app/components/ui/AppLink/AppLink";
 import s from "./TopBar.module.scss";
 import siteData from "@/content/site.json";
 import { type Locale } from "@/i18n/config";
-import { getLocalizedHref } from "@/utils/i18n-helpers";
 import { useAppSelector } from "@/store/hooks";
 import Image from "next/image";
 import LanguageSwitch from "@/app/components/Header/Shared/LanguageSwitch";

@@ -1,34 +1,58 @@
 .main {
     background-color: #f8f8f8;
     min-height: 100vh;
-    padding-bottom: 60px;
+    padding-bottom: 20px;
+
+    @media (min-width: 1280px) {
+        padding-bottom: 80px;
+    }
 }
 
 .content {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px 16px;
+    padding: 20px 16px 40px;
+
+    @media (min-width: 768px) {
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-bottom: 60px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 38px 0 70px;
+    }
 
     @media (min-width: 1360px) {
         max-width: 1280px;
     }
 }
 
-.breadcrumbs {
-    margin-bottom: 24px;
-}
-
-.postHeader {
-    margin-bottom: 32px;
+nav.breadcrumbs {
+    @media (min-width: 1280px) {
+        margin-bottom: 32px;
+    }
 }
 
 .featuredImage {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    height: 200px;
     border-radius: 14px;
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: 18px;
+
+    @media (min-width: 1024px) {
+        height: 300px;
+    }
+
+    @media (min-width: 1280px) {
+        height: 400px;
+    }
+
+    @media (min-width: 1440px) {
+        height: 500px;
+    }
 
     img {
         object-fit: cover;
@@ -38,7 +62,7 @@
 .meta {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     margin-bottom: 32px;
 
     @media (min-width: 768px) {
@@ -51,41 +75,77 @@
 .metaLeft {
     display: flex;
     align-items: center;
-    gap: 32px;
+    justify-content: space-between;
+    gap: 14px;
 }
 
 .date {
-    color: #8E8E93;
-    font-size: 16px;
+    color: #828282;
+    font-size: 12px;
+    font-style: normal;
     font-weight: 400;
+    line-height: normal;
+    margin-top: 2px;
+
+    @media (min-width: 1280px) {
+        font-size: 14px;
+    }
 }
 
 .views {
-    color: #1a1a1a;
-    font-size: 16px;
-    font-weight: 700;
+    color: #000;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 171.429%;
+    letter-spacing: 0.28px;
+    margin-left: auto;
+    margin-top: 2px;
+
+    @media (min-width: 1280px) {
+        font-size: 14px;
+    }
 }
 
 .likeBtn {
-    width: 48px;
-    height: 48px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: 1px solid #1a1a1a;
-    background: #fff;
+    border: 1px solid #000;
+    background-color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease;
+
+    @media (min-width: 1280px) {
+        width: 44px;
+        height: 44px;
+    }
 
     @media (any-hover: hover) {
         &:hover {
-            background-color: #f5f5f5;
+            background-color: #000;
+
+            .likeBtnIcon path {
+                stroke: #fff;
+            }
         }
     }
 
-    img {
-        object-fit: contain;
+    .likeBtnIcon {
+        width: 16px;
+        height: 16px;
+
+        @media (min-width: 1280px) {
+            width: 16px;
+            height: 16px;
+        }
+
+        path {
+            transition: stroke 0.2s ease;
+        }
     }
 }
 
@@ -96,9 +156,11 @@
 }
 
 .shareLabel {
-    font-size: 14px;
+    color: #262626;
+    font-size: 12px;
+    font-style: normal;
     font-weight: 700;
-    color: #1a1a1a;
+    line-height: normal;
 }
 
 .facebookBtn {
@@ -107,11 +169,13 @@
     border: none;
     padding: 10px 40px;
     border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
     text-decoration: none;
+    margin-left: auto;
+    transition: opacity 0.2s ease;
 
     @media (any-hover: hover) {
         &:hover {
@@ -121,36 +185,36 @@
 }
 
 .postTitle {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 800;
     color: #1a1a1a;
     text-transform: uppercase;
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 
-    @media (min-width: 768px) {
-        font-size: 40px;
+    @media (min-width: 1280px) {
+        font-size: 28px;
     }
 }
 
 .postBody {
-    max-width: 900px;
+    max-width: 836px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 18px;
 }
 
 .paragraph {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #444;
-    text-align: center;
+    color: #000;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 170%;
+    letter-spacing: 0.36px;
     white-space: pre-wrap;
 
-    &.bold {
-        font-weight: 700;
-        color: #1a1a1a;
+    @media (min-width: 1280px) {
         font-size: 18px;
     }
 }
@@ -168,27 +232,68 @@
 }
 
 .recommended {
-    margin-top: 60px;
+    padding-left: 16px;
+
+    @media (min-width: 768px) {
+        padding-left: 40px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 0 calc((100% - 1200px) / 2);
+    }
+
+    @media (min-width: 1360px) {
+        padding: 0 calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding: 0 calc((100% - 1300px) / 2);
+    }
 }
 
-.recommendedTitle {
-    margin-bottom: 32px;
+.swiperWrapper {
+    display: block;
+
+    @media (min-width: 1280px) {
+        display: none;
+    }
 }
 
-.sliderContainer {
-    position: relative;
+.recommendedGrid {
+    display: none;
+
+    @media (min-width: 1280px) {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        row-gap: 24px;
+        column-gap: 16px;
+        padding-top: 38px;
+    }
 }
 
 .swiperContainer {
-    padding: 10px 0 40px;
+    position: relative;
+    padding: 20px 16px;
+    margin-left: -16px;
+
+    @media (min-width: 768px) {
+        padding-top: 30px;
+        padding-left: 40px;
+        padding-right: 40px;
+        margin-left: -40px;
+    }
+
+    &:global(.swiper) {
+        overflow: visible;
+    }
 }
 
 .sliderNav {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     position: absolute;
-    top: -55px;
-    right: 0;
+    top: -45px;
+    right: 40px;
 
     @media (max-width: 767px) {
         display: none;

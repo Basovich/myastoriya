@@ -12,7 +12,6 @@ import LanguageSwitch from "@/app/components/Header/Shared/LanguageSwitch";
 import { type Locale } from "@/i18n/config";
 import Image from "next/image";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
-import { getLocalizedHref } from "@/utils/i18n-helpers";
 import siteData from "@/content/site.json";
 
 export const TOP_NAV_ITEMS = [

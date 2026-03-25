@@ -5,7 +5,6 @@ import Image from "next/image";
 import s from "./Contacts.module.scss";
 import { type Locale } from "@/i18n/config";
 import { type Dictionary, type ContactsPageDict } from "@/i18n/types";
-import { getLocalizedHref } from "@/utils/i18n-helpers";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import Header from "@/app/components/Header/Header";
 import Footer from "@/app/components/Footer/Footer";
@@ -95,7 +94,7 @@ export default function ContactsPage({ dict, lang }: ContactsPageProps) {
     const meatBarRestaurants = restaurants.filter(r => r.type === "meatbar");
 
     const breadcrumbs = [
-        { label: contactsPage.breadcrumbs.home, href: getLocalizedHref("/", lang) },
+        { label: contactsPage.breadcrumbs.home, href: "/" },
         { label: contactsPage.breadcrumbs.contacts },
     ];
 

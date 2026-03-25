@@ -5,7 +5,6 @@ import { Locale } from "@/i18n/config";
 import { Dictionary } from "@/i18n/types";
 import s from "./Careers.module.scss";
 import Image from "next/image";
-import {getLocalizedHref} from "@/utils/i18n-helpers";
 import Button from "@/app/components/ui/Button/Button";
 
 interface CareersPageProps {
@@ -36,7 +35,7 @@ export default function CareersPage({ dict, lang }: CareersPageProps) {
                     <p className={s.text}>{careersPage.about.text}</p>
                     <Button
                         variant="red"
-                        href={getLocalizedHref("/careers/apply", lang)}
+                        href="/careers/apply"
                         className={s.button}
                     >
                         {careersPage.form.button}

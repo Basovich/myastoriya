@@ -1,7 +1,6 @@
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import { type Locale } from "@/i18n/config";
-import { getLocalizedHref } from "@/utils/i18n-helpers";
 import clsx from "clsx";
 import s from "./Logo.module.scss";
 
