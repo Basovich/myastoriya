@@ -89,7 +89,7 @@ export default function ActionsGrid({ dict, initialItems, lang, pageType }: Acti
 
             <div className={s.grid}>
                 {items.map((item, idx) => (
-                    <AppLink key={`${item.id}-${idx}`} href={`/${pageType}/${item.id}`} className={s.cardLink}>
+                    <AppLink key={`${item.id}-${idx}`} href={`/${pageType === 'promotions' ? 'actions' : pageType}/${item.id}`} className={s.cardLink}>
                         <div className={s.card}>
                             <div className={s.cardImage}>
                                 <Image src={item.image}
