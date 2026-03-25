@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Logo() {
@@ -22,8 +23,8 @@ export default function Logo() {
     }
 
     return (
-        <a href="/">
+        <Link href="/">
             {logoContent}
-        </a>
+        </Link>
     );
 }

@@ -6,7 +6,7 @@ import siteData from "@/content/site.json";
 import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
 import { useAppSelector } from "@/store/hooks";
-
+import Image from "next/image";
 import LanguageSwitch from "@/app/components/Header/Shared/LanguageSwitch";
 import PointsInfo from "@/app/components/Header/DesktopHeader/MainBar/PointsInfo";
 
@@ -43,7 +43,12 @@ export default function TopBar({ lang }: TopBarProps) {
                 <div className={s.navRight}>
                     {isAuthenticated && <PointsInfo />}
                     <a href={`tel:${siteData.contact.phone.replace(/\s+/g, '')}`} className={s.navPhone}>
-                        <img src="/icons/icon-phone-outline.svg" alt="Phone" width="16" height="16" />
+                        <Image
+                            src="/icons/icon-phone-outline.svg"
+                            alt="Phone"
+                            width="16"
+                            height="16"
+                        />
                         {siteData.contact.phone}
                     </a>
                     <div className={s.langSwitchWrapper}>

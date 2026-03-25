@@ -1,7 +1,7 @@
-import { useRef, useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useTransition, config, animated } from "react-spring";
+import { useTransition, animated } from "react-spring";
 import s from "./MobileMenu.module.scss";
 import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";

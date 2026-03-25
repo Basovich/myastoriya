@@ -24,7 +24,7 @@ export default function SearchBar() {
     const lang = params?.lang || "uk";
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const handleSearch = (e?: React.FormEvent) => {
+    const handleSearch = (e?: React.SyntheticEvent) => {
         if (e) e.preventDefault();
 
         if (!query.trim()) {

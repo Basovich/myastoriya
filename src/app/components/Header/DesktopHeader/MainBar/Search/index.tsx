@@ -166,7 +166,6 @@ export default function Search({ lang }: { lang: Locale }) {
         if (isActive) {
             disableScroll();
         } else {
-            setShowOverlay(false);
             enableScroll();
         }
 
