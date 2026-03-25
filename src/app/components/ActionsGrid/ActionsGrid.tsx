@@ -10,7 +10,6 @@ import Tabs from "../ui/Tabs/Tabs";
 import Icon from "../ui/Icon/Icon";
 import AppLink from "../ui/AppLink/AppLink";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
-import { Locale } from "@/i18n/config";
 
 interface ActionItem {
     id: number;

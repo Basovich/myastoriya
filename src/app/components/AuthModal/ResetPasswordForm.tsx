@@ -3,7 +3,6 @@
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 import * as Yup from 'yup';
-import clsx from 'clsx';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import s from './AuthModal.module.scss';

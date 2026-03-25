@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
-import clsx from 'clsx';
 import s from './AuthModal.module.scss';
 import Button from "@/app/components/ui/Button/Button";
 import InputField from '@/app/components/ui/InputField';
@@ -155,8 +154,6 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
         if (!phoneVerified) return;
         onVerified(phone);
     };
-
-    const showPhoneError = phoneTouched && !!phoneError;
 
     return (
         <>

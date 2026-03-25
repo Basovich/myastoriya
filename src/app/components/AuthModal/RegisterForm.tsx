@@ -7,7 +7,6 @@ import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
-import clsx from 'clsx';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 import Button from "@/app/components/ui/Button/Button";
@@ -120,8 +119,9 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                     name: values.name,
                 }));
                 onSuccess();
-            } catch (err: any) {
-                setStatus(err.message || 'Помилка реєстрації');
+            } catch (err) {
+                const errorMessage = err instanceof Error ? err.message : 'Помилка реєстрації';
+                setStatus(errorMessage);
             }
         },
     });
@@ -224,8 +224,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         setSmsCode(cleaned);
         if (smsError) setSmsError('');
     };
-
-    const isPhoneFieldError = formik.touched.phone && !!formik.errors.phone;
 
     return (
         <>
