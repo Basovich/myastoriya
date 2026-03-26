@@ -67,10 +67,7 @@ export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }
 
     return (
         <section className={s.section}>
-            {/* Breadcrumbs */}
-            <div className={s.breadcrumbsWrapper}>
-                <Breadcrumbs items={breadcrumbItems} />
-            </div>
+            <Breadcrumbs items={breadcrumbItems} className={s.breadcrumbsWrapper} />
 
             {/* Hero banner */}
             <div className={s.heroWrapper}>
@@ -112,7 +109,6 @@ export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }
 
             {/* Products section */}
             <div className={s.productsSection}>
-                <h2 className={s.productsTitle}>Товари, що беруть участь у акції</h2>
                 <div className={s.productsGrid}>
                     {visibleProducts.map((product) => (
                         <ProductCard

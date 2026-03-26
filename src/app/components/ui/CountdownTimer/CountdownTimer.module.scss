@@ -1,29 +1,29 @@
 .wrapper {
     background: #fff;
-    border-radius: 12px 12px 0 0;
     padding: 12px 16px 16px;
     text-align: center;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 7.953px 18.558px 0 rgba(0, 0, 0, 0.10);
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    min-width: 280px;
+    width: 274px;
 
     @media (min-width: 768px) {
-        padding: 14px 24px 18px;
-        min-width: 360px;
+        padding: 22px 26px 26px;
+        width: 344px;
     }
 }
 
 .label {
-    font-family: var(--font-helios), sans-serif;
-    font-size: 13px;
-    color: #555;
+    color: #060606;
+    text-align: center;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;
     margin-bottom: 10px;
-
-    @media (min-width: 768px) {
-        font-size: 14px;
-    }
 }
 
 .values {
@@ -32,7 +32,7 @@
     gap: 6px;
 
     @media (min-width: 768px) {
-        gap: 10px;
+        gap: 8px;
     }
 }
 
@@ -40,34 +40,45 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 1px solid #EBEBEB;
-    border-radius: 8px;
-    padding: 6px 10px;
-    min-width: 52px;
-
-    @media (min-width: 768px) {
-        min-width: 64px;
-        padding: 8px 14px;
-    }
 }
 
 .number {
-    font-family: var(--font-houschka), sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: #E6030F;
-    line-height: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 46px;
+    border-radius: 9px;
+    padding: 10px 8px 8px;
+    background: #FFF;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.25);
+    color: #E6000F;
+    text-align: center;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 110%;
     margin-bottom: 4px;
 
     @media (min-width: 768px) {
-        font-size: 28px;
+        font-size: 40px;
+        padding: 12px 6px 10px;
     }
 }
 
 .unit {
-    font-family: var(--font-helios), sans-serif;
-    font-size: 11px;
-    color: #999;
+    color: #828282;
+    text-align: center;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;
+    margin-top: 6px;
+
+    @media (min-width: 768px) {
+        margin-top: 10px;
+    }
 }
 
 .separator {
@@ -75,7 +86,7 @@
     font-size: 22px;
     font-weight: 700;
     color: #E6030F;
-    padding-bottom: 16px;
+    padding-bottom: 28px;
 
     @media (min-width: 768px) {
         font-size: 28px;
