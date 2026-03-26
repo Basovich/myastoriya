@@ -31,11 +31,20 @@ export default function TopBar({ lang }: TopBarProps) {
                 <div className={s.leftSection}>
 
                     <div className={s.navLinks}>
-                        {TOP_NAV_ITEMS.map((item, i) => (
-                            <AppLink key={i} href={item.href} className={s.navLink}>
-                                {item.label}
-                            </AppLink>
-                        ))}
+                        {TOP_NAV_ITEMS.map((item, i) => {
+                            const isExternal = item.href.startsWith("http");
+                            return (
+                                <AppLink 
+                                    key={i} 
+                                    href={item.href} 
+                                    className={s.navLink}
+                                    target={isExternal ? "_blank" : undefined}
+                                    rel={isExternal ? "noopener noreferrer" : undefined}
+                                >
+                                    {item.label}
+                                </AppLink>
+                            );
+                        })}
                     </div>
                 </div>
 

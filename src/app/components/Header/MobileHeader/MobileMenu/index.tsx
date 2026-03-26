@@ -150,6 +150,8 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                                     href={href}
                                     className={s.footerLink}
                                     onClick={!isPlaceholder ? onClose : undefined}
+                                    target={href.startsWith("http") ? "_blank" : undefined}
+                                    rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
                                 >
                                     {item.label}
                                 </AppLink>

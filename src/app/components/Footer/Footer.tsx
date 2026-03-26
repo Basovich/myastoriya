@@ -37,14 +37,36 @@ export default function Footer({ lang }: FooterProps) {
                     <h3 className={s.linksTitle}>Розділи сайту</h3>
                     <div className={s.linksGrid}>
                         <nav className={s.linksList}>
-                            {siteLinks.map((link, i) => (
-                                <AppLink key={i} href={link.href} className={s.link}>{link.label}</AppLink>
-                            ))}
+                            {siteLinks.map((link, i) => {
+                                const isExternal = link.href.startsWith("http");
+                                return (
+                                    <AppLink 
+                                        key={i} 
+                                        href={link.href} 
+                                        className={s.link}
+                                        target={isExternal ? "_blank" : undefined}
+                                        rel={isExternal ? "noopener noreferrer" : undefined}
+                                    >
+                                        {link.label}
+                                    </AppLink>
+                                );
+                            })}
                         </nav>
                         <nav className={s.linksList}>
-                            {legalLinks.map((link, i) => (
-                                <AppLink key={i} href={link.href} className={s.link}>{link.label}</AppLink>
-                            ))}
+                            {legalLinks.map((link, i) => {
+                                const isExternal = link.href.startsWith("http");
+                                return (
+                                    <AppLink 
+                                        key={i} 
+                                        href={link.href} 
+                                        className={s.link}
+                                        target={isExternal ? "_blank" : undefined}
+                                        rel={isExternal ? "noopener noreferrer" : undefined}
+                                    >
+                                        {link.label}
+                                    </AppLink>
+                                );
+                            })}
                         </nav>
                     </div>
                 </div>
