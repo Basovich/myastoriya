@@ -1,162 +1,152 @@
-.section {
-    padding-top: 60px;
-    padding-bottom: 80px;
-    background-color: #F8F8F8;
-    min-height: 80vh;
+$side-padding: 16px;
+$side-padding-md: 40px;
+$container-max: 1200px;
+
+@mixin container-padding {
+    padding-left: $side-padding;
+    padding-right: $side-padding;
+
+    @media (min-width: 768px) {
+        padding-left: $side-padding-md;
+        padding-right: $side-padding-md;
+    }
+
+    @media (min-width: 1280px) {
+        padding-left: calc((100% - $container-max) / 2);
+        padding-right: calc((100% - $container-max) / 2);
+    }
+
+    @media (min-width: 1360px) {
+        padding-left: calc((100% - 1280px) / 2);
+        padding-right: calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: calc((100% - 1300px) / 2);
+        padding-right: calc((100% - 1300px) / 2);
+    }
 }
 
-/* Standardized container and breadcrumbs handled by UI components */
+.section {
+    background: #fff;
+    padding-bottom: 80px;
 
-.bannerWrapper {
+    @media (min-width: 1024px) {
+        padding-bottom: 120px;
+    }
+}
+
+/* ─── Hero ─── */
+.heroWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.heroImageWrapper {
     position: relative;
     width: 100%;
     height: 240px;
-    border-radius: 14px;
+    border-radius: 0 0 16px 16px;
     overflow: hidden;
-    margin-bottom: 80px;
 
-    @media (min-width: 769px) {
-        height: 380px;
-        margin-bottom: 40px;
+    @media (min-width: 768px) {
+        height: 340px;
+        border-radius: 0 0 20px 20px;
     }
 
-    @media (min-width: 1025px) {
-        height: 496px;
+    @media (min-width: 1024px) {
+        height: 440px;
     }
 }
 
-.bannerImg {
+.heroImage {
     object-fit: cover;
+    object-position: center;
 }
 
-.timerBlock {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #FFF;
-    border-radius: 12px 12px 0 0;
-    padding: 12px 16px;
-    min-width: 90%;
-    text-align: center;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+.timerAnchor {
+    @include container-padding;
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    justify-content: center;
+    margin-top: -1px; // flush with hero bottom edge
+}
 
-    @media (min-width: 769px) {
-        min-width: 380px;
-        padding: 16px 32px;
+/* ─── Breadcrumbs ─── */
+.breadcrumbsWrapper {
+    @include container-padding;
+    margin-top: 40px;
+    margin-bottom: 40px;
+
+    @media (min-width: 768px) {
+        margin-top: 60px;
     }
 }
 
-.timerHeader {
-    font-size: 14px;
-    font-weight: 500;
-    color: #222;
-    margin-bottom: 12px;
-}
-
-.timerValues {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.timerItem {
+/* ─── Text Content ─── */
+.contentLayout {
+    @include container-padding;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #FFF;
-    border: 1px solid #EBEBEB;
-    border-radius: 8px;
-    padding: 8px 12px;
-    min-width: 60px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-}
-
-.timerNumber {
-    font-family: 'Houschka Rounded', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: #E30613;
-    line-height: 1;
-    margin-bottom: 4px;
-
-    @media (min-width: 769px) {
-        font-size: 28px;
-    }
-}
-
-.timerLabel {
-    font-size: 11px;
-    color: #999;
-}
-
-.timerSeparator {
-    font-size: 24px;
-    font-weight: 700;
-    color: #E30613;
-    padding-bottom: 20px;
-}
-
-.breadcrumbsWrapper {
-    margin-top: 24px;
-}
-
-.contentLayout {
-    display: flex;
-    justify-content: center;
-    background: #FFF;
-    border-radius: 14px;
-    padding: 40px 16px;
+    text-align: center;
     margin-bottom: 60px;
 
-    @media (min-width: 769px) {
-        padding: 60px 24px;
+    @media (min-width: 1024px) {
+        margin-bottom: 80px;
     }
-}
-
-.textContent {
-    max-width: 800px;
-    width: 100%;
 }
 
 .title {
-    font-family: 'Houschka Rounded', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: #000;
-    margin-bottom: 32px;
+    font-family: var(--font-houschka), sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #171717;
     line-height: 1.2;
+    margin-bottom: 24px;
+    max-width: 800px;
 
-    @media (min-width: 769px) {
-        font-size: 32px;
+    @media (min-width: 768px) {
+        font-size: 30px;
+        margin-bottom: 32px;
     }
 
-    @media (min-width: 1025px) {
-        font-size: 40px;
+    @media (min-width: 1024px) {
+        font-size: 36px;
     }
 }
 
 .description {
-    font-size: 16px;
+    font-family: var(--font-helios), sans-serif;
+    font-size: 14px;
     color: #444;
-    line-height: 1.6;
+    line-height: 1.7;
+    max-width: 760px;
+    width: 100%;
+    text-align: left;
+
+    @media (min-width: 768px) {
+        font-size: 16px;
+    }
 
     p {
-        margin-bottom: 16px;
+        margin-bottom: 12px;
     }
 
     h3 {
-        font-size: 20px;
+        font-family: var(--font-houschka), sans-serif;
+        font-size: 18px;
         font-weight: 700;
-        color: #222;
-        margin-top: 32px;
-        margin-bottom: 16px;
+        color: #171717;
+        margin-top: 28px;
+        margin-bottom: 12px;
     }
 
     ul {
-        list-style-type: disc;
-        padding-left: 24px;
+        list-style: disc;
+        padding-left: 20px;
 
         li {
             margin-bottom: 8px;
@@ -164,98 +154,42 @@
     }
 }
 
+/* ─── Products ─── */
 .productsSection {
-    margin-top: 80px;
+    @include container-padding;
 }
 
 .productsTitle {
-    font-family: 'Houschka Rounded', sans-serif;
-    font-size: 32px;
-    font-weight: 700;
-    color: #222;
-    margin-bottom: 40px;
+    font-family: var(--font-houschka), sans-serif;
+    font-size: 22px;
+    font-weight: 800;
     text-transform: uppercase;
+    color: #171717;
+    margin-bottom: 32px;
+
+    @media (min-width: 768px) {
+        font-size: 28px;
+        margin-bottom: 40px;
+    }
 }
 
 .productsGrid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
 
-    @media (min-width: 769px) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (min-width: 1025px) {
+    @media (min-width: 768px) {
         grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
     }
 
-    @media (min-width: 1281px) {
+    @media (min-width: 1024px) {
         grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
     }
 }
 
-.productCardStub {
-    background: #FFF;
-    border-radius: 14px;
-    padding: 24px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid #EBEBEB;
-
-    @media (any-hover: hover) {
-        &:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
-        }
-    }
-}
-
-.productImage {
-    position: relative;
-    width: 100%;
-    height: 200px;
-    margin-bottom: 16px;
-}
-
-.productInfo {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.priceWrapper {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-    margin-bottom: 8px;
-}
-
-.price {
-    font-family: 'Houschka Rounded', sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: #000;
-}
-
-.unit {
-    font-size: 14px;
-    color: #999;
-}
-
-.productTitle {
-    font-size: 16px;
-    font-weight: 700;
-    color: #222;
-    margin-bottom: 8px;
-    flex: 1;
-    line-height: 1.4;
-}
-
-.weight {
-    font-size: 14px;
-    color: #666;
+.sentinel {
+    height: 40px;
+    margin-top: 16px;
 }

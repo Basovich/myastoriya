@@ -1,9 +1,14 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import s from './ActionDetail.module.scss';
 import ProductCard from '../ui/ProductCard/ProductCard';
 import Breadcrumbs from '../ui/Breadcrumbs/Breadcrumbs';
-import HeroBanner from '../ui/HeroBanner/HeroBanner';
+import CountdownTimer from '../ui/CountdownTimer/CountdownTimer';
 import { type Dictionary } from '@/i18n/types';
+
+const PAGE_SIZE = 12;
 
 interface ActionDetailProps {
     dict: Dictionary;
@@ -24,86 +29,105 @@ export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }
     }
 
     const title = item ? item.title : 'Steak Days щовівторка!';
+    const endDate = (item && 'date' in item ? item.date : (item && 'dateRange' in item ? item.dateRange : '30.11.2026')) ?? '30.11.2026';
 
     const breadcrumbItems = [
         { label: dict.home.actionsPage.breadcrumbs.home, href: '/' },
-        { 
-            label: pageType === 'promotions' 
-                ? dict.home.actionsPage.breadcrumbs.promotions 
-                : dict.home.complexDiscountsPage.breadcrumbs.complexDiscounts, 
-            href: pageType === 'promotions' ? '/actions' : '/complex-discounts' 
+        {
+            label: pageType === 'promotions'
+                ? dict.home.actionsPage.breadcrumbs.promotions
+                : dict.home.complexDiscountsPage.breadcrumbs.complexDiscounts,
+            href: pageType === 'promotions' ? '/actions' : '/complex-discounts'
         },
         { label: title }
     ];
 
+    const allProducts = dict.home.products.items;
+    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+    const sentinelRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const sentinel = sentinelRef.current;
+        if (!sentinel) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && visibleCount < allProducts.length) {
+                    setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, allProducts.length));
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    }, [visibleCount, allProducts.length]);
+
+    const visibleProducts = allProducts.slice(0, visibleCount);
+
     return (
         <section className={s.section}>
-            <HeroBanner image="/images/promotions/promo-hero-bg2.png">
-                <div className={s.timerBlock}>
-                    <div className={s.timerHeader}>До кінця акції залишилось:</div>
-                    <div className={s.timerValues}>
-                        <div className={s.timerItem}>
-                            <div className={s.timerNumber}>02</div>
-                            <div className={s.timerLabel}>Днів</div>
-                        </div>
-                        <div className={s.timerSeparator}>:</div>
-                        <div className={s.timerItem}>
-                            <div className={s.timerNumber}>12</div>
-                            <div className={s.timerLabel}>Годин</div>
-                        </div>
-                        <div className={s.timerSeparator}>:</div>
-                        <div className={s.timerItem}>
-                            <div className={s.timerNumber}>27</div>
-                            <div className={s.timerLabel}>Хвилин</div>
-                        </div>
-                        <div className={s.timerSeparator}>:</div>
-                        <div className={s.timerItem}>
-                            <div className={s.timerNumber}>54</div>
-                            <div className={s.timerLabel}>Секунди</div>
-                        </div>
-                    </div>
+            {/* Hero banner */}
+            <div className={s.heroWrapper}>
+                <div className={s.heroImageWrapper}>
+                    <Image
+                        src="/images/promotions/promo-hero-bg2.png"
+                        alt={title}
+                        fill
+                        className={s.heroImage}
+                        priority
+                    />
                 </div>
-            </HeroBanner>
+                <div className={s.timerAnchor}>
+                    <CountdownTimer
+                        targetDate={endDate}
+                        label="До кінця акції залишилось:"
+                        labelDays="Днів"
+                        labelHours="Годин"
+                        labelMinutes="Хвилин"
+                        labelSeconds="Секунди"
+                    />
+                </div>
+            </div>
 
+            {/* Breadcrumbs */}
             <div className={s.breadcrumbsWrapper}>
                 <Breadcrumbs items={breadcrumbItems} />
             </div>
 
+            {/* Title + description */}
             <div className={s.contentLayout}>
-                <div className={s.textContent}>
-                    <p className={s.title}>
-                        {title}
-                    </p>
-                    <div className={s.description}>
-                        <p>Щовівторка даруємо 20% знижки на всі стейки з нашого гриль меню.</p>
-                        <p>Це чудова нагода скуштувати улюблений стейк сухої чи вологої витримки або стейк від Бренд Шефа за ще приємнішою ціною. Акція діє лише офлайн у ресторанах «М&#39;ясторія».</p>
-
-                        <h3>Умови:</h3>
-                        <ul>
-                            <li>в акції беруть участь усі товари з категорій «Стейки від Бренд Шефа», «Стейки сухої витримки», «Стейки вологої витримки», а також позиції з категорії «М&#39;ясо на грилі»: Рібай су-від, Філе Міньйон су-від;</li>
-                            <li>розмір знижки 20%;</li>
-                            <li>Акція діє кожен вівторок з 05.08.2025 до 30.11.2025 (включно).</li>
-                        </ul>
-                    </div>
+                <h1 className={s.title}>{title}</h1>
+                <div className={s.description}>
+                    <p>Щовівторка даруємо 20% знижки на всі стейки з нашого гриль меню.</p>
+                    <p>Це чудова нагода скуштувати улюблений стейк сухої чи вологої витримки або стейк від Бренд Шефа за ще приємнішою ціною. Акція діє лише офлайн у ресторанах «М&apos;ясторія».</p>
+                    <h3>Умови:</h3>
+                    <ul>
+                        <li>в акції беруть участь усі товари з категорій «Стейки від Бренд Шефа», «Стейки сухої витримки», «Стейки вологої витримки», а також позиції з категорії «М&apos;ясо на грилі»: Рібай су-від, Філе Міньйон су-від;</li>
+                        <li>розмір знижки 20%;</li>
+                        <li>Акція діє кожен вівторок з 05.08.2025 до 30.11.2025 (включно).</li>
+                    </ul>
                 </div>
             </div>
 
+            {/* Products section */}
             <div className={s.productsSection}>
                 <h2 className={s.productsTitle}>Товари, що беруть участь у акції</h2>
                 <div className={s.productsGrid}>
-                    {dict.home.products.items.slice(0, 8).map((item) => (
+                    {visibleProducts.map((product) => (
                         <ProductCard
-                            key={item.id}
-                            id={item.id}
-                            title={item.title}
-                            weight={item.weight}
-                            price={item.price}
-                            unit={item.unit}
-                            badge={item.badge}
-                            image={item.image}
+                            key={product.id}
+                            id={product.id}
+                            title={product.title}
+                            weight={product.weight}
+                            price={product.price}
+                            unit={product.unit}
+                            badge={product.badge}
+                            image={product.image}
                         />
                     ))}
                 </div>
+                <div ref={sentinelRef} className={s.sentinel} aria-hidden="true" />
             </div>
         </section>
     );
