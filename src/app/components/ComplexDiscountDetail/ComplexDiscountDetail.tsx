@@ -7,6 +7,9 @@ import Breadcrumbs from '../ui/Breadcrumbs/Breadcrumbs';
 import CountdownTimer from '../ui/CountdownTimer/CountdownTimer';
 import Button from '../ui/Button/Button';
 import ProductCard from '../ui/ProductCard/ProductCard';
+import CartModal from '../CartModal/CartModal';
+import { useAppDispatch } from '@/store/hooks';
+import { addToCart } from '@/store/slices/cartSlice';
 import { type Dictionary } from '@/i18n/types';
 
 interface ComplexDiscountDetailProps {
@@ -43,16 +46,19 @@ export default function ComplexDiscountDetail({ dict, lang, id }: ComplexDiscoun
     const discountFactor = 1 - (Math.abs(parseInt(discountPercent)) / 100);
     const discountedPrice = Math.round(totalPrice * discountFactor);
 
-    const [added, setAdded] = useState(false);
+    const dispatch = useAppDispatch();
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     const handleAddToCart = () => {
-        setAdded(true);
-        setTimeout(() => setAdded(false), 2000);
+        bundleProducts.forEach((product) => {
+            dispatch(addToCart({ id: String(product.id), quantity: 1 }));
+        });
+        setIsCartOpen(true);
     };
 
     return (
-        <section className={s.section}>
-            {/* Breadcrumbs */}
+        <>
+            <section className={s.section}>
             <div className={s.breadcrumbsWrapper}>
                 <Breadcrumbs items={breadcrumbItems} />
             </div>
@@ -131,10 +137,13 @@ export default function ComplexDiscountDetail({ dict, lang, id }: ComplexDiscoun
                         className={s.ctaButton}
                         onClick={handleAddToCart}
                     >
-                        {added ? 'ДОДАНО!' : 'ДОДАТИ ДО КОШИКА'}
+                        ДОДАТИ ДО КОШИКА
                     </Button>
                 </div>
             </div>
-        </section>
+            </section>
+
+            <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+        </>
     );
 }
