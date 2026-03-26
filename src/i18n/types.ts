@@ -233,6 +233,11 @@ export interface ContactsPageDict {
     home: string;
     contacts: string;
   };
+  sections: {
+    callCenter: string;
+    restaurants: string;
+    meatBar: string;
+  };
   labels: {
     workingHours: string;
     phone: string;
