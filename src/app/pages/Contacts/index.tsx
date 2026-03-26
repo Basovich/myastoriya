@@ -40,7 +40,6 @@ function InfoItem({ icon, label, value, isLink, href }: InfoItemProps) {
 function RestaurantCard({ restaurant, labels }: { restaurant: Restaurant; labels: ContactsPageDict["labels"] }) {
     return (
         <div className={s.restaurantCard}>
-            <div className={s.restaurantName}>{restaurant.name}</div>
             <div className={s.cardInfo}>
                 <InfoItem
                     icon="phone"

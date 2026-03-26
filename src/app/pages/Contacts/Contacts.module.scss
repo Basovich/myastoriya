@@ -101,11 +101,6 @@
     font-weight: 700;
     color: #1a1a1a;
     width: 100%;
-
-    @media (min-width: 1280px) {
-        width: 140px;
-        min-width: 140px;
-    }
 }
 
 .cardInfo {
@@ -173,8 +168,9 @@
     font-weight: 600;
     text-align: center;
     text-decoration: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
     white-space: nowrap;
+    max-width: 300px;
+    transition: background-color 0.2s ease, color 0.2s ease;
 
     @media (min-width: 1280px) {
         min-width: 218px;
