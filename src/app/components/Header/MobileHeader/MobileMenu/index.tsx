@@ -138,7 +138,6 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                     </div>
                 </AnimatedDiv>
 
-                {/* Footer */}
                 <div className={s.menuFooter}>
                     <nav className={s.footerLinks}>
                         {siteData.navigation.map((item, i) => {

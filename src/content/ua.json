@@ -512,6 +512,31 @@
                 "home": "Головна",
                 "notFound": "404"
             }
+        },
+        "ourStoresPage": {
+            "title": "ЗАКЛАДИ М'ЯСТОРІЇ",
+            "breadcrumbs": {
+                "home": "Головна",
+                "stores": "Заклади"
+            },
+            "filters": {
+                "all": "Всі заклади",
+                "restaurants": "Ресторани / Магазини",
+                "meatbar": "MeatBar"
+            },
+            "search": {
+                "placeholder": "Пошук по адресі",
+                "button": "ПОШУК"
+            },
+            "viewToggle": {
+                "list": "СПИСОК",
+                "map": "КАРТА"
+            },
+            "storeCard": {
+                "workingHours": "Графік роботи:",
+                "details": "ДЕТАЛЬНІШЕ",
+                "route": "ПОБУДУВАТИ МАРШРУТ"
+            }
         }
     }
 }

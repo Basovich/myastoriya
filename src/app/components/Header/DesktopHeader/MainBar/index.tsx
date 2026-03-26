@@ -19,7 +19,7 @@ export const TOP_NAV_ITEMS = [
     { label: "Акції", href: "/actions" },
     { label: "Доставка та Оплата", href: "/delivery" },
     { label: "Блог", href: "/blog" },
-    { label: "Франшиза", href: "/franchise" },
+    { label: "Франшиза", href: "https://f.myastoriya.ua/" },
     { label: "Контакти", href: "/contacts" },
 ];
 

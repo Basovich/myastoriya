@@ -1,0 +1,67 @@
+[
+    {
+        "id": "obolon",
+        "name": "М'ясторія на Оболоні",
+        "type": "restaurant",
+        "address": "м. Київ, пр-т Героїв Сталінграда, 8",
+        "workingHours": "Пн.-Нд.: 10:00-22:00",
+        "phone": "+38 (067) 463-63-63",
+        "email": "pr@myastoriya.com.ua",
+        "lat": 50.4939,
+        "lng": 30.5186,
+        "image": "/images/contacts/obolon.png",
+        "mapUrl": "https://maps.app.goo.gl/obolon"
+    },
+    {
+        "id": "pozniaky",
+        "name": "М'ясторія на Позняках",
+        "type": "restaurant",
+        "address": "м. Київ, вул. Анни Ахматової, 22",
+        "workingHours": "Пн.-Нд.: 10:00-22:00",
+        "phone": "+38 (067) 463-63-63",
+        "email": "pr@myastoriya.com.ua",
+        "lat": 50.4024,
+        "lng": 30.6305,
+        "image": "/images/contacts/pozniaky.png",
+        "mapUrl": "https://maps.app.goo.gl/pozniaky"
+    },
+    {
+        "id": "hreshchatyk",
+        "name": "Meat Bar на Хрещатику",
+        "type": "meatbar",
+        "address": "м. Київ, вул. Хрещатик, 13",
+        "workingHours": "Пн.-Нд.: 10:00-22:00",
+        "phone": "+38 (067) 463-63-63",
+        "email": "pr@myastoriya.com.ua",
+        "lat": 50.4497,
+        "lng": 30.5235,
+        "image": "/images/contacts/meatbar1.png",
+        "mapUrl": "https://maps.app.goo.gl/meatbar1"
+    },
+    {
+        "id": "respublika",
+        "name": "Meat Bar (ТРЦ Respublika Park)",
+        "type": "meatbar",
+        "address": "м. Київ, Кільцева дорога, 1",
+        "workingHours": "Пн.-Нд.: 10:00-22:00",
+        "phone": "+38 (067) 463-63-63",
+        "email": "pr@myastoriya.com.ua",
+        "lat": 50.3772,
+        "lng": 30.4452,
+        "image": "/images/contacts/meatbar2.png",
+        "mapUrl": "https://maps.app.goo.gl/meatbar2"
+    },
+    {
+        "id": "cavy",
+        "name": "М'ясторія в ЦУМі",
+        "type": "restaurant",
+        "address": "м. Київ, вул. Хрещатик, 38",
+        "workingHours": "Пн.-Нд.: 10:00-22:00",
+        "phone": "+38 (067) 463-63-63",
+        "email": "pr@myastoriya.com.ua",
+        "lat": 50.4449,
+        "lng": 30.5204,
+        "image": "/images/contacts/tsum.png",
+        "mapUrl": "https://maps.app.goo.gl/tsum"
+    }
+]

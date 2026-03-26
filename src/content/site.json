@@ -20,8 +20,8 @@
     },
     "navigation": [
         {
-            "label": "Закладки",
-            "href": "#"
+            "label": "Заклади",
+            "href": "/our-stores"
         },
         {
             "label": "Акції",
@@ -33,11 +33,11 @@
         },
         {
             "label": "Блог",
-            "href": "#publications"
+            "href": "/blog"
         },
         {
             "label": "Франшиза",
-            "href": "#"
+            "href": "https://f.myastoriya.ua/"
         },
         {
             "label": "Контакти",
@@ -47,17 +47,17 @@
     "socialLinks": [
         {
             "platform": "Facebook",
-            "url": "#",
+            "url": "https://www.facebook.com/myastoriya",
             "icon": "facebook"
         },
         {
             "platform": "YouTube",
-            "url": "#",
+            "url": "https://www.youtube.com/channel/UCWSiAa5OYc3Jl7NFKFYpTDg",
             "icon": "youtube"
         },
         {
             "platform": "Instagram",
-            "url": "#",
+            "url": "https://www.instagram.com/myastoriya/",
             "icon": "instagram"
         }
     ],
@@ -78,8 +78,8 @@
                 "href": "#"
             },
             {
-                "label": "Закладки",
-                "href": "#"
+                "label": "Заклади",
+                "href": "/our-stores"
             },
             {
                 "label": "Акції",
@@ -91,15 +91,15 @@
             },
             {
                 "label": "Блог",
-                "href": "#"
+                "href": "/blog"
             },
             {
                 "label": "Франшиза",
-                "href": "#"
+                "href": "https://f.myastoriya.ua/"
             },
             {
                 "label": "Контакти",
-                "href": "#"
+                "href": "/contacts"
             },
             {
                 "label": "Договір публічної оферти",
@@ -123,8 +123,8 @@
             }
         ],
         "appLinks": {
-            "googlePlay": "#",
-            "appStore": "#"
+            "googlePlay": "https://play.google.com/store/apps/details?id=ua.myastoriya.shop",
+            "appStore": "https://apps.apple.com/ua/app/myastoriya/id1583915008"
         },
         "paymentMethods": [
             "visa",

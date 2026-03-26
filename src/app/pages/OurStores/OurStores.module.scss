@@ -1,0 +1,72 @@
+.main {
+    background-color: #fff;
+    min-height: 100vh;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 16px;
+    width: 100%;
+
+    @media (min-width: 768px) {
+        padding: 0 40px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 0 80px;
+    }
+}
+
+.breadcrumbsContainer {
+    margin-top: 24px;
+    margin-bottom: 24px;
+
+    @media (min-width: 768px) {
+        margin-top: 32px;
+        margin-bottom: 32px;
+    }
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    @media (min-width: 768px) {
+        flex-direction: column;
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+}
+
+.filtersRow {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.searchRow {
+    width: 100%;
+}
+
+.viewContainer {
+    width: 100%;
+    margin-bottom: 60px;
+
+    @media (min-width: 768px) {
+        margin-bottom: 100px;
+    }
+}

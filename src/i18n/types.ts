@@ -155,6 +155,7 @@ export interface HomeDict {
   careersPage: CareersPageDict;
   applicantFormPage: ApplicantFormPageDict;
   contactsPage: ContactsPageDict;
+  ourStoresPage: OurStoresPageDict;
   notFoundPage: NotFoundPageDict;
 }
 
@@ -232,11 +233,6 @@ export interface ContactsPageDict {
     home: string;
     contacts: string;
   };
-  sections: {
-    callCenter: string;
-    restaurants: string;
-    meatBar: string;
-  };
   labels: {
     workingHours: string;
     phone: string;
@@ -244,6 +240,32 @@ export interface ContactsPageDict {
     address: string;
     restaurantAddress: string;
     buildRoute: string;
+  };
+}
+
+export interface OurStoresPageDict {
+  title: string;
+  breadcrumbs: {
+    home: string;
+    stores: string;
+  };
+  filters: {
+    all: string;
+    restaurants: string;
+    meatbar: string;
+  };
+  search: {
+    placeholder: string;
+    button: string;
+  };
+  viewToggle: {
+    list: string;
+    map: string;
+  };
+  storeCard: {
+    workingHours: string;
+    details: string;
+    route: string;
   };
 }
 

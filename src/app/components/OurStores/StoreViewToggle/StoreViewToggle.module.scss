@@ -1,0 +1,49 @@
+.toggleWrapper {
+    display: flex;
+    gap: 8px;
+    padding: 4px;
+    border-radius: 12px;
+    width: fit-content;
+    border: 1px solid #E30613;
+
+    @media (min-width: 768px) {
+        gap: 0;
+        border: none;
+    }
+}
+
+.toggleBtn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 700;
+    color: #666;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &.active {
+        color: #E30613;
+        
+        @media (min-width: 768px) {
+            border: 1px solid #E30613;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E30613;
+        outline-offset: 2px;
+    }
+
+    .icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: inherit;
+    }
+}

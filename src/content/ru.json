@@ -512,6 +512,31 @@
                 "home": "Главная",
                 "notFound": "404"
             }
+        },
+        "ourStoresPage": {
+            "title": "ЗАВЕДЕНИЯ МЯСТОРИЯ",
+            "breadcrumbs": {
+                "home": "Главная",
+                "stores": "Заведения"
+            },
+            "filters": {
+                "all": "Все заведения",
+                "restaurants": "Рестораны / Магазины",
+                "meatbar": "MeatBar"
+            },
+            "search": {
+                "placeholder": "Поиск по адресу",
+                "button": "ПОИСК"
+            },
+            "viewToggle": {
+                "list": "СПИСОК",
+                "map": "КАРТА"
+            },
+            "storeCard": {
+                "workingHours": "График работы:",
+                "details": "ПОДРОБНЕЕ",
+                "route": "ПОСТРОИТЬ МАРШРУТ"
+            }
         }
     }
 }
