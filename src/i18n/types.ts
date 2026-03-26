@@ -58,6 +58,7 @@ export interface ComplexDiscount {
   image: string;
   dateRange: string;
   discount: string;
+  endDate?: string;
 }
 
 export interface BlogPageDictBreadcrumbs {
