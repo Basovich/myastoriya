@@ -67,6 +67,11 @@ export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }
 
     return (
         <section className={s.section}>
+            {/* Breadcrumbs */}
+            <div className={s.breadcrumbsWrapper}>
+                <Breadcrumbs items={breadcrumbItems} />
+            </div>
+
             {/* Hero banner */}
             <div className={s.heroWrapper}>
                 <div className={s.heroImageWrapper}>
@@ -88,11 +93,6 @@ export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }
                         labelSeconds="Секунди"
                     />
                 </div>
-            </div>
-
-            {/* Breadcrumbs */}
-            <div className={s.breadcrumbsWrapper}>
-                <Breadcrumbs items={breadcrumbItems} />
             </div>
 
             {/* Title + description */}
