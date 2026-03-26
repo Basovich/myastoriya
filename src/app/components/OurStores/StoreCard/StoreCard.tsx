@@ -48,7 +48,12 @@ export default function StoreCard({ store, dict, variant = "list" }: StoreCardPr
                 </div>
                 <div className={s.actions}>
                     <button className={s.detailsBtn}>{dict.details}</button>
-                    <a href={store.mapUrl} target="_blank" rel="noopener noreferrer" className={s.routeBtn}>
+                    <a 
+                        href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(store.address)}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className={s.routeBtn}
+                    >
                         {dict.route}
                     </a>
                 </div>

@@ -24,17 +24,15 @@ interface InfoItemProps {
 function InfoItem({ icon, label, value, isLink, href }: InfoItemProps) {
     return (
         <div className={s.infoItem}>
-            <div className={s.iconWrapper}>
-                <Image src={`/icons/contacts/${icon}.svg`} alt="" width={18} height={18} />
-            </div>
-            <div className={s.infoContent}>
+            <div className={s.infoTop}>
+                <Image src={`/icons/contacts/${icon}.svg`} className={s.icon} alt="" width={20} height={20} />
                 <span className={s.label}>{label}</span>
-                {isLink && href ? (
-                    <a href={href} className={s.value}>{value}</a>
-                ) : (
-                    <span className={s.value}>{value}</span>
-                )}
             </div>
+            {isLink && href ? (
+                <a href={href} className={s.value}>{value}</a>
+            ) : (
+                <span className={s.value}>{value}</span>
+            )}
         </div>
     );
 }
@@ -70,7 +68,7 @@ function RestaurantCard({ restaurant, labels }: { restaurant: Restaurant; labels
                 />
             </div>
             <a
-                href={restaurant.mapUrl}
+                href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(restaurant.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={s.mapButton}
@@ -103,6 +101,8 @@ export default function ContactsPage({ dict, lang }: ContactsPageProps) {
             <Header lang={lang} />
             <main className={s.main}>
                 <div className={s.content}>
+                    <Breadcrumbs items={breadcrumbs} className={s.breadcrumbsContainer} />
+
                     {/* Hero Section */}
                     <div className={s.hero}>
                         <HeroBanner
@@ -111,12 +111,6 @@ export default function ContactsPage({ dict, lang }: ContactsPageProps) {
                         />
                     </div>
 
-                    {/* Breadcrumbs */}
-                    <div className={s.breadcrumbsContainer}>
-                        <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
-                    </div>
-
-                    {/* Call Center Section */}
                     <section className={s.section}>
                         <h2 className={s.sectionTitle}>{contactsPage.sections.callCenter}</h2>
                         <div className={s.callCenterCard}>

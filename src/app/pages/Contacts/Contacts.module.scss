@@ -1,6 +1,7 @@
 .main {
     background-color: #f8f8f8;
     min-height: 100vh;
+    padding-top: 18px;
 }
 
 .hero {
@@ -18,9 +19,13 @@
 }
 
 .content {
-    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 16px 60px;
+    padding: 0 16px 40px;
+
+    @media (min-width: 1280px) {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
 
     @media (min-width: 1360px) {
         max-width: 1280px;
@@ -28,23 +33,19 @@
 }
 
 .section {
-    margin-bottom: 40px;
+    margin-top: 40px;
 
-    @media (min-width: 768px) {
+    @media (min-width: 1280px) {
         margin-bottom: 60px;
     }
 }
 
 .sectionTitle {
     color: #1a1a1a;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     margin-bottom: 24px;
     text-align: left;
-
-    @media (min-width: 768px) {
-        font-size: 20px;
-    }
 }
 
 .callCenterCard {
@@ -57,9 +58,14 @@
 .callCenterGrid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 14px;
 
     @media (min-width: 768px) {
+        grid-template-columns: repeat(2, 2fr);
+        gap: 24px 14px;
+    }
+
+    @media (min-width: 1280px) {
         grid-template-columns: repeat(4, 1fr);
     }
 }
@@ -68,6 +74,10 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    @media (min-width: 1280px) {
+        gap: 8px;
+    }
 }
 
 .restaurantCard {
@@ -79,7 +89,7 @@
     flex-direction: column;
     gap: 24px;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
@@ -92,7 +102,7 @@
     color: #1a1a1a;
     width: 100%;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         width: 140px;
         min-width: 140px;
     }
@@ -101,31 +111,39 @@
 .cardInfo {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 14px;
     flex-grow: 1;
 
     @media (min-width: 768px) {
         grid-template-columns: repeat(2, 1fr);
+        gap: 24px 14px;
     }
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         grid-template-columns: repeat(4, 1fr);
     }
 }
 
 .infoItem {
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 6px;
 }
 
-.iconWrapper {
+.icon {
     width: 20px;
     height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+}
+
+.infoTop {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .infoContent {
@@ -141,24 +159,6 @@
     text-transform: uppercase;
 }
 
-.value {
-    font-size: 14px;
-    color: #1a1a1a;
-    font-weight: 500;
-    text-decoration: none;
-    line-height: 1.4;
-
-    @media (any-hover: hover) {
-        &:hover {
-            color: #e3051b;
-        }
-    }
-
-    &:focus-visible {
-        outline: 2px solid #e3051b;
-        outline-offset: 2px;
-    }
-}
 
 .mapButton {
     display: flex;
@@ -173,10 +173,10 @@
     font-weight: 600;
     text-align: center;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
     white-space: nowrap;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         min-width: 218px;
     }
 
