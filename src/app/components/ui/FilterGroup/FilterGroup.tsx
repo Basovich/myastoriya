@@ -15,7 +15,7 @@ interface FilterGroupProps {
 export default function FilterGroup({
     title,
     children,
-    initialOpen = true,
+    initialOpen = false,
     className = '',
 }: FilterGroupProps) {
     const [isOpen, setIsOpen] = useState(initialOpen);
