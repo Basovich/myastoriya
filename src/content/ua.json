@@ -11,7 +11,7 @@
                     "title": "НОВІ СТРАВИ ВІД М'ЯСТОРІЯ",
                     "ctaButton": {
                         "text": "ДІЗНАТИСЬ БІЛЬШЕ",
-                        "href": "#products"
+                        "href": "/actions/1"
                     },
                     "image": "/images/products/hero-slide-1.png"
                 },
@@ -20,7 +20,7 @@
                     "title": "СМАЧНІ БУРГЕРИ ВЖЕ В МЕНЮ",
                     "ctaButton": {
                         "text": "ЗАМОВИТИ ЗАРАЗ",
-                        "href": "#products"
+                        "href": "/actions/1"
                     },
                     "image": "/images/products/hero-slide-2.png"
                 },
@@ -29,7 +29,7 @@
                     "title": "ІДЕАЛЬНИЙ СТЕЙК ДЛЯ ВЕЧЕРІ",
                     "ctaButton": {
                         "text": "ОБРАТИ СТЕЙК",
-                        "href": "#products"
+                        "href": "/actions/1"
                     },
                     "image": "/images/products/hero-slide-3.png"
                 }

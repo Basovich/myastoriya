@@ -10,6 +10,7 @@ import clsx from "clsx";
 import s from "./Hero.module.scss";
 import Image from "next/image";
 import Button from "../../../components/ui/Button/Button";
+import AppLink from "../../../components/ui/AppLink/AppLink";
 
 interface SlideContent {
     image: string;
@@ -49,7 +50,9 @@ export default function Hero({ hero }: HeroProps) {
                     <div className={s.contentOverlay}>
                         <div className={s.content}>
                             <span className={s.badge}>{slide.badge}</span>
-                            <h1 className={s.title}>{slide.title}</h1>
+                            <AppLink href={slide.ctaButton?.href ?? "/actions/1"}>
+                                <h1 className={s.title}>{slide.title}</h1>
+                            </AppLink>
                             {slide.ctaButton && (
                                 <Button href={slide.ctaButton.href} variant="outline" className={s.ctaButton}>
                                     <span className={s.ctaButtonInner}>{slide.ctaButton.text}</span>
@@ -98,7 +101,9 @@ export default function Hero({ hero }: HeroProps) {
                             <div className={s.contentOverlay}>
                                 <div className={s.content}>
                                     <span className={s.badge}>{slide.badge}</span>
-                                    <h1 className={s.title}>{slide.title}</h1>
+                                    <AppLink href={slide.ctaButton?.href ?? "/actions/1"}>
+                                        <h2 className={s.title}>{slide.title}</h2>
+                                    </AppLink>
                                     {slide.ctaButton && (
                                         <Button href={slide.ctaButton.href} variant="outline" className={s.ctaButton}>
                                             <span className={s.ctaButtonInner}>{slide.ctaButton.text}</span>

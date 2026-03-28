@@ -11,7 +11,7 @@
                     "title": "НОВЫЕ БЛЮДА ОТ МЯСТОРИЯ",
                     "ctaButton": {
                         "text": "УЗНАТЬ БОЛЬШЕ",
-                        "href": "#products"
+                        "href": "/actions/1"
                     },
                     "image": "/images/products/hero-slide-1.png"
                 },
@@ -20,7 +20,7 @@
                     "title": "ВКУСНЫЕ БУРГЕРЫ УЖЕ В МЕНЮ",
                     "ctaButton": {
                         "text": "ЗАКАЗАТЬ СЕЙЧАС",
-                        "href": "#products"
+                        "href": "/actions/1"
                     },
                     "image": "/images/products/hero-slide-2.png"
                 },
@@ -29,7 +29,7 @@
                     "title": "ИДЕАЛЬНЫЙ СТЕЙК ДЛЯ УЖИНА",
                     "ctaButton": {
                         "text": "ВЫБРАТЬ СТЕЙК",
-                        "href": "#products"
+                        "href": "/actions/1"
                     },
                     "image": "/images/products/hero-slide-3.png"
                 }
