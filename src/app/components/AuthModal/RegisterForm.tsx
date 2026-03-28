@@ -11,6 +11,7 @@ import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 import Button from "@/app/components/ui/Button/Button";
 import InputField from '@/app/components/ui/InputField';
+import clsx from "clsx";
 
 const COUNTDOWN_SECONDS = 60;
 const PHONE_REGEX = /^380\d{9}$/;
@@ -262,7 +263,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                             e.currentTarget.removeAttribute('readonly');
                             formik.setFieldTouched('phone', false);
                         }}
-                        className={phoneVerified ? s.inputVerified : undefined}
+                        className={clsx(phoneVerified && s.inputVerified, s.inputFieldWrapper)}
                         label="Телефон"
                         required
                         value={phoneFormatted}
@@ -354,6 +355,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                     onBlur={formik.handleBlur}
                     error={formik.errors.password}
                     touched={formik.touched.password}
+                    className={s.inputFieldWrapper}
                 />
 
                 {/* Confirm password */}
@@ -374,6 +376,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                     onBlur={formik.handleBlur}
                     error={formik.errors.confirmPassword}
                     touched={formik.touched.confirmPassword}
+                    className={s.inputFieldWrapper}
                 />
 
                 {formik.status && <div className={s.error}>{formik.status}</div>}

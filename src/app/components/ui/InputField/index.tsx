@@ -30,10 +30,10 @@ export default function Index({
     };
 
     return (
-        <div className={s.fieldWrapper}>
+        <div className={clsx(s.fieldWrapper, className)}>
             <input
                 id={id}
-                className={clsx(s.input, hasError && s.inputError, className)}
+                className={clsx(s.input, hasError && s.inputError)}
                 placeholder=" "
                 onFocus={handleFocus}
                 aria-invalid={hasError}

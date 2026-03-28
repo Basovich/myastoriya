@@ -111,6 +111,7 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSucc
                     onBlur={formik.handleBlur}
                     error={formik.errors.password}
                     touched={formik.touched.password}
+                    className={s.inputFieldWrapper}
                 />
 
                 <button type="button" className={s.forgotLink} onClick={onForgotPassword}>Забули пароль?</button>
