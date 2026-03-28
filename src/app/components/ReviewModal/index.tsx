@@ -114,9 +114,13 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                         </div>
                         <h2 className={s.successTitle}>Дякуємо за відгук!</h2>
                         <p className={s.successText}>Ваш відгук успішно надіслано. Ми цінуємо вашу думку.</p>
-                        <button type="button" className={s.submitBtn} onClick={handleClose}>
+                        <Button type="button"
+                                className={s.submitBtn}
+                                onClick={handleClose}
+                                variant='red'
+                        >
                             Закрити
-                        </button>
+                        </Button>
                     </div>
                 ) : (
                     <>
