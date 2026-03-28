@@ -71,11 +71,11 @@
         "siteLinks": [
             {
                 "label": "Сира продукція",
-                "href": "#"
+                "href": "/catalog"
             },
             {
                 "label": "Готова продукція",
-                "href": "#"
+                "href": "/catalog"
             },
             {
                 "label": "Заклади",

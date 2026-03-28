@@ -102,7 +102,13 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
             {/* Scrollable content area */}
             <div className={s.menuBody}>
                 {/* Catalog Header */}
-                <div className={s.catalogHeader} onClick={toggleCatalog}>
+                <AppLink href="/catalog" className={s.catalogHeader} onClick={(e) => {
+                    // Prevent navigation if only toggling is intended? No, user said "everywhere links to catalog".
+                    // But we still want to toggle to see categories.
+                    // If we navigate, the menu will close anyway (onClose is called by AppLink or page change).
+                    // Let's keep toggle logic as well.
+                    toggleCatalog();
+                }}>
                     Каталог продукції
                     <div className={s.iconWrapper} style={{ transform: isCatalogOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
                         <svg
@@ -117,7 +123,7 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </div>
-                </div>
+                </AppLink>
 
                 {/* Categories List (Accordion) */}
                 <AnimatedDiv style={accordionStyle} className={s.catalogListWrapper}>

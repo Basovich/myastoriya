@@ -1,102 +1,102 @@
 [
     {
         "label": "Літнє меню",
-        "href": "/summer-menu",
+        "href": "/catalog",
         "icon": "summer-menu"
     },
     {
         "label": "Візьми з собою",
-        "href": "/take-away",
+        "href": "/catalog",
         "icon": "take-away"
     },
     {
         "label": "Набори для компаній",
-        "href": "/company-sets",
+        "href": "/catalog",
         "icon": "sets"
     },
     {
         "label": "Гриль меню",
-        "href": "/grill-menu",
+        "href": "/catalog",
         "icon": "grill-menu"
     },
     {
         "label": "Ресторанне меню",
-        "href": "/restaurant-menu",
+        "href": "/catalog",
         "icon": "restaurant"
     },
     {
         "label": "Бургери",
-        "href": "/burgers",
+        "href": "/catalog",
         "icon": "burgers"
     },
     {
         "label": "Дитяче меню",
-        "href": "/kids-menu",
+        "href": "/catalog",
         "icon": "kids-menu"
     },
     {
         "label": "Власне виробництво",
-        "href": "/own-production",
+        "href": "/catalog",
         "icon": "own-production"
     },
     {
         "label": "М'ясна продукція",
-        "href": "/meat-products",
+        "href": "/catalog",
         "icon": "meat-products"
     },
     {
         "label": "Консервація",
-        "href": "/conservation",
+        "href": "/catalog",
         "icon": "conservation"
     },
     {
         "label": "Сири",
-        "href": "/cheese",
+        "href": "/catalog",
         "icon": "cheese"
     },
     {
         "label": "Масло",
-        "href": "/butter",
+        "href": "/catalog",
         "icon": "butter"
     },
     {
         "label": "Соуси",
-        "href": "/sauces",
+        "href": "/catalog",
         "icon": "sauces"
     },
     {
         "label": "Напої",
-        "href": "/drinks",
+        "href": "/catalog",
         "icon": "drinks"
     },
     {
         "label": "Хліб і випічка",
-        "href": "/bread",
+        "href": "/catalog",
         "icon": "bread"
     },
     {
         "label": "Морозиво Gelarty",
-        "href": "/gelarty",
+        "href": "/catalog",
         "icon": "gelarty"
     },
     {
         "label": "Солодощі",
-        "href": "/sweets",
+        "href": "/catalog",
         "icon": "sweets"
     },
     {
         "label": "Кава",
-        "href": "/coffee",
+        "href": "/catalog",
         "icon": "coffee"
     },
     {
         "label": "Мед",
-        "href": "/honey",
+        "href": "/catalog",
         "icon": "honey"
     },
     {
         "label": "Інше",
-        "href": "/other",
+        "href": "/catalog",
         "icon": "other"
     }
 ]

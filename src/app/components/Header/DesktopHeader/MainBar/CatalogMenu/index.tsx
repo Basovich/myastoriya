@@ -10,6 +10,7 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 interface Category {
     id: string;
     title: string;
+    slug: string;
     icon?: string;
     bgImage?: string;
     subcategories?: { title: string; href: string; icon?: string }[];
@@ -19,6 +20,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "summer",
         title: "Літнє меню",
+        slug: "litne-menu",
         icon: "/icons/icon-category.svg",
         bgImage: "/images/catalog-bg.png",
         subcategories: [
@@ -30,6 +32,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "takeaway",
         title: "Візьми з собою",
+        slug: "vizmy-z-soboyu",
         icon: "/icons/icon-category.svg",
         bgImage: "/images/catalog-bg.png",
         subcategories: [
@@ -41,6 +44,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "sets",
         title: "Набори для компаній",
+        slug: "nabory-dlya-kompaniyi",
         icon: "/icons/icon-category.svg",
         bgImage: "/images/cat-sets.png",
         subcategories: [
@@ -52,6 +56,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "grill",
         title: "Гриль меню",
+        slug: "gryl-menu",
         icon: "/icons/icon-category.svg",
         bgImage: "/images/cat-grill.png",
         subcategories: [
@@ -63,6 +68,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "brand-steaks",
         title: "Стейки від бренд-шефа",
+        slug: "restoranne-menu", // Using restaurant-menu as a fallback or if we had a proper slug, this is for demo
         icon: "/icons/icon-cow.svg",
         bgImage: "/images/catalog-bg.png",
         subcategories: [
@@ -76,6 +82,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "restaurant",
         title: "Ресторанне меню",
+        slug: "restoranne-menu",
         icon: "/icons/icon-category.svg",
         bgImage: "/images/cat-restaurant.png",
         subcategories: [
@@ -87,6 +94,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "burgers",
         title: "Бургери",
+        slug: "burgery",
         icon: "/icons/icon-category.svg",
         bgImage: "/images/cat-burgers.png",
         subcategories: [
@@ -98,6 +106,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "kids",
         title: "Дитяче меню",
+        slug: "dytyache-menu",
         icon: "/icons/icon-category.svg",
         bgImage: "/images/catalog-bg.png",
         subcategories: [
@@ -109,6 +118,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "production",
         title: "Власне виробництво",
+        slug: "vlasne-vyrobnytstvo",
         icon: "/icons/icon-category.svg",
         bgImage: "/images/catalog-bg.png",
         subcategories: [
@@ -120,6 +130,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "meat",
         title: "М'ясна продукція",
+        slug: "myasna-produktsiya",
         icon: "/icons/icon-cow.svg",
         bgImage: "/images/catalog-bg.png",
         subcategories: [
@@ -131,6 +142,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "preservation",
         title: "Консервація",
+        slug: "konservatsiya",
         icon: "/icons/icon-category.svg",
         bgImage: "/images/catalog-bg.png",
         subcategories: [
@@ -142,6 +154,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "cheese",
         title: "Сири",
+        slug: "syry",
         icon: "/icons/icon-lamb.svg",
         bgImage: "/images/catalog-bg.png",
         subcategories: [
@@ -152,6 +165,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "oil",
         title: "Масло",
+        slug: "maslo",
         icon: "/icons/icon-category.svg",
         bgImage: "/images/catalog-bg.png",
         subcategories: [
@@ -162,6 +176,7 @@ const CATALOG_DATA: Category[] = [
     {
         id: "sauces",
         title: "Соуси",
+        slug: "sousy",
         icon: "/icons/icon-skewer.svg",
         bgImage: "/images/catalog-bg.png",
         subcategories: [
@@ -210,12 +225,12 @@ export default function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                                 className={clsx(s.categoryItem, activeCategory.id === cat.id && s.active)}
                                 onMouseEnter={() => setActiveCategory(cat)}
                             >
-                                <div className={s.categoryLink}>
+                                <AppLink href="/catalog" className={s.categoryLink} onClick={onClose}>
                                     <div className={s.iconWrapper}>
                                         {cat.icon && <Image src={cat.icon} alt="" width={16} height={16} className={s.icon} />}
                                     </div>
                                     <span className={s.catTitle}>{cat.title}</span>
-                                </div>
+                                </AppLink>
                             </li>
                         ))}
                     </ul>
@@ -237,7 +252,7 @@ export default function CatalogMenu({ isOpen, onClose }: CatalogMenuProps) {
                             <ul className={s.subList}>
                                 {activeCategory.subcategories.map((sub, i) => (
                                     <li key={i} className={s.subItem}>
-                                        <AppLink href={sub.href} className={s.subLink}>
+                                        <AppLink href={`/catalog/${activeCategory.slug}`} className={s.subLink} onClick={onClose}>
                                             <span className={s.subTitleText}>{sub.title}</span>
                                         </AppLink>
                                     </li>
