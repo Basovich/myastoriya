@@ -5,6 +5,7 @@ import Image from "next/image";
 import Badge from "../Badge/Badge";
 import WishButton from "../WishButton/WishButton";
 import AddToCartButton from "../AddToCartButton/AddToCartButton";
+import AppLink from "../AppLink/AppLink";
 
 interface ProductCardProps {
     id: number | string;
@@ -28,13 +29,15 @@ export default function ProductCard({
     return (
         <div className={s.card}>
             <div className={s.imageWrap}>
-                <Image
-                    src={image}
-                    alt={title}
-                    className={s.productImg}
-                    width={162}
-                    height={120}
-                />
+                <AppLink href={`/products/${id}`} className={s.productImgLink}>
+                    <Image
+                        src={image}
+                        alt={title}
+                        className={s.productImg}
+                        width={162}
+                        height={120}
+                    />
+                </AppLink>
                 {badge && (
                     <Badge
                         variant={badge === "NEW" ? "new" : "sale"}
@@ -47,7 +50,9 @@ export default function ProductCard({
                 <span className={s.weight}>{weight}</span>
             </div>
             <div className={s.info}>
-                <h3 className={s.title}>{title}</h3>
+                <AppLink href={`/products/${id}`}>
+                    <h3 className={s.title}>{title}</h3>
+                </AppLink>
                 <div className={s.priceRow}>
                     <div className={s.priceGroup}>
                         <span className={s.price}>{price.toLocaleString("uk-UA")} ₴</span>

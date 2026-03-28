@@ -33,8 +33,6 @@ export default function Actions({ dict, lang }: ActionsProps) {
 
     if (!dict || !dict.items || dict.items.length === 0) return null;
 
-
-
     return (
         <section className={s.section} id="actions">
             <div className={s.promotionsHeader}>

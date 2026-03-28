@@ -81,12 +81,6 @@
         scroll-snap-align: none;
     }
 
-    @media (any-hover: hover) {
-        &:hover {
-            transform: translateY(-2px);
-        }
-    }
-
     &:focus-visible {
         outline: 2px solid var(--color-primary, #EC3138);
         outline-offset: 2px;
@@ -99,6 +93,18 @@
     aspect-ratio: 16/10;
     overflow: hidden;
     width: 100%;
+
+    @media (min-width: 1280px) {
+        height: 250px;
+    }
+
+    @media (any-hover: hover) {
+      &:hover {
+          .cardImg {
+              transform: scale(1.05);
+          }
+      }
+    }
 }
 
 .cardImg {
@@ -106,6 +112,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    transition: transform 0.2s;
 }
 
 .info {
@@ -133,6 +140,13 @@
     line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    transition: color 0.2s;
+
+    @media (any-hover: hover) {
+      &:hover {
+        color: var(--color-accent-hover);
+      }
+    }
 }
 
 .allBtn {

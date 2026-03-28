@@ -96,10 +96,19 @@
     @media (min-width: 1280px) {
         height: 250px;
     }
+
+    @media (any-hover: hover) {
+        &:hover {
+            .cardImg {
+                transform: scale(1.05);
+            }
+        }
+    }
 }
 
 .cardImg {
     object-fit: cover;
+    transition: transform 0.2s;
 }
 
 .discountBadge {
@@ -144,4 +153,11 @@
     font-style: normal;
     font-weight: 700;
     line-height: 137.5%;
+    transition: color 0.2s;
+
+    @media (any-hover: hover) {
+      &:hover {
+        color: var(--color-accent-hover);
+      }
+    }
 }

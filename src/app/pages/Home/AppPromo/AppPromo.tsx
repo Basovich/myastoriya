@@ -36,10 +36,10 @@ export default function AppPromo() {
                         </div>
                     </div>
                     <div className={s.buttons}>
-                        <a href={appPromo.googlePlay} className={s.storeBtn}>
+                        <a href="https://play.google.com/store/apps/details?id=ua.myastoriya.shop" className={s.storeBtn}>
                             <Image src="/icons/google_play.svg" className={s.google} alt="Google Play" width={74} height={14} />
                         </a>
-                        <a href={appPromo.appStore} className={s.storeBtn}>
+                        <a href="https://apps.apple.com/ua/app/myastoriya/id1583915008" className={s.storeBtn}>
                             <Image src="/icons/apple_store.svg" className={s.apple} alt="Apple Store" width={71} height={16} />
                         </a>
                     </div>
