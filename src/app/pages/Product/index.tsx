@@ -41,7 +41,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
     }
 
     const product = {
-        id: slug || "1",
+        id: matchedItem ? String(matchedItem.id) : (slug || "1"),
         name: matchedItem ? matchedItem.title : "Стейк Рібай USA",
         category: "Ресторанне меню",
         categorySlug: "restoranne-menu",
@@ -141,7 +141,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                         
                         <div className={s.mainGrid}>
                             <section className={s.gallery}>
-                                <ProductGallery images={product.images} discount={product.discount} />
+                                <ProductGallery id={product.id} images={product.images} discount={product.discount} />
                             </section>
 
                             <section className={s.info}>
