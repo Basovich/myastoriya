@@ -10,6 +10,8 @@
     justify-content: center;
     padding: 60px 16px 16px;
     align-items: flex-start;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 
     @media (min-width: 481px) {
         padding: 20px;

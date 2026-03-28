@@ -211,26 +211,32 @@
         }
     }
 
-    .zoomBtn, .videoBtn {
+    .zoomBtn {
+        position: absolute;
+        bottom: 24px;
+        left: 24px;
+        z-index: 10;
         width: 44px;
         height: 44px;
         border-radius: 50%;
         border: 1.5px solid white;
-        background: rgba(0, 0, 0, 0.2); // Added subtle background for better visibility on light images
+        background: rgba(0, 0, 0, 0.2);
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.3s ease;
-        
+
         @media (min-width: 1280px) {
             width: 48px;
             height: 48px;
         }
 
-        &:hover:any-hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: scale(1.05);
+        @media (any-hover: hover) {
+          &:hover {
+              background: rgba(255, 255, 255, 0.1);
+              transform: scale(1.05);
+          }
         }
 
         svg {
@@ -239,18 +245,35 @@
         }
     }
 
-    .zoomBtn {
-        position: absolute;
-        bottom: 24px;
-        left: 24px;
-        z-index: 10;
-    }
-
     .videoBtn {
         position: absolute;
         bottom: 24px;
         right: 24px;
         z-index: 10;
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        @media (any-hover: hover) {
+          &:hover {
+              transform: scale(1.1);
+          }
+        }
+
+        svg {
+            width: 40px;
+            height: 40px;
+            
+            @media (min-width: 1280px) {
+                width: 48px;
+                height: 48px;
+            }
+        }
     }
 
     .prevBtn, .nextBtn {
@@ -280,9 +303,11 @@
             background-size: contain;
         }
 
-        &:hover:any-hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-50%) scale(1.05);
+        @media (any-hover: hover) {
+          &:hover {
+              background: rgba(255, 255, 255, 0.1);
+              transform: translateY(-50%) scale(1.05);
+          }
         }
 
         & :global(.swiper-button-disabled) {
@@ -385,8 +410,10 @@
     transition: all 0.3s;
     text-align: left;
 
-    &:hover:any-hover {
-        background-color: #EEEEEE;
+    @media (any-hover: hover) {
+      &:hover {
+          background-color: #EEEEEE;
+      }
     }
 
     &.selected {
@@ -476,8 +503,10 @@
         white-space: nowrap;
     }
 
-    &:hover:any-hover {
-        opacity: 0.8;
+    @media (any-hover: hover) {
+      &:hover {
+          opacity: 0.8;
+      }
     }
 
     &.active {

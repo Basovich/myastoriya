@@ -1,0 +1,96 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: opacity 0.3s ease;
+}
+
+.modalWrapper {
+    position: relative;
+    width: 90vw;
+    max-width: 1000px;
+    max-height: 90vh;
+    outline: none;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.modalContent {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeBtn {
+    position: absolute;
+    top: -40px; // Default mobile position (above video)
+    right: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.2s;
+    padding: 10px;
+
+    @media (any-hover: hover) {
+        &:hover {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        top: 0;
+        right: -40px; // side position for desktop
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+.videoContainer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 80vh;
+    background: black;
+    border-radius: var(--radius-lg, 12px);
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+
+    @media (orientation: landscape) and (max-height: 500px) {
+        width: auto;
+        height: 85vh;
+        aspect-ratio: 16 / 9;
+    }
+
+    iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+}
