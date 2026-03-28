@@ -27,7 +27,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
-    // Filter out invalid items and map to mock product data
+    // Catalog out invalid items and map to mock product data
     const populatedItems = useMemo(() => {
         return cartItems.map(item => {
             const product = MOCK_PRODUCTS[item.id] || FALLBACK_PRODUCT;
@@ -65,7 +65,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
         dispatch(addToCart({ id, quantity: 1 }));
     };
 
-    // Filter MOCK_PRODUCTS to show as suggestions (those not already in cart)
+    // Catalog MOCK_PRODUCTS to show as suggestions (those not already in cart)
     const suggestedProducts = useMemo(() => {
         const inCartIds = new Set(cartItems.map(item => item.id));
         return Object.values(MOCK_PRODUCTS).filter(p => !inCartIds.has(p.id));

@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import s from './FilterContent.module.scss';
+import s from './CatalogContent.module.scss';
 import HeroBanner from '../../../components/ui/HeroBanner/HeroBanner';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs/Breadcrumbs';
 import CategoryCircles from '@/app/components/CategoryCircles/CategoryCircles';
 import Image from 'next/image';
-import FilterProductRow from '@/app/pages/Filter/FilterProductRow/FilterProductRow';
-import FilterSidebar from '@/app/pages/Filter/FilterSidebar/FilterSidebar';
-import FilterModal from '@/app/pages/Filter/FilterModal/FilterModal';
+import Index from '@/app/pages/Catalog/CatalogProductRow';
+import FilterSidebar from '@/app/pages/Catalog/CatalogSidebar';
+import FilterModal from '@/app/pages/Catalog/CatalogModal';
 import ProductCard from '../../../components/ui/ProductCard/ProductCard';
 import SectionHeader from '../../../components/ui/SectionHeader/SectionHeader';
 import Pagination from '@/app/components/ui/Pagination/Pagination';
@@ -68,11 +68,11 @@ const FAQ_DATA = [
 
 const TOTAL_PAGES = 6;
 
-interface FilterContentProps {
+interface CatalogContentProps {
     category?: string;
 }
 
-export default function FilterContent({ category }: FilterContentProps) {
+export default function CatalogContent({ category }: CatalogContentProps) {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [activePage, setActivePage] = useState(1);
     const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
@@ -120,7 +120,7 @@ export default function FilterContent({ category }: FilterContentProps) {
                                 className={s.sortWrap}
                             />
 
-                            {/* Mobile filter button */}
+                            {/* Mobile catalog button */}
                             <button
                                 id="filter-btn"
                                 type="button"
@@ -161,7 +161,7 @@ export default function FilterContent({ category }: FilterContentProps) {
                                                     image={product.image}
                                                 />
                                             ) : (
-                                                <FilterProductRow
+                                                <Index
                                                     key={product.id}
                                                     id={product.id}
                                                     title={product.title}
@@ -247,7 +247,7 @@ export default function FilterContent({ category }: FilterContentProps) {
                 </div>
             </div>
 
-            {/* Mobile filter drawer */}
+            {/* Mobile catalog drawer */}
             <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
         </>
     );

@@ -47,7 +47,7 @@ interface FilterSidebarProps {
     onClose?: () => void;
 }
 
-export default function FilterSidebar({ onApply, onClose }: FilterSidebarProps) {
+export default function CatalogSidebar({ onApply, onClose }: FilterSidebarProps) {
     const [filters, setFilters] = useState<FilterState>({
         priceFrom: MIN_PRICE,
         priceTo: MAX_PRICE,

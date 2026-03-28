@@ -1,6 +1,6 @@
 'use client';
 
-import s from './FilterProductRow.module.scss';
+import s from './index.module.scss';
 import Image from 'next/image';
 import Badge from '@/app/components/ui/Badge/Badge';
 import WishButton from '@/app/components/ui/WishButton/WishButton';
@@ -18,7 +18,7 @@ interface SearchProductRowProps {
     description?: string;
 }
 
-export default function FilterProductRow({
+export default function Index({
     id,
     title,
     weight,

@@ -3,14 +3,14 @@
 import { useEffect } from 'react';
 import { useTransition, animated, config } from '@react-spring/web';
 import s from './FilterModal.module.scss';
-import FilterSidebar from '@/app/pages/Filter/FilterSidebar/FilterSidebar';
+import FilterSidebar from '@/app/pages/Catalog/CatalogSidebar';
 
 interface FilterModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
+export default function  CatalogModal({ isOpen, onClose }: FilterModalProps) {
     // Prevent body scroll when open
     useEffect(() => {
         if (isOpen) {

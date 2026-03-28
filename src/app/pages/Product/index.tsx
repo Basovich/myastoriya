@@ -85,8 +85,8 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
 
     const breadcrumbs = [
         { label: "Головна", href: "/" },
-        { label: "Готова продукція", href: "/filter" },
-        { label: product.category, href: "/filter" },
+        { label: "Готова продукція", href: "/catalog" },
+        { label: product.category, href: "/catalog" },
     ];
 
     return (

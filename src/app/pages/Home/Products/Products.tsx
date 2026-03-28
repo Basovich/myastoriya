@@ -41,7 +41,7 @@ export default function Products({ dict, categories }: ProductsProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
-    // Filter simulation: For different tabs, we rearrange or slice the array
+    // Catalog simulation: For different tabs, we rearrange or slice the array
     // to give the visual impression of server-side or actual category filtering
     const visibleProducts = useMemo(() => {
         if (!dict?.items) return [];
