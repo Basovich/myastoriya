@@ -11,6 +11,7 @@ export interface HeroSlide {
 export interface Category {
   title: string;
   image: string;
+  slug: string;
 }
 
 export interface CategoriesSection {

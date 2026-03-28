@@ -68,6 +68,29 @@ const FAQ_DATA = [
 
 const TOTAL_PAGES = 6;
 
+const CATEGORY_LABELS: Record<string, string> = {
+    'litne-menu': 'Літнє меню',
+    'vizmy-z-soboyu': 'Візьми з собою',
+    'nabory-dlya-kompaniyi': 'Набори для компанії',
+    'gryl-menu': 'Гриль-меню',
+    'restoranne-menu': 'Ресторанне меню',
+    'burgery': 'Бургери',
+    'dytyache-menu': 'Дитяче меню',
+    'vlasne-vyrobnytstvo': 'Власне виробництво',
+    'myasna-produktsiya': "М'ясна продукція",
+    'konservatsiya': 'Консервація',
+    'syry': 'Сири',
+    'maslo': 'Масло',
+    'sousy': 'Соуси',
+    'napoyi': 'Напої',
+    'khlib-ta-vypichka': 'Хліб та випічка',
+    'morozyvo-gelarty': 'Морозиво Gelarty',
+    'solodoshchi': 'Солодощі',
+    'kava': 'Кава',
+    'med': 'Мед',
+    'shashylk': 'Шашлик',
+};
+
 interface CatalogContentProps {
     category?: string;
 }
@@ -78,10 +101,15 @@ export default function CatalogContent({ category }: CatalogContentProps) {
     const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
     const [view, setView] = useState<ViewType>('list');
 
+    const categoryLabel = category ? (CATEGORY_LABELS[category] ?? category) : null;
+
     const breadcrumbItems = [
         { label: 'Головна', href: '/' },
-        { label: 'Готова продукція' },
+        { label: 'Каталог', href: '/catalog' },
+        ...(categoryLabel ? [{ label: categoryLabel }] : []),
     ];
+
+    const pageTitle = categoryLabel ? categoryLabel.toUpperCase() : 'ГОТОВА ПРОДУКЦІЯ';
 
     return (
         <>
@@ -89,7 +117,7 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                 <div className={s.topSection}>
                     <HeroBanner
                         prefix=""
-                        title="ГОТОВА ПРОДУКЦІЯ"
+                        title={pageTitle}
                         className={s.heroBanner}
                     />
                     <div className={s.categoriesSection}>

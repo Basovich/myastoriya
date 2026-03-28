@@ -40,83 +40,103 @@
             "items": [
                 {
                     "title": "Літнє меню",
-                    "image": "/images/cat-grill.png"
+                    "image": "/images/cat-grill.png",
+                    "slug": "litne-menu"
                 },
                 {
                     "title": "Візьми з собою",
-                    "image": "/images/cat-burgers.png"
+                    "image": "/images/cat-burgers.png",
+                    "slug": "vizmy-z-soboyu"
                 },
                 {
                     "title": "Набори для компанії",
-                    "image": "/images/cat-sets.png"
+                    "image": "/images/cat-sets.png",
+                    "slug": "nabory-dlya-kompaniyi"
                 },
                 {
                     "title": "Гриль-меню",
-                    "image": "/images/cat-grill.png"
+                    "image": "/images/cat-grill.png",
+                    "slug": "gryl-menu"
                 },
                 {
                     "title": "Ресторанне меню",
-                    "image": "/images/cat-restaurant.png"
+                    "image": "/images/cat-restaurant.png",
+                    "slug": "restoranne-menu"
                 },
                 {
                     "title": "Бургери",
-                    "image": "/images/cat-burgers.png"
+                    "image": "/images/cat-burgers.png",
+                    "slug": "burgery"
                 },
                 {
                     "title": "Дитяче меню",
-                    "image": "/images/cat-restaurant.png"
+                    "image": "/images/cat-restaurant.png",
+                    "slug": "dytyache-menu"
                 },
                 {
                     "title": "Власне виробництво",
-                    "image": "/images/cat-branded.png"
+                    "image": "/images/cat-branded.png",
+                    "slug": "vlasne-vyrobnytstvo"
                 },
                 {
                     "title": "М'ясна продукція",
-                    "image": "/images/cat-branded.png"
+                    "image": "/images/cat-branded.png",
+                    "slug": "myasna-produktsiya"
                 },
                 {
                     "title": "Консервація",
-                    "image": "/images/cat-sets.png"
+                    "image": "/images/cat-sets.png",
+                    "slug": "konservatsiya"
                 },
                 {
                     "title": "Сири",
-                    "image": "/images/cat-shashlik.png"
+                    "image": "/images/cat-shashlik.png",
+                    "slug": "syry"
                 },
                 {
                     "title": "Масло",
-                    "image": "/images/cat-grill.png"
+                    "image": "/images/cat-grill.png",
+                    "slug": "maslo"
                 },
                 {
                     "title": "Соуси",
-                    "image": "/images/cat-burgers.png"
+                    "image": "/images/cat-burgers.png",
+                    "slug": "sousy"
                 },
                 {
                     "title": "Напої",
-                    "image": "/images/cat-restaurant.png"
+                    "image": "/images/cat-restaurant.png",
+                    "slug": "napoyi"
                 },
                 {
                     "title": "Хліб та випічка",
-                    "image": "/images/cat-branded.png"
+                    "image": "/images/cat-branded.png",
+                    "slug": "khlib-ta-vypichka"
                 },
                 {
                     "title": "Морозиво Gelarty",
-                    "image": "/images/cat-sets.png"
+                    "image": "/images/cat-sets.png",
+                    "slug": "morozyvo-gelarty"
                 },
                 {
                     "title": "Солодощі",
-                    "image": "/images/cat-shashlik.png"
+                    "image": "/images/cat-shashlik.png",
+                    "slug": "solodoshchi"
                 },
                 {
                     "title": "Кава",
-                    "image": "/images/cat-grill.png"
+                    "image": "/images/cat-grill.png",
+                    "slug": "kava"
                 },
                 {
                     "title": "Мед",
-                    "image": "/images/cat-burgers.png"
+                    "image": "/images/cat-burgers.png",
+                    "slug": "med"
                 },
                 {
                     "title": "Шашлик",
-                    "image": "/images/cat-shashlik.png"
+                    "image": "/images/cat-shashlik.png",
+                    "slug": "shashylk"
                 }
             ]
         },

@@ -10,10 +10,12 @@ import s from "./Categories.module.scss";
 import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import Image from "next/image";
+import AppLink from "../../../components/ui/AppLink/AppLink";
 
 interface Category {
     title: string;
     image: string;
+    slug: string;
 }
 
 interface CategoriesProps {
@@ -67,12 +69,12 @@ export default function Categories({ categories }: CategoriesProps) {
                 >
                     {categories.items.map((cat, i) => (
                         <SwiperSlide key={i} className={s.slide}>
-                            <a href="#" className={s.item}>
+                            <AppLink href={`/catalog/${cat.slug}`} className={s.item}>
                                 <div className={s.circle}>
                                     <Image src={cat.image} alt={cat.title} width={100} height={100} className={s.circleImg} />
                                 </div>
                                 <span className={s.label}>{cat.title}</span>
-                            </a>
+                            </AppLink>
                         </SwiperSlide>
                     ))}
                 </Swiper>
