@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import styles from './Product.module.scss';
 
@@ -13,26 +13,25 @@ interface Modification {
 interface ProductModificationsProps {
     title: string;
     items: Modification[];
+    selectedItems: string[];
+    onToggle: (id: string) => void;
 }
 
-const ProductModifications: React.FC<ProductModificationsProps> = ({ title, items }) => {
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
-
-    const toggleItem = (id: string) => {
-        setSelectedItems(prev => 
-            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-        );
-    };
-
+const ProductModifications: React.FC<ProductModificationsProps> = ({ 
+    title, 
+    items, 
+    selectedItems, 
+    onToggle 
+}) => {
     return (
         <div className={styles.modificationsSection}>
             <h3 className={styles.modSectionTitle}>{title}</h3>
             <div className={styles.modGrid}>
-                {items.map((item) => (
+                {items?.map((item) => (
                     <button
                         key={item.id}
                         className={clsx(styles.modItem, selectedItems.includes(item.id) && styles.selected)}
-                        onClick={() => toggleItem(item.id)}
+                        onClick={() => onToggle(item.id)}
                     >
                         <div className={styles.modCheck}>
                             {selectedItems.includes(item.id) && (

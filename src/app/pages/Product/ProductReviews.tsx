@@ -17,18 +17,22 @@ interface ProductReviewsProps {
 
 const ProductReviews: React.FC<ProductReviewsProps> = ({ reviews }) => {
     return (
-        <div className={styles.reviewsSection}>
+        <div className={styles.reviewsSection} id="reviews">
             <div className={styles.reviewsHeader}>
                 <h2 className={styles.sectionTitle}>Відгуки наших клієнтів</h2>
-                <Button variant="primary" className={styles.leaveReviewBtn}>Залишити свій відгук</Button>
             </div>
             
             <div className={styles.reviewsList}>
                 {reviews.map((review) => (
                     <div key={review.id} className={styles.reviewCard}>
                         <div className={styles.reviewTop}>
-                            <span className={styles.reviewAuthor}>{review.author}</span>
-                            <span className={styles.reviewDate}>{review.date}</span>
+                            <div className={styles.authorAvatar}>
+                                {review.author.charAt(0)}
+                            </div>
+                            <div className={styles.authorInfo}>
+                                <span className={styles.reviewAuthor}>{review.author}</span>
+                                <span className={styles.reviewDate}>{review.date}</span>
+                            </div>
                         </div>
                         <div className={styles.reviewContent}>
                             <p>{review.text}</p>
@@ -50,7 +54,8 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ reviews }) => {
             </div>
             
             <div className={styles.reviewsFooter}>
-                <Button variant="outline-black">Показати ще 5 відгуків</Button>
+                <Button variant="outline-black">Показати всі відгуки</Button>
+                <Button variant="primary">Написати відгук</Button>
             </div>
         </div>
     );

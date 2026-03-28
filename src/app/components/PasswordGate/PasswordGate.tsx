@@ -9,7 +9,19 @@ const STORAGE_KEY = "myastoriya_auth";
 export default function PasswordGate({ children }: { children: React.ReactNode }) {
     const [isAuthorized, setIsAuthorized] = useState(() => {
         if (typeof window === "undefined") return false;
-        return sessionStorage.getItem(STORAGE_KEY) === "true";
+        
+        // Check session storage
+        const authorizedInStorage = sessionStorage.getItem(STORAGE_KEY) === "true";
+        if (authorizedInStorage) return true;
+        
+        // Check query param
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("password") === CORRECT_PASSWORD) {
+            sessionStorage.setItem(STORAGE_KEY, "true");
+            return true;
+        }
+        
+        return false;
     });
 
     const handleSubmit = () => {
