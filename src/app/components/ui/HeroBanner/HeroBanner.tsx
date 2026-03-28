@@ -19,7 +19,7 @@ export default function HeroBanner({
     children
 }: HeroBannerProps) {
     return (
-        <div className={clsx(s.bannerWrapper, className)}>
+        <section className={clsx(s.bannerWrapper, className)}>
             <Image
                 src={image}
                 alt={title || "Banner"}
@@ -49,6 +49,6 @@ export default function HeroBanner({
                 )}
                 {children}
             </div>
-        </div>
+        </section>
     );
 }

@@ -1,82 +1,15 @@
-"use client";
-
 import React from "react";
-import Image from "next/image";
 import s from "./Contacts.module.scss";
 import { type Locale } from "@/i18n/config";
-import { type Dictionary, type ContactsPageDict } from "@/i18n/types";
+import { type Dictionary } from "@/i18n/types";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import Header from "@/app/components/Header/Header";
 import Footer from "@/app/components/Footer/Footer";
 import HeroBanner from "@/app/components/ui/HeroBanner/HeroBanner";
 import contactsData from "@/content/contacts.json";
+import {InfoItem} from "@/app/pages/Contacts/InfoItem";
+import {RestaurantCard} from "@/app/pages/Contacts/RestaurantCard";
 
-type Restaurant = (typeof contactsData.restaurants)[number];
-
-interface InfoItemProps {
-    icon: string;
-    label: string;
-    value: string;
-    isLink?: boolean;
-    href?: string;
-}
-
-function InfoItem({ icon, label, value, isLink, href }: InfoItemProps) {
-    return (
-        <div className={s.infoItem}>
-            <div className={s.infoTop}>
-                <Image src={`/icons/contacts/${icon}.svg`} className={s.icon} alt="" width={20} height={20} />
-                <span className={s.label}>{label}</span>
-            </div>
-            {isLink && href ? (
-                <a href={href} className={s.value}>{value}</a>
-            ) : (
-                <span className={s.value}>{value}</span>
-            )}
-        </div>
-    );
-}
-
-function RestaurantCard({ restaurant, labels }: { restaurant: Restaurant; labels: ContactsPageDict["labels"] }) {
-    return (
-        <div className={s.restaurantCard}>
-            <div className={s.cardInfo}>
-                <InfoItem
-                    icon="phone"
-                    label={labels.phone}
-                    value={restaurant.phone}
-                    isLink
-                    href={`tel:${restaurant.phone.replace(/\s+/g, '')}`}
-                />
-                <InfoItem
-                    icon="email"
-                    label={labels.email}
-                    value={restaurant.email}
-                    isLink
-                    href={`mailto:${restaurant.email}`}
-                />
-                <InfoItem
-                    icon="address"
-                    label={labels.restaurantAddress}
-                    value={restaurant.address}
-                />
-                <InfoItem
-                    icon="time"
-                    label={labels.workingHours}
-                    value={restaurant.workingHours}
-                />
-            </div>
-            <a
-                href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(restaurant.address)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={s.mapButton}
-            >
-                {labels.buildRoute}
-            </a>
-        </div>
-    );
-}
 
 interface ContactsPageProps {
     dict: Dictionary;
@@ -99,69 +32,63 @@ export default function ContactsPage({ dict, lang }: ContactsPageProps) {
         <>
             <Header lang={lang} />
             <main className={s.main}>
-                <div className={s.content}>
-                    <Breadcrumbs items={breadcrumbs} className={s.breadcrumbsContainer} />
+                <HeroBanner
+                    title={contactsPage.title}
+                    image="/images/contacts/contacts_hero.png"
+                />
+                <Breadcrumbs items={breadcrumbs} className={s.breadcrumbsContainer} />
 
-                    {/* Hero Section */}
-                    <div className={s.hero}>
-                        <HeroBanner
-                            title={contactsPage.title}
-                            image="/images/contacts/contacts_hero.png"
-                        />
+                <section className={s.section}>
+                    <h2 className={s.sectionTitle}>{contactsPage.sections.callCenter}</h2>
+                    <div className={s.callCenterCard}>
+                        <div className={s.callCenterGrid}>
+                            <InfoItem
+                                icon="phone"
+                                label={contactsPage.labels.phone}
+                                value={callCenter.phone}
+                                isLink
+                                href={`tel:${callCenter.phone.replace(/\s+/g, '')}`}
+                            />
+                            <InfoItem
+                                icon="email"
+                                label={contactsPage.labels.email}
+                                value={callCenter.email}
+                                isLink
+                                href={`mailto:${callCenter.email}`}
+                            />
+                            <InfoItem
+                                icon="address"
+                                label={contactsPage.labels.address}
+                                value={callCenter.address}
+                            />
+                            <InfoItem
+                                icon="time"
+                                label={contactsPage.labels.workingHours}
+                                value={callCenter.workingHours}
+                            />
+                        </div>
                     </div>
+                </section>
 
-                    <section className={s.section}>
-                        <h2 className={s.sectionTitle}>{contactsPage.sections.callCenter}</h2>
-                        <div className={s.callCenterCard}>
-                            <div className={s.callCenterGrid}>
-                                <InfoItem
-                                    icon="phone"
-                                    label={contactsPage.labels.phone}
-                                    value={callCenter.phone}
-                                    isLink
-                                    href={`tel:${callCenter.phone.replace(/\s+/g, '')}`}
-                                />
-                                <InfoItem
-                                    icon="email"
-                                    label={contactsPage.labels.email}
-                                    value={callCenter.email}
-                                    isLink
-                                    href={`mailto:${callCenter.email}`}
-                                />
-                                <InfoItem
-                                    icon="address"
-                                    label={contactsPage.labels.address}
-                                    value={callCenter.address}
-                                />
-                                <InfoItem
-                                    icon="time"
-                                    label={contactsPage.labels.workingHours}
-                                    value={callCenter.workingHours}
-                                />
-                            </div>
-                        </div>
-                    </section>
+                {/* Myastoriya Restaurants */}
+                <section className={s.section}>
+                    <h2 className={s.sectionTitle}>{contactsPage.sections.restaurants}</h2>
+                    <div className={s.restaurantList}>
+                        {myastoriyaRestaurants.map((restaurant) => (
+                            <RestaurantCard key={restaurant.id} restaurant={restaurant} labels={contactsPage.labels} />
+                        ))}
+                    </div>
+                </section>
 
-                    {/* Myastoriya Restaurants */}
-                    <section className={s.section}>
-                        <h2 className={s.sectionTitle}>{contactsPage.sections.restaurants}</h2>
-                        <div className={s.restaurantList}>
-                            {myastoriyaRestaurants.map((restaurant) => (
-                                <RestaurantCard key={restaurant.id} restaurant={restaurant} labels={contactsPage.labels} />
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* Meat Bar Restaurants */}
-                    <section className={s.section}>
-                        <h2 className={s.sectionTitle}>{contactsPage.sections.meatBar}</h2>
-                        <div className={s.restaurantList}>
-                            {meatBarRestaurants.map((restaurant) => (
-                                <RestaurantCard key={restaurant.id} restaurant={restaurant} labels={contactsPage.labels} />
-                            ))}
-                        </div>
-                    </section>
-                </div>
+                {/* Meat Bar Restaurants */}
+                <section className={s.section}>
+                    <h2 className={s.sectionTitle}>{contactsPage.sections.meatBar}</h2>
+                    <div className={s.restaurantList}>
+                        {meatBarRestaurants.map((restaurant) => (
+                            <RestaurantCard key={restaurant.id} restaurant={restaurant} labels={contactsPage.labels} />
+                        ))}
+                    </div>
+                </section>
             </main>
             <Footer lang={lang} />
         </>
