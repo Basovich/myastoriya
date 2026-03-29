@@ -14,7 +14,7 @@ export default function CategoryCatalog({ params }: CategoryCatalogProps) {
     return (
         <>
             <Header lang={lang as Locale} />
-            <main style={{ minHeight: "100vh" }}>
+            <main>
                 <CatalogContent category={category} />
             </main>
             <Footer lang={lang as Locale} />

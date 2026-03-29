@@ -1,22 +1,21 @@
-
 .container {
-    min-height: 100vh;
     background: #fff;
 }
 
 .topSection {
     width: 100%;
-    margin-top: 16px;
+    margin-top: 18px;
 
     @media (min-width: 768px) {
         margin-top: 40px;
     }
 }
 
-div.heroBanner {
+section.heroBanner {
     width: calc(100% - 32px);
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 26px;
 
     @media (min-width: 768px) {
         width: calc(100% - 80px);
@@ -34,6 +33,10 @@ div.heroBanner {
     @media (min-width: 1440px) {
         max-width: 1300px;
     }
+}
+
+nav.breadcrumbs {
+    margin-bottom: 0;
 }
 
 .categoriesSection {

@@ -11,7 +11,7 @@ export default function Catalog({ params }: { params: Promise<{ lang: string }> 
     return (
         <>
             <Header lang={lang as Locale} />
-            <main style={{ minHeight: "100vh" }}>
+            <main>
                 <CatalogContent />
             </main>
             <Footer lang={lang as Locale} />
