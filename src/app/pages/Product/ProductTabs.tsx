@@ -80,6 +80,17 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
         { key: "Тип соусу", value: "Соус для бургерів" },
     ];
 
+    // Helper to extract YouTube ID and get thumbnail
+    const getYouTubeThumbnail = (url: string) => {
+        const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+        const match = url.match(regExp);
+        const videoId = (match && match[7].length === 11) ? match[7] : null;
+        return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
+    };
+
+    const deliveryVideoUrl = "https://www.youtube.com/watch?v=ixeV2E3by60";
+    const deliveryThumbnailUrl = getYouTubeThumbnail(deliveryVideoUrl);
+
     // Delivery items
     const deliveryItems = [
         {
@@ -102,7 +113,13 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
             content: (
                 <div className={styles.videoContent}>
                     <div className={styles.videoPreview} onClick={() => setIsVideoOpen(true)}>
-                        <Image src="/images/product/product-main.png" alt="Video Preview" width={280} height={158} />
+                        <Image 
+                            src={deliveryThumbnailUrl} 
+                            alt="Video Preview" 
+                            width={280} 
+                            height={158}
+                            unoptimized // YouTube images often need this to avoid issues with Next.js optimization for external domains without config
+                        />
                         <div className={styles.playBtn}>
                             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M15 9L5 15L5 3L15 9Z" fill="currentColor"/>
