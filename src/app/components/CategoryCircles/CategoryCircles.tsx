@@ -13,18 +13,18 @@ import SliderArrow from "../ui/SliderArrow/SliderArrow";
 import SectionHeader from "@/app/components/ui/SectionHeader/SectionHeader";
 
 const searchCategories: CategoryCircleItem[] = [
-    { name: "Сезонне меню", image: "/images/cat-grill.png", href: "#" },
-    { name: "Ресторанне меню", image: "/images/cat-restaurant.png", href: "#" },
-    { name: "Бургери", image: "/images/cat-burgers.png", href: "#" },
-    { name: "Піца", image: "/images/cat-shashlik.png", href: "#" },
-    { name: "Смакуй одразу", image: "/images/cat-sets.png", href: "#" },
-    { name: "Набори для компаній", image: "/images/cat-branded.png", href: "#" },
-    { name: "Гриль меню", image: "/images/cat-grill.png", href: "#" },
-    { name: "Дитяче меню", image: "/images/cat-restaurant.png", href: "#" },
-    { name: "Власне виробництво", image: "/images/cat-burgers.png", href: "#" },
-    { name: "М'ясна продукція", image: "/images/cat-shashlik.png", href: "#" },
-    { name: "Консервація", image: "/images/cat-sets.png", href: "#" },
-    { name: "Сир", image: "/images/cat-branded.png", href: "#" },
+    { name: "Сезонне меню", image: "/images/cat-grill.png", href: "/catalog/litne-menu" },
+    { name: "Ресторанне меню", image: "/images/cat-restaurant.png", href: "/catalog/restoranne-menu" },
+    { name: "Бургери", image: "/images/cat-burgers.png", href: "/catalog/burgery" },
+    { name: "Піца", image: "/images/cat-shashlik.png", href: "/catalog/pitsa" },
+    { name: "Смакуй одразу", image: "/images/cat-sets.png", href: "/catalog/vizmy-z-soboyu" },
+    { name: "Набори для компаній", image: "/images/cat-branded.png", href: "/catalog/nabory-dlya-kompaniyi" },
+    { name: "Гриль меню", image: "/images/cat-grill.png", href: "/catalog/gryl-menu" },
+    { name: "Дитяче меню", image: "/images/cat-restaurant.png", href: "/catalog/dytyache-menu" },
+    { name: "Власне виробництво", image: "/images/cat-burgers.png", href: "/catalog/vlasne-vyrobnytstvo" },
+    { name: "М'ясна продукція", image: "/images/cat-shashlik.png", href: "/catalog/myasna-produktsiya" },
+    { name: "Консервація", image: "/images/cat-sets.png", href: "/catalog/konservatsiya" },
+    { name: "Сир", image: "/images/cat-branded.png", href: "/catalog/syry" },
 ];
 
 export interface CategoryCircleItem {

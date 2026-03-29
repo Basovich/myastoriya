@@ -5,6 +5,18 @@ import AppLink from '../AppLink/AppLink';
 import s from './CategorySwitcher.module.scss';
 import clsx from 'clsx';
 
+const categories = [
+    { id: 'parent', label: 'Ресторанне меню', href: '#', isParent: true },
+    { id: '1', label: 'Салати', href: '#' },
+    { id: '2', label: 'Холодні закуски', href: '#' },
+    { id: '3', label: 'Гарячі закуски', href: '#', isActive: true },
+    { id: '4', label: 'Перші страви', href: '#' },
+    { id: '5', label: 'Основні страви', href: '#' },
+    { id: '6', label: 'Гарніри', href: '#' },
+    { id: '7', label: 'Соуси (30 г)', href: '#' },
+    { id: '8', label: 'Десерти', href: '#' },
+];
+
 interface Category {
     id: string;
     label: string;
@@ -14,13 +26,11 @@ interface Category {
 }
 
 interface CategorySwitcherProps {
-    categories: Category[];
     title?: string;
     className?: string;
 }
 
 export default function CategorySwitcher({
-    categories,
     title = 'КАТЕГОРІЇ',
     className,
 }: CategorySwitcherProps) {

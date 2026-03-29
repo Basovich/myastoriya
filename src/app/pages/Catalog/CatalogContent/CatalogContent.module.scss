@@ -4,10 +4,14 @@
 
 .topSection {
     width: 100%;
-    margin-top: 18px;
+    padding-top: 18px;
 
-    @media (min-width: 768px) {
-        margin-top: 40px;
+    @media (min-width: 1280px) {
+        padding-top: 38px;
+    }
+
+    &.topSectionCategory {
+        background-color: #F6F6F6;
     }
 }
 
@@ -33,10 +37,40 @@ section.heroBanner {
     @media (min-width: 1440px) {
         max-width: 1300px;
     }
+
+    &.heroBannerCategory {
+        margin-bottom: 0;
+    }
 }
 
 nav.breadcrumbs {
     margin-bottom: 0;
+}
+
+nav.breadcrumbsCategory {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 26px;
+
+    @media (min-width: 768px) {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    @media (min-width: 1280px) {
+        padding-left: calc((100% - 1200px) / 2);
+        padding-right: calc((100% - 1200px) / 2);
+    }
+
+    @media (min-width: 1360px) {
+        padding-left: calc((100% - 1280px) / 2);
+        padding-right: calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: calc((100% - 1300px) / 2);
+        padding-right: calc((100% - 1300px) / 2);
+    }
 }
 
 .categoriesSection {
@@ -67,7 +101,6 @@ nav.breadcrumbs {
 }
 
 .mainInner {
-    max-width: 1360px;
     margin: 0 auto;
     padding: 24px 16px;
     display: flex;
@@ -75,13 +108,21 @@ nav.breadcrumbs {
     gap: 20px;
 
     @media (min-width: 768px) {
-        padding: 28px 24px;
+        padding: 28px 40px;
         gap: 24px;
     }
 
     @media (min-width: 1280px) {
-        padding: 32px 40px;
+        padding: 32px calc((100% - 1200px) / 2);
         gap: 32px;
+    }
+
+    @media (min-width: 1360px) {
+        padding: 32px calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding: 32px calc((100% - 1300px) / 2);
     }
 }
 

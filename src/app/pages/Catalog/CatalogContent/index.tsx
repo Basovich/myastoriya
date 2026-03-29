@@ -7,7 +7,7 @@ import Breadcrumbs from '../../../components/ui/Breadcrumbs/Breadcrumbs';
 import CategoryCircles from '@/app/components/CategoryCircles/CategoryCircles';
 import Image from 'next/image';
 import Index from '@/app/pages/Catalog/CatalogProductRow';
-import FilterSidebar from '@/app/pages/Catalog/CatalogSidebar';
+import CatalogSidebar from '@/app/pages/Catalog/CatalogSidebar';
 import FilterModal from '@/app/pages/Catalog/CatalogModal';
 import ProductCard from '../../../components/ui/ProductCard/ProductCard';
 import SectionHeader from '../../../components/ui/SectionHeader/SectionHeader';
@@ -17,6 +17,7 @@ import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
 import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
 import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
 import clsx from 'clsx';
+import CategorySwitcher from "@/app/components/ui/CategorySwitcher/CategorySwitcher";
 
 interface Product {
     id: number;
@@ -68,29 +69,6 @@ const FAQ_DATA = [
 
 const TOTAL_PAGES = 6;
 
-const CATEGORY_LABELS: Record<string, string> = {
-    'litne-menu': 'Літнє меню',
-    'vizmy-z-soboyu': 'Візьми з собою',
-    'nabory-dlya-kompaniyi': 'Набори для компанії',
-    'gryl-menu': 'Гриль-меню',
-    'restoranne-menu': 'Ресторанне меню',
-    'burgery': 'Бургери',
-    'dytyache-menu': 'Дитяче меню',
-    'vlasne-vyrobnytstvo': 'Власне виробництво',
-    'myasna-produktsiya': "М'ясна продукція",
-    'konservatsiya': 'Консервація',
-    'syry': 'Сири',
-    'maslo': 'Масло',
-    'sousy': 'Соуси',
-    'napoyi': 'Напої',
-    'khlib-ta-vypichka': 'Хліб та випічка',
-    'morozyvo-gelarty': 'Морозиво Gelarty',
-    'solodoshchi': 'Солодощі',
-    'kava': 'Кава',
-    'med': 'Мед',
-    'shashylk': 'Шашлик',
-};
-
 interface CatalogContentProps {
     category?: string;
 }
@@ -101,11 +79,11 @@ export default function CatalogContent({ category }: CatalogContentProps) {
     const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
     const [view, setView] = useState<ViewType>('list');
 
-    const categoryLabel = category ? (CATEGORY_LABELS[category] ?? category) : null;
+    const categoryLabel = category ? category : null;
 
     const breadcrumbItems = [
         { label: 'Головна', href: '/' },
-        { label: 'Каталог', href: '/catalog' },
+        ...(categoryLabel ? [{ label: 'Каталог', href: '/catalog' }] : [{ label: 'Каталог' }]),
         ...(categoryLabel ? [{ label: categoryLabel }] : []),
     ];
 
@@ -114,17 +92,23 @@ export default function CatalogContent({ category }: CatalogContentProps) {
     return (
         <>
             <div className={s.container}>
-                <div className={s.topSection}>
+                <div className={clsx(s.topSection, category && s.topSectionCategory)}>
                     <HeroBanner
                         prefix=""
                         title={pageTitle}
-                        className={s.heroBanner}
+                        className={clsx(s.heroBanner, category && s.heroBannerCategory)}
                     />
-                    <div className={s.categoriesSection}>
-                        <CategoryCircles
-                            headerLeft={<Breadcrumbs items={breadcrumbItems} className={s.breadcrumbs} />}
-                        />
-                    </div>
+                    {
+                        category ? (
+                            <Breadcrumbs items={breadcrumbItems} className={clsx(s.breadcrumbs, s.breadcrumbsCategory)} />
+                        ) : (
+                            <div className={s.categoriesSection}>
+                                <CategoryCircles
+                                    headerLeft={<Breadcrumbs items={breadcrumbItems} className={s.breadcrumbs} />}
+                                />
+                            </div>
+                        )
+                    }
                 </div>
                 <div className={s.mainSection}>
                     <Image
@@ -168,7 +152,8 @@ export default function CatalogContent({ category }: CatalogContentProps) {
 
                         <div className={s.contentLayout}>
                             <aside className={s.sidebar}>
-                                <FilterSidebar />
+                                { category && <CategorySwitcher />}
+                                <CatalogSidebar />
                             </aside>
 
                             {/* Results column */}

@@ -7,7 +7,6 @@ import FilterCheckbox from '@/app/components/ui/FilterCheckbox/FilterCheckbox';
 import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
 import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
-import CategorySwitcher from '@/app/components/ui/CategorySwitcher/CategorySwitcher';
 
 interface FilterState {
     priceFrom: number;
@@ -27,27 +26,16 @@ const MARBLING_OPTIONS = ['Choice', 'Select', 'Prime'];
 const COUNTRY_OPTIONS = ['Україна', 'США', 'Австралія', 'Аргентина'];
 const BREED_OPTIONS = ['Ангус', 'Герефорд', 'Вагю', 'Симентальська'];
 
-const DUMMY_CATEGORIES = [
-    { id: 'parent', label: 'Ресторанне меню', href: '#', isParent: true },
-    { id: '1', label: 'Салати', href: '#' },
-    { id: '2', label: 'Холодні закуски', href: '#' },
-    { id: '3', label: 'Гарячі закуски', href: '#', isActive: true },
-    { id: '4', label: 'Перші страви', href: '#' },
-    { id: '5', label: 'Основні страви', href: '#' },
-    { id: '6', label: 'Гарніри', href: '#' },
-    { id: '7', label: 'Соуси (30 г)', href: '#' },
-    { id: '8', label: 'Десерти', href: '#' },
-];
 
 const MIN_PRICE = 0;
 const MAX_PRICE = 10000;
 
-interface FilterSidebarProps {
+interface CatalogSidebarProps {
     onApply?: (filters: FilterState) => void;
     onClose?: () => void;
 }
 
-export default function CatalogSidebar({ onApply, onClose }: FilterSidebarProps) {
+export default function CatalogSidebar({ onApply, onClose }: CatalogSidebarProps) {
     const [filters, setFilters] = useState<FilterState>({
         priceFrom: MIN_PRICE,
         priceTo: MAX_PRICE,
@@ -101,8 +89,6 @@ export default function CatalogSidebar({ onApply, onClose }: FilterSidebarProps)
 
     return (
         <div className={s.sidebar}>
-            <CategorySwitcher categories={DUMMY_CATEGORIES} />
-            
             <div className={s.filtersWrapper}>
                 <PriceRange
                     min={MIN_PRICE}
