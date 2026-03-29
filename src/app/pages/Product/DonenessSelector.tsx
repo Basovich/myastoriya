@@ -63,6 +63,16 @@ const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange }) 
                     </div>
                 ))}
             </div>
+
+            <div className={s.promoBanner}>
+                <Image 
+                    src="/images/product/gift-banner.png" 
+                    alt="При покупці отримайте стейк Рібай у подарунок"
+                    width={320}
+                    height={80}
+                    layout="responsive"
+                />
+            </div>
         </div>
     );
 };
