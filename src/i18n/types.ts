@@ -157,6 +157,7 @@ export interface HomeDict {
   applicantFormPage: ApplicantFormPageDict;
   contactsPage: ContactsPageDict;
   ourStoresPage: OurStoresPageDict;
+  deliveryPage: DeliveryPageDict;
   notFoundPage: NotFoundPageDict;
 }
 
@@ -278,6 +279,54 @@ export interface OurStoresPageDict {
     address: string;
     workingHoursLabel: string;
     phoneLabel: string;
+  };
+}
+
+export interface DeliveryMethodCard {
+  title: string;
+  shippingCostLabel: string;
+  shippingCostValue: string;
+  minOrderLabel: string;
+  minOrderValue: string;
+  features: string[];
+  image: string;
+}
+
+export interface DeliveryPageDict {
+  title: string;
+  breadcrumbs: {
+    home: string;
+    delivery: string;
+  };
+  zones: {
+    title: string;
+    tabs: {
+      restaurants: string;
+      meatbar: string;
+    };
+    search: {
+      placeholder: string;
+      button: string;
+    };
+    info: string;
+  };
+  methods: {
+    title: string;
+    items: DeliveryMethodCard[];
+  };
+  policies: {
+    returns: {
+      title: string;
+      text: string;
+    };
+    payment: {
+      title: string;
+      items: string[];
+    };
+    returnableCategories: {
+      title: string;
+      text: string;
+    };
   };
 }
 

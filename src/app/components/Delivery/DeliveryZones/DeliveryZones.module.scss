@@ -1,0 +1,164 @@
+
+.zonesSection {
+  padding: 60px 0;
+  background: #fff;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    width: auto;
+    gap: 10px;
+  }
+}
+
+.tab {
+  width: 100%;
+  height: 44px;
+  font-size: 10px;
+
+  @media (min-width: 1280px) {
+    width: auto;
+    height: 36px;
+    min-width: 196px;
+    padding: 0 24px;
+  }
+}
+
+.searchRow {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
+
+  @media (min-width: 1024px) {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.searchInputWrapper {
+  flex: 1;
+  display: flex;
+  background: #F9F9F9;
+  border: 1px solid #EAEAEA;
+  border-radius: 100px;
+  padding: 8px 8px 8px 24px;
+  transition: border-color 0.3s ease;
+
+  &:focus-within {
+    border-color: var(--color-primary, #E30613);
+  }
+}
+
+.searchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #1A1A1A;
+
+  &::placeholder {
+    color: #8C8C8C;
+  }
+}
+
+.searchBtn {
+  background: var(--color-primary, #E30613);
+  color: #fff;
+  border: none;
+  border-radius: 100px;
+  padding: 12px 30px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.infoBadge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #1A1A1A;
+  font-weight: 600;
+  font-size: 14px;
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--color-primary, #E30613);
+    border-radius: 50%;
+  }
+}
+
+.mapWrapper {
+  margin-bottom: 40px;
+}
+
+.mapPlaceholder {
+  height: 450px;
+  background: #212121;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: var(--font-unbounded, 'Unbounded');
+}
+
+.storesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.storeMiniCard {
+  background: #F9F9F9;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.storeName {
+  font-family: var(--font-unbounded, 'Unbounded');
+  font-weight: 700;
+  font-size: 16px;
+  color: #1A1A1A;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.storeDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  p {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #4D4D4D;
+  }
+}
