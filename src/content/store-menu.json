@@ -1,0 +1,56 @@
+{
+    "categories": [
+        { "id": "hot-appetizers", "title": "Гарячі закуски", "image": "/images/cat-grill.png" },
+        { "id": "soups", "title": "Супи", "image": "/images/cat-restaurant.png" },
+        { "id": "salads", "title": "Салати", "image": "/images/cat-burgers.png" },
+        { "id": "steaks", "title": "Стейки", "image": "/images/cat-grill.png" },
+        { "id": "burgers", "title": "Бургери", "image": "/images/cat-burgers.png" },
+        { "id": "kids-menu", "title": "Дитяче меню", "image": "/images/cat-restaurant.png" }
+    ],
+    "promotions": [
+        {
+            "id": 1,
+            "title": "BURGER DAYS",
+            "image": "/images/promotions/promo-hero-bg.png",
+            "badge": "АКЦІЯ В ЗАКЛАДІ"
+        },
+        {
+            "id": 2,
+            "title": "STEAK NIGHTS",
+            "image": "/images/promotions/promo-hero-bg.png",
+            "badge": "АКЦІЯ В ЗАКЛАДІ"
+        }
+    ],
+    "products": [
+        {
+            "id": 101,
+            "categoryId": "hot-appetizers",
+            "title": "КРЕМ-СУП З ГАРБУЗА",
+            "description": "Класичний крем-суп на основі запеченого у печі гарбуза з вершками та прянощами. Подається з грінками та насінням гарбуза.",
+            "price": 275,
+            "weight": "250г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 102,
+            "categoryId": "hot-appetizers",
+            "title": "СОЛЯНКА З КОПЧЕНОСТЯМИ ТА ЯЛОВИЧИМ ЯЗИКОМ",
+            "description": "Класичний суп з трьох видів запечених яловичих копченостей, соліннями та овочами. Подається зі сметаною та лимоном.",
+            "price": 250,
+            "weight": "300г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 103,
+            "categoryId": "hot-appetizers",
+            "title": "САЛАТ З ГАРБУЗОМ, КУПАТЕЛЛО ТА МАНДАРИНОМ",
+            "description": "Ніжний салат на поєднанні гарбуза, мандарина, купаттелло, листя салату, волоських горіхів під пікантною медово-гірчичною заправкою.",
+            "price": 235,
+            "weight": "210г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        }
+    ]
+}

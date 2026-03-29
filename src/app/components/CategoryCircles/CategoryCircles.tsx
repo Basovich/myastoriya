@@ -37,17 +37,19 @@ interface CategoryCirclesProps {
     title?: string;
     className?: string;
     headerLeft?: React.ReactNode;
+    categories?: CategoryCircleItem[];
 }
 
 export default function CategoryCircles({
     title,
     className,
-    headerLeft
+    headerLeft,
+    categories = searchCategories
 }: CategoryCirclesProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
-    if (!searchCategories || searchCategories.length === 0) return null;
+    if (!categories || categories.length === 0) return null;
 
     return (
         <div className={clsx(s.wrapper, className)}>
@@ -88,7 +90,7 @@ export default function CategoryCircles({
                     1440: { slidesPerView: 12, spaceBetween: 16 },
                 }}
             >
-                {searchCategories.map((item, index) => (
+                {categories.map((item, index) => (
                     <SwiperSlide key={index} className={s.slide}>
                         <AppLink href={item.href} className={s.item}>
                             <div className={s.circle}>

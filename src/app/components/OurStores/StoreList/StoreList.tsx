@@ -8,6 +8,11 @@ interface StoreListProps {
         workingHours: string;
         details: string;
         route: string;
+        open: string;
+        closed: string;
+        address: string;
+        workingHoursLabel: string;
+        phoneLabel: string;
     };
 }
 

@@ -1,0 +1,66 @@
+.container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 16px;
+
+    @media (min-width: 1024px) {
+        padding: 0 40px;
+    }
+}
+
+.hero {
+    margin-bottom: 32px;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 56px;
+    }
+}
+
+.breadcrumbs {
+    margin-top: 16px;
+    margin-bottom: 16px;
+
+    @media (min-width: 1024px) {
+        margin-top: 24px;
+        margin-bottom: 24px;
+    }
+}
+
+.categories {
+    margin-bottom: 40px;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 64px;
+    }
+}
+
+.section {
+    margin-bottom: 48px;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 80px;
+    }
+}
+
+.sectionHeader {
+    margin-bottom: 24px;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 32px;
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+
+    @media (min-width: 1024px) {
+        grid-template-columns: 1fr; // On desktop they are wide cards as in screenshot, but stacked?
+        // Wait, looking at the desktop screenshot, the cards are very wide. 
+        // If I use grid 1fr, they will be full width.
+        // If the user wants 2 columns, they would be narrower.
+        // Let's stick with 1 column as it matches the "wide card" look.
+        gap: 24px;
+    }
+}

@@ -8,6 +8,7 @@ import Header from '@/app/components/Header/Header';
 import Footer from '@/app/components/Footer/Footer';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import Button from '@/app/components/ui/Button/Button';
+import Link from 'next/link';
 import Image from 'next/image';
 import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
 
@@ -102,7 +103,11 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ store, lang, dict }) 
                                 </svg>
                                 Дивитись на карті
                             </Button>
-                            <Button variant="outline" className={s.actionBtn}>
+                            <Button 
+                                variant="outline" 
+                                className={s.actionBtn}
+                                href={`/our-stores/${store.id}/menu`}
+                            >
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19" />
                                 </svg>

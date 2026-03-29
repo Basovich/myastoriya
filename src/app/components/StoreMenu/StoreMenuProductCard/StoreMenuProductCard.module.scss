@@ -1,0 +1,117 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    padding: 16px;
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #ebebeb;
+
+    @media (any-hover: hover) {
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        flex-direction: row;
+        gap: 24px;
+        padding: 24px;
+        align-items: flex-start;
+    }
+}
+
+.imageWrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    flex-shrink: 0;
+
+    @media (min-width: 1024px) {
+        width: 380px;
+        height: 240px;
+    }
+}
+
+.productImg {
+    object-fit: cover;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding-top: 16px;
+
+    @media (min-width: 1024px) {
+        padding-top: 0;
+        height: 100%;
+    }
+}
+
+.header {
+    margin-bottom: 12px;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+
+    @media (min-width: 1024px) {
+        font-size: 22px;
+    }
+}
+
+.priceInfo {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--color-text-primary);
+}
+
+.unit {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+.description {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+    margin-bottom: 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    @media (min-width: 1024px) {
+        font-size: 15px;
+        -webkit-line-clamp: 4;
+    }
+}
+
+.footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-start;
+
+    :global(.AddToCartButton) {
+        padding: 12px 24px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+}
