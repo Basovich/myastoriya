@@ -7,20 +7,12 @@
 .deliveryItem {
     background: #fff;
     border-radius: 12px;
-    border: 1px solid #F0F0F0;
+    border: 1px solid rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
 
     &.isOpen {
-        border-color: #E0E0E0;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-
         .arrowWrap {
             transform: rotate(180deg);
-        }
-
-        .iconBox {
-            background: #E3051B;
-            color: #fff;
         }
     }
 }
@@ -91,13 +83,16 @@
     ul {
         list-style: disc;
         padding-left: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
 
         li {
+            margin-bottom: 8px; // Replaced gap with margin for better wrap support
+
             &::marker {
                 color: #000;
+            }
+
+            &:last-child {
+                margin-bottom: 0;
             }
         }
     }

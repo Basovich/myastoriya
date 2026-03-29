@@ -609,39 +609,49 @@
 
 /* Video Content Specifics */
 .videoContent {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+    display: block; // Changed from flex to block to support float wrapping
     margin-bottom: 24px;
 
-    @media (min-width: 1024px) {
-        flex-direction: row;
-        align-items: flex-start;
+    &::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+
+    ul {
+        list-style-position: inside; // Ensure bullets are visible when floated
     }
 }
 
 .videoPreview {
-    position: relative;
-    width: 100%;
-    max-width: 280px;
+    position: relative; // RESTORED: Needed for playBtn absolute positioning
+    float: left; // Support text wrapping
+    width: 280px;
     aspect-ratio: 1.77;
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
     background: #000;
-    flex-shrink: 0;
+    margin-right: 24px;
+    margin-bottom: 24px;
+
+    @media (max-width: 767px) {
+        float: none;
+        width: 100%;
+        margin-right: 0;
+    }
 
     img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        opacity: 0.8;
+        opacity: 1; // Full opacity by default for better visibility
         transition: opacity 0.3s;
     }
 
     &:hover {
         img {
-            opacity: 1;
+            opacity: 0.8;
         }
 
         .playBtn {
