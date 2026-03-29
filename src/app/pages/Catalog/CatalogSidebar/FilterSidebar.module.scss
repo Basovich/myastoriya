@@ -20,7 +20,19 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-top: 8px;
+    margin-top: auto;
+    padding-top: 16px;
+    padding-bottom: 20px;
+    position: sticky;
+    bottom: -20px; // Offsets the padding in body
+    background: #fff;
+    z-index: 5;
+
+    @media (min-width: 1280px) {
+        position: static;
+        padding-bottom: 0;
+        margin-top: 8px;
+    }
 }
 
 .applyBtn {
@@ -38,13 +50,65 @@
     transition: opacity 0.2s;
 
     @media (any-hover: hover) {
-        &:hover {
+        &:hover:not(:disabled) {
             opacity: 0.88;
         }
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 
     &:focus-visible {
         outline: 2px solid #E3051B;
         outline-offset: 3px;
+    }
+}
+
+.onlyMobile {
+    @media (min-width: 1280px) {
+        display: none;
+    }
+}
+
+.sortOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 24px;
+}
+
+.sortOption {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 10px 0;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 400;
+    color: #4B4B4B;
+    cursor: pointer;
+    transition: color 0.15s, background-color 0.15s;
+    border-radius: 6px;
+    padding-left: 8px;
+    margin-left: -8px;
+
+    @media (any-hover: hover) {
+        &:hover {
+            color: #E3051B;
+            background-color: rgba(227, 5, 27, 0.04);
+        }
+    }
+
+    &Active {
+        color: #E3051B;
+        font-weight: 700;
+        background-color: rgba(227, 5, 27, 0.04);
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: -2px;
     }
 }

@@ -160,7 +160,10 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                         <div className={s.contentLayout}>
                             <aside className={s.sidebar}>
                                 { category && <CategorySwitcher />}
-                                <CatalogSidebar />
+                                <CatalogSidebar 
+                                    sortBy={sortBy} 
+                                    onSortChange={setSortBy} 
+                                />
                             </aside>
 
                             {/* Results column */}
@@ -268,7 +271,12 @@ export default function CatalogContent({ category }: CatalogContentProps) {
             </div>
 
             {/* Mobile catalog drawer */}
-            <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+            <FilterModal 
+                isOpen={isFilterOpen} 
+                onClose={() => setIsFilterOpen(false)} 
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+            />
         </>
     );
 }

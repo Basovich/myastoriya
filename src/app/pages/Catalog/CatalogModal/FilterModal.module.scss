@@ -7,22 +7,24 @@
     align-items: flex-end;
     justify-content: center;
 
-    @media (min-width: 768px) {
+    @media (min-width: 1280px) {
         align-items: center;
     }
 }
 
 .drawer {
     width: 100%;
-    max-width: 480px;
-    max-height: 90dvh;
+    height: 100dvh;
+    max-height: 100dvh;
     background: #fff;
-    border-radius: 24px 24px 0 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    border-radius: 0;
 
-    @media (min-width: 768px) {
+    @media (min-width: 1280px) {
+        max-width: 480px;
+        height: auto;
         max-height: 85dvh;
         border-radius: 20px;
     }
@@ -32,9 +34,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 20px 14px;
+    padding: 16px 20px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     flex-shrink: 0;
+    min-height: 60px;
 }
 
 .title {
@@ -42,20 +45,48 @@
     font-weight: 700;
     margin: 0;
     color: #000;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.clearBtn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: #E3051B;
+    cursor: pointer;
+    padding: 8px;
+    transition: opacity 0.15s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
 }
 
 .closeBtn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     background: none;
     border: none;
     border-radius: 50%;
     cursor: pointer;
     color: #000;
     transition: background 0.15s;
+    padding: 0;
+    margin-left: -6px;
 
     @media (any-hover: hover) {
         &:hover {

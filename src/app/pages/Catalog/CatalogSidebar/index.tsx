@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import s from './FilterSidebar.module.scss';
 import FilterGroup from '@/app/components/ui/FilterGroup/FilterGroup';
 import FilterCheckbox from '@/app/components/ui/FilterCheckbox/FilterCheckbox';
@@ -8,6 +8,7 @@ import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
 import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
 import Button from "@/app/components/ui/Button/Button";
+import clsx from 'clsx';
 
 interface FilterState {
     priceFrom: number;
@@ -34,9 +35,20 @@ const MAX_PRICE = 10000;
 interface CatalogSidebarProps {
     onApply?: (filters: FilterState) => void;
     onClose?: () => void;
+    sortBy?: string;
+    onSortChange?: (value: string) => void;
+    onClearAll?: () => void;
+    onModifiedChange?: (modified: boolean) => void;
 }
 
-export default function CatalogSidebar({ onApply, onClose }: CatalogSidebarProps) {
+const SORT_OPTIONS = [
+    'За замовчуванням',
+    'За популярністю',
+    'від дешевих до дорогих',
+    'від дорогих до дешевих',
+];
+
+export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange, onClearAll, onModifiedChange }: CatalogSidebarProps) {
     const [filters, setFilters] = useState<FilterState>({
         priceFrom: MIN_PRICE,
         priceTo: MAX_PRICE,
@@ -70,6 +82,16 @@ export default function CatalogSidebar({ onApply, onClose }: CatalogSidebarProps
         filters.country.length +
         filters.breed.length;
 
+    const isModified = 
+        selectedCount > 0 || 
+        filters.priceFrom !== MIN_PRICE || 
+        filters.priceTo !== MAX_PRICE || 
+        (sortBy !== undefined && sortBy !== 'За замовчуванням');
+
+    useEffect(() => {
+        onModifiedChange?.(isModified);
+    }, [isModified, onModifiedChange]);
+
     const handleClear = () => {
         setFilters({
             priceFrom: MIN_PRICE,
@@ -81,9 +103,15 @@ export default function CatalogSidebar({ onApply, onClose }: CatalogSidebarProps
             country: [],
             breed: [],
         });
+        onClearAll?.();
+    };
+
+    const handlePriceClear = () => {
+        setFilters(prev => ({ ...prev, priceFrom: MIN_PRICE, priceTo: MAX_PRICE }));
     };
 
     const handleApply = () => {
+        if (!isModified) return;
         onApply?.(filters);
         onClose?.();
     };
@@ -91,6 +119,25 @@ export default function CatalogSidebar({ onApply, onClose }: CatalogSidebarProps
     return (
         <div className={s.sidebar}>
             <div className={s.filtersWrapper}>
+                <div className={s.onlyMobile}>
+                    <FilterGroup title={sortBy || "ПО ПОПУЛЯРНОСТІ"}>
+                        <div className={s.sortOptions}>
+                            {SORT_OPTIONS.map(option => (
+                                <button
+                                    key={option}
+                                    type="button"
+                                    className={clsx(s.sortOption, (sortBy === option || (!sortBy && option === 'За замовчуванням')) && s.sortOptionActive)}
+                                    onClick={() => {
+                                        onSortChange?.(option);
+                                    }}
+                                >
+                                    {option}
+                                </button>
+                            ))}
+                        </div>
+                    </FilterGroup>
+                </div>
+
                 <PriceRange
                     min={MIN_PRICE}
                     max={MAX_PRICE}
@@ -99,8 +146,8 @@ export default function CatalogSidebar({ onApply, onClose }: CatalogSidebarProps
                     step={50}
                     onChange={(from, to) => setFilters(prev => ({ ...prev, priceFrom: from, priceTo: to }))}
                     label="ЦІНА (ГРН)"
-                    onClear={handleClear}
-                    showClear={selectedCount > 0}
+                    onClear={handlePriceClear}
+                    showClear={filters.priceFrom !== MIN_PRICE || filters.priceTo !== MAX_PRICE}
                 />
 
                 <FilterGroup title="М'ЯСНА ЧАСТИНА">
@@ -182,6 +229,7 @@ export default function CatalogSidebar({ onApply, onClose }: CatalogSidebarProps
                     type="button"
                     className={s.applyBtn}
                     onClick={handleApply}
+                    disabled={!isModified}
                 >
                     {selectedCount > 0
                         ? `ЗАСТОСУВАТИ (${selectedCount})`
