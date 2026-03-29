@@ -1,6 +1,7 @@
 import React from "react";
 import s from "./StoreCard.module.scss";
 import Image from "next/image";
+import Link from "next/link";
 import { type StoreType } from "../../../pages/OurStores/index";
 
 export interface Store {
@@ -47,7 +48,9 @@ export default function StoreCard({ store, dict, variant = "list" }: StoreCardPr
                     </div>
                 </div>
                 <div className={s.actions}>
-                    <button className={s.detailsBtn}>{dict.details}</button>
+                    <Link href={`/our-stores/${store.id}`} className={s.detailsBtn}>
+                        {dict.details}
+                    </Link>
                     <a 
                         href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(store.address)}`} 
                         target="_blank" 
