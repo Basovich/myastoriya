@@ -25,9 +25,7 @@ export default function StoreViewToggle({ viewMode, onViewChange, dict }: StoreV
                         <line x1="8" y1="6" x2="21" y2="6" />
                         <line x1="8" y1="12" x2="21" y2="12" />
                         <line x1="8" y1="18" x2="21" y2="18" />
-                        <line x1="3" y1="6" x2="3.01" y2="6" />
-                        <line x1="3" y1="12" x2="3.01" y2="12" />
-                        <line x1="3" y1="18" x2="3.01" y2="18" />
+                        <path d="M3 6h1v0H3V6zm0 6h1v0H3v0zm0 6h1v0H3v0z" strokeLinecap="round" />
                     </svg>
                 </div>
             </button>
@@ -38,8 +36,8 @@ export default function StoreViewToggle({ viewMode, onViewChange, dict }: StoreV
                 <span>{dict.map}</span>
                 <div className={s.icon}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                        <circle cx="12" cy="10" r="3" />
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                     </svg>
                 </div>
             </button>

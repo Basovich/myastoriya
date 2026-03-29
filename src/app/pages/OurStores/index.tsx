@@ -50,6 +50,7 @@ export default function OurStoresPage({ dict, lang }: OurStoresPageProps) {
                 <div className={s.content}>
                     <HeroBanner
                         title={ourStoresPage.title}
+                        subtitle="..........."
                         image="/images/promotions/promo-hero-bg.png"
                     />
                     
@@ -59,11 +60,16 @@ export default function OurStoresPage({ dict, lang }: OurStoresPageProps) {
                         </div>
 
                         <div className={s.controls}>
-                            <div className={s.filtersRow}>
+                            <div className={s.topRow}>
                                 <StoreFilter 
                                     activeFilter={activeFilter} 
                                     onFilterChange={setActiveFilter} 
                                     dict={ourStoresPage.filters}
+                                />
+                                <StoreSearch 
+                                    value={searchQuery} 
+                                    onChange={setSearchQuery} 
+                                    dict={ourStoresPage.search}
                                 />
                                 <StoreViewToggle 
                                     viewMode={viewMode} 
@@ -71,19 +77,24 @@ export default function OurStoresPage({ dict, lang }: OurStoresPageProps) {
                                     dict={ourStoresPage.viewToggle}
                                 />
                             </div>
-
-                            <div className={s.searchRow}>
-                                <StoreSearch 
-                                    value={searchQuery} 
-                                    onChange={setSearchQuery} 
-                                    dict={ourStoresPage.search}
-                                />
-                            </div>
                         </div>
 
                         <div className={s.viewContainer}>
                             {viewMode === "list" ? (
-                                <StoreList stores={filteredStores} dict={ourStoresPage.storeCard} />
+                                <>
+                                    <StoreList stores={filteredStores} dict={ourStoresPage.storeCard} />
+                                    {filteredStores.length > 0 && (
+                                        <div className={s.loadMoreWrapper}>
+                                            <button className={s.loadMoreBtn}>
+                                                {ourStoresPage.loadMore}
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <polyline points="7 13 12 18 17 13" />
+                                                    <polyline points="7 6 12 11 17 6" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    )}
+                                </>
                             ) : (
                                 <StoreMap stores={filteredStores} dict={ourStoresPage.storeCard} />
                             )}

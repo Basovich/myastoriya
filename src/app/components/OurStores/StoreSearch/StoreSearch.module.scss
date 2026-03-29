@@ -1,10 +1,12 @@
+
 .searchWrapper {
     display: flex;
     gap: 8px;
     width: 100%;
+    margin: 0 auto;
 
     @media (min-width: 768px) {
-        gap: 12px;
+        max-width: 600px;
     }
 }
 
@@ -13,54 +15,71 @@
     flex: 1;
     display: flex;
     align-items: center;
-    background: #fff;
-    border: 1px solid #E0E0E0;
+    background: #FFF;
+    border: 1px solid #F0F0F0;
     border-radius: 8px;
     padding: 0 16px;
-    transition: border-color 0.3s ease;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 
     &:focus-within {
-        border-color: #000;
+        border-color: #E3051B;
+        box-shadow: 0 4px 12px rgba(227, 5, 27, 0.08);
     }
 
     .icon {
         margin-right: 12px;
         display: flex;
         align-items: center;
+        color: #828282;
     }
 
     .input {
         width: 100%;
-        padding: 14px 0;
+        padding: 12px 0;
         border: none;
         outline: none;
-        font-size: 16px;
+        font-size: 14px;
+        font-weight: 500;
         color: #000;
 
         &::placeholder {
-            color: #999;
+            color: #828282;
+        }
+
+        @media (min-width: 768px) {
+            padding: 14px 0;
+            font-size: 15px;
         }
     }
 }
 
 .searchBtn {
-    background: #E30613;
-    color: #fff;
+    background: #E3051B;
+    color: #FFF;
     border: none;
     border-radius: 8px;
-    padding: 0 32px;
-    font-size: 14px;
+    padding: 0 24px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.3s ease;
-    display: none;
+    transition: background 0.2s;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(227, 5, 27, 0.3);
 
     @media (min-width: 768px) {
-        display: block;
+        padding: 0 32px;
+        font-size: 14px;
     }
 
     &:hover {
-        background: #CC0511;
+        @media (any-hover: hover) {
+            background: #BF0416;
+        }
+    }
+
+    &:active {
+        background: #9E0412;
     }
 
     &:focus-visible {

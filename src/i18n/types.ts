@@ -251,6 +251,7 @@ export interface ContactsPageDict {
 
 export interface OurStoresPageDict {
   title: string;
+  loadMore: string;
   breadcrumbs: {
     home: string;
     stores: string;
@@ -272,6 +273,11 @@ export interface OurStoresPageDict {
     workingHours: string;
     details: string;
     route: string;
+    open: string;
+    closed: string;
+    address: string;
+    workingHoursLabel: string;
+    phoneLabel: string;
   };
 }
 

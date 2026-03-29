@@ -5,6 +5,7 @@ import React from "react";
 
 interface HeroBannerProps {
     title?: string;
+    subtitle?: string;
     prefix?: string;
     image?: string;
     className?: string;
@@ -13,6 +14,7 @@ interface HeroBannerProps {
 
 export default function HeroBanner({
     title,
+    subtitle,
     prefix,
     image = "/images/promotions/promotions-banner.png",
     className,
@@ -40,7 +42,8 @@ export default function HeroBanner({
                         {title}
                     </h1>
                 )}
-                {!children && (
+                {subtitle && <p className={s.bannerSubtitle}>{subtitle}</p>}
+                {!children && !subtitle && (
                     <div className={s.bannerDots}>
                         <span className={s.dot}></span>
                         <span className={s.dot}></span>

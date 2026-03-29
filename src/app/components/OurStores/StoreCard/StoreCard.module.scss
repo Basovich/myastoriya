@@ -1,102 +1,204 @@
+
 .card {
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+    background: #FFF;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
-    height: 100%;
-}
+    gap: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: auto;
 
-.imageWrapper {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
+    @media (min-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+        padding: 32px;
+        gap: 32px;
+    }
 
-    .image {
-        object-fit: cover;
+    &:hover {
+        @media (any-hover: hover) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
     }
 }
 
-.content {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+.logoSection {
+    flex-shrink: 0;
 }
 
-.name {
-    font-size: 18px;
-    font-weight: 800;
-    margin-bottom: 12px;
-    color: #000;
-}
-
-.info {
-    margin-bottom: 20px;
-    flex: 1;
-}
-
-.infoItem {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #666;
-    font-size: 14px;
-}
-
-.timeIcon {
+.logoCircle {
+    width: 64px;
+    height: 64px;
+    background: #E3051B;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #E30613;
+    box-shadow: 0 4px 12px rgba(227, 5, 27, 0.3);
+}
+
+.logoM {
+    color: #FFF;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.mainInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 180px;
+
+    @media (min-width: 768px) {
+        border-right: 1px solid #F0F0F0;
+        padding-right: 24px;
+        height: 50px;
+        justify-content: center;
+    }
+}
+
+.name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #000;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.statusBadge {
+    display: inline-flex;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    width: fit-content;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+
+    &.open {
+        color: #27AE60;
+        background: rgba(39, 174, 96, 0.1);
+        border-color: rgba(39, 174, 96, 0.3);
+    }
+
+    &.closed {
+        color: #828282;
+        background: rgba(130, 130, 130, 0.1);
+        border-color: rgba(130, 130, 130, 0.3);
+    }
+}
+
+.detailsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+}
+
+.detailItem {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.iconWrapper {
+    color: #E3051B;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.textWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    label {
+        font-size: 10px;
+        font-weight: 700;
+        color: #828282;
+        text-transform: uppercase;
+    }
+
+    p {
+        font-size: 13px;
+        font-weight: 600;
+        color: #000;
+        margin: 0;
+        line-height: 1.4;
+    }
 }
 
 .actions {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    flex-shrink: 0;
 
     @media (min-width: 768px) {
-        flex-direction: row;
+        padding-left: 24px;
+        border-left: 1px solid #F0F0F0;
+        height: 50px;
+        align-items: center;
+    }
+}
+
+.pinBtn, .detailsBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.pinBtn {
+    color: #E3051B;
+    background: transparent;
+    border: 1px solid rgba(227, 5, 27, 0.3);
+
+    &:hover {
+        @media (any-hover: hover) {
+            background: #E3051B;
+            color: #FFF;
+        }
     }
 }
 
 .detailsBtn {
-    background: #000;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    flex: 1;
+    background: #FFF;
+    color: #000;
+    border: 1px solid #000;
 
     &:hover {
         @media (any-hover: hover) {
-            background: #252525;
+            background: #000;
+            color: #FFF;
         }
     }
 }
 
-.routeBtn {
-    border: 1px solid #E30613;
-    color: #E30613;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    flex: 1.5;
+// Map variant (small card for popups)
+.mapVariant {
+    padding: 16px;
+    border-radius: 12px;
+    gap: 12px;
+    flex-direction: column !important;
+    max-width: 280px;
 
-    &:hover {
-        @media (any-hover: hover) {
-            background: #E30613;
-            color: #fff;
-        }
-    }
+    .logoCircle { font-size: 20px; width: 40px; height: 40px; }
+    .logoM { font-size: 20px; }
+    .mainInfo { border: none; padding: 0; height: auto; }
+    .detailsGrid { border: none; padding: 0; }
+    .actions { border: none; padding: 0; height: auto; }
 }

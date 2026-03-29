@@ -555,8 +555,14 @@
             "storeCard": {
                 "workingHours": "Графік роботи:",
                 "details": "ДЕТАЛЬНІШЕ",
-                "route": "ПОБУДУВАТИ МАРШРУТ"
-            }
+                "route": "ПОБУДУВАТИ МАРШРУТ",
+                "open": "Відчинено",
+                "closed": "Зачинено",
+                "address": "АДРЕСА",
+                "workingHoursLabel": "ЧАС РОБОТИ:",
+                "phoneLabel": "ТЕЛЕФОН"
+            },
+            "loadMore": "ПОКАЗАТИ ЩЕ"
         }
     }
 }
