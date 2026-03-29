@@ -276,6 +276,7 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                 onClose={() => setIsFilterOpen(false)} 
                 sortBy={sortBy}
                 onSortChange={setSortBy}
+                category={category}
             />
         </>
     );

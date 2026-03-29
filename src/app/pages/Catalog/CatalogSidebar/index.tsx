@@ -8,6 +8,7 @@ import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
 import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
 import Button from "@/app/components/ui/Button/Button";
+import CategorySwitcher from "@/app/components/ui/CategorySwitcher/CategorySwitcher";
 import clsx from 'clsx';
 
 interface FilterState {
@@ -39,6 +40,7 @@ interface CatalogSidebarProps {
     onSortChange?: (value: string) => void;
     onClearAll?: () => void;
     onModifiedChange?: (modified: boolean) => void;
+    category?: string;
 }
 
 const SORT_OPTIONS = [
@@ -48,7 +50,7 @@ const SORT_OPTIONS = [
     'від дорогих до дешевих',
 ];
 
-export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange, onClearAll, onModifiedChange }: CatalogSidebarProps) {
+export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange, onClearAll, onModifiedChange, category }: CatalogSidebarProps) {
     const [filters, setFilters] = useState<FilterState>({
         priceFrom: MIN_PRICE,
         priceTo: MAX_PRICE,
@@ -120,7 +122,12 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
         <div className={s.sidebar}>
             <div className={s.filtersWrapper}>
                 <div className={s.onlyMobile}>
-                    <FilterGroup title={sortBy || "ПО ПОПУЛЯРНОСТІ"}>
+                    {category && (
+                        <FilterGroup title="КАТЕГОРІЇ">
+                            <CategorySwitcher isSidebar />
+                        </FilterGroup>
+                    )}
+                    <FilterGroup title={sortBy || "За замовчуванням"}>
                         <div className={s.sortOptions}>
                             {SORT_OPTIONS.map(option => (
                                 <button

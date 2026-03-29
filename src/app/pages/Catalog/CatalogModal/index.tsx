@@ -9,9 +9,10 @@ interface FilterModalProps {
     onClose: () => void;
     sortBy?: string;
     onSortChange?: (value: string) => void;
+    category?: string;
 }
 
-export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange }: FilterModalProps) {
+export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, category }: FilterModalProps) {
     const [clearTrigger, setClearTrigger] = useState(0);
     const [isModified, setIsModified] = useState(false);
 
@@ -86,6 +87,7 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange }:
                         onClearAll={() => {}} 
                         onModifiedChange={setIsModified}
                         key={clearTrigger} 
+                        category={category}
                     />
                 </div>
             </animated.div>

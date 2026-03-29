@@ -28,14 +28,16 @@ interface Category {
 interface CategorySwitcherProps {
     title?: string;
     className?: string;
+    isSidebar?: boolean;
 }
 
 export default function CategorySwitcher({
     title = 'КАТЕГОРІЇ',
     className,
+    isSidebar = false,
 }: CategorySwitcherProps) {
     return (
-        <div className={clsx(s.wrapper, className)}>
+        <div className={clsx(s.wrapper, isSidebar && s.sidebarMode, className)}>
             {title && <h3 className={s.title}>{title}</h3>}
             <div className={s.list}>
                 {categories.map((category) => (
