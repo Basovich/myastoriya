@@ -7,6 +7,7 @@ import Button from '@/app/components/ui/Button/Button';
 import ProductGallery from './ProductGallery';
 import ProductTabs from './ProductTabs';
 import ProductModifications from './ProductModifications';
+import DonenessSelector from './DonenessSelector';
 import ProductReviews from './ProductReviews';
 import RelatedProducts from './RelatedProducts';
 import QuantitySelector from '@/app/components/ui/QuantitySelector/QuantitySelector';
@@ -32,6 +33,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
 
     // State
     const [quantity, setQuantity] = useState(1);
+    const [selectedDoneness, setSelectedDoneness] = useState('medium');
     const [selectedMods, setSelectedMods] = useState<string[]>([]);
     const [selectedSouces, setSelectedSouces] = useState<string[]>([]);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -179,6 +181,11 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                             <Button variant="primary" className={s.mainBuyBtn}>Додати у кошик</Button>
                             <QuantitySelector value={quantity} onChange={setQuantity} />
                         </div>
+
+                        <DonenessSelector 
+                            value={selectedDoneness} 
+                            onChange={setSelectedDoneness} 
+                        />
 
                         <ProductModifications
                             title="Додати до замовлення:"
