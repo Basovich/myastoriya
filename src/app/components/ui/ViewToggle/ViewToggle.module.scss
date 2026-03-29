@@ -2,10 +2,15 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    height: 46px;
     background: #FFFFFF;
-    padding: 12px 24px;
-    border-radius: 60px;
+    padding: 12px 20px;
+    border-radius: 10px;
     width: fit-content;
+
+    @media (min-width: 1280px) {
+        border-radius: 60px;
+    }
 }
 
 .viewBtn {

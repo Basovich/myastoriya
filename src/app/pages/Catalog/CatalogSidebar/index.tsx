@@ -7,6 +7,7 @@ import FilterCheckbox from '@/app/components/ui/FilterCheckbox/FilterCheckbox';
 import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
 import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
+import Button from "@/app/components/ui/Button/Button";
 
 interface FilterState {
     priceFrom: number;
@@ -176,7 +177,8 @@ export default function CatalogSidebar({ onApply, onClose }: CatalogSidebarProps
             </div>
 
             <div className={s.actions}>
-                <button
+                <Button
+                    variant="red"
                     type="button"
                     className={s.applyBtn}
                     onClick={handleApply}
@@ -184,14 +186,7 @@ export default function CatalogSidebar({ onApply, onClose }: CatalogSidebarProps
                     {selectedCount > 0
                         ? `ЗАСТОСУВАТИ (${selectedCount})`
                         : 'ЗАСТОСУВАТИ ФІЛЬТР'}
-                </button>
-                {onClose && (
-                    <ShowMoreButton
-                        fullWidth
-                        onClick={onClose}
-                        label="ЗАКРИТИ"
-                    />
-                )}
+                </Button>
             </div>
         </div>
     );

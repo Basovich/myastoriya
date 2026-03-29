@@ -76,7 +76,6 @@ nav.breadcrumbsCategory {
 .categoriesSection {
     background: #fff;
     padding: 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .mainSection {
@@ -135,6 +134,10 @@ nav.breadcrumbsCategory {
     }
 }
 
+div.sortWrap {
+    display: none;
+}
+
 .sidebar {
     display: none;
 
@@ -166,18 +169,20 @@ nav.breadcrumbsCategory {
 .filterBtn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    height: 46px;
     position: relative;
-    padding: 10px 16px;
+    padding: 10px 36px;
     border-radius: 10px;
-    border: 1.5px solid rgba(0, 0, 0, 0.15);
+    border: 0;
     background: #fff;
-    font-size: 13px;
+    color: #060606;
+    text-align: right;
+    font-size: 12px;
+    font-style: normal;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    line-height: 120%;
     text-transform: uppercase;
-    color: #000;
-    cursor: pointer;
     transition: border-color 0.15s;
 
     @media (min-width: 1280px) {
@@ -194,15 +199,11 @@ nav.breadcrumbsCategory {
         outline: 2px solid #E3051B;
         outline-offset: 2px;
     }
-}
 
-.filterDot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #E3051B;
-    flex-shrink: 0;
+    .filterBtnText {
+        display: inline-block;
+        padding-top: 4px;
+    }
 }
 
 .viewToggle {
