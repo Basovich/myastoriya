@@ -183,13 +183,13 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                             onToggle={toggleSouce}
                         />
                     </section>
-                </div>
 
-                <ProductTabs
-                    description={product.description}
-                    characteristics={product.characteristics}
-                    delivery={product.delivery}
-                />
+                    <ProductTabs
+                        description={product.description}
+                        characteristics={product.characteristics}
+                        delivery={product.delivery}
+                    />
+                </div>
 
                 <ProductReviews reviews={product.reviews} />
 
