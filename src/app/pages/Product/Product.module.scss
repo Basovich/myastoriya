@@ -33,15 +33,18 @@
     grid-template-areas: 
         "gallery"
         "info"
-        "tabs";
+        "tabs"
+        "reviews";
     gap: 32px;
 
     @media (min-width: 1024px) {
         grid-template-columns: 1fr 382px;
         grid-template-areas: 
             "gallery info"
-            "tabs info";
+            "tabs info"
+            "reviews info";
         gap: 60px;
+        align-items: start;
     }
 }
 
@@ -65,8 +68,10 @@
         background-color: #FFF;
         padding: 40px;
         border-radius: 12px;
-        border: 1px solid #E0E0E0;
+        // border: 1px solid #E0E0E0; // Border removed
         width: 382px;
+        position: sticky;
+        top: 20px;
     }
 }
 
@@ -490,7 +495,7 @@
     background-color: #FFF;
     border-radius: 12px;
     padding: 24px;
-    border: 1px solid #E0E0E0;
+    // border: 1px solid #E0E0E0; // Border removed
 
     @media (min-width: 1024px) {
         margin-top: 0;
@@ -562,9 +567,50 @@
     max-width: 900px;
 }
 
+/* Nutrition List */
+.nutritionGroup {
+    margin-bottom: 32px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.nutritionTitle {
+    font-size: 16px;
+    font-weight: 800;
+    color: #000;
+    margin-bottom: 20px;
+}
+
+.nutritionRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #F0F0F0;
+
+    &:first-child {
+        border-top: 1px solid #F0F0F0;
+    }
+}
+
+.nutritionKey {
+    font-size: 15px;
+    color: #4F4F4F;
+    font-weight: 500;
+}
+
+.nutritionValue {
+    font-size: 15px;
+    color: #000;
+    font-weight: 700;
+}
+
 /* Reviews Section Refinement */
 .reviewsSection {
-    margin-top: 80px;
+    grid-area: reviews;
+    // margin-top: 80px; // Margin removed since it's now in mainGrid
     padding-bottom: 60px;
 }
 
@@ -653,7 +699,7 @@
 .reviewsBlock {
     background: #FFF;
     border-radius: 12px;
-    border: 1px solid #E0E0E0;
+    // border: 1px solid #E0E0E0; // Border removed
     padding: 24px;
 
     @media (min-width: 1024px) {

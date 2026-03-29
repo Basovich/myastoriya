@@ -14,15 +14,31 @@ interface Review extends BaseReview {
 
 interface ProductReviewsProps {
     reviews: Review[];
+    isAuthenticated?: boolean;
+    onAuthRequired?: () => void;
+    onVideoReviewRequired?: () => void;
 }
 
-const ProductReviews: React.FC<ProductReviewsProps> = ({ reviews }) => {
+const ProductReviews: React.FC<ProductReviewsProps> = ({ 
+    reviews, 
+    isAuthenticated, 
+    onAuthRequired,
+    onVideoReviewRequired
+}) => {
     const [activeTab, setActiveTab] = useState<'text' | 'video'>('text');
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [visibleCount, setVisibleCount] = useState(3);
 
     const showMore = () => {
         setVisibleCount(prev => prev + 5);
+    };
+
+    const handleVideoReviewClick = () => {
+        if (!isAuthenticated) {
+            onAuthRequired?.();
+        } else {
+            onVideoReviewRequired?.();
+        }
     };
 
     return (
@@ -54,7 +70,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ reviews }) => {
                 </div>
 
                 <div className={styles.rewardsBanner}>
-                    <Button variant="outline-black" className={styles.bannerLink}>
+                    <Button variant="outline-black" className={styles.bannerLink} onClick={handleVideoReviewClick}>
                         ЗАЛИШАЙТЕ ВІДЕО ВІДГУК І ОТРИМУЙТЕ 100 БАЛІВ
                     </Button>
                 </div>
@@ -138,7 +154,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ reviews }) => {
             </div>
 
             <div className={styles.mobileRewardsBanner}>
-                <Button variant="outline-black" className={styles.bannerLink}>
+                <Button variant="outline-black" className={styles.bannerLink} onClick={handleVideoReviewClick}>
                     ЗАЛИШАЙТЕ ВІДЕО ВІДГУК І ОТРИМУЙТЕ 100 БАЛІВ
                 </Button>
             </div>

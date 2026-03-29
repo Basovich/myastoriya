@@ -17,15 +17,25 @@ import uaData from '@/content/ua.json';
 import ruData from '@/content/ru.json';
 import { Locale } from '@/i18n/config';
 
+import AuthModal from '@/app/components/AuthModal';
+import VideoReviewModal from '@/app/components/VideoReviewModal';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
+
 const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = ({ params }) => {
     const { lang, slug } = React.use(params);
     const locale = lang as Locale;
     const dict = locale === 'ru' ? ruData : uaData;
     
+    // Auth state
+    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
     // State
     const [quantity, setQuantity] = useState(1);
     const [selectedMods, setSelectedMods] = useState<string[]>([]);
     const [selectedSouces, setSelectedSouces] = useState<string[]>([]);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [isVideoReviewModalOpen, setIsVideoReviewModalOpen] = useState(false);
 
     // Find product data (mock logic for now based on slug)
     const parsedId = Number(slug);
@@ -189,17 +199,22 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                         characteristics={product.characteristics}
                         delivery={product.delivery}
                     />
-                </div>
 
-                <ProductReviews reviews={dict.home.reviews.items.map(review => ({
-                    ...review,
-                    scores: {
-                        "Якість обслуговування": review.rating,
-                        "Ввічливість персоналу": review.rating,
-                        "Швидкість доставки": review.rating,
-                        "Якість продукції": review.rating
-                    }
-                }))} />
+                    <ProductReviews 
+                        reviews={dict.home.reviews.items.map(review => ({
+                            ...review,
+                            scores: {
+                                "Якість обслуговування": review.rating,
+                                "Ввічливість персоналу": review.rating,
+                                "Швидкість доставки": review.rating,
+                                "Якість продукції": review.rating
+                            }
+                        }))} 
+                        isAuthenticated={isAuthenticated}
+                        onAuthRequired={() => setIsAuthModalOpen(true)}
+                        onVideoReviewRequired={() => setIsVideoReviewModalOpen(true)}
+                    />
+                </div>
 
                 <RelatedProducts
                     title="З цим товаром купують"
@@ -224,6 +239,8 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                 </div>
             </main>
             <Footer lang={locale} />
+            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+            <VideoReviewModal isOpen={isVideoReviewModalOpen} onClose={() => setIsVideoReviewModalOpen(false)} />
         </>
     );
 };
