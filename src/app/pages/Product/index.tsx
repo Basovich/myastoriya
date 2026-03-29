@@ -145,13 +145,12 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                     </section>
 
                     <section className={s.info}>
-                        <div className={s.metaInfo}>
-                            <div className={s.reviewsMeta} onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' })}>
-                                <div className={s.metaStars}>
-                                    {[...Array(5)].map((_, i) => <span key={i}>★</span>)}
-                                </div>
-                                <span className={s.reviewsCount}>1 відгук</span>
-                            </div>
+                        <div className={s.availability}>
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="9" cy="9" r="8" stroke="#00B060" strokeWidth="2"/>
+                                <path d="M5 9L8 12L13 6" stroke="#00B060" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <span>Є в наявності</span>
                         </div>
 
                         <h1 className={s.title}>{product.name}</h1>
@@ -159,13 +158,16 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                         <div className={s.priceSection}>
                             <div className={s.priceWrapper}>
                                 <span className={s.price}>{product.price} ₴</span>
-                                <span className={s.unit}>/ {product.unit}</span>
+                                {product.oldPrice && <span className={s.oldPrice}>{product.oldPrice} ₴</span>}
                             </div>
-                            {product.oldPrice && <span className={s.oldPrice}>Стара ціна {product.oldPrice} ₴</span>}
+                            <div className={s.priceSubtitle}>
+                                Вага: <span className={s.weight}>{product.characteristics['Вага'] || "1000 г"}</span> (361 грн / 100г)
+                            </div>
                         </div>
 
-                        <div className={s.badgeBanner}>
-                            {product.badge}
+                        <div className={s.actionsBlock}>
+                            <Button variant="primary" className={s.mainBuyBtn}>Додати у кошик</Button>
+                            <QuantitySelector value={quantity} onChange={setQuantity} />
                         </div>
 
                         <ProductModifications
@@ -180,16 +182,6 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                             selectedItems={selectedSouces}
                             onToggle={toggleSouce}
                         />
-
-                        <div className={s.actionsBlock}>
-                            <QuantitySelector value={quantity} onChange={setQuantity} />
-                            <Button variant="primary" className={s.mainBuyBtn}>Додати до кошика</Button>
-                        </div>
-
-                        <div className={s.totalBlock}>
-                            <span className={s.totalLabel}>Всього:</span>
-                            <span className={s.totalValue}>{totalPrice} ₴</span>
-                        </div>
                     </section>
                 </div>
 

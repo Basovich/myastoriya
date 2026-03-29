@@ -33,27 +33,53 @@
     gap: 32px;
 
     @media (min-width: 1024px) {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr 382px;
         gap: 60px;
     }
 }
 
 .gallery, .info {
     min-width: 0;
+    
+    @media (min-width: 1024px) {
+        background-color: transparent; // Default
+        padding: 0; // Default
+    }
+}
+
+.info {
+    @media (min-width: 1024px) {
+        background-color: #FFF;
+        padding: 40px;
+        border-radius: 12px;
+        border: 1px solid #E0E0E0;
+        width: 382px; // Strictly match max-width requirement
+    }
+}
+
+.availability {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #00B060;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
 }
 
 .title {
     color: #000;
-    font-size: 22px;
+    font-size: 24px;
     font-style: normal;
     font-weight: 800;
-    line-height: 136.364%;
+    line-height: 1.25;
     text-transform: uppercase;
-    margin-bottom: 20px;
-
-    @media (min-width: 1280px) {
-        font-size: 24px;
-    }
+    margin-bottom: 24px;
 }
 
 .priceSection {
@@ -63,63 +89,41 @@
 .priceWrapper {
     display: flex;
     align-items: baseline;
-    gap: 8px;
-    margin-bottom: 4px;
+    gap: 12px;
+    margin-bottom: 6px;
 }
 
 .price {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 900;
-    color: var(--color-text-primary);
-}
-
-.unit {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--color-text-muted);
+    color: #E3051B;
+    line-height: 1;
 }
 
 .oldPrice {
     font-size: 18px;
     text-decoration: line-through;
-    color: var(--color-text-muted);
-    opacity: 0.6;
+    color: #A0A0A0;
+    font-weight: 600;
 }
 
-.badgeBanner {
-    background-color: var(--color-accent);
-    color: white;
-    padding: 10px 20px;
-    border-radius: var(--radius-lg);
-    font-weight: 800;
+.priceSubtitle {
     font-size: 15px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 32px;
-    text-transform: uppercase;
+    color: #A0A0A0;
+    font-weight: 600;
 
-    &::before {
-        content: "";
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        background: url('/icons/icon-info.svg') no-repeat center / contain;
-        filter: brightness(0) invert(1);
+    .weight {
+        color: #000;
+        font-weight: 800;
     }
 }
 
 .actionsBlock {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 40px;
-
-    @media (min-width: 480px) {
-        flex-direction: row;
-        align-items: center;
-        gap: 24px;
-    }
+    align-items: center;
+    gap: 12px;
+    margin-top: 32px;
+    margin-bottom: 24px;
 }
 
 .mainBuyBtn {
@@ -127,27 +131,21 @@
     height: 48px;
     font-size: 16px;
     font-weight: 800;
-    text-transform: uppercase;
+    text-transform: none !important; // Mobile default
+    background-color: #E3051B;
+    border-radius: 8px;
+
+    @media (min-width: 1024px) {
+        text-transform: uppercase !important; // Match desktop design 'ДОДАТИ У КОШИК'
+    }
+
+    &:hover {
+        background-color: #C10416;
+    }
 }
 
 .totalBlock {
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid var(--color-bg-secondary);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .totalLabel {
-        font-size: 18px;
-        font-weight: 600;
-    }
-
-    .totalValue {
-        font-size: 24px;
-        font-weight: 800;
-        color: var(--color-accent);
-    }
+    display: none; // Hiding for now to match the "clean" design if not needed
 }
 
 /* Gallery styles */
@@ -399,19 +397,22 @@
 
 /* Modifications */
 .modificationsSection {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #E0E0E0;
 }
 
 .modSectionTitle {
     font-size: 16px;
     font-weight: 800;
-    margin-bottom: 20px;
-    text-transform: uppercase;
+    margin-bottom: 16px;
+    color: #000;
 }
 
 .modGrid {
-    display: grid;
-    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .modItem {
@@ -419,22 +420,17 @@
     align-items: center;
     gap: 16px;
     width: 100%;
-    padding: 12px 16px;
-    background-color: var(--color-bg-secondary);
-    border: 2px solid transparent;
-    border-radius: var(--radius-md);
-    transition: all 0.3s;
+    padding: 2px 0;
+    background-color: transparent;
+    border: none;
+    transition: all 0.2s;
     text-align: left;
+    cursor: pointer;
 
     @media (any-hover: hover) {
       &:hover {
-          background-color: #EEEEEE;
+          opacity: 0.8;
       }
-    }
-
-    &.selected {
-        border-color: var(--color-accent);
-        background-color: white;
     }
 }
 
@@ -442,16 +438,17 @@
     width: 24px;
     height: 24px;
     border-radius: 4px;
-    border: 2px solid #DDDDDD;
+    border: 1px solid #A0A0A0;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     transition: all 0.2s;
+    background: #FFF;
 
     .selected & {
-        background-color: var(--color-accent);
-        border-color: var(--color-accent);
+        background-color: #000;
+        border-color: #000;
     }
 }
 
@@ -465,12 +462,13 @@
 .modName {
     font-size: 15px;
     font-weight: 600;
+    color: #000;
 }
 
 .modPrice {
     font-size: 15px;
     font-weight: 800;
-    color: var(--color-accent);
+    color: #000;
 }
 
 /* Tabs */
