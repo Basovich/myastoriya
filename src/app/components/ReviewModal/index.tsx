@@ -51,8 +51,10 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
     useEffect(() => {
         if (isOpen) {
             disableScroll();
-            return () => enableScroll();
+        } else {
+            enableScroll();
         }
+        return () => enableScroll();
     }, [isOpen, disableScroll, enableScroll]);
 
     const formik = useFormik({
