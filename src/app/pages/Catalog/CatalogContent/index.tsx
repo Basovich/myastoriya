@@ -6,7 +6,7 @@ import HeroBanner from '../../../components/ui/HeroBanner/HeroBanner';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs/Breadcrumbs';
 import CategoryCircles from '@/app/components/CategoryCircles/CategoryCircles';
 import Image from 'next/image';
-import Index from '@/app/pages/Catalog/CatalogProductRow';
+import ProductCardRow from '@/app/components/ui/ProductCardRow';
 import CatalogSidebar from '@/app/pages/Catalog/CatalogSidebar';
 import FilterModal from '@/app/pages/Catalog/CatalogModal';
 import ProductCard from '../../../components/ui/ProductCard/ProductCard';
@@ -184,7 +184,7 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                                                     image={product.image}
                                                 />
                                             ) : (
-                                                <Index
+                                                <ProductCardRow
                                                     key={product.id}
                                                     id={product.id}
                                                     title={product.title}
