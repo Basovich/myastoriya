@@ -191,7 +191,15 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                     />
                 </div>
 
-                <ProductReviews reviews={product.reviews} />
+                <ProductReviews reviews={dict.home.reviews.items.map(review => ({
+                    ...review,
+                    scores: {
+                        "Якість обслуговування": review.rating,
+                        "Ввічливість персоналу": review.rating,
+                        "Швидкість доставки": review.rating,
+                        "Якість продукції": review.rating
+                    }
+                }))} />
 
                 <RelatedProducts
                     title="З цим товаром купують"
