@@ -1,10 +1,25 @@
 .productPage {
-    padding-top: 20px;
-    padding-bottom: 80px;
+    padding: 18px 16px 45px;
     background-color: #F6F6F6;
 
-    @media (min-width: 1024px) {
-        padding-top: 40px;
+    @media (min-width: 768px) {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    @media (min-width: 1280px) {
+        padding-left: calc((100% - 1200px) / 2);
+        padding-right: calc((100% - 1200px) / 2);
+    }
+
+    @media (min-width: 1360px) {
+        padding-left: calc((100% - 1280px) / 2);
+        padding-right: calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: calc((100% - 1300px) / 2);
+        padding-right: calc((100% - 1300px) / 2);
     }
 }
 
@@ -28,14 +43,16 @@
 }
 
 .title {
-    font-size: 28px;
-    line-height: 1.2;
+    color: #000;
+    font-size: 22px;
+    font-style: normal;
     font-weight: 800;
-    margin-bottom: 20px;
+    line-height: 136.364%;
     text-transform: uppercase;
+    margin-bottom: 20px;
 
-    @media (min-width: 1024px) {
-        font-size: 42px;
+    @media (min-width: 1280px) {
+        font-size: 24px;
     }
 }
 
