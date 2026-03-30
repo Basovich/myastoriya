@@ -213,6 +213,10 @@ nav.breadcrumbs {
     border-radius: 12px;
     overflow: hidden;
 
+    @media (min-width: 1280px) {
+        border-radius: 14px;
+    }
+
     img {
         object-fit: cover;
     }
@@ -224,9 +228,9 @@ nav.breadcrumbs {
     margin-top: 20px;
 
     @media (min-width: 768px) {
-        flex-direction: row;
         justify-content: center;
         gap: 8px;
+        margin-top: 36px;
     }
 }
 
@@ -244,6 +248,7 @@ a.actionBtn {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    border-radius: 8px;
     text-transform: initial;
     white-space: initial;
     padding-left: 8px;
@@ -259,6 +264,10 @@ a.actionBtn {
         max-width: 280px;
         height: 36px;
         gap: 10px;
+    }
+
+    @media (min-width: 1280px) {
+        width: 220px;
     }
 
     svg {
@@ -279,13 +288,23 @@ a.actionBtn {
     border-radius: 14px;
     background: #FFF;
     box-shadow: 0 14px 20px 0 rgba(0, 0, 0, 0.10);
-    padding: 22px 20px 40px;
+    padding: 22px 20px 30px;
     margin-top: 30px;
 
     @media (min-width: 768px) {
         flex-direction: row;
         align-items: center;
         padding: 40px;
+    }
+
+    @media (min-width: 1024px) {
+        width: 876px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 36px 50px 42px;
+        border-radius: 14px;
+        background: #FFF;
+        box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.10);
     }
 }
 
@@ -297,10 +316,20 @@ a.actionBtn {
     height: 44px;
     background: #E3051B;
     border-radius: 50%;
+    box-shadow: 0 14px 20px 0 rgba(0, 0, 0, 0.10);
+
+    @media (min-width: 1024px) {
+        width: 92px;
+        height: 92px;
+    }
 
     svg {
         width: 18px;
         height: auto;
+
+        @media (min-width: 1024px) {
+            width: 38px;
+        }
     }
 }
 
@@ -311,14 +340,32 @@ a.actionBtn {
     flex: 1;
 
     @media (min-width: 768px) {
-        grid-template-columns: repeat(2, 1fr);
-        padding-left: 24px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 30px;
+    }
+
+    @media (min-width: 1024px) {
+        padding-left: 50px;
     }
 }
 
 .detailItem {
     display: flex;
     flex-direction: column;
+
+    &.lastItem {
+        @media (min-width: 1024px) {
+            width: 100%;
+        }
+    }
+}
+
+.detailItemHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .icon {
@@ -334,6 +381,7 @@ a.actionBtn {
     font-weight: 700;
     line-height: 120%;
     text-transform: uppercase;
+    margin-top: 3px;
 }
 
 .text {
@@ -343,41 +391,68 @@ a.actionBtn {
     font-weight: 400;
     line-height: 166.667%;
     letter-spacing: 0.24px;
+    margin-top: 6px;
 }
 
-.googleReviewBtn {
+a.googleReviewBtn {
     width: 100%;
-    height: 52px;
+    height: 44px;
     background-color: #000;
     color: #FFF;
-    font-weight: 600;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-transform: initial;
     border: none;
     border-radius: 8px;
-    margin-top: 8px;
+    margin-top: 44px;
+    margin-left: auto;
+    margin-right: auto;
 
     @media (min-width: 768px) {
-        max-width: 400px;
-        margin: 0 auto;
+        max-width: 285px;
+        height: 36px;
     }
 }
 
 .about {
-    margin-top: 24px;
+    margin-top: 28px;
     text-align: center;
+
+    @media (min-width: 1024px) {
+        width: 876px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 50px;
+    }
 }
 
 .sectionTitle {
-    font-size: 24px;
+    color: #060606;
+    text-align: center;
+    font-size: 20px;
+    font-style: normal;
     font-weight: 800;
+    line-height: 130%;
     text-transform: uppercase;
-    margin-bottom: 16px;
-    color: #000;
+    
+    @media (min-width: 1024px) {
+        font-size: 28px;
+    }
 }
 
 .aboutText {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #333;
-    max-width: 800px;
-    margin: 0 auto;
+    color: #000;
+    text-align: center;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 171.429%;
+    letter-spacing: 0.28px;
+    margin-top: 16px;
+
+    @media (min-width: 1024px) {
+        font-size: 18px;
+    }
 }
