@@ -272,49 +272,135 @@ div.sortWrap {
 
 .orderedSection {
     background: #fff;
-    padding: 40px 0;
+    padding: 40px 0 0;
 
     @media (min-width: 1280px) {
-        padding: 60px 0;
+        padding: 60px 0 0;
     }
 }
 
 .relatedInner {
-    max-width: 1360px;
     margin: 0 auto;
     padding: 0 16px;
 
     @media (min-width: 768px) {
-        padding: 0 24px;
+        padding: 0 40px;
     }
 
     @media (min-width: 1280px) {
-        padding: 0 40px;
+        padding-left: calc((100% - 1200px) / 2);
+        padding-right: calc((100% - 1200px) / 2);
+    }
+
+    @media (min-width: 1360px) {
+        padding-left: calc((100% - 1280px) / 2);
+        padding-right: calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: calc((100% - 1300px) / 2);
+        padding-right: calc((100% - 1300px) / 2);
     }
 }
 
 .sectionTitle {
-    margin-bottom: 24px;
-
-    @media (min-width: 1280px) {
-        margin-bottom: 32px;
-    }
+    margin-bottom: 0px;
 }
 
-.relatedGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+.sectionHeaderRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0;
+    padding: 0 16px;
 
     @media (min-width: 768px) {
-        grid-template-columns: repeat(3, 1fr);
+        padding: 0 40px;
     }
 
     @media (min-width: 1280px) {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
+        padding-left: calc((100% - 1200px) / 2);
+        padding-right: calc((100% - 1200px) / 2);
+    }
+
+    @media (min-width: 1360px) {
+        padding-left: calc((100% - 1280px) / 2);
+        padding-right: calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: calc((100% - 1300px) / 2);
+        padding-right: calc((100% - 1300px) / 2);
     }
 }
+
+.navArrows {
+    display: flex;
+    gap: 8px;
+    
+    @media (min-width: 768px) {
+        gap: 12px;
+    }
+}
+
+.sliderSection {
+    padding-top: 40px;
+
+    @media (min-width: 1280px) {
+        padding-top: 60px;
+    }
+}
+
+.sliderContainer {
+    position: relative;
+    padding: 24px 16px;
+
+    @media (min-width: 768px) {
+        padding: 24px 40px;
+    }
+
+    @media (min-width: 1280px) {
+        padding-left: calc((100% - 1200px) / 2);
+        padding-right: calc((100% - 1200px) / 2);
+    }
+
+    @media (min-width: 1360px) {
+        padding-left: calc((100% - 1280px) / 2);
+        padding-right: calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: calc((100% - 1300px) / 2);
+        padding-right: calc((100% - 1300px) / 2);
+    }
+}
+
+.swiper {
+    width: 100%;
+    height: auto;
+    overflow: initial;
+}
+
+.slide {
+    height: auto;
+}
+
+.bullet {
+    width: 8px !important;
+    height: 8px !important;
+    background: #D9D9D9 !important;
+    opacity: 1 !important;
+    margin: 0 4px 0 0 !important;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.bulletActive {
+    background: #E20B1C !important;
+}
+
+
 
 .faqSection {
     background: #fff;

@@ -2,9 +2,9 @@
  
 import React from 'react';
 import s from './Product.module.scss';
-import ProductCardRow from '@/app/components/ui/ProductCardRow';
 import clsx from 'clsx';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
+import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
  
 interface RelatedProduct {
     id: number | string;
@@ -29,7 +29,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ title, products, clas
             <SectionHeader title={title} classNameWrapper={s.relatedHeader} />
             <div className={s.relatedGrid}>
                 {products.map((product) => (
-                    <ProductCardRow key={product.id} {...product} />
+                    <ProductCard key={product.id} {...product} />
                 ))}
             </div>
         </section>

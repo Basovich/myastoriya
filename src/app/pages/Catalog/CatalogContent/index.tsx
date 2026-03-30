@@ -18,6 +18,14 @@ import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
 import clsx from 'clsx';
 import CategorySwitcher from "@/app/components/ui/CategorySwitcher/CategorySwitcher";
 import Button from "@/app/components/ui/Button/Button";
+import SliderArrow from '../../../components/ui/SliderArrow/SliderArrow';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Grid } from 'swiper/modules';
+
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/grid';
 
 interface Product {
     id: number;
@@ -42,8 +50,8 @@ const MOCK_RESULTS: Product[] = [
     { id: 8, title: 'Томлена курка в соусі карі', price: 2500, weight: '330г', unit: 'упаковка', badge: null, image: '/images/products/product-shashlik.png', description: 'Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.' },
 ];
 
-const MOCK_RELATED: Product[] = MOCK_RESULTS.slice(0, 4);
-const MOCK_ORDERED: Product[] = MOCK_RESULTS.slice(0, 4);
+const MOCK_RELATED: Product[] = [...MOCK_RESULTS, ...MOCK_RESULTS.slice(0, 4)];
+const MOCK_ORDERED: Product[] = [...MOCK_RESULTS, ...MOCK_RESULTS.slice(0, 4)];
 
 const SORT_OPTIONS = [
     'За популярністю',
@@ -77,6 +85,12 @@ export default function CatalogContent({ category }: CatalogContentProps) {
     const [activePage, setActivePage] = useState(1);
     const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
     const [view, setView] = useState<ViewType>('list');
+
+    const [prevRelated, setPrevRelated] = useState<HTMLButtonElement | null>(null);
+    const [nextRelated, setNextRelated] = useState<HTMLButtonElement | null>(null);
+
+    const [prevOrdered, setPrevOrdered] = useState<HTMLButtonElement | null>(null);
+    const [nextOrdered, setNextOrdered] = useState<HTMLButtonElement | null>(null);
 
     const categoryLabel = category ? category : null;
 
@@ -226,45 +240,113 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                 </div>
 
                 {/* "Вас може зацікавити" */}
-                <div className={s.relatedSection}>
-                    <div className={s.relatedInner}>
-                        <SectionHeader title="ВАС МОЖЕ ЗАЦІКАВИТИ" classNameWrapper={s.sectionTitle} />
-                        <div className={s.relatedGrid}>
-                            {MOCK_RELATED.map(product => (
-                                <ProductCard
-                                    key={`related-${product.id}`}
-                                    id={product.id}
-                                    title={product.title}
-                                    weight={product.weight}
-                                    price={product.price}
-                                    unit={product.unit}
-                                    badge={product.badge}
-                                    image={product.image}
-                                />
-                            ))}
+                <div className={s.sliderSection}>
+                    {/*<div className={s.relatedInner}>*/}
+                        <div className={s.sectionHeaderRow}>
+                            <SectionHeader title="ВАС МОЖЕ ЗАЦІКАВИТИ" classNameWrapper={s.sectionTitle} withDots={true} />
+                            <div className={s.navArrows}>
+                                <SliderArrow direction="left" ref={setPrevRelated} />
+                                <SliderArrow direction="right" ref={setNextRelated} />
+                            </div>
                         </div>
-                    </div>
+                        <div className={s.sliderContainer}>
+                            <Swiper
+                                modules={[Navigation, Grid]}
+                                navigation={{
+                                    prevEl: prevRelated,
+                                    nextEl: nextRelated,
+                                }}
+                                spaceBetween={12}
+                                slidesPerView={2}
+                                slidesPerGroup={1}
+                                grid={{ rows: 2, fill: 'row' }}
+                                breakpoints={{
+                                    768: {
+                                        slidesPerView: 3,
+                                        slidesPerGroup: 1,
+                                        grid: { rows: 1 },
+                                        spaceBetween: 16
+                                    },
+                                    1280: {
+                                        slidesPerView: 4,
+                                        slidesPerGroup: 1,
+                                        grid: { rows: 1 },
+                                        spaceBetween: 20
+                                    }
+                                }}
+                                className={s.swiper}
+                            >
+                                {MOCK_RELATED.map((product, idx) => (
+                                    <SwiperSlide key={`related-${product.id}-${idx}`} className={s.slide}>
+                                        <ProductCard
+                                            id={product.id}
+                                            title={product.title}
+                                            weight={product.weight}
+                                            price={product.price}
+                                            unit={product.unit}
+                                            badge={product.badge}
+                                            image={product.image}
+                                        />
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
+                        </div>
+                    {/*</div>*/}
                 </div>
 
                 {/* "Часто замовляють" */}
-                <div className={s.orderedSection}>
-                    <div className={s.relatedInner}>
-                        <SectionHeader title="ЧАСТО ЗАМОВЛЯЮТЬ" classNameWrapper={s.sectionTitle} />
-                        <div className={s.relatedGrid}>
-                            {MOCK_ORDERED.map(product => (
-                                <ProductCard
-                                    key={`ordered-${product.id}`}
-                                    id={product.id}
-                                    title={product.title}
-                                    weight={product.weight}
-                                    price={product.price}
-                                    unit={product.unit}
-                                    badge={product.badge}
-                                    image={product.image}
-                                />
-                            ))}
+                <div className={s.sliderSection}>
+                    {/*<div className={s.relatedInner}>*/}
+                        <div className={s.sectionHeaderRow}>
+                            <SectionHeader title="ЧАСТО ЗАМОВЛЯЮТЬ" classNameWrapper={s.sectionTitle} withDots={true} />
+                            <div className={s.navArrows}>
+                                <SliderArrow direction="left" ref={setPrevOrdered} />
+                                <SliderArrow direction="right" ref={setNextOrdered} />
+                            </div>
                         </div>
-                    </div>
+                        <div className={s.sliderContainer}>
+                            <Swiper
+                                modules={[Navigation, Grid]}
+                                navigation={{
+                                    prevEl: prevOrdered,
+                                    nextEl: nextOrdered,
+                                }}
+                                spaceBetween={12}
+                                slidesPerView={2}
+                                slidesPerGroup={1}
+                                grid={{ rows: 2, fill: 'row' }}
+                                breakpoints={{
+                                    768: {
+                                        slidesPerView: 3,
+                                        slidesPerGroup: 1,
+                                        grid: { rows: 1 },
+                                        spaceBetween: 16
+                                    },
+                                    1280: {
+                                        slidesPerView: 4,
+                                        slidesPerGroup: 1,
+                                        grid: { rows: 1 },
+                                        spaceBetween: 20
+                                    }
+                                }}
+                                className={s.swiper}
+                            >
+                                {MOCK_ORDERED.map((product, idx) => (
+                                    <SwiperSlide key={`ordered-${product.id}-${idx}`} className={s.slide}>
+                                        <ProductCard
+                                            id={product.id}
+                                            title={product.title}
+                                            weight={product.weight}
+                                            price={product.price}
+                                            unit={product.unit}
+                                            badge={product.badge}
+                                            image={product.image}
+                                        />
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
+                        </div>
+                    {/*</div>*/}
                 </div>
 
                 {/* FAQ */}
