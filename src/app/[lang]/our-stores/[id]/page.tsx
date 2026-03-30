@@ -1,6 +1,6 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
-import StoreDetailPage from "@/app/pages/OurStores/StoreDetailPage";
+import StoreDetailPage from "@/app/pages/OurStores/StoreDetailPage/StoreDetailPage";
 import storesData from "@/content/stores.json";
 import { notFound } from "next/navigation";
 
