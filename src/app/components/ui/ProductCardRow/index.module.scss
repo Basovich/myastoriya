@@ -4,16 +4,13 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); // Slightly more shadow for premium look
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     width: 100%;
-    transition: transform 0.2s ease;
-
-    padding: 16px; // Standard mobile padding
 
     @media (min-width: 768px) {
         flex-direction: row;
         height: 270px;
-        padding: 24px; // Requested padding
+        padding: 24px;
     }
 }
 
@@ -21,14 +18,15 @@
     position: relative;
     flex-shrink: 0;
     width: 100%;
-    height: 134px; // Mobile image height requested
+    height: 134px;
     overflow: hidden;
-    border-radius: 12px; // Match mockup roundedness
+    border-radius: 12px 12px 0 0;
 
     @media (min-width: 768px) {
-        width: 307px; // Requested width
-        height: 220px; // Requested height
+        width: 307px;
+        height: 220px;
         aspect-ratio: auto;
+        border-radius: 14px;
     }
 }
 
@@ -63,51 +61,34 @@
     z-index: 2;
 }
 
-.badge {
-    // Inherits styles from Badge component, but we can add positioning if needed
-}
-
-.favorite {
-    background-color: #fff !important;
-    border-radius: 50% !important;
-    width: 40px !important;
-    height: 40px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border: none !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    
-    svg {
-        width: 20px !important;
-        height: 20px !important;
-        stroke: #000 !important;
-        fill: transparent !important;
-    }
-
-    &.active svg {
-        fill: #000 !important;
-    }
+button.favorite {
+    margin-left: auto;
 }
 
 .info {
     flex: 1;
-    padding: 0; // Padding is handled by the card container
+    padding: 12px 20px 20px;
 
     @media (min-width: 768px) {
-        padding: 0 0 0 24px; // Gap between image and info
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 0 0 0 32px;
     }
 }
 
 .header {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
+
+    @media (min-width: 768px) {
+        margin-bottom: 18px;
+    }
 }
 
 .titleLink {
     text-decoration: none;
     color: inherit;
     display: block;
-    margin-bottom: 4px;
 
     @media (any-hover: hover) {
         &:hover .title {
@@ -117,40 +98,49 @@
 }
 
 .title {
-    font-size: 18px;
-    font-weight: 800;
     color: #000;
-    margin: 0;
-    line-height: 1.2;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 114.286%;
     transition: color 0.15s;
 
     @media (min-width: 768px) {
-        font-size: 24px;
+        font-size: 18px;
     }
 }
 
 .weightList {
-    font-size: 14px;
-    font-weight: 700;
     color: #000;
-    opacity: 1;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 133.333%;
+    margin-top: 6px;
+
+    @media (min-width: 768px) {
+        margin-top: 8px;
+        font-size: 14px;
+    }
 }
 
 .description {
-    font-size: 14px;
-    color: rgba(0, 0, 0, 0.7);
-    line-height: 1.5;
-    margin: 0 0 20px;
+    color: #060606;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
 
     @media (min-width: 768px) {
         -webkit-line-clamp: 3;
         line-clamp: 3;
-        font-size: 15px;
+        font-size: 14px;
     }
 }
 
@@ -159,44 +149,63 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: 16px;
-    margin-top: auto;
+    margin-top: 24px;
+
+    @media (min-width: 768px) {
+        margin-top: auto;
+        flex: 1 1;
+    }
 }
 
 .priceGroup {
     display: flex;
     flex-direction: column;
-    gap: 2px;
 }
 
 .priceRow {
     display: flex;
     align-items: baseline;
-    gap: 12px;
+    gap: 6px;
 }
 
 .price {
-    font-size: 24px;
-    font-weight: 800;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
     color: #000;
 
     @media (min-width: 768px) {
-        font-size: 28px;
+        font-size: 26px;
+    }
+
+    &.newPrice {
+        color: #E3051B;
     }
 }
 
 .oldPrice {
-    font-size: 14px;
-    font-weight: 600;
-    color: rgba(0, 0, 0, 0.4);
-    text-decoration: line-through;
+    color: rgba(#060606, 0.6);
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 172.48%;
+    text-decoration-line: line-through;
+
+    @media (min-width: 768px) {
+        font-size: 14px;
+    }
 }
 
 .unit {
-    font-size: 13px;
-    color: rgba(0, 0, 0, 0.4);
-    font-weight: 600;
-}
+    color: rgba(#000, 0.5);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 133.333%;
 
-.buyBtn {
-    // Standard pill button style handled by variant="full" inside AddToCartButton
+    @media (min-width: 768px) {
+        font-size: 12px;
+    }
 }

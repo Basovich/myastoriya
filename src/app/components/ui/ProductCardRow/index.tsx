@@ -6,6 +6,7 @@ import Badge from '@/app/components/ui/Badge/Badge';
 import WishButton from '@/app/components/ui/WishButton/WishButton';
 import AddToCartButton from '@/app/components/ui/AddToCartButton/AddToCartButton';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
+import clsx from "clsx";
 
 interface ProductCardRowProps {
     id: number | string;
@@ -61,7 +62,7 @@ export default function ProductCardRow({
             <div className={s.info}>
                 <div className={s.header}>
                     <AppLink href={productUrl} className={s.titleLink}>
-                        <h3 className={s.title}>{title}</h3>
+                        <span className={s.title}>{title}</span>
                     </AppLink>
                     <span className={s.weightList}>{weight}</span>
                 </div>
@@ -73,7 +74,7 @@ export default function ProductCardRow({
                 <div className={s.footer}>
                     <div className={s.priceGroup}>
                         <div className={s.priceRow}>
-                            <span className={s.price}>{price.toLocaleString('uk-UA')} ₴</span>
+                            <span className={clsx(s.price, oldPrice && s.newPrice)}>{price.toLocaleString('uk-UA')} ₴</span>
                             {oldPrice && (
                                 <span className={s.oldPrice}>{oldPrice.toLocaleString('uk-UA')} ₴</span>
                             )}

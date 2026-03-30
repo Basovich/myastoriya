@@ -51,6 +51,7 @@ const ImageZoomModal: React.FC<ImageZoomModalProps> = ({
             <Swiper
                 initialSlide={initialSlide}
                 spaceBetween={20}
+                loop={true}
                 navigation={{
                     nextEl: `.${s.nextBtn}`,
                     prevEl: `.${s.prevBtn}`,

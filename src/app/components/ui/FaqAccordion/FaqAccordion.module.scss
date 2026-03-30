@@ -6,9 +6,13 @@
 
 .faqItem {
     background: #fff;
-    padding: 24px 32px 32px;
+    padding: 24px 32px;
     border-radius: 14px;
     box-shadow: 0 14px 20px 0 rgba(0, 0, 0, 0.10);
+
+    @media (min-width: 1280px) {
+        padding: 40px 34px;
+    }
 
     &.isOpen {
         .iconWrap {
@@ -30,6 +34,7 @@
     font-style: normal;
     font-weight: 700;
     line-height: 150%;
+    text-align: start;
     cursor: pointer;
     gap: 20px;
     outline: none;

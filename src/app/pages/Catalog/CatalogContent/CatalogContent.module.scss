@@ -107,7 +107,7 @@ nav.breadcrumbsCategory {
     gap: 20px;
 
     @media (min-width: 768px) {
-        padding: 28px 40px;
+        padding: 28px 40px 60px;
         gap: 24px;
     }
 
@@ -217,11 +217,7 @@ div.sortWrap {
 .productList {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-
-    @media (min-width: 768px) {
-        gap: 16px;
-    }
+    gap: 20px;
 }
 
 .productListGrid {
