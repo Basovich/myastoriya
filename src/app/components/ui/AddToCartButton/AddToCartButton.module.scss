@@ -1,8 +1,5 @@
 .btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #000;
+    background: var(--color-accent) !important;
     border: none;
     color: #fff;
     display: flex;
@@ -14,10 +11,25 @@
 
     @media (any-hover: hover) {
         &:hover {
-            background-color: var(--color-accent);
+            background-color: var(--color-accent-hover) !important;
             transform: scale(1.05);
         }
     }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 3px;
+    }
+
+    &.active {
+        background-color: var(--color-accent-hover) !important;
+    }
+}
+
+.icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
 
     @media (min-width: 768px) {
         width: 40px;
@@ -27,11 +39,6 @@
     @media (min-width: 1280px) {
         width: 48px;
         height: 48px;
-    }
-
-    &:focus-visible {
-        outline: 2px solid var(--color-accent);
-        outline-offset: 3px;
     }
 
     svg,
@@ -49,8 +56,32 @@
             height: 16px;
         }
     }
+}
 
-    &.active {
-        background-color: var(--color-accent);
+.full {
+    width: auto;
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 22px;
+    gap: 12px;
+    
+    @media (min-width: 768px) {
+        height: 54px;
+        padding: 0 32px;
+        border-radius: 27px;
+    }
+
+    .btnText {
+        font-size: 14px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+    }
+
+    .bagIcon {
+        width: 20px !important; // Fixed size as seen in mockup
+        height: 20px !important;
+        filter: invert(1);
     }
 }

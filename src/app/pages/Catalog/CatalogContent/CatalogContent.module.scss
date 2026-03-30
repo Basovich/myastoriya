@@ -138,6 +138,8 @@ div.sortWrap {
 
     @media (min-width: 1280px) {
         display: flex;
+        justify-content: space-between;
+        width: 310px;
     }
 }
 
@@ -319,7 +321,7 @@ div.sortWrap {
 }
 
 .faqSection {
-    background: #F5F5F5;
+    background: #fff;
     padding: 40px 0;
 
     @media (min-width: 1280px) {

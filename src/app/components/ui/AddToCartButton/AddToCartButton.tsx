@@ -11,9 +11,16 @@ import CartModal from "@/app/components/CartModal/CartModal";
 interface AddToCartButtonProps {
     productId: string | number;
     className?: string;
+    variant?: "icon" | "full";
+    text?: string;
 }
 
-export default function AddToCartButton({ productId, className }: AddToCartButtonProps) {
+export default function AddToCartButton({ 
+    productId, 
+    className, 
+    variant = "icon",
+    text = "В КОШИК"
+}: AddToCartButtonProps) {
     const dispatch = useAppDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -36,12 +43,19 @@ export default function AddToCartButton({ productId, className }: AddToCartButto
         <>
             <button
                 type="button"
-                className={clsx(s.btn, isInCart && s.active, className)}
+                className={clsx(s.btn, s[variant], isInCart && s.active, className)}
                 onClick={handleClick}
-                aria-label={isInCart ? "Товар у кошику" : "Додати до кошика"}
+                aria-label={isInCart ? "Товар у кошику" : (variant === 'full' ? text : "Додати до кошика")}
                 aria-pressed={isInCart}
             >
-                <Image src="/icons/icon-plus.svg" width={12} height={12} alt="" aria-hidden="true" />
+                {variant === "icon" ? (
+                    <Image src="/icons/icon-plus.svg" width={12} height={12} alt="" aria-hidden="true" />
+                ) : (
+                    <>
+                        <span className={s.btnText}>{text}</span>
+                        <Image src="/icons/shopping-bag.svg" width={18} height={18} alt="" aria-hidden="true" className={s.bagIcon} />
+                    </>
+                )}
             </button>
 
             <CartModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

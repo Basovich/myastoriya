@@ -112,7 +112,7 @@ nav.breadcrumbs {
     height: 32px;
     border-radius: 50%;
     border: 1px solid #000;
-    background-color: #fff;
+    background-color: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -237,6 +237,7 @@ a.facebookBtn {
 
 .recommended {
     padding-left: 16px;
+    overflow: hidden;
 
     @media (min-width: 768px) {
         padding-left: 40px;

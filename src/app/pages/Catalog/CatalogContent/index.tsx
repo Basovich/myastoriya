@@ -207,8 +207,8 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                                     <Button variant="outline-black" className={s.showMoreBtn}>
                                         <span className={s.showMoreBtnText}>показать еще</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="16" viewBox="0 0 13 16" fill="none">
-                                            <path d="M11.8624 8.56895L6.43164 13.9997L1.00087 8.56895" stroke="black" stroke-width="2" stroke-linecap="round"/>
-                                            <line x1="6.42383" y1="12.7305" x2="6.42383" y2="0.999994" stroke="black" stroke-width="2" stroke-linecap="round"/>
+                                            <path d="M11.8624 8.56895L6.43164 13.9997L1.00087 8.56895" stroke="black" strokeWidth="2" strokeLinecap="round"/>
+                                            <line x1="6.42383" y1="12.7305" x2="6.42383" y2="0.999994" stroke="black" strokeWidth="2" strokeLinecap="round"/>
                                         </svg>
                                     </Button>
                                 </div>

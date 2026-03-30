@@ -45,25 +45,31 @@ export default function ProductCardRow({
                         priority
                     />
                 </AppLink>
-                {badge && (
-                    <Badge
-                        variant={badge.toLowerCase() === 'new' ? 'new' : 'sale'}
-                        className={s.badge}
-                    >
-                        {badge}
-                    </Badge>
-                )}
-                <WishButton productId={String(id)} className={s.favorite} />
-                <span className={s.weight}>{weight}</span>
+                <div className={s.overlayTop}>
+                    {badge && (
+                        <Badge
+                            variant={badge.toLowerCase() === 'акція' || badge.toLowerCase() === 'sale' ? 'sale' : 'new'}
+                            className={s.badge}
+                        >
+                            {badge}
+                        </Badge>
+                    )}
+                    <WishButton productId={String(id)} className={s.favorite} />
+                </div>
             </div>
 
             <div className={s.info}>
-                <AppLink href={productUrl} className={s.titleLink}>
-                    <h3 className={s.title}>{title}</h3>
-                </AppLink>
+                <div className={s.header}>
+                    <AppLink href={productUrl} className={s.titleLink}>
+                        <h3 className={s.title}>{title}</h3>
+                    </AppLink>
+                    <span className={s.weightList}>{weight}</span>
+                </div>
+                
                 {description && (
                     <p className={s.description}>{description}</p>
                 )}
+
                 <div className={s.footer}>
                     <div className={s.priceGroup}>
                         <div className={s.priceRow}>
@@ -74,7 +80,7 @@ export default function ProductCardRow({
                         </div>
                         <span className={s.unit}>{unit}</span>
                     </div>
-                    <AddToCartButton productId={String(id)} />
+                    <AddToCartButton productId={String(id)} variant="full" className={s.buyBtn} />
                 </div>
             </div>
         </div>

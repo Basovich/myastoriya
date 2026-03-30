@@ -4,20 +4,16 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-    transition: box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); // Slightly more shadow for premium look
     width: 100%;
+    transition: transform 0.2s ease;
 
-    @media (any-hover: hover) {
-        &:hover {
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-        }
-    }
+    padding: 16px; // Standard mobile padding
 
     @media (min-width: 768px) {
         flex-direction: row;
-        border-radius: 18px;
+        height: 270px;
+        padding: 24px; // Requested padding
     }
 }
 
@@ -25,17 +21,14 @@
     position: relative;
     flex-shrink: 0;
     width: 100%;
-    aspect-ratio: 343 / 240;
+    height: 134px; // Mobile image height requested
     overflow: hidden;
+    border-radius: 12px; // Match mockup roundedness
 
     @media (min-width: 768px) {
-        width: 220px;
+        width: 307px; // Requested width
+        height: 220px; // Requested height
         aspect-ratio: auto;
-        height: auto;
-    }
-
-    @media (min-width: 1280px) {
-        width: 320px;
     }
 }
 
@@ -59,98 +52,95 @@
     }
 }
 
-.badge {
+.overlayTop {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     z-index: 2;
+}
+
+.badge {
+    // Inherits styles from Badge component, but we can add positioning if needed
 }
 
 .favorite {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 2;
-}
+    background-color: #fff !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    
+    svg {
+        width: 20px !important;
+        height: 20px !important;
+        stroke: #000 !important;
+        fill: transparent !important;
+    }
 
-.weight {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 40px;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 0 16px 8px;
-    display: flex;
-    align-items: flex-end;
-    pointer-events: none;
-
-    @media (min-width: 768px) {
-        width: auto;
-        background: rgba(0, 0, 0, 0.6);
-        bottom: 12px;
-        left: 12px;
-        height: auto;
-        border-radius: 6px;
-        padding: 6px 10px;
-        font-size: 14px;
+    &.active svg {
+        fill: #000 !important;
     }
 }
 
 .info {
     flex: 1;
-    padding: 16px 20px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-width: 0;
+    padding: 0; // Padding is handled by the card container
 
     @media (min-width: 768px) {
-        padding: 24px;
-        gap: 16px;
+        padding: 0 0 0 24px; // Gap between image and info
     }
+}
 
-    @media (min-width: 1280px) {
-        padding: 32px;
-    }
+.header {
+    margin-bottom: 12px;
 }
 
 .titleLink {
     text-decoration: none;
     color: inherit;
+    display: block;
+    margin-bottom: 4px;
 
     @media (any-hover: hover) {
         &:hover .title {
-            color: #E3051B;
+            color: var(--color-accent);
         }
     }
 }
 
 .title {
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 800;
     color: #000;
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.2;
     transition: color 0.15s;
 
     @media (min-width: 768px) {
-        font-size: 18px;
-    }
-
-    @media (min-width: 1280px) {
         font-size: 24px;
     }
 }
 
+.weightList {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+    opacity: 1;
+}
+
 .description {
-    font-size: 13px;
-    color: rgba(0, 0, 0, 0.5);
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.7);
     line-height: 1.5;
-    margin: 0;
+    margin: 0 0 20px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -158,68 +148,55 @@
     overflow: hidden;
 
     @media (min-width: 768px) {
-        font-size: 14px;
         -webkit-line-clamp: 3;
         line-clamp: 3;
-    }
-
-    @media (min-width: 1280px) {
         font-size: 15px;
     }
 }
 
 .footer {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
     gap: 16px;
     margin-top: auto;
-    padding-top: 4px;
 }
 
 .priceGroup {
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 2px;
 }
 
 .priceRow {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 12px;
 }
 
 .price {
-    font-size: 18px;
-    font-weight: 700;
-    color: #E3051B;
+    font-size: 24px;
+    font-weight: 800;
+    color: #000;
 
     @media (min-width: 768px) {
-        font-size: 22px;
-    }
-
-    @media (min-width: 1280px) {
         font-size: 28px;
     }
 }
 
 .oldPrice {
-    font-size: 13px;
-    font-weight: 400;
-    color: rgba(0, 0, 0, 0.3);
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.4);
     text-decoration: line-through;
-
-    @media (min-width: 768px) {
-        font-size: 15px;
-    }
 }
 
 .unit {
-    font-size: 11px;
-    color: rgba(0, 0, 0, 0.3);
-    font-weight: 400;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.4);
+    font-weight: 600;
+}
 
-    @media (min-width: 768px) {
-        font-size: 13px;
-    }
+.buyBtn {
+    // Standard pill button style handled by variant="full" inside AddToCartButton
 }

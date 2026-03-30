@@ -979,7 +979,7 @@
 
 /* Related products section */
 .relatedProductsGrid {
-    background-color: #fff;
+    background-color: transparent;
     padding-top: 30px;
     padding-left: 16px;
     padding-right: 16px;
@@ -1031,8 +1031,8 @@
     }
 
     @media (min-width: 1280px) {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 24px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
     }
 }
 

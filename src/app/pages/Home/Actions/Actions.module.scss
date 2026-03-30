@@ -1,5 +1,6 @@
 .section {
     padding: 24px 16px;
+    overflow: hidden;
 
     @media (min-width: 768px) {
         padding-left: 40px;

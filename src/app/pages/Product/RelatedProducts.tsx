@@ -2,7 +2,7 @@
  
 import React from 'react';
 import s from './Product.module.scss';
-import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
+import ProductCardRow from '@/app/components/ui/ProductCardRow';
 import clsx from 'clsx';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
  
@@ -14,6 +14,7 @@ interface RelatedProduct {
     unit: string;
     badge?: string | null;
     image: string;
+    description?: string;
 }
  
 interface RelatedProductsProps {
@@ -28,7 +29,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ title, products, clas
             <SectionHeader title={title} classNameWrapper={s.relatedHeader} />
             <div className={s.relatedGrid}>
                 {products.map((product) => (
-                    <ProductCard key={product.id} {...product} />
+                    <ProductCardRow key={product.id} {...product} />
                 ))}
             </div>
         </section>
