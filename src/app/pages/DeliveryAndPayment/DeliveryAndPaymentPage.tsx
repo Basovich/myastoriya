@@ -23,7 +23,7 @@ interface DeliveryAndPaymentPageProps {
 export default function DeliveryAndPaymentPage({ dict, lang, isMeatBar = false }: DeliveryAndPaymentPageProps) {
     const { deliveryPage, ourStoresPage } = dict.home;
     const breadcrumbs = [
-        { label: deliveryPage.breadcrumbs.home, href: lang === 'ua' ? '/' : `/${lang}` },
+        { label: deliveryPage.breadcrumbs.home, href: "/" },
         { label: deliveryPage.breadcrumbs.delivery }
     ];
 
