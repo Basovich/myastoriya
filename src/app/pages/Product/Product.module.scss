@@ -1020,8 +1020,24 @@
     background: transparent;
 }
 
-.relatedHeader {
+.relatedHeaderRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 32px;
+}
+
+.relatedHeader {
+    margin-bottom: 0;
+}
+
+.navArrowsMobile {
+    display: flex;
+    gap: 8px;
+
+    @media (min-width: 1280px) {
+        display: none;
+    }
 }
 
 .relatedGrid {
@@ -1036,6 +1052,40 @@
 
     @media (min-width: 1280px) {
         gap: 32px;
+    }
+}
+
+.desktopGrid {
+    display: none;
+    @media (min-width: 1280px) {
+        display: block;
+    }
+}
+
+.mobileSlider {
+    display: block;
+    width: 100%;
+    @media (min-width: 1280px) {
+        display: none;
+    }
+}
+
+div.relatedSwiper {
+    overflow: visible;
+    
+    :global(.swiper-wrapper) {
+        box-sizing: border-box;
+    }
+}
+
+.slide {
+    height: auto !important;
+    display: flex;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+
+    &:not(:global(.swiper-slide-visible)) {
+        opacity: 0;
     }
 }
 

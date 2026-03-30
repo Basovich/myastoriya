@@ -243,6 +243,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                         title="Популярні позиції"
                         products={popularProducts}
                         className={s.recommendations}
+                        isSliderOnMobile={true}
                     />
                     <div className={s.showMoreWrapper}>
                         <Button variant="outline-black">

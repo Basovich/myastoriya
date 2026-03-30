@@ -42,7 +42,6 @@ nav.breadcrumbs {
 .mainSection {
     display: flex;
     flex-direction: column;
-    gap: 32px;
 }
 
 .gallery {
@@ -222,6 +221,7 @@ nav.breadcrumbs {
 .actions {
     display: flex;
     gap: 6px;
+    margin-top: 20px;
 
     @media (min-width: 768px) {
         flex-direction: row;
@@ -280,6 +280,7 @@ a.actionBtn {
     background: #FFF;
     box-shadow: 0 14px 20px 0 rgba(0, 0, 0, 0.10);
     padding: 22px 20px 40px;
+    margin-top: 30px;
 
     @media (min-width: 768px) {
         flex-direction: row;
@@ -317,33 +318,31 @@ a.actionBtn {
 
 .detailItem {
     display: flex;
-    align-items: flex-start;
-    gap: 16px;
+    flex-direction: column;
 }
 
 .icon {
-    color: #E3051B;
-    margin-top: 4px;
+    width: 14px;
+    height: 14px;
+}
+
+.title {
+    color: #060606;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 120%;
+    text-transform: uppercase;
 }
 
 .text {
-    label {
-        display: block;
-        font-size: 11px;
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    p {
-        font-size: 14px;
-        color: #000;
-        font-weight: 500;
-        line-height: 1.4;
-        margin: 0;
-    }
+    color: #000;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 166.667%;
+    letter-spacing: 0.24px;
 }
 
 .googleReviewBtn {
