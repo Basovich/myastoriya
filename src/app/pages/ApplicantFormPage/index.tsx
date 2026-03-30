@@ -18,7 +18,7 @@ export default function ApplicantFormPage({ dict, lang }: ApplicantFormPageProps
     return (
         <>
             <Header lang={lang} />
-            <main>
+            <main className={s.main}>
                 <Breadcrumbs
                     items={[
                         { label: applicantFormPageDict.breadcrumbs.home, href: "/" },

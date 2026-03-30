@@ -10,6 +10,7 @@ import TextareaField from '@/app/components/ui/TextareaField';
 import { ApplicantFormPageDict } from '@/i18n/types';
 import s from './ApplicantForm.module.scss';
 import CustomSelect from '@/app/components/ui/CustomSelect';
+import clsx from "clsx";
 
 interface ApplicantFormProps {
     dict: ApplicantFormPageDict['form'];
@@ -140,7 +141,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                         error={Boolean(formik.touched.desiredPosition && formik.errors.desiredPosition)}
                     />
                     {formik.touched.desiredPosition && formik.errors.desiredPosition && (
-                        <span className={s.fieldError}>{formik.errors.desiredPosition}</span>
+                        <span className={clsx(s.fieldError, s.fieldErrorSelect)}>{formik.errors.desiredPosition}</span>
                     )}
                 </div>
 
@@ -192,7 +193,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                         error={Boolean(formik.touched.location && formik.errors.location)}
                     />
                     {formik.touched.location && formik.errors.location && (
-                        <span className={s.fieldError}>{formik.errors.location}</span>
+                        <span className={clsx(s.fieldError, s.fieldErrorSelect)}>{formik.errors.location}</span>
                     )}
                 </div>
 
