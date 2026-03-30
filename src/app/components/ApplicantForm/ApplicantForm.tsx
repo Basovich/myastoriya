@@ -127,13 +127,13 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
 
                 {/* Desired Position */}
                 <div className={s.groupField}>
-                    <h3 className={s.groupTitle}>{dict.desiredPosition}:</h3>
+                    <h3 className={s.groupTitle}>{dict.desiredPosition}</h3>
                     <CustomSelect
                         value={formik.values.desiredPosition}
                         options={[
-                            { label: 'Менеджер', value: 'manager' },
-                            { label: 'Кухар', value: 'cook' },
-                            { label: 'Касир', value: 'cashier' },
+                            { label: dict.options.manager, value: 'manager' },
+                            { label: dict.options.cook, value: 'cook' },
+                            { label: dict.options.cashier, value: 'cashier' },
                         ]}
                         onChange={(val) => formik.setFieldValue('desiredPosition', val)}
                         onBlur={() => formik.setFieldTouched('desiredPosition', true)}
@@ -147,7 +147,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
 
                 {/* Has Experience */}
                 <div className={s.groupField}>
-                    <h3 className={s.groupTitle}>{dict.hasExperience}?</h3>
+                    <h3 className={s.groupTitle}>{dict.hasExperience}</h3>
                     <div className={s.radioGroup}>
                         <label className={s.radioLabel}>
                             <input
@@ -181,7 +181,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
 
                 {/* Location */}
                 <div className={s.groupField}>
-                    <h3 className={s.groupTitle}>{dict.location}:</h3>
+                    <h3 className={s.groupTitle}>{dict.location}</h3>
                     <CustomSelect
                         value={formik.values.location}
                         options={[

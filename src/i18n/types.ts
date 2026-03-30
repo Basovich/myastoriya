@@ -196,6 +196,9 @@ export interface ApplicantFormPageDict {
       yes: string;
       no: string;
       kyiv: string;
+      manager: string;
+      cook: string;
+      cashier: string;
     };
     errors: {
       required: string;
