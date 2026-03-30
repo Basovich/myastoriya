@@ -1,11 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import clsx from 'clsx';
 import styles from '../Product.module.scss';
 import Image from "next/image";
 import DeliveryAccordion from '@/app/components/ui/DeliveryAccordion/DeliveryAccordion';
 import VideoModal from '@/app/components/VideoModal/VideoModal';
+
+// Swiper
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { FreeMode } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/free-mode';
 
 interface ProductTabsProps {
     description: string;
@@ -159,16 +165,31 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
     return (
         <div className={styles.tabsWrapper}>
             <div className={styles.tabsHeader}>
-                {tabs.map((tab) => (
-                    <button
-                        key={tab.id}
-                        className={clsx(styles.tabButton, activeTab === tab.id && styles.active)}
-                        onClick={() => setActiveTab(tab.id)}
-                    >
-                        <Image src={tab.icon} alt={tab.label} width={24} height={24} />
-                        <span>{tab.label}</span>
-                    </button>
-                ))}
+                <Swiper
+                    modules={[FreeMode]}
+                    slidesPerView={'auto'}
+                    spaceBetween={32}
+                    freeMode={true}
+                    watchSlidesProgress={true}
+                    className={styles.tabsSwiper}
+                    breakpoints={{
+                        1024: {
+                            spaceBetween: 60
+                        }
+                    }}
+                >
+                    {tabs.map((tab) => (
+                        <SwiperSlide key={tab.id} className={styles.tabSlide}>
+                            <button
+                                className={clsx(styles.tabButton, activeTab === tab.id && styles.active)}
+                                onClick={() => setActiveTab(tab.id)}
+                            >
+                                <Image src={tab.icon} alt={tab.label} width={24} height={24} />
+                                <span>{tab.label}</span>
+                            </button>
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
             </div>
             <div className={styles.tabContent}>
                 {activeTab === 'description' && (

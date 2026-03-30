@@ -333,7 +333,8 @@
         }
     }
 
-    .prevBtn, .nextBtn {
+    .prevBtn,
+    .nextBtn {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
@@ -344,11 +345,11 @@
         height: 48px;
         border-radius: 50%;
         border: 1px solid white;
-        transition: all 0.3s ease;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: background-color 0.2s linear, transform .2s linear;
         
         &::after {
             content: "";
@@ -530,14 +531,20 @@
 
 /* Tabs Header Refinement */
 .tabsHeader {
-    display: flex;
     border-bottom: 2px solid #F0F0F0;
     margin-bottom: 40px;
-    gap: 32px;
-    
-    @media (min-width: 768px) {
-        gap: 60px;
-    }
+    width: 100%;
+}
+
+.tabsSwiper {
+    width: 100%;
+    overflow: visible; // To show the border or other elements if needed
+}
+
+.tabSlide {
+    width: auto !important;
+    height: auto;
+    flex-shrink: 0;
 }
 
 .tabButton {
@@ -1007,9 +1014,6 @@
     }
 }
 
-.recommendations {
-
-}
 
 .relatedSection {
     margin-bottom: 80px;
@@ -1026,12 +1030,11 @@
     gap: 16px;
 
     @media (min-width: 768px) {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: 20px;
     }
 
     @media (min-width: 1280px) {
-        grid-template-columns: repeat(2, 1fr);
         gap: 32px;
     }
 }
