@@ -12,7 +12,7 @@ interface PrivacyPolicyPageProps {
 }
 
 export default function PrivacyPolicyPage({ dict, lang }: PrivacyPolicyPageProps) {
-    const { privacyPolicyPage } = dict.home as any;
+    const { privacyPolicyPage } = dict.home;
 
     const breadcrumbs = [
         { label: privacyPolicyPage.breadcrumbs.home, href: lang === 'ua' ? '/' : `/${lang}` },
@@ -51,17 +51,17 @@ export default function PrivacyPolicyPage({ dict, lang }: PrivacyPolicyPageProps
                 <h1 className={s.title}>{privacyPolicyPage.title}</h1>
 
                 <div className={s.content}>
-                    {privacyPolicyPage.content.map((item: any, index: number) => (
+                    {privacyPolicyPage.content.map((item, index) => (
                         <React.Fragment key={index}>
-                            {item.type === 'header' && (
+                            {item.type === 'header' && typeof item.value === 'string' && (
                                 <h2 className={s.sectionHeader}>{item.value}</h2>
                             )}
-                            {item.type === 'text' && (
+                            {item.type === 'text' && typeof item.value === 'string' && (
                                 <p className={s.paragraph}>{renderTextWithLinks(item.value)}</p>
                             )}
-                            {item.type === 'list' && (
+                            {item.type === 'list' && Array.isArray(item.value) && (
                                 <ul className={s.list}>
-                                    {item.value.map((li: string, liIndex: number) => (
+                                    {item.value.map((li, liIndex) => (
                                         <li key={liIndex} className={s.listItem}>
                                             {renderTextWithLinks(li)}
                                         </li>

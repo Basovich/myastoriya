@@ -133,15 +133,6 @@ export interface HomeDict {
     };
     showBtn: string;
   };
-  promotionsPage: {
-    title: string;
-    breadcrumbs: PromotionsPageBreadcrumbs;
-    tabs: {
-      promotions: string;
-      complexDiscounts: string;
-    };
-    showBtn: string;
-  };
   complexDiscountsPage: {
     title: string;
     breadcrumbs: ComplexDiscountsPageBreadcrumbs;
@@ -158,6 +149,7 @@ export interface HomeDict {
   contactsPage: ContactsPageDict;
   ourStoresPage: OurStoresPageDict;
   deliveryPage: DeliveryPageDict;
+  privacyPolicyPage: PrivacyPolicyPageDict;
   notFoundPage: NotFoundPageDict;
 }
 
@@ -280,6 +272,20 @@ export interface OurStoresPageDict {
     workingHoursLabel: string;
     phoneLabel: string;
   };
+}
+
+export interface PrivacyPolicyContentItem {
+  type: "text" | "header" | "list";
+  value: string | string[];
+}
+
+export interface PrivacyPolicyPageDict {
+  title: string;
+  breadcrumbs: {
+    home: string;
+    privacy: string;
+  };
+  content: PrivacyPolicyContentItem[];
 }
 
 export interface DeliveryMethodCard {
