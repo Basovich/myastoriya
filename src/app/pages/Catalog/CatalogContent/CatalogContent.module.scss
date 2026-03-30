@@ -136,6 +136,10 @@ nav.breadcrumbsCategory {
 
 div.sortWrap {
     display: none;
+
+    @media (min-width: 1280px) {
+        display: flex;
+    }
 }
 
 .sidebar {
