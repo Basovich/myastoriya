@@ -5,6 +5,7 @@ import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import { Locale } from "@/i18n/config";
 import type { Publication } from "@/i18n/types";
+import clsx from "clsx";
 
 interface PublicationsProps {
   dict: {
@@ -13,12 +14,13 @@ interface PublicationsProps {
     items: Publication[];
   };
   lang: Locale;
+  className?: string;
 }
 
-export default function Index({ dict, lang }: PublicationsProps) {
+export default function Index({ dict, lang, className }: PublicationsProps) {
 
     return (
-        <section className={s.section} id="publications">
+        <section className={clsx(s.section, className)} id="publications">
             <div className={s.headerWrap}>
                 <SectionHeader title={dict.sectionTitle} />
             </div>

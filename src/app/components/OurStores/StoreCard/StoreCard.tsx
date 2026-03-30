@@ -31,14 +31,61 @@ interface StoreCardProps {
         phoneLabel: string;
     };
     variant?: "list" | "map";
+    onClose?: () => void;
 }
 
-export default function StoreCard({ store, dict, variant = "list" }: StoreCardProps) {
+export default function StoreCard({ store, dict, variant = "list", onClose }: StoreCardProps) {
     // Determine if store is open based on status from data (mocking isOpen for now as data doesn't have it)
     const isOpen = true; 
 
+    if (variant === 'map') {
+        return (
+            <div className={s.mapVariant}>
+                <button className={s.closeCardBtn} onClick={onClose} type="button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 6L6 18M6 6L18 18" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                </button>
+                <div className={s.mapImageWrapper}>
+                    <Image 
+                        src="/images/store/map-point.png" 
+                        alt={store.name}
+                        fill
+                        className={s.mapImage}
+                    />
+                </div>
+                
+                <div className={s.mapContent}>
+                    <h4 className={s.mapName}>{store.name.toUpperCase()}</h4>
+                    
+                    <div className={s.mapHours}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="9" stroke="#E3051B" strokeWidth="2"/>
+                            <path d="M12 7V12L15 15" stroke="#E3051B" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                        <span>з 10:00 до 22:00</span>
+                    </div>
+                    
+                    <div className={s.mapActions}>
+                        <Link href={`/our-stores/${store.id}`} className={s.detailsBtnFull}>
+                            {dict.details}
+                        </Link>
+                        <a 
+                            href={store.mapUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className={s.routeBtnFull}
+                        >
+                            {dict.route}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className={`${s.card} ${variant === 'map' ? s.mapVariant : ''}`}>
+        <div className={s.card}>
             <div className={s.logoSection}>
                 <div className={s.logoCircle}>
                     <div className={s.logoM}>M</div>

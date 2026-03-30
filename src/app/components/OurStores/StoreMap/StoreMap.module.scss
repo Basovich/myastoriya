@@ -4,10 +4,29 @@
     border-radius: 16px;
     overflow: hidden;
     position: relative;
-}
 
-.infoWindow {
-    max-width: 300px;
+    /* Global overrides for Google Maps InfoWindow (nested to satisfy purity) */
+    :global(.gm-style-iw-c) {
+        padding: 10px 12px 12px !important;
+        border-radius: 20px !important;
+        overflow: visible !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+        width: 188px !important;
+    }
+
+    :global(.gm-style-iw-d) {
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    :global(.gm-style-iw-chr) {
+        display: none !important;
+    }
+
+    :global(.gm-ui-hover-reveal) {
+        display: none !important;
+    }
 }
 
 .loading {
@@ -21,3 +40,13 @@
     font-size: 18px;
     color: #999;
 }
+
+.infoWindowContainer {
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+
+
+
+

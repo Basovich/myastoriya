@@ -255,10 +255,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                         </Button>
                     </div>
                 </div>
-
-                <div className={s.publications}>
-                    <Publications dict={dict.home.publications} lang={locale} />
-                </div>
+                <Publications dict={dict.home.publications} lang={locale} className={s.publications} />
             </main>
             <Footer lang={locale} />
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />

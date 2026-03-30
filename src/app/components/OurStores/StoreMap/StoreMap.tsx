@@ -332,7 +332,7 @@ export default function StoreMap({ stores, dict }: StoreMapProps) {
                         onClick={() => setSelectedStore(store)}
                         icon={{
                             url: "/icons/stores/map-pin.svg",
-                            scaledSize: new window.google.maps.Size(40, 48)
+                            scaledSize: new window.google.maps.Size(28, 41)
                         }}
                     />
                 ))}
@@ -341,9 +341,17 @@ export default function StoreMap({ stores, dict }: StoreMapProps) {
                     <InfoWindow
                         position={{ lat: selectedStore.lat, lng: selectedStore.lng }}
                         onCloseClick={() => setSelectedStore(null)}
+                        options={{
+                            pixelOffset: new window.google.maps.Size(0, -30)
+                        }}
                     >
-                        <div className={s.infoWindow}>
-                            <StoreCard store={selectedStore} dict={dict} variant="map" />
+                        <div className={s.infoWindowContainer}>
+                            <StoreCard 
+                                store={selectedStore} 
+                                dict={dict} 
+                                variant="map" 
+                                onClose={() => setSelectedStore(null)}
+                            />
                         </div>
                     </InfoWindow>
                 )}

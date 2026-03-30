@@ -986,11 +986,10 @@
 
 /* Related products section */
 .relatedProductsGrid {
-    background-color: transparent;
     padding-top: 30px;
     padding-left: 16px;
     padding-right: 16px;
-
+    background: #fff;
 
     @media (min-width: 768px) {
         padding-left: 40px;
@@ -1043,15 +1042,15 @@
 .relatedGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 10px;
 
     @media (min-width: 768px) {
         grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
+        gap: 12px;
     }
 
     @media (min-width: 1280px) {
-        gap: 32px;
+        gap: 22px;
     }
 }
 
@@ -1090,8 +1089,8 @@ div.relatedSwiper {
 }
 
 .publications {
-    margin-top: 100px;
-    padding-bottom: 60px;
+
+    background: #fff;
 }
 
 

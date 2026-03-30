@@ -47,17 +47,19 @@ export default function OurStoresPage({ dict, lang }: OurStoresPageProps) {
         <>
             <Header lang={lang} />
             <main className={s.main}>
-                <div className={s.content}>
+                <div className={s.topSection}>
                     <HeroBanner
+                        prefix=""
                         title={ourStoresPage.title}
-                        subtitle="..........."
-                        image="/images/promotions/promo-hero-bg.png"
+                        className={s.heroBanner}
+                        image="/images/store/herobanner.png"
                     />
-                    
-                    <div className={s.container}>
-                        <div className={s.breadcrumbsContainer}>
-                            <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
-                        </div>
+                </div>
+                
+                <div className={s.container}>
+                    <div className={s.breadcrumbsContainer}>
+                        <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
+                    </div>
 
                         <div className={s.controls}>
                             <div className={s.topRow}>
@@ -100,8 +102,7 @@ export default function OurStoresPage({ dict, lang }: OurStoresPageProps) {
                             )}
                         </div>
                     </div>
-                </div>
-            </main>
+                </main>
             <Footer lang={lang} />
         </>
     );
