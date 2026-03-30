@@ -116,7 +116,33 @@
 }
 
 .mapWrapper {
-  margin-bottom: 40px;
+    margin-bottom: 40px;
+    position: relative; // Ensure positioning for potential overlay elements
+
+    :global {
+        .gm-style-iw-c {
+            padding: 10px 12px 12px !important;
+            border-radius: 20px !important;
+            overflow: visible !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+            width: 188px !important;
+        }
+
+        .gm-style-iw-d {
+            overflow: visible !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .gm-style-iw-chr {
+            display: none !important;
+        }
+
+        // Hide default close button
+        .gm-ui-hover-reveal {
+            display: none !important;
+        }
+    }
 }
 
 .mapPlaceholder {
@@ -162,3 +188,10 @@
     color: #4D4D4D;
   }
 }
+
+.infoWindowContainer {
+    position: relative;
+    padding: 0;
+    margin: 0;
+}
+

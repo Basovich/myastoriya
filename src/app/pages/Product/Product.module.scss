@@ -2,17 +2,20 @@
     background-color: #F6F6F6;
 }
 
-.breadcrumbsWrapper {
+nav.breadcrumbsWrapper {
     padding-top: 18px;
     padding-left: 16px;
     padding-right: 16px;
+    margin-bottom: 0;
 
     @media (min-width: 768px) {
+        padding-top: 24px;
         padding-left: 40px;
         padding-right: 40px;
     }
 
     @media (min-width: 1280px) {
+        padding-top: 26px;
         padding-left: calc((100% - 1180px) / 2);
         padding-right: calc((100% - 1180px) / 2);
     }
@@ -41,6 +44,7 @@
     background-color: #F6F6F6;
 
     @media (min-width: 768px) {
+        padding-top: 24px;
         padding-left: 40px;
         padding-right: 40px;
     }
@@ -53,9 +57,7 @@
             "reviews info";
         gap: 34px;
         align-items: start;
-        padding-left: calc((100% - 1180px) / 2);
-        padding-right: calc((100% - 1180px) / 2);
-        padding-bottom: 88px;
+        padding: 32px calc((100% - 1180px) / 2) 88px;
     }
 
     @media (min-width: 1360px) {
@@ -224,30 +226,64 @@
 
     .discountWrapper {
         position: absolute;
-        top: 24px;
+        top: 18px;
         left: 24px;
         z-index: 10;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 9px;
         pointer-events: none;
+        max-width: 220px;
+        
+        @media (min-width: 768px) {
+            max-width: initial;
+            gap: 12px;
+            top: 24px;
+            left: 27px;
+        }
+
+        @media (min-width: 1280px) {
+            top: 34px;
+            left: 37px;
+        }
     }
 
     .discountBadge {
-        background-color: #FF0000;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        padding: 2px 6px 0;
+        height: 20px;
+        border-radius: 6px;
+        background: #E3051B;
+        color: #FFF;
+        font-family: var(--font-houschka), sans-serif;
+        font-size: 8px;
+        font-style: normal;
         font-weight: 800;
-        font-size: 14px;
+        line-height: 120%;
+        text-transform: uppercase;
+
+        @media (min-width: 768px) {
+            height: 36px;
+            font-size: 14px;
+            padding-left: 12px;
+            padding-right: 12px;
+            border-radius: 10px;
+        }
     }
 
     .promoText {
-        color: white;
+        color: #FFF;
+        font-family: var(--font-houschka), sans-serif;
+        font-size: 10px;
+        font-style: normal;
         font-weight: 800;
-        font-size: 13px;
+        line-height: 120%;
         text-transform: uppercase;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+
+        @media (min-width: 768px) {
+            font-size: 14px;
+        }
     }
 
     .galleryActions {
@@ -538,7 +574,7 @@
 
 .tabsSwiper {
     width: 100%;
-    overflow: visible; // To show the border or other elements if needed
+    overflow: hidden;
 }
 
 .tabSlide {
@@ -990,6 +1026,7 @@
     padding-left: 16px;
     padding-right: 16px;
     background: #fff;
+    overflow: hidden;
 
     @media (min-width: 768px) {
         padding-left: 40px;
