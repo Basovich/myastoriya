@@ -3,47 +3,59 @@
     display: flex;
     background: #FFF;
     border-radius: 12px;
-    padding: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    width: fit-content;
+    padding: 2px;
+    border: 1px solid #EAEAEA;
+    width: 100%;
+
+    @media (min-width: 768px) {
+        width: fit-content;
+    }
 }
 
 .toggleBtn {
+    flex: 1;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     padding: 10px 16px;
-    border-radius: 8px;
+    border-radius: 10px;
     background: transparent;
     border: 1px solid transparent;
-    color: #000;
+    color: #828282;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s ease;
     text-transform: uppercase;
 
-    @media (min-width: 768px) {
-        padding: 12px 24px;
+    @media (min-width: 1024px) {
+        padding: 10px 24px;
+        min-width: 140px;
     }
 
     .icon {
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #000;
-        transition: color 0.2s;
+        color: inherit;
+        
+        svg {
+            width: 18px;
+            height: 18px;
+        }
     }
 
     &:hover {
         @media (any-hover: hover) {
-            background: rgba(0, 0, 0, 0.05);
+            color: #000;
         }
     }
 
     &.active {
         border-color: #E3051B;
         color: #E3051B;
+        background: #FFF;
 
         .icon {
             color: #E3051B;
@@ -51,8 +63,9 @@
 
         &:hover {
             @media (any-hover: hover) {
-                background: rgba(227, 5, 27, 0.05);
+                background: rgba(227, 5, 27, 0.02);
             }
         }
     }
 }
+

@@ -19,13 +19,10 @@ export default function StoreViewToggle({ viewMode, onViewChange, dict }: StoreV
                 className={clsx(s.toggleBtn, viewMode === "list" && s.active)}
                 onClick={() => onViewChange("list")}
             >
-                <span>{dict.list}</span>
+                <span>{dict.list.toUpperCase()}</span>
                 <div className={s.icon}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="8" y1="6" x2="21" y2="6" />
-                        <line x1="8" y1="12" x2="21" y2="12" />
-                        <line x1="8" y1="18" x2="21" y2="18" />
-                        <path d="M3 6h1v0H3V6zm0 6h1v0H3v0zm0 6h1v0H3v0z" strokeLinecap="round" />
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 6H21V8H8V6ZM8 11H21V13H8V11ZM8 16H21V18H8V16ZM3 6H6V8H3V6ZM3 11H6V13H3V11ZM3 16H6V18H3V16Z" fill="currentColor"/>
                     </svg>
                 </div>
             </button>
@@ -33,14 +30,14 @@ export default function StoreViewToggle({ viewMode, onViewChange, dict }: StoreV
                 className={clsx(s.toggleBtn, viewMode === "map" && s.active)}
                 onClick={() => onViewChange("map")}
             >
-                <span>{dict.map}</span>
+                <span>{dict.map.toUpperCase()}</span>
                 <div className={s.icon}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
                     </svg>
                 </div>
             </button>
         </div>
     );
 }
+

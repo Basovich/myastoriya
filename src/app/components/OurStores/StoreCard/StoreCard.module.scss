@@ -2,19 +2,14 @@
 .card {
     background: #FFF;
     border-radius: 20px;
-    padding: 24px;
+    padding: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
     transition: transform 0.2s, box-shadow 0.2s;
-    height: auto;
+    margin-bottom: 12px;
 
-    @media (min-width: 768px) {
-        flex-direction: row;
-        align-items: center;
-        padding: 32px;
-        gap: 32px;
+    @media (min-width: 1024px) {
+        padding: 24px 40px;
+        margin-bottom: 20px;
     }
 
     &:hover {
@@ -25,95 +20,130 @@
     }
 }
 
-.logoSection {
-    flex-shrink: 0;
+.cardColumns {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+
+    @media (min-width: 1024px) {
+        flex-direction: row;
+        align-items: center;
+        gap: 0;
+    }
+}
+
+.logoAndName {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    @media (min-width: 1024px) {
+        width: 320px;
+        flex-shrink: 0;
+        border-right: 1px solid #F2F2F2;
+        padding-right: 24px;
+        margin-right: 24px;
+    }
 }
 
 .logoCircle {
-    width: 64px;
-    height: 64px;
+    width: 60px;
+    height: 60px;
     background: #E3051B;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(227, 5, 27, 0.3);
+    flex-shrink: 0;
+
+    @media (min-width: 1024px) {
+        width: 64px;
+        height: 64px;
+    }
 }
 
 .logoM {
     color: #FFF;
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 800;
+
+    @media (min-width: 1024px) {
+        font-size: 32px;
+    }
 }
 
-.mainInfo {
+.nameWrapper {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-width: 180px;
-
-    @media (min-width: 768px) {
-        border-right: 1px solid #F0F0F0;
-        padding-right: 24px;
-        height: 50px;
-        justify-content: center;
-    }
+    gap: 6px;
 }
 
 .name {
     font-size: 16px;
     font-weight: 800;
     color: #000;
-    text-transform: uppercase;
     margin: 0;
+    line-height: 1.2;
+
+    @media (min-width: 1024px) {
+        font-size: 18px;
+    }
 }
 
 .statusBadge {
     display: inline-flex;
-    padding: 4px 12px;
+    padding: 4px 10px;
     border-radius: 6px;
-    font-size: 10px;
+    font-size: 8px;
     font-weight: 700;
     width: fit-content;
     text-transform: uppercase;
     border: 1px solid transparent;
+    box-shadow: none;
+
 
     &.open {
-        color: #27AE60;
-        background: rgba(39, 174, 96, 0.1);
-        border-color: rgba(39, 174, 96, 0.3);
+        color: #1BC573;
+        background: rgba(27, 197, 115, 0.1);
+        border-color: #1BC573;
     }
 
     &.closed {
-        color: #828282;
-        background: rgba(130, 130, 130, 0.1);
-        border-color: rgba(130, 130, 130, 0.3);
+        color: #838383;
+        background: rgba(131, 131, 131, 0.1);
+        border-color: #838383;
+    }
+
+
+    @media (max-width: 1023px) {
+        position: absolute;
+        top: 0;
+        right: 0;
     }
 }
 
-.detailsGrid {
+.detailsRow {
     display: flex;
     flex-direction: column;
     gap: 16px;
     flex: 1;
 
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
         flex-direction: row;
-        justify-content: space-between;
-        align-items: flex-start;
+        gap: 24px;
     }
 }
 
-.detailItem {
+.detailCol {
     display: flex;
     gap: 12px;
     align-items: flex-start;
-}
 
-.iconWrapper {
-    color: #E3051B;
-    margin-top: 2px;
-    flex-shrink: 0;
+    @media (min-width: 1024px) {
+        flex: 1;
+        min-width: 0;
+    }
 }
 
 .textWrapper {
@@ -122,10 +152,10 @@
     gap: 4px;
 
     label {
-        font-size: 10px;
-        font-weight: 700;
+        font-size: 9px;
+        font-weight: 800;
         color: #828282;
-        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
     p {
@@ -133,20 +163,24 @@
         font-weight: 600;
         color: #000;
         margin: 0;
-        line-height: 1.4;
+        line-height: 1.35;
+
+        @media (min-width: 1024px) {
+            font-size: 14px;
+        }
     }
 }
 
 .actions {
     display: flex;
     gap: 12px;
-    flex-shrink: 0;
+    align-self: flex-end;
 
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
         padding-left: 24px;
-        border-left: 1px solid #F0F0F0;
-        height: 50px;
-        align-items: center;
+        border-left: 1px solid #F2F2F2;
+        margin-left: 24px;
+        align-self: center;
     }
 }
 
@@ -158,35 +192,33 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid transparent;
+    transition: all 0.25s ease;
+    border: 1px solid #EAEAEA;
+    background: #FFF;
+
+    @media (min-width: 1024px) {
+        width: 48px;
+        height: 48px;
+    }
+
+    &:hover {
+        @media (any-hover: hover) {
+            transform: scale(1.05);
+            border-color: #000;
+        }
+    }
 }
+
 
 .pinBtn {
-    color: #E3051B;
-    background: transparent;
-    border: 1px solid rgba(227, 5, 27, 0.3);
-
     &:hover {
         @media (any-hover: hover) {
-            background: #E3051B;
-            color: #FFF;
+            border-color: #E3051B;
         }
     }
 }
 
-.detailsBtn {
-    background: #FFF;
-    color: #000;
-    border: 1px solid #000;
 
-    &:hover {
-        @media (any-hover: hover) {
-            background: #000;
-            color: #FFF;
-        }
-    }
-}
 
 // Map variant (high-fidelity card for popups)
 .mapVariant {

@@ -1,21 +1,28 @@
 .grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
 
     @media (min-width: 768px) {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
+        gap: 16px;
     }
 
-    @media (min-width: 1280px) {
-        grid-template-columns: repeat(3, 1fr);
+    @media (min-width: 1024px) {
+        gap: 20px;
     }
 }
+
+.grid > * {
+    width: 100%;
+}
+
 
 .empty {
     text-align: center;
     padding: 60px 0;
     font-size: 18px;
-    color: #666;
+    color: #828282;
+    width: 100%;
 }
+

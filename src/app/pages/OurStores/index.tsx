@@ -8,6 +8,7 @@ import Header from "@/app/components/Header/Header";
 import Footer from "@/app/components/Footer/Footer";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import HeroBanner from "@/app/components/ui/HeroBanner/HeroBanner";
+import Button from "@/app/components/ui/Button/Button";
 import storesData from "@/content/stores.json";
 import StoreFilter from "@/app/components/OurStores/StoreFilter/StoreFilter";
 import StoreSearch from "@/app/components/OurStores/StoreSearch/StoreSearch";
@@ -25,7 +26,7 @@ export type ViewMode = "list" | "map";
 
 export default function OurStoresPage({ dict, lang }: OurStoresPageProps) {
     const { ourStoresPage } = dict.home;
-    const [activeFilter, setActiveFilter] = useState<StoreType>("all");
+    const [activeFilter, setActiveFilter] = useState<StoreType>("restaurant");
     const [searchQuery, setSearchQuery] = useState("");
     const [viewMode, setViewMode] = useState<ViewMode>("map");
 
@@ -87,14 +88,18 @@ export default function OurStoresPage({ dict, lang }: OurStoresPageProps) {
                                     <StoreList stores={filteredStores} dict={ourStoresPage.storeCard} />
                                     {filteredStores.length > 0 && (
                                         <div className={s.loadMoreWrapper}>
-                                            <button className={s.loadMoreBtn}>
+                                            <Button 
+                                                variant="outline-black" 
+                                                className={s.loadMoreBtn}
+                                            >
                                                 {ourStoresPage.loadMore}
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <polyline points="7 13 12 18 17 13" />
-                                                    <polyline points="7 6 12 11 17 6" />
+                                                <svg width="18" height="15" viewBox="0 0 18 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M9.98467 0.999945L16.3131 7.32837L9.98467 13.6568" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                    <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                                                 </svg>
-                                            </button>
+                                            </Button>
                                         </div>
+
                                     )}
                                 </>
                             ) : (

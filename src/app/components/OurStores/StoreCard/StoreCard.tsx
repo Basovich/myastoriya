@@ -93,75 +93,79 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
 
     return (
         <div className={s.card}>
-            <div className={s.logoSection}>
-                <div className={s.logoCircle}>
-                    <div className={s.logoM}>M</div>
+            <div className={s.cardColumns}>
+                <div className={s.logoAndName}>
+                    <div className={s.logoCircle}>
+                        <div className={s.logoM}>М</div>
+                    </div>
+                    <div className={s.nameWrapper}>
+                        <h4 className={s.name}>{store.name.toUpperCase()}</h4>
+                        <div className={`${s.statusBadge} ${isOpen ? s.open : s.closed}`}>
+                            {isOpen ? dict.open : dict.closed}
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div className={s.mainInfo}>
-                <h4 className={s.name}>{store.name}</h4>
-                <div className={`${s.statusBadge} ${isOpen ? s.open : s.closed}`}>
-                    {isOpen ? dict.open : dict.closed}
-                </div>
-            </div>
+                <div className={s.detailsRow}>
+                    <div className={s.detailCol}>
+                        <div className={s.iconWrapper}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#E3051B"/>
+                            </svg>
+                        </div>
+                        <div className={s.textWrapper}>
+                            <label>{dict.address.toUpperCase()}</label>
+                            <p>{store.address}</p>
+                        </div>
+                    </div>
 
-            <div className={s.detailsGrid}>
-                <div className={s.detailItem}>
-                    <div className={s.iconWrapper}>
-                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                            <circle cx="12" cy="10" r="3" />
-                        </svg>
+                    <div className={s.detailCol}>
+                        <div className={s.iconWrapper}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="#E3051B"/>
+                                <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="#E3051B"/>
+                            </svg>
+                        </div>
+                        <div className={s.textWrapper}>
+                            <label>{dict.workingHoursLabel.toUpperCase()}</label>
+                            <p>{store.workingHours}</p>
+                        </div>
                     </div>
-                    <div className={s.textWrapper}>
-                        <label>{dict.address}</label>
-                        <p>{store.address}</p>
-                    </div>
-                </div>
-                <div className={s.detailItem}>
-                    <div className={s.iconWrapper}>
-                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="12" cy="12" r="10" />
-                            <polyline points="12 6 12 12 16 14" />
-                        </svg>
-                    </div>
-                    <div className={s.textWrapper}>
-                        <label>{dict.workingHoursLabel}</label>
-                        <p>{store.workingHours}</p>
-                    </div>
-                </div>
-                <div className={s.detailItem}>
-                    <div className={s.iconWrapper}>
-                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                        </svg>
-                    </div>
-                    <div className={s.textWrapper}>
-                        <label>{dict.phoneLabel}</label>
-                        <p>{store.phone}</p>
-                    </div>
-                </div>
-            </div>
 
-            <div className={s.actions}>
-                <a 
-                    href={store.mapUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className={s.pinBtn}
-                >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                        <circle cx="12" cy="10" r="3" />
-                    </svg>
-                </a>
-                <Link href={`/our-stores/${store.id}`} className={s.detailsBtn}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                </Link>
+                    <div className={s.detailCol}>
+                        <div className={s.iconWrapper}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.62 10.79c1.44 2.82 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="#E3051B"/>
+                            </svg>
+                        </div>
+                        <div className={s.textWrapper}>
+                            <label>{dict.phoneLabel.toUpperCase()}</label>
+                            <p>{store.phone}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className={s.actions}>
+                    <a 
+                        href={store.mapUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className={s.pinBtn}
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#E3051B"/>
+                        </svg>
+                    </a>
+                    <Link href={`/our-stores/${store.id}`} className={s.detailsBtn}>
+                        <svg width="18" height="15" viewBox="0 0 18 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.98467 0.999945L16.3131 7.32837L9.98467 13.6568" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                    </Link>
+
+                </div>
             </div>
         </div>
     );
 }
+

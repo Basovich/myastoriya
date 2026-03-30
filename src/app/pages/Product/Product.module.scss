@@ -288,19 +288,33 @@ nav.breadcrumbsWrapper {
 
     .galleryActions {
         position: absolute;
-        top: 24px;
-        right: 24px;
+        top: 19px;
+        right: 25px;
         z-index: 10;
+
+        @media (min-width: 1280px) {
+            top: 28px;
+            right: 40px;
+        }
     }
 
-    .actionBtn {
-        cursor: pointer;
-        transition: all 0.3s ease;
+    button.actionBtn {
         z-index: 10;
-        
-        @media (any-hover: hover) {
-            &:hover {
-                transform: scale(1.05);
+        width: 40px;
+        height: 40px;
+
+        @media (min-width: 768px) {
+            width: 56px;
+            height: 56px;
+        }
+
+        svg {
+            width: 16px;
+            height: 15px;
+
+            @media (min-width: 768px) {
+                width: 24px;
+                height: 21px;
             }
         }
     }
@@ -377,24 +391,33 @@ nav.breadcrumbsWrapper {
         z-index: 10;
         color: white;
         background: transparent;
-        width: 48px;
-        height: 48px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        border: 1px solid white;
+        border: 2px solid white;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: background-color 0.2s linear, transform .2s linear;
+
+        @media (min-width: 768px) {
+            width: 56px;
+            height: 56px;
+        }
         
         &::after {
             content: "";
             display: block;
             width: 22px;
-            height: 18px;
+            height: 12px;
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
+
+            @media (min-width: 768px) {
+                height: 18px;
+            }
         }
 
         @media (any-hover: hover) {
@@ -411,14 +434,24 @@ nav.breadcrumbsWrapper {
     }
 
     .prevBtn {
-        left: 20px;
+        left: 24px;
+
+        @media (min-width: 1280px) {
+            left: 37px;
+        }
+
         &::after {
             background-image: url('/icons/gallery-arrow-left.svg');
         }
     }
 
     .nextBtn {
-        right: 20px;
+        right: 25px;
+
+        @media (min-width: 1280px) {
+            right: 40px;
+        }
+
         &::after {
             background-image: url('/icons/gallery-arrow-right.svg');
         }
