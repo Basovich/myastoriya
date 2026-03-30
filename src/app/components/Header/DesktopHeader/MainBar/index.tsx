@@ -58,6 +58,35 @@ export default function MainBar({
 
     return (
         <div className={s.mainBar} ref={menuRef}>
+            {/* Scrolled nav menu dropdown */}
+            {isScrolled && (
+                <div className={clsx(s.scrolledMenu, isMenuOpen && s.scrolledMenuOpen)}>
+                    <div className={s.scrolledMenuInner}>
+                        <div className={s.scrolledMenuLinks}>
+                            {TOP_NAV_ITEMS.map((item, i) => (
+                                <AppLink
+                                    key={i}
+                                    href={item.href}
+                                    className={s.scrolledMenuLink}
+                                    onClick={onMenuClose}
+                                >
+                                    {item.label}
+                                </AppLink>
+                            ))}
+                        </div>
+                        <div className={s.scrolledMenuRight}>
+                            <a
+                                href={`tel:${siteData.contact.phone.replace(/\s+/g, '')}`}
+                                className={s.scrolledMenuPhone}
+                            >
+                                {siteData.contact.phone}
+                            </a>
+                            <LanguageSwitch lang={lang} />
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className={s.mainBarInner}>
                 <div className={s.logoWrapper}>
                     <Logo lang={lang} />
@@ -111,35 +140,6 @@ export default function MainBar({
 
             {/* Catalog dropdown */}
             <CatalogMenu isOpen={isCatalogOpen} onClose={() => setIsCatalogOpen(false)} />
-
-            {/* Scrolled nav menu dropdown */}
-            {isScrolled && (
-                <div className={clsx(s.scrolledMenu, isMenuOpen && s.scrolledMenuOpen)}>
-                    <div className={s.scrolledMenuInner}>
-                        <div className={s.scrolledMenuLinks}>
-                            {TOP_NAV_ITEMS.map((item, i) => (
-                                <AppLink
-                                    key={i}
-                                    href={item.href}
-                                    className={s.scrolledMenuLink}
-                                    onClick={onMenuClose}
-                                >
-                                    {item.label}
-                                </AppLink>
-                            ))}
-                        </div>
-                        <div className={s.scrolledMenuRight}>
-                            <a
-                                href={`tel:${siteData.contact.phone.replace(/\s+/g, '')}`}
-                                className={s.scrolledMenuPhone}
-                            >
-                                {siteData.contact.phone}
-                            </a>
-                            <LanguageSwitch lang={lang} />
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
