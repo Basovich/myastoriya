@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import Image from 'next/image';
 import AppLink from '../AppLink/AppLink';
 import s from './CategorySwitcher.module.scss';
 import clsx from 'clsx';
@@ -51,9 +51,15 @@ export default function CategorySwitcher({
                         )}
                     >
                         {category.isParent && (
-                            <svg className={s.backIcon} width="20" height="12" viewBox="0 0 20 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M19 6L1 6M1 6L6.5 11M1 6L6.5 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
+                            <>
+                                <Image 
+                                    src="/images/icons/parent-catalog.png" 
+                                    alt="" 
+                                    width={20} 
+                                    height={20} 
+                                    className={s.parentIcon}
+                                />
+                            </>
                         )}
                         <span className={s.label}>{category.label}</span>
                     </AppLink>
