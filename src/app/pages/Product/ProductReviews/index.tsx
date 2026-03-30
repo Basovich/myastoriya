@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
-import styles from './Product.module.scss';
+import styles from '../Product.module.scss';
 import Button from '@/app/components/ui/Button/Button';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import Image from 'next/image';

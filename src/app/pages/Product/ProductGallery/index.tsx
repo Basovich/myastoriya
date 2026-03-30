@@ -6,10 +6,10 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import Image from "next/image";
-import styles from './Product.module.scss';
+import styles from '../Product.module.scss';
 import WishButton from '@/app/components/ui/WishButton/WishButton';
 import VideoModal from '@/app/components/VideoModal/VideoModal';
-import ImageZoomModal from './ImageZoomModal';
+import ImageZoomModal from '@/app/components/ImageZoomModal/index';
 
 interface ProductGalleryProps {
     id: string;

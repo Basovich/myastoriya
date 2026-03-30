@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import clsx from 'clsx';
-import styles from './Product.module.scss';
+import styles from '../Product.module.scss';
 import Image from "next/image";
+import DeliveryAccordion from '@/app/components/ui/DeliveryAccordion/DeliveryAccordion';
+import VideoModal from '@/app/components/VideoModal/VideoModal';
 
 interface ProductTabsProps {
     description: string;
@@ -11,8 +13,6 @@ interface ProductTabsProps {
     delivery: string;
 }
 
-import DeliveryAccordion from '@/app/components/ui/DeliveryAccordion/DeliveryAccordion';
-import VideoModal from '@/app/components/VideoModal/VideoModal';
 
 // --- Icons ---
 const BoxIcon = () => (

@@ -16,7 +16,7 @@ import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import ImageZoomModal from '@/app/pages/Product/ImageZoomModal';
+import ImageZoomModal from '@/app/components/ImageZoomModal/index';
 import { useState } from 'react';
 
 interface StoreDetailPageProps {

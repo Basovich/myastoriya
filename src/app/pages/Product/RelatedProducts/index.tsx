@@ -1,7 +1,7 @@
 'use client';
  
 import React from 'react';
-import s from './Product.module.scss';
+import s from '../Product.module.scss';
 import clsx from 'clsx';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
