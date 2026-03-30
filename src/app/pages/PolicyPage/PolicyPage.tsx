@@ -1,24 +1,19 @@
 import React from 'react';
-import s from './PrivacyPolicyPage.module.scss';
-import { Dictionary } from '@/i18n/types';
+import s from './PolicyPage.module.scss';
 import { Locale } from '@/i18n/config';
 import Header from '@/app/components/Header/Header';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import Footer from "@/app/components/Footer/Footer";
+import { PolicyPageContentItem } from '@/i18n/types';
 
-interface PrivacyPolicyPageProps {
-    dict: Dictionary;
+interface PolicyPageProps {
+    title: string;
+    breadcrumbs: { label: string; href?: string }[];
+    content: PolicyPageContentItem[];
     lang: Locale;
 }
 
-export default function PrivacyPolicyPage({ dict, lang }: PrivacyPolicyPageProps) {
-    const { privacyPolicyPage } = dict.home;
-
-    const breadcrumbs = [
-        { label: privacyPolicyPage.breadcrumbs.home, href: lang === 'ua' ? '/' : `/${lang}` },
-        { label: privacyPolicyPage.breadcrumbs.privacy }
-    ];
-
+export default function PolicyPage({ title, breadcrumbs, content, lang }: PolicyPageProps) {
     const renderTextWithLinks = (text: string) => {
         if (typeof text !== 'string') return text;
         const parts = text.split(/(\[\[.*?\]\])/g);
@@ -48,10 +43,10 @@ export default function PrivacyPolicyPage({ dict, lang }: PrivacyPolicyPageProps
             <main className={s.main}>
                 <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
 
-                <h1 className={s.title}>{privacyPolicyPage.title}</h1>
+                <h1 className={s.title}>{title}</h1>
 
                 <div className={s.content}>
-                    {privacyPolicyPage.content.map((item, index) => (
+                    {content.map((item, index) => (
                         <React.Fragment key={index}>
                             {item.type === 'header' && typeof item.value === 'string' && (
                                 <h2 className={s.sectionHeader}>{item.value}</h2>
@@ -61,7 +56,7 @@ export default function PrivacyPolicyPage({ dict, lang }: PrivacyPolicyPageProps
                             )}
                             {item.type === 'list' && Array.isArray(item.value) && (
                                 <ul className={s.list}>
-                                    {item.value.map((li, liIndex) => (
+                                    {item.value.map((li: string, liIndex: number) => (
                                         <li key={liIndex} className={s.listItem}>
                                             {renderTextWithLinks(li)}
                                         </li>

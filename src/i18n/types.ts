@@ -150,6 +150,7 @@ export interface HomeDict {
   ourStoresPage: OurStoresPageDict;
   deliveryPage: DeliveryPageDict;
   privacyPolicyPage: PrivacyPolicyPageDict;
+  loyaltyProgramRulesPage: LoyaltyProgramRulesPageDict;
   notFoundPage: NotFoundPageDict;
 }
 
@@ -274,7 +275,7 @@ export interface OurStoresPageDict {
   };
 }
 
-export interface PrivacyPolicyContentItem {
+export interface PolicyPageContentItem {
   type: "text" | "header" | "list";
   value: string | string[];
 }
@@ -285,7 +286,16 @@ export interface PrivacyPolicyPageDict {
     home: string;
     privacy: string;
   };
-  content: PrivacyPolicyContentItem[];
+  content: PolicyPageContentItem[];
+}
+
+export interface LoyaltyProgramRulesPageDict {
+  title: string;
+  breadcrumbs: {
+    home: string;
+    loyalty: string;
+  };
+  content: PolicyPageContentItem[];
 }
 
 export interface DeliveryMethodCard {
