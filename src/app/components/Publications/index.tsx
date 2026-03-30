@@ -1,6 +1,6 @@
 import s from "./Publications.module.scss";
-import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
-import Button from "../../../components/ui/Button/Button";
+import SectionHeader from "../ui/SectionHeader/SectionHeader";
+import Button from "../ui/Button/Button";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import { Locale } from "@/i18n/config";
@@ -15,7 +15,7 @@ interface PublicationsProps {
   lang: Locale;
 }
 
-export default function Publications({ dict, lang }: PublicationsProps) {
+export default function Index({ dict, lang }: PublicationsProps) {
 
     return (
         <section className={s.section} id="publications">

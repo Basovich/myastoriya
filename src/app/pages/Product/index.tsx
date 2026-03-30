@@ -11,7 +11,7 @@ import DonenessSelector from './DonenessSelector/index';
 import ProductReviews from './ProductReviews/index';
 import RelatedProducts from './RelatedProducts/index';
 import QuantitySelector from '@/app/components/ui/QuantitySelector/QuantitySelector';
-import PublicationsHome from '../Home/Publications/Publications';
+import Publications from '@/app/components/Publications';
 import Header from '@/app/components/Header/Header';
 import Footer from '@/app/components/Footer/Footer';
 import uaData from '@/content/ua.json';
@@ -132,6 +132,23 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
         badge: item.badge
     }));
 
+    // Create 12 items for "Popular products" by repeating the mock data
+    const popularProducts = [];
+    for (let i = 0; i < 12; i++) {
+        const item = list[i % list.length];
+        if (item) {
+            popularProducts.push({
+                id: `${item.id}-${i}`, // Unique ID for key
+                title: item.title,
+                price: item.price,
+                weight: item.weight || "330г",
+                unit: item.unit || "упаковка",
+                image: item.image,
+                badge: item.badge
+            });
+        }
+    }
+
     return (
         <>
             <Header lang={locale} />
@@ -224,13 +241,22 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
 
                     <RelatedProducts
                         title="Популярні позиції"
-                        products={relatedProducts}
+                        products={popularProducts}
                         className={s.recommendations}
                     />
+                    <div className={s.showMoreWrapper}>
+                        <Button variant="outline-black">
+                            <span className={s.showMoreText}>ПОКАЗАТЬ ЕЩЕ</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                <path d="M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                        </Button>
+                    </div>
                 </div>
 
                 <div className={s.publications}>
-                    <PublicationsHome dict={dict.home.publications} lang={locale} />
+                    <Publications dict={dict.home.publications} lang={locale} />
                 </div>
             </main>
             <Footer lang={locale} />

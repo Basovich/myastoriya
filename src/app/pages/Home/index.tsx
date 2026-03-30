@@ -5,7 +5,7 @@ import Products from "@/app/pages/Home/Products/Products";
 import Actions from "@/app/pages/Home/Actions/Actions";
 import AppPromo from "@/app/pages/Home/AppPromo/AppPromo";
 import ComplexDiscounts from "@/app/pages/Home/ComplexDiscounts/ComplexDiscounts";
-import Publications from "@/app/pages/Home/Publications/Publications";
+import Publications from "@/app/components/Publications";
 import Reviews from "@/app/pages/Home/Reviews/Reviews";
 import SeoText from "@/app/pages/Home/SeoText/SeoText";
 import Footer from "@/app/components/Footer/Footer";
