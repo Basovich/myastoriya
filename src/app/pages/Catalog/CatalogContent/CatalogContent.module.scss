@@ -311,27 +311,9 @@ div.sortWrap {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 0;
-    padding: 0 16px;
-
-    @media (min-width: 768px) {
-        padding: 0 40px;
-    }
-
-    @media (min-width: 1280px) {
-        padding-left: calc((100% - 1200px) / 2);
-        padding-right: calc((100% - 1200px) / 2);
-    }
-
-    @media (min-width: 1360px) {
-        padding-left: calc((100% - 1280px) / 2);
-        padding-right: calc((100% - 1280px) / 2);
-    }
-
-    @media (min-width: 1440px) {
-        padding-left: calc((100% - 1300px) / 2);
-        padding-right: calc((100% - 1300px) / 2);
-    }
+    margin-bottom: 0px;
+    // Inherit alignment from relatedInner or re-apply calc if not in relatedInner
+    // But currently they are in relatedInner.
 }
 
 .navArrows {
@@ -347,32 +329,13 @@ div.sortWrap {
     padding-top: 40px;
 
     @media (min-width: 1280px) {
-        padding-top: 60px;
+        padding-top: 70px;
     }
 }
 
 .sliderContainer {
     position: relative;
-    padding: 24px 16px;
-
-    @media (min-width: 768px) {
-        padding: 24px 40px;
-    }
-
-    @media (min-width: 1280px) {
-        padding-left: calc((100% - 1200px) / 2);
-        padding-right: calc((100% - 1200px) / 2);
-    }
-
-    @media (min-width: 1360px) {
-        padding-left: calc((100% - 1280px) / 2);
-        padding-right: calc((100% - 1280px) / 2);
-    }
-
-    @media (min-width: 1440px) {
-        padding-left: calc((100% - 1300px) / 2);
-        padding-right: calc((100% - 1300px) / 2);
-    }
+    padding: 24px 0;
 }
 
 .swiper {
@@ -383,6 +346,14 @@ div.sortWrap {
 
 .slide {
     height: auto;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+
+    &:global(.swiper-slide-visible) {
+        opacity: 1;
+        visibility: visible;
+    }
 }
 
 .bullet {
@@ -407,6 +378,6 @@ div.sortWrap {
     padding: 40px 0;
 
     @media (min-width: 1280px) {
-        padding: 60px 0;
+        padding: 100px 0;
     }
 }

@@ -241,7 +241,7 @@ export default function CatalogContent({ category }: CatalogContentProps) {
 
                 {/* "Вас може зацікавити" */}
                 <div className={s.sliderSection}>
-                    {/*<div className={s.relatedInner}>*/}
+                    <div className={s.relatedInner}>
                         <div className={s.sectionHeaderRow}>
                             <SectionHeader title="ВАС МОЖЕ ЗАЦІКАВИТИ" classNameWrapper={s.sectionTitle} withDots={true} />
                             <div className={s.navArrows}>
@@ -259,6 +259,7 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                                 spaceBetween={12}
                                 slidesPerView={2}
                                 slidesPerGroup={1}
+                                watchSlidesProgress={true}
                                 grid={{ rows: 2, fill: 'row' }}
                                 breakpoints={{
                                     768: {
@@ -291,12 +292,12 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                                 ))}
                             </Swiper>
                         </div>
-                    {/*</div>*/}
+                    </div>
                 </div>
 
                 {/* "Часто замовляють" */}
                 <div className={s.sliderSection}>
-                    {/*<div className={s.relatedInner}>*/}
+                    <div className={s.relatedInner}>
                         <div className={s.sectionHeaderRow}>
                             <SectionHeader title="ЧАСТО ЗАМОВЛЯЮТЬ" classNameWrapper={s.sectionTitle} withDots={true} />
                             <div className={s.navArrows}>
@@ -314,6 +315,7 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                                 spaceBetween={12}
                                 slidesPerView={2}
                                 slidesPerGroup={1}
+                                watchSlidesProgress={true}
                                 grid={{ rows: 2, fill: 'row' }}
                                 breakpoints={{
                                     768: {
@@ -346,7 +348,7 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                                 ))}
                             </Swiper>
                         </div>
-                    {/*</div>*/}
+                    </div>
                 </div>
 
                 {/* FAQ */}
