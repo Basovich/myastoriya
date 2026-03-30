@@ -57,7 +57,6 @@ export default function SortSelect({
                 
                 {isOpen && (
                     <div className={s.sortDropdown} role="listbox">
-                        <div className={s.dropdownPlaceholder}>{value}</div>
                         <ul className={s.optionsList}>
                             {options.map((opt) => (
                                 <li

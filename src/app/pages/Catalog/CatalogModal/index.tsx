@@ -19,7 +19,7 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, c
     const handleClearAll = () => {
         setClearTrigger((prev: number) => prev + 1);
         if (onSortChange) {
-            onSortChange('За замовчуванням');
+            onSortChange('За популярністю');
         }
     };
 

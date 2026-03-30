@@ -21,11 +21,14 @@
 }
 
 .groupTitle {
-    font-size: 12px;
+    color: #060606;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 14px;
+    font-style: normal;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    line-height: normal;
+    letter-spacing: 0.32px;
     text-transform: uppercase;
-    color: #000;
 }
 
 .arrow {

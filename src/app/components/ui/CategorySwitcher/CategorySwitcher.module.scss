@@ -4,7 +4,8 @@
     background: #FFFFFF;
     border-radius: 20px;
     padding: 24px 20px;
-    box-shadow: 0 4px 60px rgba(0, 0, 0, 0.05); // Matching the catalog card
+    box-shadow: 0 4px 60px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
 
     &.sidebarMode {
         background: transparent;
@@ -41,7 +42,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    margin-left: 24px;
+    width: auto;
     min-height: 48px;
     padding: 10px 16px;
     background: #FFFFFF;
@@ -64,28 +66,29 @@
     }
 
     &.parent {
-        justify-content: flex-start;
-        gap: 12px;
+        justify-content: center;
+        gap: 10px;
         font-weight: 700;
         padding-left: 20px;
+        margin-left: 0;
         
         .label {
-            width: 100%;
             text-align: center;
-            margin-left: -32px; // Offset for the icon to center text
         }
     }
 
     &.active {
         background: #000000;
         border-color: #000000;
-        color: #FFFFFF;
-        font-weight: 700;
 
         @media (any-hover: hover) {
             &:hover {
                 opacity: 0.9;
             }
+        }
+
+        .label {
+            color: #FFFFFF;
         }
     }
 }
@@ -96,6 +99,9 @@
 }
 
 .label {
+    color: #000;
     font-size: 14px;
-    line-height: 1.2;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
 }

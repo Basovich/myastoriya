@@ -6,7 +6,6 @@ import FilterGroup from '@/app/components/ui/FilterGroup/FilterGroup';
 import FilterCheckbox from '@/app/components/ui/FilterCheckbox/FilterCheckbox';
 import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
-import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
 import Button from "@/app/components/ui/Button/Button";
 import CategorySwitcher from "@/app/components/ui/CategorySwitcher/CategorySwitcher";
 import clsx from 'clsx';
@@ -44,10 +43,9 @@ interface CatalogSidebarProps {
 }
 
 const SORT_OPTIONS = [
-    'За замовчуванням',
     'За популярністю',
-    'від дешевих до дорогих',
-    'від дорогих до дешевих',
+    'Від дешевих до дорогих',
+    'Від дорогих до дешевих',
 ];
 
 export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange, onClearAll, onModifiedChange, category }: CatalogSidebarProps) {
@@ -88,7 +86,7 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
         selectedCount > 0 || 
         filters.priceFrom !== MIN_PRICE || 
         filters.priceTo !== MAX_PRICE || 
-        (sortBy !== undefined && sortBy !== 'За замовчуванням');
+        (sortBy !== undefined && sortBy !== 'За популярністю');
 
     useEffect(() => {
         onModifiedChange?.(isModified);
@@ -127,13 +125,13 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                             <CategorySwitcher isSidebar />
                         </FilterGroup>
                     )}
-                    <FilterGroup title={sortBy || "За замовчуванням"}>
+                    <FilterGroup title={sortBy || "За популярністю"}>
                         <div className={s.sortOptions}>
                             {SORT_OPTIONS.map(option => (
                                 <button
                                     key={option}
                                     type="button"
-                                    className={clsx(s.sortOption, (sortBy === option || (!sortBy && option === 'За замовчуванням')) && s.sortOptionActive)}
+                                    className={clsx(s.sortOption, (sortBy === option || (!sortBy && option === 'За популярністю')) && s.sortOptionActive)}
                                     onClick={() => {
                                         onSortChange?.(option);
                                     }}
@@ -228,9 +226,6 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                         </FilterPill>
                     ))}
                 </FilterGroup>
-            </div>
-
-            <div className={s.actions}>
                 <Button
                     variant="red"
                     type="button"

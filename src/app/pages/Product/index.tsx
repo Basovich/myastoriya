@@ -123,19 +123,6 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
         setSelectedSouces(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
     };
 
-    const totalPrice = (() => {
-        let base = productPrice;
-        selectedMods.forEach(id => {
-            const mod = productModifications.find(m => m.id === id);
-            if (mod) base += mod.price;
-        });
-        selectedSouces.forEach(id => {
-            const souce = productSouces.find(s => s.id === id);
-            if (souce) base += souce.price;
-        });
-        return base * quantity;
-    })();
-
     const relatedProducts = list.slice(0, 4).map(item => ({
         id: item.id,
         title: item.title,
@@ -223,23 +210,25 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                     />
                 </div>
 
-                <RelatedProducts
-                    title="З цим товаром купують"
-                    products={relatedProducts}
-                    className={s.recommendations}
-                />
+                <div className={s.relatedProductsGrid}>
+                    <RelatedProducts
+                        title="З цим товаром купують"
+                        products={relatedProducts}
+                        className={s.recommendations}
+                    />
 
-                <RelatedProducts
-                    title={`Популярні товари в категорії: ${product.category}`}
-                    products={relatedProducts}
-                    className={s.recommendations}
-                />
+                    <RelatedProducts
+                        title={`Популярні товари в категорії: ${product.category}`}
+                        products={relatedProducts}
+                        className={s.recommendations}
+                    />
 
-                <RelatedProducts
-                    title="Популярні позиції"
-                    products={relatedProducts}
-                    className={s.recommendations}
-                />
+                    <RelatedProducts
+                        title="Популярні позиції"
+                        products={relatedProducts}
+                        className={s.recommendations}
+                    />
+                </div>
 
                 <div className={s.publications}>
                     <PublicationsHome dict={dict.home.publications} lang={locale} />

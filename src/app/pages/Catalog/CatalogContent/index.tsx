@@ -14,10 +14,10 @@ import SectionHeader from '../../../components/ui/SectionHeader/SectionHeader';
 import Pagination from '@/app/components/ui/Pagination/Pagination';
 import ViewToggle, { ViewType } from '@/app/components/ui/ViewToggle/ViewToggle';
 import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
-import ShowMoreButton from '@/app/components/ui/ShowMoreButton/ShowMoreButton';
 import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
 import clsx from 'clsx';
 import CategorySwitcher from "@/app/components/ui/CategorySwitcher/CategorySwitcher";
+import Button from "@/app/components/ui/Button/Button";
 
 interface Product {
     id: number;
@@ -46,10 +46,9 @@ const MOCK_RELATED: Product[] = MOCK_RESULTS.slice(0, 4);
 const MOCK_ORDERED: Product[] = MOCK_RESULTS.slice(0, 4);
 
 const SORT_OPTIONS = [
-    'За замовчуванням',
     'За популярністю',
-    'від дешевих до дорогих',
-    'від дорогих до дешевих',
+    'Від дешевих до дорогих',
+    'Від дорогих до дешевих',
 ];
 
 const FAQ_DATA = [
@@ -203,6 +202,17 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                                     )}
                                 </div>
 
+                                {/* Show more button */}
+                                <div className={s.showMoreWrap}>
+                                    <Button variant="outline-black" className={s.showMoreBtn}>
+                                        <span className={s.showMoreBtnText}>показать еще</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="16" viewBox="0 0 13 16" fill="none">
+                                            <path d="M11.8624 8.56895L6.43164 13.9997L1.00087 8.56895" stroke="black" stroke-width="2" stroke-linecap="round"/>
+                                            <line x1="6.42383" y1="12.7305" x2="6.42383" y2="0.999994" stroke="black" stroke-width="2" stroke-linecap="round"/>
+                                        </svg>
+                                    </Button>
+                                </div>
+
                                 {/* Pagination */}
                                 <Pagination
                                     currentPage={activePage}
@@ -210,11 +220,6 @@ export default function CatalogContent({ category }: CatalogContentProps) {
                                     onPageChange={setActivePage}
                                     className={s.pagination}
                                 />
-
-                                {/* Show more button */}
-                                <div className={s.showMoreWrap}>
-                                    <ShowMoreButton />
-                                </div>
                             </div>
                         </div>
                     </div>

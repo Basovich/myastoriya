@@ -7,14 +7,18 @@
     border: none;
     padding: 0;
     cursor: pointer;
+    color: #060606;
+    font-feature-settings: 'liga' off, 'clig' off;
     font-size: 14px;
+    font-style: normal;
     font-weight: 400;
-    color: #000;
+    line-height: 120%;
     transition: color 0.15s;
 
     @media (any-hover: hover) {
         &:hover {
             color: #E3051B;
+
             .checkbox {
                 border-color: #000;
             }
