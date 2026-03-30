@@ -1,6 +1,6 @@
-import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import PolicyPage from "@/app/pages/PolicyPage/PolicyPage";
+import loyaltyRules from "@/content/loyalty-rules.json";
 
 export default async function LoyaltyProgramRules({
   params,
@@ -8,8 +8,7 @@ export default async function LoyaltyProgramRules({
   params: Promise<{ lang: Locale }>;
 }) {
   const { lang } = await params;
-  const dict = await getDictionary(lang);
-  const data = dict.home.loyaltyProgramRulesPage;
+  const data = loyaltyRules[lang as keyof typeof loyaltyRules] || loyaltyRules.ua;
 
   const breadcrumbs = [
     { label: data.breadcrumbs.home, href: "/" },
@@ -21,7 +20,7 @@ export default async function LoyaltyProgramRules({
         lang={lang} 
         title={data.title}
         breadcrumbs={breadcrumbs}
-        content={data.content}
+        content={data.content as any}
       />
   );
 }

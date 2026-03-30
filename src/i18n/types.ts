@@ -150,7 +150,7 @@ export interface HomeDict {
   ourStoresPage: OurStoresPageDict;
   deliveryPage: DeliveryPageDict;
   privacyPolicyPage: PrivacyPolicyPageDict;
-  loyaltyProgramRulesPage: LoyaltyProgramRulesPageDict;
+  loyaltyProgramRulesPage?: LoyaltyProgramRulesPageDict;
   notFoundPage: NotFoundPageDict;
 }
 
