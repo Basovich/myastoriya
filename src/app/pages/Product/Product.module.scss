@@ -1026,8 +1026,7 @@ button.reviewTabBtn {
 
 .reviewHeader {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    justify-content: space-between;
     margin-bottom: 16px;
 
     @media (min-width: 768px) {
@@ -1064,10 +1063,12 @@ button.reviewTabBtn {
 
 .overallRating {
     display: flex;
-    gap: 4px;
+    gap: 1px;
 }
 
 .star {
+    width: 16px;
+    height: 16px;
     line-height: 1;
     stroke: #E3051C;
     fill: transparent;
@@ -1134,18 +1135,14 @@ button.reviewTabBtn {
     }
 }
 
-.showMoreBtn {
-    height: 48px;
-    font-size: 14px;
-    font-weight: 800;
-    padding: 0 32px !important;
+button.showMoreBtn {
+    height: 44px;
+    width: 100%;
 }
 
-.leaveReviewBtn {
-    height: 48px;
-    font-size: 14px;
-    font-weight: 800;
-    padding: 0 40px !important;
+button.leaveReviewBtn {
+    height: 44px;
+    width: 100%;
 }
 
 .mobileRewardsBanner {

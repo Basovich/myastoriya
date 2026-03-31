@@ -89,17 +89,17 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                                         <div className={styles.authorMeta}>
                                             <span className={styles.reviewAuthor}>{review.name}</span>
                                             <span className={styles.reviewDate}>{review.date}</span>
-                                            <div className={styles.overallRating}>
-                                                {[...Array(5)].map((_, i) => (
-                                                    <svg
-                                                        key={i}
-                                                        className={clsx(styles.star, i < review.rating && styles.filled)}
-                                                        width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path d="M16 2.66667L20.12 11.0267L29.3333 12.36L22.6667 18.8533L24.24 28.0267L16 23.6933L7.76 28.0267L9.33333 18.8533L2.66667 12.36L11.88 11.0267L16 2.66667Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                    </svg>
-                                                ))}
-                                            </div>
+                                        </div>
+                                        <div className={styles.overallRating}>
+                                            {[...Array(5)].map((_, i) => (
+                                                <svg
+                                                    key={i}
+                                                    className={clsx(styles.star, i < review.rating && styles.filled)}
+                                                    width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path d="M16 2.66667L20.12 11.0267L29.3333 12.36L22.6667 18.8533L24.24 28.0267L16 23.6933L7.76 28.0267L9.33333 18.8533L2.66667 12.36L11.88 11.0267L16 2.66667Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                </svg>
+                                            ))}
                                         </div>
                                     </div>
                                     

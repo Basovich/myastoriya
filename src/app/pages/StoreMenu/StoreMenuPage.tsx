@@ -11,7 +11,7 @@ import PromotionsSlider from '@/app/components/StoreMenu/PromotionsSlider/Promot
 import CategoryCircles, { CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
 import StoreMenuProductCard from '@/app/components/StoreMenu/StoreMenuProductCard/StoreMenuProductCard';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
-import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
+import StoreMenuHero from '@/app/components/StoreMenu/StoreMenuHero/StoreMenuHero';
 import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
 import menuData from '@/content/store-menu.json';
 
@@ -22,14 +22,6 @@ interface StoreMenuPageProps {
 }
 
 const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ store, lang, dict }) => {
-    const { ourStoresPage } = dict.home;
-    const breadcrumbs = [
-        { label: ourStoresPage.breadcrumbs.home, href: '/' },
-        { label: ourStoresPage.breadcrumbs.stores, href: '/our-stores' },
-        { label: store.name, href: `/our-stores/${store.id}` },
-        { label: "Меню", href: '' },
-    ];
-
     const categories: CategoryCircleItem[] = menuData.categories.map(cat => ({
         name: cat.title,
         image: cat.image,
@@ -38,41 +30,39 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ store, lang, dict }) => {
 
     return (
         <>
-            <Header lang={lang} />
             <main className={s.page}>
-                <div className={s.container}>
-                    <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
-                </div>
+                <StoreMenuHero lang={lang} />
                 
-                <HeroBanner 
-                    title={store.name}
-                    image="/images/promotions/promo-hero-bg.png"
-                    className={s.hero}
-                />
+                <section className={s.whiteSection}>
+                    <div className={s.container}>
+                        <PromotionsSlider 
+                            promotions={menuData.promotions} 
+                            title="АКЦІЯ В ЗАКЛАДІ"
+                        />
+                    </div>
+                </section>
+
+                <section className={s.whiteSection}>
+                    <div className={s.container}>
+                        <CategoryCircles 
+                            title="МЕНЮ М'ЯСТОРІЯ"
+                            categories={categories}
+                            className={s.categories}
+                        />
+                    </div>
+                </section>
 
                 <div className={s.container}>
-                    <PromotionsSlider 
-                        promotions={menuData.promotions} 
-                        title="АКЦІЯ В ЗАКЛАДІ" 
-                    />
-
-                    <CategoryCircles 
-                        title="МЕНЮ РЕСТОРАНІВ" 
-                        categories={categories}
-                        className={s.categories}
-                    />
-
                     <div className={s.menuSections}>
                         {menuData.categories.map((category) => {
                             const products = menuData.products.filter(p => p.categoryId === category.id);
                             if (products.length === 0) return null;
 
                             return (
-                                <section key={category.id} id={category.id} className={s.section}>
+                                <section key={category.id} id={category.id} className={s.sectionSpacing}>
                                     <SectionHeader 
                                         title={category.title.toUpperCase()} 
                                         withDots={true} 
-                                        classNameWrapper={s.sectionHeader}
                                     />
                                     <div className={s.grid}>
                                         {products.map((product) => (

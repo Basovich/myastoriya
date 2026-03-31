@@ -20,7 +20,7 @@ interface Promotion {
 
 interface PromotionsSliderProps {
     promotions: Promotion[];
-    title: string;
+    title?: string;
 }
 
 const PromotionsSlider: React.FC<PromotionsSliderProps> = ({ promotions, title }) => {
@@ -32,7 +32,7 @@ const PromotionsSlider: React.FC<PromotionsSliderProps> = ({ promotions, title }
     return (
         <section className={s.wrapper}>
             <div className={s.header}>
-                <SectionHeader title={title} withDots={true} classNameWrapper={s.sectionHeader} />
+                {title && <SectionHeader title={title} withDots={true} />}
                 <div className={s.nav}>
                     <SliderArrow
                         direction="left"
@@ -66,7 +66,7 @@ const PromotionsSlider: React.FC<PromotionsSliderProps> = ({ promotions, title }
                     <SwiperSlide key={promo.id}>
                         <div className={s.slide}>
                             <Image
-                                src={promo.image}
+                                src="/images/store/menu_promo.png"
                                 alt={promo.title}
                                 fill
                                 className={s.promoImg}

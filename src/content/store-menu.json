@@ -1,11 +1,17 @@
 {
     "categories": [
+        { "id": "seasonal", "title": "СЕЗОННЕ МЕНЮ", "image": "/images/cat-grill.png" },
         { "id": "hot-appetizers", "title": "Гарячі закуски", "image": "/images/cat-grill.png" },
         { "id": "soups", "title": "Супи", "image": "/images/cat-restaurant.png" },
         { "id": "salads", "title": "Салати", "image": "/images/cat-burgers.png" },
         { "id": "steaks", "title": "Стейки", "image": "/images/cat-grill.png" },
         { "id": "burgers", "title": "Бургери", "image": "/images/cat-burgers.png" },
-        { "id": "kids-menu", "title": "Дитяче меню", "image": "/images/cat-restaurant.png" }
+        { "id": "pizza", "title": "Піца", "image": "/images/cat-shashlik.png" },
+        { "id": "sides", "title": "Гарніри", "image": "/images/cat-sets.png" },
+        { "id": "kids-menu", "title": "Дитяче меню", "image": "/images/cat-restaurant.png" },
+        { "id": "desserts", "title": "Десерти", "image": "/images/cat-sets.png" },
+        { "id": "drinks", "title": "Напої", "image": "/images/cat-branded.png" },
+        { "id": "bar", "title": "Барна карта", "image": "/images/cat-shashlik.png" }
     ],
     "promotions": [
         {
@@ -23,8 +29,8 @@
     ],
     "products": [
         {
-            "id": 101,
-            "categoryId": "hot-appetizers",
+            "id": 1,
+            "categoryId": "seasonal",
             "title": "КРЕМ-СУП З ГАРБУЗА",
             "description": "Класичний крем-суп на основі запеченого у печі гарбуза з вершками та прянощами. Подається з грінками та насінням гарбуза.",
             "price": 275,
@@ -33,8 +39,8 @@
             "image": "/images/products/product-sticks-cheese.png"
         },
         {
-            "id": 102,
-            "categoryId": "hot-appetizers",
+            "id": 2,
+            "categoryId": "seasonal",
             "title": "СОЛЯНКА З КОПЧЕНОСТЯМИ ТА ЯЛОВИЧИМ ЯЗИКОМ",
             "description": "Класичний суп з трьох видів запечених яловичих копченостей, соліннями та овочами. Подається зі сметаною та лимоном.",
             "price": 250,
@@ -43,13 +49,183 @@
             "image": "/images/products/product-sticks-cheese.png"
         },
         {
-            "id": 103,
-            "categoryId": "hot-appetizers",
+            "id": 3,
+            "categoryId": "seasonal",
             "title": "САЛАТ З ГАРБУЗОМ, КУПАТЕЛЛО ТА МАНДАРИНОМ",
             "description": "Ніжний салат на поєднанні гарбуза, мандарина, купаттелло, листя салату, волоських горіхів під пікантною медово-гірчичною заправкою.",
             "price": 235,
             "weight": "210г",
             "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 4,
+            "categoryId": "hot-appetizers",
+            "title": "СИРНІ ПАЛИЧКИ З ЖУРАВЛИННИМ СОУСОМ",
+            "description": "Хрустка золотиста паніровка, всередині — тягучий сир моцарела. Подається з кисло-солодким журавлинним соусом.",
+            "price": 185,
+            "weight": "150г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 5,
+            "categoryId": "hot-appetizers",
+            "title": "КРИЛЬЦЯ БАФФАЛО",
+            "description": "Класичні гострі курячі крильця з соусом Блю Чіз та свіжими овочами (селера, морква).",
+            "price": 210,
+            "weight": "250г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 6,
+            "categoryId": "soups",
+            "title": "БОРЩ ПО-ДОМАШНЬОМУ",
+            "description": "Наваристий борщ на яловичому бульйоні. Подається з пампушками, сметаною та свіжим салом.",
+            "price": 195,
+            "weight": "350г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 7,
+            "categoryId": "soups",
+            "title": "КУРЯЧИЙ БУЛЬЙОН З ЛОКШИНОЮ",
+            "description": "Легкий та поживний бульйон з домашньою локшиною, фрикадельками з індички та зеленню.",
+            "price": 145,
+            "weight": "300г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 8,
+            "categoryId": "salads",
+            "title": "ЦЕЗАР З КУРКОЮ ГРИЛЬ",
+            "description": "Листя салату ромен, соковита курка гриль, перепелині яйця, томати черрі, грінки та фірмовий соус цезар.",
+            "price": 240,
+            "weight": "280г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 9,
+            "categoryId": "salads",
+            "title": "ГРЕЦЬКИЙ САЛАТ З ФЕТОЮ",
+            "description": "Класичний салат зі свіжих овочів, маслин та сиру фета під оливковою олією з травами.",
+            "price": 190,
+            "weight": "250г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 10,
+            "categoryId": "steaks",
+            "title": "РИБАЙ СТЕЙК (UKRAINE)",
+            "description": "Класичний стейк з мармурової яловичини. Рекомендований ступінь прожарки — Medium.",
+            "price": 420,
+            "weight": "100г",
+            "unit": "сира вага",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 11,
+            "categoryId": "steaks",
+            "title": "ФІЛЕ МІНЬЙОН",
+            "description": "Надзвичайно ніжний стейк з внутрішньої яловичої вирізки. Найбільш дієтичний варіант.",
+            "price": 540,
+            "weight": "100г",
+            "unit": "сира вага",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 12,
+            "categoryId": "burgers",
+            "title": "ЧІЗБУРГЕР CLASSIC",
+            "description": "Соковита яловича котлета, сир чеддер, маринований огірок, цибуля та фірмовий соус на булочці бріош.",
+            "price": 265,
+            "weight": "320г",
+            "unit": "шт",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 13,
+            "categoryId": "burgers",
+            "title": "БІФ-БУРГЕР З БЕКОНОМ",
+            "description": "Яловича котлета, хрусткий бекон, карамелізована цибуля, томати та соус BBQ.",
+            "price": 295,
+            "weight": "350г",
+            "unit": "шт",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 14,
+            "categoryId": "pizza",
+            "title": "ПІЦА МАГАРІТА",
+            "description": "Класична піца на тонкому тісті з томатами, моцарелою та свіжим базиліком.",
+            "price": 215,
+            "weight": "450г",
+            "unit": "шт",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 15,
+            "categoryId": "pizza",
+            "title": "ПІЦА КВАТРО ФОРМАДЖІ",
+            "description": "Поєднання чотирьох видів преміальних сирів з вершковим соусом та медом.",
+            "price": 320,
+            "weight": "500г",
+            "unit": "шт",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 16,
+            "categoryId": "sides",
+            "title": "КАРТОПЛЯ ФРІ",
+            "description": "Хрустка картопля фрі з морською сіллю та фірмовим соусом.",
+            "price": 65,
+            "weight": "150г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 17,
+            "categoryId": "sides",
+            "title": "ОВОЧІ ГРИЛЬ",
+            "description": "Асорті сезонних овочів, приготованих на відкритому вогні.",
+            "price": 125,
+            "weight": "200г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 18,
+            "categoryId": "kids-menu",
+            "title": "КУРЯЧІ НАГЕТСИ",
+            "description": "Ніжне куряче філе в хрусткій паніровці. Подається з картопляним пюре.",
+            "price": 135,
+            "weight": "200г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 19,
+            "categoryId": "desserts",
+            "title": "ЧІЗКЕЙК НЬЮ-ЙОРК",
+            "description": "Класичний сирний десерт на пісочній основі з ягідним кюлі.",
+            "price": 155,
+            "weight": "160г",
+            "unit": "порція",
+            "image": "/images/products/product-sticks-cheese.png"
+        },
+        {
+            "id": 20,
+            "categoryId": "drinks",
+            "title": "ФРЕШ АПЕЛЬСИНОВИЙ",
+            "description": "Свіжовижатий сік з відбірних апельсинів.",
+            "price": 110,
+            "weight": "250мл",
+            "unit": "склянка",
             "image": "/images/products/product-sticks-cheese.png"
         }
     ]

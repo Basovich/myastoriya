@@ -36,18 +36,12 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({
                 />
             </div>
             <div className={s.content}>
-                <div className={s.header}>
-                    <h3 className={s.title}>{title}</h3>
-                    <div className={s.priceInfo}>
-                        <span className={s.price}>{price} ₴</span>
-                        <span className={s.unit}>- {weight} / {unit}</span>
-                    </div>
+                <h3 className={s.title}>{title}</h3>
+                <div className={s.details}>
+                    <span className={s.price}>{price} ₴</span>
+                    <span className={s.weight}>{weight}</span>
                 </div>
                 {description && <p className={s.description}>{description}</p>}
-                <div className={s.footer}>
-                    {/* Reuse AddToCartButton if it exists and works with strings, or a custom one for now */}
-                    <AddToCartButton productId={String(id)} />
-                </div>
             </div>
         </div>
     );
