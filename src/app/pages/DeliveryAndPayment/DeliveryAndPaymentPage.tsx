@@ -13,6 +13,7 @@ import DeliveryZones from '@/app/components/Delivery/DeliveryZones/DeliveryZones
 import PolicySections from '@/app/components/Delivery/PolicySections/PolicySections';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import storesData from '@/content/stores.json';
+import Button from "@/app/components/ui/Button/Button";
 
 interface DeliveryAndPaymentPageProps {
     dict: Dictionary;
@@ -26,18 +27,41 @@ export default function DeliveryAndPaymentPage({ dict, lang, isMeatBar = false }
         { label: deliveryPage.breadcrumbs.home, href: "/" },
         { label: deliveryPage.breadcrumbs.delivery }
     ];
+    const langPrefix = lang === 'ua' ? '' : `/${lang}`;
 
     return (
         <>
             <Header lang={lang} />
             <main className={s.main}>
                 <div className={s.container}>
-                    <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
                     <HeroBanner 
                         title={deliveryPage.title}
                         image="/images/delivery/delivery.png"
                         className={s.hero}
                     />
+                    <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
+                </div>
+
+                <div className={s.header}>
+                    <SectionHeader title={deliveryPage.zones.title} classNameWrapper={s.sectionHeader} />
+                    <div className={s.tabs}>
+                        <Button
+                            href={`${langPrefix}/delivery`}
+                            variant={!isMeatBar ? "black" : "outline-black"}
+                            active={!isMeatBar}
+                            className={s.tab}
+                        >
+                            {deliveryPage.zones.tabs.restaurants}
+                        </Button>
+                        <Button
+                            href={`${langPrefix}/delivery-meat-bar`}
+                            variant={isMeatBar ? "black" : "outline-black"}
+                            active={isMeatBar}
+                            className={s.tab}
+                        >
+                            {deliveryPage.zones.tabs.meatbar}
+                        </Button>
+                    </div>
                 </div>
 
                 <DeliveryZones 

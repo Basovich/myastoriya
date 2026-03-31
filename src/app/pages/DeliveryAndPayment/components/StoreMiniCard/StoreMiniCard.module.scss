@@ -1,10 +1,9 @@
 .card {
     background: #FFFFFF;
-    border-radius: 20px;
-    padding: 24px;
+    padding: 12px 26px 16px;
     position: relative;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-    min-height: 200px;
+    border-radius: 14px;
+    border: 1px solid #C8C8C8;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -15,34 +14,49 @@
 }
 
 .promo {
-    background: linear-gradient(0deg, rgba(230, 0, 15, 0.85), rgba(230, 0, 15, 0.85)), 
+    background: linear-gradient(0deg, rgba(230, 0, 15, 0.6), rgba(230, 0, 15, 0.6)),
                 url('/images/delivery/delivery_card.png') lightgray 50% / cover no-repeat;
     color: #FFFFFF;
     border: none;
+    min-height: 200px;
 }
 
 .promoInner {
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end;
+    position: relative;
+    padding-right: 50px;
+
+    svg {
+        width: 58px;
+        height: 75px;
+        opacity: 0.4;
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
 }
 
 .promoText {
     h3 {
-        font-family: inherit;
-        font-size: 24px;
+        color: #FFF;
+        font-size: 16px;
+        font-style: normal;
         font-weight: 800;
-        line-height: 1.1;
-        margin: 0 0 8px 0;
+        line-height: 125%;
         text-transform: uppercase;
     }
 
     p {
-        font-size: 14px;
-        font-weight: 400;
-        margin: 0;
-        opacity: 0.9;
+        color: #FFF;
+        font-feature-settings: 'liga' off, 'clig' off;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 140%;
+        margin-top: 8px;
     }
 }
 
@@ -69,32 +83,35 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
 }
 
 .titleGroup {
+    display: flex;
+    flex-direction: column;
+
     .name {
-        font-size: 20px;
+        color: #000;
+        font-size: 14px;
+        font-style: normal;
         font-weight: 800;
-        margin: 0;
-        color: #000000;
+        line-height: 185.714%;
         text-transform: uppercase;
     }
 
     .region {
-        display: block;
-        font-size: 11px;
-        font-weight: 700;
-        color: #BDBDBD;
-        margin-top: 4px;
+        color: #828282;
+        font-feature-settings: 'liga' off, 'clig' off;
+        font-size: 10px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 120%;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
 }
 
 .logoCircleBlack {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     background: #000000;
     border-radius: 50%;
     display: flex;
@@ -111,6 +128,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-top: 8px;
 }
 
 .row {
@@ -120,36 +138,29 @@
 }
 
 .icon {
-    flex-shrink: 0;
-    margin-top: 2px;
-    opacity: 0.6;
+    width: 16px;
+    height: 16px;
+    margin-top: -2px;
 }
+
 
 .textCol {
     p {
-        font-size: 13px;
-        font-weight: 600;
-        margin: 0;
-        color: #1A1A1A;
-        line-height: 1.4;
+        color: #000;
+        font-feature-settings: 'liga' off, 'clig' off;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 120%;
+        letter-spacing: -0.24px;
     }
 
     .subText {
-        display: block;
-        font-size: 11px;
-        color: #828282;
-        margin-top: 2px;
-    }
-}
-
-// Hover effect for address cards only
-.card:not(.promo) {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    
-    @media (any-hover: hover) {
-        &:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-        }
+        color: var(--Black, #060606);
+        font-feature-settings: 'liga' off, 'clig' off;
+        font-size: 10px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 150%;
     }
 }

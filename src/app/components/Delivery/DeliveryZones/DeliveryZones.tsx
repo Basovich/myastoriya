@@ -22,7 +22,7 @@ interface DeliveryZonesProps {
 
 const containerStyle = {
     width: '100%',
-    height: '450px',
+    height: '100%',
     borderRadius: '20px'
 };
 
@@ -319,106 +319,80 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
         }
     }, [filteredStores]);
 
-    const langPrefix = lang === 'ua' ? '' : `/${lang}`;
 
     return (
         <section className={s.zonesSection}>
-            <div className={s.container}>
-                <div className={s.header}>
-                    <SectionHeader title={dict.zones.title} classNameWrapper={s.sectionHeader} />
-                    <div className={s.tabs}>
-                        <Button 
-                            href={`${langPrefix}/delivery`}
-                            variant={!isMeatBar ? "black" : "outline-black"}
-                            active={!isMeatBar}
-                            className={s.tab}
-                        >
-                            {dict.zones.tabs.restaurants}
-                        </Button>
-                        <Button 
-                            href={`${langPrefix}/delivery-meat-bar`}
-                            variant={isMeatBar ? "black" : "outline-black"}
-                            active={isMeatBar}
-                            className={s.tab}
-                        >
-                            {dict.zones.tabs.meatbar}
-                        </Button>
-                    </div>
-                </div>
+            <div className={s.mapWrapper}>
+                {isLoaded ? (
+                    <GoogleMap
+                        mapContainerStyle={containerStyle}
+                        center={center}
+                        zoom={12}
+                        onLoad={onMapLoad}
+                        options={{
+                            styles: darkMapStyle,
+                            disableDefaultUI: true,
+                            zoomControl: true,
+                        }}
+                    >
+                        {filteredStores.map((store) => (
+                            <Marker
+                                key={store.id}
+                                position={{ lat: store.lat, lng: store.lng }}
+                                onClick={() => setSelectedStore(store)}
+                                icon={{
+                                    url: '/icons/stores/map-pin.svg',
+                                    scaledSize: new window.google.maps.Size(28, 41)
+                                }}
+                            />
+                        ))}
 
-                <div className={s.mapWrapper}>
-                    {isLoaded ? (
-                        <GoogleMap
-                            mapContainerStyle={containerStyle}
-                            center={center}
-                            zoom={12}
-                            onLoad={onMapLoad}
-                            options={{
-                                styles: darkMapStyle,
-                                disableDefaultUI: true,
-                                zoomControl: true,
-                            }}
-                        >
-                            {filteredStores.map((store) => (
-                                <Marker
-                                    key={store.id}
-                                    position={{ lat: store.lat, lng: store.lng }}
-                                    onClick={() => setSelectedStore(store)}
-                                    icon={{
-                                        url: '/icons/stores/map-pin.svg',
-                                        scaledSize: new window.google.maps.Size(28, 41)
-                                    }}
-                                />
-                            ))}
+                        {selectedStore && (
+                            <InfoWindow
+                                position={{ lat: selectedStore.lat, lng: selectedStore.lng }}
+                                onCloseClick={() => setSelectedStore(null)}
+                                options={{
+                                    pixelOffset: new window.google.maps.Size(0, -30)
+                                }}
+                            >
+                                <div className={s.infoWindowContainer}>
+                                    <StoreCard
+                                        store={selectedStore}
+                                        dict={storeDict}
+                                        variant="map"
+                                        onClose={() => setSelectedStore(null)}
+                                    />
+                                </div>
+                            </InfoWindow>
+                        )}
+                    </GoogleMap>
+                ) : (
+                    <div className={s.mapPlaceholder}>Loading Map...</div>
+                )}
+            </div>
 
-                            {selectedStore && (
-                                <InfoWindow
-                                    position={{ lat: selectedStore.lat, lng: selectedStore.lng }}
-                                    onCloseClick={() => setSelectedStore(null)}
-                                    options={{
-                                        pixelOffset: new window.google.maps.Size(0, -30)
-                                    }}
-                                >
-                                    <div className={s.infoWindowContainer}>
-                                        <StoreCard 
-                                            store={selectedStore} 
-                                            dict={storeDict} 
-                                            variant="map" 
-                                            onClose={() => setSelectedStore(null)}
-                                        />
-                                    </div>
-                                </InfoWindow>
-                            )}
-                        </GoogleMap>
-                    ) : (
-                        <div className={s.mapPlaceholder}>Loading Map...</div>
-                    )}
-                </div>
-
-                <div className={s.searchRow}>
-                    <Search
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        placeholder={dict.zones.search.placeholder}
-                        buttonText={dict.zones.search.button}
-                        buttonColor="black"
-                        className={s.search}
-                    />
-                    <div className={s.infoBadge}>
-                        <span className={s.dot}></span>
-                        {dict.zones.info}
-                    </div>
-                </div>
+            <div className={s.searchRow}>
+                <p className={s.infoBadge}>
+                    А мені безкоштовно?
+                </p>
+                <Search
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    placeholder={dict.zones.search.placeholder}
+                    buttonText={dict.zones.search.button}
+                    buttonColor="red"
+                    className={s.search}
+                />
+            </div>
 
 
-                <div className={s.storesList}>
-                    {/* Promo card is always first */}
-                    <StoreMiniCard isPromo={true} />
-                    
-                    {filteredStores.map(store => (
-                        <StoreMiniCard key={store.id} store={store} />
-                    ))}
-                </div>
+            <div className={s.storesList}>
+                {/* Promo card is always first */}
+                <StoreMiniCard isPromo={true} />
+
+                {filteredStores.map(store => (
+                    <StoreMiniCard key={store.id} store={store} />
+                ))}
             </div>
         </section>
     );
