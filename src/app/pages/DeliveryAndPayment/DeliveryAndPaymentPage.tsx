@@ -75,9 +75,23 @@ export default function DeliveryAndPaymentPage({ dict, lang, isMeatBar = false }
                 <section className={s.methodsSection}>
                     <div className={s.container}>
                         <div className={s.methodsGrid}>
-                            {deliveryPage.methods.items.map((item, idx) => (
-                                <DeliveryMethodCard key={idx} item={item} />
-                            ))}
+                            {(() => {
+                                // Reorder items: move "Самовивіз" (idx 3) to the end
+                                const originalItems = [...deliveryPage.methods.items];
+                                const reorderedItems = [...originalItems];
+                                if (reorderedItems.length > 4) {
+                                    const pickupItem = reorderedItems.splice(3, 1)[0];
+                                    reorderedItems.push(pickupItem);
+                                }
+                                
+                                return reorderedItems.map((item, idx) => (
+                                    <DeliveryMethodCard 
+                                        key={idx} 
+                                        item={item} 
+                                        hasBackground={idx === 0 || idx === 2 || idx === 4}
+                                    />
+                                ));
+                            })()}
                         </div>
                     </div>
                 </section>

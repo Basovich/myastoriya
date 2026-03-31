@@ -5,11 +5,12 @@ import { DeliveryMethodCard as DeliveryMethodCardType } from '@/i18n/types';
 
 interface DeliveryMethodCardProps {
     item: DeliveryMethodCardType;
+    hasBackground?: boolean;
 }
 
 
 
-const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item }) => {
+const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item, hasBackground }) => {
     // Helper to render text with bold parts and red highlighting
     const renderStyledText = (text: string, className?: string) => {
         // Match both **bold** and keyword variations for free delivery
@@ -54,7 +55,7 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item }) => {
     );
 
     return (
-        <div className={s.card}>
+        <div className={`${s.card} ${hasBackground ? s.hasBackground : ''}`}>
             {item.badge && <div className={s.badge}>{item.badge}</div>}
             <div className={s.imageWrapper}>
                 <Image
