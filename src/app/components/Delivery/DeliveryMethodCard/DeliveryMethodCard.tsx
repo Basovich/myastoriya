@@ -70,14 +70,14 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item }) => {
                 
                 {item.shippingCostLabel && (
                     <div className={s.infoRow}>
-                        <span className={s.label}>{item.shippingCostLabel}</span>
+                        {renderStyledText(item.shippingCostLabel, s.label)}
                         {item.shippingCostValue && <div className={s.value}>{renderStyledText(item.shippingCostValue)}</div>}
                     </div>
                 )}
                 
                 {item.minOrderLabel && (
                     <div className={s.infoRow}>
-                        <span className={s.label}>{item.minOrderLabel}</span>
+                        {renderStyledText(item.minOrderLabel, s.label)}
                         {item.minOrderValue && <div className={s.value}>{renderStyledText(item.minOrderValue)}</div>}
                     </div>
                 )}

@@ -655,6 +655,20 @@
                         "image": "/images/delivery/delivery-m-4.png",
                         "badge": "Київ",
                         "isPickup": true
+                    },
+                    {
+                        "title": "ДОСТАВКА MEAT BAR",
+                        "shippingCostLabel": "Доставка здійснюється за **допомогою сервісу Uklon**",
+                        "shippingCostValue": "",
+                        "minOrderLabel": "Мінімальна сума замовлення",
+                        "minOrderValue": "250 ₴",
+                        "features": [
+                            "Доставка можлива в радіусі 3 км від Meat Bar (вул. Володимирська 18/2).",
+                            "Мінімальна сума замовлення **250 грн**.",
+                            "Вартість доставки – безкоштовно.",
+                            "Час доставки – **30-60 хвилин**."
+                        ],
+                        "image": "/images/delivery/delivery-m-5.png"
                     }
                 ]
             },
