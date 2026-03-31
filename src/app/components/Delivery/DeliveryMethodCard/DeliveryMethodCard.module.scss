@@ -1,54 +1,58 @@
 
 .card {
-  background: var(--bg-card, #F9F9F9);
+  background: #ffffff;
   border-radius: 20px;
-  padding: 30px 20px;
+  overflow: hidden;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  height: 100%;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid transparent;
 
   &:hover {
     @media (any-hover: hover) {
       transform: translateY(-5px);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-      border-color: var(--color-primary, #E30613);
     }
   }
 }
 
 .imageWrapper {
-  margin-bottom: 24px;
-  background: #fff;
-  border-radius: 50%;
-  padding: 15px;
-  width: 90px;
-  height: 90px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  width: 100%;
+  height: 136px;
+  position: relative;
+  overflow: hidden;
 
   .image {
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
 .content {
-  width: 100%;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+
+  @media (min-width: 1024px) {
+    padding: 30px 24px;
+  }
 }
 
 .title {
   font-family: var(--font-unbounded, 'Unbounded');
   font-weight: 700;
-  font-size: 16px;
-  line-height: 1.2;
-  margin-bottom: 20px;
+  font-size: 18px;
+  line-height: 1.25;
+  margin-bottom: 24px;
   text-transform: uppercase;
   color: #1A1A1A;
+
+  @media (min-width: 1024px) {
+    font-size: 20px;
+    margin-bottom: 30px;
+  }
 }
 
 .infoRow {
@@ -56,6 +60,10 @@
   flex-direction: column;
   gap: 4px;
   margin-bottom: 16px;
+
+  &:nth-last-of-type(1) {
+    margin-bottom: 24px;
+  }
 
   .label {
     font-size: 14px;
@@ -65,44 +73,63 @@
   .value {
     font-family: var(--font-unbounded, 'Unbounded');
     font-weight: 700;
-    font-size: 18px;
-    color: var(--color-primary, #E30613);
+    font-size: 24px;
+    color: #1A1A1A;
+
+    @media (min-width: 1024px) {
+      font-size: 28px;
+    }
   }
 }
 
 .features {
   list-style: none;
-  padding: 0;
+  padding: 24px 0 0;
   margin: 0;
-  text-align: left;
   display: flex;
   flex-direction: column;
   gap: 12px;
   border-top: 1px solid #EDEDED;
-  padding-top: 20px;
+  margin-top: auto;
 
   .featureItem {
     font-size: 14px;
     line-height: 1.5;
-    color: #4D4D4D;
+    color: #1A1A1A;
     position: relative;
     padding-left: 20px;
 
     &::before {
-      content: "";
+      content: "•";
       position: absolute;
       left: 0;
-      top: 7px;
-      width: 6px;
-      height: 6px;
-      background: var(--color-primary, #E30613);
-      border-radius: 50%;
+      color: #1A1A1A;
+      font-weight: bold;
+    }
+
+    strong, b {
+      font-weight: 700;
+    }
+
+    &.highlight {
+      color: var(--color-primary, #E30613);
+      font-weight: 700;
     }
   }
 }
 
-@media (min-width: 1024px) {
-  .card {
-     padding: 40px 24px;
+.promoText {
+  color: #1A1A1A;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  margin-bottom: 20px;
+
+  b, strong {
+    font-weight: 700;
+
+    &.red {
+      color: var(--color-primary, #E30613);
+    }
   }
 }
