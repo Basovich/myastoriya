@@ -125,34 +125,19 @@
 
 .storesList {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-}
+  grid-template-columns: repeat(1, 1fr);
+  gap: 16px;
 
-.storeMiniCard {
-  background: #F9F9F9;
-  border-radius: 16px;
-  padding: 20px;
-}
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-.storeName {
-  font-family: var(--font-unbounded, 'Unbounded');
-  font-weight: 700;
-  font-size: 16px;
-  color: #1A1A1A;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-}
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 
-.storeDetails {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  p {
-    font-size: 14px;
-    line-height: 1.4;
-    color: #4D4D4D;
+  @media (min-width: 1440px) {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 

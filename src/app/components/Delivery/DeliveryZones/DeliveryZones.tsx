@@ -9,6 +9,7 @@ import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import Button from '@/app/components/ui/Button/Button';
 import Search from '@/app/components/ui/Search/Search';
 import { Locale } from '@/i18n/config';
+import StoreMiniCard from '@/app/pages/DeliveryAndPayment/components/StoreMiniCard/StoreMiniCard';
 
 
 interface DeliveryZonesProps {
@@ -328,7 +329,7 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                     <div className={s.tabs}>
                         <Button 
                             href={`${langPrefix}/delivery`}
-                            variant="black"
+                            variant={!isMeatBar ? "black" : "outline-black"}
                             active={!isMeatBar}
                             className={s.tab}
                         >
@@ -336,7 +337,7 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                         </Button>
                         <Button 
                             href={`${langPrefix}/delivery-meat-bar`}
-                            variant="outline-black"
+                            variant={isMeatBar ? "black" : "outline-black"}
                             active={isMeatBar}
                             className={s.tab}
                         >
@@ -411,15 +412,11 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
 
 
                 <div className={s.storesList}>
+                    {/* Promo card is always first */}
+                    <StoreMiniCard isPromo={true} />
+                    
                     {filteredStores.map(store => (
-                        <div key={store.id} className={s.storeMiniCard}>
-                            <h4 className={s.storeName}>{store.name}</h4>
-                            <div className={s.storeDetails}>
-                                <p>{store.address}</p>
-                                <p>{store.workingHours}</p>
-                                <p>{store.phone}</p>
-                            </div>
-                        </div>
+                        <StoreMiniCard key={store.id} store={store} />
                     ))}
                 </div>
             </div>

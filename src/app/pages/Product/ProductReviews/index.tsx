@@ -79,7 +79,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
             <div className={styles.reviewsBlock}>
                 <div className={styles.reviewsList}>
                     {reviews.slice(0, visibleCount).map((review) => (
-                        <div key={review.id} className={styles.reviewCard}>
+                        <div key={review.id} className={clsx(styles.reviewCard)}>
                             <div className={styles.reviewMain}>
                                 <div className={styles.authorAvatar}>
                                     <Image src={review.avatar || "/images/reviews/avatar-1.png"} alt={review.name} width={48} height={48} className={styles.avatarImg} />
@@ -154,7 +154,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
             </div>
 
             <div className={styles.mobileRewardsBanner}>
-                <Button variant="outline-black" className={styles.bannerLink} onClick={handleVideoReviewClick}>
+                <Button variant="outline-black" className={styles.mobileBannerLink} onClick={handleVideoReviewClick}>
                     ЗАЛИШАЙТЕ ВІДЕО ВІДГУК І ОТРИМУЙТЕ 100 БАЛІВ
                 </Button>
             </div>

@@ -1,0 +1,155 @@
+.card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 24px;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    @media (min-width: 1024px) {
+        padding: 32px;
+    }
+}
+
+.promo {
+    background: linear-gradient(0deg, rgba(230, 0, 15, 0.85), rgba(230, 0, 15, 0.85)), 
+                url('/images/delivery/delivery_card.png') lightgray 50% / cover no-repeat;
+    color: #FFFFFF;
+    border: none;
+}
+
+.promoInner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.promoText {
+    h3 {
+        font-family: inherit;
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1.1;
+        margin: 0 0 8px 0;
+        text-transform: uppercase;
+    }
+
+    p {
+        font-size: 14px;
+        font-weight: 400;
+        margin: 0;
+        opacity: 0.9;
+    }
+}
+
+.logoCircleWhite {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    svg {
+        width: 18px;
+        height: auto;
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.titleGroup {
+    .name {
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0;
+        color: #000000;
+        text-transform: uppercase;
+    }
+
+    .region {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        color: #BDBDBD;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
+.logoCircleBlack {
+    width: 44px;
+    height: 44px;
+    background: #000000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 18px;
+        height: auto;
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    opacity: 0.6;
+}
+
+.textCol {
+    p {
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0;
+        color: #1A1A1A;
+        line-height: 1.4;
+    }
+
+    .subText {
+        display: block;
+        font-size: 11px;
+        color: #828282;
+        margin-top: 2px;
+    }
+}
+
+// Hover effect for address cards only
+.card:not(.promo) {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    @media (any-hover: hover) {
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+    }
+}
