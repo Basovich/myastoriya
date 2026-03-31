@@ -1,65 +1,99 @@
-
 .policySection {
-  padding: 60px 0 100px;
-  background: #fff;
+  padding: 44px 0 55px;
+
+  @media (min-width: 1024px) {
+    padding: 53px 0 71px;
+  }
 }
 
 .container {
-  max-width: 1440px;
+  max-width: 1300px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 16px;
+
+  @media (min-width: 768px) {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  @media (min-width: 1280px) {
+    padding: 0;
+    max-width: 1200px;
+  }
+
+  @media (min-width: 1360px) {
+    max-width: 1280px;
+  }
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 40px;
+  gap: 20px;
 
   @media (min-width: 1024px) {
     grid-template-columns: repeat(3, 1fr);
-    gap: 60px;
+    gap: 20px;
   }
 }
 
 .column {
+  background: #ffffff;
+  border: 1px dashed #e30613;
+  border-radius: 20px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
 
-.iconTitle {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  @media (min-width: 1280px) {
+    padding: 30px 40px;
+    border-radius: 14px;
+  }
 }
 
 .iconWrapper {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  background: #F9F9F9;
-  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  background: #e30613;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(227, 6, 19, 0.2);
 }
 
 .title {
-  font-family: var(--font-unbounded, 'Unbounded');
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 1.4;
-  color: #1A1A1A;
+  color: #000;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 137.5%;
   text-transform: uppercase;
+  margin: 0;
+
+  @media (min-width: 1024px) {
+    font-size: 18px;
+  }
 }
 
 .content {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #4D4D4D;
+  color: #000;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 180%;
+  letter-spacing: -0.24px;
+  margin-top: 10px;
 
   p {
     margin: 0;
+  }
+
+  @media (min-width: 1024px) {
+    line-height: 1.6;
   }
 }
 
@@ -69,21 +103,17 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 
   li {
     position: relative;
-    padding-left: 18px;
+    padding-left: 14px;
 
     &::before {
-      content: "";
+      content: "•";
       position: absolute;
       left: 0;
-      top: 8px;
-      width: 4px;
-      height: 4px;
-      background: var(--color-primary, #E30613);
-      border-radius: 50%;
+      color: #1a1a1a;
     }
   }
 }
@@ -91,17 +121,26 @@
 .paymentIcons {
   display: flex;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 10px;
+
+  @media (min-width: 1024px) {
+    margin-top: 20px;
+  }
+}
+
+.paymentIconBox {
+  width: 80px;
+  height: 48px;
+  border: 1px dashed #e0e0e0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
 
   img {
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
-    filter: grayscale(1);
-    opacity: 0.6;
-    transition: all 0.3s ease;
-
-    &:hover {
-      filter: grayscale(0);
-      opacity: 1;
-    }
   }
 }
