@@ -12,18 +12,23 @@ interface DeliveryMethodCardProps {
 const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item }) => {
     // Helper to render text with bold parts and red highlighting
     const renderStyledText = (text: string, className?: string) => {
-        const keyword = "доставка безкоштовна";
-        const hasKeyword = text.toLowerCase().includes(keyword);
+        // Match both **bold** and keyword variations for free delivery
+        // Keywords: "доставка безкоштовна", "безкоштовна доставка", "доставка бесплатная", "бесплатная доставка"
+        const keywords = [
+            "доставка безкоштовна", 
+            "безкоштовна доставка", 
+            "доставка бесплатная", 
+            "бесплатная доставка"
+        ];
         
-        // Match both **bold** and keyword
-        // Regex: /(\*\*.*?\*\*|доставка безкоштовна)/gi
-        const parts = text.split(/(\*\*.*?\*\*|доставка безкоштовна)/gi);
+        const regex = new RegExp(`(\\*\\*.*?\\*\\*|${keywords.join('|')})`, 'gi');
+        const parts = text.split(regex);
 
         return (
             <p className={className}>
                 {parts.map((part, i) => {
                     const lowerPart = part.toLowerCase();
-                    if (lowerPart === keyword) {
+                    if (keywords.includes(lowerPart)) {
                         return <strong key={i} className={s.red}>{part}</strong>;
                     }
                     if (part.startsWith('**') && part.endsWith('**')) {
@@ -53,17 +58,17 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item }) => {
             <div className={s.content}>
                 <h3 className={s.title}>{item.title}</h3>
                 
-                {item.shippingCostValue && (
+                {item.shippingCostLabel && (
                     <div className={s.infoRow}>
                         <span className={s.label}>{item.shippingCostLabel}</span>
-                        <span className={s.value}>{item.shippingCostValue}</span>
+                        {item.shippingCostValue && <div className={s.value}>{renderStyledText(item.shippingCostValue)}</div>}
                     </div>
                 )}
                 
-                {item.minOrderValue && (
+                {item.minOrderLabel && (
                     <div className={s.infoRow}>
                         <span className={s.label}>{item.minOrderLabel}</span>
-                        <span className={s.value}>{item.minOrderValue}</span>
+                        {item.minOrderValue && <div className={s.value}>{renderStyledText(item.minOrderValue)}</div>}
                     </div>
                 )}
 
