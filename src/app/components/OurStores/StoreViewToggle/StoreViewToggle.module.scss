@@ -3,9 +3,9 @@
     display: flex;
     background: #FFF;
     border-radius: 12px;
-    padding: 2px;
-    border: 1px solid #EAEAEA;
+    padding: 4px 6px;
     width: 100%;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.10));
 
     @media (min-width: 768px) {
         width: fit-content;
@@ -22,16 +22,22 @@
     border-radius: 10px;
     background: transparent;
     border: 1px solid transparent;
-    color: #828282;
-    font-size: 13px;
+    color: #000;
+    font-size: 12px;
+    font-style: normal;
     font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
     cursor: pointer;
     transition: all 0.25s ease;
-    text-transform: uppercase;
 
     @media (min-width: 1024px) {
         padding: 10px 24px;
         min-width: 140px;
+    }
+
+    span {
+        margin-top: 2px;
     }
 
     .icon {

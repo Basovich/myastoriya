@@ -8,8 +8,11 @@
         "workingHours": "10:00 – 22:00",
         "kitchenHours": "(кухня – 10:00 – 21:00)",
         "phone": "+38 (067) 463-63-63",
+        "email": "info@myastoriya.com",
         "lat": 50.4024,
-        "lng": 30.6305
+        "lng": 30.6305,
+        "image": "/images/stores/pozniaky.jpg",
+        "mapUrl": "https://maps.google.com/?q=50.4024,30.6305"
     },
     {
         "id": "obolon",
@@ -20,8 +23,11 @@
         "workingHours": "10:00 – 22:00 (магазин), 12:00 – 22:00 (ресторан)",
         "kitchenHours": "(кухня – 10:00 – 21:00)",
         "phone": "+38 (067) 463-63-63",
+        "email": "info@myastoriya.com",
         "lat": 50.4939,
-        "lng": 30.5186
+        "lng": 30.5186,
+        "image": "/images/stores/pozniaky.jpg",
+        "mapUrl": "https://maps.google.com/?q=50.4024,30.6305"
     },
     {
         "id": "teremky",
@@ -32,8 +38,11 @@
         "workingHours": "10:00 – 22:00",
         "kitchenHours": "(кухня – 10:00 – 21:00)",
         "phone": "+38 (067) 463-63-63",
+        "email": "info@myastoriya.com",
         "lat": 50.3800,
-        "lng": 30.4600
+        "lng": 30.4600,
+        "image": "/images/stores/pozniaky.jpg",
+        "mapUrl": "https://maps.google.com/?q=50.4024,30.6305"
     },
     {
         "id": "borschahivka",
@@ -44,8 +53,11 @@
         "workingHours": "10:00 – 22:00",
         "kitchenHours": "(кухня – 10:00 – 21:00)",
         "phone": "+38 (067) 463-63-63",
+        "email": "info@myastoriya.com",
         "lat": 50.3950,
-        "lng": 30.3450
+        "lng": 30.3450,
+        "image": "/images/stores/pozniaky.jpg",
+        "mapUrl": "https://maps.google.com/?q=50.4024,30.6305"
     },
     {
         "id": "sofia",
@@ -56,8 +68,11 @@
         "workingHours": "пн.–пт. – 09:00 – 21:00",
         "kitchenHours": "(кухня – 09:00 – 20:30); сб. нд. – 10:00 – 21:00 (кухня – 10:00 – 20:30)",
         "phone": "+38 (067) 463-63-63",
+        "email": "info@myastoriya.com",
         "lat": 50.4530,
-        "lng": 30.5180
+        "lng": 30.5180,
+        "image": "/images/stores/pozniaky.jpg",
+        "mapUrl": "https://maps.google.com/?q=50.4024,30.6305"
     },
     {
         "id": "holosiivska",
@@ -65,11 +80,14 @@
         "region": "Голосіївський район",
         "type": "restaurant",
         "address": "просп. Голосіївський, 58-А",
+        "email": "info@myastoriya.com",
         "workingHours": "10:00 – 22:00",
         "kitchenHours": "(кухня – 10:00 – 21:00)",
         "phone": "+38 (067) 463-63-63",
         "lat": 50.3980,
-        "lng": 30.5120
+        "lng": 30.5120,
+        "image": "/images/stores/pozniaky.jpg",
+        "mapUrl": "https://maps.google.com/?q=50.4024,30.6305"
     },
     {
         "id": "solomianka",
@@ -77,10 +95,13 @@
         "region": "Соломʼянський район",
         "type": "restaurant",
         "address": "вул. Мокра, 20А (колишня вул. Кудряшова)",
+        "email": "info@myastoriya.com",
         "workingHours": "10:00 – 22:00",
         "kitchenHours": "(кухня – 10:00 – 21:00)",
         "phone": "+38 (067) 463-63-63",
         "lat": 50.4320,
-        "lng": 30.4850
+        "lng": 30.4850,
+        "image": "/images/stores/pozniaky.jpg",
+        "mapUrl": "https://maps.google.com/?q=50.4024,30.6305"
     }
 ]

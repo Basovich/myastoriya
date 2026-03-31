@@ -33,13 +33,12 @@ export default function DeliveryAndPaymentPage({ dict, lang, isMeatBar = false }
             <main className={s.main}>
                 <div className={s.container}>
                     <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
+                    <HeroBanner 
+                        title={deliveryPage.title}
+                        image="/images/delivery/delivery.png"
+                        className={s.hero}
+                    />
                 </div>
-
-                <HeroBanner 
-                    title={deliveryPage.title}
-                    image="/images/delivery/delivery-hero.png"
-                    className={s.hero}
-                />
 
                 <DeliveryZones 
                     stores={storesData} 

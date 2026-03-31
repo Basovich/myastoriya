@@ -1,26 +1,34 @@
 
 .filterWrapper {
     display: flex;
-    flex-direction: column;
     gap: 12px;
     width: 100%;
 
     @media (min-width: 768px) {
-        flex-direction: row;
         width: auto;
         gap: 10px;
     }
 }
 
-.filterBtn {
-    // Rely on Button component for colors, borders, and padding
-    // We only need to ensure they take full width on mobile for better UX
-    width: 100%;
-    border-radius: 12px !important; // Ensure consistent radius for all variants
+button.filterBtn {
+    font-size: 10px;
+    flex: 1;
+    border-radius: 8px;
+    height: 36px;
+    padding: 0 4px;
 
     @media (min-width: 768px) {
+        padding: 0 24px;
+    }
+
+    @media (min-width: 1024px) {
+        height: 44px;
+    }
+
+    @media (min-width: 1280px) {
         width: auto;
         min-width: 220px;
+        font-size: 12px;
     }
 
     .icon {

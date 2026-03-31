@@ -32,7 +32,7 @@ const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange }) 
                 <button className={s.infoBtn} type="button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                         <rect x="7.26953" y="6.54517" width="1.45455" height="6.54545" rx="0.727273" fill="black"/>
-                        <circle cx="8" cy="8" r="7.4" stroke="black" stroke-width="1.2"/>
+                        <circle cx="8" cy="8" r="7.4" stroke="black" strokeWidth="1.2"/>
                         <circle cx="7.9968" cy="4.36448" r="0.727273" fill="black"/>
                     </svg>
                 </button>
