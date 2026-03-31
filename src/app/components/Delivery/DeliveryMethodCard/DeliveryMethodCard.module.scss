@@ -2,18 +2,13 @@
 .card {
   background: #ffffff;
   border-radius: 20px;
-  overflow: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative; // For absolute child elements like badge
+  position: relative;
 
-  &:hover {
-    @media (any-hover: hover) {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    }
+  @media (min-width: 1280px) {
+    border-radius: 14px;
   }
 }
 
@@ -22,6 +17,12 @@
   height: 136px;
   position: relative;
   overflow: hidden;
+  border-radius: 20px 20px 0 0;
+  
+  @media (min-width: 1280px) {
+    height: 246px;
+    border-radius: 14px 14px 0 0;
+  }
 
   .image {
     width: 100%;
@@ -32,24 +33,23 @@
 
 .badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 54px;
-  height: 54px;
+  top: -8px;
+  right: -12px;
+  width: 56px;
+  height: 56px;
   background: #E30613;
   color: #ffffff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  font-family: var(--font-unbounded, 'Unbounded');
-  font-weight: 700;
-  font-size: 11px;
-  line-height: 1.1;
+  font-family: var(--font-houschka), sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 157.143%;
   text-transform: uppercase;
   z-index: 5;
-  box-shadow: 0 4px 12px rgba(227, 6, 19, 0.3);
 
   @media (min-width: 1024px) {
     top: 12px;
@@ -61,28 +61,54 @@
 }
 
 .content {
-  padding: 24px 20px;
+  padding: 18px 36px 30px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  color: #000;
+  font-feature-settings: 'liga' off, 'clig' off;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.24px;
 
   @media (min-width: 1024px) {
-    padding: 30px 24px;
+    padding: 22px 26px;
   }
 }
 
 .title {
-  font-family: var(--font-unbounded, 'Unbounded');
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 1.25;
-  margin-bottom: 24px;
+  color: #000;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 137.5% ;
   text-transform: uppercase;
-  color: #1A1A1A;
 
   @media (min-width: 1024px) {
-    font-size: 20px;
-    margin-bottom: 30px;
+    font-size: 16px;
+  }
+}
+
+.cardBody {
+  margin-top: 10px;
+
+  div ~ .features {
+    padding-top: 10px;
+  }
+
+  .value {
+    color: #000;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 110%;
+
+    @media (min-width: 768px) {
+      font-size: 20px;
+    }
   }
 }
 
@@ -95,38 +121,17 @@
   &:nth-last-of-type(1) {
     margin-bottom: 24px;
   }
-
-  .label {
-    font-size: 14px;
-    color: #8C8C8C;
-  }
-
-  .value {
-    font-family: var(--font-unbounded, 'Unbounded');
-    font-weight: 700;
-    font-size: 24px;
-    color: #1A1A1A;
-
-    @media (min-width: 1024px) {
-      font-size: 28px;
-    }
-  }
 }
 
 .features {
   list-style: none;
-  padding: 24px 0 0;
+  padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  border-top: 1px solid #EDEDED;
-  margin-top: auto;
 
   .featureItem {
-    font-size: 14px;
-    line-height: 1.5;
-    color: #1A1A1A;
     position: relative;
     padding-left: 20px;
 
@@ -166,22 +171,6 @@
         align-items: center;
         justify-content: center;
       }
-    }
-  }
-}
-
-.promoText {
-  color: #1A1A1A;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.5;
-  margin-bottom: 20px;
-
-  b, strong {
-    font-weight: 700;
-
-    &.red {
-      color: var(--color-primary, #E30613);
     }
   }
 }

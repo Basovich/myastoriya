@@ -74,7 +74,6 @@ export default function DeliveryAndPaymentPage({ dict, lang, isMeatBar = false }
 
                 <section className={s.methodsSection}>
                     <div className={s.container}>
-                        <SectionHeader title={deliveryPage.methods.title} />
                         <div className={s.methodsGrid}>
                             {deliveryPage.methods.items.map((item, idx) => (
                                 <DeliveryMethodCard key={idx} item={item} />
