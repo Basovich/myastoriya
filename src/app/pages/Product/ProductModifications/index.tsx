@@ -15,17 +15,19 @@ interface ProductModificationsProps {
     items: Modification[];
     selectedItems: string[];
     onToggle: (id: string) => void;
+    className?: string;
 }
 
 const ProductModifications: React.FC<ProductModificationsProps> = ({ 
     title, 
     items, 
     selectedItems, 
-    onToggle 
+    onToggle,
+    className
 }) => {
     return (
-        <div className={styles.modificationsSection}>
-            <h3 className={styles.modSectionTitle}>{title}</h3>
+        <div className={clsx(styles.modificationsSection, className)}>
+            <p className={styles.modSectionTitle}>{title}</p>
             <div className={styles.modGrid}>
                 {items?.map((item) => (
                     <button

@@ -7,7 +7,9 @@ import StoreCard from '../../OurStores/StoreCard/StoreCard';
 import { DeliveryPageDict, OurStoresPageDict } from '@/i18n/types';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import Button from '@/app/components/ui/Button/Button';
+import Search from '@/app/components/ui/Search/Search';
 import { Locale } from '@/i18n/config';
+
 
 interface DeliveryZonesProps {
     stores: Store[];
@@ -393,23 +395,20 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                 </div>
 
                 <div className={s.searchRow}>
-                    <div className={s.searchInputWrapper}>
-                        <input 
-                            type="text" 
-                            placeholder={dict.zones.search.placeholder}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className={s.searchInput}
-                        />
-                        <button className={s.searchBtn}>
-                            {dict.zones.search.button}
-                        </button>
-                    </div>
+                    <Search
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder={dict.zones.search.placeholder}
+                        buttonText={dict.zones.search.button}
+                        buttonColor="black"
+                        className={s.search}
+                    />
                     <div className={s.infoBadge}>
                         <span className={s.dot}></span>
                         {dict.zones.info}
                     </div>
                 </div>
+
 
                 <div className={s.storesList}>
                     {filteredStores.map(store => (

@@ -9,13 +9,23 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 16px;
-    font-size: 15px;
-    color: rgba(0, 0, 0, 0.4);
-    font-weight: 500;
+
+    .label {
+        color: #787878;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 228.571%;
+        letter-spacing: 0.28px;
+    }
 
     .currentValue {
         color: #000;
-        font-weight: 800;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 228.571%;
+        letter-spacing: 0.28px;
     }
 }
 
@@ -27,6 +37,7 @@
     border: none;
     padding: 0;
     cursor: pointer;
+    margin-top: -2px;
     transition: opacity 0.2s;
 
     &:hover {
@@ -72,7 +83,8 @@
 
     &.active {
         .imageBox {
-            border-color: #E3051B;
+            outline: 1px solid #E3051B;
+            outline-offset: 1px;
         }
     }
 }
@@ -103,25 +115,5 @@
         border-left: 4px solid transparent;
         border-right: 4px solid transparent;
         border-top: 4px solid #E3051B;
-    }
-}
-
-.promoBanner {
-    margin-top: 32px;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-    }
-
-    img {
-        display: block;
-        width: 100%;
-        height: auto;
     }
 }

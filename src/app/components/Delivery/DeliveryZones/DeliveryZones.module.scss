@@ -61,43 +61,10 @@
   }
 }
 
-.searchInputWrapper {
+.search {
   flex: 1;
-  display: flex;
-  background: #F9F9F9;
-  border: 1px solid #EAEAEA;
-  border-radius: 100px;
-  padding: 8px 8px 8px 24px;
-  transition: border-color 0.3s ease;
-
-  &:focus-within {
-    border-color: var(--color-primary, #E30613);
-  }
 }
 
-.searchInput {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  color: #1A1A1A;
-
-  &::placeholder {
-    color: #8C8C8C;
-  }
-}
-
-.searchBtn {
-  background: var(--color-primary, #E30613);
-  color: #fff;
-  border: none;
-  border-radius: 100px;
-  padding: 12px 30px;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-}
 
 .infoBadge {
   display: flex;

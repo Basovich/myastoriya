@@ -30,10 +30,10 @@ const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange }) 
                 <span className={s.label}>Оберіть рівень прожарки:</span>
                 <span className={s.currentValue}>{selectedOption.label}</span>
                 <button className={s.infoBtn} type="button">
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="9" cy="9" r="8" stroke="#000" strokeOpacity="0.4" strokeWidth="1.5"/>
-                        <path d="M9 12V8" stroke="#000" strokeOpacity="0.4" strokeWidth="1.5" strokeLinecap="round"/>
-                        <circle cx="9" cy="6" r="1" fill="#000" fillOpacity="0.4"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <rect x="7.26953" y="6.54517" width="1.45455" height="6.54545" rx="0.727273" fill="black"/>
+                        <circle cx="8" cy="8" r="7.4" stroke="black" stroke-width="1.2"/>
+                        <circle cx="7.9968" cy="4.36448" r="0.727273" fill="black"/>
                     </svg>
                 </button>
             </div>
@@ -62,16 +62,6 @@ const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange }) 
                         </div>
                     </div>
                 ))}
-            </div>
-
-            <div className={s.promoBanner}>
-                <Image 
-                    src="/images/product/gift-banner.png" 
-                    alt="При покупці отримайте стейк Рібай у подарунок"
-                    width={320}
-                    height={80}
-                    layout="responsive"
-                />
             </div>
         </div>
     );

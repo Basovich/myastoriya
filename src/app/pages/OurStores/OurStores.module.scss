@@ -112,14 +112,34 @@
     flex-direction: column;
     gap: 16px;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 768px) {
         flex-direction: row;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
+        gap: 20px;
+    }
+
+    @media (min-width: 1280px) {
+        flex-wrap: nowrap;
         gap: 24px;
-        flex-wrap: wrap;
     }
 }
+
+.search {
+    @media (min-width: 768px) and (max-width: 1279px) {
+        order: 3;
+        width: 100% !important;
+        margin-top: 4px;
+    }
+
+    @media (min-width: 1280px) {
+        flex: 1;
+        max-width: 480px;
+        order: 0; // Natural order (between filter and toggle)
+    }
+}
+
 
 .viewContainer {
     width: 100%;

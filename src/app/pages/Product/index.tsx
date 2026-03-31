@@ -21,6 +21,8 @@ import AuthModal from '@/app/components/AuthModal';
 import VideoReviewModal from '@/app/components/VideoReviewModal';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
+import clsx from "clsx";
+import Image from "next/image";
 
 const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = ({ params }) => {
     const { lang, slug } = React.use(params);
@@ -161,9 +163,8 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
 
                     <section className={s.info}>
                         <div className={s.availability}>
-                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="9" cy="9" r="8" stroke="#00B060" strokeWidth="2"/>
-                                <path d="M5 9L8 12L13 6" stroke="#00B060" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M11.448 6.111L7.587 9.981L6.102 8.496C6.02132 8.40178 5.92203 8.32526 5.81038 8.27124C5.69872 8.21722 5.5771 8.18687 5.45315 8.18208C5.3292 8.17729 5.2056 8.19818 5.09011 8.24342C4.97462 8.28867 4.86973 8.3573 4.78202 8.44501C4.69431 8.53272 4.62568 8.63761 4.58043 8.75311C4.53518 8.8686 4.5143 8.9922 4.51908 9.11615C4.52387 9.24009 4.55423 9.36171 4.60825 9.47337C4.66227 9.58503 4.73879 9.68431 4.833 9.765L6.948 11.889C7.0321 11.9724 7.13183 12.0384 7.24149 12.0832C7.35114 12.128 7.46856 12.1507 7.587 12.15C7.82311 12.149 8.04937 12.0553 8.217 11.889L12.717 7.389C12.8014 7.30533 12.8683 7.20579 12.914 7.09612C12.9597 6.98644 12.9832 6.86881 12.9832 6.75C12.9832 6.63119 12.9597 6.51355 12.914 6.40388C12.8683 6.29421 12.8014 6.19466 12.717 6.111C12.5484 5.94337 12.3203 5.84929 12.0825 5.84929C11.8447 5.84929 11.6166 5.94337 11.448 6.111ZM9 0C7.21997 0 5.47991 0.527841 3.99987 1.51677C2.51983 2.50571 1.36628 3.91131 0.685088 5.55585C0.00389956 7.20038 -0.17433 9.00998 0.172937 10.7558C0.520203 12.5016 1.37737 14.1053 2.63604 15.364C3.89472 16.6226 5.49836 17.4798 7.24419 17.8271C8.99002 18.1743 10.7996 17.9961 12.4442 17.3149C14.0887 16.6337 15.4943 15.4802 16.4832 14.0001C17.4722 12.5201 18 10.78 18 9C18 7.8181 17.7672 6.64778 17.3149 5.55585C16.8626 4.46392 16.1997 3.47177 15.364 2.63604C14.5282 1.80031 13.5361 1.13738 12.4442 0.685084C11.3522 0.232792 10.1819 0 9 0ZM9 16.2C7.57598 16.2 6.18393 15.7777 4.9999 14.9866C3.81586 14.1954 2.89302 13.0709 2.34807 11.7553C1.80312 10.4397 1.66054 8.99201 1.93835 7.59535C2.21616 6.19868 2.9019 4.91577 3.90883 3.90883C4.91577 2.90189 6.19869 2.21616 7.59535 1.93835C8.99202 1.66053 10.4397 1.80312 11.7553 2.34807C13.071 2.89302 14.1954 3.81586 14.9866 4.99989C15.7777 6.18393 16.2 7.57597 16.2 9C16.2 10.9096 15.4414 12.7409 14.0912 14.0912C12.7409 15.4414 10.9096 16.2 9 16.2Z" fill="#1BC573"/>
                             </svg>
                             <span>Є в наявності</span>
                         </div>
@@ -172,17 +173,27 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
 
                         <div className={s.priceSection}>
                             <div className={s.priceWrapper}>
-                                <span className={s.price}>{product.price} ₴</span>
+                                <span className={clsx(s.price, product.oldPrice && s.newPrice)}>{product.price} ₴</span>
                                 {product.oldPrice && <span className={s.oldPrice}>{product.oldPrice} ₴</span>}
                             </div>
                             <div className={s.priceSubtitle}>
-                                Вага: <span className={s.weight}>{product.characteristics['Вага'] || "1000 г"}</span> (361 грн / 100г)
+                                Вага: <span className={s.weight}>{product.characteristics['Вага'] || "1000 г"}</span> <span className={s.weightPrice}> (361 грн / 100г)</span>
                             </div>
                         </div>
 
                         <div className={s.actionsBlock}>
                             <Button variant="primary" className={s.mainBuyBtn}>Додати у кошик</Button>
-                            <QuantitySelector value={quantity} onChange={setQuantity} />
+                            <QuantitySelector value={quantity} onChange={setQuantity} className={s.quantitySelector} />
+
+                            <div className={s.promoBanner}>
+                                <Image
+                                    src="/images/product/gift-banner.png"
+                                    alt="При покупці отримайте стейк Рібай у подарунок"
+                                    width={320}
+                                    height={80}
+                                    layout="responsive"
+                                />
+                            </div>
                         </div>
 
                         <DonenessSelector 
@@ -195,6 +206,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                             items={product.modifications}
                             selectedItems={selectedMods}
                             onToggle={toggleMod}
+                            className={s.productModifications}
                         />
                         <ProductModifications
                             title="Додати соус до замовлення:"

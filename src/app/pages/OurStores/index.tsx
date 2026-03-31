@@ -11,8 +11,9 @@ import HeroBanner from "@/app/components/ui/HeroBanner/HeroBanner";
 import Button from "@/app/components/ui/Button/Button";
 import storesData from "@/content/stores.json";
 import StoreFilter from "@/app/components/OurStores/StoreFilter/StoreFilter";
-import StoreSearch from "@/app/components/OurStores/StoreSearch/StoreSearch";
+import Search from "@/app/components/ui/Search/Search";
 import StoreViewToggle from "@/app/components/OurStores/StoreViewToggle/StoreViewToggle";
+
 import StoreList from "@/app/components/OurStores/StoreList/StoreList";
 import StoreMap from "@/app/components/OurStores/StoreMap/StoreMap";
 
@@ -69,10 +70,13 @@ export default function OurStoresPage({ dict, lang }: OurStoresPageProps) {
                                     onFilterChange={setActiveFilter} 
                                     dict={ourStoresPage.filters}
                                 />
-                                <StoreSearch 
-                                    value={searchQuery} 
-                                    onChange={setSearchQuery} 
-                                    dict={ourStoresPage.search}
+                                <Search
+                                    value={searchQuery}
+                                    onChange={setSearchQuery}
+                                    placeholder={ourStoresPage.search.placeholder}
+                                    buttonText={ourStoresPage.search.button}
+                                    buttonColor="red"
+                                    className={s.search}
                                 />
                                 <StoreViewToggle 
                                     viewMode={viewMode} 

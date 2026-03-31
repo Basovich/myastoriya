@@ -6,10 +6,7 @@ import styles from '../Product.module.scss';
 import Image from "next/image";
 import DeliveryAccordion from '@/app/components/ui/DeliveryAccordion/DeliveryAccordion';
 import VideoModal from '@/app/components/VideoModal/VideoModal';
-
-// Swiper
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { FreeMode } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/free-mode';
 
@@ -166,11 +163,8 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
         <div className={styles.tabsWrapper}>
             <div className={styles.tabsHeader}>
                 <Swiper
-                    modules={[FreeMode]}
                     slidesPerView={'auto'}
-                    spaceBetween={32}
-                    freeMode={true}
-                    watchSlidesProgress={true}
+                    spaceBetween={16}
                     className={styles.tabsSwiper}
                     breakpoints={{
                         1024: {
@@ -200,7 +194,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                 {activeTab === 'characteristics' && (
                     <div className={styles.characteristics}>
                         <div className={styles.nutritionGroup}>
-                            <h3 className={styles.nutritionTitle}>Калорійність (на 100 г продукту)</h3>
+                            <p className={styles.nutritionTitle}>Калорійність (на 100 г продукту)</p>
                             <div className={styles.nutritionList}>
                                 {nutritionInfo.per100g.map((item) => (
                                     <div key={item.key} className={styles.nutritionRow}>
@@ -212,7 +206,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                         </div>
 
                         <div className={styles.nutritionGroup}>
-                            <h3 className={styles.nutritionTitle}>Калорійність (на 1 порцію)</h3>
+                            <p className={styles.nutritionTitle}>Калорійність (на 1 порцію)</p>
                             <div className={styles.nutritionList}>
                                 {nutritionInfo.perPortion.map((item) => (
                                     <div key={item.key} className={styles.nutritionRow}>
@@ -227,7 +221,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                 {activeTab === 'allergens' && (
                     <div className={styles.allergens}>
                         <div className={styles.nutritionGroup}>
-                            <h3 className={styles.nutritionTitle}>Алергени</h3>
+                            <p className={styles.nutritionTitle}>Алергени</p>
                             <div className={styles.nutritionList}>
                                 {allergensInfo.map((item) => (
                                     <div key={item.key} className={styles.nutritionRow}>
@@ -241,7 +235,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                 )}
                 {activeTab === 'delivery' && (
                     <div className={styles.delivery}>
-                        <h2 className={styles.nutritionTitle}>СПОСОБИ ДОСТАВКИ</h2>
+                        <p className={styles.nutritionTitle}>СПОСОБИ ДОСТАВКИ</p>
                         <DeliveryAccordion items={deliveryItems} />
                     </div>
                 )}
