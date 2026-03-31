@@ -36,6 +36,7 @@ export interface CategoryCircleItem {
 interface CategoryCirclesProps {
     title?: string;
     className?: string;
+    withDots?: boolean;
     headerLeft?: React.ReactNode;
     categories?: CategoryCircleItem[];
 }
@@ -43,6 +44,7 @@ interface CategoryCirclesProps {
 export default function CategoryCircles({
     title,
     className,
+    withDots,
     headerLeft,
     categories = searchCategories
 }: CategoryCirclesProps) {
@@ -55,7 +57,7 @@ export default function CategoryCircles({
         <div className={clsx(s.wrapper, className)}>
             <div className={s.header}>
                 {title ? (
-                    <SectionHeader title={title} withDots={false} classNameWrapper={s.sectionHeaderWrapper} />
+                    <SectionHeader title={title} withDots={withDots} classNameWrapper={s.sectionHeaderWrapper} />
                 ) : headerLeft ? (
                     headerLeft
                 ) : null}

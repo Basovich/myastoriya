@@ -43,13 +43,12 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ store, lang, dict }) => {
                 </section>
 
                 <section className={s.whiteSection}>
-                    <div className={s.container}>
-                        <CategoryCircles 
-                            title="МЕНЮ М'ЯСТОРІЯ"
-                            categories={categories}
-                            className={s.categories}
-                        />
-                    </div>
+                    <CategoryCircles
+                        title="МЕНЮ М'ЯСТОРІЯ"
+                        categories={categories}
+                        className={s.categories}
+                        withDots={true}
+                    />
                 </section>
 
                 <div className={s.container}>

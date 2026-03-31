@@ -72,10 +72,6 @@ const PromotionsSlider: React.FC<PromotionsSliderProps> = ({ promotions, title }
                                 className={s.promoImg}
                                 priority
                             />
-                            <div className={s.promoContent}>
-                                {promo.badge && <span className={s.badge}>{promo.badge}</span>}
-                                <h3 className={s.promoTitle}>{promo.title}</h3>
-                            </div>
                         </div>
                     </SwiperSlide>
                 ))}

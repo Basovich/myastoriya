@@ -3,7 +3,6 @@
 import React from 'react';
 import s from './StoreMenuHero.module.scss';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Locale } from '@/i18n/config';
 
 interface StoreMenuHeroProps {

@@ -39,9 +39,10 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({
                 <h3 className={s.title}>{title}</h3>
                 <div className={s.details}>
                     <span className={s.price}>{price} ₴</span>
-                    <span className={s.weight}>{weight}</span>
+                    <span className={s.unit}>{weight}</span>
                 </div>
                 {description && <p className={s.description}>{description}</p>}
+                <span className={s.weight}>{weight}</span>
             </div>
         </div>
     );

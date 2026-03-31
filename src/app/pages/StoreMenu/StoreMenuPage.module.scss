@@ -1,10 +1,25 @@
 .container {
-    max-width: 1440px;
     margin: 0 auto;
     padding: 0 16px;
 
-    @media (min-width: 1024px) {
-        padding: 0 40px;
+    @media (min-width: 768px) {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    @media (min-width: 1280px) {
+        padding-left: calc((100% - 1200px) / 2);
+        padding-right: calc((100% - 1200px) / 2);
+    }
+
+    @media (min-width: 1360px) {
+        padding-left: calc((100% - 1280px) / 2);
+        padding-right: calc((100% - 1280px) / 2);
+    }
+
+    @media (min-width: 1440px) {
+        padding-left: calc((100% - 1300px) / 2);
+        padding-right: calc((100% - 1300px) / 2);
     }
 }
 
@@ -42,12 +57,6 @@
 .whiteSection {
     background-color: #FFF;
     padding: 32px 0;
-    margin-bottom: 32px;
-
-    @media (min-width: 1024px) {
-        padding: 56px 0;
-        margin-bottom: 56px;
-    }
 }
 
 .sectionSpacing {
@@ -58,13 +67,23 @@
     }
 }
 
+.menuSections {
+    padding-top: 30px;
+
+    @media (min-width: 1280px) {
+        margin-bottom: 58px;
+    }
+}
+
 .grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
+    padding-top: 24px;
 
     @media (min-width: 1024px) {
         grid-template-columns: 1fr;
         gap: 24px;
+        padding-top: 40px;
     }
 }
