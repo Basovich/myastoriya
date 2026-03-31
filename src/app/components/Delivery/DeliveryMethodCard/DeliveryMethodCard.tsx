@@ -25,7 +25,7 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item }) => {
         const parts = text.split(regex);
 
         return (
-            <p className={className}>
+            <div className={className}>
                 {parts.map((part, i) => {
                     const lowerPart = part.toLowerCase();
                     if (keywords.includes(lowerPart)) {
@@ -36,16 +36,26 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item }) => {
                     }
                     return <span key={i}>{part}</span>;
                 })}
-            </p>
+            </div>
         );
     };
 
     const firstFeature = item.features[0];
-    const isPromo = firstFeature && firstFeature.toLowerCase().includes("безкоштовна");
+    const isPromo = firstFeature && (
+        firstFeature.toLowerCase().includes("безкоштовна") || 
+        firstFeature.toLowerCase().includes("бесплатная")
+    );
     const otherFeatures = isPromo ? item.features.slice(1) : item.features;
+
+    const LocationIcon = () => (
+        <svg width="14" height="18" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 0C3.13 0 0 3.13 0 7C0 12.25 7 18 7 18C7 18 14 12.25 14 7C14 3.13 10.87 0 7 0ZM7 9.5C5.62 9.5 4.5 8.38 4.5 7C4.5 5.62 5.62 4.5 7 4.5C8.38 4.5 9.5 5.62 9.5 7C9.5 8.38 8.38 9.5 7 9.5Z" fill="#333333"/>
+        </svg>
+    );
 
     return (
         <div className={s.card}>
+            {item.badge && <div className={s.badge}>{item.badge}</div>}
             <div className={s.imageWrapper}>
                 <Image
                     src={item.image}
@@ -75,9 +85,10 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item }) => {
                 {isPromo && renderStyledText(firstFeature, s.promoText)}
 
                 {otherFeatures.length > 0 && (
-                    <ul className={s.features}>
+                    <ul className={`${s.features} ${item.isPickup ? s.pickupList : ''}`}>
                         {otherFeatures.map((feature, index) => (
                             <li key={index} className={s.featureItem}>
+                                {item.isPickup && <div className={s.icon}><LocationIcon /></div>}
                                 {renderStyledText(feature)}
                             </li>
                         ))}

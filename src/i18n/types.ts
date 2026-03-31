@@ -309,6 +309,8 @@ export interface DeliveryMethodCard {
   minOrderValue: string;
   features: string[];
   image: string;
+  badge?: string;
+  isPickup?: boolean;
 }
 
 export interface DeliveryPageDict {

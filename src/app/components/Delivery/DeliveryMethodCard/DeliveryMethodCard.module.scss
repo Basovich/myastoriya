@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative; // For absolute child elements like badge
 
   &:hover {
     @media (any-hover: hover) {
@@ -26,6 +27,36 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 54px;
+  height: 54px;
+  background: #E30613;
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: var(--font-unbounded, 'Unbounded');
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  z-index: 5;
+  box-shadow: 0 4px 12px rgba(227, 6, 19, 0.3);
+
+  @media (min-width: 1024px) {
+    top: 12px;
+    right: 12px;
+    width: 60px;
+    height: 60px;
+    font-size: 12px;
   }
 }
 
@@ -114,6 +145,27 @@
     &.highlight {
       color: var(--color-primary, #E30613);
       font-weight: 700;
+    }
+  }
+
+  &.pickupList {
+    .featureItem {
+      padding-left: 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+
+      &::before {
+        display: none;
+      }
+
+      .icon {
+        flex-shrink: 0;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   }
 }
