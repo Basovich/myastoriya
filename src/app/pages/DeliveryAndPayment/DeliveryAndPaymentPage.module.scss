@@ -133,5 +133,6 @@ a.tab {
 
   @media (min-width: 1200px) {
     grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
   }
 }
