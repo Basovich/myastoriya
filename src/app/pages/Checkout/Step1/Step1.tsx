@@ -409,6 +409,7 @@ export default function Step1() {
                             onBlur={() => handleBlur('firstName')}
                             error={errors.firstName}
                             touched={touched.firstName}
+                            className={s.checkoutInput}
                         />
                         <InputField
                             id="checkout-last-name"
@@ -419,6 +420,7 @@ export default function Step1() {
                             onBlur={() => handleBlur('lastName')}
                             error={errors.lastName}
                             touched={touched.lastName}
+                            className={s.checkoutInput}
                         />
                     </div>
 
@@ -439,7 +441,7 @@ export default function Step1() {
                                 onBlur={() => handleBlur('phone')}
                                 error={!phoneVerified ? errors.phone : undefined}
                                 touched={touched.phone}
-                                className={clsx(phoneVerified && s.inputVerified)}
+                                className={clsx(s.checkoutInput, phoneVerified && s.inputVerified)}
                             />
                             {phoneVerified && (
                                 <span className={s.verifiedBadge}>
@@ -458,6 +460,7 @@ export default function Step1() {
                             value={formData.email}
                             onChange={e => handleChange('email', e.target.value)}
                             onBlur={() => handleBlur('email')}
+                            className={s.checkoutInput}
                         />
                     </div>
 
@@ -469,7 +472,7 @@ export default function Step1() {
                                 value={formData.smsCode}
                                 onChange={e => handleChange('smsCode', e.target.value)}
                                 onBlur={() => handleBlur('smsCode')}
-                                className={s.smsInput}
+                                className={clsx(s.checkoutInput, s.smsInput)}
                                 disabled={!smsRequested}
                             />
                             <div className={s.smsActionCol}>

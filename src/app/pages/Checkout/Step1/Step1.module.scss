@@ -122,7 +122,9 @@
 .hasAccountBtn {
     display: block;
     width: 100%;
-    padding: 14px 16px;
+    height: 44px;
+    line-height: 42px; // 44px - 2px border
+    padding: 0 16px;
     border: 1px solid #000;
     border-radius: 8px;
     background: transparent;
@@ -135,6 +137,11 @@
     letter-spacing: 0.04em;
     margin-bottom: 20px;
     transition: background 0.2s, color 0.2s;
+
+    @media (min-width: 1024px) {
+        height: 46px;
+        line-height: 44px;
+    }
 
     @media (min-width: 768px) {
         font-size: 15px;
@@ -159,7 +166,20 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    :global(input) {
+        height: 44px;
+        @media (min-width: 1024px) {
+            height: 46px;
+        }
+    }
 }
+
+.checkoutInput {
+    // Hosts height override for :global(input) targets, no layout-altering properties here
+}
+
+
 
 .formRow {
     display: flex;
@@ -248,8 +268,13 @@
 }
 
 .sendCodeBtn {
-    height: 50px;
+    height: 44px;
     width: 100%;
+    
+    @media (min-width: 1024px) {
+        height: 46px;
+    }
+    
     padding: 0 20px;
     background: #000;
     color: #fff;
@@ -375,7 +400,12 @@
 
 .submitBtn {
     width: 100%;
-    height: 50px;
+    height: 44px;
+    
+    @media (min-width: 1024px) {
+        height: 46px;
+    }
+    
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -621,7 +651,15 @@
 .promoBtn {
     display: block;
     width: 100%;
-    padding: 14px 16px;
+    height: 44px;
+    line-height: 44px;
+    padding: 0 16px;
+    
+    @media (min-width: 1024px) {
+        height: 46px;
+        line-height: 46px;
+    }
+
     background: #000;
     color: #fff;
     border: none;
