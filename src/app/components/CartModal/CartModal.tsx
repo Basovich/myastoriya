@@ -18,9 +18,10 @@ import Button from "@/app/components/ui/Button/Button";
 interface CartModalProps {
     isOpen: boolean;
     onClose: () => void;
+    isCheckoutMode?: boolean;
 }
 
-export default function CartModal({ isOpen, onClose }: CartModalProps) {
+export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: CartModalProps) {
     const { disableScroll, enableScroll } = useScrollLock();
     const dispatch = useAppDispatch();
     const cartItems = useAppSelector(state => state.cart.items);
@@ -193,12 +194,20 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                                 </div>
                             </div>
                             <div className={s.actionButtons}>
-                                <Button variant='outline-black' className={(s.btnOutline)} onClick={onClose}>
-                                    Продовжити покупки
-                                </Button>
-                                <Button variant='red' className={s.btnSolid} href="/checkout?step=1">
-                                    Оформити замовлення
-                                </Button>
+                                {isCheckoutMode ? (
+                                    <Button variant="red" className={s.btnApply} onClick={onClose}>
+                                        Застосувати
+                                    </Button>
+                                ) : (
+                                    <>
+                                        <Button variant='outline-black' className={(s.btnOutline)} onClick={onClose}>
+                                            Продовжити покупки
+                                        </Button>
+                                        <Button variant='red' className={s.btnSolid} href="/checkout?step=1">
+                                            Оформити замовлення
+                                        </Button>
+                                    </>
+                                )}
                             </div>
                         </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import s from './Actions.module.scss';
 import { useAppSelector } from '@/store/hooks';
@@ -14,7 +14,9 @@ export default function Actions() {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
     const router = useRouter();
     const params = useParams();
+    const pathname = usePathname();
     const lang = params?.lang as string || 'ua';
+    const isCheckoutPage = pathname?.includes('/checkout');
 
     const cartItems = useAppSelector((state) => state.cart.items);
     const wishlistItems = useAppSelector((state) => state.wishlist.items);
@@ -66,6 +68,7 @@ export default function Actions() {
             <CartModal
                 isOpen={isCartModalOpen}
                 onClose={() => setIsCartModalOpen(false)}
+                isCheckoutMode={isCheckoutPage}
             />
         </>
     );

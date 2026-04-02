@@ -611,7 +611,11 @@ export default function Step1() {
             <CartSummary onEditCart={() => setIsCartModalOpen(true)} />
             
             {/* ── Cart Modal ── */}
-            <CartModal isOpen={isCartModalOpen} onClose={handleCloseCartModal} />
+            <CartModal 
+                isOpen={isCartModalOpen} 
+                onClose={handleCloseCartModal} 
+                isCheckoutMode={true}
+            />
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
         </div>
     );

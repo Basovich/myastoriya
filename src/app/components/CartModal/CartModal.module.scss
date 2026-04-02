@@ -621,6 +621,21 @@
     }
 }
 
+.btnApply {
+    height: 44px;
+    width: 100%;
+    color: #FFF;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 125%;
+    text-transform: initial;
+
+    @media (min-width: 1024px) {
+        width: 324px;
+    }
+}
+
 // ==== SUGGESTED BLOCK ====
 
 .suggestedBlock {

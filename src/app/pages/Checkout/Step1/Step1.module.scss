@@ -546,11 +546,16 @@
 }
 
 .cartItemWeight {
-    font-size: 11px;
     color: #4F4F4F;
-    font-weight: 400;
-    opacity: 0.6;
-    margin-top: 2px;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 118%;
+    margin-top: auto;
+
+    @media (min-width: 1280px) {
+        font-size: 14px;
+    }
 }
 
 .cartItemPriceRow {
