@@ -12,6 +12,7 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import AuthModal from '@/app/components/AuthModal';
+import Checkbox from '@/app/components/ui/Checkbox/Checkbox';
 
 // ── Step Indicator ────────────────────────────────────────────────────────────
 
@@ -226,6 +227,7 @@ interface Touched {
     phone?: boolean;
     email?: boolean;
     smsCode?: boolean;
+    agreed?: boolean;
 }
 
 export default function Step1() {
@@ -236,7 +238,7 @@ export default function Step1() {
         phone: '',
         email: '',
         smsCode: '',
-        agreed: false,
+        agreed: true,
         anotherRecipient: false,
     });
 
@@ -396,6 +398,7 @@ export default function Step1() {
             phone: true,
             email: true,
             smsCode: true,
+            agreed: true,
         };
         setTouched(allTouched);
         if (Object.keys(errors).length > 0) return;
@@ -532,22 +535,15 @@ export default function Step1() {
                     <div className={s.divider} />
 
                     <div className={s.checkboxRow}>
-                        <label className={s.checkboxLabel} htmlFor="checkout-agree">
-                            <input
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <Checkbox
                                 id="checkout-agree"
-                                type="checkbox"
-                                className={s.checkboxInput}
                                 checked={formData.agreed}
-                                onChange={e => handleChange('agreed', e.target.checked)}
-                            />
-                            <span className={clsx(s.checkboxCustom, { [s.checkboxChecked]: formData.agreed })}>
-                                {formData.agreed && (
-                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                                        <path d="M1 3.5L3.8 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                )}
-                            </span>
-                            <span className={s.checkboxText}>
+                                onChange={val => {
+                                    handleChange('agreed', val);
+                                    if (!val) setTouched(prev => ({ ...prev, agreed: true }));
+                                }}
+                            >
                                 Я згоден з{' '}
                                 <Link
                                     href="/oferta"
@@ -557,26 +553,19 @@ export default function Step1() {
                                 >
                                     угодою користувача
                                 </Link>
-                            </span>
-                        </label>
+                            </Checkbox>
+                            {touched.agreed && errors.agreed && (
+                                <span className={s.fieldError} style={{ marginLeft: '28px' }}>{errors.agreed}</span>
+                            )}
+                        </div>
 
-                        <label className={s.checkboxLabel} htmlFor="checkout-another-recipient">
-                            <input
-                                id="checkout-another-recipient"
-                                type="checkbox"
-                                className={s.checkboxInput}
-                                checked={formData.anotherRecipient}
-                                onChange={e => handleChange('anotherRecipient', e.target.checked)}
-                            />
-                            <span className={clsx(s.checkboxCustom, { [s.checkboxChecked]: formData.anotherRecipient })}>
-                                {formData.anotherRecipient && (
-                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                                        <path d="M1 3.5L3.8 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                )}
-                            </span>
-                            <span className={s.checkboxText}>Додати іншого отримувача</span>
-                        </label>
+                        <Checkbox
+                            id="checkout-another-recipient"
+                            checked={formData.anotherRecipient}
+                            onChange={val => handleChange('anotherRecipient', val)}
+                        >
+                            Додати іншого отримувача
+                        </Checkbox>
                     </div>
 
                     <Button

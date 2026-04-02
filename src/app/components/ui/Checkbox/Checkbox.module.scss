@@ -1,0 +1,61 @@
+.checkboxWrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.hiddenInput {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.checkboxCustom {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border: 1px solid #000;
+    border-radius: 6px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    margin-top: 2px; // Align with first line of text
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #000;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.checkboxChecked {
+    background: #000;
+    border-color: #000;
+}
+
+.checkboxText {
+    color: #060606;
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;
+    padding-top: 3px;
+
+    a {
+        text-decoration: underline;
+    }
+}
