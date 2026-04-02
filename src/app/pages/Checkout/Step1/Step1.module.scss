@@ -178,6 +178,13 @@
 
 // ── SMS Row ───────────────────────────────────────────────────────────────────
 
+.fieldError {
+    font-size: 11px;
+    color: var(--color-accent);
+    margin-bottom: 6px;
+    white-space: nowrap;
+}
+
 .resendHint {
     font-size: 11px;
     color: #4F4F4F;
@@ -221,6 +228,23 @@
 .smsInput {
     flex: 1;
     width: 100%;
+}
+
+.inputVerified {
+    :global(input) {
+        border-color: #2a9d5c !important;
+        background-color: #f7fdf9 !important;
+    }
+}
+
+.verifiedBadge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #2a9d5c;
+    font-weight: 600;
+    margin-top: -6px; // Adjust placement below the phone input
 }
 
 .sendCodeBtn {
