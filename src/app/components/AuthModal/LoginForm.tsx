@@ -137,7 +137,6 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSucc
                 <GoogleAuthButton onSuccess={(user) => {
                     console.log('Logged in via Google:', user);
                     dispatch(login(user));
-                    router.push('/personal/profile/');
                     onSuccess();
                 }} />
             </form>

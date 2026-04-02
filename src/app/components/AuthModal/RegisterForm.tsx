@@ -397,7 +397,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
 
                 <GoogleAuthButton onSuccess={(user) => {
                     dispatch(login(user));
-                    router.push('/personal/profile/');
                     onSuccess();
                 }} />
             </form>

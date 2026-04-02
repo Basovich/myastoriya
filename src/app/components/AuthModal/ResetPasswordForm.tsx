@@ -55,7 +55,6 @@ export default function ResetPasswordForm({ phone, onSuccess, onBack }: ResetPas
                     name: 'Користувач',
                 }));
                 onSuccess();
-                router.push('/personal/profile/');
             } catch (err) {
                 const msg = err instanceof Error ? err.message : 'Помилка скидання паролю';
                 setStatus(msg);

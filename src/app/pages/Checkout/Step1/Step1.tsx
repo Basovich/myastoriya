@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import s from './Step1.module.scss';
 import InputField from '@/app/components/ui/InputField/index';
@@ -229,6 +229,7 @@ interface Touched {
 }
 
 export default function Step1() {
+    const { user, isAuthenticated } = useAppSelector(state => state.auth);
     const [formData, setFormData] = useState<FormData>({
         firstName: '',
         lastName: '',
@@ -248,6 +249,21 @@ export default function Step1() {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
     const cartItems = useAppSelector(state => state.cart.items);
     const router = useRouter();
+
+    useEffect(() => {
+        if (isAuthenticated && user) {
+            setFormData(prev => ({
+                ...prev,
+                firstName: prev.firstName || user.name?.split(' ')[0] || '',
+                lastName: prev.lastName || user.name?.split(' ').slice(1).join(' ') || '',
+                phone: prev.phone || user.phone || '',
+                email: prev.email || user.email || '',
+            }));
+            if (user.phone) {
+                setPhoneVerified(true);
+            }
+        }
+    }, [isAuthenticated, user]);
 
     const handleCloseCartModal = () => {
         setIsCartModalOpen(false);
@@ -396,14 +412,16 @@ export default function Step1() {
             <div className={s.formCard}>
                 <StepIndicator current={1} />
 
-                <button
-                    className={s.hasAccountBtn}
-                    id="has-account-btn"
-                    type="button"
-                    onClick={() => setIsAuthModalOpen(true)}
-                >
-                    У ВАС Є АККАУНТ?
-                </button>
+                {!isAuthenticated && (
+                    <button
+                        className={s.hasAccountBtn}
+                        id="has-account-btn"
+                        type="button"
+                        onClick={() => setIsAuthModalOpen(true)}
+                    >
+                        У ВАС Є АККАУНТ?
+                    </button>
+                )}
 
                 <form className={s.form} onSubmit={handleSubmit} noValidate>
                     <div className={s.formRow}>
