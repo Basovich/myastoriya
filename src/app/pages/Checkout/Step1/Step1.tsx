@@ -258,7 +258,7 @@ export default function Step1() {
                 ...prev,
                 firstName: prev.firstName || user.name?.split(' ')[0] || '',
                 lastName: prev.lastName || user.name?.split(' ').slice(1).join(' ') || '',
-                phone: prev.phone || user.phone || '',
+                phone: prev.phone || (user.phone || '').replace(/\D/g, ''),
                 email: prev.email || user.email || '',
             }));
             if (user.phone) {
@@ -276,7 +276,33 @@ export default function Step1() {
     };
 
     const handleChange = (field: keyof FormData, value: string | boolean) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+        if (field === 'anotherRecipient' && typeof value === 'boolean') {
+            if (value) {
+                // Clearing for another recipient
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: true,
+                    firstName: '',
+                    lastName: '',
+                    phone: '',
+                    email: '',
+                }));
+                setPhoneVerified(false);
+            } else if (user) {
+                // Restoring user data
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: false,
+                    firstName: user.name?.split(' ')[0] || '',
+                    lastName: user.name?.split(' ').slice(1).join(' ') || '',
+                    phone: (user.phone || '').replace(/\D/g, ''),
+                    email: user.email || '',
+                }));
+                if (user.phone) setPhoneVerified(true);
+            }
+        } else {
+            setFormData(prev => ({ ...prev, [field]: value }));
+        }
     };
 
     const [phoneVerified, setPhoneVerified] = useState(false);
@@ -559,13 +585,15 @@ export default function Step1() {
                             )}
                         </div>
 
-                        <Checkbox
-                            id="checkout-another-recipient"
-                            checked={formData.anotherRecipient}
-                            onChange={val => handleChange('anotherRecipient', val)}
-                        >
-                            Додати іншого отримувача
-                        </Checkbox>
+                        {isAuthenticated && (
+                            <Checkbox
+                                id="checkout-another-recipient"
+                                checked={formData.anotherRecipient}
+                                onChange={val => handleChange('anotherRecipient', val)}
+                            >
+                                Додати іншого отримувача
+                            </Checkbox>
+                        )}
                     </div>
 
                     <Button
