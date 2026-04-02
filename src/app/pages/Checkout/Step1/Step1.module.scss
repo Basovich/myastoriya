@@ -409,10 +409,16 @@
 .cartTitle {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    font-weight: 700;
+    gap: 10px;
     color: #000;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    
+    @media (min-width: 1280px) {
+        font-size: 18px;
+    }
 }
 
 .editCartBtn {
@@ -506,6 +512,11 @@
     border-radius: 10px;
     overflow: hidden;
     background: #e2e2e2;
+
+    @media (min-width: 1280px) {
+        width: 108px;
+        height: 77px;
+    }
 }
 
 .cartImg {
@@ -523,10 +534,15 @@
 }
 
 .cartItemTitle {
-    font-size: 12px;
-    font-weight: 700;
     color: #000;
-    line-height: 1.35;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 125%;
+    
+    @media (min-width: 1280px) {
+        font-size: 16px;
+    }
 }
 
 .cartItemWeight {

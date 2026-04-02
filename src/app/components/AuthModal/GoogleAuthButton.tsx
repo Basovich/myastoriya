@@ -22,7 +22,7 @@ export default function GoogleAuthButton({ onSuccess }: GoogleAuthButtonProps) {
                 onSuccess({
                     name: 'Google User',
                     email: 'google@example.com',
-                    phone: '+380XXXXXXXXX',
+                    phone: '380998887766',
                 });
             }
         } catch (error) {

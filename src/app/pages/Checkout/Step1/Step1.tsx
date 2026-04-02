@@ -253,19 +253,19 @@ export default function Step1() {
     const router = useRouter();
 
     useEffect(() => {
-        if (isAuthenticated && user) {
+        if (isAuthenticated && user && !formData.anotherRecipient) {
             setFormData(prev => ({
                 ...prev,
-                firstName: prev.firstName || user.name?.split(' ')[0] || '',
-                lastName: prev.lastName || user.name?.split(' ').slice(1).join(' ') || '',
-                phone: prev.phone || (user.phone || '').replace(/\D/g, ''),
-                email: prev.email || user.email || '',
+                firstName: user.name?.split(' ')[0] || '',
+                lastName: user.name?.split(' ').slice(1).join(' ') || '',
+                phone: (user.phone || '').replace(/\D/g, ''),
+                email: user.email || '',
             }));
             if (user.phone) {
                 setPhoneVerified(true);
             }
         }
-    }, [isAuthenticated, user]);
+    }, [isAuthenticated, user, formData.anotherRecipient]);
 
     const handleCloseCartModal = () => {
         setIsCartModalOpen(false);
