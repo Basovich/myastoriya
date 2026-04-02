@@ -11,6 +11,7 @@ import { useMemo } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
+import AuthModal from '@/app/components/AuthModal';
 
 // ── Step Indicator ────────────────────────────────────────────────────────────
 
@@ -261,6 +262,7 @@ export default function Step1() {
     };
 
     const [phoneVerified, setPhoneVerified] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [smsRequested, setSmsRequested] = useState(false);
     const [smsVerifying, setSmsVerifying] = useState(false);
     const [smsError, setSmsError] = useState('');
@@ -394,7 +396,12 @@ export default function Step1() {
             <div className={s.formCard}>
                 <StepIndicator current={1} />
 
-                <button className={s.hasAccountBtn} id="has-account-btn" type="button">
+                <button
+                    className={s.hasAccountBtn}
+                    id="has-account-btn"
+                    type="button"
+                    onClick={() => setIsAuthModalOpen(true)}
+                >
                     У ВАС Є АККАУНТ?
                 </button>
 
@@ -496,8 +503,8 @@ export default function Step1() {
                                     {smsVerifying
                                         ? 'Перевірка...'
                                         : smsRequested
-                                            ? 'Відправити код'
-                                            : 'Отримати смс'
+                                            ? 'Підтвердити код'
+                                            : 'Відправити код'
                                     }
                                 </button>
                             </div>
@@ -570,6 +577,7 @@ export default function Step1() {
             
             {/* ── Cart Modal ── */}
             <CartModal isOpen={isCartModalOpen} onClose={handleCloseCartModal} />
+            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
         </div>
     );
 }

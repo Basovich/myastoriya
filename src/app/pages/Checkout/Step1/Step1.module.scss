@@ -36,7 +36,9 @@
 .stepIndicator {
     display: flex;
     align-items: center;
-    margin-bottom: 28px;
+    width: 100%;
+    max-width: 442px;
+    margin: 0 auto 28px;
 
     @media (min-width: 1024px) {
         margin-bottom: 36px;
@@ -72,13 +74,13 @@
 }
 
 .stepCircleActive {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
+    border-color: #E3051B;
+    color: #E3051B;
 }
 
 .stepCircleDone {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
+    border-color: #E3051B;
+    background: #E3051B;
     color: #fff;
 }
 
@@ -114,7 +116,7 @@
 }
 
 .stepLineDone {
-    background: var(--color-accent);
+    background: #E3051B;
 }
 
 // ── Has Account Button ────────────────────────────────────────────────────────
@@ -134,8 +136,8 @@
     color: #000;
     text-align: center;
     cursor: pointer;
-    letter-spacing: 0.04em;
-    margin-bottom: 20px;
+    margin: 0 auto 20px;
+    max-width: 324px;
     transition: background 0.2s, color 0.2s;
 
     @media (min-width: 1024px) {
@@ -175,9 +177,7 @@
     }
 }
 
-.checkoutInput {
-    // Hosts height override for :global(input) targets, no layout-altering properties here
-}
+// ── Form Row ──────────────────────────────────────────────────────────────────
 
 
 
@@ -410,7 +410,8 @@
     font-weight: 700;
     letter-spacing: 0.05em;
     border-radius: 8px;
-    margin-top: 4px;
+    margin: 4px auto 0;
+    max-width: 368px;
 }
 
 // ── Cart Summary ──────────────────────────────────────────────────────────────
