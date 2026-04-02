@@ -51,7 +51,7 @@ export default function ProductCard({
             </div>
             <div className={s.info}>
                 <AppLink href={`/products/${id}`}>
-                    <h3 className={s.title}>{title}</h3>
+                    <p className={s.title}>{title}</p>
                 </AppLink>
                 <div className={s.priceRow}>
                     <div className={s.priceGroup}>

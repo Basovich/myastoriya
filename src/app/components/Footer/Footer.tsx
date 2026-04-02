@@ -20,7 +20,7 @@ export default function Footer({ lang }: FooterProps) {
             {/* ===== Left Column ===== */}
             <div className={s.leftColumn}>
                 <div className={s.appSection}>
-                    <h3 className={s.appTitle}>Завантажуйте наш застосунок</h3>
+                    <p className={s.appTitle}>Завантажуйте наш застосунок</p>
                     <div className={s.appButtons}>
                         <a href={footer.appLinks.googlePlay} className={s.storeBtn}>
                             <span className={s.storeSub}>Скачати в</span>
@@ -34,7 +34,7 @@ export default function Footer({ lang }: FooterProps) {
                 </div>
 
                 <div className={s.linksSection}>
-                    <h3 className={s.linksTitle}>Розділи сайту</h3>
+                    <p className={s.linksTitle}>Розділи сайту</p>
                     <div className={s.linksGrid}>
                         <nav className={s.linksList}>
                             {siteLinks.map((link, i) => {
@@ -76,7 +76,7 @@ export default function Footer({ lang }: FooterProps) {
             <div className={s.rightColumn}>
                 <div className={s.rightTopRow}>
                     <div className={clsx(s.socialSection, s.desktop)}>
-                        <h3 className={s.socialTitle}>Ми в соціальних мережах</h3>
+                        <p className={s.socialTitle}>Ми в соціальних мережах</p>
                         <div className={s.socialIcons}>
                             {socialLinks.map((link, i) => (
                                 <a key={i} href={link.url} className={s.socialIcon} aria-label={link.platform} target="_blank" rel="noopener noreferrer">

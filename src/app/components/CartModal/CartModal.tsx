@@ -196,7 +196,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                                 <Button variant='outline-black' className={(s.btnOutline)} onClick={onClose}>
                                     Продовжити покупки
                                 </Button>
-                                <Button variant='red' className={s.btnSolid}>
+                                <Button variant='red' className={s.btnSolid} href="/checkout?step=1">
                                     Оформити замовлення
                                 </Button>
                             </div>
