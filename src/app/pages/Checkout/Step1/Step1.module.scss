@@ -375,6 +375,23 @@
 
 // ── Cart Summary ──────────────────────────────────────────────────────────────
 
+.sidebar {
+    @media (min-width: 1024px) {
+        width: 360px;
+        min-width: 360px;
+        position: sticky;
+        top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    @media (min-width: 1280px) {
+        width: 516px;
+        min-width: 516px;
+    }
+}
+
 .cartSummary {
     background: #fff;
     border-radius: 14px;
@@ -386,16 +403,7 @@
     }
 
     @media (min-width: 1024px) {
-        width: 360px;
-        min-width: 360px;
         padding: 28px 30px 36px;
-        position: sticky;
-        top: 20px;
-    }
-
-    @media (min-width: 1280px) {
-        width: 516px;
-        min-width: 516px;
     }
 }
 
@@ -596,7 +604,7 @@
 .cartStat {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .cartStatLabel {
@@ -623,49 +631,22 @@
     color: var(--color-accent);
 }
 
-// ── Promo Button ──────────────────────────────────────────────────────────────
-
-.promoWrapper {
-    margin-top: 16px;
+.priceBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
-.promoBtn {
-    display: block;
-    width: 100%;
-    height: 44px;
-    line-height: 44px;
-    padding: 0 16px;
-    
-    @media (min-width: 1024px) {
-        height: 46px;
-        line-height: 46px;
-    }
-
-    background: #000;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    text-align: center;
-    cursor: pointer;
-    letter-spacing: 0.04em;
-    transition: opacity 0.2s;
-
-    @media (any-hover: hover) {
-        &:hover {
-            opacity: 0.8;
-        }
-    }
-
-    &:focus-visible {
-        outline: 2px solid var(--color-accent);
-        outline-offset: 2px;
-    }
+.oldPrice {
+    font-size: 14px;
+    color: #828282;
+    text-decoration: line-through;
+    font-weight: 400;
 }
 
-// ── Package Note ──────────────────────────────────────────────────────────────
+.discountLabel {
+    color: #2A9D5C;
+}
 
 .packageNote {
     display: flex;
