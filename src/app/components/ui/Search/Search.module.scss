@@ -2,12 +2,12 @@
     display: flex;
     align-items: center;
     background: #FFF;
-    border: 1px solid #E0E0E0;
-    border-radius: 8px;
+    border: 1px solid #E2E2E2;
+    border-radius: 12px;
     padding: 6px 6px 6px 20px;
     transition: all 0.3s ease;
     width: 100%;
-    height: 44px;
+    height: 48px;
     gap: 12px;
 
     &:focus-within {
@@ -16,6 +16,17 @@
         
         .icon {
             color: #000;
+            opacity: 1;
+        }
+    }
+
+    &.noButton {
+        padding: 6px 20px;
+        height: 44px;
+        border-radius: 8px;
+
+        .inputContainer {
+            flex-direction: row-reverse;
         }
     }
 }
@@ -33,19 +44,16 @@
     background: transparent;
     border: none;
     outline: none;
-    padding: 4px 12px 4px 0;
+    padding: 4px 0;
     font-size: 14px;
     color: #000;
     font-weight: 500;
     min-width: 0;
     text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-
-
 
     &::placeholder {
         color: #828282;
+        font-weight: 400;
     }
 }
 
@@ -53,12 +61,12 @@
     display: flex;
     align-items: center;
     color: #828282;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    opacity: 0.6;
     
     svg {
         width: 18px;
         height: 18px;
-        opacity: 0.6;
     }
 }
 

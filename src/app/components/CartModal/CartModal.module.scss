@@ -39,7 +39,7 @@
 
     @media (min-width: 1024px) {
         max-width: 886px;
-        max-height: 78vh;
+        max-height: initial;
         align-items: stretch;
         padding-top: 0;
         overflow-y: initial;
@@ -110,7 +110,7 @@
     }
 
     @media (min-width: 1024px) {
-        max-height: calc(90vh - 60px);
+        max-height: initial;
         padding: 34px 46px 58px;
     }
 }

@@ -1,0 +1,292 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+
+    @media (min-width: 768px) {
+        padding: 40px;
+    }
+}
+
+.overlayAfterOpen {
+    opacity: 1;
+}
+
+.overlayBeforeClose {
+    opacity: 0;
+}
+
+.modalWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    outline: none;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.modal {
+    background: #fff;
+    width: 100%;
+    max-width: 680px;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+
+    @media (min-width: 1024px) {
+        width: 842px;
+        max-width: 100%;
+    }
+}
+
+.modalWrapperOpen {
+    .modal {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalWrapperBeforeClose {
+    .modal {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.closeBtn {
+    position: absolute;
+    top: -30px;
+    right: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1010;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: transform 0.2s, opacity 0.2s;
+
+    &:hover {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+
+    @media (max-width: 767px) {
+        right: 10px;
+        top: 10px;
+        color: #000;
+        z-index: 1020;
+    }
+}
+
+.modalContent {
+    padding: 32px 24px;
+
+    @media (min-width: 768px) {
+        padding: 24px 32px 32px;
+    }
+}
+
+.title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    letter-spacing: 0.02em;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formRow {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+        gap: 20px;
+    }
+}
+
+.streetField {
+    flex: 1;
+}
+
+.mapToggleBtn {
+    height: 48px;
+    border: 1px solid #E2E2E2;
+    border-radius: 12px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #000;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    svg {
+        flex-shrink: 0;
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #E3051B;
+            background: #F8F8F8;
+        }
+    }
+
+    @media (min-width: 768px) {
+        width: 200px;
+    }
+}
+
+.gridFields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+}
+
+.submitBtn {
+    width: 100%;
+    max-width: 260px;
+    height: 48px;
+    font-size: 13px;
+    font-weight: 700;
+    align-self: center;
+    margin-top: 12px;
+
+    @media (min-width: 768px) {
+        align-self: flex-end;
+    }
+}
+
+// ── Map View ──────────────────────────────────────────────────────────────────
+
+.mapViewLayout {
+    display: flex;
+    flex-direction: column;
+}
+
+.mapHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 32px 24px 20px;
+    
+    @media (min-width: 768px) {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 32px 24px;
+    }
+}
+
+.mapSearchWrapper {
+    width: 100%;
+    
+    @media (min-width: 768px) {
+        max-width: 400px;
+    }
+}
+
+.mapContainer {
+    width: 100%;
+    height: 350px;
+    position: relative;
+    overflow: hidden;
+
+    @media (min-width: 1024px) {
+        height: 394px;
+    }
+}
+
+.mapFooter {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 24px 32px;
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px 32px 32px;
+    }
+}
+
+.mapAddressText {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+    flex: 1;
+}
+
+.footerButtons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+
+    @media (min-width: 768px) {
+        width: auto;
+    }
+}
+
+.backToFormBtn {
+    flex: 1;
+    height: 48px;
+    font-size: 13px;
+    font-weight: 700;
+    
+    @media (min-width: 768px) {
+        width: 160px;
+        flex: none;
+    }
+}
+
+.confirmBtn {
+    flex: 1;
+    height: 48px;
+    font-size: 13px;
+    font-weight: 700;
+
+    @media (min-width: 768px) {
+        width: 220px;
+        flex: none;
+    }
+}
+
+
+// ── Google Autocomplete Styles Moved to globals.css ─────────────────────────

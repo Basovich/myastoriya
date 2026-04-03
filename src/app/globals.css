@@ -123,3 +123,55 @@ button {
 button.swiper-button-lock {
   display: none;
 }
+
+/* ===== Google Autocomplete Customization ===== */
+.pac-container {
+  border: none;
+  border-radius: var(--radius-md);
+  margin-top: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-sans);
+  z-index: 2000;
+  background-color: #fff;
+  padding: 8px 0;
+}
+
+.pac-container::after {
+  display: none !important;
+}
+
+.pac-item {
+  padding: 10px 20px;
+  border-top: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.pac-item:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.pac-item .pac-icon {
+  margin-top: 0;
+  display: none;
+}
+
+.pac-item .pac-item-query {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  padding-right: 0;
+  font-weight: 600;
+}
+
+.pac-item span:not(.pac-item-query) {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.pac-matched {
+  font-weight: 700;
+  color: var(--color-accent);
+}

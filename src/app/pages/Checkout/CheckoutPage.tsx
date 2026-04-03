@@ -7,6 +7,7 @@ import Header from '@/app/components/Header/Header';
 import Footer from '@/app/components/Footer/Footer';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import Step1 from './Step1/Step1';
+import Step2 from './Step2/Step2';
 import s from './CheckoutPage.module.scss';
 
 interface CheckoutPageProps {
@@ -39,6 +40,7 @@ function CheckoutContent({ lang }: CheckoutPageProps) {
                     </div>
 
                     {currentStep === 1 && <Step1 />}
+                    {currentStep === 2 && <Step2 />}
                 </div>
             </main>
             <Footer lang={lang} />

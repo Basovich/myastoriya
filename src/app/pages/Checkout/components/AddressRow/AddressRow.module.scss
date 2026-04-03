@@ -1,0 +1,108 @@
+.addressRow {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    margin-top: 16px;
+
+    @media (min-width: 1024px) {
+        flex-wrap: wrap;
+        overflow: visible;
+    }
+}
+
+.addressCard {
+    width: 200px;
+    height: 98px;
+    min-width: 200px;
+    background: #fff;
+    border: 1px solid #E2E2E2;
+    border-radius: 10px;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #E3051B;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.addressCardActive {
+    border-color: #E3051B;
+    box-shadow: 0 4px 12px rgba(227, 5, 27, 0.1);
+}
+
+.addressTitle {
+    font-size: 11px;
+    color: #4F4F4F;
+    margin-bottom: 4px;
+    opacity: 0.6;
+}
+
+.addressStreet {
+    font-size: 13px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.4;
+}
+
+.addAddressCard {
+    width: 200px;
+    height: 98px;
+    min-width: 200px;
+    background: #fff;
+    border: 1px dashed #E2E2E2;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    background: transparent;
+    padding: 0;
+
+    span {
+        font-size: 12px;
+        font-weight: 700;
+        color: #000;
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            background: #F8F8F8;
+            border-color: #c4c4c4;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.plusCircle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #F2F2F2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
