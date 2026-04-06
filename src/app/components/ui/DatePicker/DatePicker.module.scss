@@ -1,0 +1,184 @@
+@use "sass:color";
+
+.datePickerWrapper {
+    width: 100%;
+    position: relative;
+
+    :global {
+        .react-datepicker-wrapper {
+            width: 100%;
+        }
+
+        .react-datepicker__input-container {
+            display: block;
+            width: 100%;
+        }
+
+        .react-datepicker-popper {
+            z-index: 100;
+        }
+
+        .react-datepicker__triangle {
+            display: none !important;
+        }
+
+        .react-datepicker {
+            border: 1px solid #e2e2e2;
+            border-radius: 8px;
+            font-family: inherit;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background: #fff;
+            padding: 8px;
+        }
+
+        .react-datepicker__header {
+            background-color: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 12px 0;
+        }
+
+        .react-datepicker__current-month {
+            font-size: 14px;
+            font-weight: 700;
+            color: #060606;
+            margin-bottom: 8px;
+            text-transform: capitalize;
+        }
+
+        .react-datepicker__day-name {
+            font-size: 12px;
+            color: #999;
+            width: 44px;
+            line-height: 44px;
+            margin: 2px;
+        }
+
+        .react-datepicker__day {
+            width: 44px;
+            height: 44px;
+            line-height: 44px;
+            font-size: 14px;
+            color: #060606;
+            border-radius: 8px;
+            transition: all 0.2s;
+            margin: 2px;
+
+            &:hover {
+                background-color: rgba(253, 36, 39, 0.1) !important;
+                color: #FD2427 !important;
+                border-radius: 8px !important;
+            }
+
+            &.react-datepicker__day--disabled {
+                color: #ccc !important;
+                cursor: not-allowed !important;
+                background-color: transparent !important;
+
+                @media (any-hover: hover) {
+                    &:hover {
+                        background-color: transparent !important;
+                        color: #ccc !important;
+                    }
+                }
+            }
+        }
+
+        .react-datepicker__day--selected {
+            background-color: #FD2427 !important;
+            color: #fff !important;
+            font-weight: 700;
+
+            &:hover {
+                background-color: #FD2427 !important;
+                color: #fff !important;
+            }
+        }
+
+        .react-datepicker__day--keyboard-selected {
+            background-color: rgba(253, 36, 39, 0.1) !important;
+            color: #FD2427 !important;
+        }
+
+        .react-datepicker__day--today {
+            font-weight: 700;
+            color: #060606;
+
+            &.react-datepicker__day--selected {
+                color: #fff;
+                text-decoration: none;
+            }
+        }
+
+        .react-datepicker__navigation {
+            top: 12px;
+        }
+
+        .react-datepicker__navigation--previous {
+            left: 8px;
+        }
+
+        .react-datepicker__navigation--next {
+            right: 8px;
+        }
+
+        .react-datepicker__day--outside-month {
+            color: #ccc;
+        }
+    }
+}
+
+.customInput {
+    width: 100%;
+    border: 1px solid #c4c4c4;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 16px;
+    color: #333;
+    background-color: #fff;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover {
+        border-color: #FD2427;
+    }
+
+    &:focus-visible {
+        border-color: #FD2427;
+    }
+}
+
+.inputContent {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.leftIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.inputValue {
+    font-size: 16px;
+    color: #060606;
+}
+
+.arrowRight {
+    transition: transform 0.2s ease;
+    color: #000;
+    flex-shrink: 0;
+
+    &.isOpen {
+        transform: rotate(-90deg); // Or just keep it as is
+    }
+}

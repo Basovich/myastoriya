@@ -20,8 +20,14 @@
     cursor: pointer;
     text-align: left;
 
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #FD2427;
+        }
+    }
+
     &:focus-visible {
-        border-color: #E6000F;
+        border-color: #FD2427;
     }
 
     &.isOpen {
