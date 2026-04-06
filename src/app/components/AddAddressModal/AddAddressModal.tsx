@@ -25,7 +25,7 @@ const center = {
     lng: 30.5234
 };
 
-const libraries: ("places" | "drawing" | "geometry" | "localContext" | "visualization")[] = ['places'];
+const libraries: ("places" | "drawing" | "geometry" | "visualization")[] = ['places'];
 
 const darkMapStyle = [
     { "featureType": "all", "elementType": "geometry", "stylers": [{ "color": "#1d2c4d" }] },

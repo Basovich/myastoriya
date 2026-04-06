@@ -458,6 +458,7 @@ export default function Step1() {
                 <CartSummary 
                     onEditCart={() => setIsCartModalOpen(true)} 
                     discountPercent={appliedPromo?.discount || 0}
+                    deliveryPrice={125}
                 />
                 <PromoBlock 
                     onApply={(code, discount) => setAppliedPromo({ code, discount })} 

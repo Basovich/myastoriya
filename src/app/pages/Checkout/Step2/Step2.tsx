@@ -16,6 +16,7 @@ import AddressRow from '../components/AddressRow/AddressRow';
 import AddAddressModal from '@/app/components/AddAddressModal/AddAddressModal';
 import { addAddress } from '@/store/slices/authSlice';
 import { useDispatch } from 'react-redux';
+import Image from 'next/image';
 
 // ── Mock Data ────────────────────────────────────────────────────────────────
 
@@ -26,10 +27,15 @@ const MOCK_CITIES = [
     { value: 'odesa', label: 'Одеса' },
 ];
 
-const DELIVERY_METHODS = [
+const KYIV_DELIVERY = [
     { id: 'courier-kyiv', label: 'Кур’єром по Києву', price: 125 },
     { id: 'courier-region', label: 'Кур’єром в Київській області', price: 80 },
     { id: 'pickup', label: 'Самовивіз з закладу М’ясторія', price: 0, free: true },
+];
+
+const OTHER_DELIVERY = [
+    { id: 'courier-nova-poshta', label: 'Курьєром Нової Пошти', price: 125, isNP: true },
+    { id: 'branch-nova-poshta', label: 'У відділення Нової Пошти', price: 225, isNP: true },
 ];
 
 const MOCK_DATES = [
@@ -53,10 +59,18 @@ export default function Step2() {
     const addresses = [...(user?.addresses || []), ...guestAddresses];
 
     const [city, setCity] = useState(MOCK_CITIES[0].value);
-    const [deliveryMethod, setDeliveryMethod] = useState(DELIVERY_METHODS[0].id);
+    
+    const deliveryMethods = city === 'kyiv' ? KYIV_DELIVERY : OTHER_DELIVERY;
+
+    const [deliveryMethod, setDeliveryMethod] = useState(deliveryMethods[0].id);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(addresses.length > 0 ? addresses[0].id : null);
     const [deliveryDate, setDeliveryDate] = useState(MOCK_DATES[0].value);
     const [deliveryTime, setDeliveryTime] = useState(MOCK_TIMES[0].value);
+
+    // Reset delivery method when city changes
+    useEffect(() => {
+        setDeliveryMethod(city === 'kyiv' ? KYIV_DELIVERY[0].id : OTHER_DELIVERY[0].id);
+    }, [city]);
     
     // UI state
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -133,35 +147,55 @@ export default function Step2() {
                 <div className={s.formSection}>
                     <h2 className={s.sectionTitle}>Оберіть спосіб доставки чи самовивозу</h2>
                     <div className={s.deliveryMethods}>
-                        {DELIVERY_METHODS.map(method => (
-                            <label key={method.id} className={s.methodItem}>
-                                <input 
-                                    type="radio" 
-                                    name="deliveryMethod"
-                                    value={method.id}
-                                    checked={deliveryMethod === method.id}
-                                    onChange={() => setDeliveryMethod(method.id)}
-                                    className={s.hiddenRadio}
-                                />
-                                <span className={s.radioCircle} />
-                                <span className={s.methodLabel}>
-                                    {method.label} 
-                                    <span className={s.methodPrice}>
-                                        ({method.price === 0 ? 'Безкоштовно' : `${method.price} ₴`})
-                                    </span>
-                                </span>
-                            </label>
-                        ))}
-                    </div>
+                        {deliveryMethods.map(method => {
+                            const isCourier = ['courier-kyiv', 'courier-region', 'courier-nova-poshta'].includes(method.id);
+                            const isSelected = deliveryMethod === method.id;
 
-                    {deliveryMethod !== 'pickup' && (
-                        <AddressRow 
-                            addresses={addresses}
-                            selectedAddressId={selectedAddressId}
-                            onSelect={setSelectedAddressId}
-                            onAddClick={() => setIsAddAddressModalOpen(true)}
-                        />
-                    )}
+                            return (
+                                <div key={method.id} className={s.methodContainer}>
+                                    <label className={s.methodItem}>
+                                        <input 
+                                            type="radio" 
+                                            name="deliveryMethod"
+                                            value={method.id}
+                                            checked={isSelected}
+                                            onChange={() => setDeliveryMethod(method.id)}
+                                            className={s.hiddenRadio}
+                                        />
+                                        <span className={s.radioCircle} />
+                                        <span className={s.methodLabel}>
+                                            {method.label} 
+                                            <span className={s.methodPrice}>
+                                                ({method.price === 0 ? 'Безкоштовно' : `${method.price} ₴`})
+                                            </span>
+                                            {('isNP' in method && method.isNP) && (
+                                                <div className={s.npIconContainer}>
+                                                    <Image
+                                                        src="/icons/novaposhta_rounded.svg"
+                                                        alt="Nova Poshta"
+                                                        width={20}
+                                                        height={20}
+                                                        className={s.npIcon}
+                                                    />
+                                                </div>
+                                            )}
+                                        </span>
+                                    </label>
+                                    
+                                    {(isSelected && isCourier) && (
+                                        <div className={s.nestedAddressRow}>
+                                            <AddressRow 
+                                                addresses={addresses}
+                                                selectedAddressId={selectedAddressId}
+                                                onSelect={setSelectedAddressId}
+                                                onAddClick={() => setIsAddAddressModalOpen(true)}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 <div className={s.freeDeliveryBlock}>
@@ -211,6 +245,7 @@ export default function Step2() {
                 <CartSummary 
                     onEditCart={() => setIsCartModalOpen(true)} 
                     discountPercent={appliedPromo?.discount || 0}
+                    deliveryPrice={deliveryMethods.find(m => m.id === deliveryMethod)?.price || 0}
                 />
                 <PromoBlock 
                     onApply={(code, discount) => setAppliedPromo({ code, discount })} 

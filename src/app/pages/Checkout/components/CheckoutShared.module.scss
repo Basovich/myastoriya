@@ -2,7 +2,7 @@
 
 .stepIndicator {
     display: flex;
-    align-items: center;
+    align-items: flex-start; // Alignment with circle top
     width: 100%;
     max-width: 442px;
     margin: 0 auto 28px;
@@ -17,6 +17,12 @@
     flex-direction: column;
     align-items: center;
     gap: 6px;
+    width: 32px;
+    flex-shrink: 0;
+
+    @media (min-width: 768px) {
+        width: 36px;
+    }
 }
 
 .stepCircle {
@@ -52,33 +58,25 @@
 }
 
 .stepLabel {
+    color: #060606;
+    text-align: center;
+    font-feature-settings: 'liga' off, 'clig' off;
     font-size: 10px;
-    font-weight: 700;
-    color: #999;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;
     white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-
-    @media (min-width: 768px) {
-        font-size: 11px;
-    }
-}
-
-.stepLabelActive {
-    color: #000;
 }
 
 .stepLine {
     flex: 1;
     height: 1px;
     background: #c4c4c4;
-    margin: 0 6px;
-    margin-bottom: 18px;
+    margin: 15.5px 0 0; // Centered with mobile circle (32px)
     transition: background 0.2s;
 
     @media (min-width: 768px) {
-        margin: 0 12px;
-        margin-bottom: 20px;
+        margin-top: 17.5px; // Centered with desktop circle (36px)
     }
 }
 

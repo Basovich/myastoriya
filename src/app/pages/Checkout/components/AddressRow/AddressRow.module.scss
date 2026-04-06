@@ -17,22 +17,24 @@
 }
 
 .addressCard {
-    width: 200px;
-    height: 98px;
-    min-width: 200px;
+    width: 208px;
+    height: 118px;
+    min-width: 208px;
     background: #fff;
-    border: 1px solid #E2E2E2;
-    border-radius: 10px;
+    border: none;
+    border-radius: 12px;
     padding: 20px 16px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.11);
+    transition: transform 0.2s, box-shadow 0.2s;
 
     @media (any-hover: hover) {
         &:hover {
-            border-color: #E3051B;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.15);
         }
     }
 
@@ -43,8 +45,8 @@
 }
 
 .addressCardActive {
-    border-color: #E3051B;
-    box-shadow: 0 4px 12px rgba(227, 5, 27, 0.1);
+    outline: 1.5px solid #E3051B; // Using outline instead of border to preserve dimensions
+    box-shadow: 0 4px 12px rgba(227, 5, 27, 0.15);
 }
 
 .addressTitle {
@@ -62,21 +64,21 @@
 }
 
 .addAddressCard {
-    width: 200px;
-    height: 98px;
-    min-width: 200px;
+    width: 208px;
+    height: 118px;
+    min-width: 208px;
     background: #fff;
-    border: 1px dashed #E2E2E2;
-    border-radius: 10px;
+    border: none;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 12px;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-    background: transparent;
     padding: 0;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.11);
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
 
     span {
         font-size: 12px;
@@ -86,8 +88,9 @@
 
     @media (any-hover: hover) {
         &:hover {
-            background: #F8F8F8;
-            border-color: #c4c4c4;
+            background: #FAFAFA;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.15);
         }
     }
 
@@ -98,11 +101,12 @@
 }
 
 .plusCircle {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #F2F2F2;
+    width: 56px;
+    height: 56px;
+    border-radius: 56px;
+    background: #F6F6F6;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.20);
 }

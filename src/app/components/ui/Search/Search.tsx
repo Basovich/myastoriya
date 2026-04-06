@@ -12,7 +12,7 @@ interface SearchProps {
     showButton?: boolean;
 }
 
-export default function Search({ 
+const Search = React.forwardRef<HTMLInputElement, SearchProps>(({ 
     value, 
     onChange, 
     placeholder = "Пошук...", 
@@ -20,7 +20,7 @@ export default function Search({
     buttonColor = "red",
     className,
     showButton = true
-}: SearchProps) {
+}, ref) => {
     return (
         <div className={clsx(s.searchWrapper, className, !showButton && s.noButton)}>
             <div className={s.inputContainer}>
@@ -31,6 +31,7 @@ export default function Search({
                     </svg>
                 </div>
                 <input
+                    ref={ref}
                     type="text"
                     className={s.input}
                     placeholder={placeholder}
@@ -45,4 +46,6 @@ export default function Search({
             )}
         </div>
     );
-}
+});
+
+export default Search;

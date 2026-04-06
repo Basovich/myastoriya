@@ -50,14 +50,19 @@
 }
 
 .citySelect {
-    max-width: 442px;
+    width: 100%;
 }
 
 .deliveryMethods {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     margin-bottom: 24px;
+}
+
+.methodContainer {
+    display: flex;
+    flex-direction: column;
 }
 
 .methodItem {
@@ -65,14 +70,25 @@
     align-items: center;
     gap: 12px;
     cursor: pointer;
-    padding: 8px 0;
+    padding: 12px 0;
 
     @media (any-hover: hover) {
         &:hover {
             .radioCircle {
-                border-color: #E3051B;
+                border-color: #FD2427;
             }
         }
+    }
+}
+
+.nestedAddressRow {
+    margin-top: 8px;
+    margin-bottom: 12px;
+    padding-left: 0; // Or adjust if the design requires indentation
+
+    @media (min-width: 768px) {
+        margin-top: 12px;
+        margin-bottom: 20px;
     }
 }
 
@@ -83,39 +99,24 @@
     opacity: 0;
 
     &:checked + .radioCircle {
-        border-color: #E3051B;
-        &::after {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
+        border: 4px solid #FD2427;
     }
 }
 
 .radioCircle {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border: 2px solid #c4c4c4;
     border-radius: 50%;
     position: relative;
     flex-shrink: 0;
-    transition: border-color 0.2s;
-
-    &::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 10px;
-        height: 10px;
-        background: #E3051B;
-        border-radius: 50%;
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.5);
-        transition: opacity 0.2s, transform 0.2s;
-    }
+    transition: all 0.2s;
 }
 
 .methodLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 14px;
     font-weight: 700;
     color: #000;
@@ -125,8 +126,17 @@
     }
 }
 
-.methodPrice {
-    margin-left: 4px;
+.npIconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.npIcon {
+    width: 20px !important;
+    height: 20px !important;
+    object-fit: contain;
 }
 
 // ── Address Row ───────────────────────────────────────────────────────────────
@@ -162,7 +172,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-width: 600px;
+    width: 100%;
 
     @media (min-width: 600px) {
         flex-direction: row;

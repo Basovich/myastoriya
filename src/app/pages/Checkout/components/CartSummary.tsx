@@ -9,9 +9,10 @@ import s from './CheckoutShared.module.scss';
 interface CartSummaryProps {
     onEditCart: () => void;
     discountPercent?: number;
+    deliveryPrice?: number;
 }
 
-export default function CartSummary({ onEditCart, discountPercent = 0 }: CartSummaryProps) {
+export default function CartSummary({ onEditCart, discountPercent = 0, deliveryPrice = 0 }: CartSummaryProps) {
     const cartItems = useAppSelector(state => state.cart.items);
 
     const populatedItems = useMemo(() => {
@@ -25,7 +26,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0 }: CartSum
         return populatedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
     }, [populatedItems]);
 
-    const delivery = 120;
+    const delivery = deliveryPrice;
     const discountAmount = Math.round(totalSum * (discountPercent / 100));
     const cashback = Math.round((totalSum - discountAmount) * 0.03);
 

@@ -131,7 +131,7 @@ button.swiper-button-lock {
   margin-top: 8px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   font-family: var(--font-sans);
-  z-index: 2000;
+  z-index: 2000 !important;
   background-color: #fff;
   padding: 8px 0;
 }
