@@ -17,6 +17,8 @@ interface CustomSelectProps {
     placeholder?: string;
     error?: boolean;
     className?: string;
+    leftIcon?: React.ReactNode;
+    arrowVariant?: 'down' | 'right';
 }
 
 export default function CustomSelect({
@@ -27,6 +29,8 @@ export default function CustomSelect({
     placeholder = 'Оберіть варіант',
     error = false,
     className = '',
+    leftIcon,
+    arrowVariant = 'down',
 }: CustomSelectProps) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -58,12 +62,21 @@ export default function CustomSelect({
                 aria-expanded={isOpen}
                 aria-haspopup="listbox"
             >
-                <span className={clsx(s.selectValue, !selectedOption && s.placeholder)}>
-                    {selectedOption ? selectedOption.label : placeholder}
-                </span>
-                <svg className={s.arrow} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <div className={s.selectContent}>
+                    {leftIcon && <div className={s.leftIcon}>{leftIcon}</div>}
+                    <span className={clsx(s.selectValue, !selectedOption && s.placeholder)}>
+                        {selectedOption ? selectedOption.label : placeholder}
+                    </span>
+                </div>
+                {arrowVariant === 'down' ? (
+                    <svg className={s.arrow} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                ) : (
+                    <svg className={s.arrowRight} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                )}
             </button>
             
             {isOpen && (

@@ -39,13 +39,28 @@
     }
 }
 
+.selectContent {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.leftIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
 .placeholder {
     color: #888;
 }
 
-.arrow {
+.arrow, .arrowRight {
     transition: transform 0.2s ease;
     color: #000;
+    flex-shrink: 0;
 }
 
 .dropdown {
