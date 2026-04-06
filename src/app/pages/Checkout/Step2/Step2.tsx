@@ -44,11 +44,16 @@ const MOCK_DATES = [
     { value: 'tomorrow', label: 'Завтра' },
 ];
 
-const MOCK_TIMES = [
-    { value: '14:00-15:00', label: '14:00 - 15:00' },
-    { value: '15:00-16:00', label: '15:00 - 16:00' },
-    { value: '16:00-17:00', label: '16:00 - 17:00' },
-];
+const SHOP_OPEN = 10;
+const SHOP_CLOSE = 22;
+
+function isTodayDate(date: Date | null) {
+    if (!date) return false;
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear();
+}
 
 // ── Main Step2 Component ──────────────────────────────────────────────────────
 
@@ -66,7 +71,38 @@ export default function Step2() {
     const [deliveryMethod, setDeliveryMethod] = useState(deliveryMethods[0].id);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(addresses.length > 0 ? addresses[0].id : null);
     const [deliveryDate, setDeliveryDate] = useState<Date | null>(new Date());
-    const [deliveryTime, setDeliveryTime] = useState(MOCK_TIMES[0].value);
+    
+    // Generate dynamic time slots
+    const availableTimeSlots = React.useMemo(() => {
+        const slots = [];
+        const isToday = isTodayDate(deliveryDate);
+        const currentHour = new Date().getHours();
+        
+        // Start from SHOP_OPEN or current hour + 1 for Today
+        const startHour = isToday ? Math.max(SHOP_OPEN, currentHour + 1) : SHOP_OPEN;
+        
+        for (let h = startHour; h < SHOP_CLOSE; h++) {
+            const nextH = h + 1;
+            const timeStr = `${h.toString().padStart(2, '0')}:00-${nextH.toString().padStart(2, '0')}:00`;
+            const label = `${h.toString().padStart(2, '0')}:00 - ${nextH.toString().padStart(2, '0')}:00`;
+            slots.push({ value: timeStr, label });
+        }
+        return slots;
+    }, [deliveryDate]);
+
+    const [deliveryTime, setDeliveryTime] = useState('');
+
+    // Ensure deliveryTime is valid when available slots change
+    useEffect(() => {
+        if (availableTimeSlots.length > 0) {
+            const isValid = availableTimeSlots.some(s => s.value === deliveryTime);
+            if (!isValid) {
+                setDeliveryTime(availableTimeSlots[0].value);
+            }
+        } else {
+            setDeliveryTime('');
+        }
+    }, [availableTimeSlots, deliveryTime]);
 
     // Reset delivery method when city changes
     useEffect(() => {
@@ -214,7 +250,7 @@ export default function Step2() {
                             className={s.timeSelect}
                         />
                         <CustomSelect 
-                            options={MOCK_TIMES}
+                            options={availableTimeSlots}
                             value={deliveryTime}
                             onChange={setDeliveryTime}
                             className={s.timeSelect}
