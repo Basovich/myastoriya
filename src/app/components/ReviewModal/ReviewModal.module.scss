@@ -30,8 +30,7 @@
     max-height: calc(100vh - 80px);
 
     &:focus-visible {
-        outline: 2px solid #e3051b;
-        outline-offset: 2px;
+        outline: none;
     }
 
     @media (min-width: 481px) {
