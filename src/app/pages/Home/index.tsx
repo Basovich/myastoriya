@@ -29,7 +29,7 @@ export default function HomePage({ dict, lang, publications, slides, popularCate
             <main>
                 <Hero slides={slides} lang={lang} />
                 <Categories lang={lang} popularCategories={popularCategories} />
-                <Products dict={dict.home.products} categories={dict.home.categories.items} />
+                <Products dict={dict.home.products} categories={popularCategories} />
                 <Actions dict={dict.home.actions} lang={lang} />
                 <AppPromo />
                 <ComplexDiscounts dict={dict.home.discounts} lang={lang} />

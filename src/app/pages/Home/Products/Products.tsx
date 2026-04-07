@@ -11,11 +11,9 @@ import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import Button from "../../../components/ui/Button/Button";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import Image from "next/image";
+import type { PopularCategory } from "@/lib/graphql";
 
-interface Category {
-    title: string;
-    image: string;
-}
+
 
 interface ProductItem {
     id: number;
@@ -33,7 +31,7 @@ interface ProductsProps {
         items: ProductItem[];
         showMoreButton: string;
     };
-    categories: Category[];
+    categories: PopularCategory[];
 }
 
 export default function Products({ dict, categories }: ProductsProps) {
@@ -81,14 +79,14 @@ export default function Products({ dict, categories }: ProductsProps) {
                         className={clsx(s.tabs, "products-tabs-swiper")}
                     >
                         {categories.map((cat, i) => (
-                            <SwiperSlide key={i} className={s.tabSlide}>
+                            <SwiperSlide key={cat.id} className={s.tabSlide}>
                                 <Button
                                     variant="pill"
                                     active={activeTab === i}
                                     onClick={() => setActiveTab(i)}
                                     className={s.tabButton}
                                 >
-                                    {cat.title}
+                                    {cat.name}
                                 </Button>
                             </SwiperSlide>
                         ))}
