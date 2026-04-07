@@ -1,0 +1,70 @@
+const GQL_ENDPOINT = 'https://dev-api.myastoriya.com.ua/graphql';
+
+export interface GqlError {
+    message: string;
+    locations?: { line: number; column: number }[];
+    path?: string[];
+    extensions?: Record<string, unknown>;
+}
+
+export interface GqlResponse<T> {
+    data?: T;
+    errors?: GqlError[];
+}
+
+export class GraphQLError extends Error {
+    constructor(
+        message: string,
+        public readonly errors: GqlError[],
+    ) {
+        super(message);
+        this.name = 'GraphQLError';
+    }
+}
+
+interface RequestOptions {
+    /** Access token for authenticated requests */
+    token?: string;
+    /** Next.js cache / revalidate options (server-side only) */
+    next?: NextFetchRequestConfig;
+}
+
+/**
+ * Base GraphQL fetch. Returns typed `data` or throws `GraphQLError`.
+ */
+export async function gqlRequest<T>(
+    query: string,
+    variables?: Record<string, unknown>,
+    options?: RequestOptions,
+): Promise<T> {
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    };
+
+    if (options?.token) {
+        headers['Authorization'] = `Bearer ${options.token}`;
+    }
+
+    const res = await fetch(GQL_ENDPOINT, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ query, variables }),
+        ...(options?.next ? { next: options.next } : {}),
+    });
+
+    if (!res.ok) {
+        throw new Error(`Network error: ${res.status} ${res.statusText}`);
+    }
+
+    const json: GqlResponse<T> = await res.json();
+
+    if (json.errors?.length) {
+        throw new GraphQLError(json.errors[0].message, json.errors);
+    }
+
+    if (json.data === undefined) {
+        throw new Error('No data returned from GraphQL');
+    }
+
+    return json.data;
+}

@@ -10,14 +10,9 @@ import Pagination from "../ui/Pagination/Pagination";
 import Tabs from "../ui/Tabs/Tabs";
 import SubscribeBanner from "../SubscribeBanner/SubscribeBanner";
 import s from "./BlogGrid.module.scss";
+import type { BlogPost, BlogType } from "@/lib/graphql";
 
-// Reusing interfaces from existing Content
-interface PublicationItem {
-    id: number;
-    title: string;
-    image: string;
-    dateRange: string;
-}
+type TabType = "all" | string;
 
 interface BlogGridProps {
     dict: {
@@ -34,49 +29,77 @@ interface BlogGridProps {
         };
         showBtn: string;
     };
-    initialItems: PublicationItem[];
+    initialItems: BlogPost[];
+    totalPages: number;
+    hasMore: boolean;
+    blogTypes: BlogType[];
     lang: string;
-    activeCategory?: TabType;
+    activeTypeSlug?: string;
 }
 
-type TabType = 'all' | 'news' | 'recipes' | 'events';
-
-export default function BlogGrid({ dict, initialItems, lang, activeCategory = 'all' }: BlogGridProps) {
-    // Generate 12 mock initial items regardless of what was passed in
-    const twelveInitialItems = Array.from({ length: 12 }).map((_, i) => {
-        const baseItem = initialItems[i % initialItems.length];
-        return { ...baseItem, id: baseItem.id + i * 1000 };
-    });
-
-    const [items, setItems] = useState<PublicationItem[]>(twelveInitialItems);
-    const [hasMore, setHasMore] = useState(true);
+export default function BlogGrid({
+    dict,
+    initialItems,
+    totalPages,
+    hasMore: initialHasMore,
+    blogTypes,
+    lang,
+    activeTypeSlug,
+}: BlogGridProps) {
+    const [items, setItems] = useState<BlogPost[]>(initialItems);
+    const [hasMore, setHasMore] = useState(initialHasMore);
     const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 10; // Mock total pages
-
-    // removed getRoute as AppLink automatically handles localization
+    const [loading, setLoading] = useState(false);
 
     const breadcrumbItems = [
-        { label: dict.breadcrumbs.home, href: '/' },
-        { label: dict.breadcrumbs.blog }
+        { label: dict.breadcrumbs.home, href: "/" },
+        { label: dict.breadcrumbs.blog },
     ];
 
-    const loadMore = () => {
-        // Load exactly 12 more mock items
-        const moreItems = Array.from({ length: 12 }).map((_, i) => {
-            const baseItem = initialItems[(i + 1) % initialItems.length];
-            return { ...baseItem, id: baseItem.id + (i + 12) * 1000 };
-        });
-
-        setItems((prev) => [...prev, ...moreItems]);
-        setHasMore(false);
+    const loadMore = async () => {
+        if (loading) return;
+        setLoading(true);
+        try {
+            const nextPage = currentPage + 1;
+            const res = await fetch("/api/blogs", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ page: nextPage, typeSlug: activeTypeSlug ?? null }),
+            });
+            const data = await res.json();
+            if (data.items?.length) {
+                setItems((prev) => [...prev, ...data.items]);
+                setHasMore(data.hasMore);
+                setCurrentPage(nextPage);
+            }
+        } catch {
+            // silent
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const tabsData = [
-        { id: 'all', label: dict.tabs.all, href: '/blog', active: activeCategory === 'all' },
-        { id: 'news', label: dict.tabs.news, href: '/blog/news', active: activeCategory === 'news' },
-        { id: 'recipes', label: dict.tabs.recipes, href: '/blog/recipes', active: activeCategory === 'recipes' },
-        { id: 'events', label: dict.tabs.events, href: '/blog/events', active: activeCategory === 'events' },
+    const staticTabs = [
+        { id: "all", label: dict.tabs.all, href: "/blog", active: !activeTypeSlug },
     ];
+
+    const dynamicTabs = blogTypes.map((t) => ({
+        id: t.slug,
+        label: t.name,
+        href: `/blog/${t.slug}`,
+        active: activeTypeSlug === t.slug,
+    }));
+
+    const tabsData = [...staticTabs, ...dynamicTabs];
+
+    const formatDate = (iso: string | null) => {
+        if (!iso) return "";
+        return new Date(iso).toLocaleDateString("uk-UA", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        });
+    };
 
     return (
         <section className={s.section}>
@@ -95,15 +118,29 @@ export default function BlogGrid({ dict, initialItems, lang, activeCategory = 'a
                 </div>
 
                 <div className={s.grid}>
-                    {items.map((item, idx) => (
-                        <AppLink key={`${item.id}-${idx}`} href={`/blog/${item.id}`} className={s.cardLink}>
+                    {items.map((item) => (
+                        <AppLink
+                            key={item.id}
+                            href={`/blog/${item.slug}`}
+                            className={s.cardLink}
+                        >
                             <div className={s.card}>
                                 <div className={s.cardImage}>
-                                    <Image src={item.image} alt={item.title} fill className={s.cardImg} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                                    {item.image?.url?.size2x ? (
+                                        <Image
+                                            src={item.image.url.size2x}
+                                            alt={item.name}
+                                            fill
+                                            className={s.cardImg}
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                        />
+                                    ) : (
+                                        <div className={s.cardImgPlaceholder} />
+                                    )}
                                 </div>
                                 <div className={s.cardBody}>
-                                    <span className={s.date}>{item.dateRange}</span>
-                                    <h3 className={s.cardTitle}>{item.title}</h3>
+                                    <span className={s.date}>{formatDate(item.publishedAt)}</span>
+                                    <h3 className={s.cardTitle}>{item.name}</h3>
                                 </div>
                             </div>
                         </AppLink>
@@ -112,28 +149,37 @@ export default function BlogGrid({ dict, initialItems, lang, activeCategory = 'a
 
                 {hasMore && (
                     <div className={s.loadMoreWrapper}>
-                        <Button variant="outline-black" onClick={loadMore} className={s.loadMoreBtn}>
-                            <span className={s.loadMoreBtnText}>{dict.showBtn}</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
-                                <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" strokeWidth="2" strokeLinecap="round" />
-                                <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" strokeWidth="2" strokeLinecap="round" />
-                            </svg>
+                        <Button
+                            variant="outline-black"
+                            onClick={loadMore}
+                            className={s.loadMoreBtn}
+                            disabled={loading}
+                        >
+                            <span className={s.loadMoreBtnText}>
+                                {loading ? "Завантаження..." : dict.showBtn}
+                            </span>
+                            {!loading && (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
+                                    <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" strokeWidth="2" strokeLinecap="round" />
+                                    <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" strokeWidth="2" strokeLinecap="round" />
+                                </svg>
+                            )}
                         </Button>
                     </div>
                 )}
 
                 <div className={s.paginationRow}>
-                    <Pagination 
+                    <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}
                         onPageChange={(page) => {
                             setCurrentPage(page);
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
                     />
                 </div>
 
-                <SubscribeBanner 
+                <SubscribeBanner
                     image="/images/blog/subscribe-bg1.png"
                     title="Підпишіться на нашу розсилку"
                 />

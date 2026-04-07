@@ -32,10 +32,6 @@
             "href": "/delivery"
         },
         {
-            "label": "Блог",
-            "href": "/blog"
-        },
-        {
             "label": "Франшиза",
             "href": "https://f.myastoriya.ua/"
         },
@@ -88,10 +84,6 @@
             {
                 "label": "Доставка та Оплата",
                 "href": "/delivery"
-            },
-            {
-                "label": "Блог",
-                "href": "/blog"
             },
             {
                 "label": "Франшиза",

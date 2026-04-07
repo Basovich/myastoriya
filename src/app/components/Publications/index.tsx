@@ -4,20 +4,32 @@ import Button from "../ui/Button/Button";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import { Locale } from "@/i18n/config";
-import type { Publication } from "@/i18n/types";
 import clsx from "clsx";
+import type { BlogPost } from "@/lib/graphql";
 
 interface PublicationsProps {
   dict: {
     sectionTitle: string;
     showAllButton: string;
-    items: Publication[];
   };
+  posts: BlogPost[];
   lang: Locale;
   className?: string;
 }
 
-export default function Index({ dict, lang, className }: PublicationsProps) {
+export default function Index({ dict, posts, lang, className }: PublicationsProps) {
+    if (!posts || posts.length === 0) {
+        return null;
+    }
+
+    const formatDate = (iso: string | null) => {
+        if (!iso) return "";
+        return new Date(iso).toLocaleDateString("uk-UA", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        });
+    };
 
     return (
         <section className={clsx(s.section, className)} id="publications">
@@ -25,14 +37,18 @@ export default function Index({ dict, lang, className }: PublicationsProps) {
                 <SectionHeader title={dict.sectionTitle} />
             </div>
             <div className={s.carousel}>
-                {dict.items.map((pub) => (
-                    <AppLink href={`/blog/${pub.id}`} key={pub.id} className={s.card}>
+                {posts.map((pub) => (
+                    <AppLink href={`/blog/${pub.slug}`} key={pub.id} className={s.card}>
                         <div className={s.imageWrap}>
-                            <Image src={pub.image} alt={pub.title} fill className={s.cardImg} />
+                            {pub.image?.url?.size2x ? (
+                                <Image src={pub.image.url.size2x} alt={pub.name} fill className={s.cardImg} sizes="(max-width: 768px) 100vw, 33vw" />
+                            ) : (
+                                <div className={s.cardImgPlaceholder} />
+                            )}
                         </div>
                         <div className={s.info}>
-                            <span className={s.date}>{pub.dateRange}</span>
-                            <h3 className={s.title} title={pub.title}>{pub.title}</h3>
+                            <span className={s.date}>{formatDate(pub.publishedAt)}</span>
+                            <h3 className={s.title} title={pub.name}>{pub.name}</h3>
                         </div>
                     </AppLink>
                 ))}

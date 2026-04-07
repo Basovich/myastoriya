@@ -11,13 +11,15 @@ import SeoText from "@/app/pages/Home/SeoText/SeoText";
 import Footer from "@/app/components/Footer/Footer";
 import { Locale } from "@/i18n/config";
 import { Dictionary } from "@/i18n/types";
+import type { BlogPost } from "@/lib/graphql";
 
 interface HomePageProps {
   dict: Dictionary;
   lang: Locale;
+  publications: BlogPost[];
 }
 
-export default function HomePage({ dict, lang }: HomePageProps) {
+export default function HomePage({ dict, lang, publications }: HomePageProps) {
     return (
         <>
             <Header lang={lang} />
@@ -28,7 +30,7 @@ export default function HomePage({ dict, lang }: HomePageProps) {
                 <Actions dict={dict.home.actions} lang={lang} />
                 <AppPromo />
                 <ComplexDiscounts dict={dict.home.discounts} lang={lang} />
-                <Publications dict={dict.home.publications} lang={lang} />
+                <Publications dict={dict.home.publications} posts={publications} lang={lang} />
                 <Reviews dict={dict.home.reviews} />
                 <SeoText dict={dict.home.seo} />
             </main>

@@ -1,0 +1,21 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getBlogsApi } from "@/lib/graphql";
+
+export async function POST(req: NextRequest) {
+    try {
+        const body = await req.json();
+        const page: number = body.page ?? 1;
+        const typeSlug: string | null = body.typeSlug ?? null;
+
+        const result = await getBlogsApi({ page, typeSlug });
+
+        return NextResponse.json({
+            items: result.data,
+            hasMore: result.has_more_pages,
+            currentPage: result.current_page,
+        });
+    } catch (err) {
+        const message = err instanceof Error ? err.message : "Помилка";
+        return NextResponse.json({ error: message }, { status: 500 });
+    }
+}

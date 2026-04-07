@@ -3,10 +3,22 @@ import Footer from "@/app/components/Footer/Footer";
 import { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import BlogGrid from "@/app/components/BlogGrid/BlogGrid";
+import { getBlogsApi, getBlogTypesApi } from "@/lib/graphql";
 
-export default async function RecipesPage({ params }: { params: Promise<{ lang: Locale }> }) {
+export default async function RecipesPage({
+    params,
+}: {
+    params: Promise<{ lang: Locale }>;
+}) {
     const { lang } = await params;
     const dict = await getDictionary(lang);
+
+    const activeSlug = "recipes";
+
+    const [blogsResult, blogTypes] = await Promise.all([
+        getBlogsApi({ page: 1, typeSlug: activeSlug }),
+        getBlogTypesApi(),
+    ]);
 
     return (
         <main>
@@ -14,9 +26,12 @@ export default async function RecipesPage({ params }: { params: Promise<{ lang: 
 
             <BlogGrid
                 dict={dict.home.blogPage}
-                initialItems={dict.home.publications.items}
+                initialItems={blogsResult.data}
+                totalPages={blogsResult.has_more_pages ? 999 : blogsResult.current_page}
+                hasMore={blogsResult.has_more_pages}
+                blogTypes={blogTypes}
                 lang={lang}
-                activeCategory="recipes"
+                activeTypeSlug={activeSlug}
             />
 
             <Footer lang={lang} />
