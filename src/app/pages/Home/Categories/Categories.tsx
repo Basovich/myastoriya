@@ -11,29 +11,25 @@ import SectionHeader from "../../../components/ui/SectionHeader/SectionHeader";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import Image from "next/image";
 import AppLink from "../../../components/ui/AppLink/AppLink";
-
-interface Category {
-    title: string;
-    image: string;
-    slug: string;
-}
+import type { PopularCategory } from "@/lib/graphql";
+import { Locale } from "@/i18n/config";
 
 interface CategoriesProps {
-    categories: {
-        sectionTitle: string;
-        items: Category[];
-    };
+    lang: Locale;
+    popularCategories: PopularCategory[];
 }
 
-export default function Categories({ categories }: CategoriesProps) {
+export default function Categories({ lang, popularCategories }: CategoriesProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
-    if (!categories || !categories.items) return null;
+    if (!popularCategories) return null;
+
+    const sectionTitle = lang === "ua" ? "КАТЕГОРІЇ" : "КАТЕГОРИИ";
 
     return (
         <section className={s.section} id="categories">
-            <SectionHeader title={categories.sectionTitle} classNameWrapper={s.classNameWrapper} />
+            <SectionHeader title={sectionTitle} classNameWrapper={s.classNameWrapper} />
 
             <div className={s.sliderWrapper}>
                 <div className={s.sliderNav}>
@@ -67,13 +63,21 @@ export default function Categories({ categories }: CategoriesProps) {
                         1280: { slidesPerView: 6, spaceBetween: 0 },
                     }}
                 >
-                    {categories.items.map((cat, i) => (
-                        <SwiperSlide key={i} className={s.slide}>
-                            <AppLink href={`/catalog/${cat.slug}`} className={s.item}>
+                    {popularCategories.map((cat) => (
+                        <SwiperSlide key={cat.id} className={s.slide}>
+                            <AppLink href={`/catalog/${cat.id}`} className={s.item}>
                                 <div className={s.circle}>
-                                    <Image src={cat.image} alt={cat.title} width={100} height={100} className={s.circleImg} />
+                                    {cat.image?.big2x && (
+                                        <Image
+                                            src={cat.image.big2x}
+                                            alt={cat.name}
+                                            width={180}
+                                            height={180}
+                                            className={s.circleImg}
+                                        />
+                                    )}
                                 </div>
-                                <span className={s.label}>{cat.title}</span>
+                                <span className={s.label}>{cat.name}</span>
                             </AppLink>
                         </SwiperSlide>
                     ))}

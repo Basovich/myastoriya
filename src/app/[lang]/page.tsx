@@ -1,7 +1,7 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import HomePage from "@/app/pages/Home";
-import { getBlogsApi, getSlidesApi } from "@/lib/graphql";
+import { getBlogsApi, getSlidesApi, getPopularCategoriesApi } from "@/lib/graphql";
 
 export default async function Home({
   params,
@@ -11,12 +11,13 @@ export default async function Home({
   const { lang } = await params;
   const dict = await getDictionary(lang);
 
-  const [blogsResponse, slides] = await Promise.all([
+  const [blogsResponse, slides, popularCategories] = await Promise.all([
     getBlogsApi({ limit: 4 }),
     getSlidesApi("main"),
+    getPopularCategoriesApi(),
   ]);
 
   return (
-      <HomePage lang={lang} dict={dict} publications={blogsResponse.data} slides={slides} />
+      <HomePage lang={lang} dict={dict} publications={blogsResponse.data} slides={slides} popularCategories={popularCategories} />
   );
 }

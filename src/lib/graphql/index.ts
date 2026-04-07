@@ -46,3 +46,7 @@ export type {
 // Re-export slides
 export { SLIDES_QUERY, getSlidesApi } from './queries/slides';
 export type { Slide, SlideImage, SlideImageWeb, SlideLinkTo } from './queries/slides';
+
+// Re-export categories
+export { getPopularCategoriesApi } from './queries/categories';
+export type { PopularCategory } from './queries/categories';
