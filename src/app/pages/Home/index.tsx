@@ -11,20 +11,21 @@ import SeoText from "@/app/pages/Home/SeoText/SeoText";
 import Footer from "@/app/components/Footer/Footer";
 import { Locale } from "@/i18n/config";
 import { Dictionary } from "@/i18n/types";
-import type { BlogPost } from "@/lib/graphql";
+import type { BlogPost, Slide } from "@/lib/graphql";
 
 interface HomePageProps {
   dict: Dictionary;
   lang: Locale;
   publications: BlogPost[];
+  slides: Slide[];
 }
 
-export default function HomePage({ dict, lang, publications }: HomePageProps) {
+export default function HomePage({ dict, lang, publications, slides }: HomePageProps) {
     return (
         <>
             <Header lang={lang} />
             <main>
-                <Hero hero={dict.home.hero} />
+                <Hero slides={slides} lang={lang} />
                 <Categories categories={dict.home.categories} />
                 <Products dict={dict.home.products} categories={dict.home.categories.items} />
                 <Actions dict={dict.home.actions} lang={lang} />

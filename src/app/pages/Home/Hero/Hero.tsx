@@ -9,61 +9,63 @@ import "swiper/css/pagination";
 import clsx from "clsx";
 import s from "./Hero.module.scss";
 import Image from "next/image";
-import Button from "../../../components/ui/Button/Button";
 import AppLink from "../../../components/ui/AppLink/AppLink";
-
-interface SlideContent {
-    image: string;
-    badge: string;
-    title: string;
-    ctaButton: {
-        text: string;
-        href: string;
-    };
-}
+import Button from "../../../components/ui/Button/Button";
+import type { Slide } from "@/lib/graphql";
+import { type Locale } from "@/i18n/config";
 
 interface HeroProps {
-    hero: {
-        slides: SlideContent[];
-    };
+    slides: Slide[];
+    lang: Locale;
 }
 
-export default function Hero({ hero }: HeroProps) {
-    if (!hero || !hero.slides || hero.slides.length === 0) return null;
+export default function Hero({ slides, lang }: HeroProps) {
+    if (!slides || slides.length === 0) return null;
 
-    if (hero.slides.length === 1) {
-        const slide = hero.slides[0];
+    const btnText = lang === 'ua' ? 'Дізнатися більше' : 'Узнать больше';
+
+    // Helper to generate correct link from linkTo
+    const getLink = (linkTo: Slide['linkTo']) => {
+        if (!linkTo || !linkTo.type || !linkTo.id) return "/actions";
+        if (linkTo.type === "product") return `/catalog/item/${linkTo.id}`;
+        if (linkTo.type === "category") return `/catalog/${linkTo.id}`;
+        return `/actions/${linkTo.id}`; // Default fallback for actions/sales
+    };
+
+    if (slides.length === 1) {
+        const slide = slides[0];
+        const imageUrl = slide.imageWeb?.desktop || slide.image?.size3x || slide.image?.size2x || '';
+        const href = getLink(slide.linkTo);
+
         return (
             <section className={s.hero} id="hero">
                 <div className={s.singleSlide}>
-                    <div className={s.slide}>
-                        <Image
-                            src={slide.image}
-                            alt={slide.title}
-                            className={s.bgImage}
-                            width={320}
-                            height={555}
-                            priority
-                        />
+                    <AppLink href="#" className={s.slide}>
+                        {imageUrl && (
+                            <Image
+                                src={imageUrl}
+                                alt={slide.name || "Слайд"}
+                                className={s.bgImage}
+                                width={1920}
+                                height={555}
+                                priority
+                            />
+                        )}
                         <div className={s.overlay} />
-                    </div>
-                    <div className={s.contentOverlay}>
-                        <div className={s.content}>
-                            <span className={s.badge}>{slide.badge}</span>
-                            <AppLink href={slide.ctaButton?.href ?? "/actions/1"}>
-                                <h1 className={s.title}>{slide.title}</h1>
-                            </AppLink>
-                            {slide.ctaButton && (
-                                <Button href={slide.ctaButton.href} variant="outline" className={s.ctaButton}>
-                                    <span className={s.ctaButtonInner}>{slide.ctaButton.text}</span>
+                        
+                        <div className={s.contentOverlay}>
+                            <div className={s.content}>
+                                <h1 className={s.title}>{slide.name}</h1>
+                                <Button href="#" variant="outline" className={s.ctaButton}>
+                                    <span className={s.ctaButtonInner}>{btnText}</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                                         <path d="M9.98565 0.999945L16.3141 7.32837L9.98565 13.6568" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                                         <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                                     </svg>
                                 </Button>
-                            )}
+                            </div>
                         </div>
-                    </div>
+                    </AppLink>
                 </div>
             </section>
         );
@@ -84,40 +86,40 @@ export default function Hero({ hero }: HeroProps) {
                 loop={true}
                 className={clsx(s.swiperContainer, "hero-swiper")}
             >
-                {hero.slides.map((slide, index) => (
-                    <SwiperSlide key={index}>
-                        <div className={s.slide}>
-                            <Image
-                                src={slide.image}
-                                alt={slide.title}
-                                className={s.bgImage}
-                                width={320}
-                                height={555}
-                                priority={index === 0}
-                            />
-                            <div className={s.overlay} />
+                {slides.map((slide, index) => {
+                    const imageUrl = slide.imageWeb?.desktop || slide.image?.size3x || slide.image?.size2x || '';
 
-                            {/* Content Overlay всередину кожного слайду */}
-                            <div className={s.contentOverlay}>
-                                <div className={s.content}>
-                                    <span className={s.badge}>{slide.badge}</span>
-                                    <AppLink href={slide.ctaButton?.href ?? "/actions/1"}>
-                                        <h2 className={s.title}>{slide.title}</h2>
-                                    </AppLink>
-                                    {slide.ctaButton && (
-                                        <Button href={slide.ctaButton.href} variant="outline" className={s.ctaButton}>
-                                            <span className={s.ctaButtonInner}>{slide.ctaButton.text}</span>
+                    return (
+                        <SwiperSlide key={slide.id || index}>
+                            <AppLink href="#" className={s.slide}>
+                                {imageUrl && (
+                                    <Image
+                                        src={imageUrl}
+                                        alt={slide.name || "Слайд"}
+                                        className={s.bgImage}
+                                        width={1920}
+                                        height={555}
+                                        priority={index === 0}
+                                    />
+                                )}
+                                <div className={s.overlay} />
+
+                                <div className={s.contentOverlay}>
+                                    <div className={s.content}>
+                                        <h2 className={s.title}>{slide.name}</h2>
+                                        <Button href="#" variant="outline" className={s.ctaButton}>
+                                            <span className={s.ctaButtonInner}>{btnText}</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                                                 <path d="M9.98565 0.999945L16.3141 7.32837L9.98565 13.6568" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                                                 <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                                             </svg>
                                         </Button>
-                                    )}
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </SwiperSlide>
-                ))}
+                            </AppLink>
+                        </SwiperSlide>
+                    );
+                })}
 
                 {/* Desktop navigation arrows */}
                 <button className={clsx(s.navArrow, s.navLeft, 'hero-swiper-prev')} aria-label="Попередній слайд">
