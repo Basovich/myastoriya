@@ -1,4 +1,4 @@
-import { gqlRequest } from '../client';
+import { gqlRequest } from "../../../client";
 
 export interface PopularCategory {
     id: string;
@@ -26,5 +26,5 @@ export async function getPopularCategoriesApi(): Promise<PopularCategory[]> {
         undefined,
         { next: { revalidate: 3600 } },
     );
-    return data.popularCategories;
+    return data.popularCategories ?? [];
 }

@@ -11,7 +11,7 @@ import SeoText from "@/app/pages/Home/SeoText/SeoText";
 import Footer from "@/app/components/Footer/Footer";
 import { Locale } from "@/i18n/config";
 import { Dictionary } from "@/i18n/types";
-import type { BlogPost, Slide, PopularCategory } from "@/lib/graphql";
+import type { BlogPost, Slide, PopularCategory, HomeReview } from "@/lib/graphql";
 
 interface HomePageProps {
   dict: Dictionary;
@@ -19,9 +19,10 @@ interface HomePageProps {
   publications: BlogPost[];
   slides: Slide[];
   popularCategories: PopularCategory[];
+  reviews: HomeReview[];
 }
 
-export default function HomePage({ dict, lang, publications, slides, popularCategories }: HomePageProps) {
+export default function HomePage({ dict, lang, publications, slides, popularCategories, reviews }: HomePageProps) {
     return (
         <>
             <Header lang={lang} />
@@ -33,7 +34,7 @@ export default function HomePage({ dict, lang, publications, slides, popularCate
                 <AppPromo />
                 <ComplexDiscounts dict={dict.home.discounts} lang={lang} />
                 <Publications dict={dict.home.publications} posts={publications} lang={lang} />
-                <Reviews dict={dict.home.reviews} />
+                <Reviews dict={dict.home.reviews} reviews={reviews} />
                 <SeoText dict={dict.home.seo} />
             </main>
             <Footer lang={lang} />

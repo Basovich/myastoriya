@@ -44,9 +44,13 @@ export type {
 } from './queries/blog';
 
 // Re-export slides
-export { SLIDES_QUERY, getSlidesApi } from './queries/slides';
-export type { Slide, SlideImage, SlideImageWeb, SlideLinkTo } from './queries/slides';
+export { SLIDES_QUERY, getSlidesApi } from './queries/pages/home/slides';
+export type { Slide, SlideImage, SlideImageWeb, SlideLinkTo } from './queries/pages/home/slides';
 
 // Re-export categories
-export { getPopularCategoriesApi } from './queries/categories';
-export type { PopularCategory } from './queries/categories';
+export { getPopularCategoriesApi } from './queries/pages/home/categories';
+export type { PopularCategory } from './queries/pages/home/categories';
+
+// Re-export reviews
+export { getReviewsApi } from './queries/pages/home/reviews';
+export type { HomeReview, ReviewUser } from './queries/pages/home/reviews';
