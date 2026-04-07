@@ -40,7 +40,7 @@ export default function Hero({ slides, lang }: HeroProps) {
         return (
             <section className={s.hero} id="hero">
                 <div className={s.singleSlide}>
-                    <AppLink href="#" className={s.slide}>
+                    <div className={s.slide}>
                         {imageUrl && (
                             <Image
                                 src={imageUrl}
@@ -55,7 +55,9 @@ export default function Hero({ slides, lang }: HeroProps) {
                         
                         <div className={s.contentOverlay}>
                             <div className={s.content}>
-                                <h1 className={s.title}>{slide.name}</h1>
+                                <AppLink href="#">
+                                    <h1 className={s.title}>{slide.name}</h1>
+                                </AppLink>
                                 <Button href="#" variant="outline" className={s.ctaButton}>
                                     <span className={s.ctaButtonInner}>{btnText}</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
@@ -65,7 +67,7 @@ export default function Hero({ slides, lang }: HeroProps) {
                                 </Button>
                             </div>
                         </div>
-                    </AppLink>
+                    </div>
                 </div>
             </section>
         );
@@ -91,7 +93,7 @@ export default function Hero({ slides, lang }: HeroProps) {
 
                     return (
                         <SwiperSlide key={slide.id || index}>
-                            <AppLink href="#" className={s.slide}>
+                            <div className={s.slide}>
                                 {imageUrl && (
                                     <Image
                                         src={imageUrl}
@@ -106,7 +108,9 @@ export default function Hero({ slides, lang }: HeroProps) {
 
                                 <div className={s.contentOverlay}>
                                     <div className={s.content}>
-                                        <h2 className={s.title}>{slide.name}</h2>
+                                        <AppLink href="#">
+                                            <h2 className={s.title}>{slide.name}</h2>
+                                        </AppLink>
                                         <Button href="#" variant="outline" className={s.ctaButton}>
                                             <span className={s.ctaButtonInner}>{btnText}</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
@@ -116,7 +120,7 @@ export default function Hero({ slides, lang }: HeroProps) {
                                         </Button>
                                     </div>
                                 </div>
-                            </AppLink>
+                            </div>
                         </SwiperSlide>
                     );
                 })}
