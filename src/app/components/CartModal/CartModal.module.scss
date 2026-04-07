@@ -167,30 +167,34 @@
     overflow-x: hidden;
     flex: 1;
     min-height: 250px;
-    scrollbar-width: thin;
-    scrollbar-color: #E6000F rgba(0, 0, 0, 0.05);
     padding-right: 8px;
 
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #E3051B #E2E2E2;
+
+    /* Chrome, Edge, Safari */
     &::-webkit-scrollbar {
         width: 4px;
     }
 
     &::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.05);
+        background: #E2E2E2;
         border-radius: 4px;
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: #E6000F;
+        background-color: #E3051B;
         border-radius: 4px;
     }
 
     @media (min-width: 1024px) {
         max-height: 418px;
-        /* Fits exactly 3 items at ~139px each */
         padding-right: 8px;
     }
 }
+
+
 
 .emptyState {
     text-align: center;
