@@ -15,6 +15,7 @@ import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
 import Header from '@/app/components/Header/Header';
 import Footer from '@/app/components/Footer/Footer';
 import RecentlyViewedSlider from '@/app/components/Personal/RecentlyViewedSlider/RecentlyViewedSlider';
+import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import uaData from '@/content/ua.json';
 import ruData from '@/content/ru.json';
 
@@ -57,38 +58,55 @@ export default function ProfilePage() {
         <main className={s.pageWrapper}>
             <Header lang={lang} />
             <div className={s.profilePage}>
-                <aside className={s.profileSidebar}>
-                    <PersonalNav 
-                        lang={lang} 
-                        dict={dict.navigation} 
-                        onLogout={handleLogout} 
-                    />
-                    <BonusCard 
-                        balance={1200} 
-                        percent={3} 
-                        dict={dict.bonusCard} 
-                    />
-                </aside>
+                <div className={s.unifiedBlock}>
+                    <div className={s.blockHeader}>
+                        <SectionHeader 
+                            title={dict.title} 
+                            withDots={true} 
+                            classNameTitle={s.pageTitle}
+                        />
+                        <button className={s.logoutBtn} onClick={handleLogout}>
+                            <span>{dict.navigation.logout}</span>
+                            <img src="/icons/icon-profile.svg" alt="Logout" className={s.logoutIcon} />
+                        </button>
+                    </div>
 
-                <div className={s.profileMain}>
-                    <RecentOrderCard 
-                        status={mockOrder.status}
-                        items={mockOrder.items}
-                        totalItems={mockOrder.totalItems}
-                        dict={dict.recentOrder}
-                    />
+                    <div className={s.layoutBody}>
+                        <aside className={s.profileSidebar}>
+                            <PersonalNav 
+                                lang={lang} 
+                                dict={dict.navigation} 
+                                onLogout={handleLogout} 
+                            />
+                        </aside>
 
-                    <ProfileForm 
-                        user={user} 
-                        dict={dict.form} 
-                        onSubmit={handleFormSubmit} 
-                    />
+                        <div className={s.profileMain}>
+                            <RecentOrderCard 
+                                status={mockOrder.status}
+                                items={mockOrder.items}
+                                totalItems={mockOrder.totalItems}
+                                dict={dict.recentOrder}
+                            />
 
-                    <RecentlyViewedSlider 
-                        title={dict.recommendations.title} 
-                        products={wishlistProducts} 
-                    />
+                            <BonusCard 
+                                balance={1200} 
+                                percent={3} 
+                                dict={dict.bonusCard} 
+                            />
+
+                            <ProfileForm 
+                                user={user} 
+                                dict={dict.form} 
+                                onSubmit={handleFormSubmit} 
+                            />
+                        </div>
+                    </div>
                 </div>
+
+                <RecentlyViewedSlider 
+                    title={dict.recommendations.title} 
+                    products={wishlistProducts} 
+                />
             </div>
             <Footer lang={lang} />
         </main>
