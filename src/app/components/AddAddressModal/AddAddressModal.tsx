@@ -8,6 +8,7 @@ import useScrollLock from '@/hooks/useScrollLock';
 import InputField from '@/app/components/ui/InputField';
 import Button from '@/app/components/ui/Button/Button';
 import Search from '@/app/components/ui/Search/Search';
+import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE } from '@/lib/constants';
 
 interface AddAddressModalProps {
     isOpen: boolean;
@@ -27,27 +28,12 @@ const center = {
 
 const libraries: ("places" | "drawing" | "geometry" | "visualization")[] = ['places'];
 
-const darkMapStyle = [
-    { "featureType": "all", "elementType": "geometry", "stylers": [{ "color": "#1d2c4d" }] },
-    { "featureType": "all", "elementType": "labels.text.fill", "stylers": [{ "color": "#8ec3b9" }] },
-    { "featureType": "all", "elementType": "labels.text.stroke", "stylers": [{ "color": "#1a3646" }] },
-    { "featureType": "administrative.country", "elementType": "geometry.stroke", "stylers": [{ "color": "#4b6878" }] },
-    { "featureType": "administrative.province", "elementType": "geometry.stroke", "stylers": [{ "color": "#4b6878" }] },
-    { "featureType": "administrative.land_parcel", "elementType": "labels", "stylers": [{ "visibility": "off" }] },
-    { "featureType": "administrative.land_parcel", "elementType": "labels.text.fill", "stylers": [{ "color": "#64779e" }] },
-    { "featureType": "landscape.man_made", "elementType": "geometry.stroke", "stylers": [{ "color": "#334e87" }] },
-    { "featureType": "landscape.natural", "elementType": "geometry", "stylers": [{ "color": "#023e58" }] },
-    { "featureType": "poi", "elementType": "geometry", "stylers": [{ "color": "#283d6a" }] },
-    { "featureType": "poi", "elementType": "labels.text", "stylers": [{ "visibility": "off" }] },
-    { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#304a7d" }] },
-    { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#2c6675" }] },
-    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#0e1626" }] }
-];
+
 
 export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressModalProps) {
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
-        googleMapsApiKey: 'AIzaSyBqMW1rDNxXNdeuJD8_z-hUfotocayp5ro',
+        googleMapsApiKey: GOOGLE_MAPS_API_KEY,
         libraries
     });
 
@@ -263,7 +249,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                                     onLoad={onMapLoad}
                                     onClick={onMapClick}
                                     options={{
-                                        styles: darkMapStyle,
+                                        styles: DARK_MAP_STYLE,
                                         disableDefaultUI: true,
                                         zoomControl: true,
                                     }}

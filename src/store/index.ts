@@ -16,7 +16,7 @@ import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
 import authReducer from './slices/authSlice';
 
-const ONE_MINUTE = 60 * 1000;
+const SIX_HOURS = 6 * 60 * 60 * 1000;
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
 // Auth session expiration transform — applies only to the auth slice.
@@ -27,7 +27,7 @@ const authExpireTransform = createTransform(
     }),
     (outboundState: any) => {
         const persistedAt = outboundState?._persistedAt;
-        if (persistedAt && Date.now() - persistedAt > ONE_MINUTE) {
+        if (persistedAt && Date.now() - persistedAt > SIX_HOURS) {
             return { user: null, isAuthenticated: false } as any;
         }
         return outboundState;
