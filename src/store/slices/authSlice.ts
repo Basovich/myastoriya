@@ -4,6 +4,10 @@ export interface AuthUser {
     email: string;
     phone: string;
     name?: string;
+    surname?: string;
+    middleName?: string;
+    birthday?: string;
+    gender?: 'male' | 'female';
     addresses?: { id: string; title: string; street: string }[];
 }
 
@@ -16,7 +20,11 @@ const initialState: AuthState = {
     user: {
         email: 'customer@test.com',
         phone: '380998887766',
-        name: 'Олександр Іванов',
+        name: 'Олександр',
+        surname: 'Іванов',
+        middleName: 'Сергійович',
+        birthday: '1990-01-01',
+        gender: 'male',
         addresses: [
             { id: '1', title: 'Моя адреса №1', street: 'вул. Антонова, дім 45, кв. 34' },
         ],

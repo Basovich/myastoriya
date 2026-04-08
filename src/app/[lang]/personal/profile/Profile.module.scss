@@ -1,60 +1,66 @@
-.profileContainer {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px;
-    min-height: 60vh;
+.pageWrapper {
+    background-color: #F6F6F6;
+    min-height: 100vh;
 }
 
-.title {
-    font-size: 24px;
-    font-weight: 800;
-    margin-bottom: 32px;
-    text-transform: uppercase;
-}
-
-.content {
-    background: #fff;
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
-
-.userInfo {
+.profilePage {
+    padding: 20px;
+    background: #F6F6F6;
+    min-height: calc(100vh - 80px);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 32px;
+
+    @media (min-width: 1024px) {
+        padding: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+        flex-direction: row;
+        align-items: flex-start;
+    }
 }
 
-.infoRow {
+.profileSidebar {
     display: flex;
-    gap: 12px;
-    align-items: center;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+
+    @media (min-width: 1024px) {
+        width: 320px;
+        flex-shrink: 0;
+    }
 }
 
-.label {
-    font-weight: 600;
-    color: #666;
-    min-width: 100px;
+.profileMain {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
 }
 
-.value {
-    color: #000;
-    font-weight: 700;
-}
-
-.notAuthenticated {
-    text-align: center;
-    padding: 40px;
-}
-
-.loginBtn {
-    background: #E6000F;
-    color: #fff;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 700;
-    cursor: pointer;
+.recommendations {
     margin-top: 20px;
+}
+
+.recommendationsTitle {
+    font-size: 18px;
+    font-weight: 700;
     text-transform: uppercase;
+    margin-bottom: 20px;
+    color: var(--color-text-primary);
+}
+
+.productsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }

@@ -1,0 +1,129 @@
+.bonusCard {
+    position: relative;
+    padding: 24px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #1A1A1A 0%, #E30613 100%);
+    color: #FFFFFF;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 10px 30px rgba(227, 6, 19, 0.2);
+    min-height: 180px;
+
+    @media (min-width: 768px) {
+        min-height: 200px;
+    }
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 2;
+}
+
+.balanceInfo {
+    .amount {
+        font-family: var(--font-heading);
+        font-size: 32px;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+
+    .label {
+        font-size: 14px;
+        opacity: 0.8;
+        font-weight: 500;
+    }
+}
+
+.logoIcon {
+    opacity: 0.9;
+}
+
+.middle {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cashbackBadge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #E30613;
+    width: fit-content;
+    padding: 6px 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+    .percent {
+        font-size: 18px;
+        font-weight: 800;
+        font-family: var(--font-heading);
+    }
+
+    .desc {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        opacity: 0.9;
+    }
+}
+
+.cashbackLabel {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+    position: relative;
+    z-index: 2;
+}
+
+.rate {
+    font-size: 13px;
+    font-weight: 700;
+    opacity: 0.7;
+}
+
+.howToUse {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #FFFFFF;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+
+    @media (any-hover: hover) {
+        &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #FFFFFF;
+        }
+    }
+}
+
+.decoration {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    pointer-events: none;
+    z-index: 1;
+}

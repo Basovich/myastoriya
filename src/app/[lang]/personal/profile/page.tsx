@@ -1,30 +1,96 @@
 'use client';
 
-import { useAppSelector } from '@/store/hooks';
+import React from 'react';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { logout } from '@/store/slices/authSlice';
+import { useParams } from 'next/navigation';
+import personalData from '@/content/personal.json';
+import { Locale } from '@/i18n/config';
+
+import BonusCard from '@/app/components/Personal/BonusCard/BonusCard';
+import RecentOrderCard from '@/app/components/Personal/RecentOrderCard/RecentOrderCard';
+import PersonalNav from '@/app/components/Personal/PersonalNav/PersonalNav';
+import ProfileForm from '@/app/components/Personal/ProfileForm/ProfileForm';
+import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
+import Header from '@/app/components/Header/Header';
+import Footer from '@/app/components/Footer/Footer';
+import RecentlyViewedSlider from '@/app/components/Personal/RecentlyViewedSlider/RecentlyViewedSlider';
+import uaData from '@/content/ua.json';
+import ruData from '@/content/ru.json';
+
 import s from './Profile.module.scss';
 
 export default function ProfilePage() {
     const { user } = useAppSelector((state) => state.auth);
+    const dispatch = useAppDispatch();
+    const params = useParams();
+    const lang = (params?.lang as Locale) || 'ua';
+    const dict = personalData[lang as keyof typeof personalData];
+    const { items: wishlistIds } = useAppSelector((state) => state.wishlist);
+    const mainDict = lang === 'ua' ? uaData : ruData;
+    const allProducts = mainDict.home.products.items;
+
+    // Filter products that are in the wishlist
+    const wishlistProducts = allProducts.filter(p => wishlistIds.includes(String(p.id)));
+
+    const handleLogout = () => {
+        dispatch(logout());
+    };
+
+    const handleFormSubmit = (values: any) => {
+        console.log('Update Profile:', values);
+        // Here we would dispatch an updateProfile action
+    };
+
+    // Mock data for display
+    const mockOrder = {
+        status: lang === 'ua' ? 'В дорозі' : 'В пути',
+        totalItems: 5,
+        items: [
+            '/images/products/product-sticks-cheese.png',
+            '/images/products/product-teriyaki.png',
+            '/images/products/product-tartar.png',
+        ]
+    };
 
     return (
-        <div className={s.profileContainer}>
-            <h1 className={s.title}>Особистий кабінет</h1>
-            <div className={s.content}>
-                <div className={s.userInfo}>
-                    <div className={s.infoRow}>
-                        <span className={s.label}>Ім&apos;я:</span>
-                        <span className={s.value}>{user?.name || 'Не вказано'}</span>
-                    </div>
-                    <div className={s.infoRow}>
-                        <span className={s.label}>Телефон:</span>
-                        <span className={s.value}>{user?.phone}</span>
-                    </div>
-                    <div className={s.infoRow}>
-                        <span className={s.label}>Email:</span>
-                        <span className={s.value}>{user?.email}</span>
-                    </div>
+        <main className={s.pageWrapper}>
+            <Header lang={lang} />
+            <div className={s.profilePage}>
+                <aside className={s.profileSidebar}>
+                    <PersonalNav 
+                        lang={lang} 
+                        dict={dict.navigation} 
+                        onLogout={handleLogout} 
+                    />
+                    <BonusCard 
+                        balance={1200} 
+                        percent={3} 
+                        dict={dict.bonusCard} 
+                    />
+                </aside>
+
+                <div className={s.profileMain}>
+                    <RecentOrderCard 
+                        status={mockOrder.status}
+                        items={mockOrder.items}
+                        totalItems={mockOrder.totalItems}
+                        dict={dict.recentOrder}
+                    />
+
+                    <ProfileForm 
+                        user={user} 
+                        dict={dict.form} 
+                        onSubmit={handleFormSubmit} 
+                    />
+
+                    <RecentlyViewedSlider 
+                        title={dict.recommendations.title} 
+                        products={wishlistProducts} 
+                    />
                 </div>
             </div>
-        </div>
+            <Footer lang={lang} />
+        </main>
     );
 }
