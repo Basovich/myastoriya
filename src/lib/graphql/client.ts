@@ -25,6 +25,8 @@ export class GraphQLError extends Error {
 interface RequestOptions {
     /** Access token for authenticated requests */
     token?: string;
+    /** Current locale ('ua' or 'ru') */
+    lang?: string;
     /** Next.js cache / revalidate options (server-side only) */
     next?: NextFetchRequestConfig;
 }
@@ -44,6 +46,9 @@ export async function gqlRequest<T>(
     if (options?.token) {
         headers['Authorization'] = `Bearer ${options.token}`;
     }
+
+    const langHeader = options?.lang === 'ru' ? 'ru_RU' : 'uk_UA';
+    headers['Content-Language'] = langHeader;
 
     const res = await fetch(GQL_ENDPOINT, {
         method: 'POST',

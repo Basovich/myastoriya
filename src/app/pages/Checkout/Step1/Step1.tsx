@@ -16,7 +16,7 @@ import Checkbox from '@/app/components/ui/Checkbox/Checkbox';
 import StepIndicator from '../components/StepIndicator';
 import CartSummary from '../components/CartSummary';
 import PromoBlock from '../components/PromoBlock/Index';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import CartModal from '@/app/components/CartModal/CartModal';
 
 
@@ -52,6 +52,8 @@ interface Touched {
 }
 
 export default function Step1() {
+    const params = useParams();
+    const locale = params?.lang as string;
     const { user, isAuthenticated } = useAppSelector(state => state.auth);
     const [formData, setFormData] = useState<FormData>({
         firstName: '',
@@ -197,7 +199,10 @@ export default function Step1() {
         try {
             const res = await fetch('/api/send-sms', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
+                },
                 body: JSON.stringify({ phone: formData.phone }),
             });
             const data = await res.json();
@@ -240,7 +245,10 @@ export default function Step1() {
         try {
             const res = await fetch('/api/verify-sms', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
+                },
                 body: JSON.stringify({ phone: formData.phone, code: formData.smsCode.trim() }),
             });
             const data = await res.json();

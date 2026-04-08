@@ -48,11 +48,11 @@ export const SLIDES_QUERY = /* GraphQL */ `
     }
 `;
 
-export async function getSlidesApi(slideType: string = "main"): Promise<Slide[]> {
+export async function getSlidesApi(slideType: string = "main", lang?: string): Promise<Slide[]> {
     const data = await gqlRequest<{ slides: Slide[] }>(
         SLIDES_QUERY,
         { slide: slideType },
-        { next: { revalidate: 3600 } },
+        { next: { revalidate: 3600 }, lang },
     );
     return data.slides ?? [];
 }

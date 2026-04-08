@@ -1,5 +1,5 @@
 .btn {
-    background: var(--color-accent);
+    background: #000;
     border: none;
     color: #fff;
     display: flex;
@@ -11,7 +11,7 @@
 
     @media (any-hover: hover) {
         &:hover {
-            background-color: var(--color-accent-hover);
+            background-color: var(--color-accent);
             transform: scale(1.05);
         }
     }
@@ -22,7 +22,13 @@
     }
 
     &.active {
-        background-color: var(--color-accent-hover);
+        background-color: var(--color-accent);
+
+        @media (any-hover: hover) {
+            &:hover {
+                background-color: var(--color-accent-hover);
+            }
+        }
     }
 }
 
@@ -80,7 +86,7 @@
     }
 
     &.active {
-        background: #000;
+        background: var(--color-accent);
     }
 
     .btnText {

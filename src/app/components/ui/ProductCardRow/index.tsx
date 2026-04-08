@@ -6,7 +6,9 @@ import Badge from '@/app/components/ui/Badge/Badge';
 import WishButton from '@/app/components/ui/WishButton/WishButton';
 import AddToCartButton from '@/app/components/ui/AddToCartButton/AddToCartButton';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
+import { useParams } from 'next/navigation';
 import clsx from "clsx";
+
 
 interface ProductCardRowProps {
     id: number | string;
@@ -31,7 +33,21 @@ export default function ProductCardRow({
     image,
     description,
 }: ProductCardRowProps) {
+    const params = useParams();
+    const lang = params?.lang as string;
+    const isRu = lang === 'ru';
+    
+    const displayWeight = weight === "1" 
+        ? (isRu ? "1 единица" : "1 одиниця") 
+        : weight;
+
+    const displayUnit = unit.toLowerCase() === "шт"
+        ? (isRu ? "За 1 шт" : "За 1 шт")
+        : `За ${unit}`;
+
     const productUrl = `/products/${id}`;
+
+
 
     return (
         <div className={s.card}>
@@ -64,7 +80,8 @@ export default function ProductCardRow({
                     <AppLink href={productUrl} className={s.titleLink}>
                         <span className={s.title}>{title}</span>
                     </AppLink>
-                    <span className={s.weightList}>{weight}</span>
+                    <span className={s.weightList}>{displayWeight}</span>
+
                 </div>
                 
                 {description && (
@@ -79,7 +96,8 @@ export default function ProductCardRow({
                                 <span className={s.oldPrice}>{oldPrice.toLocaleString('uk-UA')} ₴</span>
                             )}
                         </div>
-                        <span className={s.unit}>{unit}</span>
+                        <span className={s.unit}>{displayUnit}</span>
+
                     </div>
                     <AddToCartButton productId={String(id)} variant="full" className={s.buyBtn} />
                 </div>

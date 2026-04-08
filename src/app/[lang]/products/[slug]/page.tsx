@@ -1,4 +1,5 @@
 import Product from "@/app/pages/Product";
+import { getBlogsApi } from "@/lib/graphql";
 
 // Define Params type based on App Router conventions
 type Props = {
@@ -7,7 +8,10 @@ type Props = {
 };
 
 export default async function ProductPage({ params }: Props) {
+    const blogsResponse = await getBlogsApi({ limit: 4 });
+
     return (
-        <Product params={params} />
+        <Product params={params} publications={blogsResponse.data} />
     );
 }
+

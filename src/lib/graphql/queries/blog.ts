@@ -226,7 +226,7 @@ const BLOG_TYPES_QUERY = /* GraphQL */ `
 // API functions
 // ---------------------------------------------------------------------------
 
-export async function getBlogsApi(filter?: BlogsFilter): Promise<BlogsPagination> {
+export async function getBlogsApi(filter?: BlogsFilter, lang?: string): Promise<BlogsPagination> {
     const data = await gqlRequest<{ blogs: BlogsPagination }>(
         BLOGS_QUERY,
         {
@@ -237,16 +237,16 @@ export async function getBlogsApi(filter?: BlogsFilter): Promise<BlogsPagination
             limit: filter?.limit ?? null,
             page: filter?.page ?? null,
         },
-        { next: { revalidate: 60 } },
+        { next: { revalidate: 60 }, lang },
     );
     return data.blogs;
 }
 
-export async function getBlogBySlugApi(slug: string): Promise<BlogPost | null> {
+export async function getBlogBySlugApi(slug: string, lang?: string): Promise<BlogPost | null> {
     const data = await gqlRequest<{ blog: BlogPost | null }>(
         BLOG_BY_SLUG_QUERY,
         { slug },
-        { next: { revalidate: 60 } },
+        { next: { revalidate: 60 }, lang },
     );
     return data.blog;
 }

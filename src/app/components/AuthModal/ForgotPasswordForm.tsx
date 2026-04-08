@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useParams } from 'next/navigation';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import s from './AuthModal.module.scss';
 import Button from "@/app/components/ui/Button/Button";
@@ -15,6 +16,8 @@ interface ForgotPasswordFormProps {
 }
 
 export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswordFormProps) {
+    const params = useParams();
+    const locale = params?.lang as string;
     const [phone, setPhone] = useState('');
     const [phoneError, setPhoneError] = useState('');
     const [phoneTouched, setPhoneTouched] = useState(false);
@@ -95,7 +98,10 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
         try {
             const res = await fetch('/api/send-sms', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
+                },
                 body: JSON.stringify({ phone }),
             });
             const data = await res.json();
@@ -123,7 +129,10 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
         try {
             const res = await fetch('/api/verify-sms', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
+                },
                 body: JSON.stringify({ phone, code: smsCode.trim() }),
             });
             const data = await res.json();

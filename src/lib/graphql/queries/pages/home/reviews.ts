@@ -60,11 +60,11 @@ export const PRODUCT_REVIEWS_QUERY = /* GraphQL */ `
     }
 `;
 
-export async function getReviewsApi(): Promise<HomeReview[]> {
+export async function getReviewsApi(lang?: string): Promise<HomeReview[]> {
     const data = await gqlRequest<ProductReviewsResponse>(
         PRODUCT_REVIEWS_QUERY,
         undefined,
-        { next: { revalidate: 3600 } }
+        { next: { revalidate: 3600 }, lang }
     );
     // User wants only the last 8 reviews. 
     // Usually the API returns them ordered, but we can slice just in case or if it returns more.

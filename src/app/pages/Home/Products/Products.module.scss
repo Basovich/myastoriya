@@ -13,16 +13,12 @@
     position: absolute;
     right: 0;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%) translateX(30%);
     width: auto;
-    height: 120%;
+    height: 1000px;
     z-index: 0;
     pointer-events: none;
     opacity: 0.5;
-
-    @media (min-width: 768px) {
-        height: 70%;
-    }
 }
 
 .section {
@@ -161,6 +157,14 @@
 
     &.left {
         right: 60px;
+
+        @media (min-width: 768px) {
+            right: 80px;
+        }
+
+        @media (min-width: 1280px) {
+            right: 60px;
+        }
     }
 
     &.right {
@@ -189,6 +193,12 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     padding: 0 20px;
+    transition: opacity 0.3s ease;
+
+    &.loading {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 
     @media (min-width: 768px) {
         padding: 0 40px;

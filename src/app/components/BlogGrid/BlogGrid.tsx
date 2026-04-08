@@ -63,7 +63,10 @@ export default function BlogGrid({
             const nextPage = currentPage + 1;
             const res = await fetch("/api/blogs", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Content-Language": lang === "ru" ? "ru_RU" : "uk_UA"
+                },
                 body: JSON.stringify({ page: nextPage, typeSlug: activeTypeSlug ?? null }),
             });
             const data = await res.json();

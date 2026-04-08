@@ -20,11 +20,11 @@ const POPULAR_CATEGORIES_QUERY = /* GraphQL */ `
     }
 `;
 
-export async function getPopularCategoriesApi(): Promise<PopularCategory[]> {
+export async function getPopularCategoriesApi(lang?: string): Promise<PopularCategory[]> {
     const data = await gqlRequest<{ popularCategories: PopularCategory[] }>(
         POPULAR_CATEGORIES_QUERY,
         undefined,
-        { next: { revalidate: 3600 } },
+        { next: { revalidate: 3600 }, lang },
     );
     return data.popularCategories ?? [];
 }

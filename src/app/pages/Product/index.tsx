@@ -23,8 +23,11 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import clsx from "clsx";
 import Image from "next/image";
+import { BlogPost } from "@/lib/graphql";
 
-const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = ({ params }) => {
+
+const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }>; publications?: BlogPost[] }> = ({ params, publications = [] }) => {
+
     const { lang, slug } = React.use(params);
     const locale = lang as Locale;
     const dict = locale === 'ru' ? ruData : uaData;
@@ -267,7 +270,8 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }> }> = 
                         </Button>
                     </div>
                 </div>
-                <Publications dict={dict.home.publications} lang={locale} className={s.publications} />
+                <Publications dict={dict.home.publications} posts={publications} lang={locale} className={s.publications} />
+
             </main>
             <Footer lang={locale} />
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />

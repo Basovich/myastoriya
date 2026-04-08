@@ -12,12 +12,12 @@ interface PublicationsProps {
     sectionTitle: string;
     showAllButton: string;
   };
-  posts: BlogPost[];
+  posts?: BlogPost[];
   lang: Locale;
   className?: string;
 }
 
-export default function Index({ dict, posts, lang, className }: PublicationsProps) {
+export default function Index({ dict, posts = [], lang, className }: PublicationsProps) {
     if (!posts || posts.length === 0) {
         return null;
     }

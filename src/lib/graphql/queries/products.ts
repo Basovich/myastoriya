@@ -17,31 +17,40 @@ export interface ProductCategory {
 
 export interface Product {
     id: string;
+    categoryId?: number;
     name: string;
-    slug: string;
-    description?: string;
-    price: number;
-    oldPrice?: number;
-    images: ProductImage[];
-    category?: ProductCategory;
-    isNew?: boolean;
-    isSale?: boolean;
-    weight?: string;
-    calories?: number;
+    cost: number;
+    oldCost?: number;
+    unit: string;
+    multiplier?: number;
+    is_new?: boolean;
+    available?: boolean;
+    image?: {
+        url: {
+            grid2x: string;
+            grid1x?: string;
+            main2x?: string;
+            main1x?: string;
+            big?: string;
+        };
+    } | null;
+    specifications?: {
+        name: string;
+        values: string[];
+    }[];
 }
 
 export interface ProductsFilter {
-    categoryId?: string;
-    search?: string;
-    page?: number;
-    perPage?: number;
+    categoryId?: number | null;
+    limit?: number | null;
+    page?: number | null;
 }
 
 export interface ProductsResponse {
-    items: Product[];
-    total: number;
-    page: number;
-    perPage: number;
+    data: Product[];
+    per_page: number;
+    current_page: number;
+    has_more_pages: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -49,30 +58,35 @@ export interface ProductsResponse {
 // ---------------------------------------------------------------------------
 
 const PRODUCTS_QUERY = /* GraphQL */ `
-    query Products($filter: ProductsFilter) {
-        products(filter: $filter) {
-            items {
+    query Products($categoryId: Int, $limit: Int, $page: Int) {
+        products(categoryId: $categoryId, limit: $limit, page: $page) {
+            per_page
+            current_page
+            has_more_pages
+            data {
                 id
+                categoryId
                 name
-                slug
-                price
-                oldPrice
-                isNew
-                isSale
-                weight
-                images {
-                    url
-                    alt
+                cost
+                oldCost
+                unit
+                multiplier
+                is_new
+                available
+                image {
+                    url {
+                        grid2x
+                        grid1x
+                        main2x
+                        main1x
+                        big
+                    }
                 }
-                category {
-                    id
+                specifications {
                     name
-                    slug
+                    values
                 }
             }
-            total
-            page
-            perPage
         }
     }
 `;
@@ -117,29 +131,33 @@ const CATEGORIES_QUERY = /* GraphQL */ `
 // API functions
 // ---------------------------------------------------------------------------
 
-export async function getProductsApi(filter?: ProductsFilter): Promise<ProductsResponse> {
+export async function getProductsApi(filter?: ProductsFilter, lang?: string): Promise<ProductsResponse> {
     const data = await gqlRequest<{ products: ProductsResponse }>(
         PRODUCTS_QUERY,
-        filter ? { filter } : undefined,
-        { next: { revalidate: 60 } },
+        {
+            categoryId: filter?.categoryId ?? null,
+            limit: filter?.limit ?? null,
+            page: filter?.page ?? null
+        },
+        { next: { revalidate: 60 }, lang },
     );
     return data.products;
 }
 
-export async function getProductBySlugApi(slug: string): Promise<Product> {
+export async function getProductBySlugApi(slug: string, lang?: string): Promise<Product> {
     const data = await gqlRequest<{ productBySlug: Product }>(
         PRODUCT_BY_SLUG_QUERY,
         { slug },
-        { next: { revalidate: 60 } },
+        { next: { revalidate: 60 }, lang },
     );
     return data.productBySlug;
 }
 
-export async function getCategoriesApi(): Promise<ProductCategory[]> {
+export async function getCategoriesApi(lang?: string): Promise<ProductCategory[]> {
     const data = await gqlRequest<{ categories: ProductCategory[] }>(
         CATEGORIES_QUERY,
         undefined,
-        { next: { revalidate: 3600 } },
+        { next: { revalidate: 3600 }, lang },
     );
     return data.categories;
 }

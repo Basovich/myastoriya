@@ -84,26 +84,27 @@ const ME_QUERY = /* GraphQL */ `
 // API functions
 // ---------------------------------------------------------------------------
 
-export async function loginApi(input: LoginInput): Promise<AuthPayload> {
-    const data = await gqlRequest<{ login: AuthPayload }>(LOGIN_MUTATION, { ...input });
+export async function loginApi(input: LoginInput, lang?: string): Promise<AuthPayload> {
+    const data = await gqlRequest<{ login: AuthPayload }>(LOGIN_MUTATION, { ...input }, { lang });
     return data.login;
 }
 
-export async function registerApi(input: RegisterInput): Promise<AuthPayload> {
-    const data = await gqlRequest<{ register: AuthPayload }>(REGISTER_MUTATION, { ...input });
+export async function registerApi(input: RegisterInput, lang?: string): Promise<AuthPayload> {
+    const data = await gqlRequest<{ register: AuthPayload }>(REGISTER_MUTATION, { ...input }, { lang });
     return data.register;
 }
 
 export async function refreshTokenApi(
     refreshToken: string,
+    lang?: string,
 ): Promise<Pick<AuthPayload, 'accessToken' | 'refreshToken'>> {
     const data = await gqlRequest<{
         refreshToken: Pick<AuthPayload, 'accessToken' | 'refreshToken'>;
-    }>(REFRESH_TOKEN_MUTATION, { refreshToken });
+    }>(REFRESH_TOKEN_MUTATION, { refreshToken }, { lang });
     return data.refreshToken;
 }
 
-export async function getMeApi(token: string): Promise<AuthPayload['user']> {
-    const data = await gqlRequest<{ me: AuthPayload['user'] }>(ME_QUERY, undefined, { token });
+export async function getMeApi(token: string, lang?: string): Promise<AuthPayload['user']> {
+    const data = await gqlRequest<{ me: AuthPayload['user'] }>(ME_QUERY, undefined, { token, lang });
     return data.me;
 }

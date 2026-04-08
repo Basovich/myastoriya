@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import s from './PromoBlock.module.scss';
 import clsx from 'clsx';
 
@@ -10,6 +11,8 @@ interface PromoBlockProps {
 }
 
 export default function PromoBlock({ onApply, isApplied }: PromoBlockProps) {
+    const params = useParams();
+    const locale = params?.lang as string;
     const [isEditing, setIsEditing] = useState(false);
     const [code, setCode] = useState('');
     const [error, setError] = useState('');
@@ -28,7 +31,10 @@ export default function PromoBlock({ onApply, isApplied }: PromoBlockProps) {
         try {
             const res = await fetch('/api/promo/verify', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
+                },
                 body: JSON.stringify({ code: code.trim() }),
             });
             const data = await res.json();

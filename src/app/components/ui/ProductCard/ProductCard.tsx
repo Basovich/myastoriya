@@ -6,6 +6,8 @@ import Badge from "../Badge/Badge";
 import WishButton from "../WishButton/WishButton";
 import AddToCartButton from "../AddToCartButton/AddToCartButton";
 import AppLink from "../AppLink/AppLink";
+import { useParams } from "next/navigation";
+
 
 interface ProductCardProps {
     id: number | string;
@@ -26,7 +28,21 @@ export default function ProductCard({
     badge,
     image,
 }: ProductCardProps) {
+    const params = useParams();
+    const lang = params?.lang as string;
+    const isRu = lang === 'ru';
+    
+    const displayWeight = weight === "1" 
+        ? (isRu ? "1 единица" : "1 одиниця") 
+        : weight;
+
+    const displayUnit = unit.toLowerCase() === "шт"
+        ? (isRu ? "За 1 шт" : "За 1 шт")
+        : `За ${unit}`;
+
     return (
+
+
         <div className={s.card}>
             <div className={s.imageWrap}>
                 <AppLink href={`/products/${id}`} className={s.productImgLink}>
@@ -47,7 +63,8 @@ export default function ProductCard({
                     </Badge>
                 )}
                 <WishButton productId={String(id)} className={s.favorite} />
-                <span className={s.weight}>{weight}</span>
+                <span className={s.weight}>{displayWeight}</span>
+
             </div>
             <div className={s.info}>
                 <AppLink href={`/products/${id}`}>
@@ -56,7 +73,8 @@ export default function ProductCard({
                 <div className={s.priceRow}>
                     <div className={s.priceGroup}>
                         <span className={s.price}>{price.toLocaleString("uk-UA")} ₴</span>
-                        <span className={s.unit}>{unit}</span>
+                        <span className={s.unit}>{displayUnit}</span>
+
                     </div>
                     <AddToCartButton productId={String(id)} />
                 </div>

@@ -7,7 +7,10 @@ export async function POST(req: NextRequest) {
         const page: number = body.page ?? 1;
         const typeSlug: string | null = body.typeSlug ?? null;
 
-        const result = await getBlogsApi({ page, typeSlug });
+        const langHeader = req.headers.get('content-language');
+        const lang = langHeader === 'ru_RU' ? 'ru' : 'ua';
+
+        const result = await getBlogsApi({ page, typeSlug }, lang);
 
         return NextResponse.json({
             items: result.data,

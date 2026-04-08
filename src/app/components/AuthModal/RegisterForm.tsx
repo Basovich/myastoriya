@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
@@ -37,6 +37,8 @@ interface RegisterFormProps {
 export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFormProps) {
     const dispatch = useAppDispatch();
     const router = useRouter();
+    const params = useParams();
+    const locale = params?.lang as string;
 
     // Set of phone numbers already verified in this modal session
     const verifiedPhonesRef = useRef<Set<string>>(new Set());
@@ -166,7 +168,10 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         try {
             const res = await fetch('/api/send-sms', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
+                },
                 body: JSON.stringify({ phone: currentPhone }),
             });
             const data = await res.json();
@@ -194,7 +199,10 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         try {
             const res = await fetch('/api/verify-sms', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
+                },
                 body: JSON.stringify({ phone: currentPhone, code: smsCode.trim() }),
             });
             const data = await res.json();
