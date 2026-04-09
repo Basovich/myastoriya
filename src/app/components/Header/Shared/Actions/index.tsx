@@ -20,13 +20,14 @@ export default function Actions() {
 
     const cartItems = useAppSelector((state) => state.cart.items);
     const wishlistItems = useAppSelector((state) => state.wishlist.items);
-    const { isAuthenticated } = useAppSelector((state) => state.auth);
+    const { isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
+    const isReallyLoggedIn = isAuthenticated && !isGuest;
 
     const totalCartItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
     const totalWishlistItems = wishlistItems.length;
 
     const handleFavoritesClick = () => {
-        if (isAuthenticated) {
+        if (isReallyLoggedIn) {
             router.push(`/${lang}/personal/favorites/`);
         } else {
             setIsAuthModalOpen(true);

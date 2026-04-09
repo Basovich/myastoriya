@@ -28,17 +28,18 @@ export function usePhoneMask(
         // Strip everything that is not a digit
         let digits = e.target.value.replace(/\D/g, '');
 
-        // Normalise prefix: always keep exactly "380" at the start
-        if (digits.startsWith('380')) {
-            // ok — keep as is
-        } else if (digits.startsWith('38')) {
-            // User typed "38..." — keep, they'll type "0" next
-        } else if (digits.startsWith('3')) {
-            digits = '38' + digits.slice(1);
-        } else if (digits.startsWith('0')) {
-            digits = '38' + digits;
-        } else if (digits.length > 0) {
-            digits = '380' + digits;
+        if (digits.length < 3) {
+            digits = '380';
+        } else if (!digits.startsWith('380')) {
+            if (digits.startsWith('0')) {
+                digits = '38' + digits;
+            } else if (digits.startsWith('80')) {
+                digits = '3' + digits;
+            } else if (digits.startsWith('38')) {
+                digits = '380' + digits.slice(2);
+            } else {
+                digits = '380' + digits;
+            }
         }
 
         // Clamp to 12 digits
@@ -47,11 +48,17 @@ export function usePhoneMask(
         onChange(digits);
     }, [onChange]);
 
+    const handleFocus = useCallback(() => {
+        if (!rawValue || rawValue.length < 3) {
+            onChange('380');
+        }
+    }, [rawValue, onChange]);
+
     // Reformat rawValue (digits only, 12 chars) each render
     const digits = rawValue.replace(/\D/g, '').slice(0, 12);
     const formatted = format(digits);
 
-    return { formatted, handleChange };
+    return { formatted, handleChange, handleFocus };
 }
 
 export default usePhoneMask;

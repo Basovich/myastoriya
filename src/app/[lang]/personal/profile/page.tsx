@@ -24,7 +24,7 @@ import ruData from '@/content/ru.json';
 import s from './Profile.module.scss';
 
 export default function ProfilePage() {
-    const { user } = useAppSelector((state) => state.auth);
+    const { user, isGuest, isAuthenticated } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const params = useParams();
     const router = useRouter();
@@ -36,6 +36,12 @@ export default function ProfilePage() {
 
     // Filter products that are in the wishlist
     const wishlistProducts = allProducts.filter(p => wishlistIds.includes(String(p.id)));
+
+    React.useEffect(() => {
+        if (!isAuthenticated || isGuest) {
+            router.replace(`/${lang === 'ru' ? 'ru' : ''}`);
+        }
+    }, [isAuthenticated, isGuest, router, lang]);
 
     const handleLogout = async () => {
         try {
@@ -65,6 +71,10 @@ export default function ProfilePage() {
             '/images/products/product-tartar.png',
         ]
     };
+
+    if (!isAuthenticated || isGuest) {
+        return null;
+    }
 
     return (
         <main className={s.pageWrapper}>

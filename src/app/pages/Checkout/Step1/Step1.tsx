@@ -169,7 +169,7 @@ export default function Step1() {
         if (timerRef.current) clearInterval(timerRef.current);
     };
 
-    const { formatted: phoneFormatted, handleChange: handlePhoneChange } = usePhoneMask(
+    const { formatted: phoneFormatted, handleChange: handlePhoneChange, handleFocus: handlePhoneFocus } = usePhoneMask(
         formData.phone,
         handlePhoneRawChange,
     );
@@ -343,6 +343,7 @@ export default function Step1() {
                                 readOnly
                                 onFocus={(e) => {
                                     e.currentTarget.removeAttribute('readonly');
+                                    handlePhoneFocus();
                                 }}
                                 value={phoneFormatted}
                                 onChange={handlePhoneChange}

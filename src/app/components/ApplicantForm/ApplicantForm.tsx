@@ -63,7 +63,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
         formik.setFieldValue('phone', raw);
     };
 
-    const { formatted: phoneFormatted, handleChange: handlePhoneChange } = usePhoneMask(
+    const { formatted: phoneFormatted, handleChange: handlePhoneChange, handleFocus: handlePhoneFocus } = usePhoneMask(
         formik.values.phone,
         handlePhoneRawChange,
     );
@@ -120,7 +120,11 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                     value={phoneFormatted}
                     onChange={handlePhoneChange}
                     onBlur={() => formik.setFieldTouched('phone', true)}
-                    onFocus={() => formik.setFieldTouched('phone', false)}
+                    onFocus={(e) => {
+                        e.currentTarget.removeAttribute('readonly');
+                        formik.setFieldTouched('phone', false);
+                        handlePhoneFocus();
+                    }}
                     error={formik.errors.phone}
                     touched={formik.touched.phone}
                 />

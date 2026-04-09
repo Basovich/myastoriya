@@ -82,7 +82,7 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
         [stopCountdown],
     );
 
-    const { formatted: phoneFormatted, handleChange: handlePhoneChange } = usePhoneMask(
+    const { formatted: phoneFormatted, handleChange: handlePhoneChange, handleFocus: handlePhoneFocus } = usePhoneMask(
         phone,
         handlePhoneRawChange,
     );
@@ -177,6 +177,7 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
                         onFocus={(e) => {
                             e.currentTarget.removeAttribute('readonly');
                             setPhoneTouched(false);
+                            handlePhoneFocus();
                         }}
                         className={phoneVerified ? s.inputVerified : undefined}
                         label="Телефон"

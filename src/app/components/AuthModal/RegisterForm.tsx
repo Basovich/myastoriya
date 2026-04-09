@@ -166,7 +166,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         [stopCountdown],
     );
 
-    const { formatted: phoneFormatted, handleChange: handlePhoneChange } = usePhoneMask(
+    const { formatted: phoneFormatted, handleChange: handlePhoneChange, handleFocus: handlePhoneFocus } = usePhoneMask(
         formik.values.phone,
         handlePhoneRawChange,
     );
@@ -283,6 +283,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         onFocus={(e) => {
                             e.currentTarget.removeAttribute('readonly');
                             formik.setFieldTouched('phone', false);
+                            handlePhoneFocus();
                         }}
                         className={clsx(phoneVerified && s.inputVerified, s.inputFieldWrapper)}
                         label="Телефон"
@@ -290,7 +291,13 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         value={phoneFormatted}
                         onChange={handlePhoneChange}
                         onBlur={() => formik.setFieldTouched('phone', true)}
-                        error={!phoneVerified ? formik.errors.phone : undefined}
+                        error={
+                            !phoneVerified && formik.errors.phone
+                                ? formik.errors.phone === 'Підтвердіть номер телефону через SMS' && formik.submitCount === 0
+                                    ? undefined
+                                    : formik.errors.phone
+                                : undefined
+                        }
                         touched={formik.touched.phone}
                     />
 

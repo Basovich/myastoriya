@@ -11,12 +11,13 @@ import AuthModal from '@/app/components/AuthModal';
 export default function AuthButton() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter();
-    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+    const { user, isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
 
+    const isReallyLoggedIn = isAuthenticated && !isGuest;
     const firstLetter = user?.email?.charAt(0)?.toUpperCase() || '?';
 
     const handleAuthClick = () => {
-        if (isAuthenticated) {
+        if (isReallyLoggedIn) {
             router.push('/personal/profile/');
         } else {
             setIsModalOpen(true);
@@ -26,16 +27,16 @@ export default function AuthButton() {
     return (
         <>
             <button
-                className={clsx(s.authBtn, isAuthenticated && s.loggedIn)}
+                className={clsx(s.authBtn, isReallyLoggedIn && s.loggedIn)}
                 onClick={handleAuthClick}
-                aria-label={isAuthenticated ? 'Профіль' : 'Вхід'}
+                aria-label={isReallyLoggedIn ? 'Профіль' : 'Вхід'}
             >
-                {isAuthenticated ? (
+                {isReallyLoggedIn ? (
                     <Image src="/icons/icon-profile.svg" alt="Profile" width={20} height={20} className={s.icon} />
                 ) : (
                     <>
                         <span className={s.label}>
-                            {isAuthenticated ? firstLetter : 'Вхід'}
+                            {isReallyLoggedIn ? firstLetter : 'Вхід'}
                         </span>
                         <Image src="/icons/icon-profile.svg" alt="Profile" width={20} height={20} className={s.icon} />
                     </>

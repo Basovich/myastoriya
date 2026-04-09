@@ -65,7 +65,7 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSucc
         },
     });
 
-    const { formatted: phoneFormatted, handleChange: handlePhoneChange } = usePhoneMask(
+    const { formatted: phoneFormatted, handleChange: handlePhoneChange, handleFocus: handlePhoneFocus } = usePhoneMask(
         formik.values.phone,
         (raw) => formik.setFieldValue('phone', raw),
     );
@@ -83,6 +83,7 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSucc
                     onFocus={(e) => {
                         e.currentTarget.removeAttribute('readonly');
                         formik.setFieldTouched('phone', false);
+                        handlePhoneFocus();
                     }}
                     label="Телефон"
                     required

@@ -22,7 +22,8 @@ const TOP_NAV_ITEMS = [
 ];
 
 export default function TopBar({ lang }: TopBarProps) {
-    const { isAuthenticated } = useAppSelector((state) => state.auth);
+    const { isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
+    const isReallyLoggedIn = isAuthenticated && !isGuest;
 
     return (
         <nav className={s.secondaryNav}>
@@ -48,7 +49,7 @@ export default function TopBar({ lang }: TopBarProps) {
                 </div>
 
                 <div className={s.navRight}>
-                    {isAuthenticated && <PointsInfo />}
+                    {isReallyLoggedIn && <PointsInfo />}
                     <a href={`tel:${siteData.contact.phone.replace(/\s+/g, '')}`} className={s.navPhone}>
                         <Image
                             src="/icons/icon-phone-outline.svg"
