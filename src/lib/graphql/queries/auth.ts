@@ -90,9 +90,6 @@ const LOGIN_MUTATION = /* GraphQL */ `
                 name
                 surname
                 phone
-                email
-                birthday
-                sex
             }
         }
     }
@@ -126,9 +123,6 @@ const REGISTRATION_MUTATION = /* GraphQL */ `
                 name
                 surname
                 phone
-                email
-                birthday
-                sex
             }
         }
     }
@@ -181,9 +175,6 @@ const ME_QUERY = /* GraphQL */ `
             name
             surname
             phone
-            email
-            birthday
-            sex
         }
     }
 `;
