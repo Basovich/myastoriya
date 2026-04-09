@@ -1,23 +1,20 @@
-'use client';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-import { useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { useAppSelector } from '@/store/hooks';
+export default async function PersonalLayout({
+    children,
+    params,
+}: {
+    children: React.ReactNode;
+    params: Promise<{ lang: string }>;
+}) {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('access_token')?.value;
 
-export default function PersonalLayout({ children }: { children: React.ReactNode }) {
-    const router = useRouter();
-    const params = useParams();
-    const lang = params?.lang as string || 'ua';
-
-    const { isAuthenticated } = useAppSelector((state) => state.auth);
-
-    useEffect(() => {
-        if (!isAuthenticated) {
-            router.replace(`/${lang}/`);
-        }
-    }, [isAuthenticated, lang, router]);
-
-    if (!isAuthenticated) return null;
+    if (!token) {
+        const { lang } = await params;
+        redirect(`/${lang === 'ru' ? 'ru' : ''}`);
+    }
 
     return <>{children}</>;
 }

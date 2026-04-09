@@ -102,6 +102,7 @@ export async function generateStaticParams() {
 }
 
 import ReduxProvider from "@/store/ReduxProvider";
+import AuthInitializer from "@/app/components/AuthInitializer/AuthInitializer";
 
 export default async function RootLayout({
   children,
@@ -115,6 +116,7 @@ export default async function RootLayout({
     <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <body>
         <ReduxProvider>
+          <AuthInitializer />
           <PasswordGate>{children}</PasswordGate>
         </ReduxProvider>
       </body>

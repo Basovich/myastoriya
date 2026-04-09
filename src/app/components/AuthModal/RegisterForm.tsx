@@ -1,33 +1,22 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
+import { sendSmsApi, smsVerifyApi, registrationApi } from '@/lib/graphql/queries/auth';
+import { setAuthCookies } from '@/app/actions/authActions';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
-import Button from "@/app/components/ui/Button/Button";
+import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
-import clsx from "clsx";
+import clsx from 'clsx';
 
 const COUNTDOWN_SECONDS = 60;
 const PHONE_REGEX = /^380\d{9}$/;
-
-// Stub API call for registration
-async function registerAPI(data: { name: string; phone: string; password: string }) {
-    return new Promise<void>((resolve, reject) => {
-        setTimeout(() => {
-            if (data.phone && data.password) {
-                resolve();
-            } else {
-                reject(new Error('Заповніть усі поля'));
-            }
-        }, 500);
-    });
-}
 
 interface RegisterFormProps {
     onSwitchToLogin: () => void;
@@ -36,19 +25,22 @@ interface RegisterFormProps {
 
 export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFormProps) {
     const dispatch = useAppDispatch();
-    const router = useRouter();
     const params = useParams();
-    const locale = params?.lang as string;
+    const locale = (params?.lang as string) || 'ua';
 
-    // Set of phone numbers already verified in this modal session
-    const verifiedPhonesRef = useRef<Set<string>>(new Set());
+    // Track verified phones and their SMS tokens in this session
+    const verifiedPhonesRef = useRef<Map<string, string>>(new Map());
 
-    // Whether the current phone value is verified
     const [phoneVerified, setPhoneVerified] = useState(false);
-    // Ref-synced version for Yup validation (avoids stale closure)
     const phoneVerifiedRef = useRef(false);
 
-    // SMS state
+    // Current SMS token from sendSMS mutation
+    const [smsToken, setSmsToken] = useState('');
+
+    // Verified actionToken from smsVerify mutation
+    const [actionToken, setActionToken] = useState('');
+
+    // SMS UI state
     const [smsRequested, setSmsRequested] = useState(false);
     const [smsCode, setSmsCode] = useState('');
     const [smsError, setSmsError] = useState('');
@@ -72,7 +64,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
             setCountdown((prev) => {
                 if (prev <= 1) {
                     stopCountdown();
-                    // 60 s elapsed — reset SMS state so user must re-request
                     setSmsRequested(false);
                     setSmsCode('');
                     setSmsError('');
@@ -88,18 +79,15 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
     }, [stopCountdown]);
 
     const registerSchema = Yup.object({
-        name: Yup.string()
-            .required('Обов\'язкове поле')
-            .min(2, 'Мінімум 2 символи'),
+        name: Yup.string().required('Обов\'язкове поле').min(2, 'Мінімум 2 символи'),
+        surname: Yup.string().required('Обов\'язкове поле').min(2, 'Мінімум 2 символи'),
         phone: Yup.string()
             .required('Обов\'язкове поле')
             .matches(PHONE_REGEX, 'Введіть повний номер: +38 (0XX) XXX XX XX')
             .test('phone-verified', 'Підтвердіть номер телефону через SMS', () => {
                 return phoneVerifiedRef.current;
             }),
-        password: Yup.string()
-            .required('Обов\'язкове поле')
-            .min(6, 'Мінімум 6 символів'),
+        password: Yup.string().required('Обов\'язкове поле').min(6, 'Мінімум 6 символів'),
         confirmPassword: Yup.string()
             .required('Обов\'язкове поле')
             .oneOf([Yup.ref('password')], 'Паролі не збігаються'),
@@ -108,6 +96,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
     const formik = useFormik({
         initialValues: {
             name: '',
+            surname: '',
             phone: '',
             password: '',
             confirmPassword: '',
@@ -115,12 +104,28 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         validationSchema: registerSchema,
         onSubmit: async (values, { setStatus }) => {
             try {
-                await registerAPI({ name: values.name, phone: values.phone, password: values.password });
-                dispatch(login({
-                    email: `${values.phone.slice(-4)}@myastoriya.ua`,
-                    phone: values.phone,
-                    name: values.name,
-                }));
+                const result = await registrationApi(
+                    {
+                        name: values.name,
+                        surname: values.surname,
+                        phone: values.phone,
+                        password: values.password,
+                        actionToken,
+                    },
+                    locale,
+                );
+                await setAuthCookies(result.accessToken, result.refreshToken);
+                dispatch(
+                    login({
+                        id: result.user.id,
+                        name: result.user.name,
+                        surname: result.user.surname,
+                        phone: result.user.phone,
+                        email: result.user.email,
+                        birthday: result.user.birthday,
+                        sex: result.user.sex,
+                    }),
+                );
                 onSuccess();
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : 'Помилка реєстрації';
@@ -129,7 +134,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         },
     });
 
-    // Keep ref in sync with state
     useEffect(() => {
         phoneVerifiedRef.current = phoneVerified;
     }, [phoneVerified]);
@@ -137,25 +141,30 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
     const currentPhone = formik.values.phone;
     const phoneComplete = PHONE_REGEX.test(currentPhone);
 
-    // Reset SMS state when phone changes
-    const handlePhoneRawChange = useCallback((raw: string) => {
-        formik.setFieldValue('phone', raw);
+    const handlePhoneRawChange = useCallback(
+        (raw: string) => {
+            formik.setFieldValue('phone', raw);
+            const newPhoneComplete = PHONE_REGEX.test(raw);
 
-        const newPhoneComplete = PHONE_REGEX.test(raw);
-
-        if (newPhoneComplete && verifiedPhonesRef.current.has(raw)) {
-            setPhoneVerified(true);
-            phoneVerifiedRef.current = true;
-        } else {
-            setPhoneVerified(false);
-            phoneVerifiedRef.current = false;
-            setSmsRequested(false);
-            setSmsCode('');
-            setSmsError('');
-            setCountdown(0);
-            stopCountdown();
-        }
-    }, [formik, stopCountdown]);
+            if (newPhoneComplete && verifiedPhonesRef.current.has(raw)) {
+                const savedActionToken = verifiedPhonesRef.current.get(raw)!;
+                setPhoneVerified(true);
+                phoneVerifiedRef.current = true;
+                setActionToken(savedActionToken);
+            } else {
+                setPhoneVerified(false);
+                phoneVerifiedRef.current = false;
+                setActionToken('');
+                setSmsRequested(false);
+                setSmsCode('');
+                setSmsError('');
+                setCountdown(0);
+                stopCountdown();
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [stopCountdown],
+    );
 
     const { formatted: phoneFormatted, handleChange: handlePhoneChange } = usePhoneMask(
         formik.values.phone,
@@ -166,24 +175,18 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         setSmsError('');
         setSmsSending(true);
         try {
-            const res = await fetch('/api/send-sms', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
-                },
-                body: JSON.stringify({ phone: currentPhone }),
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                setSmsError(data.error || 'Помилка відправки SMS');
-                return;
+            const result = await sendSmsApi(currentPhone, locale);
+            setSmsToken(result.token);
+            // In developer mode the code is returned — show in console
+            if (result.code) {
+                console.info('[SMS DEV] Code:', result.code);
             }
             setSmsRequested(true);
             setSmsCode('');
             startCountdown();
-        } catch {
-            setSmsError('Помилка мережі. Спробуйте ще раз.');
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Помилка відправки SMS';
+            setSmsError(msg);
         } finally {
             setSmsSending(false);
         }
@@ -197,38 +200,27 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         setSmsError('');
         setSmsVerifying(true);
         try {
-            const res = await fetch('/api/verify-sms', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
-                },
-                body: JSON.stringify({ phone: currentPhone, code: smsCode.trim() }),
-            });
-            const data = await res.json();
-            if (data.valid) {
-                verifiedPhonesRef.current.add(currentPhone);
-                setPhoneVerified(true);
-                phoneVerifiedRef.current = true;
-                stopCountdown();
-                setCountdown(0);
-                setSmsRequested(false);
-                setSmsCode('');
-                // Re-validate phone field to clear the "not verified" error
-                formik.setFieldTouched('phone', true, true);
-            } else {
-                setSmsError(data.error || 'Невірний код. Спробуйте ще раз.');
-                setSmsCode('');
-            }
-        } catch {
-            setSmsError('Помилка мережі. Спробуйте ще раз.');
+            const result = await smsVerifyApi(smsToken, smsCode.trim(), locale);
+            const verifiedActionToken = result.token;
+            verifiedPhonesRef.current.set(currentPhone, verifiedActionToken);
+            setActionToken(verifiedActionToken);
+            setPhoneVerified(true);
+            phoneVerifiedRef.current = true;
+            stopCountdown();
+            setCountdown(0);
+            setSmsRequested(false);
+            setSmsCode('');
+            formik.setFieldTouched('phone', true, true);
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Невірний код. Спробуйте ще раз.';
+            setSmsError(msg);
+            setSmsCode('');
         } finally {
             setSmsVerifying(false);
         }
     };
 
     const handleSmsCodeChange = (value: string) => {
-        // Allow only digits, max 6 chars
         const cleaned = value.replace(/\D/g, '').slice(0, 6);
         setSmsCode(cleaned);
         if (smsError) setSmsError('');
@@ -259,6 +251,27 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                     touched={formik.touched.name}
                 />
 
+                {/* Surname */}
+                <InputField
+                    id="reg-surname"
+                    type="text"
+                    name="surname"
+                    autoComplete="off"
+                    readOnly
+                    onFocus={(e) => {
+                        e.currentTarget.removeAttribute('readonly');
+                        formik.setFieldTouched('surname', false);
+                    }}
+                    label="Прізвище"
+                    required
+                    value={formik.values.surname}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.errors.surname}
+                    touched={formik.touched.surname}
+                    className={s.inputFieldWrapper}
+                />
+
                 {/* Phone */}
                 <div className={s.field}>
                     <InputField
@@ -281,7 +294,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         touched={formik.touched.phone}
                     />
 
-                    {/* Verification badge */}
                     {phoneVerified && (
                         <span className={s.verifiedBadge}>
                             <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
@@ -292,11 +304,8 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         </span>
                     )}
 
-
-                    {/* SMS block — shown when phone is complete and not yet verified */}
                     {phoneComplete && !phoneVerified && (
                         <div className={s.smsBlock}>
-                            {/* Countdown timer */}
                             {countdown > 0 && (
                                 <p className={s.timerText}>
                                     Відправити код повторно можна буде через:{' '}
@@ -304,7 +313,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                                 </p>
                             )}
 
-                            {/* Input + button row */}
                             <div className={s.smsInputRow}>
                                 <input
                                     id="sms-code"
@@ -334,12 +342,10 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                                             ? 'Перевірка...'
                                             : smsRequested
                                                 ? 'Підтвердити'
-                                                : 'Отримати смс'
-                                    }
+                                                : 'Отримати смс'}
                                 </button>
                             </div>
 
-                            {/* SMS error */}
                             {smsError && <span className={s.fieldError}>{smsError}</span>}
                         </div>
                     )}
@@ -389,10 +395,11 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
 
                 {formik.status && <div className={s.error}>{formik.status}</div>}
 
-                <Button type="submit"
-                        className={s.submitBtn}
-                        disabled={formik.isSubmitting}
-                        variant='red'
+                <Button
+                    type="submit"
+                    className={s.submitBtn}
+                    disabled={formik.isSubmitting}
+                    variant="red"
                 >
                     {formik.isSubmitting ? 'Зачекайте...' : 'ЗАРЕЄСТРУВАТИСЬ'}
                 </Button>
@@ -403,10 +410,12 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                     </button>
                 </div>
 
-                <GoogleAuthButton onSuccess={(user) => {
-                    dispatch(login(user));
-                    onSuccess();
-                }} />
+                <GoogleAuthButton
+                    onSuccess={(user) => {
+                        dispatch(login(user));
+                        onSuccess();
+                    }}
+                />
             </form>
         </>
     );

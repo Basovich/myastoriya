@@ -4,12 +4,27 @@ export type { GqlError, GqlResponse } from './client';
 
 // Re-export auth
 export {
+    sendSmsApi,
+    smsVerifyApi,
     loginApi,
-    registerApi,
+    registrationApi,
+    resetPasswordApi,
     refreshTokenApi,
+    authAsGuestApi,
+    logoutApi,
+    checkUserPhoneApi,
     getMeApi,
 } from './queries/auth';
-export type { LoginInput, RegisterInput, AuthPayload } from './queries/auth';
+export type {
+    BackendUser,
+    AuthFields,
+    LoggedInUser,
+    SMSTokenResponse,
+    ActionTokenResponse,
+    LoginInput,
+    RegisterInput,
+    AuthPayload,
+} from './queries/auth';
 
 // Re-export products
 export {

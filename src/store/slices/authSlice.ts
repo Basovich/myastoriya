@@ -1,35 +1,29 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface AuthUser {
-    email: string;
+    id?: string;
     phone: string;
     name?: string;
     surname?: string;
+    email?: string;
     middleName?: string;
     birthday?: string;
     gender?: 'male' | 'female';
+    sex?: string;
     addresses?: { id: string; title: string; street: string }[];
 }
 
 interface AuthState {
     user: AuthUser | null;
     isAuthenticated: boolean;
+    /** Guest mode — user is authed as guest (no personal data) */
+    isGuest: boolean;
 }
 
 const initialState: AuthState = {
-    user: {
-        email: 'customer@test.com',
-        phone: '380998887766',
-        name: 'Олександр',
-        surname: 'Іванов',
-        middleName: 'Сергійович',
-        birthday: '1990-01-01',
-        gender: 'male',
-        addresses: [
-            { id: '1', title: 'Моя адреса №1', street: 'вул. Антонова, дім 45, кв. 34' },
-        ],
-    },
-    isAuthenticated: true,
+    user: null,
+    isAuthenticated: false,
+    isGuest: false,
 };
 
 const authSlice = createSlice({
@@ -39,13 +33,21 @@ const authSlice = createSlice({
         login(state, action: PayloadAction<AuthUser>) {
             state.user = action.payload;
             state.isAuthenticated = true;
+            state.isGuest = false;
+        },
+        loginAsGuest(state) {
+            state.user = null;
+            state.isAuthenticated = true;
+            state.isGuest = true;
         },
         logout(state) {
             state.user = null;
             state.isAuthenticated = false;
+            state.isGuest = false;
         },
         setUser(state, action: PayloadAction<AuthUser>) {
             state.user = action.payload;
+            state.isGuest = false;
         },
         addAddress(state, action: PayloadAction<{ id: string; title: string; street: string }>) {
             if (state.user) {
@@ -58,5 +60,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { login, logout, setUser, addAddress } = authSlice.actions;
+export const { login, loginAsGuest, logout, setUser, addAddress } = authSlice.actions;
 export default authSlice.reducer;

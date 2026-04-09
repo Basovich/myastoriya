@@ -3,7 +3,9 @@
 import React from 'react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
-import { useParams } from 'next/navigation';
+import { logoutApi } from '@/lib/graphql/queries/auth';
+import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
+import { useRouter, useParams } from 'next/navigation';
 import personalData from '@/content/personal.json';
 import { Locale } from '@/i18n/config';
 
@@ -25,6 +27,7 @@ export default function ProfilePage() {
     const { user } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const params = useParams();
+    const router = useRouter();
     const lang = (params?.lang as Locale) || 'ua';
     const dict = personalData[lang as keyof typeof personalData];
     const { items: wishlistIds } = useAppSelector((state) => state.wishlist);
@@ -34,11 +37,20 @@ export default function ProfilePage() {
     // Filter products that are in the wishlist
     const wishlistProducts = allProducts.filter(p => wishlistIds.includes(String(p.id)));
 
-    const handleLogout = () => {
-        dispatch(logout());
+    const handleLogout = async () => {
+        try {
+            const token = await getAccessToken();
+            if (token) await logoutApi(token);
+        } catch {
+            // Ignore API errors on logout
+        } finally {
+            await clearAuthCookies();
+            dispatch(logout());
+            router.replace('/');
+        }
     };
 
-    const handleFormSubmit = (values: any) => {
+    const handleFormSubmit = (values: Record<string, string>) => {
         console.log('Update Profile:', values);
         // Here we would dispatch an updateProfile action
     };

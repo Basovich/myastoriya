@@ -3,28 +3,33 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
+import { sendSmsApi, smsVerifyApi } from '@/lib/graphql/queries/auth';
 import s from './AuthModal.module.scss';
-import Button from "@/app/components/ui/Button/Button";
+import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
 
 const COUNTDOWN_SECONDS = 60;
 const PHONE_REGEX = /^380\d{9}$/;
 
 interface ForgotPasswordFormProps {
-    onVerified: (phone: string) => void;
+    /** Called when phone is verified — passes both phone and actionToken */
+    onVerified: (phone: string, actionToken: string) => void;
     onBack: () => void;
 }
 
 export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswordFormProps) {
     const params = useParams();
-    const locale = params?.lang as string;
+    const locale = (params?.lang as string) || 'ua';
     const [phone, setPhone] = useState('');
     const [phoneError, setPhoneError] = useState('');
     const [phoneTouched, setPhoneTouched] = useState(false);
 
     const [phoneVerified, setPhoneVerified] = useState(false);
 
-    // SMS state
+    // SMS token from sendSMS mutation
+    const [smsToken, setSmsToken] = useState('');
+
+    // SMS UI state
     const [smsRequested, setSmsRequested] = useState(false);
     const [smsCode, setSmsCode] = useState('');
     const [smsError, setSmsError] = useState('');
@@ -64,15 +69,18 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
 
     const phoneComplete = PHONE_REGEX.test(phone);
 
-    const handlePhoneRawChange = useCallback((raw: string) => {
-        setPhone(raw);
-        setPhoneVerified(false);
-        setSmsRequested(false);
-        setSmsCode('');
-        setSmsError('');
-        setCountdown(0);
-        stopCountdown();
-    }, [stopCountdown]);
+    const handlePhoneRawChange = useCallback(
+        (raw: string) => {
+            setPhone(raw);
+            setPhoneVerified(false);
+            setSmsRequested(false);
+            setSmsCode('');
+            setSmsError('');
+            setCountdown(0);
+            stopCountdown();
+        },
+        [stopCountdown],
+    );
 
     const { formatted: phoneFormatted, handleChange: handlePhoneChange } = usePhoneMask(
         phone,
@@ -96,24 +104,17 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
         setSmsError('');
         setSmsSending(true);
         try {
-            const res = await fetch('/api/send-sms', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
-                },
-                body: JSON.stringify({ phone }),
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                setSmsError(data.error || 'Помилка відправки SMS');
-                return;
+            const result = await sendSmsApi(phone, locale);
+            setSmsToken(result.token);
+            if (result.code) {
+                console.info('[SMS DEV] Code:', result.code);
             }
             setSmsRequested(true);
             setSmsCode('');
             startCountdown();
-        } catch {
-            setSmsError('Помилка мережі. Спробуйте ще раз.');
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Помилка відправки SMS';
+            setSmsError(msg);
         } finally {
             setSmsSending(false);
         }
@@ -127,27 +128,18 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
         setSmsError('');
         setSmsVerifying(true);
         try {
-            const res = await fetch('/api/verify-sms', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
-                },
-                body: JSON.stringify({ phone, code: smsCode.trim() }),
-            });
-            const data = await res.json();
-            if (data.valid) {
-                setPhoneVerified(true);
-                stopCountdown();
-                setCountdown(0);
-                setSmsRequested(false);
-                setSmsCode('');
-            } else {
-                setSmsError(data.error || 'Невірний код. Спробуйте ще раз.');
-                setSmsCode('');
-            }
-        } catch {
-            setSmsError('Помилка мережі. Спробуйте ще раз.');
+            const result = await smsVerifyApi(smsToken, smsCode.trim(), locale);
+            setPhoneVerified(true);
+            stopCountdown();
+            setCountdown(0);
+            setSmsRequested(false);
+            setSmsCode('');
+            // Immediately proceed — pass phone + actionToken to parent
+            onVerified(phone, result.token);
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Невірний код. Спробуйте ще раз.';
+            setSmsError(msg);
+            setSmsCode('');
         } finally {
             setSmsVerifying(false);
         }
@@ -161,7 +153,6 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
 
     const handleRestore = () => {
         if (!phoneVerified) return;
-        onVerified(phone);
     };
 
     return (
@@ -200,7 +191,6 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
                         touched={phoneTouched}
                     />
 
-                    {/* Verified badge */}
                     {phoneVerified && (
                         <span className={s.verifiedBadge}>
                             <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
@@ -211,7 +201,6 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
                         </span>
                     )}
 
-                    {/* SMS block */}
                     {phoneComplete && !phoneVerified && (
                         <div className={s.smsBlock}>
                             {countdown > 0 && (
@@ -260,10 +249,11 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
                 </div>
 
                 <Button
-                    type="submit"
+                    type="button"
                     className={s.submitBtn}
                     disabled={!phoneVerified}
-                    variant='red'
+                    variant="red"
+                    onClick={handleRestore}
                 >
                     Відновити
                 </Button>

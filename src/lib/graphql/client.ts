@@ -1,4 +1,7 @@
-const GQL_ENDPOINT = 'https://dev-api.myastoriya.com.ua/graphql';
+const isServer = typeof window === 'undefined';
+const GQL_ENDPOINT = isServer 
+    ? 'https://dev-api.myastoriya.com.ua/graphql' 
+    : '/api/graphql';
 
 export interface GqlError {
     message: string;
@@ -64,7 +67,19 @@ export async function gqlRequest<T>(
     const json: GqlResponse<T> = await res.json();
 
     if (json.errors?.length) {
-        throw new GraphQLError(json.errors[0].message, json.errors);
+        const error = json.errors[0];
+        let errorMessage = error.message;
+
+        // Extract deep validation messages if present
+        if (error.extensions && error.extensions.validation) {
+            const validation = error.extensions.validation as Record<string, string[]>;
+            const firstKey = Object.keys(validation)[0];
+            if (firstKey && validation[firstKey] && validation[firstKey].length > 0) {
+                errorMessage = validation[firstKey][0];
+            }
+        }
+
+        throw new GraphQLError(errorMessage, json.errors);
     }
 
     if (json.data === undefined) {

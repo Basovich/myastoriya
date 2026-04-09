@@ -20,6 +20,7 @@ type ModalView = 'login' | 'register' | 'forgot-password' | 'reset-password';
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     const [view, setView] = useState<ModalView>('login');
     const [forgotPhone, setForgotPhone] = useState('');
+    const [forgotActionToken, setForgotActionToken] = useState('');
     const { disableScroll, enableScroll } = useScrollLock();
 
     useEffect(() => {
@@ -69,8 +70,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 )}
                 {view === 'forgot-password' && (
                     <ForgotPasswordForm
-                        onVerified={(phone) => {
+                        onVerified={(phone, actionToken) => {
                             setForgotPhone(phone);
+                            setForgotActionToken(actionToken);
                             setView('reset-password');
                         }}
                         onBack={() => setView('login')}
@@ -79,6 +81,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 {view === 'reset-password' && (
                     <ResetPasswordForm
                         phone={forgotPhone}
+                        actionToken={forgotActionToken}
                         onSuccess={handleSuccess}
                         onBack={() => setView('forgot-password')}
                     />

@@ -1,26 +1,15 @@
 'use client';
 
 import { useFormik } from 'formik';
-import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
+import { resetPasswordApi, loginApi } from '@/lib/graphql/queries/auth';
+import { setAuthCookies } from '@/app/actions/authActions';
 import s from './AuthModal.module.scss';
-import Button from "@/app/components/ui/Button/Button";
+import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
-
-// Stub API call — replace with real endpoint
-async function resetPasswordAPI(phone: string, password: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (phone && password) {
-                resolve();
-            } else {
-                reject(new Error('Помилка скидання паролю'));
-            }
-        }, 500);
-    });
-}
 
 const resetSchema = Yup.object({
     password: Yup.string()
@@ -33,13 +22,16 @@ const resetSchema = Yup.object({
 
 interface ResetPasswordFormProps {
     phone: string;
+    actionToken: string;
     onSuccess: () => void;
     onBack: () => void;
 }
 
-export default function ResetPasswordForm({ phone, onSuccess, onBack }: ResetPasswordFormProps) {
-    const router = useRouter();
+export default function ResetPasswordForm({ phone, actionToken, onSuccess, onBack }: ResetPasswordFormProps) {
     const dispatch = useAppDispatch();
+    const params = useParams();
+    const lang = (params?.lang as string) || 'ua';
+
     const formik = useFormik({
         initialValues: {
             password: '',
@@ -48,12 +40,21 @@ export default function ResetPasswordForm({ phone, onSuccess, onBack }: ResetPas
         validationSchema: resetSchema,
         onSubmit: async (values, { setStatus }) => {
             try {
-                await resetPasswordAPI(phone, values.password);
-                dispatch(login({
-                    phone,
-                    email: `${phone.slice(-4)}@myastoriya.ua`,
-                    name: 'Користувач',
-                }));
+                await resetPasswordApi(phone, values.password, actionToken, lang);
+                // Auto-login after successful password reset
+                const loginResult = await loginApi({ phone, password: values.password }, lang);
+                await setAuthCookies(loginResult.accessToken, loginResult.refreshToken);
+                dispatch(
+                    login({
+                        id: loginResult.user.id,
+                        name: loginResult.user.name,
+                        surname: loginResult.user.surname,
+                        phone: loginResult.user.phone,
+                        email: loginResult.user.email,
+                        birthday: loginResult.user.birthday,
+                        sex: loginResult.user.sex,
+                    }),
+                );
                 onSuccess();
             } catch (err) {
                 const msg = err instanceof Error ? err.message : 'Помилка скидання паролю';
@@ -105,14 +106,16 @@ export default function ResetPasswordForm({ phone, onSuccess, onBack }: ResetPas
                     onBlur={formik.handleBlur}
                     error={formik.errors.confirmPassword}
                     touched={formik.touched.confirmPassword}
+                    className={s.inputFieldWrapper}
                 />
 
                 {formik.status && <div className={s.error}>{formik.status}</div>}
 
-                <Button type="submit"
-                        className={s.submitBtn}
-                        disabled={formik.isSubmitting}
-                        variant='red'
+                <Button
+                    type="submit"
+                    className={s.submitBtn}
+                    disabled={formik.isSubmitting}
+                    variant="red"
                 >
                     {formik.isSubmitting ? 'Зачекайте...' : 'Зберегти'}
                 </Button>
