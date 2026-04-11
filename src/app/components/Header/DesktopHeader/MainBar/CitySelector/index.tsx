@@ -19,22 +19,45 @@ import {
 import s from './CitySelector.module.scss';
 import clsx from 'clsx';
 import Image from 'next/image';
-import uaDict from '@/content/ua.json';
-import ruDict from '@/content/ru.json';
 
-const dictionaries: Record<string, any> = {
-    ua: uaDict,
-    ru: ruDict,
-};
+const translations = {
+    ua: {
+        label: "Ваше місто",
+        searchPlaceholder: "Введіть назву",
+        notFound: "Місто не знайдено",
+        prompt: {
+            title: "Ваше місто",
+            yes: "Так",
+            no: "Ні"
+        }
+    },
+    ru: {
+        label: "Ваш город",
+        searchPlaceholder: "Введите название",
+        notFound: "Город не найден",
+        prompt: {
+            title: "Ваш город",
+            yes: "Да",
+            no: "Нет"
+        }
+    }
+} as const;
 
 const PAGE_SIZE = 50;
 
-export default function CitySelector() {
+interface CitySelectorProps {
+    renderPrompt?: boolean;
+    renderSelector?: boolean;
+}
+
+export default function CitySelector({ 
+    renderPrompt = true, 
+    renderSelector = true 
+}: CitySelectorProps) {
     const dispatch = useAppDispatch();
     const params = useParams();
-    const lang = (params?.lang as string) || 'ua';
-    const dict = dictionaries[lang] || uaDict;
-    const t = dict.home.citySelector;
+    const lang = (params?.lang as 'ua' | 'ru') || 'ua';
+    const t = translations[lang] || translations.ua;
 
     const { 
         selectedCity, 
@@ -62,22 +85,19 @@ export default function CitySelector() {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
 
-    // Handle initial auto-detection
+    // Handle initial auto-detection - Always run logic regardless of props to sync state
     useEffect(() => {
         const detectCity = async () => {
+            // Only detect if no city is selected AND we haven't interacted with prompt before
             if (!selectedCity && !isDetectionLoading && !isPromptInteractionDone && isAuthenticated) {
                 dispatch(setDetectionLoading(true));
                 try {
-                    console.log('[CitySelector] Checking selected locality...');
                     const existing = await getSelectedLocalityApi(lang);
                     
                     if (existing) {
-                        console.log('[CitySelector] Existing locality found:', existing);
                         dispatch(setSelectedCity(existing));
                         dispatch(setPromptVisible(true));
                     } else {
-                        // Step 2: If not, try to auto-detect by IP/coords
-                        console.log('[CitySelector] Auto-detecting city...');
                         const detected = await autoDetectLocalityApi(undefined, undefined, lang);
                         
                         if (detected) {
@@ -90,8 +110,6 @@ export default function CitySelector() {
                         }
                     }
                 } catch (error) {
-                    // We use console.warn instead of console.error to avoid the Next.js Red Screen Overlay in dev mode,
-                    // since this is a non-critical background task.
                     console.warn('[CitySelector] Failed to determine locality:', error);
                     const fallback = { id: 1, name: lang === 'ua' ? 'Київ' : 'Киев' };
                     dispatch(setSelectedCity(fallback));
@@ -199,7 +217,6 @@ export default function CitySelector() {
         const handleClickOutside = (event: MouseEvent) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
                 dispatch(setManualSelectionOpen(false));
-                // Do NOT close prompt on click outside as per user request
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -233,36 +250,33 @@ export default function CitySelector() {
     const toggleDropdown = () => {
         dispatch(setManualSelectionOpen(!isManualSelectionOpen));
         if (isPromptVisible) {
-             // User didn't interact with Yes/No yet, but if they explicitly open dropdown, we can hide prompt
-             // or keep it. Let's hide it for UX but not set InteractionDone yet? 
-             // Actually user said "close only on Yes or No".
-             // But if I open dropdown, the prompt is in the way.
-             // I'll leave it as is for now - maybe the prompt should disappear if dropdown opens.
             dispatch(setPromptVisible(false));
         }
     };
 
     return (
-        <div className={s.wrapper} ref={wrapperRef}>
-            <div className={s.citySelector} onClick={toggleDropdown}>
-                <span className={s.cityLabel}>{t.label}</span>
-                <span className={s.cityValue}>
-                    {selectedCity?.name || '...'}
-                    <svg
-                        className={clsx(s.icon, isManualSelectionOpen && s.iconOpen)}
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                    >
-                        <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                </span>
-            </div>
+        <div className={clsx(renderSelector && s.wrapper)} ref={wrapperRef}>
+            {renderSelector && (
+                <div className={s.citySelector} onClick={toggleDropdown}>
+                    <span className={s.cityLabel}>{t.label}</span>
+                    <span className={s.cityValue}>
+                        {selectedCity?.name || '...'}
+                        <svg
+                            className={clsx(s.icon, isManualSelectionOpen && s.iconOpen)}
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                        >
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </span>
+                </div>
+            )}
 
-            {isPromptVisible && selectedCity && (
+            {renderPrompt && isPromptVisible && selectedCity && (
                 <div className={s.prompt}>
                     <div className={s.promptContent}>
                         <p className={s.promptText}>
@@ -280,7 +294,7 @@ export default function CitySelector() {
                 </div>
             )}
 
-            {isManualSelectionOpen && (
+            {renderSelector && isManualSelectionOpen && (
                 <div className={s.dropdown}>
                     <div className={s.searchWrapper}>
                         <div className={s.searchIcon}>
