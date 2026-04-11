@@ -35,6 +35,16 @@
                 }
             ]
         },
+        "citySelector": {
+            "label": "Ваше місто",
+            "searchPlaceholder": "Введіть назву",
+            "notFound": "Місто не знайдено",
+            "prompt": {
+                "title": "Ваше місто",
+                "yes": "Так",
+                "no": "Ні"
+            }
+        },
         "categories": {
             "sectionTitle": "КАТЕГОРІЇ",
             "items": [

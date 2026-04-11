@@ -15,6 +15,21 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        // Forward client IP
+        const clientIp = req.ip || req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+        if (clientIp) {
+            headers['X-Forwarded-For'] = clientIp;
+            headers['X-Real-IP'] = clientIp;
+        }
+
+        // Add Authorization header from cookie if not already present
+        if (!headers['authorization']) {
+            const token = req.cookies.get('access_token')?.value;
+            if (token) {
+                headers['authorization'] = `Bearer ${token}`;
+            }
+        }
+
         const res = await fetch(GQL_ENDPOINT, {
             method: 'POST',
             headers,

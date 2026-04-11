@@ -35,6 +35,16 @@
                 }
             ]
         },
+        "citySelector": {
+            "label": "Ваш город",
+            "searchPlaceholder": "Введите название",
+            "notFound": "Город не найден",
+            "prompt": {
+                "title": "Ваш город",
+                "yes": "Да",
+                "no": "Нет"
+            }
+        },
         "categories": {
             "sectionTitle": "КАТЕГОРИИ",
             "items": [
