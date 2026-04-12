@@ -112,7 +112,7 @@ export default function MainBar({
                         <Search lang={lang} />
                     </div>
 
-                    <CitySelector />
+                    <CitySelector lang={lang} />
                 </div>
 
                 <div className={s.rightSection}>

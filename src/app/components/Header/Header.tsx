@@ -13,9 +13,10 @@ interface HeaderProps {
 export default function Header({ lang }: HeaderProps) {
     return (
         <header className={s.header} id="header">
+            {/* Dedicated handler for global city selector UI (Popups/Overlay) */}
+            <CitySelector lang={lang} renderSelector={false} renderGlobalUI={true} />
+            
             <div className={s.mobileOnly}>
-                {/* Global city logic and responsive fixed prompt for mobile/tablet */}
-                <CitySelector renderSelector={false} />
                 <MobileHeader lang={lang} />
             </div>
             <div className={s.desktopOnly}>
