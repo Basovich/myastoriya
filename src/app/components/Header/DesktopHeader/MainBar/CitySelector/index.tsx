@@ -380,7 +380,7 @@ export default function CitySelector({
                     <div className={s.citySelector} onClick={toggleDropdown}>
                         <span className={s.cityLabel}>{t.label}</span>
                         <span className={s.cityValue}>
-                            {selectedCity?.name || '...'}
+                            <span className={s.cityValueName} title={selectedCity?.name || '...'}>{selectedCity?.name || '...'}</span>
                             <svg
                                 className={clsx(s.icon, isManualSelectionOpen && s.iconOpen)}
                                 width="12"
