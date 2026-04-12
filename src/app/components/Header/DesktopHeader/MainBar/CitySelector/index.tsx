@@ -86,10 +86,13 @@ export default function CitySelector({
     const wrapperRef = useRef<HTMLDivElement>(null);
     const hasDetectedRef = useRef(false);
 
-    // 1. Mount stabilization
+    // 1. Mount stabilization and UI state reset
     useEffect(() => {
         setMounted(true);
-    }, []);
+        // Reset UI states on mount to avoid persistence after reload
+        dispatch(setManualSelectionOpen(false));
+        dispatch(setPromptVisible(false));
+    }, [dispatch]);
 
     // 2. Initial city detection logic (Centralized in Global UI instance)
     useEffect(() => {
@@ -111,13 +114,15 @@ export default function CitySelector({
                     if (detected) {
                         dispatch(setSelectedCity(detected));
                     } else {
-                        const fallback = { id: 1, name: lang === 'ua' ? 'Київ' : 'Киев' };
+                        const fallbackTitle = lang === 'ua' ? 'м. Київ' : 'г. Киев';
+                        const fallback = { id: 2581, name: fallbackTitle };
                         dispatch(setSelectedCity(fallback));
                     }
                 }
             } catch (error) {
                 console.warn('[CitySelector] Detection failed:', error);
-                const fallback = { id: 1, name: lang === 'ua' ? 'Київ' : 'Киев' };
+                const fallbackTitle = lang === 'ua' ? 'м. Київ' : 'г. Киев';
+                const fallback = { id: 2581, name: fallbackTitle };
                 dispatch(setSelectedCity(fallback));
             } finally {
                 dispatch(setDetectionLoading(false));
@@ -253,8 +258,13 @@ export default function CitySelector({
     const toggleDropdown = (e?: React.MouseEvent) => {
         e?.preventDefault();
         e?.stopPropagation();
-        dispatch(setManualSelectionOpen(!isManualSelectionOpen));
-        if (isPromptVisible) dispatch(setPromptVisible(false));
+        const nextState = !isManualSelectionOpen;
+        dispatch(setManualSelectionOpen(nextState));
+        
+        if (isPromptVisible) {
+            dispatch(setPromptVisible(false));
+            dispatch(setPromptInteractionDone(true));
+        }
     };
 
     const handleCloseManualSelection = (e?: React.MouseEvent) => {
@@ -314,7 +324,7 @@ export default function CitySelector({
                             <>
                                 {allCities.map((city) => (
                                     <div key={city.id} className={s.cityItem} onClick={() => handleSelectCity(city)}>
-                                        <span className={clsx(s.cityName, selectedCity?.id === city.id && s.active)}>
+                                        <span className={clsx(s.cityName, (Number(selectedCity?.id) === Number(city.id)) && s.active)}>
                                             {city.name}
                                         </span>
                                     </div>
@@ -330,7 +340,7 @@ export default function CitySelector({
                         <>
                             {searchResults.map((city) => (
                                 <div key={city.id} className={s.cityItem} onClick={() => handleSelectCity(city)}>
-                                    <span className={clsx(s.cityName, selectedCity?.id === city.id && s.active)}>
+                                    <span className={clsx(s.cityName, (Number(selectedCity?.id) === Number(city.id)) && s.active)}>
                                         {city.name}
                                     </span>
                                 </div>

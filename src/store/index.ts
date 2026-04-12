@@ -53,19 +53,25 @@ const generalExpireTransform = createTransform(
     { whitelist: ['cart', 'wishlist'] }
 );
 
-const persistConfig = {
-    key: 'myastoriya-root',
+const localityPersistConfig = {
+    key: 'locality',
     storage,
-    whitelist: ['cart', 'wishlist', 'auth', 'locality'], // Things to persist
-    transforms: [authExpireTransform, generalExpireTransform]
+    blacklist: ['isManualSelectionOpen', 'isPromptVisible'],
 };
 
 const rootReducer = combineReducers({
     cart: cartReducer,
     wishlist: wishlistReducer,
     auth: authReducer,
-    locality: localityReducer,
+    locality: persistReducer(localityPersistConfig, localityReducer),
 });
+
+const persistConfig = {
+    key: 'myastoriya-root',
+    storage,
+    whitelist: ['cart', 'wishlist', 'auth'], // Removed 'locality' from here as it's now nested
+    transforms: [authExpireTransform, generalExpireTransform]
+};
 
 const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(persistConfig, rootReducer);
 
