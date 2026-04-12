@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
         });
 
         // Forward client IP
-        const clientIp = req.ip || req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+        const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || req.headers.get('x-real-ip');
         if (clientIp) {
             headers['X-Forwarded-For'] = clientIp;
             headers['X-Real-IP'] = clientIp;
