@@ -9,27 +9,56 @@ import Footer from "@/app/components/Footer/Footer";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import HeroBanner from "@/app/components/ui/HeroBanner/HeroBanner";
 import Button from "@/app/components/ui/Button/Button";
-import storesData from "@/content/stores.json";
+import { Shop } from "@/lib/graphql/queries/shops";
 import StoreFilter from "@/app/components/OurStores/StoreFilter/StoreFilter";
 import Search from "@/app/components/ui/Search/Search";
 import StoreViewToggle from "@/app/components/OurStores/StoreViewToggle/StoreViewToggle";
 
 import StoreList from "@/app/components/OurStores/StoreList/StoreList";
 import StoreMap from "@/app/components/OurStores/StoreMap/StoreMap";
+import { Store } from "@/app/components/OurStores/StoreCard/StoreCard";
 
 interface OurStoresPageProps {
     dict: Dictionary;
     lang: Locale;
+    initialShops: Shop[];
 }
 
 export type StoreType = "all" | "restaurant" | "meatbar";
 export type ViewMode = "list" | "map";
 
-export default function OurStoresPage({ dict, lang }: OurStoresPageProps) {
+const parseShopData = (shop: Shop): Store => {
+    const fullName = shop.name;
+    // Regex to extract brand and address from "Brand (Address)"
+    const match = fullName.match(/^(.*?)\((.*?)\)$/);
+    const brand = match ? match[1].trim() : fullName;
+    const address = match ? match[2].trim() : '';
+    
+    // Determine type (restaurant or meatbar) based on brand name
+    const isMeatBar = brand.toLowerCase().includes('meat bar') || brand.toLowerCase().includes('meatbar');
+    
+    return {
+        id: shop.id,
+        name: brand,
+        type: isMeatBar ? "meatbar" : "restaurant",
+        address: address || brand,
+        workingHours: shop.schedule?.[0] ? `${shop.schedule[0].days}: ${shop.schedule[0].workTime}` : "",
+        phone: shop.phones?.[0] || "",
+        email: shop.email || "",
+        lat: shop.lat || 0,
+        lng: shop.lng || 0,
+        image: shop.image?.size2x || "/images/store/herobanner.png",
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address || brand)}`
+    };
+};
+
+export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPageProps) {
     const { ourStoresPage } = dict.home;
     const [activeFilter, setActiveFilter] = useState<StoreType>("restaurant");
     const [searchQuery, setSearchQuery] = useState("");
     const [viewMode, setViewMode] = useState<ViewMode>("map");
+
+    const stores = useMemo(() => initialShops.map(parseShopData), [initialShops]);
 
     const breadcrumbs = [
         { label: ourStoresPage.breadcrumbs.home, href: "/" },
@@ -37,13 +66,13 @@ export default function OurStoresPage({ dict, lang }: OurStoresPageProps) {
     ];
 
     const filteredStores = useMemo(() => {
-        return storesData.filter((store) => {
+        return stores.filter((store) => {
             const matchesFilter = activeFilter === "all" || store.type === activeFilter;
             const matchesSearch = store.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
                                  store.name.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesFilter && matchesSearch;
         });
-    }, [activeFilter, searchQuery]);
+    }, [stores, activeFilter, searchQuery]);
 
     return (
         <>

@@ -12,16 +12,16 @@ import CategoryCircles, { CategoryCircleItem } from '@/app/components/CategoryCi
 import StoreMenuProductCard from '@/app/components/StoreMenu/StoreMenuProductCard/StoreMenuProductCard';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import StoreMenuHero from '@/app/components/StoreMenu/StoreMenuHero/StoreMenuHero';
-import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
+import { Shop } from '@/lib/graphql/queries/shops';
 import menuData from '@/content/store-menu.json';
 
 interface StoreMenuPageProps {
-    store: Store;
+    shop: Shop;
     lang: Locale;
     dict: Dictionary;
 }
 
-const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ store, lang, dict }) => {
+const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict }) => {
     const categories: CategoryCircleItem[] = menuData.categories.map(cat => ({
         name: cat.title,
         image: cat.image,

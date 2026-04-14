@@ -30,10 +30,10 @@ export default function ContactsPage({ dict, lang, shops, callCenter }: Contacts
     const { contactsPage } = dict.home;
 
     const myastoriyaRestaurants = shops.filter(s => 
-        s.name.toLowerCase().includes("м'ясторія")
+        s.name.toLowerCase().includes("м'ясторія") || s.name.toLowerCase().includes("мясторія")
     );
     const meatBarRestaurants = shops.filter(s => 
-        s.name.toLowerCase().includes("meatbar")
+        s.name.toLowerCase().includes("meatbar") || s.name.toLowerCase().includes("meat bar")
     );
 
     const breadcrumbs = [

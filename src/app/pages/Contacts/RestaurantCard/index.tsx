@@ -10,9 +10,9 @@ export function RestaurantCard({ restaurant, labels }: { restaurant: Shop; label
     const primarySchedule = restaurant.schedule[0];
     const workingHours = primarySchedule ? `${primarySchedule.days}: ${primarySchedule.workTime}` : "";
 
-    const nameParts = restaurant.name.split(" (");
-    const displayName = nameParts[0];
-    const displayAddress = nameParts[1] ? nameParts[1].replace(")", "") : restaurant.name;
+    const match = restaurant.name.match(/^(.*?)\((.*?)\)$/);
+    const displayName = match ? match[1].trim() : restaurant.name;
+    const displayAddress = match ? match[2].trim() : restaurant.name;
 
     return (
         <div className={s.restaurantCard}>

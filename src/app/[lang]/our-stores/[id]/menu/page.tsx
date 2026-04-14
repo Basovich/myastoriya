@@ -1,7 +1,7 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import StoreMenuPage from "@/app/pages/StoreMenu/StoreMenuPage";
-import storesData from "@/content/stores.json";
+import { getShopApi, getShopsApi } from "@/lib/graphql/queries/shops";
 import { notFound } from "next/navigation";
 
 export default async function StoreMenuPageRoute({
@@ -12,23 +12,35 @@ export default async function StoreMenuPageRoute({
     const { lang, id } = await params;
     const dict = await getDictionary(lang);
 
-    const store = storesData.find((s) => s.id === id);
+    try {
+        const response = await getShopApi(id, lang);
+        const shop = response.shop;
 
-    if (!store) {
+        if (!shop) {
+            notFound();
+        }
+
+        return (
+            <StoreMenuPage 
+                shop={shop} 
+                lang={lang} 
+                dict={dict} 
+            />
+        );
+    } catch (error) {
+        console.error("Failed to fetch shop for menu:", error);
         notFound();
     }
-
-    return (
-        <StoreMenuPage 
-            store={store} 
-            lang={lang} 
-            dict={dict} 
-        />
-    );
 }
 
 export async function generateStaticParams() {
-    return storesData.map((store) => ({
-        id: store.id,
-    }));
+    try {
+        const response = await getShopsApi({ limit: 100 });
+        return response.shops.data.map((shop) => ({
+            id: shop.id.toString(),
+        }));
+    } catch (error) {
+        console.error("Failed to generate menu static params:", error);
+        return [];
+    }
 }

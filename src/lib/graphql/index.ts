@@ -80,5 +80,5 @@ export {
 export type { Locality } from './queries/localities';
 
 // Re-export shops
-export { getShopsApi, SHOPS_QUERY } from './queries/shops';
+export { getShopsApi, getContactsShopsApi, SHOPS_QUERY } from './queries/shops';
 export type { Shop, ShopSchedule, ShopsResponse } from './queries/shops';

@@ -12,16 +12,42 @@ import DeliveryMethodCard from '@/app/components/Delivery/DeliveryMethodCard/Del
 import DeliveryZones from '@/app/components/Delivery/DeliveryZones/DeliveryZones';
 import PolicySections from '@/app/components/Delivery/PolicySections/PolicySections';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
-import storesData from '@/content/stores.json';
+import { Shop } from '@/lib/graphql/queries/shops';
 import Button from "@/app/components/ui/Button/Button";
+import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
 
 interface DeliveryAndPaymentPageProps {
     dict: Dictionary;
     lang: Locale;
+    initialShops: Shop[];
     isMeatBar?: boolean;
 }
 
-export default function DeliveryAndPaymentPage({ dict, lang, isMeatBar = false }: DeliveryAndPaymentPageProps) {
+const parseShopData = (shop: Shop): Store => {
+    const fullName = shop.name;
+    const match = fullName.match(/^(.*?)\((.*?)\)$/);
+    const brand = match ? match[1].trim() : fullName;
+    const address = match ? match[2].trim() : '';
+    
+    const isMeatBarBrand = brand.toLowerCase().includes('meat bar') || brand.toLowerCase().includes('meatbar');
+    
+    return {
+        id: shop.id,
+        name: brand,
+        type: isMeatBarBrand ? "meatbar" : "restaurant",
+        address: address || brand,
+        workingHours: shop.schedule?.[0] ? `${shop.schedule[0].days}: ${shop.schedule[0].workTime}` : "",
+        phone: shop.phones?.[0] || "",
+        email: shop.email || "",
+        lat: shop.lat || 0,
+        lng: shop.lng || 0,
+        image: shop.image?.size2x || "/images/store/herobanner.png",
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address || brand)}`
+    };
+};
+
+export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMeatBar = false }: DeliveryAndPaymentPageProps) {
+    const stores = initialShops.map(parseShopData);
     const { deliveryPage, ourStoresPage } = dict.home;
     const breadcrumbs = [
         { label: deliveryPage.breadcrumbs.home, href: "/" },
@@ -65,7 +91,7 @@ export default function DeliveryAndPaymentPage({ dict, lang, isMeatBar = false }
                 </div>
 
                 <DeliveryZones 
-                    stores={storesData} 
+                    stores={stores} 
                     dict={deliveryPage}
                     storeDict={ourStoresPage.storeCard}
                     lang={lang}

@@ -1,7 +1,7 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import ContactsPage from "@/app/pages/Contacts";
-import { getShopsApi } from "@/lib/graphql";
+import { getContactsShopsApi } from "@/lib/graphql";
 import contactsData from "@/content/contacts.json";
 
 export default async function Contacts({
@@ -12,8 +12,8 @@ export default async function Contacts({
   const { lang } = await params;
   const dict = await getDictionary(lang);
   
-  // Fetch restaurants from API
-  const shopsRes = await getShopsApi({ limit: 100 }, lang);
+  // Fetch restaurants from API using optimized Contacts query
+  const shopsRes = await getContactsShopsApi({ limit: 100, onlyCompanyStores: true }, lang);
   const shops = shopsRes?.shops?.data || [];
   
   // Use callCenter info from JSON as fallback/source for office

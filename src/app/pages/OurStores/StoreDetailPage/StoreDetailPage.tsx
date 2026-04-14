@@ -9,7 +9,7 @@ import Footer from '@/app/components/Footer/Footer';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import Button from '@/app/components/ui/Button/Button';
 import Image from 'next/image';
-import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
+import { Shop } from '@/lib/graphql/queries/shops';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
@@ -21,7 +21,7 @@ import { useState } from 'react';
 import clsx from "clsx";
 
 interface StoreDetailPageProps {
-    store: Store;
+    shop: Shop;
     lang: Locale;
     dict: Dictionary;
 }
@@ -31,25 +31,32 @@ function createGoogleMapsLink(address: string): string {
     return `https://www.google.com/maps/search/?api=1&query=${encoded}`
 }
 
-const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ store, lang, dict }) => {
+const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) => {
     const { ourStoresPage } = dict.home;
+
+    const match = shop.name.match(/^(.*?)\((.*?)\)$/);
+    const brandName = match ? match[1].trim() : shop.name;
+    const address = match ? match[2].trim() : (shop.name || '');
 
     const breadcrumbs = [
         { label: ourStoresPage.breadcrumbs.home, href: '/' },
         { label: ourStoresPage.breadcrumbs.stores, href: '/our-stores' },
-        { label: store.name, href: '' },
+        { label: brandName, href: '' },
     ];
 
     const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
-    // Use specific image for all slides as requested
-    const galleryImages = [
+    const apiImages = shop.image?.size3x || shop.image?.size2x ? [shop.image.size3x || shop.image.size2x || ""] : [];
+    const galleryImages = apiImages.length > 0 ? apiImages : [
         "/images/store/steikribai.png",
         "/images/store/steikribai.png",
         "/images/store/steikribai.png",
         "/images/store/steikribai.png",
     ];
+
+    const workingHours = shop.schedule?.[0] ? `${shop.schedule[0].days}: ${shop.schedule[0].workTime}` : "";
+    const phone = shop.phones?.[0] || "";
 
     return (
         <>
@@ -78,7 +85,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ store, lang, dict }) 
                                             <div className={s.slideImage}>
                                                 <Image 
                                                     src={image}
-                                                    alt={store.name} 
+                                                    alt={brandName} 
                                                     fill 
                                                     priority={index === 0}
                                                 />
@@ -107,7 +114,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ store, lang, dict }) 
                             <Button 
                                 variant="black"
                                 className={s.actionBtn}
-                                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(store.address)}`, '_blank')}
+                                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`, '_blank')}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
                                     <path d="M11.9958 3.49304C11.9987 3.4551 11.9987 3.417 11.9958 3.37906L10.7962 0.379426C10.7494 0.260854 10.666 0.160294 10.5581 0.0923342C10.4503 0.0243742 10.3236 -0.00745224 10.1964 0.00147186H1.79937C1.67924 0.00135554 1.56185 0.0373203 1.4624 0.104708C1.36294 0.172095 1.28601 0.2678 1.24156 0.379426L0.0419852 3.37906C0.039094 3.417 0.039094 3.4551 0.0419852 3.49304C0.0220547 3.52644 0.00786297 3.56294 0 3.60103C0.00667601 4.01572 0.120693 4.42161 0.330931 4.77909C0.541168 5.13658 0.840448 5.43346 1.19958 5.64078V11.4001C1.19958 11.5592 1.26277 11.7118 1.37525 11.8243C1.48774 11.9368 1.64029 12 1.79937 12H10.1964C10.3555 12 10.5081 11.9368 10.6205 11.8243C10.733 11.7118 10.7962 11.5592 10.7962 11.4001V5.66478C11.1588 5.45539 11.4603 5.15473 11.6708 4.79269C11.8812 4.43064 11.9933 4.01981 11.9958 3.60103C12.0014 3.56525 12.0014 3.52882 11.9958 3.49304ZM6.59768 10.8001H5.3981V8.40044H6.59768V10.8001ZM9.59663 10.8001H7.79726V7.80052C7.79726 7.64141 7.73407 7.48881 7.62159 7.3763C7.5091 7.2638 7.35655 7.20059 7.19747 7.20059H4.79831C4.63924 7.20059 4.48668 7.2638 4.3742 7.3763C4.26172 7.48881 4.19853 7.64141 4.19853 7.80052V10.8001H2.39916V6.00074C2.74072 5.99881 3.07793 5.92395 3.38824 5.78118C3.69855 5.6384 3.9748 5.431 4.19853 5.17284C4.42367 5.42818 4.70055 5.63269 5.01079 5.77276C5.32103 5.91284 5.65751 5.98529 5.99789 5.98529C6.33827 5.98529 6.67476 5.91284 6.985 5.77276C7.29523 5.63269 7.57212 5.42818 7.79726 5.17284C8.02098 5.431 8.29724 5.6384 8.60755 5.78118C8.91786 5.92395 9.25507 5.99881 9.59663 6.00074V10.8001ZM9.59663 4.80088C9.27848 4.80088 8.97336 4.67447 8.7484 4.44945C8.52343 4.22444 8.39705 3.91925 8.39705 3.60103C8.39705 3.44192 8.33386 3.28933 8.22138 3.17682C8.10889 3.06431 7.95634 3.0011 7.79726 3.0011C7.63819 3.0011 7.48563 3.06431 7.37315 3.17682C7.26066 3.28933 7.19747 3.44192 7.19747 3.60103C7.19747 3.91925 7.07109 4.22444 6.84612 4.44945C6.62116 4.67447 6.31604 4.80088 5.99789 4.80088C5.67975 4.80088 5.37463 4.67447 5.14966 4.44945C4.9247 4.22444 4.79831 3.91925 4.79831 3.60103C4.79831 3.44192 4.73512 3.28933 4.62264 3.17682C4.51016 3.06431 4.3576 3.0011 4.19853 3.0011C4.03945 3.0011 3.88689 3.06431 3.77441 3.17682C3.66193 3.28933 3.59874 3.44192 3.59874 3.60103C3.60464 3.7586 3.57946 3.91579 3.52464 4.06362C3.46981 4.21145 3.38641 4.34704 3.2792 4.46263C3.17198 4.57823 3.04306 4.67157 2.89978 4.73733C2.7565 4.80308 2.60167 4.83997 2.44414 4.84588C2.12599 4.85781 1.81614 4.74284 1.58274 4.52626C1.46717 4.41903 1.37385 4.29007 1.30811 4.14676C1.24236 4.00345 1.20549 3.84859 1.19958 3.69102L2.20722 1.20132H9.78856L10.7962 3.69102C10.7735 3.99339 10.6371 4.27594 10.4146 4.48185C10.192 4.68775 9.89979 4.80174 9.59663 4.80088Z" fill="white"/>
@@ -117,7 +124,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ store, lang, dict }) 
                             <Button 
                                 variant="outline-black"
                                 className={s.actionBtn}
-                                href={createGoogleMapsLink(store.address)}
+                                href={createGoogleMapsLink(address)}
                                 target="_blank"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="11" viewBox="0 0 14 11" fill="none">
@@ -128,7 +135,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ store, lang, dict }) 
                             <Button 
                                 variant="outline-black"
                                 className={s.actionBtn}
-                                href={`/our-stores/${store.id}/menu`}
+                                href={`/our-stores/${shop.id}/menu`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="11" height="14" viewBox="0 0 11 14" fill="none">
                                     <path d="M6.1875 8.4H3.4375C3.25516 8.4 3.0803 8.47375 2.95136 8.60503C2.82243 8.7363 2.75 8.91435 2.75 9.1C2.75 9.28565 2.82243 9.4637 2.95136 9.59497C3.0803 9.72625 3.25516 9.8 3.4375 9.8H6.1875C6.36984 9.8 6.5447 9.72625 6.67364 9.59497C6.80257 9.4637 6.875 9.28565 6.875 9.1C6.875 8.91435 6.80257 8.7363 6.67364 8.60503C6.5447 8.47375 6.36984 8.4 6.1875 8.4ZM8.9375 1.4H8.12625C7.98441 0.991515 7.72195 0.637699 7.37486 0.387057C7.02776 0.136415 6.61302 0.00121766 6.1875 0H4.8125C4.38698 0.00121766 3.97224 0.136415 3.62514 0.387057C3.27805 0.637699 3.01559 0.991515 2.87375 1.4H2.0625C1.51549 1.4 0.990886 1.62125 0.604092 2.01508C0.217299 2.4089 0 2.94305 0 3.5V11.9C0 12.457 0.217299 12.9911 0.604092 13.3849C0.990886 13.7788 1.51549 14 2.0625 14H8.9375C9.48451 14 10.0091 13.7788 10.3959 13.3849C10.7827 12.9911 11 12.457 11 11.9V3.5C11 2.94305 10.7827 2.4089 10.3959 2.01508C10.0091 1.62125 9.48451 1.4 8.9375 1.4ZM4.125 2.1C4.125 1.91435 4.19743 1.7363 4.32636 1.60503C4.4553 1.47375 4.63016 1.4 4.8125 1.4H6.1875C6.36984 1.4 6.5447 1.47375 6.67364 1.60503C6.80257 1.7363 6.875 1.91435 6.875 2.1V2.8H4.125V2.1ZM9.625 11.9C9.625 12.0857 9.55257 12.2637 9.42364 12.395C9.29471 12.5263 9.11984 12.6 8.9375 12.6H2.0625C1.88016 12.6 1.7053 12.5263 1.57636 12.395C1.44743 12.2637 1.375 12.0857 1.375 11.9V3.5C1.375 3.31435 1.44743 3.1363 1.57636 3.00503C1.7053 2.87375 1.88016 2.8 2.0625 2.8H2.75V3.5C2.75 3.68565 2.82243 3.8637 2.95136 3.99497C3.0803 4.12625 3.25516 4.2 3.4375 4.2H7.5625C7.74484 4.2 7.9197 4.12625 8.04864 3.99497C8.17757 3.8637 8.25 3.68565 8.25 3.5V2.8H8.9375C9.11984 2.8 9.29471 2.87375 9.42364 3.00503C9.55257 3.1363 9.625 3.31435 9.625 3.5V11.9ZM7.5625 5.6H3.4375C3.25516 5.6 3.0803 5.67375 2.95136 5.80503C2.82243 5.9363 2.75 6.11435 2.75 6.3C2.75 6.48565 2.82243 6.6637 2.95136 6.79497C3.0803 6.92625 3.25516 7 3.4375 7H7.5625C7.74484 7 7.9197 6.92625 8.04864 6.79497C8.17757 6.6637 8.25 6.48565 8.25 6.3C8.25 6.11435 8.17757 5.9363 8.04864 5.80503C7.9197 5.67375 7.74484 5.6 7.5625 5.6Z" fill="black"/>
@@ -151,7 +158,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ store, lang, dict }) 
                                         </svg>
                                         <p className={s.title}>E-MAIL</p>
                                     </div>
-                                    <a href={`mailto:${store.email}`} className={s.text}>{store.email}</a>
+                                    <a href={`mailto:${shop.email}`} className={s.text}>{shop.email}</a>
                                 </div>
                                 <div className={s.detailItem}>
                                     <div className={s.detailItemHeader}>
@@ -161,7 +168,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ store, lang, dict }) 
                                         </svg>
                                         <p className={s.title}>ЧАС РОБОТИ:</p>
                                     </div>
-                                    <p className={s.text}>{store.workingHours}</p>
+                                    <p className={s.text}>{workingHours}</p>
                                 </div>
                                 <div className={s.detailItem}>
                                     <div className={s.detailItemHeader}>
@@ -170,7 +177,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ store, lang, dict }) 
                                         </svg>
                                         <p className={s.title}>ТЕЛЕФОН</p>
                                     </div>
-                                    <a href={`tel:${store.phone}`} className={s.text}>{store.phone}</a>
+                                    <a href={`tel:${phone}`} className={s.text}>{phone}</a>
                                 </div>
                                 <div className={clsx(s.detailItem, s.lastItem)}>
                                     <div className={s.detailItemHeader}>
@@ -179,13 +186,13 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ store, lang, dict }) 
                                         </svg>
                                         <p className={s.title}>АДРЕСА</p>
                                     </div>
-                                    <p className={s.text}>{store.address}</p>
+                                    <p className={s.text}>{address}</p>
                                 </div>
                             </div>
                         </div>
 
                         <Button variant="black"
-                                href={createGoogleMapsLink(store.address)}
+                                href={createGoogleMapsLink(address)}
                                 className={s.googleReviewBtn}
                                 target="_blank"
                         >
