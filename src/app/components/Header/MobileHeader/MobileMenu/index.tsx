@@ -6,6 +6,7 @@ import { useTransition, animated } from "react-spring";
 import s from "./MobileMenu.module.scss";
 import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
+import Logo from "@/app/components/Header/Shared/Logo";
 import siteData from "@/content/site.json";
 import categoriesData from "@/content/categories.json";
 import { usePathname } from "next/navigation";
@@ -74,7 +75,7 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                             <line x1="6" y1="6" x2="18" y2="18" />
                         </svg>
                     </button>
-                    <Image src="/images/logo-white.svg" alt="М'ясторія" width={114} height={33} className={s.logo} />
+                    <Logo lang={lang} className={s.logo} />
                     <div className={s.langSwitch}>
                         <Link href={getSwitchLangHref('ua')} className={lang === 'ua' ? s.active : ''}>UKR</Link>
                         <Link href={getSwitchLangHref('ru')} className={lang === 'ru' ? s.active : ''}>RUS</Link>
@@ -148,6 +149,7 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                                     key={i}
                                     href={href}
                                     className={s.footerLink}
+                                    activeClassName={s.active}
                                     onClick={!isPlaceholder ? onClose : undefined}
                                     target={href.startsWith("http") ? "_blank" : undefined}
                                     rel={href.startsWith("http") ? "noopener noreferrer" : undefined}

@@ -1,3 +1,5 @@
+"use client";
+
 import s from "./Footer.module.scss";
 import siteData from "@/content/site.json";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
@@ -5,6 +7,7 @@ import Image from "next/image";
 import Logo from "@/app/components/Header/Shared/Logo";
 import { type Locale } from "@/i18n/config";
 import clsx from "clsx";
+import { usePathname } from "next/navigation";
 
 interface FooterProps {
     lang: Locale;
@@ -44,6 +47,7 @@ export default function Footer({ lang }: FooterProps) {
                                         key={i} 
                                         href={link.href} 
                                         className={s.link}
+                                        activeClassName={s.active}
                                         target={isExternal ? "_blank" : undefined}
                                         rel={isExternal ? "noopener noreferrer" : undefined}
                                     >
@@ -60,6 +64,7 @@ export default function Footer({ lang }: FooterProps) {
                                         key={i} 
                                         href={link.href} 
                                         className={s.link}
+                                        activeClassName={s.active}
                                         target={isExternal ? "_blank" : undefined}
                                         rel={isExternal ? "noopener noreferrer" : undefined}
                                     >
@@ -119,7 +124,7 @@ export default function Footer({ lang }: FooterProps) {
                         <p className={s.contactItem}>{contact.phone}</p>
                         <p className={s.contactItem}>{contact.email}</p>
                         <p className={s.contactItem}>Час роботи: {contact.workingHours}</p>
-                        <AppLink href="/contacts" className={s.addressBtn}>
+                        <AppLink href="/contacts" className={s.addressBtn} activeClassName={s.active}>
                             <span className={s.addressBtnNext}>АДРЕСИ РЕСТОРАНІВ</span>
                             <svg className={s.addressBtnIcon} xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                                 <path d="M9.98565 0.999701L16.3141 7.32812L9.98565 13.6565" stroke="white" strokeWidth="2" strokeLinecap="round"/>

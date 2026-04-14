@@ -171,6 +171,11 @@
         }
     }
 
+    &.active {
+        color: red;
+        opacity: 1;
+    }
+
     @media (min-width: 1280px) {
         line-height: 215%;
     }

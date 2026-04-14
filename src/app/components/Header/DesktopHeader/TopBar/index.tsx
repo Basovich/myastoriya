@@ -38,6 +38,7 @@ export default function TopBar({ lang }: TopBarProps) {
                                     key={i} 
                                     href={item.href} 
                                     className={s.navLink}
+                                    activeClassName={s.active}
                                     target={isExternal ? "_blank" : undefined}
                                     rel={isExternal ? "noopener noreferrer" : undefined}
                                 >

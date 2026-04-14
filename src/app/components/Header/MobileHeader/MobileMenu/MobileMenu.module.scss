@@ -207,4 +207,8 @@
             color: var(--color-accent);
         }
     }
+
+    &.active {
+        color: red;
+    }
 }

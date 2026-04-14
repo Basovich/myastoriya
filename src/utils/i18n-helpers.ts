@@ -17,5 +17,12 @@ export function getLocalizedHref(href: string, lang: Locale): string {
     // For other locales, prepend locale if not already present
     // Assumes href starts with / if it's an internal route from siteData
     const cleanHref = href.startsWith('/') ? href : `/${href}`;
-    return `/${lang}${cleanHref}`;
+    const localized = `/${lang}${cleanHref}`;
+    
+    // Normalize: remove trailing slash for home page in other languages (/ru/ -> /ru)
+    if (localized.length > 3 && localized.endsWith('/')) {
+        return localized.slice(0, -1);
+    }
+    
+    return localized;
 }
