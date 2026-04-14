@@ -2,128 +2,130 @@
     position: relative;
     padding: 24px;
     border-radius: 20px;
-    background: linear-gradient(135deg, #1A1A1A 0%, #E30613 100%);
+    background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+        url('/images/bonus-card-bg.png');
+    background-size: cover;
+    background-position: center;
     color: #FFFFFF;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    box-shadow: 0 10px 30px rgba(227, 6, 19, 0.2);
-    min-height: 180px;
-
-    @media (min-width: 768px) {
-        min-height: 200px;
-    }
+    gap: 32px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    min-height: 200px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    position: relative;
+.logo {
+    position: absolute;
+    top: 20px;
+    right: 20px;
     z-index: 2;
-}
-
-.balanceInfo {
-    .amount {
-        font-family: var(--font-heading);
-        font-size: 32px;
-        font-weight: 800;
-        line-height: 1;
-        margin-bottom: 4px;
-    }
-
-    .label {
-        font-size: 14px;
-        opacity: 0.8;
-        font-weight: 500;
-    }
-}
-
-.logoIcon {
-    opacity: 0.9;
-}
-
-.middle {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.cashbackBadge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #E30613;
-    width: fit-content;
-    padding: 6px 12px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-
-    .percent {
-        font-size: 18px;
-        font-weight: 800;
-        font-family: var(--font-heading);
-    }
-
-    .desc {
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        opacity: 0.9;
-    }
-}
-
-.cashbackLabel {
-    font-size: 14px;
-    font-weight: 500;
     opacity: 0.8;
 }
 
-.bottom {
+.mainContent {
+    position: relative;
+    z-index: 2;
+    margin-top: 20px;
+}
+
+.statsRow {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.balanceCol {
+    .label {
+        font-size: 13px;
+        color: #B0B0B0;
+        margin-bottom: 8px;
+        text-transform: none;
+    }
+
+    .amount {
+        font-size: 40px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.02em;
+    }
+}
+
+.cashbackCol {
+    .label {
+        font-size: 13px;
+        color: #B0B0B0;
+        margin-bottom: 8px;
+        text-align: left;
+    }
+
+    .badge {
+        background: #E30613;
+        padding: 10px 16px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 10px rgba(227, 6, 19, 0.4);
+
+        .percent {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .desc {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            max-width: 80px;
+            line-height: 1.2;
+            opacity: 0.9;
+        }
+    }
+}
+
+.bottomRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-top: auto;
     position: relative;
     z-index: 2;
 }
 
 .rate {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
-    opacity: 0.7;
+    color: #FFFFFF;
 }
 
 .howToUse {
-    background: none;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     color: #FFFFFF;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     transition: all 0.2s ease;
+    cursor: pointer;
 
     @media (any-hover: hover) {
         &:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.6);
             border-color: #FFFFFF;
+            transform: translateY(-2px);
         }
     }
-}
 
-.decoration {
-    position: absolute;
-    right: -20px;
-    bottom: -20px;
-    width: 150px;
-    height: 150px;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-    pointer-events: none;
-    z-index: 1;
+    &:active {
+        transform: translateY(0);
+    }
 }

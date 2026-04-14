@@ -97,6 +97,48 @@
     min-width: 0; // Prevent flex overflow
 }
 
+.breadcrumbsWrapper {
+    margin-bottom: 24px;
+}
+
+.titleGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.brandDots {
+    display: flex;
+    gap: 6px;
+
+    span {
+        width: 8px;
+        height: 8px;
+        background-color: #E30613;
+        border-radius: 50%;
+    }
+}
+
+.topCardsRow {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    @media (min-width: 1024px) {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: stretch;
+    }
+}
+
+.cardWrapper {
+    display: flex;
+    & > * {
+        width: 100%;
+    }
+}
+
 .recommendations {
     margin-top: 20px;
 }

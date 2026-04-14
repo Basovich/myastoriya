@@ -9,29 +9,36 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
+.profileFormContainer {
+    margin-top: 32px;
+}
+
 .sectionTitle {
     font-size: 18px;
     font-weight: 700;
-    color: var(--color-text-primary);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
+    margin-bottom: 24px;
+    color: #000;
 }
 
 .form {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 24px;
 }
 
 .fieldsGrid {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 20px;
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .readOnlyField {
-    opacity: 0.7;
+    opacity: 0.6;
     pointer-events: none;
 }
 
@@ -39,93 +46,109 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin-top: 8px;
 }
 
 .genderTitle {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
-    color: var(--color-text-primary);
+    color: #000;
 }
 
 .genderOptions {
     display: flex;
-    gap: 24px;
+    gap: 32px;
 }
 
 .genderBtn {
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: transparent;
+    gap: 10px;
+    background: none;
     border: none;
     padding: 0;
-    color: var(--color-text-primary);
-    font-size: 14px;
-    font-weight: 600;
     cursor: pointer;
+    font-size: 14px;
+    color: #000;
+    transition: opacity 0.2s ease;
 
     .radioCircle {
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
         border: 2px solid #E5E5E5;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s ease;
+        transition: border-color 0.2s ease;
     }
 
     .innerCircle {
-        width: 12px;
-        height: 12px;
-        background: var(--color-accent);
+        width: 10px;
+        height: 10px;
+        background: #000;
         border-radius: 50%;
     }
 
     &.active {
         .radioCircle {
-            border-color: var(--color-accent);
+            border-color: #000;
+        }
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.7;
         }
     }
 }
 
 .socialConnect {
-    padding-top: 16px;
-    border-top: 1px solid #F0F0F0;
+    margin-top: 8px;
 }
 
 .googleBtn {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 12px;
-    width: 100%;
     background: #FFFFFF;
-    border: 1px solid #E5E5E5;
-    border-radius: 12px;
-    padding: 14px;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--color-text-primary);
+    border: 1px solid #000000;
+    padding: 12px 24px;
+    border-radius: 10px;
+    cursor: pointer;
     transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
 
     .googleIcon {
         width: 20px;
         height: 20px;
-        background: url('/icons/contacts/google.svg') no-repeat center;
+        background-image: url('https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png');
         background-size: contain;
+        background-repeat: no-repeat;
     }
 
     @media (any-hover: hover) {
         &:hover {
-            background: #F9F9F9;
-            border-color: #D1D1D1;
+            background: #F5F5F5;
         }
     }
 }
 
 .actions {
-    padding-top: 8px;
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+
+    @media (min-width: 1024px) {
+        justify-content: flex-end;
+    }
+}
+
+.submitBtn {
+    min-width: 200px;
+    text-transform: uppercase;
+    font-weight: 800;
 }
 
 .submitBtn {

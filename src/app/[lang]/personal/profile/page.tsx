@@ -7,16 +7,17 @@ import { logoutApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter, useParams } from 'next/navigation';
 import { Locale } from '@/i18n/config';
+import clsx from 'clsx';
 
 import BonusCard from '@/app/components/Personal/BonusCard/BonusCard';
 import RecentOrderCard from '@/app/components/Personal/RecentOrderCard/RecentOrderCard';
 import PersonalNav from '@/app/components/Personal/PersonalNav/PersonalNav';
 import ProfileForm from '@/app/components/Personal/ProfileForm/ProfileForm';
-import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
 import Header from '@/app/components/Header/Header';
 import Footer from '@/app/components/Footer/Footer';
 import RecentlyViewedSlider from '@/app/components/Personal/RecentlyViewedSlider/RecentlyViewedSlider';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
+import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import uaData from '@/content/ua.json';
 import ruData from '@/content/ru.json';
 import s from './Profile.module.scss';
@@ -131,8 +132,12 @@ export default function ProfilePage() {
     const mainDict = lang === 'ua' ? uaData : ruData;
     const allProducts = mainDict.home.products.items;
 
-    // Filter products that are in the wishlist
     const wishlistProducts = allProducts.filter(p => wishlistIds.includes(String(p.id)));
+
+    const breadcrumbItems = [
+        { label: lang === 'ua' ? 'Головна' : 'Главная', href: `/${lang === 'ua' ? '' : 'ru'}` },
+        { label: dict.title, href: '#' }
+    ];
 
     React.useEffect(() => {
         if (!isInitialized) return;
@@ -157,12 +162,10 @@ export default function ProfilePage() {
 
     const handleFormSubmit = (values: Record<string, string>) => {
         console.log('Update Profile:', values);
-        // Here we would dispatch an updateProfile action
     };
 
-    // Mock data for display
     const mockOrder = {
-        status: lang === 'ua' ? 'В дорозі' : 'В пути',
+        status: lang === 'ua' ? 'Видано кур\'єру' : 'Выдано курьеру',
         totalItems: 5,
         items: [
             '/images/products/product-sticks-cheese.png',
@@ -179,6 +182,10 @@ export default function ProfilePage() {
         <main className={s.pageWrapper}>
             <Header lang={lang} />
             <div className={s.profilePage}>
+                <div className={s.breadcrumbsWrapper}>
+                    <Breadcrumbs items={breadcrumbItems} />
+                </div>
+
                 <div className={s.layoutBody}>
                     <aside className={s.profileSidebar}>
                         <PersonalNav 
@@ -192,11 +199,18 @@ export default function ProfilePage() {
                     <div className={s.profileMain}>
                         <div className={s.unifiedBlock}>
                             <div className={s.blockHeader}>
-                                <SectionHeader 
-                                    title={dict.title} 
-                                    withDots={true} 
-                                    classNameTitle={s.pageTitle}
-                                />
+                                <div className={s.titleGroup}>
+                                    <SectionHeader 
+                                        title={dict.title} 
+                                        withDots={false} 
+                                        classNameTitle={s.pageTitle}
+                                    />
+                                    <div className={s.brandDots}>
+                                        <span />
+                                        <span />
+                                        <span />
+                                    </div>
+                                </div>
                                 <button className={s.logoutBtn} onClick={handleLogout}>
                                     <span>{dict.navigation.logout}</span>
                                     <svg 
@@ -223,18 +237,23 @@ export default function ProfilePage() {
                                 </button>
                             </div>
 
-                            <RecentOrderCard 
-                                status={mockOrder.status}
-                                items={mockOrder.items}
-                                totalItems={mockOrder.totalItems}
-                                dict={dict.recentOrder}
-                            />
-
-                            <BonusCard 
-                                balance={1200} 
-                                percent={3} 
-                                dict={dict.bonusCard} 
-                            />
+                            <div className={s.topCardsRow}>
+                                <div className={s.cardWrapper}>
+                                    <RecentOrderCard 
+                                        status={mockOrder.status}
+                                        items={mockOrder.items}
+                                        totalItems={mockOrder.totalItems}
+                                        dict={dict.recentOrder}
+                                    />
+                                </div>
+                                <div className={s.cardWrapper}>
+                                    <BonusCard 
+                                        balance={1200} 
+                                        percent={3} 
+                                        dict={dict.bonusCard} 
+                                    />
+                                </div>
+                            </div>
 
                             <ProfileForm 
                                 user={user} 
