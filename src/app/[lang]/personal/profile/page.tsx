@@ -24,7 +24,7 @@ import ruData from '@/content/ru.json';
 import s from './Profile.module.scss';
 
 export default function ProfilePage() {
-    const { user, isGuest, isAuthenticated } = useAppSelector((state) => state.auth);
+    const { user, isGuest, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const params = useParams();
     const router = useRouter();
@@ -38,10 +38,12 @@ export default function ProfilePage() {
     const wishlistProducts = allProducts.filter(p => wishlistIds.includes(String(p.id)));
 
     React.useEffect(() => {
+        if (!isInitialized) return;
+
         if (!isAuthenticated || isGuest) {
             router.replace(`/${lang === 'ru' ? 'ru' : ''}`);
         }
-    }, [isAuthenticated, isGuest, router, lang]);
+    }, [isAuthenticated, isGuest, router, lang, isInitialized]);
 
     const handleLogout = async () => {
         try {
@@ -119,6 +121,7 @@ export default function ProfilePage() {
                                 lang={lang} 
                                 dict={dict.navigation} 
                                 onLogout={handleLogout} 
+                                user={user}
                             />
                         </aside>
 

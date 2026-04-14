@@ -3,8 +3,15 @@
     "title": "ОСОБИСТИЙ КАБІНЕТ КЛІЄНТА",
     "navigation": {
       "personalData": "Особисті дані",
-      "orderHistory": "Історія замовлень",
+      "orderHistory": "Мої замовлення",
+      "myReviews": "Мої відгуки",
+      "loyalty": "Лояльність та бонуси",
       "wishlist": "Список бажань",
+      "shoppingList": "Список покупок",
+      "deliveryAddresses": "Адреси доставки",
+      "bankCards": "Банківські картки",
+      "pickupPoints": "Точки самовивозу",
+      "changePassword": "Зміна паролю",
       "logout": "Вийти"
     },
     "bonusCard": {
@@ -44,8 +51,15 @@
     "title": "ЛИЧНЫЙ КАБИНЕТ КЛИЕНТА",
     "navigation": {
       "personalData": "Личные данные",
-      "orderHistory": "История заказов",
+      "orderHistory": "Мои заказы",
+      "myReviews": "Мои отзывы",
+      "loyalty": "Лояльность и бонусы",
       "wishlist": "Список желаний",
+      "shoppingList": "Список покупок",
+      "deliveryAddresses": "Адреса доставки",
+      "bankCards": "Банковские карты",
+      "pickupPoints": "Точки самовывоза",
+      "changePassword": "Смена пароля",
       "logout": "Выйти"
     },
     "bonusCard": {

@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { loginAsGuest } from '@/store/slices/authSlice';
-import { authAsGuestApi } from '@/lib/graphql/queries/auth';
+import { loginAsGuest, setUser, setInitialized } from '@/store/slices/authSlice';
+import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
 
@@ -21,14 +21,26 @@ export default function AuthInitializer() {
     const initialised = useRef(false);
 
     useEffect(() => {
-        if (initialised.current || isAuthenticated) return;
+        if (initialised.current) return;
         initialised.current = true;
 
-        const cookie = document.cookie
+        const token = document.cookie
             .split(';')
-            .some((c) => c.trim().startsWith('access_token='));
+            .find((c) => c.trim().startsWith('access_token='))
+            ?.split('=')[1];
 
-        if (cookie) return; // Already have a token (real user or existing guest)
+        if (token) {
+            // Restore user session
+            getMeApi(token)
+                .then((user) => {
+                    dispatch(setUser(user));
+                })
+                .catch((err) => {
+                    console.warn('[AuthInitializer] Session restoration failed:', err);
+                    dispatch(setInitialized(true));
+                });
+            return;
+        }
 
         const deviceId = getOrCreateDeviceId();
 
@@ -39,8 +51,9 @@ export default function AuthInitializer() {
             })
             .catch((err) => {
                 console.warn('[AuthInitializer] Guest auth failed:', err);
+                dispatch(setInitialized(true));
             });
-    }, [isAuthenticated, dispatch]);
+    }, [dispatch]);
 
     return null;
 }

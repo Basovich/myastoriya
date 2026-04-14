@@ -18,12 +18,15 @@ interface AuthState {
     isAuthenticated: boolean;
     /** Guest mode — user is authed as guest (no personal data) */
     isGuest: boolean;
+    /** True if the initial auth check (cookies/tokens) has completed */
+    isInitialized: boolean;
 }
 
 const initialState: AuthState = {
     user: null,
     isAuthenticated: false,
     isGuest: false,
+    isInitialized: false,
 };
 
 const authSlice = createSlice({
@@ -34,20 +37,28 @@ const authSlice = createSlice({
             state.user = action.payload;
             state.isAuthenticated = true;
             state.isGuest = false;
+            state.isInitialized = true;
         },
         loginAsGuest(state) {
             state.user = null;
             state.isAuthenticated = true;
             state.isGuest = true;
+            state.isInitialized = true;
         },
         logout(state) {
             state.user = null;
             state.isAuthenticated = false;
             state.isGuest = false;
+            state.isInitialized = true;
         },
         setUser(state, action: PayloadAction<AuthUser>) {
             state.user = action.payload;
+            state.isAuthenticated = true;
             state.isGuest = false;
+            state.isInitialized = true;
+        },
+        setInitialized(state, action: PayloadAction<boolean>) {
+            state.isInitialized = action.payload;
         },
         addAddress(state, action: PayloadAction<{ id: string; title: string; street: string }>) {
             if (state.user) {
@@ -60,5 +71,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { login, loginAsGuest, logout, setUser, addAddress } = authSlice.actions;
+export const { login, loginAsGuest, logout, setUser, addAddress, setInitialized } = authSlice.actions;
 export default authSlice.reducer;
