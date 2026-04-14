@@ -6,7 +6,6 @@ import { logout } from '@/store/slices/authSlice';
 import { logoutApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter, useParams } from 'next/navigation';
-import personalData from '@/content/personal.json';
 import { Locale } from '@/i18n/config';
 
 import BonusCard from '@/app/components/Personal/BonusCard/BonusCard';
@@ -20,8 +19,106 @@ import RecentlyViewedSlider from '@/app/components/Personal/RecentlyViewedSlider
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import uaData from '@/content/ua.json';
 import ruData from '@/content/ru.json';
-
 import s from './Profile.module.scss';
+
+const personalDict = {
+  ua: {
+    title: "ОСОБИСТИЙ КАБІНЕТ КЛІЄНТА",
+    navigation: {
+      personalData: "Особисті дані",
+      orderHistory: "Мої замовлення",
+      myReviews: "Мої відгуки",
+      loyalty: "Лояльність та бонуси",
+      wishlist: "Список бажань",
+      shoppingList: "Список покупок",
+      deliveryAddresses: "Адреси доставки",
+      bankCards: "Банківські картки",
+      pickupPoints: "Точки самовивозу",
+      changePassword: "Зміна паролю",
+      logout: "Вийти"
+    },
+    bonusCard: {
+      balanceLabel: "Ваші бали",
+      cashbackLabel: "Кешбек балами",
+      exchangeRate: "1 Б = 1 ₴",
+      howToUse: "ЯК ВИКОРИСТОВУВАТИ?",
+      orderPercent: "Від замовлення"
+    },
+    recentOrder: {
+      title: "Останнє / Активне замовлення",
+      statusLabel: "Статус:",
+      detailsButton: "ДЕТАЛІ",
+      moreItems: "+{count}"
+    },
+    form: {
+      personalDataTitle: "Особисті дані",
+      firstName: "Ім'я*",
+      lastName: "Прізвище*",
+      middleName: "По батькові*",
+      phone: "Телефон*",
+      email: "E-mail",
+      birthday: "День народження",
+      gender: {
+        title: "Стать",
+        male: "Чоловіча",
+        female: "Жіноча"
+      },
+      googleAuth: "Зв'язати аккаунт Google",
+      saveButton: "ЗБЕРЕГТИ ЗМІНИ"
+    },
+    recommendations: {
+      title: "Товари що ви дивилися"
+    }
+  },
+  ru: {
+    title: "ЛИЧНЫЙ КАБИНЕТ КЛИЕНТА",
+    navigation: {
+      personalData: "Личные данные",
+      orderHistory: "Мои заказы",
+      myReviews: "Мои отзывы",
+      loyalty: "Лояльность и бонусы",
+      wishlist: "Список желаний",
+      shoppingList: "Список покупок",
+      deliveryAddresses: "Адреса доставки",
+      bankCards: "Банковские карты",
+      pickupPoints: "Точки самовывоза",
+      changePassword: "Смена пароля",
+      logout: "Выйти"
+    },
+    bonusCard: {
+      balanceLabel: "Ваши баллы",
+      cashbackLabel: "Кэшбэк баллами",
+      exchangeRate: "1 Б = 1 ₴",
+      howToUse: "КАК ИСПОЛЬЗОВАТЬ?",
+      orderPercent: "От заказа"
+    },
+    recentOrder: {
+      title: "Последний / Активный заказ",
+      statusLabel: "Статус:",
+      detailsButton: "ДЕТАЛИ",
+      moreItems: "+{count}"
+    },
+    form: {
+      personalDataTitle: "Личные данные",
+      firstName: "Имя*",
+      lastName: "Фамилия*",
+      middleName: "Отчество*",
+      phone: "Телефон*",
+      email: "E-mail",
+      birthday: "День рождения",
+      gender: {
+        title: "Пол",
+        male: "Мужской",
+        female: "Женский"
+      },
+      googleAuth: "Связать аккаунт Google",
+      saveButton: "СОХРАНИТЬ ИЗМЕНЕНИЯ"
+    },
+    recommendations: {
+      title: "Товары которые вы смотрели"
+    }
+  }
+};
 
 export default function ProfilePage() {
     const { user, isGuest, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
@@ -29,7 +126,7 @@ export default function ProfilePage() {
     const params = useParams();
     const router = useRouter();
     const lang = (params?.lang as Locale) || 'ua';
-    const dict = personalData[lang as keyof typeof personalData];
+    const dict = personalDict[lang as keyof typeof personalDict];
     const { items: wishlistIds } = useAppSelector((state) => state.wishlist);
     const mainDict = lang === 'ua' ? uaData : ruData;
     const allProducts = mainDict.home.products.items;
