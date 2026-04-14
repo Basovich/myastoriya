@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginAsGuest } from '@/store/slices/authSlice';
 import { authAsGuestApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies } from '@/app/actions/authActions';
+import { getOrCreateDeviceId } from '@/lib/utils/auth';
 
 /**
  * Runs once on mount. If there is no active session (no access_token cookie
@@ -42,14 +43,4 @@ export default function AuthInitializer() {
     }, [isAuthenticated, dispatch]);
 
     return null;
-}
-
-function getOrCreateDeviceId(): string {
-    const KEY = 'mya_device_id';
-    let id = localStorage.getItem(KEY);
-    if (!id) {
-        id = crypto.randomUUID();
-        localStorage.setItem(KEY, id);
-    }
-    return id;
 }

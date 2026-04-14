@@ -9,6 +9,8 @@ import { login } from '@/store/slices/authSlice';
 import { sendSmsApi, smsVerifyApi, registrationApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies } from '@/app/actions/authActions';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
+import { getOrCreateDeviceId } from '@/lib/utils/auth';
+import { GraphQLError } from '@/lib/graphql/client';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 import Button from '@/app/components/ui/Button/Button';
@@ -104,6 +106,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         validationSchema: registerSchema,
         onSubmit: async (values, { setStatus }) => {
             try {
+                const deviceId = getOrCreateDeviceId();
                 const result = await registrationApi(
                     {
                         name: values.name,
@@ -111,6 +114,7 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         phone: values.phone,
                         password: values.password,
                         actionToken,
+                        deviceId,
                     },
                     locale,
                 );
@@ -128,7 +132,23 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                 );
                 onSuccess();
             } catch (err) {
-                const errorMessage = err instanceof Error ? err.message : 'Помилка реєстрації';
+                let errorMessage = 'Помилка реєстрації';
+
+                if (err instanceof GraphQLError && err.errors.length > 0) {
+                    const firstError = err.errors[0];
+                    const errorCode = firstError.extensions?.error_code;
+
+                    if (errorCode === 25) {
+                        errorMessage = locale === 'ua'
+                            ? 'Користувач з таким номером телефону вже зареєстрований'
+                            : 'Пользователь с таким номером телефона уже зарегистрирован';
+                    } else {
+                        errorMessage = err.message;
+                    }
+                } else if (err instanceof Error) {
+                    errorMessage = err.message;
+                }
+
                 setStatus(errorMessage);
             }
         },
