@@ -36,7 +36,7 @@ export const SHOPS_QUERY = `
 `;
 
 export const SHOP_BY_ID_QUERY = `
-  query GetShop($id: ID!) {
+  query GetShop($id: Int!) {
     shop(id: $id) {
       id
       name
@@ -142,5 +142,5 @@ export const getShopApi = async (
   id: string,
   lang: string = "ua"
 ): Promise<SingleShopResponse> => {
-  return await gqlRequest<SingleShopResponse>(SHOP_BY_ID_QUERY, { id }, { lang });
+  return await gqlRequest<SingleShopResponse>(SHOP_BY_ID_QUERY, { id: parseInt(id) }, { lang });
 };
