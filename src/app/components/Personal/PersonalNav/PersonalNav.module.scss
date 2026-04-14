@@ -72,7 +72,18 @@
     padding: 24px 16px;
 
     @media (min-width: 1024px) {
-        display: none;
+        display: none !important;
+    }
+}
+
+.desktopSidebar {
+    display: none;
+
+    @media (min-width: 1024px) {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
     }
 }
 
