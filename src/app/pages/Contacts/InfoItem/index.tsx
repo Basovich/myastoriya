@@ -19,7 +19,7 @@ export function InfoItem({ icon, label, value, isLink, href }: InfoItemProps) {
                 <span className={s.label}>{label}</span>
             </div>
             {isLink && href ? (
-                <a href={href} className={s.value}>{value}</a>
+                <a href={href} className={s.value} target="_blank" rel="noopener noreferrer">{value}</a>
             ) : (
                 <span className={s.value}>{value}</span>
             )}

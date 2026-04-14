@@ -78,3 +78,7 @@ export {
     getSelectedLocalityApi,
 } from './queries/localities';
 export type { Locality } from './queries/localities';
+
+// Re-export shops
+export { getShopsApi, SHOPS_QUERY } from './queries/shops';
+export type { Shop, ShopSchedule, ShopsResponse } from './queries/shops';

@@ -6,22 +6,35 @@ import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import Header from "@/app/components/Header/Header";
 import Footer from "@/app/components/Footer/Footer";
 import HeroBanner from "@/app/components/ui/HeroBanner/HeroBanner";
-import contactsData from "@/content/contacts.json";
 import {InfoItem} from "@/app/pages/Contacts/InfoItem";
 import {RestaurantCard} from "@/app/pages/Contacts/RestaurantCard";
+
+
+import { type Shop } from "@/lib/graphql";
 
 
 interface ContactsPageProps {
     dict: Dictionary;
     lang: Locale;
+    shops: Shop[];
+    callCenter: {
+        title: string;
+        workingHours: string;
+        phone: string;
+        email: string;
+        address: string;
+    };
 }
 
-export default function ContactsPage({ dict, lang }: ContactsPageProps) {
+export default function ContactsPage({ dict, lang, shops, callCenter }: ContactsPageProps) {
     const { contactsPage } = dict.home;
-    const { callCenter, restaurants } = contactsData;
 
-    const myastoriyaRestaurants = restaurants.filter(r => r.type === "myastoriya");
-    const meatBarRestaurants = restaurants.filter(r => r.type === "meatbar");
+    const myastoriyaRestaurants = shops.filter(s => 
+        s.name.toLowerCase().includes("м'ясторія")
+    );
+    const meatBarRestaurants = shops.filter(s => 
+        s.name.toLowerCase().includes("meatbar")
+    );
 
     const breadcrumbs = [
         { label: contactsPage.breadcrumbs.home, href: "/" },
@@ -60,6 +73,8 @@ export default function ContactsPage({ dict, lang }: ContactsPageProps) {
                                 icon="address"
                                 label={contactsPage.labels.address}
                                 value={callCenter.address}
+                                isLink
+                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(callCenter.address)}`}
                             />
                             <InfoItem
                                 icon="time"

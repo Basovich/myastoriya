@@ -1,44 +1,58 @@
-import contactsData from "@/content/contacts.json";
 import s from "@/app/pages/Contacts/Contacts.module.scss";
 import React from "react";
 import {ContactsPageDict} from "@/i18n/types";
 import {InfoItem} from "@/app/pages/Contacts/InfoItem";
 import Button from "@/app/components/ui/Button/Button";
+import { type Shop } from "@/lib/graphql";
 
-type Restaurant = (typeof contactsData.restaurants)[number];
+export function RestaurantCard({ restaurant, labels }: { restaurant: Shop; labels: ContactsPageDict["labels"] }) {
+    const phone = restaurant.phones[0] || "";
+    const primarySchedule = restaurant.schedule[0];
+    const workingHours = primarySchedule ? `${primarySchedule.days}: ${primarySchedule.workTime}` : "";
 
-export function RestaurantCard({ restaurant, labels }: { restaurant: Restaurant; labels: ContactsPageDict["labels"] }) {
+    const nameParts = restaurant.name.split(" (");
+    const displayName = nameParts[0];
+    const displayAddress = nameParts[1] ? nameParts[1].replace(")", "") : restaurant.name;
+
     return (
         <div className={s.restaurantCard}>
             <div className={s.cardInfo}>
-                <InfoItem
-                    icon="phone"
-                    label={labels.phone}
-                    value={restaurant.phone}
-                    isLink
-                    href={`tel:${restaurant.phone.replace(/\s+/g, '')}`}
-                />
-                <InfoItem
-                    icon="email"
-                    label={labels.email}
-                    value={restaurant.email}
-                    isLink
-                    href={`mailto:${restaurant.email}`}
-                />
+                {phone && (
+                    <InfoItem
+                        icon="phone"
+                        label={labels.phone}
+                        value={phone}
+                        isLink
+                        href={`tel:${phone.replace(/\s+/g, '')}`}
+                    />
+                )}
+                {restaurant.email && (
+                    <InfoItem
+                        icon="email"
+                        label={labels.email}
+                        value={restaurant.email}
+                        isLink
+                        href={`mailto:${restaurant.email}`}
+                    />
+                )}
                 <InfoItem
                     icon="address"
                     label={labels.restaurantAddress}
-                    value={restaurant.address}
+                    value={displayAddress}
+                    isLink
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress)}`}
                 />
-                <InfoItem
-                    icon="time"
-                    label={labels.workingHours}
-                    value={restaurant.workingHours}
-                />
-                <p className={s.location}>М'ясторія на Оболоні</p>
+                {workingHours && (
+                    <InfoItem
+                        icon="time"
+                        label={labels.workingHours}
+                        value={workingHours}
+                    />
+                )}
+                <p className={s.location}>{displayName}</p>
             </div>
             <Button
-                href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(restaurant.address)}`}
+                href={`https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(displayAddress)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 variant="outline-black"
