@@ -7,6 +7,10 @@ interface LocalityState {
     isDetectionLoading: boolean;
     isManualSelectionOpen: boolean;
     isPromptInteractionDone: boolean;
+    
+    // Initial cities list for dropdown
+    allCities: Locality[];
+    isLoadingCities: boolean;
 }
 
 const initialState: LocalityState = {
@@ -15,6 +19,8 @@ const initialState: LocalityState = {
     isDetectionLoading: false,
     isManualSelectionOpen: false,
     isPromptInteractionDone: false,
+    allCities: [],
+    isLoadingCities: false,
 };
 
 const localitySlice = createSlice({
@@ -36,6 +42,12 @@ const localitySlice = createSlice({
         setPromptInteractionDone: (state, action: PayloadAction<boolean>) => {
             state.isPromptInteractionDone = action.payload;
         },
+        setAllCities: (state, action: PayloadAction<Locality[]>) => {
+            state.allCities = action.payload;
+        },
+        setIsLoadingCities: (state, action: PayloadAction<boolean>) => {
+            state.isLoadingCities = action.payload;
+        },
     },
 });
 
@@ -45,6 +57,8 @@ export const {
     setDetectionLoading,
     setManualSelectionOpen,
     setPromptInteractionDone,
+    setAllCities,
+    setIsLoadingCities,
 } = localitySlice.actions;
 
 export default localitySlice.reducer;

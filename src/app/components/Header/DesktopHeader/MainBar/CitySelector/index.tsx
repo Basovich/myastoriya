@@ -8,6 +8,8 @@ import {
     setManualSelectionOpen,
     setDetectionLoading,
     setPromptInteractionDone,
+    setAllCities,
+    setIsLoadingCities,
 } from '@/store/slices/localitySlice';
 import {
     autoDetectLocalityApi,
@@ -67,14 +69,14 @@ export default function CitySelector({
         selectedCity, 
         isPromptVisible, 
         isManualSelectionOpen,
-        isPromptInteractionDone
+        isPromptInteractionDone,
+        allCities,
+        isLoadingCities,
     } = useAppSelector((state) => state.locality);
 
     // Component Local State
-    const [allCities, setAllCities] = useState<Locality[]>([]);
     const [allCitiesPage, setAllCitiesPage] = useState(1);
     const [hasMoreAll, setHasMoreAll] = useState(true);
-    const [isLoadingInitial, setIsLoadingInitial] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<Locality[]>([]);
@@ -142,23 +144,24 @@ export default function CitySelector({
 
     // 3. Initial cities fetch for dropdown
     useEffect(() => {
-        if (!mounted || !isManualSelectionOpen || allCities.length > 0) return;
+        // Redux already has cities or is loading? Skip.
+        if (!mounted || !isManualSelectionOpen || allCities.length > 0 || isLoadingCities) return;
 
         const fetchInitialCities = async () => {
-            setIsLoadingInitial(true);
+            dispatch(setIsLoadingCities(true));
             try {
                 const res = await getLocalitiesApi(undefined, PAGE_SIZE, 1, lang);
-                setAllCities(res.data);
+                dispatch(setAllCities(res.data));
                 setHasMoreAll(res.has_more_pages);
                 setAllCitiesPage(1);
             } catch (error) {
                 console.error('Failed to fetch initial cities:', error);
             } finally {
-                setIsLoadingInitial(false);
+                dispatch(setIsLoadingCities(false));
             }
         };
         fetchInitialCities();
-    }, [mounted, isManualSelectionOpen, allCities.length, lang]);
+    }, [mounted, isManualSelectionOpen, allCities.length, isLoadingCities, lang, dispatch]);
 
     // 4. Search logic with debounce
     useEffect(() => {
@@ -220,7 +223,7 @@ export default function CitySelector({
             try {
                 const nextPage = allCitiesPage + 1;
                 const res = await getLocalitiesApi(undefined, PAGE_SIZE, nextPage, lang);
-                setAllCities(prev => [...prev, ...res.data]);
+                dispatch(setAllCities([...allCities, ...res.data]));
                 setHasMoreAll(res.has_more_pages);
                 setAllCitiesPage(nextPage);
             } catch (error) {
@@ -318,7 +321,7 @@ export default function CitySelector({
                 </div>
                 <div className={s.cityList} onScroll={handleScroll}>
                     {searchQuery.length < 2 ? (
-                        isLoadingInitial ? (
+                        isLoadingCities ? (
                             <div className={s.loader}></div>
                         ) : allCities.length > 0 ? (
                             <>
