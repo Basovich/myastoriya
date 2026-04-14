@@ -9,17 +9,16 @@ export async function POST(req: NextRequest) {
         
         req.headers.forEach((value, key) => {
             const lowerKey = key.toLowerCase();
-            // Do not copy host, origin, referer, etc to avoid CORS/Host mismatch on backend side
-            if (!['host', 'origin', 'referer', 'content-length'].includes(lowerKey)) {
-                headers[key] = value;
+            if (!['host', 'origin', 'referer', 'content-length', 'cookie', 'connection', 'sec-ch-ua', 'sec-ch-ua-mobile', 'sec-ch-ua-platform', 'sec-fetch-dest', 'sec-fetch-mode', 'sec-fetch-site'].includes(lowerKey)) {
+                headers[lowerKey] = value;
             }
         });
 
         // Forward client IP
         const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || req.headers.get('x-real-ip');
         if (clientIp) {
-            headers['X-Forwarded-For'] = clientIp;
-            headers['X-Real-IP'] = clientIp;
+            headers['x-forwarded-for'] = clientIp;
+            headers['x-real-ip'] = clientIp;
         }
 
         // Add Authorization header from cookie if not already present
@@ -34,6 +33,7 @@ export async function POST(req: NextRequest) {
             method: 'POST',
             headers,
             body,
+            cache: 'no-store',
         });
 
         const data = await res.text();
