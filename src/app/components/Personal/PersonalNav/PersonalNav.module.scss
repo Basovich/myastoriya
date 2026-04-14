@@ -1,6 +1,5 @@
 .personalNav {
     width: 100%;
-    margin-bottom: 24px;
 }
 
 .currentSection {
@@ -10,17 +9,8 @@
     background: #000000;
     color: #FFFFFF;
     padding: 16px 20px;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:has(+ .dropdown) {
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-    }
 }
 
 .activeLabel {
