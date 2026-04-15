@@ -180,6 +180,12 @@ const SOCIAL_AUTH_MUTATION = /* GraphQL */ `
     }
 `;
 
+const DELETE_USER_MUTATION = /* GraphQL */ `
+    mutation DeleteUser {
+        deleteUser
+    }
+`;
+
 const CHECK_USER_PHONE_QUERY = /* GraphQL */ `
     query CheckUserPhone($phone: String) {
         checkUserPhone(phone: $phone)
@@ -333,6 +339,15 @@ export async function socialAuthApi(
         { lang, token },
     );
     return data.socialAuth;
+}
+
+export async function deleteUserApi(token: string, lang?: string): Promise<boolean> {
+    const data = await gqlRequest<{ deleteUser: boolean }>(
+        DELETE_USER_MUTATION,
+        undefined,
+        { token, lang },
+    );
+    return data.deleteUser;
 }
 
 export async function getMeApi(
