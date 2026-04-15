@@ -6,7 +6,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
-import { sendSmsApi, smsVerifyApi, registrationApi } from '@/lib/graphql/queries/auth';
+import { sendSmsApi, smsVerifyApi, registrationApi, checkUserPhoneApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies } from '@/app/actions/authActions';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
@@ -195,6 +195,17 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
         setSmsError('');
         setSmsSending(true);
         try {
+            // Early check if user already exists
+            const exists = await checkUserPhoneApi(currentPhone, locale);
+            if (exists) {
+                const msg = locale === 'ua' 
+                    ? 'Цей номер уже зареєстрований. Будь ласка, увійдіть' 
+                    : 'Этот номер уже зарегистрирован. Пожалуйста, войдите';
+                setSmsError(msg);
+                formik.setFieldError('phone', msg);
+                return;
+            }
+
             const result = await sendSmsApi(currentPhone, locale);
             setSmsToken(result.token);
             // In developer mode the code is returned — show in console
@@ -310,7 +321,22 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                         required
                         value={phoneFormatted}
                         onChange={handlePhoneChange}
-                        onBlur={() => formik.setFieldTouched('phone', true)}
+                        onBlur={async () => {
+                            formik.setFieldTouched('phone', true);
+                            if (PHONE_REGEX.test(formik.values.phone)) {
+                                try {
+                                    const exists = await checkUserPhoneApi(formik.values.phone, locale);
+                                    if (exists) {
+                                        const msg = locale === 'ua' 
+                                            ? 'Цей номер уже зареєстрований' 
+                                            : 'Этот номер уже зарегистрирован';
+                                        formik.setFieldError('phone', msg);
+                                    }
+                                } catch (e) {
+                                    console.error('Phone check error:', e);
+                                }
+                            }
+                        }}
                         error={
                             !phoneVerified && formik.errors.phone
                                 ? formik.errors.phone === 'Підтвердіть номер телефону через SMS' && formik.submitCount === 0

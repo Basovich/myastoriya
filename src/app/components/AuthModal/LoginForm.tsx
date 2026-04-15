@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
-import { loginApi } from '@/lib/graphql/queries/auth';
+import { loginApi, checkUserPhoneApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies } from '@/app/actions/authActions';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import { GraphQLError } from '@/lib/graphql/client';
@@ -53,6 +53,14 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSucc
         validationSchema: loginSchema,
         onSubmit: async (values, { setStatus }) => {
             try {
+                // Final check before login
+                const exists = await checkUserPhoneApi(values.phone, lang);
+                if (!exists) {
+                    const errorDict = authErrors[lang as keyof typeof authErrors] || authErrors.ua;
+                    setStatus(lang === 'ua' ? 'Користувача з таким номером не знайдено' : 'Пользователь с таким номером не найден');
+                    return;
+                }
+
                 const result = await loginApi(
                     { phone: values.phone, password: values.password },
                     lang,
@@ -113,7 +121,19 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSucc
                     required
                     value={phoneFormatted}
                     onChange={handlePhoneChange}
-                    onBlur={() => formik.setFieldTouched('phone', true)}
+                    onBlur={async () => {
+                        formik.setFieldTouched('phone', true);
+                        if (/^380\d{9}$/.test(formik.values.phone)) {
+                            try {
+                                const exists = await checkUserPhoneApi(formik.values.phone, lang);
+                                if (!exists) {
+                                    formik.setFieldError('phone', lang === 'ua' ? 'Користувача не знайдено' : 'Пользователь не найден');
+                                }
+                            } catch (e) {
+                                console.error('Phone check error:', e);
+                            }
+                        }
+                    }}
                     error={formik.errors.phone}
                     touched={formik.touched.phone}
                 />

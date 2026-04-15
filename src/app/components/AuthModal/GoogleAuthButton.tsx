@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
-import { AuthUser } from '@/store/slices/authSlice';
-import { socialAuthApi } from '@/lib/graphql/queries/auth';
-import { setAuthCookies, getAccessToken } from '@/app/actions/authActions';
+import { useAppDispatch } from '@/store/hooks';
+import { AuthUser, loginAsGuest } from '@/store/slices/authSlice';
+import { socialAuthApi, authAsGuestApi } from '@/lib/graphql/queries/auth';
+import { setAuthCookies, getAccessToken, clearAuthCookies } from '@/app/actions/authActions';
+import { getOrCreateDeviceId } from '@/lib/utils/auth';
+import { GraphQLError } from '@/lib/graphql/client';
 import s from './GoogleAuthButton.module.scss';
 
 interface GoogleAuthButtonProps {
@@ -12,26 +15,65 @@ interface GoogleAuthButtonProps {
 }
 
 export default function GoogleAuthButton({ onSuccess }: GoogleAuthButtonProps) {
+    const dispatch = useAppDispatch();
     const [isLoading, setIsLoading] = useState(false);
 
     const login = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             setIsLoading(true);
-            console.log('Google Auth Success. Token:', tokenResponse.access_token);
+            console.log('Google Auth Success. Token received:', tokenResponse.access_token);
 
             try {
-                // Get current token if user is already logged in (e.g., via phone)
-                const currentToken = await getAccessToken();
+                // Get device ID for the request
+                const deviceId = getOrCreateDeviceId();
+                
+                // Ensure we have a token (guest if not logged in)
+                let currentToken = await getAccessToken();
+                
+                if (!currentToken) {
+                    console.log('No token found, establishing guest session before socialAuth...');
+                    try {
+                        const guestResult = await authAsGuestApi(deviceId);
+                        await setAuthCookies(guestResult.accessToken, guestResult.refreshToken);
+                        dispatch(loginAsGuest());
+                        currentToken = guestResult.accessToken;
+                    } catch (guestErr) {
+                        console.error('Failed to establish guest session:', guestErr);
+                    }
+                }
 
-                // Real implementation: exchange Google token for backend session
-                // Pass currentToken to support account linking
-                const result = await socialAuthApi('google', tokenResponse.access_token, undefined, undefined, currentToken || undefined);
+                let result;
+                try {
+                    // Try with the current token (for linking or just for authorized request)
+                    result = await socialAuthApi('google', tokenResponse.access_token, deviceId, undefined, currentToken || undefined);
+                } catch (err) {
+                    // If Unauthorized (401) and we had a token, it might be stale/deleted
+                    const isUnauthorized = err instanceof GraphQLError && (err.status === 401 || err.errors.some(e => e.extensions?.error_code === 401 || e.message === 'Unauthorized'));
+                    
+                    if (isUnauthorized && currentToken) {
+                        console.warn('Stale token detected during Google Auth. Clearing cookies and retrying...');
+                        await clearAuthCookies();
+                        // Retry without token
+                        result = await socialAuthApi('google', tokenResponse.access_token, deviceId, undefined, undefined);
+                    } else {
+                        // For other GraphQLErrors, log full details for debugging
+                        if (err instanceof GraphQLError) {
+                            console.error('Backend GraphQLError Details:', {
+                                message: err.message,
+                                errors: err.errors,
+                                extensions: err.errors[0]?.extensions
+                            });
+                        }
+                        throw err;
+                    }
+                }
                 
                 // Set secure cookies via server action
                 await setAuthCookies(result.accessToken, result.refreshToken);
 
                 if (onSuccess) {
                     onSuccess({
+                        id: result.user.id,
                         name: result.user.name,
                         surname: result.user.surname,
                         email: result.user.email,

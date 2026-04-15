@@ -9,8 +9,9 @@ export async function POST(req: NextRequest) {
         
         req.headers.forEach((value, key) => {
             const lowerKey = key.toLowerCase();
-            if (!['host', 'origin', 'referer', 'content-length', 'cookie', 'connection', 'sec-ch-ua', 'sec-ch-ua-mobile', 'sec-ch-ua-platform', 'sec-fetch-dest', 'sec-fetch-mode', 'sec-fetch-site'].includes(lowerKey)) {
-                headers[lowerKey] = value;
+            // Forward everything except host and content-length which should be set by the new request
+            if (!['host', 'content-length'].includes(lowerKey)) {
+                headers[key] = value;
             }
         });
 
