@@ -87,9 +87,9 @@ const profileDict = {
 };
 
 export default function ProfilePage() {
-    const { user, lang: authLang } = useAppSelector((state) => state.auth);
+    const { user } = useAppSelector((state) => state.auth);
     const params = useParams();
-    const lang = (params?.lang as Locale) || authLang || 'ua';
+    const lang = (params?.lang as Locale) || 'ua';
     const dict = profileDict[lang as keyof typeof profileDict];
     
     const [viewedProducts, setViewedProducts] = React.useState<any[]>([]);
