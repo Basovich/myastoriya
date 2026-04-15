@@ -1,3 +1,9 @@
+.favoritesContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
 .unifiedBlock {
     background: #FFFFFF;
     border-radius: 20px;
@@ -39,26 +45,23 @@
     }
 }
 
-.topCardsRow {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+.emptyState {
+    padding: 40px;
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+}
+
+.productsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
 
     @media (min-width: 1024px) {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px;
-        align-items: stretch;
+        grid-template-columns: repeat(4, 1fr);
     }
-}
-
-.cardWrapper {
-    display: flex;
-    & > * {
-        width: 100%;
-    }
-}
-
-.sliderWrapper {
-    margin-top: 32px;
 }

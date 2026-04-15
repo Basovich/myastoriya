@@ -127,6 +127,31 @@ const CATEGORIES_QUERY = /* GraphQL */ `
     }
 `;
 
+const VIEWED_PRODUCTS_QUERY = /* GraphQL */ `
+    query ViewedProducts($limit: Int) {
+        products(viewed: true, limit: $limit) {
+            data {
+                id
+                name
+                cost
+                oldCost
+                unit
+                multiplier
+                is_new
+                image {
+                    url {
+                        grid2x
+                    }
+                }
+                specifications {
+                    name
+                    values
+                }
+            }
+        }
+    }
+`;
+
 // ---------------------------------------------------------------------------
 // API functions
 // ---------------------------------------------------------------------------
@@ -160,4 +185,13 @@ export async function getCategoriesApi(lang?: string): Promise<ProductCategory[]
         { next: { revalidate: 3600 }, lang },
     );
     return data.categories;
+}
+
+export async function getViewedProductsApi(limit: number = 10, lang?: string): Promise<Product[]> {
+    const data = await gqlRequest<{ products: { data: Product[] } }>(
+        VIEWED_PRODUCTS_QUERY,
+        { limit },
+        { next: { revalidate: 60 }, lang },
+    );
+    return data.products.data;
 }
