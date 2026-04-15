@@ -64,43 +64,22 @@
 }
 
 .logoutBtn {
-    display: flex;
-    align-items: center;
     gap: 10px;
-    padding: 10px 18px;
-    background: transparent;
-    border: 1px solid #000;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-size: 14px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: #000;
-    letter-spacing: 0.5px;
 
-    .logoutIcon {
-        width: 20px;
-        height: 20px;
-        color: #000;
-        transition: transform 0.3s ease, color 0.3s ease;
+    svg {
+        width: 13px;
+        height: 14px;
+        transition: all 0.2s linear;
     }
 
     @media (any-hover: hover) {
         &:hover {
-            background: #000;
-            color: #FFF;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-            .logoutIcon {
-                color: #FFF;
-                transform: scale(1.1);
+            svg {
+                path {
+                    fill: #FFF;
+                    stroke: #FFF;
+                }
             }
-        }
-
-        &:active {
-            transform: translateY(0);
         }
     }
 
