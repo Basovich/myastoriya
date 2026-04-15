@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import { AuthUser } from '@/store/slices/authSlice';
+import { socialAuthApi } from '@/lib/graphql/queries/auth';
+import { setAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import s from './GoogleAuthButton.module.scss';
 
 interface GoogleAuthButtonProps {
@@ -18,18 +20,23 @@ export default function GoogleAuthButton({ onSuccess }: GoogleAuthButtonProps) {
             console.log('Google Auth Success. Token:', tokenResponse.access_token);
 
             try {
-                // In a real implementation, you would send tokenResponse.access_token to your backend:
-                // const result = await loginByGoogleApi(tokenResponse.access_token);
+                // Get current token if user is already logged in (e.g., via phone)
+                const currentToken = await getAccessToken();
+
+                // Real implementation: exchange Google token for backend session
+                // Pass currentToken to support account linking
+                const result = await socialAuthApi('google', tokenResponse.access_token, undefined, undefined, currentToken || undefined);
                 
-                // For now, we simulate a successful backend exchange
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Set secure cookies via server action
+                await setAuthCookies(result.accessToken, result.refreshToken);
 
                 if (onSuccess) {
                     onSuccess({
-                        name: 'Google User',
-                        email: 'google@example.com',
-                        phone: '380998887766',
-                    });
+                        name: result.user.name,
+                        surname: result.user.surname,
+                        email: result.user.email,
+                        phone: result.user.phone,
+                    } as AuthUser);
                 }
             } catch (error) {
                 console.error('Backend Google Auth Error:', error);

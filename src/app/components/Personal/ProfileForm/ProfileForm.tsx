@@ -95,9 +95,13 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
                                 name="phone"
                                 label={dict.phone}
                                 value={values.phone}
-                                readOnly
-                                disabled
-                                className={s.readOnlyField}
+                                readOnly={!!user?.phone}
+                                disabled={!!user?.phone}
+                                className={clsx(user?.phone && s.readOnlyField)}
+                                onChange={user?.phone ? undefined : handleChange}
+                                error={errors.phone}
+                                touched={touched.phone}
+                                required
                             />
                             <InputField
                                 id="email"

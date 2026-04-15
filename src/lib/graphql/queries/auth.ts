@@ -162,6 +162,24 @@ const LOGOUT_MUTATION = /* GraphQL */ `
     }
 `;
 
+const SOCIAL_AUTH_MUTATION = /* GraphQL */ `
+    mutation SocialAuth($provider: String!, $code: String!, $deviceId: String) {
+        socialAuth(provider: $provider, code: $code, deviceId: $deviceId) {
+            tokenType
+            expiresIn
+            accessToken
+            refreshToken
+            user {
+                id
+                name
+                surname
+                phone
+                email
+            }
+        }
+    }
+`;
+
 const CHECK_USER_PHONE_QUERY = /* GraphQL */ `
     query CheckUserPhone($phone: String) {
         checkUserPhone(phone: $phone)
@@ -290,7 +308,6 @@ export async function logoutApi(token: string, lang?: string): Promise<boolean> 
     );
     return data.logout;
 }
-
 export async function checkUserPhoneApi(
     phone: string,
     lang?: string,
@@ -301,6 +318,21 @@ export async function checkUserPhoneApi(
         { lang },
     );
     return data.checkUserPhone;
+}
+
+export async function socialAuthApi(
+    provider: string,
+    code: string,
+    deviceId?: string,
+    lang?: string,
+    token?: string,
+): Promise<LoggedInUser> {
+    const data = await gqlRequest<{ socialAuth: LoggedInUser }>(
+        SOCIAL_AUTH_MUTATION,
+        { provider, code, deviceId },
+        { lang, token },
+    );
+    return data.socialAuth;
 }
 
 export async function getMeApi(
