@@ -175,6 +175,7 @@ const ME_QUERY = /* GraphQL */ `
             name
             surname
             phone
+            email
         }
     }
 `;

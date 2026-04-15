@@ -8,6 +8,7 @@ import Button from '@/app/components/ui/Button/Button';
 import s from './ProfileForm.module.scss';
 import clsx from 'clsx';
 import { AuthUser } from '@/store/slices/authSlice';
+import GoogleAuthButton from '@/app/components/AuthModal/GoogleAuthButton';
 
 interface ProfileFormProps {
     user: AuthUser | null;
@@ -143,12 +144,15 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
                             </div>
                         </div>
 
-                        <div className={s.socialConnect}>
-                            <button type="button" className={s.googleBtn}>
-                                <div className={s.googleIcon} />
-                                <span>{dict.googleAuth}</span>
-                            </button>
-                        </div>
+                        {!user?.email && (
+                            <div className={s.socialConnect}>
+                                <GoogleAuthButton 
+                                    onSuccess={(updatedUser) => {
+                                        onSubmit(updatedUser);
+                                    }}
+                                />
+                            </div>
+                        )}
 
                         <div className={s.actions}>
                             <Button type="submit" variant="black" className={s.submitBtn}>

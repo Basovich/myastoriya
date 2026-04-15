@@ -187,11 +187,11 @@ export async function getCategoriesApi(lang?: string): Promise<ProductCategory[]
     return data.categories;
 }
 
-export async function getViewedProductsApi(limit: number = 10, lang?: string): Promise<Product[]> {
+export async function getViewedProductsApi(limit: number = 10, lang?: string, token?: string): Promise<Product[]> {
     const data = await gqlRequest<{ products: { data: Product[] } }>(
         VIEWED_PRODUCTS_QUERY,
         { limit },
-        { next: { revalidate: 60 }, lang },
+        { next: { revalidate: 60 }, lang, token },
     );
     return data.products.data;
 }

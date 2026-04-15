@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useGoogleLogin } from '@react-oauth/google';
 import { AuthUser } from '@/store/slices/authSlice';
 import s from './GoogleAuthButton.module.scss';
 
@@ -11,32 +12,45 @@ interface GoogleAuthButtonProps {
 export default function GoogleAuthButton({ onSuccess }: GoogleAuthButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleGoogleAuth = async () => {
-        setIsLoading(true);
-        console.log('Google Auth Clicked');
+    const login = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            setIsLoading(true);
+            console.log('Google Auth Success. Token:', tokenResponse.access_token);
 
-        try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            try {
+                // In a real implementation, you would send tokenResponse.access_token to your backend:
+                // const result = await loginByGoogleApi(tokenResponse.access_token);
+                
+                // For now, we simulate a successful backend exchange
+                await new Promise(resolve => setTimeout(resolve, 1000));
 
-            if (onSuccess) {
-                onSuccess({
-                    name: 'Google User',
-                    email: 'google@example.com',
-                    phone: '380998887766',
-                });
+                if (onSuccess) {
+                    onSuccess({
+                        name: 'Google User',
+                        email: 'google@example.com',
+                        phone: '380998887766',
+                    });
+                }
+            } catch (error) {
+                console.error('Backend Google Auth Error:', error);
+            } finally {
+                setIsLoading(false);
             }
-        } catch (error) {
-            console.error('Google Auth Error:', error);
-        } finally {
+        },
+        onError: (error) => {
+            console.error('Google Login Failed:', error);
             setIsLoading(false);
-        }
-    };
+        },
+    });
 
     return (
         <button
             type="button"
             className={s.googleBtn}
-            onClick={handleGoogleAuth}
+            onClick={() => {
+                setIsLoading(true);
+                login();
+            }}
             disabled={isLoading}
         >
             <svg className={s.googleIcon} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">

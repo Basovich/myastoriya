@@ -1,8 +1,11 @@
 'use client';
 
 import React from 'react';
-import { useAppSelector } from '@/store/hooks';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { logout } from '@/store/slices/authSlice';
+import { logoutApi } from '@/lib/graphql/queries/auth';
+import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { Locale } from '@/i18n/config';
 
 import BonusCard from '@/app/components/Personal/BonusCard/BonusCard';
@@ -23,6 +26,7 @@ const profileDict = {
       howToUse: "ЯК ВИКОРИСТОВУВАТИ?",
       orderPercent: "Від замовлення"
     },
+    logout: "Вийти",
     recentOrder: {
       title: "Останнє / Активне замовлення",
       statusLabel: "Статус:",
@@ -58,6 +62,7 @@ const profileDict = {
       howToUse: "КАК ИСПОЛЬЗОВАТЬ?",
       orderPercent: "От заказа"
     },
+    logout: "Выйти",
     recentOrder: {
       title: "Последний / Активный заказ",
       statusLabel: "Статус:",
@@ -88,28 +93,55 @@ const profileDict = {
 
 export default function ProfilePage() {
     const { user } = useAppSelector((state) => state.auth);
+    const dispatch = useAppDispatch();
+    const router = useRouter();
     const params = useParams();
     const lang = (params?.lang as Locale) || 'ua';
     const dict = profileDict[lang as keyof typeof profileDict];
     
     const [viewedProducts, setViewedProducts] = React.useState<any[]>([]);
 
+    const handleLogout = async () => {
+        try {
+            const token = await getAccessToken();
+            if (token) {
+                await logoutApi(token);
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            await clearAuthCookies();
+            dispatch(logout());
+            router.push(`/${lang === 'ua' ? '' : lang}`);
+        }
+    };
+
     React.useEffect(() => {
-        getViewedProductsApi(12, lang).then(products => {
-            const mappedProducts = products.map((p: ApiProduct) => ({
-                id: p.id,
-                title: p.name,
-                price: p.cost,
-                unit: p.unit,
-                image: p.image?.url.grid2x || '',
-                badge: p.is_new ? "NEW" : null,
-                weight: p.specifications?.find((s: any) => 
-                    s.name.toLowerCase().includes('важ') || 
-                    s.name.toLowerCase().includes('вес')
-                )?.values[0] || p.multiplier?.toString() || ""
-            }));
-            setViewedProducts(mappedProducts);
-        }).catch(err => console.error(err));
+        const fetchViewedProducts = async () => {
+            try {
+                const { getAccessToken } = await import('@/app/actions/authActions');
+                const token = await getAccessToken();
+                
+                const products = await getViewedProductsApi(12, lang, token || undefined);
+                const mappedProducts = products.map((p: ApiProduct) => ({
+                    id: p.id,
+                    title: p.name,
+                    price: p.cost,
+                    unit: p.unit,
+                    image: p.image?.url.grid2x || '',
+                    badge: p.is_new ? "NEW" : null,
+                    weight: p.specifications?.find((s: any) => 
+                        s.name.toLowerCase().includes('важ') || 
+                        s.name.toLowerCase().includes('вес')
+                    )?.values[0] || p.multiplier?.toString() || ""
+                }));
+                setViewedProducts(mappedProducts);
+            } catch (err) {
+                console.error('Error fetching viewed products:', err);
+            }
+        };
+
+        fetchViewedProducts();
     }, [lang]);
 
     const handleFormSubmit = (values: Record<string, string>) => {
@@ -142,6 +174,12 @@ export default function ProfilePage() {
                             <span />
                         </div>
                     </div>
+                    <button className={s.logoutBtn} onClick={handleLogout}>
+                        <span>{dict.logout}</span>
+                        <svg className={s.logoutIcon} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 4C13.66 4 15 5.34 15 7C15 8.66 13.66 10 12 10C10.34 10 9 8.66 9 7C9 5.34 10.34 4 12 4ZM12 19.2C9.5 19.2 7.29 17.92 6 15.98C6.03 13.99 10 12.9 12 12.9C13.99 12.9 17.97 13.99 18 15.98C16.71 17.92 14.5 19.2 12 19.2Z" fill="currentColor"/>
+                        </svg>
+                    </button>
                 </div>
 
                 <div className={s.topCardsRow}>
