@@ -8,6 +8,7 @@ import { login } from '@/store/slices/authSlice';
 import { loginApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies } from '@/app/actions/authActions';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
+import { GraphQLError } from '@/lib/graphql/client';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 import Button from '@/app/components/ui/Button/Button';
@@ -21,6 +22,17 @@ const loginSchema = Yup.object({
         .required('Обов\'язкове поле')
         .min(4, 'Мінімум 4 символи'),
 });
+
+const authErrors = {
+    ua: {
+        invalidCredentials: "Невірний номер телефону або пароль",
+        generic: "Помилка входу"
+    },
+    ru: {
+        invalidCredentials: "Неверный номер телефона или пароль",
+        generic: "Ошибка входа"
+    }
+};
 
 interface LoginFormProps {
     onSwitchToRegister: () => void;
@@ -59,7 +71,19 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSucc
                 );
                 onSuccess();
             } catch (err) {
-                const errorMessage = err instanceof Error ? err.message : 'Помилка входу';
+                if (err instanceof GraphQLError) {
+                    const isInvalidCredentials = err.errors.some(e => 
+                        e.extensions?.error_code === 21 || e.extensions?.error_code === '21' ||
+                        e.extensions?.error_code === 20 || e.extensions?.error_code === '20'
+                    );
+                    if (isInvalidCredentials) {
+                        const errorDict = authErrors[lang as keyof typeof authErrors] || authErrors.ua;
+                        setStatus(errorDict.invalidCredentials);
+                        return;
+                    }
+                }
+                const errorDict = authErrors[lang as keyof typeof authErrors] || authErrors.ua;
+                const errorMessage = err instanceof Error ? err.message : errorDict.generic;
                 setStatus(errorMessage);
             }
         },
