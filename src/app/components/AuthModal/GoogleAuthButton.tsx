@@ -48,7 +48,7 @@ export default function GoogleAuthButton({ onSuccess }: GoogleAuthButtonProps) {
                     result = await socialAuthApi('google', tokenResponse.access_token, deviceId, undefined, currentToken || undefined);
                 } catch (err) {
                     // If Unauthorized (401) and we had a token, it might be stale/deleted
-                    const isUnauthorized = err instanceof GraphQLError && (err.status === 401 || err.errors.some(e => e.extensions?.error_code === 401 || e.message === 'Unauthorized'));
+                    const isUnauthorized = err instanceof GraphQLError && (err.errors.some(e => e.extensions?.error_code === 401 || e.message === 'Unauthorized'));
                     
                     if (isUnauthorized && currentToken) {
                         console.warn('Stale token detected during Google Auth. Clearing cookies and retrying...');

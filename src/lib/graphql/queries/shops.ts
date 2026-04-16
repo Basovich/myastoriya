@@ -11,7 +11,6 @@ export const SHOPS_QUERY = `
         email
         isOpen
         isCompanyStore
-        description
         schedule {
           days
           workTime
@@ -45,7 +44,6 @@ export const SHOP_BY_ID_QUERY = `
       email
       isOpen
       isCompanyStore
-      description
       schedule {
         days
         workTime
@@ -104,7 +102,6 @@ export interface Shop {
   email: string | null;
   isOpen: boolean;
   isCompanyStore: boolean;
-  description: string | null;
   schedule: ShopSchedule[];
   lat: number | null;
   lng: number | null;

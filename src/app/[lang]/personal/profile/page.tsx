@@ -244,7 +244,7 @@ export default function ProfilePage() {
             </div>
 
             <div className={s.sliderWrapper}>
-                <RecentlyViewedSlider lang={lang} products={viewedProducts} />
+                <RecentlyViewedSlider title={dict.recommendations.title} products={viewedProducts} />
             </div>
         </div>
     );
