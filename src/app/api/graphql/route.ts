@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.text();
         const headers: Record<string, string> = {};
-        
+
         req.headers.forEach((value, key) => {
             const lowerKey = key.toLowerCase();
             // Forward everything except host and content-length which should be set by the new request
@@ -14,6 +14,20 @@ export async function POST(req: NextRequest) {
                 headers[key] = value;
             }
         });
+
+        // Ensure critical browser headers are present (Next.js sometimes strips them)
+        if (!headers['origin']) {
+            headers['origin'] = req.nextUrl.origin;
+        }
+        if (!headers['referer']) {
+            headers['referer'] = req.nextUrl.href;
+        }
+        if (!headers['cookie']) {
+            const allCookies = req.cookies.getAll().map(c => `${c.name}=${c.value}`).join('; ');
+            if (allCookies) {
+                headers['cookie'] = allCookies;
+            }
+        }
 
         // Forward client IP
         const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || req.headers.get('x-real-ip');
@@ -28,6 +42,14 @@ export async function POST(req: NextRequest) {
             if (token) {
                 headers['authorization'] = `Bearer ${token}`;
             }
+        }
+
+        // Safe logging for debugging
+        try {
+            const fs = require('fs');
+            fs.writeFileSync('/tmp/proxy-headers.json', JSON.stringify({ sentHeaders: headers }, null, 2));
+        } catch (e) {
+            console.error("Failed to log headers:", e);
         }
 
         const res = await fetch(GQL_ENDPOINT, {

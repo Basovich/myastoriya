@@ -56,6 +56,7 @@ export async function gqlRequest<T>(
     const res = await fetch(GQL_ENDPOINT, {
         method: 'POST',
         headers,
+        credentials: 'include',
         body: JSON.stringify({ query, variables }),
         ...(options?.next ? { next: options.next } : {}),
     });

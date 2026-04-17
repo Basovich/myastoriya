@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginAsGuest, setUser, setInitialized } from '@/store/slices/authSlice';
 import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
-import { setAuthCookies } from '@/app/actions/authActions';
+import { setAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
 
 /**
@@ -24,35 +24,33 @@ export default function AuthInitializer() {
         if (initialised.current) return;
         initialised.current = true;
 
-        const token = document.cookie
-            .split(';')
-            .find((c) => c.trim().startsWith('access_token='))
-            ?.split('=')[1];
+        getAccessToken().then(token => {
+            if (token) {
+                // Restore user session
+                getMeApi(token)
+                    .then((user) => {
+                        dispatch(setUser(user));
+                    })
+                    .catch((err) => {
+                        console.warn('[AuthInitializer] Session restoration failed:', err);
+                        dispatch(setInitialized(true));
+                    });
+                return;
+            }
 
-        if (token) {
-            // Restore user session
-            getMeApi(token)
-                .then((user) => {
-                    dispatch(setUser(user));
+            const deviceId = getOrCreateDeviceId();
+
+            authAsGuestApi(deviceId)
+                .then(async (result) => {
+                    await setAuthCookies(result.accessToken, result.refreshToken);
+                    dispatch(loginAsGuest());
                 })
                 .catch((err) => {
-                    console.warn('[AuthInitializer] Session restoration failed:', err);
+                    console.warn('[AuthInitializer] Guest auth failed:', err);
                     dispatch(setInitialized(true));
                 });
-            return;
-        }
+        });
 
-        const deviceId = getOrCreateDeviceId();
-
-        authAsGuestApi(deviceId)
-            .then(async (result) => {
-                await setAuthCookies(result.accessToken, result.refreshToken);
-                dispatch(loginAsGuest());
-            })
-            .catch((err) => {
-                console.warn('[AuthInitializer] Guest auth failed:', err);
-                dispatch(setInitialized(true));
-            });
     }, [dispatch]);
 
     return null;
