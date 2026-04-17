@@ -313,9 +313,6 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
                         error={formik.errors.email}
                         touched={formik.touched.email}
                     />
-                </div>
-
-                <div className={s.rowBirthday}>
                     <DatePicker
                         id="birthday"
                         label={dict.birthday}
@@ -325,11 +322,11 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
                         error={formik.errors.birthday}
                         touched={formik.touched.birthday}
                         maxDate={new Date()}
+                        hideIcon
                     />
                 </div>
 
                 <div className={s.genderSection}>
-                    <span className={s.genderTitle}>{dict.gender.title}</span>
                     <div className={s.genderRow}>
                         <div className={s.genderOptions}>
                             <Checkbox

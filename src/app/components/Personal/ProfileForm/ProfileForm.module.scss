@@ -60,18 +60,6 @@
     gap: 32px;
 }
 
-.genderRow {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    margin-top: 8px;
-
-    @media (min-width: 1024px) {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-    }
-}
 
 .genderBtn {
     display: flex;
@@ -116,16 +104,6 @@
     }
 }
 
-.rowBirthday {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-
-    @media (min-width: 1024px) {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
 .genderRow {
     display: flex;
     flex-direction: column;
@@ -135,8 +113,7 @@
     @media (min-width: 1024px) {
         flex-direction: row;
         align-items: center;
-        // The Google button should be aligned with the 2nd/3rd columns of the grid above
-        gap: 32px;
+        gap: 40px;
     }
 }
 
@@ -145,9 +122,17 @@
     align-items: center;
     
     @media (min-width: 1024px) {
-        flex: 1;
-        // This helps position it roughly where the 2nd/3rd columns start if we want, 
-        // or just next to checkboxes.
+        flex: 0 1 auto;
+        width: fit-content;
+    }
+
+    button {
+        height: 44px !important;
+        padding: 0 22px !important;
+        
+        @media (min-width: 1024px) {
+            height: 46px !important;
+        }
     }
 }
 
@@ -162,10 +147,16 @@
 }
 
 .submitBtn {
-    min-width: 200px;
     text-transform: uppercase;
     font-weight: 800;
-    width: 100% !important;
+    width: 100%;
+    height: 44px;
+
+    @media (min-width: 1024px) {
+        width: fit-content !important;
+        padding: 0 60px;
+        height: 46px;
+    }
 }
 
 /* Inline SMS verification block */
