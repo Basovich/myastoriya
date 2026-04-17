@@ -149,8 +149,118 @@
     min-width: 200px;
     text-transform: uppercase;
     font-weight: 800;
+    width: 100% !important;
 }
 
-.submitBtn {
-    width: 100% !important;
+/* Inline SMS verification block */
+.smsBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 18px;
+}
+
+.timerText {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+}
+
+.timerCount {
+    color: #E6000F;
+    font-weight: 700;
+}
+
+.smsInputRow {
+    display: flex;
+    height: 48px;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+
+    &:focus-within {
+        border-color: #333;
+    }
+}
+
+.smsInput {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    padding: 2px 14px 0;
+    font-size: 14px;
+    color: #333;
+    background: #fff;
+
+    &::placeholder {
+        color: #999;
+    }
+
+    &:disabled {
+        background: #f5f5f5;
+        color: #bbb;
+        cursor: not-allowed;
+    }
+
+    &:focus-visible {
+        outline: none;
+    }
+}
+
+.smsSendBtn {
+    flex-shrink: 0;
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 2px 20px 0;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            background: #222;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E6000F;
+        outline-offset: -2px;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.verifiedBadge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #2a9d5c;
+    font-weight: 500;
+    margin-top: 4px;
+
+    svg {
+        margin-top: -4px;
+    }
+}
+
+.inputVerified {
+    :global(input) {
+        border-color: #2a9d5c !important;
+    }
+}
+
+.fieldError {
+    font-size: 11px;
+    color: #E6000F;
+    margin-top: 4px;
+    display: block;
 }

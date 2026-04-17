@@ -204,6 +204,36 @@ const ME_QUERY = /* GraphQL */ `
     }
 `;
 
+const UPDATE_USER_DATA_MUTATION = /* GraphQL */ `
+    mutation UpdateUserData(
+        $name: String!
+        $surname: String!
+        $phone: String!
+        $email: String
+        $birthday: String
+        $sex: String!
+        $password: String
+    ) {
+        updateUserData(
+            name: $name
+            surname: $surname
+            phone: $phone
+            email: $email
+            birthday: $birthday
+            sex: $sex
+            password: $password
+        ) {
+            id
+            name
+            surname
+            phone
+            email
+            birthday
+            sex
+        }
+    }
+`;
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -216,6 +246,29 @@ function formatPhone(phone: string): string {
 // ---------------------------------------------------------------------------
 // API functions
 // ---------------------------------------------------------------------------
+
+export interface UpdateUserInput {
+    name: string;
+    surname: string;
+    phone: string;
+    email?: string;
+    birthday?: string;
+    sex: string;
+    password?: string;
+}
+
+export async function updateUserDataApi(
+    input: UpdateUserInput,
+    token: string,
+    lang?: string,
+): Promise<BackendUser> {
+    const data = await gqlRequest<{ updateUserData: BackendUser }>(
+        UPDATE_USER_DATA_MUTATION,
+        { ...input, phone: formatPhone(input.phone) },
+        { token, lang },
+    );
+    return data.updateUserData;
+}
 
 export async function sendSmsApi(
     phone: string,

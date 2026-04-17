@@ -15,6 +15,8 @@ import ProfileForm from '@/app/components/Personal/ProfileForm/ProfileForm';
 import RecentlyViewedSlider from '@/app/components/Personal/RecentlyViewedSlider/RecentlyViewedSlider';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import { getViewedProductsApi, Product as ApiProduct } from '@/lib/graphql/queries/products';
+import { updateUserDataApi } from '@/lib/graphql/queries/auth';
+import { setUser } from '@/store/slices/authSlice';
 import s from './Profile.module.scss';
 
 const profileDict = {
@@ -40,10 +42,10 @@ const profileDict = {
     },
     form: {
       personalDataTitle: "Особисті дані",
-      firstName: "Ім'я*",
-      lastName: "Прізвище*",
-      middleName: "По батькові*",
-      phone: "Телефон*",
+      firstName: "Ім'я",
+      lastName: "Прізвище",
+      middleName: "По батькові",
+      phone: "Телефон",
       email: "E-mail",
       birthday: "День народження",
       gender: {
@@ -80,10 +82,10 @@ const profileDict = {
     },
     form: {
       personalDataTitle: "Личные данные",
-      firstName: "Имя*",
-      lastName: "Фамилия*",
-      middleName: "Отчество*",
-      phone: "Телефон*",
+      firstName: "Имя",
+      lastName: "Фамилия",
+      middleName: "Отчество",
+      phone: "Телефон",
       email: "E-mail",
       birthday: "День рождения",
       gender: {
@@ -174,8 +176,42 @@ export default function ProfilePage() {
         fetchViewedProducts();
     }, [lang]);
 
-    const handleFormSubmit = (values: Record<string, string>) => {
-        console.log('Update Profile:', values);
+    const handleFormSubmit = async (values: any) => {
+        try {
+            const token = await getAccessToken();
+            if (!token) {
+                alert('Помилка авторизації. Будь ласка, увійдіть знову.');
+                return;
+            }
+
+            const updatedUser = await updateUserDataApi(
+                {
+                    name: values.name,
+                    surname: values.surname,
+                    phone: values.phone,
+                    email: values.email || '',
+                    birthday: values.birthday || '',
+                    sex: values.gender,
+                },
+                token,
+                lang
+            );
+
+            dispatch(setUser({
+                id: updatedUser.id,
+                name: updatedUser.name,
+                surname: updatedUser.surname,
+                phone: updatedUser.phone,
+                email: updatedUser.email,
+                birthday: updatedUser.birthday,
+                sex: updatedUser.sex,
+            }));
+
+            alert(lang === 'ua' ? 'Зміни успішно збережено!' : 'Изменения успешно сохранены!');
+        } catch (error) {
+            console.error('Update profile error:', error);
+            alert(lang === 'ua' ? 'Помилка при збереженні змін.' : 'Ошибка при сохранении изменений.');
+        }
     };
 
     const mockOrder = {
