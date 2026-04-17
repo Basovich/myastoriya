@@ -12,6 +12,11 @@ export interface BackendUser {
     email?: string;
     birthday?: string;
     sex?: string;
+    avatar?: {
+        size1x?: string;
+        size2x?: string;
+        size3x?: string;
+    } | null;
 }
 
 export interface AuthFields {
@@ -90,6 +95,11 @@ const LOGIN_MUTATION = /* GraphQL */ `
                 name
                 surname
                 phone
+                avatar {
+                    size1x
+                    size2x
+                    size3x
+                }
             }
         }
     }
@@ -123,6 +133,11 @@ const REGISTRATION_MUTATION = /* GraphQL */ `
                 name
                 surname
                 phone
+                avatar {
+                    size1x
+                    size2x
+                    size3x
+                }
             }
         }
     }
@@ -175,6 +190,11 @@ const SOCIAL_AUTH_MUTATION = /* GraphQL */ `
                 surname
                 phone
                 email
+                avatar {
+                    size1x
+                    size2x
+                    size3x
+                }
             }
         }
     }
@@ -200,6 +220,11 @@ const ME_QUERY = /* GraphQL */ `
             surname
             phone
             email
+            avatar {
+                size1x
+                size2x
+                size3x
+            }
         }
     }
 `;
@@ -230,6 +255,24 @@ const UPDATE_USER_DATA_MUTATION = /* GraphQL */ `
             email
             birthday
             sex
+            avatar {
+                size1x
+                size2x
+                size3x
+            }
+        }
+    }
+`;
+
+const UPDATE_USER_AVATAR_MUTATION = /* GraphQL */ `
+    mutation UpdateUserAvatar($avatar: Upload!) {
+        updateUserAvatar(avatar: $avatar) {
+            id
+            avatar {
+                size1x
+                size2x
+                size3x
+            }
         }
     }
 `;
@@ -268,6 +311,19 @@ export async function updateUserDataApi(
         { token, lang },
     );
     return data.updateUserData;
+}
+
+export async function updateUserAvatarApi(
+    avatar: File,
+    token: string,
+    lang?: string,
+): Promise<BackendUser> {
+    const data = await gqlRequest<{ updateUserAvatar: BackendUser }>(
+        UPDATE_USER_AVATAR_MUTATION,
+        { avatar },
+        { token, lang },
+    );
+    return data.updateUserAvatar;
 }
 
 export async function sendSmsApi(

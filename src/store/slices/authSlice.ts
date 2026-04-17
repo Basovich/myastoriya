@@ -1,5 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export interface UserAvatars {
+    size1x?: string;
+    size2x?: string;
+    size3x?: string;
+}
+
 export interface AuthUser {
     id?: string;
     phone: string;
@@ -10,6 +16,7 @@ export interface AuthUser {
     birthday?: string;
     gender?: 'male' | 'female';
     sex?: string;
+    avatar?: UserAvatars | null;
     addresses?: { id: string; title: string; street: string }[];
 }
 
