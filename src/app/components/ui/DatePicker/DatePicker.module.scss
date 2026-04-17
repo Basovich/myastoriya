@@ -135,50 +135,99 @@
     padding: 14px 16px;
     font-size: 16px;
     color: #333;
-    background-color: #fff;
+    background-color: transparent;
     outline: none;
     font-family: inherit;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
     text-align: left;
+    position: relative;
+    min-height: 52px;
 
-    &:hover {
-        border-color: #FD2427;
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #aaa;
+        }
     }
 
     &:focus-visible {
-        border-color: #FD2427;
+        border-color: #000;
+    }
+}
+
+.inputError {
+    border-color: #E6000F !important;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: #E6000F !important;
+        }
+    }
+
+    &:focus-visible {
+        border-color: #E6000F !important;
+    }
+
+    .floatingLabel {
+        color: #E6000F !important;
     }
 }
 
 .inputContent {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    justify-content: center;
     flex: 1;
 }
 
-.leftIcon {
+.floatingLabel {
+    position: absolute;
+    left: 16px;
+    top: 14px;
+    font-size: 16px;
+    color: #888;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    background: transparent;
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    gap: 1.5px;
+    line-height: 1;
+
+    &.floating {
+        top: -9px;
+        font-size: 12px;
+        color: #666;
+        background: #fff;
+        padding: 0 4px;
+        left: 12px;
+    }
+}
+
+.asterisk {
+    color: #E6000F;
 }
 
 .inputValue {
     font-size: 16px;
-    color: #060606;
+    color: #000;
+    margin-top: 4px;
+    display: block;
+    height: 20px;
+    line-height: normal;
 }
 
-.arrowRight {
-    transition: transform 0.2s ease;
+.calendarIcon {
     color: #000;
     flex-shrink: 0;
+}
 
-    &.isOpen {
-        transform: rotate(-90deg); // Or just keep it as is
-    }
+.errorText {
+    font-size: 12px;
+    color: #E6000F;
+    margin-top: 4px;
+    padding-left: 4px;
 }

@@ -12,8 +12,21 @@ import GoogleAuthButton from '@/app/components/AuthModal/GoogleAuthButton';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import { sendSmsApi, smsVerifyApi } from '@/lib/graphql/queries/auth';
 import { PHONE_REGEX, normalizePhone } from '@/lib/utils/phone';
+import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
+import Checkbox from '@/app/components/ui/Checkbox/Checkbox';
+import { parseISO, format } from 'date-fns';
 
 const COUNTDOWN_SECONDS = 60;
+
+export interface ProfileFormValues {
+    name: string;
+    surname: string;
+    middleName: string;
+    phone: string;
+    email: string;
+    birthday: string;
+    gender: string;
+}
 
 interface ProfileFormProps {
     user: AuthUser | null;
@@ -33,7 +46,7 @@ interface ProfileFormProps {
         googleAuth: string;
         saveButton: string;
     };
-    onSubmit: (values: any) => void;
+    onSubmit: (values: ProfileFormValues) => void;
 }
 
 export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) {
@@ -81,6 +94,7 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Обов\'язкове поле'),
         surname: Yup.string().required('Обов\'язкове поле'),
+        middleName: Yup.string().required('Обов\'язкове поле'),
         email: Yup.string().email('Некоректний email'),
         phone: Yup.string()
             .required('Обов\'язкове поле')
@@ -98,10 +112,10 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
         phone: user?.phone || '',
         email: user?.email || '',
         birthday: user?.birthday || '',
-        gender: user?.sex || 'male', // Changed from user?.gender to user?.sex based on typical backend values
+        gender: user?.sex || 'male',
     };
 
-    const formik = useFormik({
+    const formik = useFormik<ProfileFormValues>({
         initialValues,
         validationSchema,
         enableReinitialize: true,
@@ -114,7 +128,6 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
         (raw: string) => {
             formik.setFieldValue('phone', raw);
             
-            // If phone matches original user phone, it's considered verified
             if (normalizePhone(raw) === normalizePhone(user?.phone)) {
                 setPhoneVerified(true);
                 setSmsRequested(false);
@@ -224,6 +237,7 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
                         onBlur={formik.handleBlur}
                         error={formik.errors.middleName}
                         touched={formik.touched.middleName}
+                        required
                     />
                     <div className={s.field}>
                         <InputField
@@ -299,52 +313,58 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
                         error={formik.errors.email}
                         touched={formik.touched.email}
                     />
-                    <InputField
+                </div>
+
+                <div className={s.rowBirthday}>
+                    <DatePicker
                         id="birthday"
-                        name="birthday"
                         label={dict.birthday}
-                        type="date"
-                        value={formik.values.birthday}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
+                        selected={formik.values.birthday ? parseISO(formik.values.birthday) : null}
+                        onChange={(date) => formik.setFieldValue('birthday', date ? format(date, 'yyyy-MM-dd') : '')}
+                        onBlur={() => formik.setFieldTouched('birthday', true)}
+                        error={formik.errors.birthday}
+                        touched={formik.touched.birthday}
+                        maxDate={new Date()}
                     />
                 </div>
 
                 <div className={s.genderSection}>
                     <span className={s.genderTitle}>{dict.gender.title}</span>
-                    <div className={s.genderOptions}>
-                        <button
-                            type="button"
-                            className={clsx(s.genderBtn, formik.values.gender === 'male' && s.active)}
-                            onClick={() => formik.setFieldValue('gender', 'male')}
-                        >
-                            <div className={s.radioCircle}>
-                                {formik.values.gender === 'male' && <div className={s.innerCircle} />}
-                            </div>
-                            <span>{dict.gender.male}</span>
-                        </button>
-                        <button
-                            type="button"
-                            className={clsx(s.genderBtn, formik.values.gender === 'female' && s.active)}
-                            onClick={() => formik.setFieldValue('gender', 'female')}
-                        >
-                            <div className={s.radioCircle}>
-                                {formik.values.gender === 'female' && <div className={s.innerCircle} />}
-                            </div>
-                            <span>{dict.gender.female}</span>
-                        </button>
+                    <div className={s.genderRow}>
+                        <div className={s.genderOptions}>
+                            <Checkbox
+                                checked={formik.values.gender === 'male'}
+                                onChange={() => formik.setFieldValue('gender', 'male')}
+                            >
+                                {dict.gender.male}
+                            </Checkbox>
+                            <Checkbox
+                                checked={formik.values.gender === 'female'}
+                                onChange={() => formik.setFieldValue('gender', 'female')}
+                            >
+                                {dict.gender.female}
+                            </Checkbox>
+                        </div>
+
+                        <div className={s.googleLinkWrapper}>
+                            <GoogleAuthButton 
+                                text="Зв'язати з аккаунтом Google"
+                                variant="outline"
+                                onSuccess={(updatedUser) => {
+                                    onSubmit({
+                                        name: updatedUser.name || '',
+                                        surname: updatedUser.surname || '',
+                                        middleName: updatedUser.middleName || '',
+                                        phone: updatedUser.phone || '',
+                                        email: updatedUser.email || '',
+                                        birthday: updatedUser.birthday || '',
+                                        gender: updatedUser.gender || updatedUser.sex || 'male',
+                                    });
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
-
-                {!user?.email && (
-                    <div className={s.socialConnect}>
-                        <GoogleAuthButton 
-                            onSuccess={(updatedUser) => {
-                                onSubmit(updatedUser);
-                            }}
-                        />
-                    </div>
-                )}
 
                 <div className={s.actions}>
                     <Button 

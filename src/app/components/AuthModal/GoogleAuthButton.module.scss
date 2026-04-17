@@ -31,6 +31,26 @@
     }
 }
 
+.outline {
+    margin-top: 0;
+    border-color: #000;
+    font-weight: 500;
+    text-transform: none;
+    border-radius: 8px;
+    height: 52px;
+
+    @media (any-hover: hover) {
+        &:hover {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: #000;
+        }
+    }
+
+    .googleBtnText {
+        padding-top: 0;
+    }
+}
+
 .googleIcon {
     width: 16px;
     height: 16px;
