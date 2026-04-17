@@ -37,10 +37,11 @@ const authErrors = {
 interface LoginFormProps {
     onSwitchToRegister: () => void;
     onForgotPassword: () => void;
+    onIncompleteProfile: (profile: any) => void;
     onSuccess: () => void;
 }
 
-export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSuccess }: LoginFormProps) {
+export default function LoginForm({ onSwitchToRegister, onForgotPassword, onIncompleteProfile, onSuccess }: LoginFormProps) {
     const dispatch = useAppDispatch();
     const params = useParams();
     const lang = (params?.lang as string) || 'ua';
@@ -186,6 +187,7 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onSucc
                         dispatch(login(user));
                         onSuccess();
                     }}
+                    onIncompleteProfile={onIncompleteProfile}
                 />
             </form>
         </>

@@ -6,6 +6,7 @@ import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import ForgotPasswordForm from './ForgotPasswordForm';
 import ResetPasswordForm from './ResetPasswordForm';
+import CompleteSocialProfileForm from './CompleteSocialProfileForm';
 import s from './AuthModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 
@@ -15,12 +16,13 @@ interface AuthModalProps {
     onSuccess?: () => void;
 }
 
-type ModalView = 'login' | 'register' | 'forgot-password' | 'reset-password';
+type ModalView = 'login' | 'register' | 'forgot-password' | 'reset-password' | 'complete-social';
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     const [view, setView] = useState<ModalView>('login');
     const [forgotPhone, setForgotPhone] = useState('');
     const [forgotActionToken, setForgotActionToken] = useState('');
+    const [pendingSocialProfile, setPendingSocialProfile] = useState<any>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
     useEffect(() => {
@@ -59,12 +61,20 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     <LoginForm
                         onSwitchToRegister={() => setView('register')}
                         onForgotPassword={() => setView('forgot-password')}
+                        onIncompleteProfile={(profile) => {
+                            setPendingSocialProfile(profile);
+                            setView('complete-social');
+                        }}
                         onSuccess={handleSuccess}
                     />
                 )}
                 {view === 'register' && (
                     <RegisterForm
                         onSwitchToLogin={() => setView('login')}
+                        onIncompleteProfile={(profile) => {
+                            setPendingSocialProfile(profile);
+                            setView('complete-social');
+                        }}
                         onSuccess={handleSuccess}
                     />
                 )}
@@ -84,6 +94,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                         actionToken={forgotActionToken}
                         onSuccess={handleSuccess}
                         onBack={() => setView('forgot-password')}
+                    />
+                )}
+                {view === 'complete-social' && (
+                    <CompleteSocialProfileForm
+                        googleProfile={pendingSocialProfile}
+                        onSuccess={handleSuccess}
+                        onBack={() => setView('login')}
                     />
                 )}
             </div>

@@ -12,17 +12,18 @@ import { GraphQLError } from '@/lib/graphql/client';
 import s from './GoogleAuthButton.module.scss';
 
 interface GoogleAuthButtonProps {
-    onSuccess?: (userData: AuthUser) => void;
+    onSuccess?: (userData: AuthUser, googleProfile?: any) => void;
+    onIncompleteProfile?: (googleProfile: any) => void;
     text?: string;
     variant?: 'default' | 'outline';
 }
 
-export default function GoogleAuthButton({ onSuccess, text, variant = 'default' }: GoogleAuthButtonProps) {
+export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text, variant = 'default' }: GoogleAuthButtonProps) {
     const dispatch = useAppDispatch();
     const [isLoading, setIsLoading] = useState(false);
 
     const login = useGoogleLogin({
-        // ... (remaining login logic SAME as before)
+        scope: 'openid profile email',
         onSuccess: async (tokenResponse) => {
             setIsLoading(true);
             try {
@@ -55,14 +56,26 @@ export default function GoogleAuthButton({ onSuccess, text, variant = 'default' 
                 
                 await setAuthCookies(result.accessToken, result.refreshToken);
 
-                if (onSuccess) {
-                    onSuccess({
-                        id: result.user.id,
+                const userData: AuthUser = {
+                    id: result.user.id,
+                    name: result.user.name || '',
+                    surname: result.user.surname || '',
+                    email: result.user.email || '',
+                    phone: result.user.phone || '',
+                };
+
+                // If phone is missing from backend, we might need the completion modal
+                if (!userData.phone && onIncompleteProfile) {
+                    onIncompleteProfile({
                         name: result.user.name,
                         surname: result.user.surname,
                         email: result.user.email,
-                        phone: result.user.phone,
-                    } as AuthUser);
+                    });
+                    return;
+                }
+
+                if (onSuccess) {
+                    onSuccess(userData);
                 }
             } catch (error) {
                 console.error('Backend Google Auth Error:', error);

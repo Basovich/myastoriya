@@ -23,10 +23,11 @@ const COUNTDOWN_SECONDS = 60;
 
 interface RegisterFormProps {
     onSwitchToLogin: () => void;
+    onIncompleteProfile: (profile: any) => void;
     onSuccess: () => void;
 }
 
-export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFormProps) {
+export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onSuccess }: RegisterFormProps) {
     const dispatch = useAppDispatch();
     const params = useParams();
     const locale = (params?.lang as string) || 'ua';
@@ -464,10 +465,12 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                 </div>
 
                 <GoogleAuthButton
+                    text="РЕЄСТРАЦІЯ ЧЕРЕЗ GOOGLE"
                     onSuccess={(user) => {
                         dispatch(login(user));
                         onSuccess();
                     }}
+                    onIncompleteProfile={onIncompleteProfile}
                 />
             </form>
         </>
