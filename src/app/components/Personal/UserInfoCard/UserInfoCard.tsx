@@ -28,12 +28,21 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
     };
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.value ? event.target.files?.[0] : null;
+        const file = event.target.files?.[0];
         if (!file || !user) return;
 
-        // Simple validation
-        if (!file.type.startsWith('image/')) {
-            alert('Будь ласка, оберіть зображення');
+        // Size limit: 2 MB
+        const MAX_SIZE = 2 * 1024 * 1024;
+        if (file.size > MAX_SIZE) {
+            alert('Максимальний розмір файлу — 2 МБ');
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            return;
+        }
+
+        // Format validation
+        if (!file.type.startsWith('image/') && !file.name.toLowerCase().endsWith('.heic') && !file.name.toLowerCase().endsWith('.heif')) {
+            alert('Будь ласка, оберіть зображення (JPG, PNG, WebP, HEIC)');
+            if (fileInputRef.current) fileInputRef.current.value = '';
             return;
         }
 
@@ -87,14 +96,14 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
                         <img src="/icons/icon-plus.svg" alt="" />
                     </button>
                 )}
-                <input 
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                />
             </div>
+            <input 
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*,.heic,.heif"
+                style={{ display: 'none' }}
+            />
             <div className={s.info}>
                 <h3 className={s.name}>{displayName}</h3>
             </div>

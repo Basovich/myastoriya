@@ -8,7 +8,6 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 24px;
 
     @media (min-width: 768px) {
         padding-left: 40px;
@@ -34,7 +33,6 @@
 .layoutBody {
     display: flex;
     flex-direction: column;
-    gap: 26px;
 
     @media (min-width: 1024px) {
         flex-direction: row;
@@ -61,5 +59,114 @@
 }
 
 .breadcrumbsWrapper {
-    margin-bottom: 0px;
+    margin-bottom: 0;
+}
+
+.mobilePageHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 8px;
+
+    @media (min-width: 1024px) {
+        display: none;
+    }
+}
+
+.mobileTitleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+button.logoutBtn {
+    height: 32px;
+    padding: 2px 10px;
+    gap: 6px;
+
+    @media (any-hover: hover) {
+        &:hover {
+            span {
+                color: #FFF;
+            }
+
+            svg {
+                path {
+                    fill: #FFF;
+                    stroke: #FFF;
+                }
+            }
+        }
+    }
+
+    @media (min-width: 1024px) {
+        height: 34px;
+        padding: 2px 26px;
+    }
+
+    span {
+        padding-top: 2px;
+        color: #000;
+        font-size: 10px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        text-transform: uppercase;
+        transition: color 0.2s linear;
+    }
+
+    svg {
+        width: 10px;
+        height: 12px;
+
+        @media (min-width: 1024px) {
+            width: 12px;
+            height: 13px;
+        }
+
+        path {
+            transition: fill 0.2s linear, stroke 0.2s linear;
+        }
+    }
+}
+
+.mobileNavTrigger {
+    margin-bottom: 8px;
+    @media (min-width: 1024px) {
+        display: none;
+    }
+}
+
+.desktopPageHeader {
+    display: none;
+
+    @media (min-width: 1024px) {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+}
+
+.desktopTitleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.contentBlock {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 14px 20px 0 rgba(0, 0, 0, 0.10);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    @media (min-width: 1024px) {
+        padding: 32px;
+    }
 }
