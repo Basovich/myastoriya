@@ -15,6 +15,7 @@ import { PHONE_REGEX, normalizePhone } from '@/lib/utils/phone';
 import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
 import Checkbox from '@/app/components/ui/Checkbox/Checkbox';
 import { parseISO, format } from 'date-fns';
+import { parseDate } from '@/lib/utils/date';
 
 const COUNTDOWN_SECONDS = 60;
 
@@ -47,9 +48,10 @@ interface ProfileFormProps {
         saveButton: string;
     };
     onSubmit: (values: ProfileFormValues) => void;
+    submitStatus?: { type: 'success' | 'error'; message: string } | null;
 }
 
-export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) {
+export default function ProfileForm({ user, dict, onSubmit, submitStatus }: ProfileFormProps) {
     // SMS verification state
     const [phoneVerified, setPhoneVerified] = useState(true);
     const [smsRequested, setSmsRequested] = useState(false);
@@ -119,8 +121,8 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
         initialValues,
         validationSchema,
         enableReinitialize: true,
-        onSubmit: (values) => {
-            onSubmit(values);
+        onSubmit: async (values) => {
+            await onSubmit(values);
         },
     });
 
@@ -315,7 +317,7 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
                     <DatePicker
                         id="birthday"
                         label={dict.birthday}
-                        selected={formik.values.birthday ? parseISO(formik.values.birthday) : null}
+                        selected={formik.values.birthday ? parseDate(formik.values.birthday) : null}
                         onChange={(date) => formik.setFieldValue('birthday', date ? format(date, 'yyyy-MM-dd') : '')}
                         onBlur={() => formik.setFieldTouched('birthday', true)}
                         error={formik.errors.birthday}
@@ -371,6 +373,12 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
                     >
                         {formik.isSubmitting ? 'Зберігаємо...' : dict.saveButton}
                     </Button>
+                    
+                    {submitStatus && (
+                        <div className={clsx(s.statusMessage, s[submitStatus.type])}>
+                            {submitStatus.message}
+                        </div>
+                    )}
                 </div>
             </form>
         </div>

@@ -111,6 +111,16 @@ export default function ProfilePage() {
     const dict = profileDict[lang as keyof typeof profileDict];
     
     const [viewedProducts, setViewedProducts] = React.useState<any[]>([]);
+    const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+    React.useEffect(() => {
+        if (submitStatus) {
+            const timer = setTimeout(() => {
+                setSubmitStatus(null);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [submitStatus]);
 
     const handleLogout = async () => {
         try {
@@ -180,7 +190,10 @@ export default function ProfilePage() {
         try {
             const token = await getAccessToken();
             if (!token) {
-                alert('Помилка авторизації. Будь ласка, увійдіть знову.');
+                setSubmitStatus({
+                    type: 'error',
+                    message: lang === 'ua' ? 'Помилка авторизації. Будь ласка, увійдіть знову.' : 'Ошибка авторизации. Пожалуйста, войдите снова.'
+                });
                 return;
             }
 
@@ -207,10 +220,16 @@ export default function ProfilePage() {
                 sex: updatedUser.sex,
             }));
 
-            alert(lang === 'ua' ? 'Зміни успішно збережено!' : 'Изменения успешно сохранены!');
+            setSubmitStatus({
+                type: 'success',
+                message: lang === 'ua' ? 'Зміни успішно збережено!' : 'Изменения успешно сохранены!'
+            });
         } catch (error) {
             console.error('Update profile error:', error);
-            alert(lang === 'ua' ? 'Помилка при збереженні змін.' : 'Ошибка при сохранении изменений.');
+            setSubmitStatus({
+                type: 'error',
+                message: lang === 'ua' ? 'Помилка при збереженні змін.' : 'Ошибка при сохранении изменений.'
+            });
         }
     };
 
@@ -247,7 +266,8 @@ export default function ProfilePage() {
             <ProfileForm 
                 user={user} 
                 dict={dict.form} 
-                onSubmit={handleFormSubmit} 
+                onSubmit={handleFormSubmit}
+                submitStatus={submitStatus}
             />
 
             <div className={s.sliderWrapper}>

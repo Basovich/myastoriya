@@ -71,12 +71,14 @@ export default function DatePicker({
     required,
     hideIcon
 }: DatePickerProps) {
+    const isValidDate = selected instanceof Date && !isNaN(selected.getTime());
+    const safeSelected = isValidDate ? selected : null;
     const isErr = touched && !!error;
 
     return (
         <div className={clsx(s.datePickerWrapper, className)}>
             <ReactDatePicker
-                selected={selected}
+                selected={safeSelected}
                 onChange={onChange}
                 locale="uk"
                 dateFormat="dd.MM.yyyy"

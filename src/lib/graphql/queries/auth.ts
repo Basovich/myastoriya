@@ -95,6 +95,9 @@ const LOGIN_MUTATION = /* GraphQL */ `
                 name
                 surname
                 phone
+                email
+                birthday
+                sex
                 avatar {
                     size1x
                     size2x
@@ -133,6 +136,9 @@ const REGISTRATION_MUTATION = /* GraphQL */ `
                 name
                 surname
                 phone
+                email
+                birthday
+                sex
                 avatar {
                     size1x
                     size2x
@@ -190,6 +196,8 @@ const SOCIAL_AUTH_MUTATION = /* GraphQL */ `
                 surname
                 phone
                 email
+                birthday
+                sex
                 avatar {
                     size1x
                     size2x
@@ -220,6 +228,8 @@ const ME_QUERY = /* GraphQL */ `
             surname
             phone
             email
+            birthday
+            sex
             avatar {
                 size1x
                 size2x

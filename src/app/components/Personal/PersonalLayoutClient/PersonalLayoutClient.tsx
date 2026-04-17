@@ -5,7 +5,7 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
 import { logoutApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Locale } from '@/i18n/config';
 import Header from '@/app/components/Header/Header';
 import Footer from '@/app/components/Footer/Footer';
@@ -59,7 +59,6 @@ export default function PersonalLayoutClient({ children, lang: paramsLang }: Per
     const { user, isGuest, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const router = useRouter();
-    const pathname = usePathname();
     const lang: Locale = (paramsLang as Locale) || 'ua';
     const dict: typeof personalDict.ua = (personalDict[lang] || personalDict.ua) as typeof personalDict.ua;
 
