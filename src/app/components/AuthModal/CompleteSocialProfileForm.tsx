@@ -24,6 +24,7 @@ interface CompleteSocialProfileFormProps {
         surname?: string;
         phone?: string;
         email?: string;
+        gender?: string;
     };
     onSuccess: () => void;
     onBack?: () => void;

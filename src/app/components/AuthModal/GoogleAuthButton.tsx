@@ -70,6 +70,7 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
                         name: result.user.name,
                         surname: result.user.surname,
                         email: result.user.email,
+                        gender: result.user.sex,
                     });
                     return;
                 }
