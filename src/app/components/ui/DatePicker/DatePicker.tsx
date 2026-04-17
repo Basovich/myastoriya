@@ -67,6 +67,12 @@ export default function DatePicker({
 }: DatePickerProps) {
     const isErr = touched && !!error;
 
+    const years = Array.from({ length: new Date().getFullYear() - 1920 + 1 }, (_, i) => 1920 + i).reverse();
+    const months = [
+        'січень', 'лютий', 'березень', 'квітень', 'травень', 'червень',
+        'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'
+    ];
+
     return (
         <div className={clsx(s.datePickerWrapper, className)}>
             <ReactDatePicker
@@ -76,6 +82,65 @@ export default function DatePicker({
                 dateFormat="dd.MM.yyyy"
                 minDate={minDate}
                 maxDate={maxDate}
+                renderCustomHeader={({
+                    date,
+                    changeYear,
+                    changeMonth,
+                    decreaseMonth,
+                    increaseMonth,
+                    prevMonthButtonDisabled,
+                    nextMonthButtonDisabled,
+                }) => (
+                    <div className={s.customHeaderContainer}>
+                        <button
+                            type="button"
+                            className={s.navBtn}
+                            onClick={decreaseMonth}
+                            disabled={prevMonthButtonDisabled}
+                        >
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                        </button>
+                        
+                        <div className={s.headerSelects}>
+                            <select
+                                className={s.customSelect}
+                                value={months[date.getMonth()]}
+                                onChange={({ target: { value } }) => changeMonth(months.indexOf(value))}
+                            >
+                                {months.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <select
+                                className={s.customSelect}
+                                value={date.getFullYear()}
+                                onChange={({ target: { value } }) => changeYear(parseInt(value))}
+                            >
+                                {years.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <button
+                            type="button"
+                            className={s.navBtn}
+                            onClick={increaseMonth}
+                            disabled={nextMonthButtonDisabled}
+                        >
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                )}
                 customInput={
                     <CustomInput 
                         id={id}
@@ -89,9 +154,6 @@ export default function DatePicker({
                 }
                 calendarStartDay={1}
                 peekNextMonth
-                showMonthDropdown
-                showYearDropdown
-                dropdownMode="select"
             />
             {isErr && (
                 <span className={s.errorText} role="alert">

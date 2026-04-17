@@ -94,7 +94,7 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Обов\'язкове поле'),
         surname: Yup.string().required('Обов\'язкове поле'),
-        middleName: Yup.string().required('Обов\'язкове поле'),
+        middleName: Yup.string(),
         email: Yup.string().email('Некоректний email'),
         phone: Yup.string()
             .required('Обов\'язкове поле')
@@ -237,7 +237,6 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
                         onBlur={formik.handleBlur}
                         error={formik.errors.middleName}
                         touched={formik.touched.middleName}
-                        required
                     />
                     <div className={s.field}>
                         <InputField
