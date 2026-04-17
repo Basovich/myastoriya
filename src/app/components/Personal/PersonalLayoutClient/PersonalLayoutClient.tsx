@@ -9,7 +9,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Locale } from '@/i18n/config';
 import Header from '@/app/components/Header/Header';
 import Footer from '@/app/components/Footer/Footer';
-import PersonalNav from '@/app/components/Personal/PersonalNav/PersonalNav';
+import PersonalNav from '../PersonalNav/PersonalNav';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import Button from '@/app/components/ui/Button/Button';
@@ -55,12 +55,13 @@ interface PersonalLayoutClientProps {
     lang: Locale;
 }
 
-export default function PersonalLayoutClient({ children, lang }: PersonalLayoutClientProps) {
+export default function PersonalLayoutClient({ children, lang: paramsLang }: PersonalLayoutClientProps) {
     const { user, isGuest, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const router = useRouter();
     const pathname = usePathname();
-    const dict = personalDict[lang as keyof typeof personalDict];
+    const lang: Locale = (paramsLang as Locale) || 'ua';
+    const dict: typeof personalDict.ua = (personalDict[lang] || personalDict.ua) as typeof personalDict.ua;
 
     const breadcrumbItems = [
         { label: lang === 'ua' ? 'Головна' : 'Главная', href: `/${lang === 'ua' ? '' : 'ru'}` },
@@ -98,7 +99,7 @@ export default function PersonalLayoutClient({ children, lang }: PersonalLayoutC
                             dict={dict.navigation} 
                             onLogout={handleLogout} 
                             user={user}
-                            isDesktopOnly
+                            isDesktopOnly={true}
                         />
                     </aside>
 
@@ -124,7 +125,7 @@ export default function PersonalLayoutClient({ children, lang }: PersonalLayoutC
                                     dict={dict.navigation} 
                                     onLogout={handleLogout} 
                                     user={user}
-                                    isMobileOnly
+                                    isMobileOnly={true}
                                 />
                             </div>
 

@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
 import { usePathname } from 'next/navigation';
-import { Locale } from '@/i18n/config';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useAppDispatch } from '@/store/hooks';
@@ -14,7 +13,7 @@ import { AuthUser } from '@/store/slices/authSlice';
 
 import useScrollLock from '@/hooks/useScrollLock';
 
-interface PersonalNavProps {
+export interface PersonalNavProps {
     dict: {
         personalData: string;
         orderHistory: string;
@@ -28,13 +27,13 @@ interface PersonalNavProps {
         changePassword: string;
         logout: string;
     };
-    onLogout: () => void;
+    onLogout: () => void | Promise<void>;
     user: AuthUser | null;
     isMobileOnly?: boolean;
     isDesktopOnly?: boolean;
 }
 
-export default function PersonalNav({ dict, onLogout, user, isMobileOnly, isDesktopOnly }: PersonalNavProps) {
+const PersonalNav: React.FC<PersonalNavProps> = ({ dict, onLogout, user, isMobileOnly, isDesktopOnly }) => {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const { disableScroll, enableScroll } = useScrollLock();
@@ -295,4 +294,6 @@ export default function PersonalNav({ dict, onLogout, user, isMobileOnly, isDesk
             )}
         </div>
     );
-}
+};
+
+export default PersonalNav;
