@@ -201,7 +201,6 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                 const msg = locale === 'ua' 
                     ? 'Цей номер уже зареєстрований. Будь ласка, увійдіть' 
                     : 'Этот номер уже зарегистрирован. Пожалуйста, войдите';
-                setSmsError(msg);
                 formik.setFieldError('phone', msg);
                 return;
             }
@@ -328,8 +327,8 @@ export default function RegisterForm({ onSwitchToLogin, onSuccess }: RegisterFor
                                     const exists = await checkUserPhoneApi(formik.values.phone, locale);
                                     if (exists) {
                                         const msg = locale === 'ua' 
-                                            ? 'Цей номер уже зареєстрований' 
-                                            : 'Этот номер уже зарегистрирован';
+                                            ? 'Цей номер уже зареєстрований. Будь ласка, увійдіть' 
+                                            : 'Этот номер уже зарегистрирован. Пожалуйста, войдите';
                                         formik.setFieldError('phone', msg);
                                     }
                                 } catch (e) {
