@@ -29,7 +29,12 @@ export default function AuthInitializer() {
                 // Restore user session
                 getMeApi(token)
                     .then((user) => {
-                        dispatch(setUser(user));
+                        // Real users always have a phone number OR an email (from Social Auth). Guests will have both as null.
+                        if (user && (user.phone || user.email)) {
+                            dispatch(setUser(user));
+                        } else {
+                            dispatch(loginAsGuest());
+                        }
                     })
                     .catch((err) => {
                         console.warn('[AuthInitializer] Session restoration failed:', err);
