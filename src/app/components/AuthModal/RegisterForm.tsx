@@ -17,8 +17,9 @@ import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
 import clsx from 'clsx';
 
+import { PHONE_REGEX } from '@/lib/utils/phone';
+
 const COUNTDOWN_SECONDS = 60;
-const PHONE_REGEX = /^380\d{9}$/;
 
 interface RegisterFormProps {
     onSwitchToLogin: () => void;

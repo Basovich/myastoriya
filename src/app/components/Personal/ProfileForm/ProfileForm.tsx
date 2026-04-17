@@ -11,9 +11,9 @@ import { AuthUser } from '@/store/slices/authSlice';
 import GoogleAuthButton from '@/app/components/AuthModal/GoogleAuthButton';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import { sendSmsApi, smsVerifyApi } from '@/lib/graphql/queries/auth';
+import { PHONE_REGEX, normalizePhone } from '@/lib/utils/phone';
 
 const COUNTDOWN_SECONDS = 60;
-const PHONE_REGEX = /^380\d{9}$/;
 
 interface ProfileFormProps {
     user: AuthUser | null;
@@ -115,7 +115,7 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
             formik.setFieldValue('phone', raw);
             
             // If phone matches original user phone, it's considered verified
-            if (raw === user?.phone) {
+            if (normalizePhone(raw) === normalizePhone(user?.phone)) {
                 setPhoneVerified(true);
                 setSmsRequested(false);
                 setSmsError('');
@@ -135,7 +135,7 @@ export default function ProfileForm({ user, dict, onSubmit }: ProfileFormProps) 
 
     const currentPhone = formik.values.phone;
     const phoneComplete = PHONE_REGEX.test(currentPhone);
-    const isNewPhone = currentPhone !== user?.phone;
+    const isNewPhone = normalizePhone(currentPhone) !== normalizePhone(user?.phone);
 
     const handleSendSms = async () => {
         setSmsError('');

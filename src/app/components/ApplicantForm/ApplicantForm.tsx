@@ -12,14 +12,14 @@ import s from './ApplicantForm.module.scss';
 import CustomSelect from '@/app/components/ui/CustomSelect';
 import clsx from "clsx";
 
+import { PHONE_REGEX } from '@/lib/utils/phone';
+
 interface ApplicantFormProps {
     dict: ApplicantFormPageDict['form'];
 }
 
 export default function ApplicantForm({ dict }: ApplicantFormProps) {
     const [isSubmitted, setIsSubmitted] = useState(false);
-
-    const PHONE_REGEX = /^380\d{9}$/;
 
     const validationSchema = Yup.object({
         fullName: Yup.string().required(dict.errors.required),

@@ -8,8 +8,9 @@ import s from './AuthModal.module.scss';
 import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
 
+import { PHONE_REGEX } from '@/lib/utils/phone';
+
 const COUNTDOWN_SECONDS = 60;
-const PHONE_REGEX = /^380\d{9}$/;
 
 interface ForgotPasswordFormProps {
     /** Called when phone is verified — passes both phone and actionToken */
