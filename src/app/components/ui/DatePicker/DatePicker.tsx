@@ -50,6 +50,12 @@ const CustomInput = forwardRef<HTMLButtonElement, { id?: string; value?: string;
 
 CustomInput.displayName = 'CustomInput';
 
+const YEARS = Array.from({ length: new Date().getFullYear() - 1920 + 1 }, (_, i) => 1920 + i).reverse();
+const MONTHS = [
+    'січень', 'лютий', 'березень', 'квітень', 'травень', 'червень',
+    'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'
+];
+
 export default function DatePicker({
     id,
     selected,
@@ -66,12 +72,6 @@ export default function DatePicker({
     hideIcon
 }: DatePickerProps) {
     const isErr = touched && !!error;
-
-    const years = Array.from({ length: new Date().getFullYear() - 1920 + 1 }, (_, i) => 1920 + i).reverse();
-    const months = [
-        'січень', 'лютий', 'березень', 'квітень', 'травень', 'червень',
-        'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'
-    ];
 
     return (
         <div className={clsx(s.datePickerWrapper, className)}>
@@ -91,7 +91,7 @@ export default function DatePicker({
                     prevMonthButtonDisabled,
                     nextMonthButtonDisabled,
                 }) => (
-                    <div className={s.customHeaderContainer}>
+                    <div className={s.customHeaderContainer} onClick={(e) => e.stopPropagation()}>
                         <button
                             type="button"
                             className={s.navBtn}
@@ -106,12 +106,12 @@ export default function DatePicker({
                         <div className={s.headerSelects}>
                             <select
                                 className={s.customSelect}
-                                value={months[date.getMonth()]}
-                                onChange={({ target: { value } }) => changeMonth(months.indexOf(value))}
+                                value={date.getMonth()}
+                                onChange={({ target: { value } }) => changeMonth(Number(value))}
                             >
-                                {months.map((option) => (
-                                    <option key={option} value={option}>
-                                        {option}
+                                {MONTHS.map((month, index) => (
+                                    <option key={month} value={index}>
+                                        {month}
                                     </option>
                                 ))}
                             </select>
@@ -119,11 +119,11 @@ export default function DatePicker({
                             <select
                                 className={s.customSelect}
                                 value={date.getFullYear()}
-                                onChange={({ target: { value } }) => changeYear(parseInt(value))}
+                                onChange={({ target: { value } }) => changeYear(Number(value))}
                             >
-                                {years.map((option) => (
-                                    <option key={option} value={option}>
-                                        {option}
+                                {YEARS.map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
                                     </option>
                                 ))}
                             </select>
