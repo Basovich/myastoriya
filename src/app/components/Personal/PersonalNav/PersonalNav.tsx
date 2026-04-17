@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
+import AppLink from '@/app/components/ui/AppLink/AppLink';
 import { usePathname } from 'next/navigation';
 import { Locale } from '@/i18n/config';
 import clsx from 'clsx';
@@ -7,8 +7,9 @@ import s from './PersonalNav.module.scss';
 import Button from '@/app/components/ui/Button/Button';
 import { AuthUser } from '@/store/slices/authSlice';
 
+import useScrollLock from '@/hooks/useScrollLock';
+
 interface PersonalNavProps {
-    lang: Locale;
     dict: {
         personalData: string;
         orderHistory: string;
@@ -26,23 +27,31 @@ interface PersonalNavProps {
     user: AuthUser | null;
 }
 
-export default function PersonalNav({ lang, dict, onLogout, user }: PersonalNavProps) {
+export default function PersonalNav({ dict, onLogout, user }: PersonalNavProps) {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
+    const { disableScroll, enableScroll } = useScrollLock();
 
-    const baseHref = lang === 'ua' ? '' : `/${lang}`;
+    React.useEffect(() => {
+        if (isOpen) {
+            disableScroll();
+        } else {
+            enableScroll();
+        }
+        return () => enableScroll();
+    }, [isOpen, disableScroll, enableScroll]);
 
     const menuItems = [
-        { href: `${baseHref}/personal/profile`, label: dict.personalData, icon: 'profile' },
-        { href: `${baseHref}/personal/orders`, label: dict.orderHistory, icon: 'orders' },
-        { href: `${baseHref}/personal/reviews`, label: dict.myReviews, icon: 'reviews' },
-        { href: `${baseHref}/personal/loyalty`, label: dict.loyalty, icon: 'loyalty' },
-        { href: `${baseHref}/personal/wishlist`, label: dict.wishlist, icon: 'wishlist' },
-        { href: `${baseHref}/personal/shopping-list`, label: dict.shoppingList, icon: 'shopping-list' },
-        { href: `${baseHref}/personal/addresses`, label: dict.deliveryAddresses, icon: 'addresses' },
-        { href: `${baseHref}/personal/cards`, label: dict.bankCards, icon: 'cards' },
-        { href: `${baseHref}/personal/pickup`, label: dict.pickupPoints, icon: 'pickup' },
-        { href: `${baseHref}/personal/change-password`, label: dict.changePassword, icon: 'password' },
+        { href: `/personal/profile`, label: dict.personalData, icon: 'profile' },
+        { href: `/personal/orders`, label: dict.orderHistory, icon: 'orders' },
+        { href: `/personal/reviews`, label: dict.myReviews, icon: 'reviews' },
+        { href: `/personal/loyalty`, label: dict.loyalty, icon: 'loyalty' },
+        { href: `/personal/wishlist`, label: dict.wishlist, icon: 'wishlist' },
+        { href: `/personal/shopping-list`, label: dict.shoppingList, icon: 'shopping-list' },
+        { href: `/personal/addresses`, label: dict.deliveryAddresses, icon: 'addresses' },
+        { href: `/personal/cards`, label: dict.bankCards, icon: 'cards' },
+        { href: `/personal/pickup`, label: dict.pickupPoints, icon: 'pickup' },
+        { href: `/personal/change-password`, label: dict.changePassword, icon: 'password' },
     ];
 
     const activeItem = menuItems.find(item => pathname.includes(item.href)) || menuItems[0];
@@ -70,6 +79,8 @@ export default function PersonalNav({ lang, dict, onLogout, user }: PersonalNavP
                 return <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="1" y="3" width="15" height="13" stroke={color} strokeWidth="2"/><polyline points="16 8 20 8 23 11 23 16 16 16"/><circle cx="5.5" cy="18.5" r="2.5" stroke={color} strokeWidth="2"/><circle cx="18.5" cy="18.5" r="2.5" stroke={color} strokeWidth="2"/></svg>;
             case 'password':
                 return <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke={color} strokeWidth="2"/><path d="M7 11V7C7 5.67392 7.52678 4.40215 8.46447 3.46447C9.40215 2.52678 10.6739 2 12 2C13.3261 2 14.5979 2.52678 15.5355 3.46447C16.4732 4.40215 17 5.67392 17 7V11" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+            case 'logout':
+                return <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
             default:
                 return null;
         }
@@ -79,7 +90,7 @@ export default function PersonalNav({ lang, dict, onLogout, user }: PersonalNavP
         setIsOpen(false);
     };
 
-    const userName = user ? `${user.name} ${user.surname || ''}` : 'Anton Antonenko';
+    const userName = user ? `${user.name || ''} ${user.surname || ''}`.trim() : 'Клієнт';
 
     const renderNavContent = () => (
         <>
@@ -107,18 +118,31 @@ export default function PersonalNav({ lang, dict, onLogout, user }: PersonalNavP
                     const isActive = pathname.includes(item.href);
                     return (
                         <React.Fragment key={item.href}>
-                            <Link
+                            <AppLink
                                 href={item.href}
                                 className={clsx(s.navItem, isActive && s.active)}
                                 onClick={handleLinkClick}
                             >
                                 <span className={s.linkIcon}>{renderIcon(item.icon, isActive)}</span>
                                 <span className={s.linkLabel}>{item.label}</span>
-                            </Link>
+                            </AppLink>
                             {(index === 3 || index === 5) && <div className={s.separator} />}
                         </React.Fragment>
                     );
                 })}
+                
+                <div className={s.separator} />
+                <button
+                    className={s.navItem}
+                    onClick={() => {
+                        handleLinkClick();
+                        onLogout();
+                    }}
+                    style={{ border: 'none', background: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                    <span className={s.linkIcon}>{renderIcon('logout', false)}</span>
+                    <span className={s.linkLabel}>{dict.logout}</span>
+                </button>
             </nav>
         </>
     );
@@ -151,15 +175,16 @@ export default function PersonalNav({ lang, dict, onLogout, user }: PersonalNavP
             {isOpen && (
                 <div className={s.mobileMenuOverlay}>
                     <div className={s.backdrop} onClick={() => setIsOpen(false)} />
-                    
-                    <button className={s.closeBtn} onClick={() => setIsOpen(false)}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M18 6L6 18M6 6L18 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                    </button>
 
-                    <div className={s.modalWrapper}>
-                        {renderNavContent()}
+                    <div className={s.scrollContainer}>
+                        <div className={s.modalWrapper}>
+                            <button className={s.closeBtn} onClick={() => setIsOpen(false)}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                    <path d="M18 6L6 18M6 6L18 18" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </button>
+                            {renderNavContent()}
+                        </div>
                     </div>
                 </div>
             )}

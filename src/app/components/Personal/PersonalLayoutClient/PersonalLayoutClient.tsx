@@ -92,8 +92,7 @@ export default function PersonalLayoutClient({ children, lang }: PersonalLayoutC
 
                 <div className={s.layoutBody}>
                     <aside className={s.sidebar}>
-                        <PersonalNav 
-                            lang={lang} 
+                        <PersonalNav
                             dict={dict.navigation} 
                             onLogout={handleLogout} 
                             user={user}
