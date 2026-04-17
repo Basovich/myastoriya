@@ -15,7 +15,7 @@ import s from '@/app/[lang]/personal/PersonalLayout.module.scss';
 
 const personalDict = {
   ua: {
-    title: "ОСОБИСТИЙ КАБІНЕТ КЛІЄНТА",
+    title: "Особистий кабінет клієнта",
     navigation: {
       personalData: "Особисті дані",
       orderHistory: "Мої замовлення",

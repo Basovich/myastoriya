@@ -19,7 +19,7 @@ import s from './Profile.module.scss';
 
 const profileDict = {
   ua: {
-    title: "ОСОБИСТИЙ КАБІНЕТ КЛІЄНТА",
+    title: "Особистий кабінет клієнта",
     bonusCard: {
       balanceLabel: "Ваші бали",
       cashbackLabel: "Кешбек балами",
