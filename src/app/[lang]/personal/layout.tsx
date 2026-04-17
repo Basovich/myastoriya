@@ -1,7 +1,5 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import Header from '@/app/components/Header/Header';
-import Footer from '@/app/components/Footer/Footer';
 import PersonalLayoutClient from '@/app/components/Personal/PersonalLayoutClient/PersonalLayoutClient';
 import { Locale } from '@/i18n/config';
 

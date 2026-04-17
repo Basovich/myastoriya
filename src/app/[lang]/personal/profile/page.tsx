@@ -205,9 +205,6 @@ export default function ProfilePage() {
                         </div>
                     </div>
                     <div className={s.headerActions}>
-                        <Button variant="outline-black" className={s.deleteBtn} onClick={handleDeleteAccount}>
-                            {dict.deleteAccount.button}
-                        </Button>
                         <Button variant="outline-black" className={s.logoutBtn} onClick={handleLogout}>
                             <span>{dict.logout}</span>
                             <svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -246,6 +243,9 @@ export default function ProfilePage() {
             <div className={s.sliderWrapper}>
                 <RecentlyViewedSlider title={dict.recommendations.title} products={viewedProducts} />
             </div>
+            <Button variant="outline-black" className={s.deleteBtn} onClick={handleDeleteAccount}>
+                {dict.deleteAccount.button}
+            </Button>
         </div>
     );
 }
