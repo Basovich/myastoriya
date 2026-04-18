@@ -62,7 +62,7 @@ export default function Reviews({ dict, reviews }: ReviewsProps) {
                 spaceBetween={16}
                 grabCursor={true}
                 slidesPerView={"auto"}
-                className={s.swiper}
+                className={s.reviewsSlider}
                 breakpoints={{
                     768: {
                         slidesPerView: 2,

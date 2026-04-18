@@ -20,7 +20,7 @@
     }
 }
 
-.swiper {
+.reviewsSlider {
     padding: 20px 16px 40px;
     overflow: visible;
 
@@ -95,27 +95,26 @@
     gap: 12px;
     align-items: center;
 
-    .navBtn {
+    .navArrowComp {
         width: 44px;
         height: 44px;
         border-radius: 50%;
-        background-color: #ffffff;
-        color: #e30613;
+        background-color: transparent;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all 0.2s;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 6px 20px 0 rgba(93, 93, 93, 0.4);
         border: none;
         cursor: pointer;
 
         svg {
-            stroke: #e30613;
+            display: block;
         }
 
         @media (any-hover: hover) {
             &:hover {
-                background-color: #fcebeb;
+                box-shadow: 0 14px 20px 0 rgba(93, 93, 93, 0.4);
             }
         }
 
