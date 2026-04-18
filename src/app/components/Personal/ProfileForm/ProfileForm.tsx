@@ -344,23 +344,25 @@ export default function ProfileForm({ user, dict, onSubmit, submitStatus }: Prof
                             </Checkbox>
                         </div>
 
-                        <div className={s.googleLinkWrapper}>
-                            <GoogleAuthButton 
-                                text="Зв'язати з аккаунтом Google"
-                                variant="outline"
-                                onSuccess={(updatedUser) => {
-                                    onSubmit({
-                                        name: updatedUser.name || '',
-                                        surname: updatedUser.surname || '',
-                                        middleName: updatedUser.middleName || '',
-                                        phone: updatedUser.phone || '',
-                                        email: updatedUser.email || '',
-                                        birthday: updatedUser.birthday || '',
-                                        gender: updatedUser.gender || updatedUser.sex || 'male',
-                                    });
-                                }}
-                            />
-                        </div>
+                        {!user?.email && (
+                            <div className={s.googleLinkWrapper}>
+                                <GoogleAuthButton 
+                                    text="Зв'язати з аккаунтом Google"
+                                    variant="outline"
+                                    onSuccess={(updatedUser) => {
+                                        onSubmit({
+                                            name: updatedUser.name || '',
+                                            surname: updatedUser.surname || '',
+                                            middleName: updatedUser.middleName || '',
+                                            phone: updatedUser.phone || '',
+                                            email: updatedUser.email || '',
+                                            birthday: updatedUser.birthday || '',
+                                            gender: updatedUser.gender || updatedUser.sex || 'male',
+                                        });
+                                    }}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
 

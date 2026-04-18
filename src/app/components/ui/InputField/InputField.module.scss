@@ -70,7 +70,7 @@
 .label {
     position: absolute;
     left: 16px;
-    top: 14px;
+    top: 12px;
     font-size: 16px;
     color: #888;
     pointer-events: none;
@@ -79,10 +79,6 @@
     display: flex;
     align-items: center;
     gap: 1px;
-
-    @media (min-width: 1024px) {
-        top: 15px;
-    }
 }
 
 .asterisk {
