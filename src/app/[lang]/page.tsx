@@ -15,7 +15,7 @@ export default async function Home({
   const firstCategoryId = popularCategories.length > 0 ? parseInt(popularCategories[0].id) : null;
 
   const [blogsResponse, slides, reviews, initialProductsResponse] = await Promise.all([
-    getBlogsApi({ limit: 4 }),
+    getBlogsApi({ limit: 3 }),
     getSlidesApi("main"),
     getReviewsApi(),
     getProductsApi({ categoryId: firstCategoryId, limit: 8 })

@@ -155,6 +155,8 @@
 
 .mobileOnlyPopup {
     display: flex;
+    justify-content: center;
+
     @media (min-width: 1280px) {
         display: none !important;
     }
@@ -162,6 +164,7 @@
 
 .desktopOnlyPopup {
     display: none;
+
     @media (min-width: 1280px) {
         display: block !important;
     }

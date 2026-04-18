@@ -61,7 +61,7 @@
 
 .card {
     min-width: 280px;
-    width: calc(85% - 8px);
+    width: 308px;
     max-width: 380px;
     flex-shrink: 0;
     text-decoration: none;
@@ -90,7 +90,6 @@
 .imageWrap {
     position: relative;
     height: 200px;
-    aspect-ratio: 16/10;
     overflow: hidden;
     width: 100%;
 

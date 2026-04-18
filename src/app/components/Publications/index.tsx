@@ -17,7 +17,7 @@ interface PublicationsProps {
   className?: string;
 }
 
-export default function Index({ dict, posts = [], lang, className }: PublicationsProps) {
+export default function Publications({ dict, posts = [], lang, className }: PublicationsProps) {
     if (!posts || posts.length === 0) {
         return null;
     }

@@ -8,7 +8,7 @@ type Props = {
 };
 
 export default async function ProductPage({ params }: Props) {
-    const blogsResponse = await getBlogsApi({ limit: 4 });
+    const blogsResponse = await getBlogsApi({ limit: 3 });
 
     return (
         <Product params={params} publications={blogsResponse.data} />
