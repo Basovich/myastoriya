@@ -103,6 +103,7 @@ export async function generateStaticParams() {
 
 import ReduxProvider from "@/store/ReduxProvider";
 import AuthInitializer from "@/app/components/AuthInitializer/AuthInitializer";
+import { cookies } from "next/headers";
 
 export default async function RootLayout({
   children,
@@ -112,12 +113,15 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }>) {
   const { lang } = await params;
+  const cookieStore = await cookies();
+  const isAuthorized = cookieStore.get("myastoriya_auth")?.value === "true";
+
   return (
     <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <body>
         <ReduxProvider>
           <AuthInitializer />
-          <PasswordGate>{children}</PasswordGate>
+          {isAuthorized ? children : <PasswordGate>{children}</PasswordGate>}
         </ReduxProvider>
       </body>
     </html>

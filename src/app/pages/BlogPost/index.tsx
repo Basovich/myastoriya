@@ -131,7 +131,7 @@ export default function BlogPostPage({ dict, lang, post }: BlogPostPageProps) {
                                             unit={product.unit ?? ""}
                                             badge={product.is_new ? "NEW" : null}
                                             image=""
-                                        />
+                                        lang="ua" />
                                     </SwiperSlide>
                                 ))}
                                 <div className={s.sliderNav}>
@@ -160,7 +160,7 @@ export default function BlogPostPage({ dict, lang, post }: BlogPostPageProps) {
                                     unit={product.unit ?? ""}
                                     badge={product.is_new ? "NEW" : null}
                                     image=""
-                                />
+                                lang="ua" />
                             ))}
                         </div>
                     </section>

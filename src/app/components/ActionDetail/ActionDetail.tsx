@@ -120,7 +120,7 @@ export default function ActionDetail({ dict, lang, id, pageType = 'promotions' }
                             unit={product.unit}
                             badge={product.badge}
                             image={product.image}
-                        />
+                        lang="ua" />
                     ))}
                 </div>
                 <div ref={sentinelRef} className={s.sentinel} aria-hidden="true" />

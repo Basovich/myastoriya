@@ -50,7 +50,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ title, products, clas
             <div className={isSliderOnMobile ? s.desktopGrid : ''}>
                 <div className={s.relatedGrid}>
                     {products.map((product) => (
-                        <ProductCard key={product.id} {...product} />
+                        <ProductCard key={product.id} {...product} lang="ua" />
                     ))}
                 </div>
             </div>
@@ -77,7 +77,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ title, products, clas
                     >
                         {products.map((product) => (
                             <SwiperSlide key={product.id} className={s.slide}>
-                                <ProductCard {...product} />
+                                <ProductCard {...product} lang="ua" />
                             </SwiperSlide>
                         ))}
                     </Swiper>

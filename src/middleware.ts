@@ -16,43 +16,50 @@ export function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
     const search = request.nextUrl.search;
 
-    // 1. Redirect /ua to / (clean URL for default locale)
-    if (pathname === '/ua' || pathname.startsWith('/ua/')) {
-        const cleanPath = pathname.replace(/^\/ua/, '') || '/';
-        if (pathname !== cleanPath) {
-            return NextResponse.redirect(new URL(`${cleanPath}${search}`, request.url));
-        }
+    // 1. Skip middleware for static assets and API
+    if (
+        pathname.startsWith('/_next') ||
+        pathname.startsWith('/api') ||
+        pathname.includes('.') // All files with extensions (.ico, .png, .svg, .webmanifest, etc.)
+    ) {
+        return NextResponse.next();
     }
 
-    // 2. Redirect /personal to /personal/profile/
+    // 2. Redirect /ua to / (clean URL for default locale)
+    if (pathname === '/ua' || pathname.startsWith('/ua/')) {
+        const cleanPath = pathname.replace(/^\/ua/, '') || '/';
+        return NextResponse.redirect(new URL(`${cleanPath}${search}`, request.url));
+    }
+
+    // 3. Redirect /personal to /personal/profile/
     if (pathname === '/personal' || pathname === '/personal/') {
         return NextResponse.redirect(new URL('/personal/profile/', request.url));
     }
 
-    // 3. Protect /personal/* — require access_token cookie
+    // 4. Protect /personal/* — require access_token cookie
     if (isProtectedPath(pathname)) {
         const token = request.cookies.get('access_token')?.value;
         if (!token) {
-            // Redirect to home; client will open AuthModal
             const redirectUrl = new URL('/', request.url);
             redirectUrl.searchParams.set('auth', '1');
             return NextResponse.redirect(redirectUrl);
         }
     }
 
-    // 4. Check if there is any supported locale in the pathname
-    const pathnameIsMissingLocale = locales.every(
-        (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
+    // 5. Internal rewrite to [lang] structure
+    // Check if the URL already has a locale
+    const pathnameHasLocale = locales.some(
+        (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
     );
 
-    if (pathnameIsMissingLocale) {
-        // Rewrite to /ua (default) internally
+    if (!pathnameHasLocale) {
+        // Rewrite to default locale /ua/path
         return NextResponse.rewrite(
-            new URL(`/ua${pathname}${search}`, request.url),
+            new URL(`/ua${pathname}${search}`, request.url)
         );
     }
 }
 
 export const config = {
-    matcher: ['/((?!api|_next/static|_next/image|favicon.ico|images|icons|fonts|site.webmanifest).*)'],
+    matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };

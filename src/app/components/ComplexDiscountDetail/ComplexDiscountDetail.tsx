@@ -107,7 +107,7 @@ export default function ComplexDiscountDetail({ dict, lang, id }: ComplexDiscoun
                                         unit={product.unit}
                                         badge={product.badge}
                                         image={product.image}
-                                    />
+                                    lang="ua" />
                                 </div>
                                 {idx < bundleProducts.length - 1 && (
                                     <span className={s.plus}>+</span>

@@ -1,6 +1,3 @@
-'use client';
-
-import { useState } from 'react';
 import s from './CatalogContent.module.scss';
 import HeroBanner from '../../../components/ui/HeroBanner/HeroBanner';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs/Breadcrumbs';
@@ -8,50 +5,18 @@ import CategoryCircles from '@/app/components/CategoryCircles/CategoryCircles';
 import Image from 'next/image';
 import ProductCardRow from '@/app/components/ui/ProductCardRow';
 import CatalogSidebar from '@/app/pages/Catalog/CatalogSidebar';
-import FilterModal from '@/app/pages/Catalog/CatalogModal';
 import ProductCard from '../../../components/ui/ProductCard/ProductCard';
-import SectionHeader from '../../../components/ui/SectionHeader/SectionHeader';
-import Pagination from '@/app/components/ui/Pagination/Pagination';
-import ViewToggle, { ViewType } from '@/app/components/ui/ViewToggle/ViewToggle';
-import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
 import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
 import clsx from 'clsx';
 import CategorySwitcher from "@/app/components/ui/CategorySwitcher/CategorySwitcher";
-import Button from "@/app/components/ui/Button/Button";
-import SliderArrow from '../../../components/ui/SliderArrow/SliderArrow';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Grid } from 'swiper/modules';
+import { Locale } from '@/i18n/config';
+import { Dictionary } from '@/i18n/types';
+import type { Product, ProductsResponse, PopularCategory, ProductCategory } from '@/lib/graphql';
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/grid';
-
-interface Product {
-    id: number;
-    title: string;
-    weight: string;
-    price: number;
-    oldPrice?: number;
-    unit: string;
-    badge: string | null;
-    image: string;
-    description?: string;
-}
-
-const MOCK_RESULTS: Product[] = [
-    { id: 1, title: "М'ясні палички з сиром", price: 2500, weight: '330г / 340г / 200г', unit: 'упаковка', badge: 'АКЦІЯ', image: '/images/products/product-shashlik.png', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.' },
-    { id: 2, title: "М'ясні палички в соусі Теріякі", price: 2500, oldPrice: 2840, weight: '330г / 340г / 200г', unit: 'упаковка', badge: 'NEW', image: '/images/products/product-meatballs.png', description: 'Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.' },
-    { id: 3, title: 'Тартар з відбірної яловичини', price: 2500, weight: '330г', unit: 'упаковка', badge: null, image: '/images/products/product-sticks-cheese.png', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet.' },
-    { id: 4, title: 'Карпачо з відбірної яловичини', price: 2500, weight: '330г', unit: 'упаковка', badge: null, image: '/images/product-ribeye.jpg', description: 'Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.' },
-    { id: 5, title: 'Мітболи в соусі BBQ', price: 2500, weight: '200г', unit: 'упаковка', badge: null, image: '/images/product-shashlik.jpg', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-    { id: 6, title: 'Шашлик з баранини в пряному маринаді', price: 2500, weight: '330г', unit: 'упаковка', badge: null, image: '/images/product-sticks-cheese.jpg', description: 'Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan.' },
-    { id: 7, title: 'Томлена курка в соусі азійському', price: 2500, weight: '330г', unit: 'упаковка', badge: null, image: '/images/products/product-meatballs.png', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-    { id: 8, title: 'Томлена курка в соусі карі', price: 2500, weight: '330г', unit: 'упаковка', badge: null, image: '/images/products/product-shashlik.png', description: 'Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.' },
-];
-
-const MOCK_RELATED: Product[] = [...MOCK_RESULTS, ...MOCK_RESULTS.slice(0, 4)];
-const MOCK_ORDERED: Product[] = [...MOCK_RESULTS, ...MOCK_RESULTS.slice(0, 4)];
+// Client Islands
+import CatalogToolbarClient from '../CatalogToolbarClient';
+import CatalogPaginationClient from '../CatalogPaginationClient';
+import CatalogRelatedSlidersClient from '../CatalogRelatedSlidersClient';
 
 const SORT_OPTIONS = [
     'За популярністю',
@@ -74,299 +39,203 @@ const FAQ_DATA = [
     }
 ];
 
-const TOTAL_PAGES = 6;
+function getImageUrl(product: Product): string {
+    const url = product.image?.url.grid2x ||
+        product.image?.url.main2x ||
+        product.image?.url.grid1x ||
+        product.image?.url.main1x ||
+        product.image?.url.big;
 
-interface CatalogContentProps {
-    category?: string;
+    if (!url) return '/images/placeholder.png';
+    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
+    return url;
 }
 
-export default function CatalogContent({ category }: CatalogContentProps) {
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [activePage, setActivePage] = useState(1);
-    const [sortBy, setSortBy] = useState(SORT_OPTIONS[0]);
-    const [view, setView] = useState<ViewType>('list');
+function getBadge(product: Product): string | null {
+    if (product.is_new) return 'NEW';
+    if (product.oldCost && product.oldCost > product.cost) return 'АКЦІЯ';
+    return null;
+}
 
-    const [prevRelated, setPrevRelated] = useState<HTMLButtonElement | null>(null);
-    const [nextRelated, setNextRelated] = useState<HTMLButtonElement | null>(null);
+function getWeight(product: Product): string {
+    const weightSpec = product.specifications?.find(sp =>
+        sp.name.toLowerCase().includes('вага') ||
+        sp.name.toLowerCase().includes("об'єм")
+    );
+    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
+    return product.multiplier ? `${product.multiplier}` : '';
+}
 
-    const [prevOrdered, setPrevOrdered] = useState<HTMLButtonElement | null>(null);
-    const [nextOrdered, setNextOrdered] = useState<HTMLButtonElement | null>(null);
+interface CatalogContentProps {
+    lang: Locale;
+    dict: Dictionary;
+    initialProducts: ProductsResponse;
+    popularCategories: PopularCategory[];
+    allCategories: ProductCategory[];
+    categorySlug?: string;
+    categoryName?: string;
+    view?: 'list' | 'grid';
+    sortBy?: string;
+}
 
-    const categoryLabel = category ? category : null;
+export default async function CatalogContent({
+    lang,
+    initialProducts,
+    popularCategories,
+    allCategories,
+    categorySlug,
+    categoryName,
+    view = 'list',
+    sortBy = 'За популярністю',
+}: CatalogContentProps) {
+    const products = initialProducts.data;
+    const activePage = initialProducts.current_page;
+    const hasMorePages = initialProducts.has_more_pages;
 
     const breadcrumbItems = [
         { label: 'Головна', href: '/' },
-        ...(categoryLabel ? [{ label: 'Каталог', href: '/catalog' }] : [{ label: 'Каталог' }]),
-        ...(categoryLabel ? [{ label: categoryLabel }] : []),
+        ...(categoryName
+            ? [{ label: 'Каталог', href: '/catalog' }, { label: categoryName }]
+            : [{ label: 'Каталог' }]),
     ];
 
-    const pageTitle = categoryLabel ? categoryLabel.toUpperCase() : 'ГОТОВА ПРОДУКЦІЯ';
+    const pageTitle = categoryName ? categoryName.toUpperCase() : 'ГОТОВА ПРОДУКЦІЯ';
+
+    // Prepare related slider data
+    const relatedProducts = products.slice(0, 8).map(product => ({
+        id: product.id,
+        element: (
+            <ProductCard
+                id={product.id}
+                slug={product.slug}
+                title={product.name}
+                weight={getWeight(product)}
+                price={product.cost}
+                unit={product.unit}
+                badge={getBadge(product)}
+                image={getImageUrl(product)}
+                lang={lang}
+            />
+        )
+    }));
+
+    const orderedProducts = products.slice(0, 8).map(product => ({
+        id: product.id,
+        element: (
+            <ProductCard
+                id={product.id}
+                slug={product.slug}
+                title={product.name}
+                weight={getWeight(product)}
+                price={product.cost}
+                unit={product.unit}
+                badge={getBadge(product)}
+                image={getImageUrl(product)}
+                lang={lang}
+            />
+        )
+    }));
 
     return (
-        <>
-            <div className={s.container}>
-                <div className={clsx(s.topSection, category && s.topSectionCategory)}>
-                    <HeroBanner
-                        prefix=""
-                        title={pageTitle}
-                        className={clsx(s.heroBanner, category && s.heroBannerCategory)}
-                    />
-                    {
-                        category ? (
-                            <Breadcrumbs items={breadcrumbItems} className={clsx(s.breadcrumbs, s.breadcrumbsCategory)} />
-                        ) : (
-                            <div className={s.categoriesSection}>
-                                <CategoryCircles
-                                    headerLeft={<Breadcrumbs items={breadcrumbItems} className={s.breadcrumbs} />}
-                                />
-                            </div>
-                        )
-                    }
-                </div>
-                <div className={s.mainSection}>
-                    <Image
-                        src="/images/products/products-bg-logo.svg"
-                        alt=""
-                        width={786}
-                        height={1011}
-                        className={s.bgLogo}
-                        aria-hidden="true"
+        <div className={s.container}>
+            <div className={clsx(s.topSection, categoryName && s.topSectionCategory)}>
+                <HeroBanner
+                    prefix=""
+                    title={pageTitle}
+                    className={clsx(s.heroBanner, categoryName && s.heroBannerCategory)}
+                />
+                {categoryName ? (
+                    <Breadcrumbs items={breadcrumbItems} className={clsx(s.breadcrumbs, s.breadcrumbsCategory)} />
+                ) : (
+                    <div className={s.categoriesSection}>
+                        <CategoryCircles
+                            headerLeft={<Breadcrumbs items={breadcrumbItems} className={s.breadcrumbs} />}
+                        />
+                    </div>
+                )}
+            </div>
+
+            <div className={s.mainSection}>
+                <Image
+                    src="/images/products/products-bg-logo.svg"
+                    alt=""
+                    width={786}
+                    height={1011}
+                    className={s.bgLogo}
+                    aria-hidden="true"
+                />
+
+                <div className={s.mainInner}>
+                    <CatalogToolbarClient 
+                        sortBy={sortBy} 
+                        view={view} 
+                        sortOptions={SORT_OPTIONS}
+                        categoryName={categoryName}
                     />
 
-                    <div className={s.mainInner}>
-                        {/* Toolbar - Full width on top */}
-                        <div className={s.toolbar}>
-                            {/* Sort dropdown */}
-                            <SortSelect
-                                label="Сортувати:"
-                                value={sortBy}
-                                options={SORT_OPTIONS}
-                                onChange={setSortBy}
-                                className={s.sortWrap}
+                    <div className={s.contentLayout}>
+                        <aside className={s.sidebar}>
+                            {categoryName && <CategorySwitcher />}
+                            <CatalogSidebar
+                                sortBy={sortBy}
                             />
+                        </aside>
 
-                            {/* Mobile catalog button */}
-                            <button
-                                id="filter-btn"
-                                type="button"
-                                className={s.filterBtn}
-                                onClick={() => setIsFilterOpen(true)}
-                            >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <g clipPath="url(#clip0_2764_1074)">
-                                        <path d="M21 18V21H19V18H17V16H23V18H21ZM5 18V21H3V18H1V16H7V18H5ZM11 6V3H13V6H15V8H9V6H11ZM11 10H13V21H11V10ZM3 14V3H5V14H3ZM19 14V3H21V14H19Z" fill="black"/>
-                                    </g>
-                                    <circle cx="19.957" cy="6" r="4" fill="#E20B1C"/>
-                                    <defs>
-                                        <clipPath id="clip0_2764_1074">
-                                            <rect width="24" height="24" fill="white"/>
-                                        </clipPath>
-                                    </defs>
-                                </svg>
-                                <span className={s.filterBtnText}>Фільтр</span>
-                            </button>
-
-                            {/* View toggles */}
-                            <ViewToggle view={view} onViewChange={setView} className={s.viewToggle} />
-                        </div>
-
-                        <div className={s.contentLayout}>
-                            <aside className={s.sidebar}>
-                                { category && <CategorySwitcher />}
-                                <CatalogSidebar 
-                                    sortBy={sortBy} 
-                                    onSortChange={setSortBy} 
-                                />
-                            </aside>
-
-                            {/* Results column */}
-                            <div className={s.results}>
-                                {/* Product list */}
-                                <div className={clsx(s.productList, view === 'grid' && s.productListGrid)}>
-                                    {MOCK_RESULTS.length > 0 ? (
-                                        MOCK_RESULTS.map(product => (
-                                            view === 'grid' ? (
-                                                <ProductCard
-                                                    key={product.id}
-                                                    id={product.id}
-                                                    title={product.title}
-                                                    weight={product.weight}
-                                                    price={product.price}
-                                                    unit={product.unit}
-                                                    badge={product.badge}
-                                                    image={product.image}
-                                                />
-                                            ) : (
-                                                <ProductCardRow
-                                                    key={product.id}
-                                                    id={product.id}
-                                                    title={product.title}
-                                                    weight={product.weight}
-                                                    price={product.price}
-                                                    oldPrice={product.oldPrice}
-                                                    unit={product.unit}
-                                                    badge={product.badge}
-                                                    image={product.image}
-                                                    description={product.description}
-                                                />
-                                            )
-                                        ))
-                                    ) : (
-                                        <div className={s.noResults}>Товарів не знайдено</div>
-                                    )}
-                                </div>
-
-                                {/* Show more button */}
-                                <div className={s.showMoreWrap}>
-                                    <Button variant="outline-black" className={s.showMoreBtn}>
-                                        <span className={s.showMoreBtnText}>показать еще</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="16" viewBox="0 0 13 16" fill="none">
-                                            <path d="M11.8624 8.56895L6.43164 13.9997L1.00087 8.56895" stroke="black" strokeWidth="2" strokeLinecap="round"/>
-                                            <line x1="6.42383" y1="12.7305" x2="6.42383" y2="0.999994" stroke="black" strokeWidth="2" strokeLinecap="round"/>
-                                        </svg>
-                                    </Button>
-                                </div>
-
-                                {/* Pagination */}
-                                <Pagination
-                                    currentPage={activePage}
-                                    totalPages={TOTAL_PAGES}
-                                    onPageChange={setActivePage}
-                                    className={s.pagination}
-                                />
+                        <div className={s.results}>
+                            <div className={clsx(s.productList, view === 'grid' && s.productListGrid)}>
+                                {products.length > 0 ? (
+                                    products.map(product => (
+                                        view === 'grid' ? (
+                                            <ProductCard
+                                                key={product.id}
+                                                id={product.id}
+                                                slug={product.slug}
+                                                title={product.name}
+                                                weight={getWeight(product)}
+                                                price={product.cost}
+                                                unit={product.unit}
+                                                badge={getBadge(product)}
+                                                image={getImageUrl(product)}
+                                                lang={lang}
+                                            />
+                                        ) : (
+                                            <ProductCardRow
+                                                key={product.id}
+                                                id={product.id}
+                                                slug={product.slug}
+                                                title={product.name}
+                                                weight={getWeight(product)}
+                                                price={product.cost}
+                                                oldPrice={product.oldCost ?? undefined}
+                                                unit={product.unit}
+                                                badge={getBadge(product)}
+                                                image={getImageUrl(product)}
+                                                lang={lang}
+                                            />
+                                        )
+                                    ))
+                                ) : (
+                                    <div className={s.noResults}>Товарів не знайдено</div>
+                                )}
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                {/* "Вас може зацікавити" */}
-                <div className={s.sliderSection}>
-                    <div className={s.relatedInner}>
-                        <div className={s.sectionHeaderRow}>
-                            <SectionHeader title="ВАС МОЖЕ ЗАЦІКАВИТИ" classNameWrapper={s.sectionTitle} withDots={true} />
-                            <div className={s.navArrows}>
-                                <SliderArrow direction="left" ref={setPrevRelated} />
-                                <SliderArrow direction="right" ref={setNextRelated} />
-                            </div>
+                            <CatalogPaginationClient 
+                                currentPage={activePage} 
+                                hasMorePages={hasMorePages} 
+                            />
                         </div>
-                        <div className={s.sliderContainer}>
-                            <Swiper
-                                modules={[Navigation, Grid]}
-                                navigation={{
-                                    prevEl: prevRelated,
-                                    nextEl: nextRelated,
-                                }}
-                                spaceBetween={12}
-                                slidesPerView={2}
-                                slidesPerGroup={1}
-                                watchSlidesProgress={true}
-                                grid={{ rows: 2, fill: 'row' }}
-                                breakpoints={{
-                                    768: {
-                                        slidesPerView: 3,
-                                        slidesPerGroup: 1,
-                                        grid: { rows: 1 },
-                                        spaceBetween: 16
-                                    },
-                                    1280: {
-                                        slidesPerView: 4,
-                                        slidesPerGroup: 1,
-                                        grid: { rows: 1 },
-                                        spaceBetween: 20
-                                    }
-                                }}
-                                className={s.swiper}
-                            >
-                                {MOCK_RELATED.map((product, idx) => (
-                                    <SwiperSlide key={`related-${product.id}-${idx}`} className={s.slide}>
-                                        <ProductCard
-                                            id={product.id}
-                                            title={product.title}
-                                            weight={product.weight}
-                                            price={product.price}
-                                            unit={product.unit}
-                                            badge={product.badge}
-                                            image={product.image}
-                                        />
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        </div>
-                    </div>
-                </div>
-
-                {/* "Часто замовляють" */}
-                <div className={s.sliderSection}>
-                    <div className={s.relatedInner}>
-                        <div className={s.sectionHeaderRow}>
-                            <SectionHeader title="ЧАСТО ЗАМОВЛЯЮТЬ" classNameWrapper={s.sectionTitle} withDots={true} />
-                            <div className={s.navArrows}>
-                                <SliderArrow direction="left" ref={setPrevOrdered} />
-                                <SliderArrow direction="right" ref={setNextOrdered} />
-                            </div>
-                        </div>
-                        <div className={s.sliderContainer}>
-                            <Swiper
-                                modules={[Navigation, Grid]}
-                                navigation={{
-                                    prevEl: prevOrdered,
-                                    nextEl: nextOrdered,
-                                }}
-                                spaceBetween={12}
-                                slidesPerView={2}
-                                slidesPerGroup={1}
-                                watchSlidesProgress={true}
-                                grid={{ rows: 2, fill: 'row' }}
-                                breakpoints={{
-                                    768: {
-                                        slidesPerView: 3,
-                                        slidesPerGroup: 1,
-                                        grid: { rows: 1 },
-                                        spaceBetween: 16
-                                    },
-                                    1280: {
-                                        slidesPerView: 4,
-                                        slidesPerGroup: 1,
-                                        grid: { rows: 1 },
-                                        spaceBetween: 20
-                                    }
-                                }}
-                                className={s.swiper}
-                            >
-                                {MOCK_ORDERED.map((product, idx) => (
-                                    <SwiperSlide key={`ordered-${product.id}-${idx}`} className={s.slide}>
-                                        <ProductCard
-                                            id={product.id}
-                                            title={product.title}
-                                            weight={product.weight}
-                                            price={product.price}
-                                            unit={product.unit}
-                                            badge={product.badge}
-                                            image={product.image}
-                                        />
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-                        </div>
-                    </div>
-                </div>
-
-                {/* FAQ */}
-                <div className={s.faqSection}>
-                    <div className={s.relatedInner}>
-                        <FaqAccordion items={FAQ_DATA} />
                     </div>
                 </div>
             </div>
 
-            {/* Mobile catalog drawer */}
-            <FilterModal 
-                isOpen={isFilterOpen} 
-                onClose={() => setIsFilterOpen(false)} 
-                sortBy={sortBy}
-                onSortChange={setSortBy}
-                category={category}
-            />
-        </>
+            <CatalogRelatedSlidersClient title="ВАС МОЖЕ ЗАЦІКАВИТИ" products={relatedProducts} />
+            <CatalogRelatedSlidersClient title="ЧАСТО ЗАМОВЛЯЮТЬ" products={orderedProducts} />
+
+            <div className={s.faqSection}>
+                <div className={s.relatedInner}>
+                    <FaqAccordion items={FAQ_DATA} />
+                </div>
+            </div>
+        </div>
     );
 }

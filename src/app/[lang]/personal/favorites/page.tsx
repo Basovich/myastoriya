@@ -69,7 +69,7 @@ export default function FavoritesPage() {
                                 weight={product.weight}
                                 image={product.image}
                                 badge={product.badge}
-                            />
+                            lang="ua" />
                         ))}
                     </div>
                 )}

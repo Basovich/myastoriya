@@ -44,14 +44,6 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        // Safe logging for debugging
-        try {
-            const fs = require('fs');
-            fs.writeFileSync('/tmp/proxy-headers.json', JSON.stringify({ sentHeaders: headers }, null, 2));
-        } catch (e) {
-            console.error("Failed to log headers:", e);
-        }
-
         const res = await fetch(GQL_ENDPOINT, {
             method: 'POST',
             headers,

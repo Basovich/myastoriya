@@ -68,7 +68,7 @@ export default function RecentlyViewedSlider({ title, products }: RecentlyViewed
             >
                 {products.map((product) => (
                     <SwiperSlide key={product.id} className={s.slide}>
-                        <ProductCard {...product} />
+                        <ProductCard {...product} lang="ua" />
                     </SwiperSlide>
                 ))}
             </Swiper>

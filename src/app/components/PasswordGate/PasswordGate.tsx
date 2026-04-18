@@ -18,6 +18,7 @@ export default function PasswordGate({ children }: { children: React.ReactNode }
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get("password") === CORRECT_PASSWORD) {
             sessionStorage.setItem(STORAGE_KEY, "true");
+            document.cookie = `${STORAGE_KEY}=true; path=/; max-age=31536000`;
             return true;
         }
         
@@ -28,7 +29,10 @@ export default function PasswordGate({ children }: { children: React.ReactNode }
         const input = prompt("Введіть пароль для доступу до сайту:");
         if (input === CORRECT_PASSWORD) {
             sessionStorage.setItem(STORAGE_KEY, "true");
+            document.cookie = `${STORAGE_KEY}=true; path=/; max-age=31536000`;
             setIsAuthorized(true);
+            // Reload to enable SSR rendering for the current page
+            window.location.reload();
         } else if (input !== null) {
             alert("Невірний пароль!");
         }

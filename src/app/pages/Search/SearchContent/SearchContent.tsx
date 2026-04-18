@@ -76,7 +76,7 @@ export default function SearchContent() {
                                     unit={product.unit}
                                     badge={product.badge}
                                     image={product.image}
-                                />
+                                lang="ua" />
                             ))
                         ) : (
                             <div className={s.noResults}>Товарів не знайдено</div>

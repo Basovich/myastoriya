@@ -29,7 +29,8 @@ export type {
 // Re-export products
 export {
     getProductsApi,
-    getProductBySlugApi,
+    getProductByIdApi,
+    findProductIdBySlug,
     getCategoriesApi,
 } from './queries/products';
 export type {

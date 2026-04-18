@@ -1,17 +1,15 @@
-'use client';
-
 import s from './index.module.scss';
 import Image from 'next/image';
 import Badge from '@/app/components/ui/Badge/Badge';
 import WishButton from '@/app/components/ui/WishButton/WishButton';
 import AddToCartButton from '@/app/components/ui/AddToCartButton/AddToCartButton';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
-import { useParams } from 'next/navigation';
 import clsx from "clsx";
 
 
 interface ProductCardRowProps {
     id: number | string;
+    slug?: string;
     title: string;
     weight: string;
     price: number;
@@ -20,10 +18,12 @@ interface ProductCardRowProps {
     badge?: string | null;
     image: string;
     description?: string;
+    lang: string;
 }
 
 export default function ProductCardRow({
     id,
+    slug,
     title,
     weight,
     price,
@@ -32,9 +32,8 @@ export default function ProductCardRow({
     badge,
     image,
     description,
+    lang,
 }: ProductCardRowProps) {
-    const params = useParams();
-    const lang = params?.lang as string;
     const isRu = lang === 'ru';
     
     const displayWeight = weight === "1" 
@@ -45,7 +44,7 @@ export default function ProductCardRow({
         ? (isRu ? "За 1 шт" : "За 1 шт")
         : `За ${unit}`;
 
-    const productUrl = `/products/${id}`;
+    const productUrl = `/products/${slug || id}`;
 
 
 

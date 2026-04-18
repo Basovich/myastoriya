@@ -1,36 +1,36 @@
-"use client";
-
 import s from "./ProductCard.module.scss";
 import Image from "next/image";
 import Badge from "../Badge/Badge";
 import WishButton from "../WishButton/WishButton";
 import AddToCartButton from "../AddToCartButton/AddToCartButton";
 import AppLink from "../AppLink/AppLink";
-import { useParams } from "next/navigation";
 
 
 interface ProductCardProps {
     id: number | string;
+    slug?: string;
     title: string;
     weight: string;
     price: number;
     unit: string;
     badge?: string | null;
     image: string;
+    lang: string;
 }
 
 export default function ProductCard({
     id,
+    slug,
     title,
     weight,
     price,
     unit,
     badge,
     image,
+    lang,
 }: ProductCardProps) {
-    const params = useParams();
-    const lang = params?.lang as string;
     const isRu = lang === 'ru';
+    const productUrl = slug ? `/products/${slug}` : `/products/${id}`;
     
     const displayWeight = weight === "1" 
         ? (isRu ? "1 единица" : "1 одиниця") 
@@ -45,7 +45,7 @@ export default function ProductCard({
 
         <div className={s.card}>
             <div className={s.imageWrap}>
-                <AppLink href={`/products/${id}`} className={s.productImgLink}>
+                <AppLink href={productUrl} className={s.productImgLink}>
                     <Image
                         src={image}
                         alt={title}
@@ -67,7 +67,7 @@ export default function ProductCard({
 
             </div>
             <div className={s.info}>
-                <AppLink href={`/products/${id}`}>
+                <AppLink href={productUrl}>
                     <p className={s.title}>{title}</p>
                 </AppLink>
                 <div className={s.priceRow}>
