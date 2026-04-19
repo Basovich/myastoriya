@@ -28,15 +28,20 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
     const [activeCategory, setActiveCategory] = useState<Category | null>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
-    // Flatten categories to show direct children of all root categories (e.g., Raw and Ready)
-    const flattenedCategories = categories.flatMap(cat => cat.children || []);
+    // Smart flattening: 
+    // If the top-level categories have very few items (like "Raw" and "Ready"), 
+    // we take their children. Otherwise, we use them as is.
+    const isRootLevel = categories.length <= 3 && categories.every(c => c.children && c.children.length > 0);
+    const displayCategories = isRootLevel 
+        ? categories.flatMap(cat => cat.children || [])
+        : categories;
 
-    // Set initial active category when flattenedCategories are loaded
+    // Set initial active category when displayCategories are loaded
     useEffect(() => {
-        if (flattenedCategories.length > 0 && !activeCategory) {
-            setActiveCategory(flattenedCategories[0]);
+        if (displayCategories.length > 0 && !activeCategory) {
+            setActiveCategory(displayCategories[0]);
         }
-    }, [flattenedCategories, activeCategory]);
+    }, [displayCategories, activeCategory]);
 
     // Close on ESC
     useEffect(() => {
@@ -62,7 +67,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
             <div className={s.menuWrapper} onClick={(e) => e.stopPropagation()}>
                 <div className={s.sidebar}>
                     <ul className={s.categoryList}>
-                        {flattenedCategories.map((cat) => (
+                        {displayCategories.map((cat) => (
                             <li
                                 key={cat.id}
                                 className={clsx(s.categoryItem, activeCategory?.id === cat.id && s.active)}

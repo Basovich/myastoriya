@@ -260,6 +260,12 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                 slug
                 image {
                     big1x
+                    big2x
+                }
+                children {
+                    id
+                    name
+                    slug
                 }
             }
         }
