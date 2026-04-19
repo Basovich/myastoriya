@@ -3,7 +3,7 @@ import Footer from "@/app/components/Footer/Footer";
 import { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import BlogGrid from "@/app/components/BlogGrid/BlogGrid";
-import { getBlogsApi, getBlogTypesApi } from "@/lib/graphql";
+import { getBlogsApi, getBlogTypesApi } from "@/lib/graphql/queries/blog";
 
 export default async function BlogPage({
     params,

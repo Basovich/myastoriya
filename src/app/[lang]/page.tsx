@@ -1,7 +1,11 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import HomePage from "@/app/pages/Home";
-import { getBlogsApi, getSlidesApi, getPopularCategoriesApi, getReviewsApi, getProductsApi } from "@/lib/graphql";
+import { getBlogsApi } from "@/lib/graphql/queries/blog";
+import { getSlidesApi } from "@/lib/graphql/queries/pages/home/slides";
+import { getPopularCategoriesApi } from "@/lib/graphql/queries/pages/home/categories";
+import { getReviewsApi } from "@/lib/graphql/queries/pages/home/reviews";
+import { getProductsApi } from "@/lib/graphql/queries/products";
 
 export default async function Home({
   params,

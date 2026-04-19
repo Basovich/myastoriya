@@ -46,6 +46,7 @@ export {
     getBlogsApi,
     getBlogBySlugApi,
     getBlogTypesApi,
+    hasBlogsApi,
 } from './queries/blog';
 export type {
     BlogPost,

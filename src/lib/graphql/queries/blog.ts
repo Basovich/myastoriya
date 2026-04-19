@@ -104,29 +104,6 @@ export interface BlogsPagination {
 }
 
 // ---------------------------------------------------------------------------
-// Fragments
-// ---------------------------------------------------------------------------
-
-const BLOG_POST_PREVIEW_FRAGMENT = /* GraphQL */ `
-    id
-    name
-    slug
-    publishedAt
-    likesCount
-    image {
-        url {
-            size1x
-            size2x
-        }
-    }
-    blogType {
-        id
-        name
-        slug
-    }
-`;
-
-// ---------------------------------------------------------------------------
 // Queries
 // ---------------------------------------------------------------------------
 
@@ -153,7 +130,22 @@ const BLOGS_QUERY = /* GraphQL */ `
             to
             has_more_pages
             data {
-                ${BLOG_POST_PREVIEW_FRAGMENT}
+                id
+                name
+                slug
+                publishedAt
+                likesCount
+                image {
+                    url {
+                        size1x
+                        size2x
+                    }
+                }
+                blogType {
+                    id
+                    name
+                    slug
+                }
             }
         }
     }
@@ -200,7 +192,22 @@ const BLOG_BY_SLUG_QUERY = /* GraphQL */ `
                 image_alt
             }
             relatedBlogs {
-                ${BLOG_POST_PREVIEW_FRAGMENT}
+                id
+                name
+                slug
+                publishedAt
+                likesCount
+                image {
+                    url {
+                        size1x
+                        size2x
+                    }
+                }
+                blogType {
+                    id
+                    name
+                    slug
+                }
             }
             recipes {
                 id
@@ -252,5 +259,19 @@ export async function getBlogBySlugApi(slug: string, lang?: string): Promise<Blo
 }
 
 export async function getBlogTypesApi(): Promise<BlogType[]> {
-    return [];
+    const data = await gqlRequest<{ blogTypes: BlogType[] }>(
+        BLOG_TYPES_QUERY,
+        {},
+        { next: { revalidate: 60 } },
+    );
+    return data.blogTypes;
+}
+
+export async function hasBlogsApi(lang?: string): Promise<boolean> {
+    try {
+        const blogs = await getBlogsApi({ limit: 1 }, lang);
+        return blogs.data.length > 0;
+    } catch {
+        return false;
+    }
 }

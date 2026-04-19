@@ -8,6 +8,7 @@ import { useAppSelector } from "@/store/hooks";
 import Image from "next/image";
 import LanguageSwitch from "@/app/components/Header/Shared/LanguageSwitch";
 import PointsInfo from "@/app/components/Header/DesktopHeader/MainBar/PointsInfo";
+import { useHasBlogs } from "@/hooks/useHasBlogs";
 
 interface TopBarProps {
     lang: Locale;
@@ -24,6 +25,13 @@ const TOP_NAV_ITEMS = [
 export default function TopBar({ lang }: TopBarProps) {
     const { isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
     const isReallyLoggedIn = isAuthenticated && !isGuest;
+    const hasBlogs = useHasBlogs(lang);
+
+    const navItems = [...TOP_NAV_ITEMS];
+    if (hasBlogs) {
+        // Insert Blog after Actions
+        navItems.splice(2, 0, { label: "Блог", href: "/blog" });
+    }
 
     return (
         <nav className={s.secondaryNav}>
@@ -31,7 +39,7 @@ export default function TopBar({ lang }: TopBarProps) {
                 <div className={s.leftSection}>
 
                     <div className={s.navLinks}>
-                        {TOP_NAV_ITEMS.map((item, i) => {
+                        {navItems.map((item, i) => {
                             const isExternal = item.href.startsWith("http");
                             return (
                                 <AppLink 

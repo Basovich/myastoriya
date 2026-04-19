@@ -7,16 +7,24 @@ import Image from "next/image";
 import Logo from "@/app/components/Header/Shared/Logo";
 import { type Locale } from "@/i18n/config";
 import clsx from "clsx";
-import { usePathname } from "next/navigation";
+import { useHasBlogs } from "@/hooks/useHasBlogs";
 
 interface FooterProps {
     lang: Locale;
 }
 
 export default function Footer({ lang }: FooterProps) {
+    const hasBlogs = useHasBlogs(lang);
     const { footer, contact, socialLinks } = siteData;
-    const siteLinks = footer.siteLinks.slice(0, 8);
-    const legalLinks = footer.siteLinks.slice(8);
+
+    const allLinks = [...footer.siteLinks];
+    if (hasBlogs) {
+        // Insert Blog after Actions (index 3 in footer.siteLinks)
+        allLinks.splice(4, 0, { label: "Блог", href: "/blog" });
+    }
+
+    const siteLinks = allLinks.slice(0, 8);
+    const legalLinks = allLinks.slice(8);
 
     return (
         <footer className={s.footer}>

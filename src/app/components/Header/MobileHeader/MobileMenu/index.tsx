@@ -12,6 +12,7 @@ import categoriesData from "@/content/categories.json";
 import { usePathname } from "next/navigation";
 import { useToggleOpenWithAnimation } from "@/hooks/useToggleOpenWithAnimation";
 import CitySelector from "@/app/components/Header/DesktopHeader/MainBar/CitySelector";
+import { useHasBlogs } from "@/hooks/useHasBlogs";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -20,6 +21,13 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
+    const hasBlogs = useHasBlogs(lang);
+    const navItems = [...siteData.navigation];
+
+    if (hasBlogs) {
+        // Insert Blog after Actions
+        navItems.splice(2, 0, { label: "Блог", href: "/blog" });
+    }
     // Menu Transition (Slide In/Out)
     const menuTransition = useTransition(isOpen, {
         from: { transform: "translateX(-100%)" },
@@ -130,7 +138,7 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                                     width={24}
                                     height={24}
                                     className={s.catIcon}
-                                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
                                 />
                                 {cat.label}
                             </AppLink>
@@ -140,7 +148,7 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
 
                 <div className={s.menuFooter}>
                     <nav className={s.footerLinks}>
-                        {siteData.navigation.map((item, i) => {
+                        {navItems.map((item, i) => {
                             const isPlaceholder = item.href === "#";
                             const href = isPlaceholder ? "#" : item.href;
                             

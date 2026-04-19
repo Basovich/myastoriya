@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getBlogsApi } from "@/lib/graphql";
+import { getBlogsApi } from "@/lib/graphql/queries/blog";
 
 export async function POST(req: NextRequest) {
     try {
