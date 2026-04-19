@@ -67,7 +67,7 @@ export default function Categories({ lang, popularCategories }: CategoriesProps)
                         <SwiperSlide key={cat.id} className={s.slide}>
                             <AppLink href={`/catalog/${cat.id}`} className={s.item}>
                                 <div className={s.circle}>
-                                    {cat.image?.big2x && (
+                                    {cat.image?.big2x ? (
                                         <Image
                                             src={cat.image.big2x}
                                             alt={cat.name}
@@ -75,6 +75,16 @@ export default function Categories({ lang, popularCategories }: CategoriesProps)
                                             height={180}
                                             className={s.circleImg}
                                         />
+                                    ) : (
+                                        <div className={s.placeholder}>
+                                            <Image 
+                                                src="/icons/logo-red.svg" 
+                                                alt="" 
+                                                width={60} 
+                                                height={60} 
+                                                className={s.placeholderLogo}
+                                            />
+                                        </div>
                                     )}
                                 </div>
                                 <span className={s.label}>{cat.name}</span>

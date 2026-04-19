@@ -141,9 +141,9 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
                                     onClick={onClose}
                                 >
                                     <div className={s.iconWrapper}>
-                                        {cat.image?.big1x ? (
+                                        {cat.image?.big2x ? (
                                             <Image
-                                                src={cat.image.big1x}
+                                                src={cat.image.big2x}
                                                 alt=""
                                                 width={24}
                                                 height={24}
