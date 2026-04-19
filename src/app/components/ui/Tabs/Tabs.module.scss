@@ -10,14 +10,14 @@
     }
 }
 
-.tab {
+span.tab,
+a.tab {
     height: 36px;
     font-size: 12px;
     border-radius: 8px;
     flex: 1 1;
     
     @media (min-width: 1280px) {
-        min-width: 162px;
-        height: 46px;
+        max-width: 204px;
     }
 }

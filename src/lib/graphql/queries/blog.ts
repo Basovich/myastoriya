@@ -276,9 +276,9 @@ export async function getBlogTypesApi(): Promise<BlogType[]> {
         console.warn('[Blog] Failed to fetch blog types from API, using static fallback:', error);
         // Fallback to known types if backend is broken
         return [
-            { id: '1', name: 'Поради', slug: 'events', title: null, h1: null, keywords: null, description: null, blogsCount: 0 },
-            { id: '2', name: 'Статті', slug: 'news', title: null, h1: null, keywords: null, description: null, blogsCount: 0 },
-            { id: '3', name: 'Рецепти', slug: 'recipes', title: null, h1: null, keywords: null, description: null, blogsCount: 0 },
+            { id: '4', name: 'Поради', slug: 'sovety', title: null, h1: null, keywords: null, description: null, blogsCount: 0 },
+            { id: '3', name: 'Статті', slug: 'stati', title: null, h1: null, keywords: null, description: null, blogsCount: 0 },
+            { id: '2', name: 'Рецепти', slug: 'recepty', title: null, h1: null, keywords: null, description: null, blogsCount: 0 },
         ];
     }
 }
