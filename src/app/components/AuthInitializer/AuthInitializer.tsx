@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { useEffect, useRef } from 'react';
+import { useAppDispatch } from '@/store/hooks';
 import { loginAsGuest, setUser, setInitialized } from '@/store/slices/authSlice';
 import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies, getAccessToken } from '@/app/actions/authActions';
@@ -17,7 +17,6 @@ import { getOrCreateDeviceId } from '@/lib/utils/auth';
  */
 export default function AuthInitializer() {
     const dispatch = useAppDispatch();
-    const { isAuthenticated } = useAppSelector((state) => state.auth);
     const initialised = useRef(false);
 
     useEffect(() => {

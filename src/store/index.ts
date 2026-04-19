@@ -9,8 +9,13 @@ import {
     PURGE,
     REGISTER,
 } from 'redux-persist';
-import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
+import { createNoopStorage } from './noopStorage';
 import createTransform from 'redux-persist/es/createTransform';
+
+const storage =
+    typeof window !== 'undefined'
+        ? require('redux-persist/lib/storage').default
+        : createNoopStorage();
 
 import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
@@ -22,14 +27,14 @@ const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
 // Auth session expiration transform — applies only to the auth slice.
 const authExpireTransform = createTransform(
-    (inboundState: any) => ({
+    (inboundState: object) => ({
         ...inboundState,
         _persistedAt: Date.now(),
     }),
-    (outboundState: any) => {
+    (outboundState: object & { _persistedAt?: number }) => {
         const persistedAt = outboundState?._persistedAt;
         if (persistedAt && Date.now() - persistedAt > SIX_HOURS) {
-            return { user: null, isAuthenticated: false } as any;
+            return { user: null, isAuthenticated: false };
         }
         return outboundState;
     },
@@ -39,14 +44,14 @@ const authExpireTransform = createTransform(
 // General expiration transform for cart and wishlist
 // Expires after 30 days
 const generalExpireTransform = createTransform(
-    (inboundState: any) => ({
+    (inboundState: object) => ({
         ...inboundState,
         _persistedAt: Date.now(),
     }),
-    (outboundState: any) => {
+    (outboundState: object & { _persistedAt?: number }) => {
         const persistedAt = outboundState?._persistedAt;
         if (persistedAt && Date.now() - persistedAt > THIRTY_DAYS) {
-            return undefined;
+            return undefined as unknown as object;
         }
         return outboundState;
     },

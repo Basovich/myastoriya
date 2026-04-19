@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "../globals.css";
 import siteData from "@/content/site.json";
-import PasswordGate from "../components/PasswordGate/PasswordGate";
 import { i18n } from "@/i18n/config";
 import clsx from "clsx";
+import ReduxProvider from "@/store/ReduxProvider";
+import AuthInitializer from "@/app/components/AuthInitializer/AuthInitializer";
 
 const houschka = localFont({
   src: [
@@ -101,10 +102,6 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }));
 }
 
-import ReduxProvider from "@/store/ReduxProvider";
-import AuthInitializer from "@/app/components/AuthInitializer/AuthInitializer";
-import { cookies } from "next/headers";
-
 export default async function RootLayout({
   children,
   params,
@@ -113,15 +110,13 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }>) {
   const { lang } = await params;
-  const cookieStore = await cookies();
-  const isAuthorized = cookieStore.get("myastoriya_auth")?.value === "true";
 
   return (
     <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <body>
         <ReduxProvider>
           <AuthInitializer />
-          {isAuthorized ? children : <PasswordGate>{children}</PasswordGate>}
+          {children}
         </ReduxProvider>
       </body>
     </html>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { useRouter, useParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import s from './Actions.module.scss';
@@ -25,6 +26,7 @@ export default function Actions() {
 
     const totalCartItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
     const totalWishlistItems = wishlistItems.length;
+    const hydrated = useIsHydrated();
 
     const handleFavoritesClick = () => {
         if (isReallyLoggedIn) {
@@ -40,7 +42,7 @@ export default function Actions() {
                 {/* Cart */}
                 <button className={s.actionBtn} aria-label="Кошик" onClick={() => setIsCartModalOpen(true)}>
                     <Image src="/icons/shopping-bag.svg" alt="Cart" width="20" height="20" />
-                    {totalCartItems > 0 && (
+                    {hydrated && totalCartItems > 0 && (
                         <span className={s.badge}>{totalCartItems}</span>
                     )}
                 </button>
@@ -52,7 +54,7 @@ export default function Actions() {
                     onClick={handleFavoritesClick}
                 >
                     <Image src="/icons/icon-heart.svg" alt="Favorites" width="20" height="20" />
-                    {totalWishlistItems > 0 && (
+                    {hydrated && totalWishlistItems > 0 && (
                         <span className={s.badge}>{totalWishlistItems}</span>
                     )}
                 </button>

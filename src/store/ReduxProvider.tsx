@@ -1,30 +1,27 @@
 'use client';
 
 import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { store, persistor } from './index';
+import { store } from './index';
 
+/**
+ * Provides the Redux store and Google OAuth context to the application.
+ *
+ * PersistGate has been intentionally removed. It blocked the entire render
+ * tree until localStorage was rehydrated, causing the server-rendered HTML to
+ * appear blank on the client until hydration completed.
+ *
+ * redux-persist still runs in the background — cart, wishlist, and auth state
+ * are rehydrated silently after first paint via the REHYDRATE action.
+ */
 export default function ReduxProvider({ children }: { children: React.ReactNode }) {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '857890084502-u85p6cp357bu5cpntjlcodkcsdm45d9a.apps.googleusercontent.com';
-
-    if (!clientId) {
-        return (
-            <Provider store={store}>
-                <PersistGate loading={null} persistor={persistor}>
-                    {children}
-                </PersistGate>
-            </Provider>
-        );
-    }
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
     return (
         <Provider store={store}>
-            <PersistGate loading={null} persistor={persistor}>
-                <GoogleOAuthProvider clientId={clientId}>
-                    {children}
-                </GoogleOAuthProvider>
-            </PersistGate>
+            <GoogleOAuthProvider clientId={clientId ?? ''}>
+                {children}
+            </GoogleOAuthProvider>
         </Provider>
     );
 }
