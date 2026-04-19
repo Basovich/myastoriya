@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginAsGuest, setUser, setInitialized } from '@/store/slices/authSlice';
 import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies, getAccessToken, tryRefreshTokenAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * Runs once on mount. Restores an existing session from cookies or
@@ -20,6 +21,24 @@ import { getOrCreateDeviceId } from '@/lib/utils/auth';
 export default function AuthInitializer() {
     const dispatch = useAppDispatch();
     const initialised = useRef(false);
+    const { user, isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
+
+    useEffect(() => {
+        if (isAuthenticated && user) {
+            Sentry.setUser({
+                id: user.id,
+                email: user.email,
+                username: `${user.name || ''} ${user.surname || ''}`.trim() || user.phone,
+            });
+            Sentry.setTag("user_type", "customer");
+        } else if (isAuthenticated && isGuest) {
+            Sentry.setUser(null);
+            Sentry.setTag("user_type", "guest");
+        } else {
+            Sentry.setUser(null);
+            Sentry.setTag("user_type", "anonymous");
+        }
+    }, [user, isAuthenticated, isGuest]);
 
     useEffect(() => {
         if (initialised.current) return;
