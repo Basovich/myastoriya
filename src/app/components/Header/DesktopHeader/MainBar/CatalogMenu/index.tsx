@@ -28,13 +28,15 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
     const [activeCategory, setActiveCategory] = useState<Category | null>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
-    // Set initial active category when categories are loaded
+    // Flatten categories to show direct children of all root categories (e.g., Raw and Ready)
+    const flattenedCategories = categories.flatMap(cat => cat.children || []);
+
+    // Set initial active category when flattenedCategories are loaded
     useEffect(() => {
-        if (categories.length > 0 && !activeCategory) {
-            const steaks = categories.find((c: any) => c.slug.includes("steyki")) || categories[0];
-            setActiveCategory(steaks);
+        if (flattenedCategories.length > 0 && !activeCategory) {
+            setActiveCategory(flattenedCategories[0]);
         }
-    }, [categories, activeCategory]);
+    }, [flattenedCategories, activeCategory]);
 
     // Close on ESC
     useEffect(() => {
@@ -60,33 +62,33 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
             <div className={s.menuWrapper} onClick={(e) => e.stopPropagation()}>
                 <div className={s.sidebar}>
                     <ul className={s.categoryList}>
-                        {categories.map((cat) => (
+                        {flattenedCategories.map((cat) => (
                             <li
                                 key={cat.id}
                                 className={clsx(s.categoryItem, activeCategory?.id === cat.id && s.active)}
                                 onMouseEnter={() => setActiveCategory(cat)}
                             >
-                                <AppLink 
-                                    href={`/catalog/${cat.slug}`} 
-                                    className={s.categoryLink} 
+                                <AppLink
+                                    href={`/catalog/${cat.slug}`}
+                                    className={s.categoryLink}
                                     onClick={onClose}
                                 >
                                     <div className={s.iconWrapper}>
                                         {cat.image?.big1x ? (
-                                            <Image 
-                                                src={cat.image.big1x} 
-                                                alt={cat.name} 
-                                                width={16} 
-                                                height={16} 
-                                                className={s.icon} 
+                                            <Image
+                                                src={cat.image.big1x}
+                                                alt={cat.name}
+                                                width={16}
+                                                height={16}
+                                                className={s.icon}
                                             />
                                         ) : (
-                                            <Image 
-                                                src="/icons/icon-category.svg" 
-                                                alt="" 
-                                                width={16} 
-                                                height={16} 
-                                                className={s.icon} 
+                                            <Image
+                                                src="/icons/icon-category.svg"
+                                                alt=""
+                                                width={16}
+                                                height={16}
+                                                className={s.icon}
                                             />
                                         )}
                                     </div>
@@ -115,9 +117,9 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                     <ul className={s.subList}>
                                         {activeCategory.children.map((sub) => (
                                             <li key={sub.id} className={s.subItem}>
-                                                <AppLink 
-                                                    href={`/catalog/${sub.slug}`} 
-                                                    className={s.subLink} 
+                                                <AppLink
+                                                    href={`/catalog/${sub.slug}`}
+                                                    className={s.subLink}
                                                     onClick={onClose}
                                                 >
                                                     <span className={s.subTitleText}>{sub.name}</span>

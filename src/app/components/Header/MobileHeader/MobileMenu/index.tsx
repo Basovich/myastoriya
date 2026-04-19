@@ -127,7 +127,7 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
                 {/* Categories List (Accordion) */}
                 <AnimatedDiv style={accordionStyle} className={s.catalogListWrapper}>
                     <div className={s.catalogList} ref={catalogListRef}>
-                        {categories.map((cat) => (
+                        {categories.flatMap(root => root.children || []).map((cat) => (
                             <AppLink 
                                 key={cat.id} 
                                 href={`/catalog/${cat.slug}`} 
