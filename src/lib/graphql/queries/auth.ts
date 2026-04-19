@@ -214,6 +214,51 @@ const DELETE_USER_MUTATION = /* GraphQL */ `
     }
 `;
 
+const UPDATE_GUEST_DATA_MUTATION = /* GraphQL */ `
+    mutation UpdateGuestData(
+        $name: String!
+        $surname: String!
+        $phone: String!
+        $email: String
+    ) {
+        updateGuestData(
+            name: $name
+            surname: $surname
+            phone: $phone
+            email: $email
+        ) {
+            id
+            name
+            surname
+            phone
+            email
+        }
+    }
+`;
+
+const UPDATE_CHECKOUT_USER_DATA_MUTATION = /* GraphQL */ `
+    mutation UpdateCheckoutUserData(
+        $name: String!
+        $surname: String!
+        $phone: String!
+        $email: String
+    ) {
+        updateCheckoutUserData(
+            name: $name
+            surname: $surname
+            phone: $phone
+            email: $email
+        ) {
+            id
+            name
+            surname
+            phone
+            email
+        }
+    }
+`;
+
+
 const CHECK_USER_PHONE_QUERY = /* GraphQL */ `
     query CheckUserPhone($phone: String) {
         checkUserPhone(phone: $phone)
@@ -479,4 +524,45 @@ export async function getMeApi(
         { token, lang },
     );
     return data.user;
+}
+
+export interface GuestDataInput {
+    name: string;
+    surname: string;
+    phone: string;
+    email?: string;
+}
+
+/**
+ * Updates personal data for a guest session.
+ * Call this on the checkout page when the guest fills in their contact info.
+ */
+export async function updateGuestDataApi(
+    input: GuestDataInput,
+    token: string,
+    lang?: string,
+): Promise<BackendUser> {
+    const data = await gqlRequest<{ updateGuestData: BackendUser }>(
+        UPDATE_GUEST_DATA_MUTATION,
+        { ...input, phone: formatPhone(input.phone) },
+        { token, lang },
+    );
+    return data.updateGuestData;
+}
+
+/**
+ * Updates contact data for both guest and logged-in users on the checkout page.
+ * Prefer this over `updateGuestData` when you don't want to branch on auth state.
+ */
+export async function updateCheckoutUserDataApi(
+    input: GuestDataInput,
+    token: string,
+    lang?: string,
+): Promise<BackendUser> {
+    const data = await gqlRequest<{ updateCheckoutUserData: BackendUser }>(
+        UPDATE_CHECKOUT_USER_DATA_MUTATION,
+        { ...input, phone: formatPhone(input.phone) },
+        { token, lang },
+    );
+    return data.updateCheckoutUserData;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useIsHydrated } from "@/hooks/useIsHydrated";
 import Image from "next/image";
 import clsx from "clsx";
 import s from "./AddToCartButton.module.scss";
@@ -23,6 +24,7 @@ export default function AddToCartButton({
 }: AddToCartButtonProps) {
     const dispatch = useAppDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const hydrated = useIsHydrated();
 
     const isInCart = useAppSelector((state) =>
         state.cart.items.some((item) => item.id === String(productId))
@@ -43,10 +45,10 @@ export default function AddToCartButton({
         <>
             <button
                 type="button"
-                className={clsx(s.btn, s[variant], isInCart && s.active, className)}
+                className={clsx(s.btn, s[variant], hydrated && isInCart && s.active, className)}
                 onClick={handleClick}
-                aria-label={isInCart ? "Товар у кошику" : (variant === 'full' ? text : "Додати до кошика")}
-                aria-pressed={isInCart}
+                aria-label={hydrated && isInCart ? "Товар у кошику" : (variant === 'full' ? text : "Додати до кошика")}
+                aria-pressed={hydrated && isInCart}
             >
                 {variant === "icon" ? (
                     <Image src="/icons/icon-plus.svg" width={12} height={12} alt="" aria-hidden="true" />

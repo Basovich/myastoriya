@@ -4,16 +4,18 @@ import { useEffect, useRef } from 'react';
 import { useAppDispatch } from '@/store/hooks';
 import { loginAsGuest, setUser, setInitialized } from '@/store/slices/authSlice';
 import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
-import { setAuthCookies, getAccessToken } from '@/app/actions/authActions';
+import { setAuthCookies, getAccessToken, tryRefreshTokenAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
 
 /**
- * Runs once on mount. If there is no active session (no access_token cookie
- * AND Redux has no authenticated user), initialises a guest session so the
- * backend can track cart/wishlist state via the API token.
+ * Runs once on mount. Restores an existing session from cookies or
+ * initialises a guest session so the backend can track cart/wishlist state.
  *
- * The guest token is stored in httpOnly cookies via the Server Action and
- * also reflected in Redux via `loginAsGuest`.
+ * Token refresh flow:
+ *  1. Try access_token cookie → getMeApi.
+ *  2. If getMeApi fails (token expired) → tryRefreshTokenAction → retry getMeApi.
+ *  3. If refresh also fails → fall through to authAsGuest.
+ *  4. If no access_token at all → authAsGuest immediately.
  */
 export default function AuthInitializer() {
     const dispatch = useAppDispatch();
@@ -23,39 +25,74 @@ export default function AuthInitializer() {
         if (initialised.current) return;
         initialised.current = true;
 
-        getAccessToken().then(token => {
-            if (token) {
-                // Restore user session
-                getMeApi(token)
-                    .then((user) => {
-                        // Real users always have a phone number OR an email (from Social Auth). Guests will have both as null.
-                        if (user && (user.phone || user.email)) {
-                            dispatch(setUser(user));
-                        } else {
-                            dispatch(loginAsGuest());
-                        }
-                    })
-                    .catch((err) => {
-                        console.warn('[AuthInitializer] Session restoration failed:', err);
-                        dispatch(setInitialized(true));
-                    });
-                return;
-            }
-
-            const deviceId = getOrCreateDeviceId();
-
-            authAsGuestApi(deviceId)
-                .then(async (result) => {
-                    await setAuthCookies(result.accessToken, result.refreshToken);
-                    dispatch(loginAsGuest());
-                })
-                .catch((err) => {
-                    console.warn('[AuthInitializer] Guest auth failed:', err);
-                    dispatch(setInitialized(true));
-                });
-        });
-
+        void initAuth(dispatch);
     }, [dispatch]);
 
     return null;
+}
+
+async function initAuth(dispatch: ReturnType<typeof useAppDispatch>) {
+    try {
+        const token = await getAccessToken();
+
+        if (token) {
+            const user = await tryGetMe(token, dispatch);
+            if (user !== null) return;
+            // getMeApi failed — access token expired, try refresh
+        }
+
+        // No token OR access token expired — attempt refresh
+        const freshToken = await tryRefreshTokenAction();
+
+        if (freshToken) {
+            const user = await tryGetMe(freshToken, dispatch);
+            if (user !== null) return;
+            // Refresh token also rejected by API — fall through to guest
+        }
+
+        // No valid session — start as guest
+        await startGuestSession(dispatch);
+
+    } catch (err) {
+        console.warn('[AuthInitializer] Unexpected error during auth init:', err);
+        dispatch(setInitialized(true));
+    }
+}
+
+/**
+ * Calls getMeApi and dispatches setUser / loginAsGuest on success.
+ * Returns the user on success or null if the token was rejected.
+ */
+async function tryGetMe(
+    token: string,
+    dispatch: ReturnType<typeof useAppDispatch>,
+) {
+    try {
+        const user = await getMeApi(token);
+        // Real users always have a phone or email. Guests have both null.
+        if (user && (user.phone || user.email)) {
+            dispatch(setUser(user));
+        } else {
+            dispatch(loginAsGuest());
+        }
+        return user;
+    } catch {
+        // Token invalid / expired — let caller decide what to do next
+        return null;
+    }
+}
+
+/**
+ * Creates a new guest session and stores the tokens in httpOnly cookies.
+ */
+async function startGuestSession(dispatch: ReturnType<typeof useAppDispatch>) {
+    try {
+        const deviceId = getOrCreateDeviceId();
+        const result = await authAsGuestApi(deviceId);
+        await setAuthCookies(result.accessToken, result.refreshToken);
+        dispatch(loginAsGuest());
+    } catch (err) {
+        console.warn('[AuthInitializer] Guest auth failed:', err);
+        dispatch(setInitialized(true));
+    }
 }
