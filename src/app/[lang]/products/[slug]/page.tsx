@@ -56,6 +56,12 @@ export default async function ProductPage({ params }: Props) {
  * Pre-generates all product pages at build time.
  * Slug is used as the route param — no id in the URL.
  */
+export const revalidate = 3600; // Revalidate at most every hour
+
+/**
+ * Generate static params for all products.
+ * Now safer with limited build concurrency (cpus: 2 in next.config.ts)
+ */
 export async function generateStaticParams() {
     try {
         const limit = 100;
@@ -67,14 +73,13 @@ export async function generateStaticParams() {
             for (const p of response.data) {
                 if (p.slug) allSlugs.push({ slug: p.slug });
             }
-            if (!response.has_more_pages) break;
+            if (!response.has_more_pages || page >= 20) break; // Safety cap at 2000 products for now
             page++;
         }
 
         return allSlugs;
-    } catch {
+    } catch (error) {
+        console.warn('[Products] Failed to generate static params:', error);
         return [];
     }
 }
-
-export const revalidate = 3600;

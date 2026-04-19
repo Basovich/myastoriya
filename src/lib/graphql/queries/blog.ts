@@ -259,12 +259,28 @@ export async function getBlogBySlugApi(slug: string, lang?: string): Promise<Blo
 }
 
 export async function getBlogTypesApi(): Promise<BlogType[]> {
-    const data = await gqlRequest<{ blogTypes: BlogType[] }>(
-        BLOG_TYPES_QUERY,
-        {},
-        { next: { revalidate: 60 } },
-    );
-    return data.blogTypes;
+    try {
+        const data = await gqlRequest<{ blogTypes: BlogType[] }>(
+            BLOG_TYPES_QUERY,
+            {},
+            { next: { revalidate: 60 } },
+        );
+        return data.blogTypes;
+    } catch (error) {
+        if (typeof window === 'undefined') {
+            const Sentry = require("@sentry/nextjs");
+            Sentry.captureException(error, {
+                tags: { component: 'getBlogTypesApi', bug: 'sorted_method_undefined' }
+            });
+        }
+        console.warn('[Blog] Failed to fetch blog types from API, using static fallback:', error);
+        // Fallback to known types if backend is broken
+        return [
+            { id: '1', name: 'Поради', slug: 'events', title: null, h1: null, keywords: null, description: null, blogsCount: 0 },
+            { id: '2', name: 'Статті', slug: 'news', title: null, h1: null, keywords: null, description: null, blogsCount: 0 },
+            { id: '3', name: 'Рецепти', slug: 'recipes', title: null, h1: null, keywords: null, description: null, blogsCount: 0 },
+        ];
+    }
 }
 
 export async function hasBlogsApi(lang?: string): Promise<boolean> {

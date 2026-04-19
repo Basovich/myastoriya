@@ -89,7 +89,7 @@ export default function BlogGrid({
     const dynamicTabs = blogTypes.map((t) => ({
         id: t.slug,
         label: t.name,
-        href: `/blog/${t.slug}`,
+        href: `/blog/category/${t.slug}`,
         active: activeTypeSlug === t.slug,
     }));
 

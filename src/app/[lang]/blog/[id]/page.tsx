@@ -1,7 +1,7 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import BlogPostPage from "@/app/pages/BlogPost";
-import { getBlogBySlugApi } from "@/lib/graphql";
+import { getBlogBySlugApi } from "@/lib/graphql/queries/blog";
 import { notFound } from "next/navigation";
 
 export default async function BlogDetail({
