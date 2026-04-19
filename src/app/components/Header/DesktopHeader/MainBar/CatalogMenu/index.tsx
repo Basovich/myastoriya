@@ -28,13 +28,16 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
     const [activeCategory, setActiveCategory] = useState<Category | null>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
-    // Smart flattening: 
-    // If the top-level categories have very few items (like "Raw" and "Ready"), 
-    // we take their children. Otherwise, we use them as is.
-    const isRootLevel = categories.length <= 3 && categories.every(c => c.children && c.children.length > 0);
-    const displayCategories = isRootLevel 
-        ? categories.flatMap(cat => cat.children || [])
-        : categories;
+    // Data Cleanup: Some categories in the API are both roots and children.
+    // We filter out any root categories that already appear as children of another root.
+    const allChildIds = new Set(categories.flatMap(cat => (cat.children || []).map(child => child.id)));
+    const uniqueRootCategories = categories.filter(cat => !allChildIds.has(cat.id));
+
+    // Smart flattening: If we have very few roots (like Raw/Ready), take their children.
+    const isDeepRoot = uniqueRootCategories.length <= 3 && uniqueRootCategories.every(c => c.children && c.children.length > 0);
+    const displayCategories = isDeepRoot 
+        ? uniqueRootCategories.flatMap(cat => cat.children || [])
+        : uniqueRootCategories;
 
     // Set initial active category when displayCategories are loaded
     useEffect(() => {

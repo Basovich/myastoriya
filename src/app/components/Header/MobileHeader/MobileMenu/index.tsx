@@ -127,38 +127,42 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
                 {/* Categories List (Accordion) */}
                 <AnimatedDiv style={accordionStyle} className={s.catalogListWrapper}>
                     <div className={s.catalogList} ref={catalogListRef}>
-                        {(categories.length <= 3 && categories.every(c => c.children && c.children.length > 0)
-                            ? categories.flatMap(root => root.children || [])
-                            : categories
-                        ).map((cat) => (
-                            <AppLink 
-                                key={cat.id} 
-                                href={`/catalog/${cat.slug}`} 
-                                className={s.categoryItem} 
-                                onClick={onClose}
-                            >
-                                <div className={s.iconWrapper}>
-                                    {cat.image?.big1x ? (
-                                        <Image
-                                            src={cat.image.big1x}
-                                            alt=""
-                                            width={24}
-                                            height={24}
-                                            className={s.catIcon}
-                                        />
-                                    ) : (
-                                        <Image
-                                            src="/icons/icon-category.svg"
-                                            alt=""
-                                            width={24}
-                                            height={24}
-                                            className={s.catIcon}
-                                        />
-                                    )}
-                                </div>
-                                {cat.name}
-                            </AppLink>
-                        ))}
+                        {(() => {
+                            const allChildIds = new Set(categories.flatMap(cat => (cat.children || []).map(child => child.id)));
+                            const uniqueRoots = categories.filter(cat => !allChildIds.has(cat.id));
+                            const isDeep = uniqueRoots.length <= 3 && uniqueRoots.every(c => c.children && c.children.length > 0);
+                            const toRender = isDeep ? uniqueRoots.flatMap(cat => cat.children || []) : uniqueRoots;
+                            
+                            return toRender.map((cat) => (
+                                <AppLink 
+                                    key={cat.id} 
+                                    href={`/catalog/${cat.slug}`} 
+                                    className={s.categoryItem} 
+                                    onClick={onClose}
+                                >
+                                    <div className={s.iconWrapper}>
+                                        {cat.image?.big1x ? (
+                                            <Image
+                                                src={cat.image.big1x}
+                                                alt=""
+                                                width={24}
+                                                height={24}
+                                                className={s.catIcon}
+                                            />
+                                        ) : (
+                                            <Image
+                                                src="/icons/icon-category.svg"
+                                                alt=""
+                                                width={24}
+                                                height={24}
+                                                className={s.catIcon}
+                                            />
+                                        )}
+                                    </div>
+                                    {cat.name}
+                                </AppLink>
+                            ));
+                        })()}
                     </div>
                 </AnimatedDiv>
 
