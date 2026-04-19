@@ -1,6 +1,16 @@
 import Hero from "@/app/pages/Home/Hero/Hero";
+import Categories from "@/app/pages/Home/Categories/Categories";
+import Products from "@/app/pages/Home/Products/Products";
+import Actions from "@/app/pages/Home/Actions/Actions";
+import AppPromo from "@/app/pages/Home/AppPromo/AppPromo";
+import ComplexDiscounts from "@/app/pages/Home/ComplexDiscounts/ComplexDiscounts";
+import Publications from "@/app/components/Publications";
+import Reviews from "@/app/pages/Home/Reviews/Reviews";
+import SeoText from "@/app/pages/Home/SeoText/SeoText";
 import { Locale } from "@/i18n/config";
 import { Dictionary } from "@/i18n/types";
+import type { BlogPost, Slide, PopularCategory, HomeReview, Product } from "@/lib/graphql";
+
 interface HomePageProps {
   dict: Dictionary;
   lang: Locale;
