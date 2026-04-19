@@ -5,7 +5,7 @@ import { getBlogsApi } from "@/lib/graphql/queries/blog";
 import { getSlidesApi } from "@/lib/graphql/queries/pages/home/slides";
 import { getPopularCategoriesApi } from "@/lib/graphql/queries/pages/home/categories";
 import { getReviewsApi } from "@/lib/graphql/queries/pages/home/reviews";
-import { getProductsApi } from "@/lib/graphql/queries/products";
+import { getProductsApi, getCatalogTreeApi } from "@/lib/graphql/queries/products";
 
 export default async function Home({
   params,

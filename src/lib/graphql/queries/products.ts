@@ -13,6 +13,11 @@ export interface ProductCategory {
     id: string;
     name: string;
     slug: string;
+    image?: {
+        big1x: string | null;
+        big2x: string | null;
+    } | null;
+    children?: ProductCategory[];
 }
 
 export interface Product {
@@ -233,6 +238,37 @@ export async function findProductIdBySlug(
 export async function getCategoriesApi(lang?: string): Promise<ProductCategory[]> {
     const data = await gqlRequest<{ categories: ProductCategory[] }>(
         CATEGORIES_QUERY,
+        undefined,
+        { next: { revalidate: 3600 }, lang },
+    );
+    return data.categories;
+}
+
+const CATEGORY_TREE_QUERY = /* GraphQL */ `
+    query CategoriesTree {
+        categories {
+            id
+            name
+            slug
+            image {
+                big1x
+                big2x
+            }
+            children {
+                id
+                name
+                slug
+                image {
+                    big1x
+                }
+            }
+        }
+    }
+`;
+
+export async function getCatalogTreeApi(lang?: string): Promise<ProductCategory[]> {
+    const data = await gqlRequest<{ categories: ProductCategory[] }>(
+        CATEGORY_TREE_QUERY,
         undefined,
         { next: { revalidate: 3600 }, lang },
     );

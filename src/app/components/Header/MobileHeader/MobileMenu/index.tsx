@@ -8,19 +8,20 @@ import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
 import Logo from "@/app/components/Header/Shared/Logo";
 import siteData from "@/content/site.json";
-import categoriesData from "@/content/categories.json";
 import { usePathname } from "next/navigation";
 import { useToggleOpenWithAnimation } from "@/hooks/useToggleOpenWithAnimation";
 import CitySelector from "@/app/components/Header/DesktopHeader/MainBar/CitySelector";
 import { useHasBlogs } from "@/hooks/useHasBlogs";
+import { ProductCategory } from "@/lib/graphql/queries/products";
 
 interface MobileMenuProps {
     isOpen: boolean;
     onClose: () => void;
     lang: Locale;
+    categories: ProductCategory[];
 }
 
-export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
+export default function MobileMenu({ isOpen, onClose, lang, categories }: MobileMenuProps) {
     const hasBlogs = useHasBlogs(lang);
     const navItems = [...siteData.navigation];
 
@@ -104,11 +105,7 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
             {/* Scrollable content area */}
             <div className={s.menuBody}>
                 {/* Catalog Header */}
-                <AppLink href="/catalog" className={s.catalogHeader} onClick={(e) => {
-                    // Prevent navigation if only toggling is intended? No, user said "everywhere links to catalog".
-                    // But we still want to toggle to see categories.
-                    // If we navigate, the menu will close anyway (onClose is called by AppLink or page change).
-                    // Let's keep toggle logic as well.
+                <div className={s.catalogHeader} onClick={(e) => {
                     toggleCatalog();
                 }}>
                     Каталог продукції
@@ -125,22 +122,38 @@ export default function MobileMenu({ isOpen, onClose, lang }: MobileMenuProps) {
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
                     </div>
-                </AppLink>
+                </div>
 
                 {/* Categories List (Accordion) */}
                 <AnimatedDiv style={accordionStyle} className={s.catalogListWrapper}>
                     <div className={s.catalogList} ref={catalogListRef}>
-                        {categoriesData.map((cat, i) => (
-                            <AppLink key={i} href={cat.href} className={s.categoryItem} onClick={onClose}>
-                                <Image
-                                    src={`/icons/categories/${cat.icon}.svg`}
-                                    alt=""
-                                    width={24}
-                                    height={24}
-                                    className={s.catIcon}
-                                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none' }}
-                                />
-                                {cat.label}
+                        {categories.map((cat) => (
+                            <AppLink 
+                                key={cat.id} 
+                                href={`/catalog/${cat.slug}`} 
+                                className={s.categoryItem} 
+                                onClick={onClose}
+                            >
+                                <div className={s.iconWrapper}>
+                                    {cat.image?.big1x ? (
+                                        <Image
+                                            src={cat.image.big1x}
+                                            alt=""
+                                            width={24}
+                                            height={24}
+                                            className={s.catIcon}
+                                        />
+                                    ) : (
+                                        <Image
+                                            src="/icons/icon-category.svg"
+                                            alt=""
+                                            width={24}
+                                            height={24}
+                                            className={s.catIcon}
+                                        />
+                                    )}
+                                </div>
+                                {cat.name}
                             </AppLink>
                         ))}
                     </div>

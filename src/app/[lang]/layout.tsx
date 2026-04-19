@@ -102,6 +102,10 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }));
 }
 
+import { getCatalogTreeApi } from "@/lib/graphql/queries/products";
+import Header from "@/app/components/Header/Header";
+import Footer from "@/app/components/Footer/Footer";
+
 export default async function RootLayout({
   children,
   params,
@@ -110,13 +114,16 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }>) {
   const { lang } = await params;
+  const catalogTree = await getCatalogTreeApi(lang);
 
   return (
     <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <body>
         <ReduxProvider>
           <AuthInitializer />
+          <Header lang={lang as any} initialCategories={catalogTree} />
           {children}
+          <Footer lang={lang as any} />
         </ReduxProvider>
       </body>
     </html>

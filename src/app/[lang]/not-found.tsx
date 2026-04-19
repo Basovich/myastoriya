@@ -1,7 +1,5 @@
 import { headers } from "next/headers";
 import { getDictionary } from "@/i18n/get-dictionary";
-import Header from "../components/Header/Header";
-import Footer from "../components/Footer/Footer";
 import NotFoundBlock from "../components/NotFoundBlock/NotFoundBlock";
 import { type Locale } from "@/i18n/config";
 
@@ -14,12 +12,8 @@ export default async function NotFound() {
     const dict = await getDictionary(lang);
 
     return (
-        <>
-            <Header lang={lang} />
-            <main>
-                <NotFoundBlock dict={dict} />
-            </main>
-            <Footer lang={lang} />
-        </>
+        <main>
+            <NotFoundBlock dict={dict} />
+        </main>
     );
 }

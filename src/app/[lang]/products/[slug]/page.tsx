@@ -1,7 +1,5 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
-import Header from "@/app/components/Header/Header";
-import Footer from "@/app/components/Footer/Footer";
 import ProductClient from "@/app/pages/Product/ProductClient";
 import {
     getBlogsApi,
@@ -38,8 +36,7 @@ export default async function ProductPage({ params }: Props) {
     if (!product) notFound();
 
     return (
-        <>
-            <Header lang={lang as Locale} />
+        <main>
             <ProductClient
                 product={product}
                 publications={blogsResponse.data}
@@ -47,8 +44,7 @@ export default async function ProductPage({ params }: Props) {
                 lang={lang as Locale}
                 dict={dict}
             />
-            <Footer lang={lang as Locale} />
-        </>
+        </main>
     );
 }
 

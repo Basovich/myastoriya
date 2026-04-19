@@ -23,12 +23,15 @@ export const TOP_NAV_ITEMS = [
     { label: "Контакти", href: "/contacts" },
 ];
 
+import { ProductCategory } from "@/lib/graphql/queries/products";
+
 interface MainBarProps {
     lang: Locale;
     isScrolled?: boolean;
     isMenuOpen?: boolean;
     onMenuToggle?: () => void;
     onMenuClose?: () => void;
+    categories: ProductCategory[];
 }
 
 export default function MainBar({
@@ -37,6 +40,7 @@ export default function MainBar({
     isMenuOpen = false,
     onMenuToggle,
     onMenuClose,
+    categories,
 }: MainBarProps) {
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -139,7 +143,7 @@ export default function MainBar({
             </div>
 
             {/* Catalog dropdown */}
-            <CatalogMenu isOpen={isCatalogOpen} onClose={() => setIsCatalogOpen(false)} />
+            <CatalogMenu isOpen={isCatalogOpen} onClose={() => setIsCatalogOpen(false)} categories={categories} />
         </div>
     );
 }

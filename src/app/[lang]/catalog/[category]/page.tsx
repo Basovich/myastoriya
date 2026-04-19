@@ -1,7 +1,5 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
-import Header from "@/app/components/Header/Header";
-import Footer from "@/app/components/Footer/Footer";
 import CatalogContent from "@/app/pages/Catalog/CatalogContent";
 import { getProductsApi, getPopularCategoriesApi, getCategoriesApi } from "@/lib/graphql";
 
@@ -35,22 +33,18 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
     );
 
     return (
-        <>
-            <Header lang={lang as Locale} />
-            <main>
-                <CatalogContent
-                    lang={lang as Locale}
-                    dict={dict}
-                    initialProducts={initialProductsResponse}
-                    popularCategories={popularCategories}
-                    allCategories={allCategories}
-                    categorySlug={category}
-                    categoryName={categoryName}
-                    view={view}
-                    sortBy={resolvedSearchParams.sort as string || 'За популярністю'}
-                />
-            </main>
-            <Footer lang={lang as Locale} />
-        </>
+        <main>
+            <CatalogContent
+                lang={lang as Locale}
+                dict={dict}
+                initialProducts={initialProductsResponse}
+                popularCategories={popularCategories}
+                allCategories={allCategories}
+                categorySlug={category}
+                categoryName={categoryName}
+                view={view}
+                sortBy={resolvedSearchParams.sort as string || 'За популярністю'}
+            />
+        </main>
     );
 }

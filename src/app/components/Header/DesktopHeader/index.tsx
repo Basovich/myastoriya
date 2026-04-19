@@ -6,12 +6,14 @@ import TopBar from "@/app/components/Header/DesktopHeader/TopBar";
 import MainBar from "@/app/components/Header/DesktopHeader/MainBar";
 import s from "./DesktopHeader.module.scss";
 import { type Locale } from "@/i18n/config";
+import { ProductCategory } from "@/lib/graphql/queries/products";
 
 interface DesktopHeaderProps {
     lang: Locale;
+    categories: ProductCategory[];
 }
 
-export default function DesktopHeader({ lang }: DesktopHeaderProps) {
+export default function DesktopHeader({ lang, categories }: DesktopHeaderProps) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isScrolledMenuOpen, setIsScrolledMenuOpen] = useState(false);
     const [placeholderHeight, setPlaceholderHeight] = useState(0);
@@ -64,6 +66,7 @@ export default function DesktopHeader({ lang }: DesktopHeaderProps) {
                     isMenuOpen={isScrolledMenuOpen}
                     onMenuToggle={() => setIsScrolledMenuOpen((v) => !v)}
                     onMenuClose={() => setIsScrolledMenuOpen(false)}
+                    categories={categories}
                 />
             </div>
             <div

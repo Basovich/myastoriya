@@ -1,7 +1,5 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
-import Footer from "../../components/Footer/Footer";
-import Header from "../../components/Header/Header";
 
 // This is the index page for Complex Discounts: /[lang]/complex-discounts
 export default async function ComplexDiscountsPage({
@@ -13,17 +11,13 @@ export default async function ComplexDiscountsPage({
     const dict = await getDictionary(lang);
 
     return (
-        <>
-            <Header lang={lang} />
-            <main>
-                <ActionsGrid
-                    dict={dict.home.complexDiscountsPage}
-                    initialItems={dict.home.discounts.items}
-                    lang={lang}
-                    pageType="complex-discounts"
-                />
-            </main>
-            <Footer lang={lang} />
-        </>
+        <main>
+            <ActionsGrid
+                dict={dict.home.complexDiscountsPage}
+                initialItems={dict.home.discounts.items}
+                lang={lang}
+                pageType="complex-discounts"
+            />
+        </main>
     );
 }
