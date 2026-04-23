@@ -1,8 +1,7 @@
 import Search from "@/app/pages/Search";
 
-
-export default function SearchPage({ params }: { params: Promise<{ lang: string }> }) {
+export default function SearchPage() {
     return (
-        <Search params={params} />
+        <Search />
     );
 }
