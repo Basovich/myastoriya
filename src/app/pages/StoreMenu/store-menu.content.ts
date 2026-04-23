@@ -1,3 +1,4 @@
+export const menuData = 
 {
     "categories": [
         { "id": "seasonal", "title": "СЕЗОННЕ МЕНЮ", "image": "/images/cat-grill.png" },

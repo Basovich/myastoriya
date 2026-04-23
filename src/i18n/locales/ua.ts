@@ -1,3 +1,4 @@
+export const ua = 
 {
     "navigation": {
         "home": "Головна",

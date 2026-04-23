@@ -1,6 +1,6 @@
 import s from "./AppPromo.module.scss";
 import Image from "next/image";
-import homeData from "@/content/pages/home.json";
+import { homeData } from "./app-promo.content";
 
 export default function AppPromo() {
     const { appPromo } = homeData;

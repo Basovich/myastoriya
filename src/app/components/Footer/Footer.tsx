@@ -1,7 +1,7 @@
 "use client";
 
 import s from "./Footer.module.scss";
-import siteData from "@/content/site.json";
+import { siteData } from "@/config/site";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import Logo from "@/app/components/Header/Shared/Logo";
@@ -19,17 +19,15 @@ interface FooterProps {
 
 export default function Footer({ lang, initialSocialLinks }: FooterProps) {
     const hasBlogs = useHasBlogs(lang);
-    const { footer, contact, socialLinks: localSocialLinks } = siteData;
-
-    const socialLinks = initialSocialLinks 
-        ? initialSocialLinks
-            .map(link => ({
-                platform: link.name,
-                url: link.link,
-                icon: link.name.toLowerCase()
-            }))
-            .filter(link => ALLOWED_SOCIAL_ICONS.includes(link.icon))
-        : localSocialLinks;
+    const { footer, contact } = siteData;
+    
+    const socialLinks = (initialSocialLinks || [])
+        .map(link => ({
+            platform: link.name,
+            url: link.link,
+            icon: link.name.toLowerCase()
+        }))
+        .filter(link => ALLOWED_SOCIAL_ICONS.includes(link.icon));
 
     const allLinks = [...footer.siteLinks];
     if (hasBlogs) {

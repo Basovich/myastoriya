@@ -2,7 +2,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import ContactsPage from "@/app/pages/Contacts";
 import { getContactsShopsApi } from "@/lib/graphql";
-import contactsData from "@/content/contacts.json";
+import { contactsData } from "@/app/pages/Contacts/contacts.content";
 
 export default async function Contacts({
   params,

@@ -351,10 +351,12 @@ export interface DeliveryPageDict {
   };
 }
 
-export interface Dictionary {
-  navigation: {
-    home: string;
-    products: string;
-  };
-  home: HomeDict;
-}
+import { ua } from "./locales/ua";
+
+type DeepString<T> = T extends string
+  ? string
+  : T extends object
+  ? { [K in keyof T]: DeepString<T[K]> }
+  : T;
+
+export type Dictionary = DeepString<typeof ua>;

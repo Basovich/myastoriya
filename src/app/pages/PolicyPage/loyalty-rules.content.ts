@@ -1,3 +1,4 @@
+export const loyaltyRulesContent = 
 {
   "ua": {
     "title": "ПРАВИЛА ПРОГРАМИ ЛОЯЛЬНОСТІ",

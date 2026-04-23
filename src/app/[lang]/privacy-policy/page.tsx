@@ -21,7 +21,7 @@ export default async function Privacy({
         lang={lang} 
         title={data.title}
         breadcrumbs={breadcrumbs}
-        content={data.content}
+        content={data.content as any}
       />
   );
 }

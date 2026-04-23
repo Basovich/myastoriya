@@ -1,3 +1,4 @@
+export const homeData = 
 {
     "hero": {
         "badge": "Акція, діє прямо зараз!",

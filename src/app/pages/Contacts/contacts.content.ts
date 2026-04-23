@@ -1,4 +1,4 @@
-{
+export const contactsData = {
     "callCenter": {
         "title": "Колцентр М'ясторія (доставка замовлень)",
         "workingHours": "Пн.-Нд.: 10:00-22:00",

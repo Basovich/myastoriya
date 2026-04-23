@@ -6,8 +6,8 @@ import { useParams } from 'next/navigation';
 import { Locale } from '@/i18n/config';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
-import uaData from '@/content/ua.json';
-import ruData from '@/content/ru.json';
+import { ua as uaData } from '@/i18n/locales/ua';
+import { ru as ruData } from '@/i18n/locales/ru';
 import s from './Favorites.module.scss';
 
 const favDict = {

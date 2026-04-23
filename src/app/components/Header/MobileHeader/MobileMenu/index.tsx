@@ -7,7 +7,7 @@ import s from "./MobileMenu.module.scss";
 import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
 import Logo from "@/app/components/Header/Shared/Logo";
-import siteData from "@/content/site.json";
+import { siteData } from "@/config/site";
 import { usePathname } from "next/navigation";
 import { useToggleOpenWithAnimation } from "@/hooks/useToggleOpenWithAnimation";
 import CitySelector from "@/app/components/Header/DesktopHeader/MainBar/CitySelector";

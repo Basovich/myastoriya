@@ -11,7 +11,7 @@ import StoreMenuProductCard from '@/app/components/StoreMenu/StoreMenuProductCar
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import StoreMenuHero from '@/app/components/StoreMenu/StoreMenuHero/StoreMenuHero';
 import { Shop } from '@/lib/graphql/queries/shops';
-import menuData from '@/content/store-menu.json';
+import { menuData } from '@/app/pages/StoreMenu/store-menu.content';
 
 interface StoreMenuPageProps {
     shop: Shop;

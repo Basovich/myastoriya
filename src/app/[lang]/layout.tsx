@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "../globals.css";
-import siteData from "@/content/site.json";
+import { siteData } from "@/config/site";
 import { i18n } from "@/i18n/config";
 import clsx from "clsx";
 import ReduxProvider from "@/store/ReduxProvider";

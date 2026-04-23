@@ -1,3 +1,4 @@
+export const ofertaContent = 
 {
   "ua": {
     "title": "ДОГОВІР ПУБЛІЧНОЇ ОФЕРТИ",

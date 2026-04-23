@@ -12,7 +12,7 @@ import LanguageSwitch from "@/app/components/Header/Shared/LanguageSwitch";
 import { type Locale } from "@/i18n/config";
 import Image from "next/image";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
-import siteData from "@/content/site.json";
+import { siteData } from "@/config/site";
 
 export const TOP_NAV_ITEMS = [
     { label: "Заклади", href: "/restaurants" },

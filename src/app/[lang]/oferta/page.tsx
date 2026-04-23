@@ -1,6 +1,6 @@
 import { Locale } from "@/i18n/config";
 import PolicyPage from "@/app/pages/PolicyPage/PolicyPage";
-import ofertaContent from "@/content/oferta.json";
+import { ofertaContent } from "@/app/pages/PolicyPage/oferta.content";
 
 export default async function OfertaPage({
   params,

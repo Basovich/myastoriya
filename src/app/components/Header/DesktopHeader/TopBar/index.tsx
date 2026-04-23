@@ -2,7 +2,7 @@
 
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import s from "./TopBar.module.scss";
-import siteData from "@/content/site.json";
+import { siteData } from "@/config/site";
 import { type Locale } from "@/i18n/config";
 import { useAppSelector } from "@/store/hooks";
 import Image from "next/image";

@@ -1,3 +1,4 @@
+export const siteData = 
 {
     "name": "М'ясторія",
     "tagline": "Смак, якому довіряють",
@@ -38,23 +39,6 @@
         {
             "label": "Контакти",
             "href": "/contacts"
-        }
-    ],
-    "socialLinks": [
-        {
-            "platform": "Facebook",
-            "url": "https://www.facebook.com/myastoriya",
-            "icon": "facebook"
-        },
-        {
-            "platform": "YouTube",
-            "url": "https://www.youtube.com/channel/UCWSiAa5OYc3Jl7NFKFYpTDg",
-            "icon": "youtube"
-        },
-        {
-            "platform": "Instagram",
-            "url": "https://www.instagram.com/myastoriya/",
-            "icon": "instagram"
         }
     ],
     "contact": {
