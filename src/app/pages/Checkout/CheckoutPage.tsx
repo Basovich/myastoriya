@@ -3,8 +3,6 @@
 import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Locale } from '@/i18n/config';
-import Header from '@/app/components/Header/Header';
-import Footer from '@/app/components/Footer/Footer';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import Step1 from './Step1/Step1';
 import Step2 from './Step2/Step2';
@@ -26,7 +24,6 @@ function CheckoutContent({ lang }: CheckoutPageProps) {
 
     return (
         <>
-            <Header lang={lang} />
             <main className={s.main}>
                 <div className={s.container}>
                     <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
@@ -43,7 +40,6 @@ function CheckoutContent({ lang }: CheckoutPageProps) {
                     {currentStep === 2 && <Step2 />}
                 </div>
             </main>
-            <Footer lang={lang} />
         </>
     );
 }

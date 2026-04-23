@@ -4,8 +4,6 @@ import React from 'react';
 import s from './StoreMenuPage.module.scss';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
-import Header from '@/app/components/Header/Header';
-import Footer from '@/app/components/Footer/Footer';
 import HeroBanner from '@/app/components/ui/HeroBanner/HeroBanner';
 import PromotionsSlider from '@/app/components/StoreMenu/PromotionsSlider/PromotionsSlider';
 import CategoryCircles, { CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
@@ -77,7 +75,6 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict }) => {
                     </div>
                 </div>
             </main>
-            <Footer lang={lang} />
         </>
     );
 };

@@ -12,8 +12,6 @@ import ProductReviews from './ProductReviews/index';
 import RelatedProducts from './RelatedProducts/index';
 import QuantitySelector from '@/app/components/ui/QuantitySelector/QuantitySelector';
 import Publications from '@/app/components/Publications';
-import Header from '@/app/components/Header/Header';
-import Footer from '@/app/components/Footer/Footer';
 import uaData from '@/content/ua.json';
 import ruData from '@/content/ru.json';
 import { Locale } from '@/i18n/config';
@@ -156,7 +154,6 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }>; publ
 
     return (
         <>
-            <Header lang={locale} />
             <main className={s.productPage}>
                 <Breadcrumbs items={breadcrumbs} className={s.breadcrumbsWrapper} />
                 <div className={s.mainGrid}>
@@ -273,7 +270,6 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }>; publ
                 <Publications dict={dict.home.publications} posts={publications} lang={locale} className={s.publications} />
 
             </main>
-            <Footer lang={locale} />
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
             <VideoReviewModal isOpen={isVideoReviewModalOpen} onClose={() => setIsVideoReviewModalOpen(false)} />
         </>

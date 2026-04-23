@@ -1,5 +1,3 @@
-import Header from "@/app/components/Header/Header";
-import Footer from "@/app/components/Footer/Footer";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import { Locale } from "@/i18n/config";
 import { Dictionary } from "@/i18n/types";
@@ -17,7 +15,6 @@ export default function ApplicantFormPage({ dict, lang }: ApplicantFormPageProps
 
     return (
         <>
-            <Header lang={lang} />
             <main className={s.main}>
                 <Breadcrumbs
                     items={[
@@ -41,7 +38,6 @@ export default function ApplicantFormPage({ dict, lang }: ApplicantFormPageProps
                     <ApplicantForm dict={applicantFormPageDict.form} />
                 </section>
             </main>
-            <Footer lang={lang} />
         </>
     );
 }

@@ -4,8 +4,6 @@ import React, { useState, useMemo } from "react";
 import s from "./OurStores.module.scss";
 import { type Locale } from "@/i18n/config";
 import { type Dictionary } from "@/i18n/types";
-import Header from "@/app/components/Header/Header";
-import Footer from "@/app/components/Footer/Footer";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import HeroBanner from "@/app/components/ui/HeroBanner/HeroBanner";
 import Button from "@/app/components/ui/Button/Button";
@@ -76,7 +74,6 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
 
     return (
         <>
-            <Header lang={lang} />
             <main className={s.main}>
                 <div className={s.topSection}>
                     <HeroBanner
@@ -141,7 +138,6 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
                         </div>
                     </div>
                 </main>
-            <Footer lang={lang} />
         </>
     );
 }

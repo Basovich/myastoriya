@@ -2,8 +2,6 @@ import React from 'react';
 import s from './StoreDetailPage.module.scss';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
-import Header from '@/app/components/Header/Header';
-import Footer from '@/app/components/Footer/Footer';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import Button from '@/app/components/ui/Button/Button';
 import { Shop } from '@/lib/graphql/queries/shops';
@@ -49,7 +47,6 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
 
     return (
         <>
-            <Header lang={lang} />
             <main className={s.storeDetailPage}>
                 <div className={s.container}>
                     <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
@@ -146,7 +143,6 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                     </section>
                 </div>
             </main>
-            <Footer lang={lang} />
         </>
     );
 };

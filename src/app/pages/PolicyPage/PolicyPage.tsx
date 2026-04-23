@@ -1,9 +1,7 @@
 import React from 'react';
 import s from './PolicyPage.module.scss';
 import { Locale } from '@/i18n/config';
-import Header from '@/app/components/Header/Header';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
-import Footer from "@/app/components/Footer/Footer";
 import { PolicyPageContentItem } from '@/i18n/types';
 
 interface PolicyPageProps {
@@ -39,7 +37,6 @@ export default function PolicyPage({ title, breadcrumbs, content, lang }: Policy
 
     return (
         <>
-            <Header lang={lang} />
             <main className={s.main}>
                 <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
 
@@ -67,7 +64,6 @@ export default function PolicyPage({ title, breadcrumbs, content, lang }: Policy
                     ))}
                 </div>
             </main>
-            <Footer lang={lang} />
         </>
     );
 }

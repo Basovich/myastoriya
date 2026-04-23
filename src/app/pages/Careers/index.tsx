@@ -1,5 +1,3 @@
-import Header from "@/app/components/Header/Header";
-import Footer from "@/app/components/Footer/Footer";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import { Locale } from "@/i18n/config";
 import { Dictionary } from "@/i18n/types";
@@ -17,7 +15,6 @@ export default function CareersPage({ dict, lang }: CareersPageProps) {
 
     return (
         <>
-            <Header lang={lang} />
             <main>
                 <Breadcrumbs
                     items={[
@@ -52,7 +49,6 @@ export default function CareersPage({ dict, lang }: CareersPageProps) {
                     </div>
                 </section>
             </main>
-            <Footer lang={lang} />
         </>
     );
 }

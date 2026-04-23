@@ -4,8 +4,6 @@ import React from 'react';
 import s from './DeliveryAndPaymentPage.module.scss';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
-import Header from '@/app/components/Header/Header';
-import Footer from '@/app/components/Footer/Footer';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import HeroBanner from '@/app/components/ui/HeroBanner/HeroBanner';
 import DeliveryMethodCard from '@/app/components/Delivery/DeliveryMethodCard/DeliveryMethodCard';
@@ -57,7 +55,6 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
 
     return (
         <>
-            <Header lang={lang} />
             <main className={s.main}>
                 <div className={s.container}>
                     <HeroBanner 
@@ -124,7 +121,6 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
 
                 <PolicySections dict={deliveryPage.policies} />
             </main>
-            <Footer lang={lang} />
         </>
     );
 }

@@ -10,8 +10,6 @@ import s from "./BlogPost.module.scss";
 import { type Locale } from "@/i18n/config";
 import { type Dictionary } from "@/i18n/types";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
-import Header from "@/app/components/Header/Header";
-import Footer from "@/app/components/Footer/Footer";
 import Button from "@/app/components/ui/Button/Button";
 import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
 import SliderArrow from "@/app/components/ui/SliderArrow/SliderArrow";
@@ -49,7 +47,6 @@ export default function BlogPostPage({ dict, lang, post }: BlogPostPageProps) {
 
     return (
         <>
-            <Header lang={lang} />
             <main className={s.main}>
                 <div className={s.content}>
                     <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
@@ -166,7 +163,6 @@ export default function BlogPostPage({ dict, lang, post }: BlogPostPageProps) {
                     </section>
                 )}
             </main>
-            <Footer lang={lang} />
         </>
     );
 }

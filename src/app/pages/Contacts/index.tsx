@@ -3,8 +3,6 @@ import s from "./Contacts.module.scss";
 import { type Locale } from "@/i18n/config";
 import { type Dictionary } from "@/i18n/types";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
-import Header from "@/app/components/Header/Header";
-import Footer from "@/app/components/Footer/Footer";
 import HeroBanner from "@/app/components/ui/HeroBanner/HeroBanner";
 import {InfoItem} from "@/app/pages/Contacts/InfoItem";
 import {RestaurantCard} from "@/app/pages/Contacts/RestaurantCard";
@@ -43,7 +41,6 @@ export default function ContactsPage({ dict, lang, shops, callCenter }: Contacts
 
     return (
         <>
-            <Header lang={lang} />
             <main className={s.main}>
                 <HeroBanner
                     title={contactsPage.title}
@@ -105,7 +102,6 @@ export default function ContactsPage({ dict, lang, shops, callCenter }: Contacts
                     </div>
                 </section>
             </main>
-            <Footer lang={lang} />
         </>
     );
 }
