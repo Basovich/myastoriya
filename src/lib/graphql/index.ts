@@ -84,3 +84,7 @@ export type { Locality } from './queries/localities';
 // Re-export shops
 export { getShopsApi, getContactsShopsApi, SHOPS_QUERY } from './queries/shops';
 export type { Shop, ShopSchedule, ShopsResponse } from './queries/shops';
+
+// Re-export settings
+export { getSocialLinksApi, SOCIAL_LINKS_QUERY } from './queries/settings';
+export type { SocialLink } from './queries/settings';

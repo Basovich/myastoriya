@@ -8,14 +8,28 @@ import Logo from "@/app/components/Header/Shared/Logo";
 import { type Locale } from "@/i18n/config";
 import clsx from "clsx";
 import { useHasBlogs } from "@/hooks/useHasBlogs";
+import { type SocialLink } from "@/lib/graphql";
+
+const ALLOWED_SOCIAL_ICONS = ["facebook", "youtube", "instagram"];
 
 interface FooterProps {
     lang: Locale;
+    initialSocialLinks?: SocialLink[];
 }
 
-export default function Footer({ lang }: FooterProps) {
+export default function Footer({ lang, initialSocialLinks }: FooterProps) {
     const hasBlogs = useHasBlogs(lang);
-    const { footer, contact, socialLinks } = siteData;
+    const { footer, contact, socialLinks: localSocialLinks } = siteData;
+
+    const socialLinks = initialSocialLinks 
+        ? initialSocialLinks
+            .map(link => ({
+                platform: link.name,
+                url: link.link,
+                icon: link.name.toLowerCase()
+            }))
+            .filter(link => ALLOWED_SOCIAL_ICONS.includes(link.icon))
+        : localSocialLinks;
 
     const allLinks = [...footer.siteLinks];
     if (hasBlogs) {

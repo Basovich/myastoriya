@@ -103,6 +103,7 @@ export async function generateStaticParams() {
 }
 
 import { getCatalogTreeApi } from "@/lib/graphql/queries/products";
+import { getSocialLinksApi } from "@/lib/graphql/queries/settings";
 import Header from "@/app/components/Header/Header";
 import Footer from "@/app/components/Footer/Footer";
 
@@ -114,7 +115,10 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }>) {
   const { lang } = await params;
-  const catalogTree = await getCatalogTreeApi(lang);
+  const [catalogTree, socialLinks] = await Promise.all([
+    getCatalogTreeApi(lang),
+    getSocialLinksApi()
+  ]);
 
   return (
     <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
@@ -123,7 +127,7 @@ export default async function RootLayout({
           <AuthInitializer />
           <Header lang={lang as any} initialCategories={catalogTree} />
           {children}
-          <Footer lang={lang as any} />
+          <Footer lang={lang as any} initialSocialLinks={socialLinks} />
         </ReduxProvider>
       </body>
     </html>
