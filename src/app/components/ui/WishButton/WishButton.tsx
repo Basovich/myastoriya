@@ -4,6 +4,7 @@ import clsx from "clsx";
 import s from "./WishButton.module.scss";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { toggleWishlistAsync } from "@/store/slices/wishlistSlice";
+import { useIsHydrated } from "@/hooks/useIsHydrated";
 
 interface WishButtonProps {
     productId: string;
@@ -17,9 +18,14 @@ export default function WishButton({
     ariaLabel,
 }: WishButtonProps) {
     const dispatch = useAppDispatch();
-    const isActive = useAppSelector((state) =>
+    const hydrated = useIsHydrated();
+    
+    const isWishlisted = useAppSelector((state) =>
         state.wishlist.items.includes(productId)
     );
+    
+    const isActive = hydrated ? isWishlisted : false;
+    
     const isLoading = useAppSelector((state) =>
         state.wishlist.loadingIds?.includes(productId) ?? false
     );
