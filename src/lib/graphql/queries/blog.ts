@@ -65,6 +65,7 @@ export interface BlogRecipe {
     slug: string;
     text: string | null;
     rating: number | null;
+    image?: BlogImage | null;
 }
 
 export interface BlogPost {
@@ -214,6 +215,12 @@ const BLOG_BY_SLUG_QUERY = /* GraphQL */ `
                 name
                 slug
                 rating
+                image {
+                    url {
+                        size1x
+                        size2x
+                    }
+                }
             }
         }
     }

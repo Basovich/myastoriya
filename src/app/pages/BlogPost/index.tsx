@@ -18,13 +18,18 @@ import type { BlogPost } from "@/lib/graphql";
 interface BlogPostPageProps {
     dict: Dictionary;
     post: BlogPost;
+    lang: string;
 }
 
-export default function BlogPostPage({ dict, post }: BlogPostPageProps) {
+export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
     const t = dict.home.blogPostPage;
 
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
+    const [recipesPrevEl, setRecipesPrevEl] = useState<HTMLButtonElement | null>(null);
+    const [recipesNextEl, setRecipesNextEl] = useState<HTMLButtonElement | null>(null);
+    const [blogsPrevEl, setBlogsPrevEl] = useState<HTMLButtonElement | null>(null);
+    const [blogsNextEl, setBlogsNextEl] = useState<HTMLButtonElement | null>(null);
 
     const breadcrumbs = [
         { label: t.breadcrumbs.home, href: "/" },
@@ -160,7 +165,159 @@ export default function BlogPostPage({ dict, post }: BlogPostPageProps) {
                                     unit={product.unit ?? ""}
                                     badge={product.is_new ? "NEW" : null}
                                     image=""
-                                lang="ua" />
+                                lang={lang} />
+                            ))}
+                        </div>
+                    </section>
+                )}
+
+                {post.recipes && post.recipes.length > 0 && (
+                    <section className={s.recommended}>
+                        <SectionHeader title={lang === "ru" ? "Связанные рецепты" : "Пов'язані рецепти"} />
+
+                        <div className={s.swiperWrapper}>
+                            <Swiper
+                                modules={[Navigation]}
+                                navigation={{ prevEl: recipesPrevEl, nextEl: recipesNextEl }}
+                                spaceBetween={16}
+                                className={s.swiperContainer}
+                                breakpoints={{
+                                    0: { slidesPerView: 1.5 },
+                                    480: { slidesPerView: 2.5 },
+                                    768: { slidesPerView: 3 },
+                                    1024: { slidesPerView: 4 },
+                                }}
+                            >
+                                {post.recipes.map((recipe) => (
+                                    <SwiperSlide key={recipe.id}>
+                                        <a href={`/blog/${recipe.slug}`} className={s.blogCardLink}>
+                                            <div className={s.blogCard}>
+                                                <div className={s.blogCardImage}>
+                                                    {recipe.image?.url?.size2x ? (
+                                                        <Image src={recipe.image.url.size2x} alt={recipe.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
+                                                    ) : (
+                                                        <div className={s.blogCardImgPlaceholder}>
+                                                            <Image src="/icons/logo-red.svg" alt={recipe.name} width={40} height={40} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className={s.blogCardBody}>
+                                                    <h3 className={s.blogCardTitle}>{recipe.name}</h3>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </SwiperSlide>
+                                ))}
+                                <div className={s.sliderNav}>
+                                    <SliderArrow
+                                        direction="left"
+                                        onClick={() => {}}
+                                        ref={setRecipesPrevEl}
+                                    />
+                                    <SliderArrow
+                                        direction="right"
+                                        onClick={() => {}}
+                                        ref={setRecipesNextEl}
+                                    />
+                                </div>
+                            </Swiper>
+                        </div>
+
+                        <div className={s.recommendedGrid}>
+                            {post.recipes.map((recipe) => (
+                                <a key={recipe.id} href={`/blog/${recipe.slug}`} className={s.blogCardLink}>
+                                    <div className={s.blogCard}>
+                                        <div className={s.blogCardImage}>
+                                            {recipe.image?.url?.size2x ? (
+                                                <Image src={recipe.image.url.size2x} alt={recipe.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
+                                            ) : (
+                                                <div className={s.blogCardImgPlaceholder}>
+                                                    <Image src="/icons/logo-red.svg" alt={recipe.name} width={40} height={40} />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className={s.blogCardBody}>
+                                            <h3 className={s.blogCardTitle}>{recipe.name}</h3>
+                                        </div>
+                                    </div>
+                                </a>
+                            ))}
+                        </div>
+                    </section>
+                )}
+
+                {post.relatedBlogs && post.relatedBlogs.length > 0 && (
+                    <section className={s.recommended}>
+                        <SectionHeader title={lang === "ru" ? "Связанные публикации" : "Схожі публікації"} />
+
+                        <div className={s.swiperWrapper}>
+                            <Swiper
+                                modules={[Navigation]}
+                                navigation={{ prevEl: blogsPrevEl, nextEl: blogsNextEl }}
+                                spaceBetween={16}
+                                className={s.swiperContainer}
+                                breakpoints={{
+                                    0: { slidesPerView: 1.5 },
+                                    480: { slidesPerView: 2.5 },
+                                    768: { slidesPerView: 3 },
+                                    1024: { slidesPerView: 4 },
+                                }}
+                            >
+                                {post.relatedBlogs.map((relatedPost) => (
+                                    <SwiperSlide key={relatedPost.id}>
+                                        <a href={`/blog/${relatedPost.slug}`} className={s.blogCardLink}>
+                                            <div className={s.blogCard}>
+                                                <div className={s.blogCardImage}>
+                                                    {relatedPost.image?.url?.size2x ? (
+                                                        <Image src={relatedPost.image.url.size2x} alt={relatedPost.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
+                                                    ) : (
+                                                        <div className={s.blogCardImgPlaceholder}>
+                                                            <Image src="/icons/logo-red.svg" alt={relatedPost.name} width={40} height={40} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className={s.blogCardBody}>
+                                                    <span className={s.blogDate}>{formatDate(relatedPost.publishedAt)}</span>
+                                                    <h3 className={s.blogCardTitle}>{relatedPost.name}</h3>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </SwiperSlide>
+                                ))}
+                                <div className={s.sliderNav}>
+                                    <SliderArrow
+                                        direction="left"
+                                        onClick={() => {}}
+                                        ref={setBlogsPrevEl}
+                                    />
+                                    <SliderArrow
+                                        direction="right"
+                                        onClick={() => {}}
+                                        ref={setBlogsNextEl}
+                                    />
+                                </div>
+                            </Swiper>
+                        </div>
+
+                        <div className={s.recommendedGrid}>
+                            {post.relatedBlogs.map((relatedPost) => (
+                                <a key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className={s.blogCardLink}>
+                                    <div className={s.blogCard}>
+                                        <div className={s.blogCardImage}>
+                                            {relatedPost.image?.url?.size2x ? (
+                                                <Image src={relatedPost.image.url.size2x} alt={relatedPost.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
+                                            ) : (
+                                                <div className={s.blogCardImgPlaceholder}>
+                                                    <Image src="/icons/logo-red.svg" alt={relatedPost.name} width={40} height={40} />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className={s.blogCardBody}>
+                                            <span className={s.blogDate}>{formatDate(relatedPost.publishedAt)}</span>
+                                            <h3 className={s.blogCardTitle}>{relatedPost.name}</h3>
+                                        </div>
+                                    </div>
+                                </a>
                             ))}
                         </div>
                     </section>
