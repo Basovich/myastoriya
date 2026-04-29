@@ -94,7 +94,12 @@ export default function BlogPostPage({ dict, lang, post }: BlogPostPageProps) {
                             {post.text && (
                                 <div
                                     className={s.paragraph}
-                                    dangerouslySetInnerHTML={{ __html: post.text }}
+                                    dangerouslySetInnerHTML={{
+                                        __html: post.text.replace(
+                                            /src="\/upload\//g,
+                                            'src="https://myastoriya.com.ua/upload/'
+                                        ),
+                                    }}
                                 />
                             )}
                         </div>
