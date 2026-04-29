@@ -289,7 +289,9 @@ a.facebookBtn {
 }
 
 .recommended {
+    padding-top: 20px;
     padding-left: 16px;
+    margin-top: -20px;
     overflow: hidden;
 
     @media (min-width: 768px) {
@@ -353,7 +355,7 @@ a.facebookBtn {
     top: -45px;
     right: 40px;
 
-    @media (max-width: 767px) {
+    @media (min-width: 1280px) {
         display: none;
     }
 }
