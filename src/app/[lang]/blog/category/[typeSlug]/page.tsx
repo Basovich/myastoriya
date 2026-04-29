@@ -35,12 +35,19 @@ export default async function BlogTypePage({
         notFound();
     }
 
+    const currentType = blogTypes.find((t) => t.slug === typeSlug);
+    let calculatedTotalPages = blogsResult.has_more_pages ? 999 : blogsResult.current_page;
+    
+    if (currentType?.blogsCount && blogsResult.per_page) {
+        calculatedTotalPages = Math.max(1, Math.ceil(currentType.blogsCount / blogsResult.per_page));
+    }
+
     return (
         <main>
             <BlogGrid
                 dict={dict.home.blogPage}
                 initialItems={blogsResult.data}
-                totalPages={blogsResult.has_more_pages ? 999 : blogsResult.current_page}
+                totalPages={calculatedTotalPages}
                 hasMore={blogsResult.has_more_pages}
                 blogTypes={blogTypes}
                 lang={lang}

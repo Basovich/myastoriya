@@ -50,6 +50,8 @@ export default function BlogGrid({
     const [hasMore, setHasMore] = useState(initialHasMore);
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [isPaginating, setIsPaginating] = useState(false);
+    const [currentTotalPages, setCurrentTotalPages] = useState(totalPages);
 
     const breadcrumbItems = [
         { label: dict.breadcrumbs.home, href: "/" },
@@ -57,7 +59,7 @@ export default function BlogGrid({
     ];
 
     const loadMore = async () => {
-        if (loading) return;
+        if (loading || isPaginating) return;
         setLoading(true);
         try {
             const nextPage = currentPage + 1;
@@ -74,6 +76,7 @@ export default function BlogGrid({
                 setItems((prev) => [...prev, ...data.items]);
                 setHasMore(data.hasMore);
                 setCurrentPage(nextPage);
+                setCurrentTotalPages((prevTotal) => data.hasMore ? prevTotal : nextPage);
             }
         } catch {
             // silent
@@ -104,6 +107,33 @@ export default function BlogGrid({
         });
     };
 
+    const loadPage = async (page: number) => {
+        if (loading || isPaginating || page === currentPage) return;
+        setIsPaginating(true);
+        try {
+            const res = await fetch("/api/blogs", {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Content-Language": lang === "ru" ? "ru_RU" : "uk_UA"
+                },
+                body: JSON.stringify({ page, typeSlug: activeTypeSlug ?? null }),
+            });
+            const data = await res.json();
+            if (data.items) {
+                setItems(data.items);
+                setHasMore(data.hasMore);
+                setCurrentPage(page);
+                setCurrentTotalPages((prevTotal) => data.hasMore ? prevTotal : page);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+        } catch {
+            // silent
+        } finally {
+            setIsPaginating(false);
+        }
+    };
+
     return (
         <section className={s.section}>
             <div className={s.container}>
@@ -120,34 +150,41 @@ export default function BlogGrid({
                     <Tabs tabs={tabsData} className={s.tabs} />
                 </div>
 
-                <div className={s.grid}>
-                    {items.map((item) => (
-                        <AppLink
-                            key={item.id}
-                            href={`/blog/${item.slug}`}
-                            className={s.cardLink}
-                        >
-                            <div className={s.card}>
-                                <div className={s.cardImage}>
-                                    {item.image?.url?.size2x ? (
-                                        <Image
-                                            src={item.image.url.size2x}
-                                            alt={item.name}
-                                            fill
-                                            className={s.cardImg}
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                        />
-                                    ) : (
-                                        <div className={s.cardImgPlaceholder} />
-                                    )}
+                <div className={s.gridWrapper}>
+                    <div className={s.grid}>
+                        {items.map((item) => (
+                            <AppLink
+                                key={item.id}
+                                href={`/blog/${item.slug}`}
+                                className={s.cardLink}
+                            >
+                                <div className={s.card}>
+                                    <div className={s.cardImage}>
+                                        {item.image?.url?.size2x ? (
+                                            <Image
+                                                src={item.image.url.size2x}
+                                                alt={item.name}
+                                                fill
+                                                className={s.cardImg}
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                            />
+                                        ) : (
+                                            <div className={s.cardImgPlaceholder} />
+                                        )}
+                                    </div>
+                                    <div className={s.cardBody}>
+                                        <span className={s.date}>{formatDate(item.publishedAt)}</span>
+                                        <h3 className={s.cardTitle}>{item.name}</h3>
+                                    </div>
                                 </div>
-                                <div className={s.cardBody}>
-                                    <span className={s.date}>{formatDate(item.publishedAt)}</span>
-                                    <h3 className={s.cardTitle}>{item.name}</h3>
-                                </div>
-                            </div>
-                        </AppLink>
-                    ))}
+                            </AppLink>
+                        ))}
+                    </div>
+                    {isPaginating && (
+                        <div className={s.gridOverlay}>
+                            <div className={s.pulseLogo} />
+                        </div>
+                    )}
                 </div>
 
                 {hasMore && (
@@ -174,11 +211,8 @@ export default function BlogGrid({
                 <div className={s.paginationRow}>
                     <Pagination
                         currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={(page) => {
-                            setCurrentPage(page);
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
+                        totalPages={currentTotalPages}
+                        onPageChange={loadPage}
                     />
                 </div>
 

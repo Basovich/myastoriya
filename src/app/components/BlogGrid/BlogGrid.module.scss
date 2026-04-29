@@ -126,11 +126,55 @@
  * for consistency with the design requirements.
  */
 
+.gridWrapper {
+    position: relative;
+    margin-bottom: 48px;
+}
+
+.gridOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+}
+
+.pulseLogo {
+    width: 120px;
+    height: 120px;
+    background-image: url('/icons/logo-red.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.9);
+        opacity: 0.7;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.9);
+        opacity: 0.7;
+    }
+}
+
 .grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 24px;
-    margin-bottom: 48px;
 
     @media (min-width: 640px) {
         grid-template-columns: repeat(2, 1fr);

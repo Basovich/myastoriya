@@ -225,6 +225,7 @@ const BLOG_TYPES_QUERY = /* GraphQL */ `
             id
             name
             slug
+            blogsCount
         }
     }
 `;
