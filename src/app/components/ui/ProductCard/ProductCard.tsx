@@ -46,13 +46,19 @@ export default function ProductCard({
         <div className={s.card}>
             <div className={s.imageWrap}>
                 <AppLink href={productUrl} className={s.productImgLink}>
-                    <Image
-                        src={image}
-                        alt={title}
-                        className={s.productImg}
-                        width={162}
-                        height={120}
-                    />
+                    {image ? (
+                        <Image
+                            src={image}
+                            alt={title}
+                            className={s.productImg}
+                            width={162}
+                            height={120}
+                        />
+                    ) : (
+                        <div className={s.imageFallback}>
+                            <Image src="/icons/logo-red.svg" alt={title} width={40} height={40} />
+                        </div>
+                    )}
                 </AppLink>
                 {badge && (
                     <Badge
