@@ -7,7 +7,6 @@ import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import s from "./BlogPost.module.scss";
-import { type Locale } from "@/i18n/config";
 import { type Dictionary } from "@/i18n/types";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import Button from "@/app/components/ui/Button/Button";
@@ -18,11 +17,10 @@ import type { BlogPost } from "@/lib/graphql";
 
 interface BlogPostPageProps {
     dict: Dictionary;
-    lang: Locale;
     post: BlogPost;
 }
 
-export default function BlogPostPage({ dict, lang, post }: BlogPostPageProps) {
+export default function BlogPostPage({ dict, post }: BlogPostPageProps) {
     const t = dict.home.blogPostPage;
 
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
@@ -79,7 +77,7 @@ export default function BlogPostPage({ dict, lang, post }: BlogPostPageProps) {
                                 <span className={s.shareLabel}>{t.shareText}</span>
                                 <Button
                                     variant="black"
-                                    href="https://facebook.com"
+                                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://myastoriya.com.ua/blog/${post.slug}`)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={s.facebookBtn}

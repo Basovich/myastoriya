@@ -298,6 +298,7 @@ a.facebookBtn {
 
     @media (min-width: 1280px) {
         padding: 0 calc((100% - 1200px) / 2);
+        overflow: visible;
     }
 
     @media (min-width: 1360px) {

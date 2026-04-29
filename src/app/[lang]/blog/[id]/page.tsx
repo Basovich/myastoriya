@@ -19,6 +19,6 @@ export default async function BlogDetail({
     }
 
     return (
-        <BlogPostPage dict={dict} lang={lang} post={post} />
+        <BlogPostPage dict={dict} post={post} />
     );
 }
