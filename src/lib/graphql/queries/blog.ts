@@ -57,6 +57,7 @@ export interface RelatedBlog {
     description: string | null;
     publishedAt: string | null;
     likesCount: number;
+    image?: BlogImage | null;
 }
 
 export interface BlogRecipe {

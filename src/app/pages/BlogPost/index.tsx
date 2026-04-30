@@ -32,9 +32,8 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
 
     useEffect(() => {
         const likedPosts = JSON.parse(localStorage.getItem("likedPosts") || "{}");
-        if (likedPosts[post.id]) {
-            setIsLiked(true);
-        }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsLiked(!!likedPosts[post.id]);
     }, [post.id]);
 
     const handleLike = async () => {
