@@ -135,14 +135,14 @@ nav.breadcrumbs {
     }
 
     &:disabled {
-        cursor: default;
+        cursor: not-allowed;
     }
 
     &.liked {
-        opacity: 0.6;
+        background-color: #000;
         
         .likeBtnIcon path {
-            fill: #E6000F;
+            stroke: #fff;
         }
     }
 
