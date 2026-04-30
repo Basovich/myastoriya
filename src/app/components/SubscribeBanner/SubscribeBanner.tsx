@@ -11,9 +11,10 @@ import Button from '../ui/Button/Button';
 interface SubscribeBannerProps {
     image: string;
     title: string;
+    lang?: string;
 }
 
-export default function SubscribeBanner({ image, title }: SubscribeBannerProps) {
+export default function SubscribeBanner({ image, title, lang = 'ua' }: SubscribeBannerProps) {
     const [success, setSuccess] = useState(false);
 
     const formik = useFormik({
@@ -24,8 +25,8 @@ export default function SubscribeBanner({ image, title }: SubscribeBannerProps) 
         validateOnBlur: false,
         validationSchema: Yup.object({
             email: Yup.string()
-                .required('Введіть email')
-                .email('Невірний формат email'),
+                .required(lang === 'ru' ? 'Введите email' : 'Введіть email')
+                .email(lang === 'ru' ? 'Неверный формат email' : 'Невірний формат email'),
         }),
         onSubmit: (values, { resetForm }) => {
             // Simulate API call
@@ -74,11 +75,11 @@ export default function SubscribeBanner({ image, title }: SubscribeBannerProps) 
                                 }}
                             />
                             <Button type="submit" variant="red" className={s.subscribeSubmitBtn}>
-                                Підписатись
+                                {lang === 'ru' ? 'Подписаться' : 'Підписатись'}
                             </Button>
                         </div>
                         {hasError && <span className={s.errorText}>{formik.errors.email as string}</span>}
-                        {success && <span className={s.successText}>Ви успішно підписалися!</span>}
+                        {success && <span className={s.successText}>{lang === 'ru' ? 'Вы успешно подписались!' : 'Ви успішно підписалися!'}</span>}
                     </form>
                 </div>
             </div>

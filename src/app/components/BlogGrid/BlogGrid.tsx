@@ -219,8 +219,9 @@ export default function BlogGrid({
                 </div>
 
                 <SubscribeBanner
-                    image="/images/blog/subscribe-bg1.png"
-                    title="Підпишіться на нашу розсилку"
+                    image="/images/blog/subscribe-bg1.webp"
+                    title={lang === "ru" ? "Подпишитесь на нашу рассылку" : "Підпишіться на нашу розсилку"}
+                    lang={lang}
                 />
             </div>
         </section>
