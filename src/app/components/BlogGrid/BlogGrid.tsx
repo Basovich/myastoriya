@@ -124,7 +124,9 @@ export default function BlogGrid({
                 setItems(data.items);
                 setHasMore(data.hasMore);
                 setCurrentPage(page);
-                setCurrentTotalPages((prevTotal) => data.hasMore ? prevTotal : page);
+                if (data.totalPages) {
+                    setCurrentTotalPages(data.totalPages);
+                }
                 window.scrollTo({ top: 0, behavior: "smooth" });
             }
         } catch {

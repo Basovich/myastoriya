@@ -21,7 +21,7 @@ export default async function BlogPage({
             <BlogGrid
                 dict={dict.home.blogPage}
                 initialItems={blogsResult.data}
-                totalPages={blogsResult.has_more_pages ? 999 : blogsResult.current_page}
+                totalPages={blogsResult.last_page || 1}
                 hasMore={blogsResult.has_more_pages}
                 blogTypes={blogTypes}
                 lang={lang}

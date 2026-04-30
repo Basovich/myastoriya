@@ -101,6 +101,8 @@ export interface BlogsPagination {
     from: number | null;
     to: number | null;
     has_more_pages: boolean;
+    total: number;
+    last_page: number;
     data: BlogPost[];
 }
 
@@ -130,6 +132,8 @@ const BLOGS_QUERY = /* GraphQL */ `
             from
             to
             has_more_pages
+            total
+            last_page
             data {
                 id
                 name
@@ -297,5 +301,28 @@ export async function hasBlogsApi(lang?: string): Promise<boolean> {
         return blogs.data.length > 0;
     } catch {
         return false;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Mutations
+// ---------------------------------------------------------------------------
+
+export const LIKE_BLOG_MUTATION = `
+    mutation LikeBlog($id: Int!) {
+        likeBlog(id: $id) {
+            id
+            likesCount
+        }
+    }
+`;
+
+export async function likeBlogApi(id: string): Promise<{ id: string; likesCount: number } | null> {
+    try {
+        const data = await gqlRequest<{ likeBlog: { id: string; likesCount: number } }>(LIKE_BLOG_MUTATION, { id: parseInt(id, 10) });
+        return data.likeBlog;
+    } catch (error) {
+        console.error("Error liking blog:", error);
+        return null;
     }
 }

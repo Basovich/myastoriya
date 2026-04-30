@@ -36,11 +36,7 @@ export default async function BlogTypePage({
     }
 
     const currentType = blogTypes.find((t) => t.slug === typeSlug);
-    let calculatedTotalPages = blogsResult.has_more_pages ? 999 : blogsResult.current_page;
-    
-    if (currentType?.blogsCount && blogsResult.per_page) {
-        calculatedTotalPages = Math.max(1, Math.ceil(currentType.blogsCount / blogsResult.per_page));
-    }
+    const calculatedTotalPages = blogsResult.last_page || 1;
 
     return (
         <main>

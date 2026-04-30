@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
             items: result.data,
             hasMore: result.has_more_pages,
             currentPage: result.current_page,
+            totalPages: result.last_page,
         });
     } catch (err) {
         const message = err instanceof Error ? err.message : "Помилка";
