@@ -26,10 +26,15 @@ export default function Hero({ slides, lang }: HeroProps) {
 
     // Helper to generate correct link from linkTo
     const getLink = (linkTo: Slide['linkTo']) => {
-        if (!linkTo || !linkTo.type || !linkTo.id) return "/actions";
-        if (linkTo.type === "product") return `/catalog/item/${linkTo.id}`;
-        if (linkTo.type === "category") return `/catalog/${linkTo.id}`;
-        return `/actions/${linkTo.id}`; // Default fallback for actions/sales
+        if (!linkTo || !linkTo.type) return "/actions";
+        
+        const identifier = linkTo.slug || linkTo.id;
+        if (!identifier) return "/actions";
+
+        if (linkTo.type === "product") return `/products/${identifier}`;
+        if (linkTo.type === "category") return `/catalog/${identifier}`;
+        if (linkTo.type === "page") return `/${identifier}`;
+        return `/actions/${identifier}`; // Default fallback for actions/sales
     };
 
     if (slides.length === 1) {
@@ -55,10 +60,10 @@ export default function Hero({ slides, lang }: HeroProps) {
                         
                         <div className={s.contentOverlay}>
                             <div className={s.content}>
-                                <AppLink href="#">
+                                <AppLink href={href}>
                                     <h1 className={s.title}>{slide.name}</h1>
                                 </AppLink>
-                                <Button href="#" variant="outline" className={s.ctaButton}>
+                                <Button href={href} variant="outline" className={s.ctaButton}>
                                     <span className={s.ctaButtonInner}>{btnText}</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                                         <path d="M9.98565 0.999945L16.3141 7.32837L9.98565 13.6568" stroke="white" strokeWidth="2" strokeLinecap="round"/>
@@ -90,6 +95,7 @@ export default function Hero({ slides, lang }: HeroProps) {
             >
                 {slides.map((slide, index) => {
                     const imageUrl = slide.imageWeb?.desktop || slide.image?.size3x || slide.image?.size2x || '';
+                    const slideHref = getLink(slide.linkTo);
 
                     return (
                         <SwiperSlide key={slide.id || index}>
@@ -108,10 +114,10 @@ export default function Hero({ slides, lang }: HeroProps) {
 
                                 <div className={s.contentOverlay}>
                                     <div className={s.content}>
-                                        <AppLink href="#">
+                                        <AppLink href={slideHref}>
                                             <h2 className={s.title}>{slide.name}</h2>
                                         </AppLink>
-                                        <Button href="#" variant="outline" className={s.ctaButton}>
+                                        <Button href={slideHref} variant="outline" className={s.ctaButton}>
                                             <span className={s.ctaButtonInner}>{btnText}</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                                                 <path d="M9.98565 0.999945L16.3141 7.32837L9.98565 13.6568" stroke="white" strokeWidth="2" strokeLinecap="round"/>

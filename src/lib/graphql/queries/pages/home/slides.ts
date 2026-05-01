@@ -15,6 +15,7 @@ export interface SlideImageWeb {
 export interface SlideLinkTo {
     type?: string | null;
     id?: string | null;
+    slug?: string | null;
 }
 
 export interface Slide {
@@ -43,6 +44,7 @@ export const SLIDES_QUERY = /* GraphQL */ `
             linkTo {
                 type
                 id
+                slug
             }
         }
     }
