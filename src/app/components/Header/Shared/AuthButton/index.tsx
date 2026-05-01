@@ -7,13 +7,15 @@ import { useAppSelector } from '@/store/hooks';
 import clsx from 'clsx';
 import s from './AuthButton.module.scss';
 import AuthModal from '@/app/components/AuthModal';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 
 export default function AuthButton() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter();
     const { user, isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
+    const hydrated = useIsHydrated();
 
-    const isReallyLoggedIn = isAuthenticated && !isGuest;
+    const isReallyLoggedIn = hydrated && isAuthenticated && !isGuest;
     const firstLetter = user?.email?.charAt(0)?.toUpperCase() || '?';
 
     const handleAuthClick = () => {

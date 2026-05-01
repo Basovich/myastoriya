@@ -67,9 +67,9 @@ export default function Categories({ lang, popularCategories }: CategoriesProps)
                         <SwiperSlide key={cat.id} className={s.slide}>
                             <AppLink href={`/catalog/${cat.slug || cat.id}`} className={s.item}>
                                 <div className={s.circle}>
-                                    {cat.image ? (
+                                    {(cat.image?.square2x || cat.image?.big2x || cat.image?.square1x || cat.image?.big1x) ? (
                                         <Image
-                                            src={cat.image.square2x || cat.image.big2x || cat.image.square1x || cat.image.big1x || "/icons/logo-red.svg"}
+                                            src={(cat.image?.square2x || cat.image?.big2x || cat.image?.square1x || cat.image?.big1x)!}
                                             alt={cat.name}
                                             width={180}
                                             height={180}

@@ -22,9 +22,12 @@ const TOP_NAV_ITEMS = [
     { label: "Контакти", href: "/contacts" },
 ];
 
+import { useIsHydrated } from "@/hooks/useIsHydrated";
+
 export default function TopBar({ lang }: TopBarProps) {
     const { isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
-    const isReallyLoggedIn = isAuthenticated && !isGuest;
+    const hydrated = useIsHydrated();
+    const isReallyLoggedIn = hydrated && isAuthenticated && !isGuest;
     const hasBlogs = useHasBlogs(lang);
 
     const navItems = [...TOP_NAV_ITEMS];
