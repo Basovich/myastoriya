@@ -20,6 +20,7 @@ export interface PopularCategory {
         big2x: string | null;
         big3x: string | null;
     } | null;
+    productsCount?: number;
 }
 
 const POPULAR_CATEGORIES_QUERY = /* GraphQL */ `
@@ -28,6 +29,7 @@ const POPULAR_CATEGORIES_QUERY = /* GraphQL */ `
             id
             name
             slug
+            productsCount
             menuIcon {
                 icon1x
                 icon2x
@@ -48,11 +50,35 @@ const POPULAR_CATEGORIES_QUERY = /* GraphQL */ `
     }
 `;
 
+import { getProductsApi } from "@/lib/graphql/queries/products";
+
 export async function getPopularCategoriesApi(lang?: string): Promise<PopularCategory[]> {
     const data = await gqlRequest<{ popularCategories: PopularCategory[] }>(
         POPULAR_CATEGORIES_QUERY,
         undefined,
         { next: { revalidate: 3600 }, lang },
     );
-    return data.popularCategories ?? [];
+    const categories = data.popularCategories ?? [];
+    
+    // Filter out categories that explicitly have 0 productsCount
+    const potentialCategories = categories.filter(cat => (cat.productsCount ?? 0) > 0);
+    
+    // Verify each category actually returns products when queried
+    // This handles discrepancies where productsCount > 0 but the product list is empty (e.g. all items unavailable)
+    const verifiedCategories = await Promise.all(
+        potentialCategories.map(async (cat) => {
+            try {
+                const productsResponse = await getProductsApi({ 
+                    categoryId: parseInt(cat.id), 
+                    limit: 1 
+                }, lang);
+                return productsResponse.data.length > 0 ? cat : null;
+            } catch (error) {
+                console.error(`Failed to verify products for category ${cat.id}:`, error);
+                return null;
+            }
+        })
+    );
+    
+    return verifiedCategories.filter((cat): cat is PopularCategory => cat !== null);
 }

@@ -19,14 +19,15 @@ interface HomePageProps {
   popularCategories: PopularCategory[];
   reviews: HomeReview[];
   initialProducts: Product[];
+  initialHasMore?: boolean;
 }
 
-export default function HomePage({ dict, lang, publications, slides, popularCategories, reviews, initialProducts }: HomePageProps) {
+export default function HomePage({ dict, lang, publications, slides, popularCategories, reviews, initialProducts, initialHasMore }: HomePageProps) {
     return (
         <main>
             <Hero slides={slides} lang={lang} />
             <Categories lang={lang} popularCategories={popularCategories} />
-            <Products dict={dict.home.products} categories={popularCategories} initialProducts={initialProducts} />
+            <Products dict={dict.home.products} categories={popularCategories} initialProducts={initialProducts} initialHasMore={initialHasMore} />
             <Actions dict={dict.home.actions} lang={lang} />
             <AppPromo />
             <ComplexDiscounts dict={dict.home.discounts} lang={lang} />

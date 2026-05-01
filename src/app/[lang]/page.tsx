@@ -34,6 +34,7 @@ export default async function Home({
           popularCategories={popularCategories}
           reviews={reviews}
           initialProducts={initialProductsResponse.data}
+          initialHasMore={initialProductsResponse.has_more_pages}
       />
   );
 }

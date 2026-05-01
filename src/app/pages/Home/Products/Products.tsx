@@ -22,9 +22,10 @@ interface ProductsProps {
     };
     categories: PopularCategory[];
     initialProducts: Product[];
+    initialHasMore?: boolean;
 }
 
-export default function Products({ dict, categories, initialProducts }: ProductsProps) {
+export default function Products({ dict, categories, initialProducts, initialHasMore }: ProductsProps) {
     const params = useParams();
     const locale = params?.lang as string;
     const [activeTab, setActiveTab] = useState(0);
@@ -32,7 +33,7 @@ export default function Products({ dict, categories, initialProducts }: Products
     const [loading, setLoading] = useState(false);
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
-    const [hasMore, setHasMore] = useState(true);
+    const [hasMore, setHasMore] = useState(initialHasMore ?? true);
     const [page, setPage] = useState(1);
 
     useEffect(() => {
@@ -191,13 +192,15 @@ export default function Products({ dict, categories, initialProducts }: Products
                         <ProductCard
                             key={`${product.id}-${idx}`}
                             id={product.id}
+                            slug={product.slug}
                             title={product.name}
                             weight={getWeight(product)}
                             price={product.cost}
                             unit={product.unit}
                             badge={getBadge(product)}
                             image={getImageUrl(product)}
-                        lang="ua" />
+                            lang="ua" 
+                        />
                     ))}
                 </div>
 
