@@ -65,7 +65,7 @@ export default function Categories({ lang, popularCategories }: CategoriesProps)
                 >
                     {popularCategories.map((cat) => (
                         <SwiperSlide key={cat.id} className={s.slide}>
-                            <AppLink href={`/catalog/${cat.id}`} className={s.item}>
+                            <AppLink href={`/catalog/${cat.slug || cat.id}`} className={s.item}>
                                 <div className={s.circle}>
                                     {cat.image?.big2x ? (
                                         <Image

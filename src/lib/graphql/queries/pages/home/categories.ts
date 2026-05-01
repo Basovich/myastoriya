@@ -3,6 +3,7 @@ import { gqlRequest } from "../../../client";
 export interface PopularCategory {
     id: string;
     name: string;
+    slug?: string | null;
     image: {
         big2x: string;
     } | null;
@@ -13,6 +14,7 @@ const POPULAR_CATEGORIES_QUERY = /* GraphQL */ `
         popularCategories {
             id
             name
+            slug
             image {
                 big2x
             }
