@@ -7,8 +7,6 @@ import { logoutApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter } from 'next/navigation';
 import { Locale } from '@/i18n/config';
-import Header from '@/app/components/Header/Header';
-import Footer from '@/app/components/Footer/Footer';
 import PersonalNav from '../PersonalNav/PersonalNav';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
@@ -86,7 +84,6 @@ export default function PersonalLayoutClient({ children, lang: paramsLang }: Per
 
     return (
         <main className={s.pageWrapper}>
-            <Header lang={lang} />
             <div className={s.personalPage}>
                 <div className={s.breadcrumbsWrapper}>
                     <Breadcrumbs items={breadcrumbItems} />
@@ -147,7 +144,6 @@ export default function PersonalLayoutClient({ children, lang: paramsLang }: Per
                     </div>
                 </div>
             </div>
-            <Footer lang={lang} />
         </main>
     );
 }

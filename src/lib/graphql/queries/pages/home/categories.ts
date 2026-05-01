@@ -10,7 +10,15 @@ export interface PopularCategory {
         icon3x: string | null;
     } | null;
     image: {
-        big2x: string;
+        square1x: string | null;
+        square2x: string | null;
+        square3x: string | null;
+        rectangle1x: string | null;
+        rectangle2x: string | null;
+        rectangle3x: string | null;
+        big1x: string | null;
+        big2x: string | null;
+        big3x: string | null;
     } | null;
 }
 
@@ -26,7 +34,15 @@ const POPULAR_CATEGORIES_QUERY = /* GraphQL */ `
                 icon3x
             }
             image {
+                square1x
+                square2x
+                square3x
+                rectangle1x
+                rectangle2x
+                rectangle3x
+                big1x
                 big2x
+                big3x
             }
         }
     }
