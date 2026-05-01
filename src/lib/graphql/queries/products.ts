@@ -13,6 +13,11 @@ export interface ProductCategory {
     id: string;
     name: string;
     slug: string;
+    menuIcon?: {
+        icon1x: string | null;
+        icon2x: string | null;
+        icon3x: string | null;
+    } | null;
     image?: {
         big1x: string | null;
         big2x: string | null;
@@ -250,6 +255,11 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
             id
             name
             slug
+            menuIcon {
+                icon1x
+                icon2x
+                icon3x
+            }
             image {
                 big1x
                 big2x
@@ -258,6 +268,11 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                 id
                 name
                 slug
+                menuIcon {
+                    icon1x
+                    icon2x
+                    icon3x
+                }
                 image {
                     big1x
                     big2x

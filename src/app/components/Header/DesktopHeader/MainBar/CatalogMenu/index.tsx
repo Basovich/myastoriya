@@ -11,6 +11,11 @@ interface Category {
     id: string;
     name: string;
     slug: string;
+    menuIcon?: {
+        icon1x: string | null;
+        icon2x: string | null;
+        icon3x: string | null;
+    } | null;
     image?: {
         big1x: string | null;
         big2x: string | null;
@@ -82,7 +87,15 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                     onClick={onClose}
                                 >
                                     <div className={s.iconWrapper}>
-                                        {cat.image?.big1x ? (
+                                        {cat.menuIcon?.icon1x ? (
+                                            <Image
+                                                src={cat.menuIcon.icon1x}
+                                                alt={cat.name}
+                                                width={16}
+                                                height={16}
+                                                className={s.icon}
+                                            />
+                                        ) : cat.image?.big1x ? (
                                             <Image
                                                 src={cat.image.big1x}
                                                 alt={cat.name}

@@ -14,7 +14,12 @@ interface HeaderProps {
 }
 
 export default function Header({ lang, initialCategories }: HeaderProps) {
-    const [categories, setCategories] = useState<ProductCategory[]>(initialCategories || []);
+    const getRootCategories = (list: ProductCategory[]) => {
+        const mainCat = list.find(c => String(c.id) === "768" || c.name.toLowerCase().includes("для сайта"));
+        return mainCat?.children || list;
+    };
+
+    const [categories, setCategories] = useState<ProductCategory[]>(() => getRootCategories(initialCategories || []));
 
     useEffect(() => {
         if (initialCategories && initialCategories.length > 0) return;
@@ -27,11 +32,11 @@ export default function Header({ lang, initialCategories }: HeaderProps) {
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
-                    setCategories(data);
+                    setCategories(getRootCategories(data));
                 }
             })
             .catch(err => console.error("Header: Failed to fetch categories:", err));
-    }, [lang]);
+    }, [lang, initialCategories]);
 
     return (
         <header className={s.header} id="header">

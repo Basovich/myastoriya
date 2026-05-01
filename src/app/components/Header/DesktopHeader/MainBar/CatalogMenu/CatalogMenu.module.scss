@@ -21,18 +21,19 @@
 }
 
 .sidebar {
-    width: calc((100vw - 830px) / 2);
+    width: calc((100vw - 730px) / 2);
     background: #F6F6F6;
     padding: 24px 0;
     overflow-y: auto;
     -ms-overflow-style: none;
-    /* IE and Edge */
     scrollbar-width: none;
-    /* Firefox */
 
     &::-webkit-scrollbar {
         display: none;
-        /* Chrome, Safari and Opera */
+    }
+
+    @media (min-width: 1440px) {
+        width: calc((100vw - 830px) / 2);
     }
 }
 
