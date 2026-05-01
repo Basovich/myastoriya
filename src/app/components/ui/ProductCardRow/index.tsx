@@ -52,14 +52,20 @@ export default function ProductCardRow({
         <div className={s.card}>
             <div className={s.imageWrap}>
                 <AppLink href={productUrl} className={s.imageLink}>
-                    <Image
-                        src={image}
-                        alt={title}
-                        className={s.productImg}
-                        width={400}
-                        height={300}
-                        priority
-                    />
+                    {image ? (
+                        <Image
+                            src={image}
+                            alt={title}
+                            className={s.productImg}
+                            width={400}
+                            height={300}
+                            priority
+                        />
+                    ) : (
+                        <div className={s.imageFallback}>
+                            <Image src="/icons/logo-red.svg" alt={title} width={80} height={80} />
+                        </div>
+                    )}
                 </AppLink>
                 <div className={s.overlayTop}>
                     {badge && (

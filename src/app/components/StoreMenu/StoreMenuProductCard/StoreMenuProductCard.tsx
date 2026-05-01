@@ -28,12 +28,18 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({
     return (
         <div className={s.card}>
             <div className={s.imageWrapper}>
-                <Image
-                    src={image}
-                    alt={title}
-                    fill
-                    className={s.productImg}
-                />
+                {image ? (
+                    <Image
+                        src={image}
+                        alt={title}
+                        fill
+                        className={s.productImg}
+                    />
+                ) : (
+                    <div className={s.imageFallback}>
+                        <Image src="/icons/logo-red.svg" alt={title} width={60} height={60} />
+                    </div>
+                )}
             </div>
             <div className={s.content}>
                 <h3 className={s.title}>{title}</h3>

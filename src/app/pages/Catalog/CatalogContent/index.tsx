@@ -46,7 +46,7 @@ function getImageUrl(product: Product): string {
         product.image?.url.main1x ||
         product.image?.url.big;
 
-    if (!url) return '/images/placeholder.png';
+    if (!url) return '';
     if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
     return url;
 }

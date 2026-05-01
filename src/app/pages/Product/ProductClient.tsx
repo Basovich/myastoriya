@@ -27,7 +27,7 @@ import type { BlogPost, Product } from '@/lib/graphql';
 // ---------------------------------------------------------------------------
 
 function getProductImageUrl(url: string): string {
-    if (!url) return '/images/placeholder.png';
+    if (!url) return '';
     if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
     return url;
 }
