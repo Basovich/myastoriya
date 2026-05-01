@@ -281,6 +281,10 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                     id
                     name
                     slug
+                    image {
+                        big1x
+                        big2x
+                    }
                 }
             }
         }

@@ -31,6 +31,7 @@ interface CatalogMenuProps {
 
 export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenuProps) {
     const [activeCategory, setActiveCategory] = useState<Category | null>(null);
+    const [hoveredSubCategory, setHoveredSubCategory] = useState<Category | null>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
     // Data Cleanup: Some categories in the API are both roots and children.
@@ -79,7 +80,10 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                             <li
                                 key={cat.id}
                                 className={clsx(s.categoryItem, activeCategory?.id === cat.id && s.active)}
-                                onMouseEnter={() => setActiveCategory(cat)}
+                                onMouseEnter={() => {
+                                    setActiveCategory(cat);
+                                    setHoveredSubCategory(null);
+                                }}
                             >
                                 <AppLink
                                     href={`/catalog/${cat.slug}`}
@@ -122,11 +126,16 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
 
                 <div className={s.content}>
                     <div className={s.bgImagesContainer}>
+                        {/* Root categories images */}
                         {displayCategories.map((cat) => (
                             cat.image?.big2x && (
                                 <div 
                                     key={cat.id} 
-                                    className={clsx(s.bgImageWrapper, activeCategory?.id === cat.id && s.visible)}
+                                    className={clsx(
+                                        s.bgImageWrapper, 
+                                        activeCategory?.id === cat.id && s.visible,
+                                        hoveredSubCategory?.image?.big2x && s.hiddenBySubHover // Fade out root if sub has image
+                                    )}
                                 >
                                     <Image
                                         src={cat.image.big2x}
@@ -138,14 +147,35 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                 </div>
                             )
                         ))}
+
+                        {/* Active category sub-images (for hover effect) */}
+                        {activeCategory?.children?.map((sub) => (
+                            sub.image?.big2x && (
+                                <div 
+                                    key={sub.id} 
+                                    className={clsx(s.bgImageWrapper, hoveredSubCategory?.id === sub.id && s.visible)}
+                                >
+                                    <Image
+                                        src={sub.image.big2x}
+                                        alt=""
+                                        fill
+                                        className={s.bgImage}
+                                    />
+                                </div>
+                            )
+                        ))}
                     </div>
 
                     {activeCategory && (
                         <div className={s.subContent}>
                             {activeCategory.children && activeCategory.children.length > 0 && (
-                                <ul className={s.subList}>
+                                <ul className={s.subList} onMouseLeave={() => setHoveredSubCategory(null)}>
                                     {activeCategory.children.map((sub) => (
-                                        <li key={sub.id} className={s.subItem}>
+                                        <li 
+                                            key={sub.id} 
+                                            className={s.subItem}
+                                            onMouseEnter={() => setHoveredSubCategory(sub)}
+                                        >
                                             <AppLink
                                                 href={`/catalog/${sub.slug}`}
                                                 className={s.subLink}

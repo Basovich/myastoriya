@@ -122,6 +122,10 @@
         opacity: 1;
     }
 
+    &.hiddenBySubHover {
+        opacity: 0;
+    }
+
     &::after {
         content: '';
         position: absolute;
