@@ -121,36 +121,43 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                 </div>
 
                 <div className={s.content}>
-                    {activeCategory && (
-                        <>
-                            <div className={s.bgImageWrapper} key={activeCategory.id}>
-                                <Image
-                                    src={activeCategory.image?.big2x || "/images/catalog-bg.png"}
-                                    alt="Background"
-                                    fill
-                                    className={s.bgImage}
-                                    priority
-                                />
-                            </div>
+                    <div className={s.bgImagesContainer}>
+                        {displayCategories.map((cat) => (
+                            cat.image?.big2x && (
+                                <div 
+                                    key={cat.id} 
+                                    className={clsx(s.bgImageWrapper, activeCategory?.id === cat.id && s.visible)}
+                                >
+                                    <Image
+                                        src={cat.image.big2x}
+                                        alt=""
+                                        fill
+                                        className={s.bgImage}
+                                        priority={activeCategory?.id === cat.id}
+                                    />
+                                </div>
+                            )
+                        ))}
+                    </div>
 
-                            <div className={s.subContent}>
-                                {activeCategory.children && activeCategory.children.length > 0 && (
-                                    <ul className={s.subList}>
-                                        {activeCategory.children.map((sub) => (
-                                            <li key={sub.id} className={s.subItem}>
-                                                <AppLink
-                                                    href={`/catalog/${sub.slug}`}
-                                                    className={s.subLink}
-                                                    onClick={onClose}
-                                                >
-                                                    <span className={s.subTitleText}>{sub.name}</span>
-                                                </AppLink>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
-                        </>
+                    {activeCategory && (
+                        <div className={s.subContent}>
+                            {activeCategory.children && activeCategory.children.length > 0 && (
+                                <ul className={s.subList}>
+                                    {activeCategory.children.map((sub) => (
+                                        <li key={sub.id} className={s.subItem}>
+                                            <AppLink
+                                                href={`/catalog/${sub.slug}`}
+                                                className={s.subLink}
+                                                onClick={onClose}
+                                            >
+                                                <span className={s.subTitleText}>{sub.name}</span>
+                                            </AppLink>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>

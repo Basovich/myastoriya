@@ -100,14 +100,27 @@
     overflow: hidden;
 }
 
-.bgImageWrapper {
+.bgImagesContainer {
     position: absolute;
     top: 0;
     right: 0;
     width: 755px;
-    /* Matches Figma rectangle */
     height: 100%;
-    animation: fadeIn 0.4s ease-out;
+}
+
+.bgImageWrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+
+    &.visible {
+        opacity: 1;
+    }
 
     &::after {
         content: '';
@@ -117,16 +130,6 @@
         width: 100%;
         height: 100%;
         background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0) 60%);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
     }
 }
 
