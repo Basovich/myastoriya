@@ -59,23 +59,12 @@ export const revalidate = 3600; // Revalidate at most every hour
  * Now safer with limited build concurrency (cpus: 2 in next.config.ts)
  */
 export async function generateStaticParams() {
-    try {
-        const limit = 100;
-        const allSlugs: { slug: string }[] = [];
-        let page = 1;
-
-        while (true) {
-            const response = await getProductsApi({ limit, page });
-            for (const p of response.data) {
-                if (p.slug) allSlugs.push({ slug: p.slug });
-            }
-            if (!response.has_more_pages || page >= 20) break; // Safety cap at 2000 products for now
-            page++;
-        }
-
-        return allSlugs;
-    } catch (error) {
-        console.warn('[Products] Failed to generate static params:', error);
-        return [];
-    }
+    /**
+     * [LIGHTWEIGHT BUILD] 
+     * To avoid overwhelming the dev-API with thousands of requests during build 
+     * (causing 504 Gateway Timeouts), we return an empty array here.
+     * 
+     * Product pages will be generated on-demand when first visited (ISR).
+     */
+    return [];
 }

@@ -5,15 +5,11 @@ import { getBlogsApi, getBlogTypesApi } from "@/lib/graphql/queries/blog";
 import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
-    try {
-        const types = await getBlogTypesApi();
-        return types.map((type) => ({
-            typeSlug: type.slug,
-        }));
-    } catch (error) {
-        console.error('[Blog] Failed to generate static params for blog types:', error);
-        return [];
-    }
+    /**
+     * [LIGHTWEIGHT BUILD]
+     * Return empty array to reduce build-time API calls.
+     */
+    return [];
 }
 
 export default async function BlogTypePage({

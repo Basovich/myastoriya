@@ -36,8 +36,8 @@ interface RequestOptions {
     _retryCount?: number;
 }
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 1000;
+const MAX_RETRIES = 5;
+const RETRY_DELAY_MS = 2000;
 
 /**
  * Helper to detect files/blobs in variables

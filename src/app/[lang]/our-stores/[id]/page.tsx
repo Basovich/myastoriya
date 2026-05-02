@@ -34,13 +34,9 @@ export default async function StorePage({
 }
 
 export async function generateStaticParams() {
-    try {
-        const response = await getShopsApi({ limit: 100 });
-        return response.shops.data.map((shop) => ({
-            id: shop.id.toString(),
-        }));
-    } catch (error) {
-        console.error("Failed to generate static params:", error);
-        return [];
-    }
+    /**
+     * [LIGHTWEIGHT BUILD]
+     * Disable pre-generation to avoid 504 errors on dev-API.
+     */
+    return [];
 }
