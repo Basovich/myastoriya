@@ -3,6 +3,7 @@
 import { Provider } from 'react-redux';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { store } from './index';
+import { GOOGLE_CLIENT_ID } from '@/lib/constants';
 
 /**
  * Provides the Redux store and Google OAuth context to the application.
@@ -15,11 +16,9 @@ import { store } from './index';
  * are rehydrated silently after first paint via the REHYDRATE action.
  */
 export default function ReduxProvider({ children }: { children: React.ReactNode }) {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-
     return (
         <Provider store={store}>
-            <GoogleOAuthProvider clientId={clientId ?? ''}>
+            <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
                 {children}
             </GoogleOAuthProvider>
         </Provider>
