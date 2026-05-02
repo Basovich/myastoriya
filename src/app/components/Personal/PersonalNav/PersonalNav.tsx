@@ -231,18 +231,6 @@ const PersonalNav: React.FC<PersonalNavProps> = ({ dict, onLogout, user, isMobil
                     );
                 })}
                 
-                <div className={s.separator} />
-                <button
-                    className={s.navItem}
-                    onClick={() => {
-                        handleLinkClick();
-                        onLogout();
-                    }}
-                    style={{ border: 'none', background: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit' }}
-                >
-                    <span className={s.linkIcon}>{renderIcon('logout', false)}</span>
-                    <span className={s.linkLabel}>{dict.logout}</span>
-                </button>
             </nav>
         </>
     );
