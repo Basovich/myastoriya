@@ -303,7 +303,7 @@
     }
 
     @media (any-hover: hover) {
-        &:hover {
+        &:not(.active):hover {
             opacity: 0.8;
         }
     }
