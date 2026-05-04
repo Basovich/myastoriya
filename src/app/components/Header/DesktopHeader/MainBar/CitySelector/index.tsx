@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import {
     setSelectedCity,
@@ -62,7 +63,7 @@ export default function CitySelector({
     const dispatch = useAppDispatch();
     const t = translations[lang] || translations.ua;
 
-    const [mounted, setMounted] = useState(false);
+    const hydrated = useIsHydrated();
     
     // Redux State
     const { 
@@ -88,17 +89,17 @@ export default function CitySelector({
     const wrapperRef = useRef<HTMLDivElement>(null);
     const hasDetectedRef = useRef(false);
 
-    // 1. Mount stabilization and UI state reset
+    // 1. UI state reset on hydration
     useEffect(() => {
-        setMounted(true);
+        if (!hydrated) return;
         // Reset UI states on mount to avoid persistence after reload
         dispatch(setManualSelectionOpen(false));
         dispatch(setPromptVisible(false));
-    }, [dispatch]);
+    }, [dispatch, hydrated]);
 
     // 2. Initial city detection logic (Centralized in Global UI instance)
     useEffect(() => {
-        if (!mounted || !renderGlobalUI || hasDetectedRef.current || isPromptInteractionDone) return;
+        if (!hydrated || !renderGlobalUI || hasDetectedRef.current || isPromptInteractionDone) return;
         
         const detectCity = async () => {
             hasDetectedRef.current = true;
@@ -132,20 +133,20 @@ export default function CitySelector({
         };
 
         detectCity();
-    }, [mounted, renderGlobalUI, isPromptInteractionDone, selectedCity, dispatch, lang]);
+    }, [hydrated, renderGlobalUI, isPromptInteractionDone, selectedCity, dispatch, lang]);
 
     // 3. Prompt Visibility Trigger (Observer pattern)
     // This ensures the prompt shows up whenever we have a city but no interaction yet
     useEffect(() => {
-        if (mounted && renderGlobalUI && selectedCity && !isPromptInteractionDone && !isPromptVisible) {
+        if (hydrated && renderGlobalUI && selectedCity && !isPromptInteractionDone && !isPromptVisible) {
             dispatch(setPromptVisible(true));
         }
-    }, [mounted, renderGlobalUI, selectedCity, isPromptInteractionDone, isPromptVisible, dispatch]);
+    }, [hydrated, renderGlobalUI, selectedCity, isPromptInteractionDone, isPromptVisible, dispatch]);
 
     // 3. Initial cities fetch for dropdown
     useEffect(() => {
         // Redux already has cities or is loading? Skip.
-        if (!mounted || !isManualSelectionOpen || allCities.length > 0 || isLoadingCities) return;
+        if (!hydrated || !isManualSelectionOpen || allCities.length > 0 || isLoadingCities) return;
 
         const fetchInitialCities = async () => {
             dispatch(setIsLoadingCities(true));
@@ -161,11 +162,11 @@ export default function CitySelector({
             }
         };
         fetchInitialCities();
-    }, [mounted, isManualSelectionOpen, allCities.length, isLoadingCities, lang, dispatch]);
+    }, [hydrated, isManualSelectionOpen, allCities.length, isLoadingCities, lang, dispatch]);
 
     // 4. Search logic with debounce
     useEffect(() => {
-        if (!mounted) return;
+        if (!hydrated) return;
 
         if (searchQuery.length >= 2) {
             const searchCities = async () => {
@@ -186,11 +187,11 @@ export default function CitySelector({
         } else {
             setSearchResults([]);
         }
-    }, [mounted, searchQuery, lang]);
+    }, [hydrated, searchQuery, lang]);
 
     // 5. Click outside handler (Global instance only)
     useEffect(() => {
-        if (!mounted || !renderGlobalUI) return;
+        if (!hydrated || !renderGlobalUI) return;
 
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as Element;
@@ -200,7 +201,7 @@ export default function CitySelector({
 
         document.addEventListener('click', handleClickOutside, true);
         return () => document.removeEventListener('click', handleClickOutside, true);
-    }, [mounted, renderGlobalUI, dispatch]);
+    }, [hydrated, renderGlobalUI, dispatch]);
 
     const handleLoadMore = async () => {
         if (isLoadingMore) return;
@@ -358,7 +359,7 @@ export default function CitySelector({
         </>
     );
 
-    if (!mounted) {
+    if (!hydrated) {
         return (
             <div className={s.wrapper}>
                 {renderSelector && (
@@ -377,7 +378,7 @@ export default function CitySelector({
     }
 
     return (
-        <div className={s.wrapper} ref={wrapperRef} suppressHydrationWarning>
+        <div className={s.wrapper} ref={wrapperRef}>
             {renderSelector && (
                 <>
                     <div className={s.citySelector} onClick={toggleDropdown}>

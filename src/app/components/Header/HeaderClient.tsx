@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import s from "./Header.module.scss";
+import s from "./HeaderClient.module.scss";
 import { type Locale } from "@/i18n/config";
-import MobileHeader from "./MobileHeader";
-import DesktopHeader from "./DesktopHeader";
+import MobileHeader from "./MobileHeader/MobileHeaderClient";
+import DesktopHeader from "./DesktopHeader/DesktopHeaderClient";
 import CitySelector from "./DesktopHeader/MainBar/CitySelector";
 import { ProductCategory } from "@/lib/graphql/queries/products";
 
@@ -13,7 +13,7 @@ interface HeaderProps {
     initialCategories?: ProductCategory[];
 }
 
-export default function Header({ lang, initialCategories }: HeaderProps) {
+export default function HeaderClient({ lang, initialCategories }: HeaderProps) {
     const getRootCategories = (list: ProductCategory[]) => {
         const mainCat = list.find(c => String(c.id) === "768" || c.name.toLowerCase().includes("для сайта"));
         return mainCat?.children || list;

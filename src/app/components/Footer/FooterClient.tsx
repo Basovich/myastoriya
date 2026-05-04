@@ -1,6 +1,6 @@
 "use client";
 
-import s from "./Footer.module.scss";
+import s from "./FooterClient.module.scss";
 import { siteData } from "@/config/site";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
@@ -17,7 +17,7 @@ interface FooterProps {
     initialSocialLinks?: SocialLink[];
 }
 
-export default function Footer({ lang, initialSocialLinks }: FooterProps) {
+export default function FooterClient({ lang, initialSocialLinks }: FooterProps) {
     const hasBlogs = useHasBlogs(lang);
     const { footer, contact } = siteData;
     

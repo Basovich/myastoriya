@@ -5,7 +5,7 @@ import { siteData } from "@/config/site";
 import { i18n } from "@/i18n/config";
 import clsx from "clsx";
 import ReduxProvider from "@/store/ReduxProvider";
-import AuthInitializer from "@/app/components/AuthInitializer/AuthInitializer";
+import AuthInitializer from "@/app/components/AuthInitializer/AuthInitializerClient";
 
 const houschka = localFont({
   src: [
@@ -104,8 +104,8 @@ export async function generateStaticParams() {
 
 import { getCatalogTreeApi } from "@/lib/graphql/queries/products";
 import { getSocialLinksApi } from "@/lib/graphql/queries/settings";
-import Header from "@/app/components/Header/Header";
-import Footer from "@/app/components/Footer/Footer";
+import Header from "@/app/components/Header/HeaderClient";
+import Footer from "@/app/components/Footer/FooterClient";
 
 export default async function RootLayout({
   children,

@@ -12,7 +12,7 @@ interface MobileHeaderProps {
     categories: ProductCategory[];
 }
 
-export default function MobileHeader({ lang, categories }: MobileHeaderProps) {
+export default function MobileHeaderClient({ lang, categories }: MobileHeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { disableScroll, enableScroll } = useScrollLock();
 

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
 import TopBar from "@/app/components/Header/DesktopHeader/TopBar";
 import MainBar from "@/app/components/Header/DesktopHeader/MainBar";
-import s from "./DesktopHeader.module.scss";
+import s from "./DesktopHeaderClient.module.scss";
 import { type Locale } from "@/i18n/config";
 import { ProductCategory } from "@/lib/graphql/queries/products";
 
@@ -13,7 +13,7 @@ interface DesktopHeaderProps {
     categories: ProductCategory[];
 }
 
-export default function DesktopHeader({ lang, categories }: DesktopHeaderProps) {
+export default function DesktopHeaderClient({ lang, categories }: DesktopHeaderProps) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isScrolledMenuOpen, setIsScrolledMenuOpen] = useState(false);
     const [placeholderHeight, setPlaceholderHeight] = useState(0);

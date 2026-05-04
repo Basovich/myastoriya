@@ -15,14 +15,14 @@ export default async function Home({
   const { lang } = await params;
   const dict = await getDictionary(lang);
 
-  const popularCategories = await getPopularCategoriesApi();
+  const popularCategories = await getPopularCategoriesApi(lang);
   const firstCategoryId = popularCategories.length > 0 ? parseInt(popularCategories[0].id) : null;
 
   const [blogsResponse, slides, reviews, initialProductsResponse] = await Promise.all([
-    getBlogsApi({ limit: 3 }),
-    getSlidesApi("main"),
-    getReviewsApi(),
-    getProductsApi({ categoryId: firstCategoryId, limit: 8 })
+    getBlogsApi({ limit: 3 }, lang),
+    getSlidesApi("main", lang),
+    getReviewsApi(lang),
+    getProductsApi({ categoryId: firstCategoryId, limit: 8 }, lang)
   ]);
 
   return (

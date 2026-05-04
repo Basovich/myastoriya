@@ -132,6 +132,15 @@ const PRODUCTS_QUERY = /* GraphQL */ `
                         big
                     }
                 }
+                images {
+                    url {
+                        grid2x
+                        grid1x
+                        main2x
+                        main1x
+                        big
+                    }
+                }
             }
         }
     }
@@ -205,14 +214,6 @@ const VIEWED_PRODUCTS_QUERY = /* GraphQL */ `
                 unit
                 multiplier
                 is_new
-                images {
-                    url {
-                        grid2x
-                        grid1x
-                        main2x
-                        main1x
-                    }
-                }
                 images {
                     url {
                         grid2x

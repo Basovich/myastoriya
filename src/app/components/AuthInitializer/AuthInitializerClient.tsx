@@ -18,7 +18,7 @@ import * as Sentry from "@sentry/nextjs";
  *  3. If refresh also fails → fall through to authAsGuest.
  *  4. If no access_token at all → authAsGuest immediately.
  */
-export default function AuthInitializer() {
+export default function AuthInitializerClient() {
     const dispatch = useAppDispatch();
     const initialised = useRef(false);
     const { user, isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
