@@ -120,8 +120,8 @@ export async function gqlRequest<T>(
         const res = await fetch(GQL_ENDPOINT, {
             method: 'POST',
             headers,
-            credentials: 'include',
             body,
+            ...(isServer ? {} : { credentials: 'include' }),
             ...(options?.next ? { next: options.next } : {}),
         });
 
@@ -201,17 +201,19 @@ export async function gqlRequest<T>(
 
         // Final attempt failed - report to Sentry before crashing the build
         if (isServer) {
-            const Sentry = require("@sentry/nextjs");
-            Sentry.captureException(err, {
-                tags: { 
-                    component: 'gqlRequest',
-                    query: query.split('{')[0].trim() || 'unknown',
-                    isBuild: process.env.SENTRY_ENVIRONMENT === 'build'
-                },
-                extra: { variables, options }
-            });
-            // Ensure Sentry has time to send the error before the process might be killed
-            await Sentry.flush(2000).catch(() => {});
+            try {
+                const Sentry = require("@sentry/nextjs");
+                Sentry.captureException(err, {
+                    tags: { 
+                        component: 'gqlRequest',
+                        query: query.split('{')[0].trim() || 'unknown',
+                    },
+                    extra: { variables, options }
+                });
+                await Sentry.flush(2000).catch(() => {});
+            } catch (sentryErr) {
+                // Ignore sentry import errors during build/static rendering
+            }
         }
 
         throw err;

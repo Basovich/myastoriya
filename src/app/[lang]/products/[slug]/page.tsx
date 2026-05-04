@@ -52,7 +52,7 @@ export default async function ProductPage({ params }: Props) {
  * Pre-generates all product pages at build time.
  * Slug is used as the route param — no id in the URL.
  */
-export const revalidate = 3600; // Revalidate at most every hour
+export const dynamic = 'force-dynamic';
 
 /**
  * Generate static params for all products.

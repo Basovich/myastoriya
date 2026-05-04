@@ -103,18 +103,18 @@ const ProductClient: React.FC<ProductClientProps> = ({
 
     // Build display data from real product — читаємо з images[], бо image завжди null
     const mainEntry = product.images?.[0] ?? product.image ?? null;
-    const mainImageUrl = mainEntry?.url.main2x ||
-        mainEntry?.url.main1x ||
-        mainEntry?.url.grid2x ||
-        mainEntry?.url.grid1x ||
-        mainEntry?.url.big || '';
+    const mainImageUrl = mainEntry?.url?.main2x ||
+        mainEntry?.url?.main1x ||
+        mainEntry?.url?.grid2x ||
+        mainEntry?.url?.grid1x ||
+        mainEntry?.url?.big || '';
 
     const resolvedMain = getProductImageUrl(mainImageUrl);
 
     // Будуємо галерею з усіх зображень товару
     const displayImages = product.images && product.images.length > 0
         ? product.images.map(img => {
-            const url = img.url.main2x || img.url.main1x || img.url.grid2x || img.url.grid1x || img.url.big || '';
+            const url = img?.url?.main2x || img?.url?.main1x || img?.url?.grid2x || img?.url?.grid1x || img?.url?.big || '';
             return getProductImageUrl(url);
           }).filter(Boolean)
         : resolvedMain

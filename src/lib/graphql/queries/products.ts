@@ -73,11 +73,11 @@ export interface Product {
 export function resolveProductImageUrl(product: Product): string {
     const entry = product.images?.[0] ?? product.image ?? null;
     const url =
-        entry?.url.grid2x ||
-        entry?.url.main2x ||
-        entry?.url.grid1x ||
-        entry?.url.main1x ||
-        entry?.url.big ||
+        entry?.url?.grid2x ||
+        entry?.url?.main2x ||
+        entry?.url?.grid1x ||
+        entry?.url?.main1x ||
+        entry?.url?.big ||
         null;
 
     if (!url) return '';
@@ -119,7 +119,11 @@ const PRODUCTS_QUERY = /* GraphQL */ `
                 multiplier
                 is_new
                 available
-                images {
+                specifications {
+                    name
+                    values
+                }
+                image {
                     url {
                         grid2x
                         grid1x
@@ -127,10 +131,6 @@ const PRODUCTS_QUERY = /* GraphQL */ `
                         main1x
                         big
                     }
-                }
-                specifications {
-                    name
-                    values
                 }
             }
         }
@@ -213,6 +213,15 @@ const VIEWED_PRODUCTS_QUERY = /* GraphQL */ `
                         main1x
                     }
                 }
+                images {
+                    url {
+                        grid2x
+                        grid1x
+                        main2x
+                        main1x
+                        big
+                    }
+                }
                 specifications {
                     name
                     values
@@ -257,8 +266,8 @@ export async function findProductIdBySlug(
     slug: string,
     lang?: string,
 ): Promise<string | null> {
-    const limit = 100;
-    const maxPages = 20;
+    const limit = 500;
+    const maxPages = 5;
 
     // Minimal fields query — just id and slug for fast resolution
     const SLUG_SCAN_QUERY = /* GraphQL */ `
