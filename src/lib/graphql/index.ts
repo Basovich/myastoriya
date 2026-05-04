@@ -75,6 +75,10 @@ export type { PopularCategory } from './queries/pages/home/categories';
 export { getReviewsApi } from './queries/pages/home/reviews';
 export type { HomeReview, ReviewUser } from './queries/pages/home/reviews';
 
+// Re-export sales
+export { getSalesApi } from './queries/pages/home/sales';
+export type { Sale, SaleImages, SalesResponse } from './queries/pages/home/sales';
+
 // Re-export localities
 export {
     autoDetectLocalityApi,

@@ -5,7 +5,7 @@ import { getBlogsApi } from "@/lib/graphql/queries/blog";
 import { getSlidesApi } from "@/lib/graphql/queries/pages/home/slides";
 import { getPopularCategoriesApi } from "@/lib/graphql/queries/pages/home/categories";
 import { getReviewsApi } from "@/lib/graphql/queries/pages/home/reviews";
-import { getProductsApi, getCatalogTreeApi } from "@/lib/graphql/queries/products";
+import { getProductsApi, getCatalogTreeApi, getSalesApi } from "@/lib/graphql";
 
 export default async function Home({
   params,
@@ -18,11 +18,12 @@ export default async function Home({
   const popularCategories = await getPopularCategoriesApi(lang);
   const firstCategoryId = popularCategories.length > 0 ? parseInt(popularCategories[0].id) : null;
 
-  const [blogsResponse, slides, reviews, initialProductsResponse] = await Promise.all([
+  const [blogsResponse, slides, reviews, initialProductsResponse, salesResponse] = await Promise.all([
     getBlogsApi({ limit: 3 }, lang),
     getSlidesApi("main", lang),
     getReviewsApi(lang),
-    getProductsApi({ categoryId: firstCategoryId, limit: 8 }, lang)
+    getProductsApi({ categoryId: firstCategoryId, limit: 8 }, lang),
+    getSalesApi(6, 1, lang)
   ]);
 
   return (
@@ -35,6 +36,7 @@ export default async function Home({
           reviews={reviews}
           initialProducts={initialProductsResponse.data}
           initialHasMore={initialProductsResponse.has_more_pages}
+          sales={salesResponse.data}
       />
   );
 }

@@ -10,11 +10,16 @@ import 'swiper/css/navigation';
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
+import { type Sale } from "@/lib/graphql";
+import { useMemo } from "react";
+import { format } from "date-fns";
+import { uk } from "date-fns/locale";
 
 interface ActionItem {
     id: number;
     title: string;
-    image: string;
+    slug: string | null;
+    image: string | null;
     date: string;
     discount?: string | null;
 }
@@ -25,13 +30,44 @@ interface ActionsProps {
         items: ActionItem[];
     };
     lang: string;
+    sales?: Sale[];
 }
 
-export default function Actions({ dict, lang }: ActionsProps) {
+export default function Actions({ dict, lang, sales }: ActionsProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
-    if (!dict || !dict.items || dict.items.length === 0) return null;
+    const itemsToRender = useMemo(() => {
+        if (sales && sales.length > 0) {
+            return sales.map(sale => {
+                // Try to extract discount from name (e.g. "-20%")
+                const discountMatch = sale.name.match(/-(\d+)%/);
+                const discount = discountMatch ? discountMatch[1] : null;
+
+                // Format date
+                let formattedDate = sale.expiresAt || "";
+                try {
+                    if (sale.expiresAt) {
+                        formattedDate = format(new Date(sale.expiresAt), "dd.MM.yyyy", { locale: uk });
+                    }
+                } catch (e) {
+                    console.error("Failed to format date:", sale.expiresAt);
+                }
+
+                return {
+                    id: parseInt(sale.id),
+                    title: sale.name,
+                    slug: sale.slug || sale.id,
+                    image: sale.image?.size2x || sale.image?.size1x || null,
+                    date: formattedDate,
+                    discount
+                };
+            });
+        }
+        return dict.items;
+    }, [sales, dict.items]);
+
+    if (!dict || itemsToRender.length === 0) return null;
 
     return (
         <section className={s.section} id="actions">
@@ -70,18 +106,30 @@ export default function Actions({ dict, lang }: ActionsProps) {
                             spaceBetween: 20
                         },
                         1280: {
-                            slidesPerView: 2.4,
+                            slidesPerView: 2.3,
                             spaceBetween: 20
                         }
                     }}
                     className={s.swiper}
                 >
-                    {dict.items.map((item, idx) => (
+                    {itemsToRender.map((item, idx) => (
                         <SwiperSlide key={`${item.id}-${idx}`} className={s.slide}>
-                            <AppLink href={`/actions/${item.id}`} className={s.cardLink}>
+                            <AppLink href={`/actions/${item.slug}`} className={s.cardLink}>
                                 <div className={s.card}>
                                     <div className={s.cardImage}>
-                                        <Image src={item.image} alt={item.title} fill className={s.cardImg} />
+                                        {item.image ? (
+                                            <Image src={item.image} alt={item.title} fill className={s.cardImg} />
+                                        ) : (
+                                            <div className={s.placeholder}>
+                                                <Image 
+                                                    src="/icons/logo-red.svg" 
+                                                    alt="Myastoriya" 
+                                                    width={120} 
+                                                    height={40} 
+                                                    className={s.placeholderLogo} 
+                                                />
+                                            </div>
+                                        )}
                                         {item.discount && (
                                             <div className={s.discountBadge}>
                                                 -{item.discount}%
