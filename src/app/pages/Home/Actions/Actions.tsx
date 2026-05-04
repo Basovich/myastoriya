@@ -15,19 +15,19 @@ import { useMemo } from "react";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
 
-interface ActionItem {
+interface DictActionItem {
     id: number;
     title: string;
-    slug: string | null;
-    image: string | null;
+    image: string;
     date: string;
     discount?: string | null;
+    slug?: string | null;
 }
 
 interface ActionsProps {
     dict: {
         sectionTitle: string;
-        items: ActionItem[];
+        items: DictActionItem[];
     };
     lang: string;
     sales?: Sale[];
@@ -64,8 +64,11 @@ export default function Actions({ dict, lang, sales }: ActionsProps) {
                 };
             });
         }
-        return dict.items;
-    }, [sales, dict.items]);
+        return dict?.items?.map(item => ({
+            ...item,
+            slug: item.slug || item.id.toString()
+        })) || [];
+    }, [sales, dict?.items]);
 
     if (!dict || itemsToRender.length === 0) return null;
 

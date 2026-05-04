@@ -6,7 +6,6 @@ async function testShowcases() {
             showcases {
                 id
                 name
-                slug
             }
         }
     `;

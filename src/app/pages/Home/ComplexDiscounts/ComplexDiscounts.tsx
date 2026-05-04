@@ -49,8 +49,8 @@ export default function ComplexDiscounts({ dict, lang, specials }: ComplexDiscou
                     };
                 });
         }
-        return dict.items.slice(0, 6);
-    }, [specials, dict.items]);
+        return dict?.items?.slice(0, 6) || [];
+    }, [specials, dict?.items]);
 
     if (!dict || itemsToRender.length === 0) return null;
 

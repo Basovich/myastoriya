@@ -33,6 +33,7 @@ export {
     findProductIdBySlug,
     getCategoriesApi,
     resolveProductImageUrl,
+    getCatalogTreeApi,
 } from './queries/products';
 export type {
     Product,

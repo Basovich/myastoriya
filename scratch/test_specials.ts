@@ -3,12 +3,19 @@ import { gqlRequest } from '../src/lib/graphql/client';
 async function testSpecials() {
     const query = `
         query Specials {
-            specials(limit: 10) {
+            specials(limit: 50) {
                 data {
                     id
-                    name
-                    image {
-                        grid2x
+                    title
+                    oldCost
+                    cost
+                    amount
+                    discountType
+                    images {
+                        url {
+                            grid2x
+                            grid3x
+                        }
                     }
                 }
             }
