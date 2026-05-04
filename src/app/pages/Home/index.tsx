@@ -19,8 +19,9 @@ interface HomePageProps {
   popularCategories: PopularCategory[];
   reviews: HomeReview[];
   initialProducts: Product[];
-  initialHasMore?: boolean;
+  initialHasMore: boolean;
   sales: any[];
+  specials: any[];
 }
 
 export default function HomePage({ 
@@ -32,7 +33,8 @@ export default function HomePage({
     reviews, 
     initialProducts, 
     initialHasMore,
-    sales
+    sales,
+    specials
 }: HomePageProps) {
     return (
         <main>
@@ -41,7 +43,7 @@ export default function HomePage({
             <Products dict={dict.home.products} categories={popularCategories} initialProducts={initialProducts} initialHasMore={initialHasMore} />
             <Actions dict={dict.home.actions} lang={lang} sales={sales} />
             <AppPromo />
-            <ComplexDiscounts dict={dict.home.discounts} lang={lang} />
+            <ComplexDiscounts dict={dict.home.discounts} lang={lang} specials={specials} />
             <Publications dict={dict.home.publications} posts={publications} lang={lang} />
             <Reviews dict={dict.home.reviews} reviews={reviews} />
             <SeoText dict={dict.home.seo} />

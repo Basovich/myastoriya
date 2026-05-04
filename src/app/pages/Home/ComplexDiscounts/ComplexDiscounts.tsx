@@ -10,6 +10,8 @@ import 'swiper/css/navigation';
 import Image from "next/image";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
+import { useMemo } from "react";
+import { type Special } from "@/lib/graphql";
 
 interface DiscountItem {
     id: number;
@@ -25,13 +27,32 @@ interface ComplexDiscountsProps {
         items: DiscountItem[];
     };
     lang: string;
+    specials?: Special[];
 }
 
-export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) {
+export default function ComplexDiscounts({ dict, lang, specials }: ComplexDiscountsProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
-    if (!dict || !dict.items || dict.items.length === 0) return null;
+    const itemsToRender = useMemo(() => {
+        if (specials && specials.length > 0) {
+            return specials
+                .slice(0, 6)
+                .map(special => {
+                    const image = special.images?.[0]?.url?.grid2x || special.images?.[0]?.url?.grid3x || null;
+                    return {
+                        id: parseInt(special.id),
+                        title: special.title || "",
+                        image: image,
+                        dateRange: "", 
+                        discount: special.amount ? `-${special.amount}%` : null
+                    };
+                });
+        }
+        return dict.items.slice(0, 6);
+    }, [specials, dict.items]);
+
+    if (!dict || itemsToRender.length === 0) return null;
 
 
 
@@ -71,12 +92,24 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                     }}
                     className={s.swiper}
                 >
-                    {dict.items.map((discount: DiscountItem) => (
-                        <SwiperSlide key={discount.id} className={s.slide}>
+                    {itemsToRender.map((discount: any, idx: number) => (
+                        <SwiperSlide key={`${discount.id}-${idx}`} className={s.slide}>
                             <AppLink href={`/complex-discounts/${discount.id}`} className={s.cardLink}>
                                 <div className={s.card}>
                                     <div className={s.cardImage}>
-                                        <Image src={discount.image} alt={discount.title} fill className={s.cardImg} />
+                                        {discount.image ? (
+                                            <Image src={discount.image} alt={discount.title} fill className={s.cardImg} />
+                                        ) : (
+                                            <div className={s.placeholder}>
+                                                <Image 
+                                                    src="/icons/logo-red.svg" 
+                                                    alt="Myastoriya" 
+                                                    width={120} 
+                                                    height={40} 
+                                                    className={s.placeholderLogo} 
+                                                />
+                                            </div>
+                                        )}
                                         {discount.discount && (
                                             <div className={s.discountBadge}>
                                                 <span>{discount.discount}</span>
@@ -84,7 +117,7 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                                         )}
                                     </div>
                                     <div className={s.cardBody}>
-                                        <span className={s.date}>{discount.dateRange}</span>
+                                        {discount.dateRange && <span className={s.date}>{discount.dateRange}</span>}
                                         <h3 className={s.cardTitle}>{discount.title}</h3>
                                     </div>
                                 </div>

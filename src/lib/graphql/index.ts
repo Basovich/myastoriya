@@ -79,6 +79,9 @@ export type { HomeReview, ReviewUser } from './queries/pages/home/reviews';
 export { getSalesApi } from './queries/pages/home/sales';
 export type { Sale, SaleImages, SalesResponse } from './queries/pages/home/sales';
 
+// Re-export specials
+export * from "./queries/pages/home/specials";
+
 // Re-export localities
 export {
     autoDetectLocalityApi,
