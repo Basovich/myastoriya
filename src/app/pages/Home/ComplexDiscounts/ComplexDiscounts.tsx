@@ -60,18 +60,12 @@ export default function ComplexDiscounts({ dict, lang }: ComplexDiscountsProps) 
                         prevEl,
                     }}
                     spaceBetween={12}
-                    slidesPerView={1.2}
+                    slidesPerView={"auto"}
                     breakpoints={{
-                        640: {
-                            slidesPerView: 2,
-                            spaceBetween: 16
-                        },
                         1024: {
-                            slidesPerView: 3,
                             spaceBetween: 20
                         },
                         1280: {
-                            slidesPerView: 2.4,
                             spaceBetween: 20
                         }
                     }}

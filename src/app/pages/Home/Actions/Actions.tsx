@@ -95,18 +95,12 @@ export default function Actions({ dict, lang, sales }: ActionsProps) {
                         prevEl,
                     }}
                     spaceBetween={12}
-                    slidesPerView={1.2}
+                    slidesPerView={"auto"}
                     breakpoints={{
-                        640: {
-                            slidesPerView: 2,
-                            spaceBetween: 16
-                        },
                         1024: {
-                            slidesPerView: 3,
                             spaceBetween: 20
                         },
                         1280: {
-                            slidesPerView: 2.3,
                             spaceBetween: 20
                         }
                     }}
@@ -128,11 +122,6 @@ export default function Actions({ dict, lang, sales }: ActionsProps) {
                                                     height={40} 
                                                     className={s.placeholderLogo} 
                                                 />
-                                            </div>
-                                        )}
-                                        {item.discount && (
-                                            <div className={s.discountBadge}>
-                                                -{item.discount}%
                                             </div>
                                         )}
                                     </div>

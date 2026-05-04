@@ -77,6 +77,15 @@
     overflow: visible;
 }
 
+div.slide {
+    width: 308px;
+    height: auto;
+
+    @media (min-width: 1280px) {
+        width: 552px;
+    }
+}
+
 .card {
     height: 100%;
     display: flex;
