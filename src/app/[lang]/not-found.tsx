@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { getDictionary } from "@/i18n/get-dictionary";
 import NotFoundBlock from "../components/NotFoundBlock/NotFoundBlock";
 import { type Locale } from "@/i18n/config";
+export const dynamic = "force-dynamic";
 
 export default async function NotFound() {
     // Next.js `not-found.tsx` does not receive `params` so we extract locale from headers

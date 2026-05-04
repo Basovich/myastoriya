@@ -2,7 +2,9 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import BlogPostPage from "@/app/pages/BlogPost";
 import { getBlogBySlugApi } from "@/lib/graphql/queries/blog";
-import { notFound } from "next/navigation";
+import NotFoundBlock from "@/app/components/NotFoundBlock/NotFoundBlock";
+
+export const dynamic = "force-dynamic";
 
 export default async function BlogDetail({
     params,
@@ -15,7 +17,11 @@ export default async function BlogDetail({
     const post = await getBlogBySlugApi(id);
 
     if (!post) {
-        notFound();
+        return (
+            <main>
+                <NotFoundBlock dict={dict} />
+            </main>
+        );
     }
 
     return (

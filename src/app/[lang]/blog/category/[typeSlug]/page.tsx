@@ -2,15 +2,10 @@ import { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import BlogGrid from "@/app/components/BlogGrid/BlogGrid";
 import { getBlogsApi, getBlogTypesApi } from "@/lib/graphql/queries/blog";
-import { notFound } from "next/navigation";
+import NotFoundBlock from "@/app/components/NotFoundBlock/NotFoundBlock";
 
-export async function generateStaticParams() {
-    /**
-     * [LIGHTWEIGHT BUILD]
-     * Return empty array to reduce build-time API calls.
-     */
-    return [];
-}
+export const dynamic = "force-dynamic";
+
 
 export default async function BlogTypePage({
     params,
@@ -28,7 +23,11 @@ export default async function BlogTypePage({
     // If the type doesn't exist in our list, show 404
     const typeExists = blogTypes.some(t => t.slug === typeSlug);
     if (!typeExists && blogsResult.data.length === 0) {
-        notFound();
+        return (
+            <main>
+                <NotFoundBlock dict={dict} />
+            </main>
+        );
     }
 
     const currentType = blogTypes.find((t) => t.slug === typeSlug);
