@@ -13,7 +13,7 @@ import Button from "@/app/components/ui/Button/Button";
 import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
 import SliderArrow from "@/app/components/ui/SliderArrow/SliderArrow";
 import SectionHeader from "@/app/components/ui/SectionHeader/SectionHeader";
-import type { BlogPost } from "@/lib/graphql";
+import { type BlogPost, type Product, resolveProductImageUrl, resolveBlogImageUrl } from "@/lib/graphql";
 import { likeBlogApi } from "@/lib/graphql/queries/blog";
 import clsx from "clsx";
 
@@ -89,10 +89,10 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                     <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
 
                     <article>
-                        {post.image?.url?.size2x && (
+                        {resolveBlogImageUrl(post.image) && (
                             <div className={s.featuredImage}>
                                 <Image
-                                    src={post.image.url.size2x}
+                                    src={resolveBlogImageUrl(post.image)}
                                     alt={post.name}
                                     fill
                                     priority
@@ -168,14 +168,16 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                 {recommendedProducts.map((product) => (
                                     <SwiperSlide key={product.id}>
                                         <ProductCard
-                                            id={Number(product.id)}
+                                            id={product.id}
+                                            slug={product.slug}
                                             title={product.name}
                                             weight={product.unit ?? ""}
                                             price={product.cost}
                                             unit={product.unit ?? ""}
                                             badge={product.is_new ? "NEW" : null}
-                                            image=""
-                                        lang="ua" />
+                                            image={resolveProductImageUrl(product as unknown as Product)}
+                                            lang="ua" 
+                                        />
                                     </SwiperSlide>
                                 ))}
                                 <div className={s.sliderNav}>
@@ -197,14 +199,16 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                             {recommendedProducts.map((product) => (
                                 <ProductCard
                                     key={product.id}
-                                    id={Number(product.id)}
+                                    id={product.id}
+                                    slug={product.slug}
                                     title={product.name}
                                     weight={product.unit ?? ""}
                                     price={product.cost}
                                     unit={product.unit ?? ""}
                                     badge={product.is_new ? "NEW" : null}
-                                    image=""
-                                lang={lang} />
+                                    image={resolveProductImageUrl(product as unknown as Product)}
+                                    lang={lang} 
+                                />
                             ))}
                         </div>
                     </section>
@@ -232,8 +236,8 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                         <a href={`/blog/${recipe.slug}`} className={s.blogCardLink}>
                                             <div className={s.blogCard}>
                                                 <div className={s.blogCardImage}>
-                                                    {recipe.image?.url?.size2x ? (
-                                                        <Image src={recipe.image.url.size2x} alt={recipe.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
+                                                    {resolveBlogImageUrl(recipe.image) ? (
+                                                        <Image src={resolveBlogImageUrl(recipe.image)} alt={recipe.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
                                                     ) : (
                                                         <div className={s.blogCardImgPlaceholder}>
                                                             <Image src="/icons/logo-red.svg" alt={recipe.name} width={40} height={40} />
@@ -267,8 +271,8 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                 <a key={recipe.id} href={`/blog/${recipe.slug}`} className={s.blogCardLink}>
                                     <div className={s.blogCard}>
                                         <div className={s.blogCardImage}>
-                                            {recipe.image?.url?.size2x ? (
-                                                <Image src={recipe.image.url.size2x} alt={recipe.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
+                                            {resolveBlogImageUrl(recipe.image) ? (
+                                                <Image src={resolveBlogImageUrl(recipe.image)} alt={recipe.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
                                             ) : (
                                                 <div className={s.blogCardImgPlaceholder}>
                                                     <Image src="/icons/logo-red.svg" alt={recipe.name} width={40} height={40} />
@@ -307,8 +311,8 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                         <a href={`/blog/${relatedPost.slug}`} className={s.blogCardLink}>
                                             <div className={s.blogCard}>
                                                 <div className={s.blogCardImage}>
-                                                    {relatedPost.image?.url?.size2x ? (
-                                                        <Image src={relatedPost.image.url.size2x} alt={relatedPost.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
+                                                    {resolveBlogImageUrl(relatedPost.image) ? (
+                                                        <Image src={resolveBlogImageUrl(relatedPost.image)} alt={relatedPost.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
                                                     ) : (
                                                         <div className={s.blogCardImgPlaceholder}>
                                                             <Image src="/icons/logo-red.svg" alt={relatedPost.name} width={40} height={40} />
@@ -343,8 +347,8 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                 <a key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className={s.blogCardLink}>
                                     <div className={s.blogCard}>
                                         <div className={s.blogCardImage}>
-                                            {relatedPost.image?.url?.size2x ? (
-                                                <Image src={relatedPost.image.url.size2x} alt={relatedPost.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
+                                            {resolveBlogImageUrl(relatedPost.image) ? (
+                                                <Image src={resolveBlogImageUrl(relatedPost.image)} alt={relatedPost.name} fill className={s.blogCardImg} sizes="(max-width: 768px) 100vw, 33vw" />
                                             ) : (
                                                 <div className={s.blogCardImgPlaceholder}>
                                                     <Image src="/icons/logo-red.svg" alt={relatedPost.name} width={40} height={40} />

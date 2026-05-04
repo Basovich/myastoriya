@@ -10,7 +10,7 @@ import Pagination from "../ui/Pagination/Pagination";
 import Tabs from "../ui/Tabs/Tabs";
 import SubscribeBanner from "../SubscribeBanner/SubscribeBanner";
 import s from "./BlogGrid.module.scss";
-import type { BlogPost, BlogType } from "@/lib/graphql";
+import { type BlogPost, type BlogType, resolveBlogImageUrl } from "@/lib/graphql";
 
 type TabType = "all" | string;
 
@@ -162,9 +162,9 @@ export default function BlogGrid({
                             >
                                 <div className={s.card}>
                                     <div className={s.cardImage}>
-                                        {item.image?.url?.size2x ? (
+                                        {resolveBlogImageUrl(item.image) ? (
                                             <Image
-                                                src={item.image.url.size2x}
+                                                src={resolveBlogImageUrl(item.image)}
                                                 alt={item.name}
                                                 fill
                                                 className={s.cardImg}

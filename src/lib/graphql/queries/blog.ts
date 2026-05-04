@@ -1,4 +1,5 @@
 import { gqlRequest } from '../client';
+import { ProductImageEntry } from './products';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -40,10 +41,13 @@ export interface BlogProduct {
     giftText: string | null;
     inLikes: boolean;
     name: string;
+    slug: string;
     image_alt: string | null;
     image_title: string | null;
     available: boolean;
     is_new: boolean;
+    image?: ProductImageEntry | null;
+    images?: ProductImageEntry[] | null;
 }
 
 export interface RelatedBlog {
@@ -185,6 +189,7 @@ const BLOG_BY_SLUG_QUERY = /* GraphQL */ `
             products {
                 id
                 name
+                slug
                 cost
                 oldCost
                 unit
@@ -196,6 +201,24 @@ const BLOG_BY_SLUG_QUERY = /* GraphQL */ `
                 available
                 is_new
                 image_alt
+                image {
+                    url {
+                        grid2x
+                        grid1x
+                        main2x
+                        main1x
+                        big
+                    }
+                }
+                images {
+                    url {
+                        grid2x
+                        grid1x
+                        main2x
+                        main1x
+                        big
+                    }
+                }
             }
             relatedBlogs {
                 id
@@ -303,6 +326,17 @@ export async function hasBlogsApi(lang?: string): Promise<boolean> {
     } catch {
         return false;
     }
+}
+
+/**
+ * Resolves a blog image URL.
+ * Handles relative paths by adding the API base URL.
+ */
+export function resolveBlogImageUrl(image: BlogImage | null | undefined): string {
+    const url = image?.url?.size2x || image?.url?.size1x || image?.url?.size3x || null;
+    if (!url) return '';
+    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
+    return url;
 }
 
 // ---------------------------------------------------------------------------

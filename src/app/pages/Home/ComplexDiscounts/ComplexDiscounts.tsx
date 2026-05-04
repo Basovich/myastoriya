@@ -39,7 +39,10 @@ export default function ComplexDiscounts({ dict, lang, specials }: ComplexDiscou
             return specials
                 .slice(0, 6)
                 .map(special => {
-                    const image = special.images?.[0]?.url?.grid2x || special.images?.[0]?.url?.grid3x || null;
+                    let image = special.images?.[0]?.url?.grid2x || special.images?.[0]?.url?.grid3x || null;
+                    if (image && image.startsWith('/')) {
+                        image = `https://dev-api.myastoriya.com.ua${image}`;
+                    }
                     return {
                         id: parseInt(special.id),
                         title: special.title || "",

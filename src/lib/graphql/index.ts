@@ -51,6 +51,7 @@ export {
     getBlogBySlugApi,
     getBlogTypesApi,
     hasBlogsApi,
+    resolveBlogImageUrl,
 } from './queries/blog';
 export type {
     BlogPost,
