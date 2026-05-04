@@ -25,6 +25,26 @@ export interface ProductCategory {
     children?: ProductCategory[];
 }
 
+export interface ProductImageUrl {
+    grid1x?: string | null;
+    grid2x?: string | null;
+    grid3x?: string | null;
+    list1x?: string | null;
+    list2x?: string | null;
+    main1x?: string | null;
+    main2x?: string | null;
+    main3x?: string | null;
+    big?: string | null;
+    squarePreview1x?: string | null;
+    squarePreview2x?: string | null;
+}
+
+export interface ProductImageEntry {
+    url: ProductImageUrl;
+    title?: string | null;
+    alt?: string | null;
+}
+
 export interface Product {
     id: string;
     slug?: string;
@@ -36,19 +56,33 @@ export interface Product {
     multiplier?: number;
     is_new?: boolean;
     available?: boolean;
-    image?: {
-        url: {
-            grid2x: string;
-            grid1x?: string;
-            main2x?: string;
-            main1x?: string;
-            big?: string;
-        };
-    } | null;
+    /** @deprecated Завжди null на бекенді — використовуйте images[0] */
+    image?: ProductImageEntry | null;
+    /** Масив зображень товару (основне джерело) */
+    images?: ProductImageEntry[] | null;
     specifications?: {
         name: string;
         values: string[];
     }[];
+}
+
+/**
+ * Повертає перший доступний URL зображення товару.
+ * Читає з images[] (актуальне поле), з fallback на застаріле image.
+ */
+export function resolveProductImageUrl(product: Product): string {
+    const entry = product.images?.[0] ?? product.image ?? null;
+    const url =
+        entry?.url.grid2x ||
+        entry?.url.main2x ||
+        entry?.url.grid1x ||
+        entry?.url.main1x ||
+        entry?.url.big ||
+        null;
+
+    if (!url) return '';
+    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
+    return url;
 }
 
 export interface ProductsFilter {
@@ -85,7 +119,7 @@ const PRODUCTS_QUERY = /* GraphQL */ `
                 multiplier
                 is_new
                 available
-                image {
+                images {
                     url {
                         grid2x
                         grid1x
@@ -136,6 +170,16 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                     big
                 }
             }
+            images {
+                url {
+                    grid2x
+                    grid1x
+                    main2x
+                    main1x
+                    main3x
+                    big
+                }
+            }
         }
     }
 `;
@@ -161,9 +205,12 @@ const VIEWED_PRODUCTS_QUERY = /* GraphQL */ `
                 unit
                 multiplier
                 is_new
-                image {
+                images {
                     url {
                         grid2x
+                        grid1x
+                        main2x
+                        main1x
                     }
                 }
                 specifications {

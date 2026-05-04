@@ -32,10 +32,13 @@ export {
     getProductByIdApi,
     findProductIdBySlug,
     getCategoriesApi,
+    resolveProductImageUrl,
 } from './queries/products';
 export type {
     Product,
     ProductImage,
+    ProductImageUrl,
+    ProductImageEntry,
     ProductCategory,
     ProductsFilter,
     ProductsResponse,

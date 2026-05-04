@@ -14,7 +14,7 @@ import Button from '@/app/components/ui/Button/Button';
 import ProfileForm from '@/app/components/Personal/ProfileForm/ProfileForm';
 import RecentlyViewedSlider from '@/app/components/Personal/RecentlyViewedSlider/RecentlyViewedSlider';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
-import { getViewedProductsApi, Product as ApiProduct } from '@/lib/graphql/queries/products';
+import { getViewedProductsApi, Product as ApiProduct, resolveProductImageUrl } from '@/lib/graphql/queries/products';
 import { updateUserDataApi } from '@/lib/graphql/queries/auth';
 import { setUser } from '@/store/slices/authSlice';
 import s from './Profile.module.scss';
@@ -170,7 +170,7 @@ export default function ProfilePage() {
                     title: p.name,
                     price: p.cost,
                     unit: p.unit,
-                    image: p.image?.url.grid2x || '',
+                    image: resolveProductImageUrl(p),
                     badge: p.is_new ? "NEW" : null,
                     weight: p.specifications?.find((s: any) => 
                         s.name.toLowerCase().includes('важ') || 

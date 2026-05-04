@@ -21,6 +21,8 @@ import Image from 'next/image';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import type { BlogPost, Product } from '@/lib/graphql';
+import { resolveProductImageUrl } from '@/lib/graphql';
+
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -99,21 +101,25 @@ const ProductClient: React.FC<ProductClientProps> = ({
         setSelectedSouces(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
     };
 
-    // Build display data from real product
-    const mainImageUrl = product.image?.url.main2x ||
-        product.image?.url.main1x ||
-        product.image?.url.grid2x ||
-        product.image?.url.grid1x ||
-        product.image?.url.big || '';
+    // Build display data from real product — читаємо з images[], бо image завжди null
+    const mainEntry = product.images?.[0] ?? product.image ?? null;
+    const mainImageUrl = mainEntry?.url.main2x ||
+        mainEntry?.url.main1x ||
+        mainEntry?.url.grid2x ||
+        mainEntry?.url.grid1x ||
+        mainEntry?.url.big || '';
 
-    const displayImages = mainImageUrl
-        ? [
-            getProductImageUrl(mainImageUrl),
-            getProductImageUrl(mainImageUrl),
-            getProductImageUrl(mainImageUrl),
-            getProductImageUrl(mainImageUrl),
-        ]
-        : ['/images/product/product-main.png'];
+    const resolvedMain = getProductImageUrl(mainImageUrl);
+
+    // Будуємо галерею з усіх зображень товару
+    const displayImages = product.images && product.images.length > 0
+        ? product.images.map(img => {
+            const url = img.url.main2x || img.url.main1x || img.url.grid2x || img.url.grid1x || img.url.big || '';
+            return getProductImageUrl(url);
+          }).filter(Boolean)
+        : resolvedMain
+            ? [resolvedMain, resolvedMain, resolvedMain, resolvedMain]
+            : ['/images/product/product-main.png'];
 
     const characteristics: Record<string, string> = {};
     product.specifications?.forEach(spec => {
@@ -140,11 +146,10 @@ const ProductClient: React.FC<ProductClientProps> = ({
         price: p.cost,
         weight: getProductWeight(p),
         unit: p.unit || 'шт',
-        image: getProductImageUrl(
-            p.image?.url.grid2x || p.image?.url.main2x || p.image?.url.grid1x || ''
-        ),
+        image: resolveProductImageUrl(p),
         badge: getProductBadge(p),
     }));
+
 
     const reviewsData = dict.home?.reviews?.items?.map(review => ({
         ...review,

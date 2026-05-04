@@ -12,7 +12,8 @@ import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import Button from "../../../components/ui/Button/Button";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import Image from "next/image";
-import { type PopularCategory, type Product } from "@/lib/graphql";
+import { type PopularCategory, type Product, resolveProductImageUrl } from "@/lib/graphql";
+
 
 interface ProductsProps {
     dict: {
@@ -123,19 +124,6 @@ export default function Products({ dict, categories, initialProducts, initialHas
         return null;
     };
 
-    const getImageUrl = (product: Product) => {
-        const url = product.image?.url.grid2x || 
-                   product.image?.url.main2x || 
-                   product.image?.url.grid1x || 
-                   product.image?.url.main1x || 
-                   product.image?.url.big;
-                   
-        if (!url) return "";
-        if (url.startsWith("/")) {
-            return `https://dev-api.myastoriya.com.ua${url}`;
-        }
-        return url;
-    };
 
     if (!dict || !categories) return null;
 
@@ -198,7 +186,7 @@ export default function Products({ dict, categories, initialProducts, initialHas
                             price={product.cost}
                             unit={product.unit}
                             badge={getBadge(product)}
-                            image={getImageUrl(product)}
+                            image={resolveProductImageUrl(product)}
                             lang="ua" 
                         />
                     ))}

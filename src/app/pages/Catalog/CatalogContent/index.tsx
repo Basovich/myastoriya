@@ -12,6 +12,8 @@ import CategorySwitcher from "@/app/components/ui/CategorySwitcher/CategorySwitc
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import type { Product, ProductsResponse, PopularCategory, ProductCategory } from '@/lib/graphql';
+import { resolveProductImageUrl } from '@/lib/graphql';
+
 
 // Client Islands
 import CatalogToolbarClient from '../CatalogToolbarClient';
@@ -39,17 +41,6 @@ const FAQ_DATA = [
     }
 ];
 
-function getImageUrl(product: Product): string {
-    const url = product.image?.url.grid2x ||
-        product.image?.url.main2x ||
-        product.image?.url.grid1x ||
-        product.image?.url.main1x ||
-        product.image?.url.big;
-
-    if (!url) return '';
-    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
-    return url;
-}
 
 function getBadge(product: Product): string | null {
     if (product.is_new) return 'NEW';
@@ -113,7 +104,7 @@ export default async function CatalogContent({
                 price={product.cost}
                 unit={product.unit}
                 badge={getBadge(product)}
-                image={getImageUrl(product)}
+                image={resolveProductImageUrl(product)}
                 lang={lang}
             />
         )
@@ -130,7 +121,7 @@ export default async function CatalogContent({
                 price={product.cost}
                 unit={product.unit}
                 badge={getBadge(product)}
-                image={getImageUrl(product)}
+                image={resolveProductImageUrl(product)}
                 lang={lang}
             />
         )
@@ -195,7 +186,7 @@ export default async function CatalogContent({
                                                 price={product.cost}
                                                 unit={product.unit}
                                                 badge={getBadge(product)}
-                                                image={getImageUrl(product)}
+                                                image={resolveProductImageUrl(product)}
                                                 lang={lang}
                                             />
                                         ) : (
@@ -209,7 +200,7 @@ export default async function CatalogContent({
                                                 oldPrice={product.oldCost ?? undefined}
                                                 unit={product.unit}
                                                 badge={getBadge(product)}
-                                                image={getImageUrl(product)}
+                                                image={resolveProductImageUrl(product)}
                                                 lang={lang}
                                             />
                                         )
