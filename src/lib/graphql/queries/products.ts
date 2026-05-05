@@ -19,8 +19,15 @@ export interface ProductCategory {
         icon3x: string | null;
     } | null;
     image?: {
+        square1x: string | null;
+        square2x: string | null;
+        square3x: string | null;
+        rectangle1x: string | null;
+        rectangle2x: string | null;
+        rectangle3x: string | null;
         big1x: string | null;
         big2x: string | null;
+        big3x: string | null;
     } | null;
     children?: ProductCategory[];
 }
@@ -80,6 +87,30 @@ export function resolveProductImageUrl(product: Product): string {
         entry?.url?.big ||
         null;
 
+    if (!url) return '';
+    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
+    return url;
+}
+
+/**
+ * Повертає URL зображення категорії.
+ */
+export function resolveCategoryImageUrl(category: ProductCategory): string {
+    const url = 
+        category.image?.square3x || 
+        category.image?.square2x || 
+        category.image?.square1x || 
+        category.image?.big3x || 
+        category.image?.big2x || 
+        category.image?.big1x || 
+        category.image?.rectangle3x || 
+        category.image?.rectangle2x || 
+        category.image?.rectangle1x || 
+        category.menuIcon?.icon3x || 
+        category.menuIcon?.icon2x || 
+        category.menuIcon?.icon1x || 
+        null;
+        
     if (!url) return '';
     if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
     return url;
@@ -322,8 +353,15 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                 icon3x
             }
             image {
+                square1x
+                square2x
+                square3x
+                rectangle1x
+                rectangle2x
+                rectangle3x
                 big1x
                 big2x
+                big3x
             }
             children {
                 id
@@ -335,16 +373,30 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                     icon3x
                 }
                 image {
+                    square1x
+                    square2x
+                    square3x
+                    rectangle1x
+                    rectangle2x
+                    rectangle3x
                     big1x
                     big2x
+                    big3x
                 }
                 children {
                     id
                     name
                     slug
                     image {
+                        square1x
+                        square2x
+                        square3x
+                        rectangle1x
+                        rectangle2x
+                        rectangle3x
                         big1x
                         big2x
+                        big3x
                     }
                 }
             }
@@ -391,14 +443,47 @@ const SEARCH_CATEGORIES_QUERY = /* GraphQL */ `
             id
             name
             slug
+            image {
+                square1x
+                square2x
+                square3x
+                rectangle1x
+                rectangle2x
+                rectangle3x
+                big1x
+                big2x
+                big3x
+            }
             children {
                 id
                 name
                 slug
+                image {
+                    square1x
+                    square2x
+                    square3x
+                    rectangle1x
+                    rectangle2x
+                    rectangle3x
+                    big1x
+                    big2x
+                    big3x
+                }
                 children {
                     id
                     name
                     slug
+                    image {
+                        square1x
+                        square2x
+                        square3x
+                        rectangle1x
+                        rectangle2x
+                        rectangle3x
+                        big1x
+                        big2x
+                        big3x
+                    }
                 }
             }
         }

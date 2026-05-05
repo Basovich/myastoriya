@@ -11,6 +11,7 @@ import WishButton from "@/app/components/ui/WishButton/WishButton";
 import AddToCartButton from "@/app/components/ui/AddToCartButton/AddToCartButton";
 import Badge from "@/app/components/ui/Badge/Badge";
 import { Locale } from "@/i18n/config";
+import { getLocalizedHref } from "@/utils/i18n-helpers";
 import { 
     getProductsApi, 
     getSearchCategoriesApi, 
@@ -34,7 +35,7 @@ const CategoryLink = ({ cat, lang, router, isRoot = false }: CategoryLinkProps) 
         <li className={isRoot ? s.categoryItem : s.subItemWrapper}>
             <div 
                 className={isRoot ? s.mainCat : s.subItem} 
-                onClick={() => router.push(`/${lang}/catalog/${cat.slug}`)}
+                onClick={() => router.push(getLocalizedHref(`/catalog/${cat.slug}`, lang as Locale))}
             >
                 {cat.name}
             </div>
@@ -80,7 +81,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
             return;
         }
 
-        router.push(`/${lang}/search?q=${encodeURIComponent(query)}`);
+        router.push(getLocalizedHref(`/search?q=${encodeURIComponent(query)}`, lang));
         setIsActive(false);
         setShowOverlay(false);
     };
