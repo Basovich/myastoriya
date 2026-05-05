@@ -78,7 +78,11 @@ export { getReviewsApi } from './queries/pages/home/reviews';
 export type { HomeReview, ReviewUser } from './queries/pages/home/reviews';
 
 // Re-export sales
-export { getSalesApi } from './queries/pages/home/sales';
+export {
+    getSalesApi,
+    getSaleApi,
+    findSaleIdBySlug,
+} from './queries/pages/home/sales';
 export type { Sale, SaleImages, SalesResponse } from './queries/pages/home/sales';
 
 // Re-export specials

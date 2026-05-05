@@ -87,6 +87,7 @@ export function resolveProductImageUrl(product: Product): string {
 
 export interface ProductsFilter {
     categoryId?: number | null;
+    saleId?: number | null;
     limit?: number | null;
     page?: number | null;
 }
@@ -103,8 +104,8 @@ export interface ProductsResponse {
 // ---------------------------------------------------------------------------
 
 const PRODUCTS_QUERY = /* GraphQL */ `
-    query Products($categoryId: Int, $limit: Int, $page: Int) {
-        products(categoryId: $categoryId, limit: $limit, page: $page) {
+    query Products($categoryId: Int, $saleId: Int, $limit: Int, $page: Int) {
+        products(categoryId: $categoryId, saleId: $saleId, limit: $limit, page: $page) {
             per_page
             current_page
             has_more_pages
@@ -241,10 +242,11 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string): Pr
         PRODUCTS_QUERY,
         {
             categoryId: filter?.categoryId ?? null,
+            saleId: filter?.saleId ?? null,
             limit: filter?.limit ?? null,
-            page: filter?.page ?? null
+            page: filter?.page ?? null,
         },
-        { next: { revalidate: 60 }, lang },
+        { next: { revalidate: 3600 }, lang },
     );
     return data.products;
 }

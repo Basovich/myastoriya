@@ -5,13 +5,14 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const categoryId = body.categoryId ? parseInt(body.categoryId) : null;
+        const saleId = body.saleId ? parseInt(body.saleId) : null;
         const limit = body.limit ?? 8;
         const page = body.page ?? 1;
 
         const langHeader = req.headers.get('content-language');
         const lang = langHeader === 'ru_RU' ? 'ru' : 'ua';
 
-        const result = await getProductsApi({ categoryId, limit, page }, lang);
+        const result = await getProductsApi({ categoryId, saleId, limit, page }, lang);
 
         return NextResponse.json(result);
     } catch (err) {

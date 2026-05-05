@@ -32,6 +32,8 @@ interface RequestOptions {
     lang?: string;
     /** Next.js cache / revalidate options (server-side only) */
     next?: NextFetchRequestConfig;
+    /** Override fetch cache mode (e.g. 'no-store' for paginated requests) */
+    cache?: RequestCache;
     /** Internal retry counter */
     _retryCount?: number;
 }
@@ -122,7 +124,7 @@ export async function gqlRequest<T>(
             headers,
             body,
             ...(isServer ? {} : { credentials: 'include' }),
-            ...(options?.next ? { next: options.next } : {}),
+            ...(options?.cache ? { cache: options.cache } : options?.next ? { next: options.next } : {}),
         });
 
         if (!res.ok) {

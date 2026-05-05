@@ -8,9 +8,13 @@ import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import Tabs from "../ui/Tabs/Tabs";
 import AppLink from "../ui/AppLink/AppLink";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
+import { format } from "date-fns";
+import { uk } from "date-fns/locale";
+import { type Sale } from "@/lib/graphql";
 
 interface ActionItem {
     id: number;
+    slug?: string | null;
     title: string;
     image: string;
     date?: string;
@@ -35,25 +39,59 @@ interface ActionsGridProps {
     initialItems: ActionItem[];
     lang: string;
     pageType: 'promotions' | 'complex-discounts';
+    initialHasMore?: boolean;
 }
 
-export default function ActionsGrid({ dict, initialItems, lang, pageType }: ActionsGridProps) {
-    const twelveInitialItems = Array.from({ length: 12 }).map((_, i) => {
-        const baseItem = initialItems[i % initialItems.length];
-        return { ...baseItem, id: baseItem.id + i * 1000 };
-    });
+export default function ActionsGrid({ dict, initialItems, lang, pageType, initialHasMore }: ActionsGridProps) {
+    const [items, setItems] = useState<ActionItem[]>(initialItems);
+    const [hasMore, setHasMore] = useState(initialHasMore ?? true);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
 
-    const [items, setItems] = useState<ActionItem[]>(twelveInitialItems);
-    const [hasMore, setHasMore] = useState(true);
+    const loadMore = async () => {
+        if (loading || !hasMore) return;
+        
+        if (pageType === 'complex-discounts') {
+            setHasMore(false);
+            return;
+        }
 
-    const loadMore = () => {
-        const moreItems = Array.from({ length: 12 }).map((_, i) => {
-            const baseItem = initialItems[i % initialItems.length];
-            return { ...baseItem, id: baseItem.id + (i + 12) * 1000 };
-        });
+        setLoading(true);
+        try {
+            const nextPage = page + 1;
+            const res = await fetch("/api/sales", {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Content-Language": lang === "ru" ? "ru_RU" : "uk_UA"
+                },
+                body: JSON.stringify({ page: nextPage, limit: 12 }),
+            });
+            const data = await res.json();
+            console.log("[ActionsGrid Debug] Response:", data);
 
-        setItems((prev) => [...prev, ...moreItems]);
-        setHasMore(false);
+            if (data.data && data.data.length > 0) {
+                const newItems: ActionItem[] = data.data.map((sale: any) => ({
+                    id: parseInt(sale.id),
+                    title: sale.name,
+                    slug: sale.slug || sale.id,
+                    image: sale.image?.size2x || sale.image?.size1x || "",
+                    date: sale.expiresAt || "",
+                    discount: null
+                }));
+
+                setItems(prev => [...prev, ...newItems]);
+                setHasMore(data.has_more_pages);
+                setPage(nextPage);
+                console.log("[ActionsGrid Debug] Added items:", newItems.length);
+            } else {
+                setHasMore(false);
+            }
+        } catch (error) {
+            console.error("Failed to load more actions:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const breadcrumbItems = [
@@ -88,16 +126,31 @@ export default function ActionsGrid({ dict, initialItems, lang, pageType }: Acti
             <Tabs tabs={tabItems} className={s.tabs} classNameBtn={s.tabBtn} />
 
             <div className={s.grid}>
-                {items.map((item, idx) => (
-                    <AppLink key={`${item.id}-${idx}`} href={`/${pageType === 'promotions' ? 'actions' : pageType}/${item.id}`} className={s.cardLink}>
+                {items.map((item, idx) => {
+                    const identifier = item.slug || item.id;
+                    const path = pageType === 'promotions' ? 'actions' : pageType;
+                    return (
+                        <AppLink key={`${item.id}-${idx}`} href={`/${path}/${identifier}`} className={s.cardLink}>
                         <div className={s.card}>
                             <div className={s.cardImage}>
-                                <Image src={item.image}
-                                       alt={item.title}
-                                       className={s.cardImg}
-                                       width={320}
-                                       height={200}
-                                />
+                                {item.image ? (
+                                    <Image src={item.image}
+                                           alt={item.title}
+                                           className={s.cardImg}
+                                           width={320}
+                                           height={200}
+                                    />
+                                ) : (
+                                    <div className={s.placeholder}>
+                                        <Image
+                                            src="/icons/logo-red.svg"
+                                            alt="Myastoriya"
+                                            width={120}
+                                            height={40}
+                                            className={s.placeholderLogo}
+                                        />
+                                    </div>
+                                )}
                             </div>
                             <div className={s.cardBody}>
                                 <div className={s.date}>
@@ -113,7 +166,8 @@ export default function ActionsGrid({ dict, initialItems, lang, pageType }: Acti
                             </div>
                         </div>
                     </AppLink>
-                ))}
+                );
+            })}
             </div>
 
             {hasMore && (
