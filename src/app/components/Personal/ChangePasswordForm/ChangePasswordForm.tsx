@@ -27,6 +27,8 @@ interface ChangePasswordFormProps {
 }
 
 export default function ChangePasswordForm({ user, dict, onSubmit, submitStatus }: ChangePasswordFormProps) {
+    const [focusedFields, setFocusedFields] = React.useState<Record<string, boolean>>({});
+
     const validationSchema = Yup.object().shape({
         newPassword: Yup.string()
             .required('Обов\'язкове поле')
@@ -50,6 +52,17 @@ export default function ChangePasswordForm({ user, dict, onSubmit, submitStatus 
         },
     });
 
+    const handleFocus = (field: string) => {
+        setFocusedFields(prev => ({ ...prev, [field]: true }));
+        formik.setFieldTouched(field, false);
+    };
+
+    const handleBlur = (e: React.FocusEvent<any>) => {
+        const { name } = e.target;
+        setFocusedFields(prev => ({ ...prev, [name]: false }));
+        formik.handleBlur(e);
+    };
+
     return (
         <div className={s.changePasswordFormContainer}>
             <form className={s.form} onSubmit={formik.handleSubmit}>
@@ -61,9 +74,10 @@ export default function ChangePasswordForm({ user, dict, onSubmit, submitStatus 
                         label={dict.newPassword}
                         value={formik.values.newPassword}
                         onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
+                        onBlur={handleBlur}
+                        onFocus={() => handleFocus('newPassword')}
                         error={formik.errors.newPassword}
-                        touched={formik.touched.newPassword}
+                        touched={!focusedFields.newPassword && (formik.submitCount > 0 || (formik.touched.newPassword && !!formik.values.newPassword))}
                         required
                         className={s.inputField}
                     />
@@ -74,9 +88,10 @@ export default function ChangePasswordForm({ user, dict, onSubmit, submitStatus 
                         label={dict.confirmNewPassword}
                         value={formik.values.confirmNewPassword}
                         onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
+                        onBlur={handleBlur}
+                        onFocus={() => handleFocus('confirmNewPassword')}
                         error={formik.errors.confirmNewPassword}
-                        touched={formik.touched.confirmNewPassword}
+                        touched={!focusedFields.confirmNewPassword && (formik.submitCount > 0 || (formik.touched.confirmNewPassword && !!formik.values.confirmNewPassword))}
                         required
                         className={s.inputField}
                     />

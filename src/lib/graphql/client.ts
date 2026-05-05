@@ -118,6 +118,7 @@ export async function gqlRequest<T>(
         delete headers['Content-Type']; // Let browser set boundary
     }
 
+    let text = "";
     try {
         const res = await fetch(GQL_ENDPOINT, {
             method: 'POST',
@@ -146,7 +147,6 @@ export async function gqlRequest<T>(
             throw new Error(`Network error: ${res.status} ${res.statusText}`);
         }
 
-        let text = "";
         text = await res.text();
         if (!text) {
             throw new Error("Empty response body from GraphQL API");
