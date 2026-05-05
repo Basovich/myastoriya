@@ -45,16 +45,23 @@ export default function CountdownTimer({
     labelSeconds,
 }: CountdownTimerProps) {
     const parsed = parseDate(targetDate);
-    const [timeLeft, setTimeLeft] = useState<TimeLeft>(getTimeLeft(parsed));
+    // null on server — prevents hydration mismatch (Date.now() differs between SSR and client)
+    const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
     useEffect(() => {
+        // Set initial value on mount (client only)
+        setTimeLeft(getTimeLeft(parsed));
+
         const id = setInterval(() => {
             setTimeLeft(getTimeLeft(parsed));
         }, 1000);
         return () => clearInterval(id);
     }, [targetDate]);
 
-    const pad = (n: number) => String(n).padStart(2, "0");
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    // Don't render until mounted on the client (avoids SSR/client Date.now() mismatch)
+    if (!timeLeft) return <div className={s.wrapper} aria-hidden="true" />;
 
     return (
         <div className={s.wrapper}>

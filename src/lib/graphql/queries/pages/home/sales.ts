@@ -4,6 +4,16 @@ export interface SaleImages {
     size1x?: string | null;
     size2x?: string | null;
     size3x?: string | null;
+    push?: string | null;
+    notification1x?: string | null;
+    notification2x?: string | null;
+    notification3x?: string | null;
+}
+
+export interface SaleBannerImages {
+    size1x?: string | null;
+    size2x?: string | null;
+    size3x?: string | null;
 }
 
 export interface Sale {
@@ -11,10 +21,12 @@ export interface Sale {
     name: string;
     slug?: string | null;
     image?: SaleImages | null;
-    banner?: SaleImages | null;
+    banner?: SaleBannerImages | null;
     expiresAt?: string | null;
+    publishedAt?: string | null;
     title?: string | null;
     description?: string | null;
+    keywords?: string | null;
     text?: string | null;
 }
 
@@ -35,19 +47,26 @@ export const SALES_QUERY = /* GraphQL */ `
                 id
                 name
                 slug
+                title
+                description
+                keywords
+                text
+                publishedAt
+                expiresAt
                 image {
                     size1x
                     size2x
                     size3x
+                    push
+                    notification1x
+                    notification2x
+                    notification3x
                 }
                 banner {
                     size1x
                     size2x
                     size3x
                 }
-                expiresAt
-                title
-                description
             }
         }
     }
