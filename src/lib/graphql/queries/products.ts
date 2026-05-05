@@ -88,6 +88,7 @@ export function resolveProductImageUrl(product: Product): string {
 export interface ProductsFilter {
     categoryId?: number | null;
     saleId?: number | null;
+    search?: string | null;
     limit?: number | null;
     page?: number | null;
 }
@@ -104,8 +105,8 @@ export interface ProductsResponse {
 // ---------------------------------------------------------------------------
 
 const PRODUCTS_QUERY = /* GraphQL */ `
-    query Products($categoryId: Int, $saleId: Int, $limit: Int, $page: Int) {
-        products(categoryId: $categoryId, saleId: $saleId, limit: $limit, page: $page) {
+    query Products($categoryId: Int, $saleId: Int, $search: String, $limit: Int, $page: Int) {
+        products(categoryId: $categoryId, saleId: $saleId, search: $search, limit: $limit, page: $page) {
             per_page
             current_page
             has_more_pages
@@ -243,6 +244,7 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string): Pr
         {
             categoryId: filter?.categoryId ?? null,
             saleId: filter?.saleId ?? null,
+            search: filter?.search ?? null,
             limit: filter?.limit ?? null,
             page: filter?.page ?? null,
         },
@@ -366,4 +368,48 @@ export async function getViewedProductsApi(limit: number = 10, lang?: string, to
         { next: { revalidate: 60 }, lang, token },
     );
     return data.products.data;
+}
+
+const SEARCH_POPULAR_QUERIES_QUERY = /* GraphQL */ `
+    query SearchPopularQueries($search: String, $limit: Int) {
+        searchPopularQueries(search: $search, limit: $limit)
+    }
+`;
+
+export async function getSearchPopularQueriesApi(search?: string, limit: number = 5, lang?: string): Promise<string[]> {
+    const data = await gqlRequest<{ searchPopularQueries: string[] }>(
+        SEARCH_POPULAR_QUERIES_QUERY,
+        { search: search ?? null, limit },
+        { next: { revalidate: 3600 }, lang }
+    );
+    return data.searchPopularQueries;
+}
+
+const SEARCH_CATEGORIES_QUERY = /* GraphQL */ `
+    query SearchCategories($search: String, $parentId: Int) {
+        categories(search: $search, parentId: $parentId) {
+            id
+            name
+            slug
+            children {
+                id
+                name
+                slug
+                children {
+                    id
+                    name
+                    slug
+                }
+            }
+        }
+    }
+`;
+
+export async function getSearchCategoriesApi(search: string, lang?: string, parentId: number = 768): Promise<ProductCategory[]> {
+    const data = await gqlRequest<{ categories: ProductCategory[] }>(
+        SEARCH_CATEGORIES_QUERY,
+        { search, parentId },
+        { next: { revalidate: 3600 }, lang }
+    );
+    return data.categories;
 }

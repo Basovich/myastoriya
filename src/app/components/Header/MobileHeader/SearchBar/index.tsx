@@ -6,17 +6,19 @@ import clsx from "clsx";
 import s from "./SearchBar.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 
-const MOCK_PRODUCTS = [
-    { id: 1, name: "Трюфельный стейк Dry-aged", price: 1260, image: "/images/products/steak-1.jpg" },
-    { id: 2, name: "Стейк бокс Классический", price: 4200, image: "/images/products/steak-2.jpg" },
-    { id: 3, name: "Стейк бокс Dry Aged", price: 5500, image: "/images/products/steak-3.jpg" },
-    { id: 4, name: "Стейк Рибай выдержанный", price: 1800, image: "/images/products/steak-4.jpg" },
-];
+import { 
+    getProductsApi, 
+    resolveProductImageUrl, 
+    Product 
+} from "@/lib/graphql/queries/products";
+
+// Removed MOCKs
 
 export default function SearchBar() {
     const [query, setQuery] = useState("");
     const [isActive, setIsActive] = useState(false);
-    const [results, setResults] = useState<typeof MOCK_PRODUCTS>([]);
+    const [results, setResults] = useState<Product[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [hasError, setHasError] = useState(false);
     const router = useRouter();
     const params = useParams();
@@ -46,15 +48,29 @@ export default function SearchBar() {
         const value = e.target.value;
         setQuery(value);
         setHasError(false);
-
-        if (value.toLowerCase().includes("стейк")) {
-            setResults(MOCK_PRODUCTS);
-        } else if (value.trim() === "") {
-            setResults([]);
-        } else {
-            setResults([]);
-        }
     };
+
+    // Debounced search
+    useEffect(() => {
+        if (query.trim().length < 3) {
+            setResults([]);
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            setIsLoading(true);
+            try {
+                const res = await getProductsApi({ search: query, limit: 6 }, String(lang));
+                setResults(res.data);
+            } catch (error) {
+                console.error("Mobile search error:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [query, lang]);
 
     // Close on click outside
     useEffect(() => {
@@ -99,13 +115,13 @@ export default function SearchBar() {
                         {results.length > 0 ? (
                             <div className={s.resultsList}>
                                 {results.map((product) => (
-                                    <div key={product.id} className={s.resultItem} onClick={() => router.push(`/${lang}/search?q=${encodeURIComponent(product.name)}`)}>
+                                    <div key={product.id} className={s.resultItem} onClick={() => router.push(`/${lang}/product/${product.slug || product.id}`)}>
                                         <div className={s.resultImage}>
-                                            <div className={s.imagePlaceholder} />
+                                            <img src={resolveProductImageUrl(product) || "/images/no-image.png"} alt={product.name} />
                                         </div>
                                         <div className={s.resultInfo}>
                                             <div className={s.resultName}>{product.name}</div>
-                                            <div className={s.resultPrice}>{product.price} ₴</div>
+                                            <div className={s.resultPrice}>{product.cost} ₴</div>
                                         </div>
                                     </div>
                                 ))}

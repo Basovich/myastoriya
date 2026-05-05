@@ -113,7 +113,7 @@ export default function MainBar({
                     </button>
 
                     <div className={s.searchWrapper}>
-                        <Search lang={lang} />
+                        <Search lang={lang} categories={categories} />
                     </div>
 
                     <CitySelector lang={lang} />

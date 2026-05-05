@@ -11,46 +11,57 @@ import WishButton from "@/app/components/ui/WishButton/WishButton";
 import AddToCartButton from "@/app/components/ui/AddToCartButton/AddToCartButton";
 import Badge from "@/app/components/ui/Badge/Badge";
 import { Locale } from "@/i18n/config";
+import { 
+    getProductsApi, 
+    getSearchCategoriesApi, 
+    getSearchPopularQueriesApi, 
+    resolveProductImageUrl, 
+    Product, 
+    ProductCategory 
+} from "@/lib/graphql/queries/products";
 
-const MOCK_PRODUCTS = [
-    { id: 1, name: "Стейк Рібай Dry-aged гриль - М'ясторія", price: 1260, weight: "330г / 340г / 200г", image: "/images/products/product-shashlik.png" },
-    { id: 2, name: "Стейк Рібай на кістці Dry-aged гриль - М'ясторія", price: 4200, weight: "330г / 340г / 200г", image: "/images/products/product-meatballs.png" },
-    { id: 3, name: "Стейк Рібай Dry-aged гриль - М'ясторія", price: 5500, weight: "330г / 340г / 200г", image: "/images/products/product-sticks-cheese.png" },
-];
+// Removed MOCKs
 
-const MOCK_FEATURED = [
-    {
-        id: 101,
-        name: "Мясные палочки с сыром",
-        price: 2500,
-        weight: "330г / 340г / 200г",
-        image: "/images/product-sticks-cheese.jpg",
-        badge: "акція"
-    },
-    {
-        id: 102,
-        name: "Стейк Рібай витриманий",
-        price: 1800,
-        weight: "300г / 350г",
-        image: "/images/product-ribeye.jpg",
-        badge: "акція"
-    },
-    {
-        id: 103,
-        name: "Шашлик зі свинини",
-        price: 350,
-        weight: "500г",
-        image: "/images/product-shashlik.jpg",
-        badge: "new"
-    }
-];
+interface CategoryLinkProps {
+    cat: ProductCategory;
+    lang: string;
+    router: any;
+    isRoot?: boolean;
+}
 
-export default function Search({ lang }: { lang: Locale }) {
+const CategoryLink = ({ cat, lang, router, isRoot = false }: CategoryLinkProps) => {
+    return (
+        <li className={isRoot ? s.categoryItem : s.subItemWrapper}>
+            <div 
+                className={isRoot ? s.mainCat : s.subItem} 
+                onClick={() => router.push(`/${lang}/catalog/${cat.slug}`)}
+            >
+                {cat.name}
+            </div>
+            {cat.children && cat.children.length > 0 && (
+                <ul className={s.subList}>
+                    {cat.children.map(sub => (
+                        <CategoryLink 
+                            key={sub.id} 
+                            cat={sub} 
+                            lang={lang} 
+                            router={router} 
+                        />
+                    ))}
+                </ul>
+            )}
+        </li>
+    );
+};
+
+export default function Search({ lang, categories }: { lang: Locale; categories?: ProductCategory[] }) {
     const [query, setQuery] = useState("");
     const [isActive, setIsActive] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false);
-    const [results, setResults] = useState<typeof MOCK_PRODUCTS>([]);
-    const [featuredProposals, setFeaturedProposals] = useState<typeof MOCK_FEATURED>([]);
+    const [results, setResults] = useState<Product[]>([]);
+    const [featuredProposals, setFeaturedProposals] = useState<Product[]>([]);
+    const [searchCategories, setSearchCategories] = useState<ProductCategory[]>([]);
+    const [popularQueries, setPopularQueries] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -79,25 +90,6 @@ export default function Search({ lang }: { lang: Locale }) {
         setHasError(false);
     };
 
-    const fetchSearchData = async (searchTerm: string) => {
-        setIsLoading(true);
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 600));
-
-        if (searchTerm.toLowerCase().includes("стейк")) {
-            setResults(MOCK_PRODUCTS);
-            setFeaturedProposals(MOCK_FEATURED);
-        } else if (searchTerm.toLowerCase().includes("один")) {
-            setResults(MOCK_PRODUCTS.slice(0, 1));
-            setFeaturedProposals(MOCK_FEATURED.slice(0, 1));
-        } else {
-            setResults([]);
-            setFeaturedProposals([]);
-        }
-        setIsLoading(false);
-        setCurrentSlide(0);
-    };
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setQuery(value);
@@ -105,12 +97,68 @@ export default function Search({ lang }: { lang: Locale }) {
 
         if (value.length >= 3) {
             setShowOverlay(true);
-            fetchSearchData(value);
         } else {
             setShowOverlay(false);
             setResults([]);
+            setSearchCategories([]);
         }
     };
+
+    // Initial data fetch when active
+    useEffect(() => {
+        if (isActive) {
+            // Fetch popular queries and featured products
+            getSearchPopularQueriesApi(undefined, 6, lang).then(setPopularQueries).catch(console.error);
+            // Using products with limit 5 for featured proposals
+            getProductsApi({ limit: 5 }, lang).then(res => setFeaturedProposals(res.data)).catch(console.error);
+        }
+    }, [isActive, lang]);
+
+    // Debounced search fetch
+    useEffect(() => {
+        if (query.length < 3) return;
+
+        const timer = setTimeout(async () => {
+            setIsLoading(true);
+            try {
+                const prodRes = await getProductsApi({ search: query, limit: 6 }, lang);
+                setResults(prodRes.data);
+
+                // Local tree filtering for categories to show hierarchy
+                if (categories) {
+                    const findMatches = (list: ProductCategory[], forceInclude: boolean = false): ProductCategory[] => {
+                        const matches: ProductCategory[] = [];
+                        for (const cat of list) {
+                            const nameMatch = cat.name.toLowerCase().includes(query.toLowerCase());
+                            const shouldInclude = forceInclude || nameMatch;
+                            
+                            const childMatches = cat.children ? findMatches(cat.children, shouldInclude) : [];
+                            
+                            if (shouldInclude || childMatches.length > 0) {
+                                matches.push({
+                                    ...cat,
+                                    children: childMatches
+                                });
+                            }
+                        }
+                        return matches;
+                    };
+                    setSearchCategories(findMatches(categories));
+                } else {
+                    const catRes = await getSearchCategoriesApi(query, lang);
+                    setSearchCategories(catRes);
+                }
+
+            } catch (error) {
+                console.error("Search error:", error);
+            } finally {
+                setIsLoading(false);
+                setCurrentSlide(0);
+            }
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [query, lang, categories]);
 
     const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
         setIsDragging(true);
@@ -232,12 +280,25 @@ export default function Search({ lang }: { lang: Locale }) {
                                         <div className={s.colCategories}>
                                             <h3 className={s.colTitle}>Категорії</h3>
                                             <ul className={s.categoryList}>
-                                                <li onClick={() => setQuery("Стейк Флет-Айрон")}>Стейк Флет-Айрон</li>
-                                                <li>Інші альтернативні стейки</li>
-                                                <li>Стейки</li>
-                                                <li className={s.activeLink}>Стейки USA</li>
-                                                <li>Фірмові стейки</li>
-                                                <li>Стейк бокси</li>
+                                                {searchCategories.length > 0 ? (
+                                                    searchCategories.map(cat => (
+                                                        <CategoryLink 
+                                                            key={cat.id} 
+                                                            cat={cat} 
+                                                            lang={String(lang)} 
+                                                            router={router} 
+                                                            isRoot={true}
+                                                        />
+                                                    ))
+                                                ) : query.length >= 3 && !isLoading ? (
+                                                    <li className={s.noResultsInline}>Нічого не знайдено</li>
+                                                ) : (
+                                                    popularQueries.map((q, idx) => (
+                                                        <li key={idx} onClick={() => setQuery(q)}>
+                                                            {q}
+                                                        </li>
+                                                    ))
+                                                )}
                                             </ul>
                                         </div>
 
@@ -251,19 +312,26 @@ export default function Search({ lang }: { lang: Locale }) {
                                             <div className={s.dishListContainer}>
                                                 <div className={s.dishList}>
                                                     {results.length > 0 ? (
-                                                        results.map((product) => (
-                                                            <div key={product.id} className={s.dishItem} onClick={() => router.push(`/${lang}/search?q=${encodeURIComponent(product.name)}`)}>
-                                                                <div className={s.dishThumb}>
-                                                                    <Image src={product.image} alt={product.name} fill />
+                                                        results.map((product) => {
+                                                            const mainImage = resolveProductImageUrl(product);
+                                                            const weight = product.specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || product.unit;
+                                                            
+                                                            return (
+                                                                <div key={product.id} className={s.dishItem} onClick={() => router.push(`/${lang}/product/${product.slug || product.id}`)}>
+                                                                    <div className={s.dishThumb}>
+                                                                        <Image src={mainImage || "/images/no-image.png"} alt={product.name} fill />
+                                                                    </div>
+                                                                    <div className={s.dishInfo}>
+                                                                        <div className={s.dishName}>{product.name}</div>
+                                                                        <div className={s.dishWeight}>{weight}</div>
+                                                                    </div>
                                                                 </div>
-                                                                <div className={s.dishInfo}>
-                                                                    <div className={s.dishName}>{product.name}</div>
-                                                                    <div className={s.dishWeight}>{product.weight}</div>
-                                                                </div>
-                                                            </div>
-                                                        ))
+                                                            );
+                                                        })
+                                                    ) : !isLoading ? (
+                                                        <div className={s.emptyPrompt}>Товарів не знайдено</div>
                                                     ) : (
-                                                        <div className={s.emptyPrompt}>Почніть вводити назву товару...</div>
+                                                        <div className={s.emptyPrompt}>Пошук...</div>
                                                     )}
                                                 </div>
                                             </div>
@@ -295,49 +363,62 @@ export default function Search({ lang }: { lang: Locale }) {
                                                                         transition: isDragging ? 'none' : 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
                                                                     }}
                                                                 >
-                                                                    {featuredProposals.map((product) => (
-                                                                        <div key={product.id} className={s.featuredCardSlide}>
-                                                                            <div className={s.featuredCard}>
-                                                                                <div className={s.featuredImage}>
-                                                                                    <Image
-                                                                                        src={product.image}
-                                                                                        alt={product.name}
-                                                                                        fill
-                                                                                        draggable={false}
-                                                                                    />
-                                                                                    {product.badge && <Badge variant={product.badge === "new" ? "new" : "sale"} className={s.featuredBadge}>{product.badge}</Badge>}
-                                                                                    <div className={s.featuredWeightOverlay}>
-                                                                                        {product.weight}
-                                                                                    </div>
-                                                                                    <WishButton productId={String(product.id)} className={s.wishBtn} />
-                                                                                </div>
-                                                                                <div className={s.featuredInfo}>
-                                                                                    <div className={s.featuredName}>{product.name}</div>
-                                                                                    <div className={s.featuredFooter}>
-                                                                                        <div className={s.featuredPriceBlock}>
-                                                                                            <div className={s.featuredPriceValue}>{product.price} ₴</div>
-                                                                                            <div className={s.featuredPriceUnit}>упаковка</div>
+                                                                    {featuredProposals.map((product) => {
+                                                                        const mainImage = resolveProductImageUrl(product);
+                                                                        const weight = product.specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || product.unit;
+                                                                        const badgeText = product.oldCost ? 'акція' : (product.is_new ? 'new' : null);
+
+                                                                        return (
+                                                                            <div key={product.id} className={s.featuredCardSlide}>
+                                                                                <div className={s.featuredCard}>
+                                                                                    <div className={s.featuredImage}>
+                                                                                        <Image
+                                                                                            src={mainImage || "/images/no-image.png"}
+                                                                                            alt={product.name}
+                                                                                            fill
+                                                                                            draggable={false}
+                                                                                        />
+                                                                                        {badgeText && <Badge variant={badgeText === "new" ? "new" : "sale"} className={s.featuredBadge}>{badgeText}</Badge>}
+                                                                                        <div className={s.featuredWeightOverlay}>
+                                                                                            {weight}
                                                                                         </div>
-                                                                                        <AddToCartButton productId={String(product.id)} className={s.addToCartBtn} />
+                                                                                        <WishButton productId={String(product.id)} className={s.wishBtn} />
+                                                                                    </div>
+                                                                                    <div className={s.featuredInfo}>
+                                                                                        <div className={s.featuredName}>{product.name}</div>
+                                                                                        <div className={s.featuredFooter}>
+                                                                                            <div className={s.featuredPriceBlock}>
+                                                                                                <div className={s.featuredPriceValue}>{product.cost} ₴</div>
+                                                                                                <div className={s.featuredPriceUnit}>{product.unit}</div>
+                                                                                            </div>
+                                                                                            <AddToCartButton productId={String(product.id)} className={s.addToCartBtn} />
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                    ))}
+                                                                        );
+                                                                    })}
                                                                 </div>
                                                             </div>
                                                         ) : (
                                                             <div className={s.featuredCard}>
                                                                 <div className={s.featuredImage}>
                                                                     <Image
-                                                                        src={featuredProposals[0].image}
+                                                                        src={resolveProductImageUrl(featuredProposals[0]) || "/images/no-image.png"}
                                                                         alt={featuredProposals[0].name}
                                                                         fill
                                                                         draggable={false}
                                                                     />
-                                                                    {featuredProposals[0].badge && <Badge variant={featuredProposals[0].badge === "new" ? "new" : "sale"} className={s.featuredBadge}>{featuredProposals[0].badge}</Badge>}
+                                                                    {(featuredProposals[0].oldCost || featuredProposals[0].is_new) && (
+                                                                        <Badge 
+                                                                            variant={featuredProposals[0].is_new ? "new" : "sale"} 
+                                                                            className={s.featuredBadge}
+                                                                        >
+                                                                            {featuredProposals[0].oldCost ? 'акція' : 'new'}
+                                                                        </Badge>
+                                                                    )}
                                                                     <div className={s.featuredWeightOverlay}>
-                                                                        {featuredProposals[0].weight}
+                                                                        {featuredProposals[0].specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || featuredProposals[0].unit}
                                                                     </div>
                                                                     <WishButton productId={String(featuredProposals[0].id)} className={s.wishBtn} />
                                                                 </div>
@@ -345,8 +426,8 @@ export default function Search({ lang }: { lang: Locale }) {
                                                                     <div className={s.featuredName}>{featuredProposals[0].name}</div>
                                                                     <div className={s.featuredFooter}>
                                                                         <div className={s.featuredPriceBlock}>
-                                                                            <div className={s.featuredPriceValue}>{featuredProposals[0].price} ₴</div>
-                                                                            <div className={s.featuredPriceUnit}>упаковка</div>
+                                                                            <div className={s.featuredPriceValue}>{featuredProposals[0].cost} ₴</div>
+                                                                            <div className={s.featuredPriceUnit}>{featuredProposals[0].unit}</div>
                                                                         </div>
                                                                         <AddToCartButton productId={String(featuredProposals[0].id)} className={s.addToCartBtn} />
                                                                     </div>
