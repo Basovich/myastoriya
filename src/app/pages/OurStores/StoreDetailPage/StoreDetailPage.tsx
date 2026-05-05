@@ -19,6 +19,26 @@ function createGoogleMapsLink(address: string): string {
     return `https://www.google.com/maps/search/?api=1&query=${encoded}`;
 }
 
+function groupSchedule(schedule: Shop["schedule"]) {
+    if (!schedule || schedule.length === 0) return [];
+
+    const groups: { days: string[]; workTime: string }[] = [];
+
+    schedule.forEach((item) => {
+        const lastGroup = groups[groups.length - 1];
+        if (lastGroup && lastGroup.workTime === item.workTime) {
+            lastGroup.days.push(item.days);
+        } else {
+            groups.push({ days: [item.days], workTime: item.workTime });
+        }
+    });
+
+    return groups.map(group => {
+        if (group.days.length === 1) return `${group.days[0]}: ${group.workTime}`;
+        return `${group.days[0]} - ${group.days[group.days.length - 1]}: ${group.workTime}`;
+    });
+}
+
 const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) => {
     const { ourStoresPage } = dict.home;
 
@@ -32,9 +52,12 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
         { label: brandName, href: '' },
     ];
 
-    const apiImages = shop.image?.size3x || shop.image?.size2x
-        ? [shop.image.size3x || shop.image.size2x || '']
-        : [];
+    const apiImages = (shop.images && shop.images.length > 0)
+        ? shop.images.map(img => img.url.size3x || img.url.size2x || img.url.size1x || '')
+        : (shop.image?.size3x || shop.image?.size2x || shop.image?.size1x)
+            ? [shop.image.size3x || shop.image.size2x || shop.image.size1x || '']
+            : [];
+            
     const galleryImages = apiImages.length > 0 ? apiImages : [
         '/images/store/steikribai.png',
         '/images/store/steikribai.png',
@@ -42,7 +65,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
         '/images/store/steikribai.png',
     ];
 
-    const workingHours = shop.schedule?.[0] ? `${shop.schedule[0].days}: ${shop.schedule[0].workTime}` : '';
+    const groupedSchedule = groupSchedule(shop.schedule);
     const phone = shop.phones?.[0] || '';
 
     return (
@@ -99,12 +122,16 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                                         <a href={`mailto:${shop.email}`} className={s.text}>{shop.email}</a>
                                     </div>
                                 )}
-                                {workingHours && (
+                                {groupedSchedule.length > 0 && (
                                     <div className={s.detailItem}>
                                         <div className={s.detailItemHeader}>
                                             <p className={s.title}>ЧАС РОБОТИ:</p>
                                         </div>
-                                        <p className={s.text}>{workingHours}</p>
+                                        <div className={s.scheduleList}>
+                                            {groupedSchedule.map((line, idx) => (
+                                                <p key={idx} className={s.text}>{line}</p>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                                 {phone && (
@@ -124,20 +151,26 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                             </div>
                         </div>
 
-                        <Button
-                            variant="black"
-                            href={createGoogleMapsLink(address)}
-                            className={s.googleReviewBtn}
-                            target="_blank"
-                        >
-                            Залишити відгук на Google карті
-                        </Button>
+                        {shop.googleReviewsUrl && (
+                            <Button
+                                variant="black"
+                                href={shop.googleReviewsUrl}
+                                className={s.googleReviewBtn}
+                                target="_blank"
+                            >
+                                Залишити відгук на Google карті
+                            </Button>
+                        )}
 
                         <div className={s.about}>
                             <h2 className={s.sectionTitle}>ПРО ЗАКЛАД</h2>
                             <p className={s.aboutText}>
-                                Улюблені стейки — зі знижкою щовівторка!<br />
-                                Щовівторка даруємо 20% знижки на всі стейки з нашого гриль меню.
+                                {shop.description || (
+                                    <>
+                                        Улюблені стейки — зі знижкою щовівторка!<br />
+                                        Щовівторка даруємо 20% знижки на всі стейки з нашого гриль меню.
+                                    </>
+                                )}
                             </p>
                         </div>
                     </section>
