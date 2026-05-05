@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import clsx from "clsx";
 import s from "./Search.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -70,6 +70,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
     const [dragOffset, setDragOffset] = useState(0);
     const [hasError, setHasError] = useState(false);
     const router = useRouter();
+    const pathname = usePathname();
     const containerRef = useRef<HTMLDivElement>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
@@ -104,6 +105,11 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
             setSearchCategories([]);
         }
     };
+    
+    // Close overlay on pathname change
+    useEffect(() => {
+        setIsActive(false);
+    }, [pathname]);
 
     // Initial data fetch when active
     useEffect(() => {
