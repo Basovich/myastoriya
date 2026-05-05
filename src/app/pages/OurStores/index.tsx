@@ -25,6 +25,8 @@ interface OurStoresPageProps {
 export type StoreType = "all" | "restaurant" | "meatbar";
 export type ViewMode = "list" | "map";
 
+const STORES_PER_PAGE = 10;
+
 const parseShopData = (shop: Shop): Store => {
     const fullName = shop.name;
     // Regex to extract brand and address from "Brand (Address)"
@@ -55,6 +57,7 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
     const [activeFilter, setActiveFilter] = useState<StoreType>("restaurant");
     const [searchQuery, setSearchQuery] = useState("");
     const [viewMode, setViewMode] = useState<ViewMode>("map");
+    const [visibleCount, setVisibleCount] = useState(STORES_PER_PAGE);
 
     const stores = useMemo(() => initialShops.map(parseShopData), [initialShops]);
 
@@ -71,6 +74,19 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
             return matchesFilter && matchesSearch;
         });
     }, [stores, activeFilter, searchQuery]);
+
+    // Reset visible count when filter or search changes
+    React.useEffect(() => {
+        setVisibleCount(STORES_PER_PAGE);
+    }, [activeFilter, searchQuery]);
+
+    const visibleStores = useMemo(() => {
+        return filteredStores.slice(0, visibleCount);
+    }, [filteredStores, visibleCount]);
+
+    const handleLoadMore = () => {
+        setVisibleCount((prev) => prev + STORES_PER_PAGE);
+    };
 
     return (
         <>
@@ -115,12 +131,13 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
                         <div className={s.viewContainer}>
                             {viewMode === "list" ? (
                                 <>
-                                    <StoreList stores={filteredStores} dict={ourStoresPage.storeCard} />
-                                    {filteredStores.length > 0 && (
+                                    <StoreList stores={visibleStores} dict={ourStoresPage.storeCard} />
+                                    {visibleCount < filteredStores.length && (
                                         <div className={s.loadMoreWrapper}>
                                             <Button 
                                                 variant="outline-black" 
                                                 className={s.loadMoreBtn}
+                                                onClick={handleLoadMore}
                                             >
                                                 <span>{ourStoresPage.loadMore}</span>
                                                 <svg width="18" height="15" viewBox="0 0 18 15" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -129,7 +146,6 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
                                                 </svg>
                                             </Button>
                                         </div>
-
                                     )}
                                 </>
                             ) : (

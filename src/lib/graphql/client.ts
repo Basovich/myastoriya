@@ -146,7 +146,12 @@ export async function gqlRequest<T>(
             throw new Error(`Network error: ${res.status} ${res.statusText}`);
         }
 
-        const json: GqlResponse<T> = await res.json();
+        let text = "";
+        text = await res.text();
+        if (!text) {
+            throw new Error("Empty response body from GraphQL API");
+        }
+        const json: GqlResponse<T> = JSON.parse(text);
 
         if (json.errors?.length) {
             const error = json.errors[0];
@@ -181,6 +186,10 @@ export async function gqlRequest<T>(
         return json.data;
 
     } catch (err) {
+        if (isServer) {
+            console.error(`[gqlRequest] Error: ${err instanceof Error ? err.message : String(err)}. Response text: "${text.substring(0, 500)}"`);
+        }
+
         // Don't retry if it's a GraphQLError (means API actually answered with a logical error)
         if (err instanceof GraphQLError) {
             throw err;

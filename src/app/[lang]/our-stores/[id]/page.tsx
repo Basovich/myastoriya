@@ -3,6 +3,7 @@ import { Locale } from "@/i18n/config";
 import StoreDetailPage from "@/app/pages/OurStores/StoreDetailPage/StoreDetailPage";
 import { getShopApi, getShopsApi } from "@/lib/graphql/queries/shops";
 import { notFound } from "next/navigation";
+export const dynamic = "force-dynamic";
 
 export default async function StorePage({
     params,
