@@ -79,6 +79,13 @@ export async function gqlRequest<T>(
         'Content-Type': 'application/json',
     };
 
+    if (!isServer) {
+        const deviceId = localStorage.getItem('mya_device_id');
+        if (deviceId) {
+            headers['device-id'] = deviceId;
+        }
+    }
+
     if (options?.token) {
         headers['Authorization'] = `Bearer ${options.token}`;
     }

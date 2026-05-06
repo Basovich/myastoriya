@@ -71,7 +71,7 @@ const PersonalNav: React.FC<PersonalNavProps> = ({ dict, onLogout, user, isMobil
         { href: `/personal/orders`, label: dict.orderHistory, icon: 'orders' },
         { href: `/personal/reviews`, label: dict.myReviews, icon: 'reviews' },
         { href: `/personal/loyalty`, label: dict.loyalty, icon: 'loyalty' },
-        { href: `/personal/wishlist`, label: dict.wishlist, icon: 'wishlist' },
+        { href: `/personal/favorites`, label: dict.wishlist, icon: 'wishlist' },
         { href: `/personal/shopping-list`, label: dict.shoppingList, icon: 'shopping-list' },
         { href: `/personal/addresses`, label: dict.deliveryAddresses, icon: 'addresses' },
         { href: `/personal/cards`, label: dict.bankCards, icon: 'cards' },

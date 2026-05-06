@@ -123,7 +123,7 @@ export default function SearchContent() {
                                         weight={weight}
                                         price={product.cost}
                                         unit={product.unit}
-                                        badge={product.is_new ? "NEW" : (product.oldCost ? "АКЦІЯ" : null)}
+                                        badge={product.is_new ? "NEW" : (product.oldCost && product.oldCost > product.cost ? "АКЦІЯ" : null)}
                                         image={resolveProductImageUrl(product)}
                                         lang={String(lang)} 
                                     />

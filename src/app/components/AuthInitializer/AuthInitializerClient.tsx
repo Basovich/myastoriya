@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginAsGuest, setUser, setInitialized } from '@/store/slices/authSlice';
+import { fetchWishlistPayloadAsync, syncWishlistOnAuthAsync } from '@/store/slices/wishlistSlice';
 import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies, getAccessToken, tryRefreshTokenAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
@@ -21,6 +22,7 @@ import * as Sentry from "@sentry/nextjs";
 export default function AuthInitializerClient() {
     const dispatch = useAppDispatch();
     const initialised = useRef(false);
+    const prevGuestStatus = useRef(true);
     const { user, isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
 
     useEffect(() => {
@@ -40,11 +42,26 @@ export default function AuthInitializerClient() {
         }
     }, [user, isAuthenticated, isGuest]);
 
+    // Handle guest to user sync
+    useEffect(() => {
+        if (!initialised.current) return;
+        
+        // If we transitioned from guest to logged in user
+        if (prevGuestStatus.current && !isGuest && isAuthenticated) {
+            void dispatch(syncWishlistOnAuthAsync());
+        }
+        
+        prevGuestStatus.current = isGuest;
+    }, [isGuest, isAuthenticated, dispatch]);
+
     useEffect(() => {
         if (initialised.current) return;
         initialised.current = true;
 
-        void initAuth(dispatch);
+        void initAuth(dispatch).finally(() => {
+            // Once auth is initialized (either as user or guest), fetch the wishlist payload
+            void dispatch(fetchWishlistPayloadAsync());
+        });
     }, [dispatch]);
 
     return null;

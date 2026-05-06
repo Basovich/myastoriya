@@ -9,24 +9,28 @@ export async function POST(req: NextRequest) {
 
         req.headers.forEach((value, key) => {
             const lowerKey = key.toLowerCase();
-            // Forward everything except host and content-length which should be set by the new request
-            if (!['host', 'content-length'].includes(lowerKey)) {
-                headers[key] = value;
+            if (!['host', 'content-length', 'cookie', 'authorization'].includes(lowerKey)) {
+                headers[lowerKey] = value;
             }
         });
 
-        // Ensure critical browser headers are present (Next.js sometimes strips them)
+        // Re-add cookie and authorization headers explicitly to ensure they are present and unique
+        const cookie = req.headers.get('cookie') || req.cookies.getAll().map(c => `${c.name}=${c.value}`).join('; ');
+        if (cookie) {
+            headers['cookie'] = cookie;
+        }
+
+        const token = req.cookies.get('access_token')?.value || req.headers.get('authorization')?.replace('Bearer ', '');
+        if (token) {
+            headers['authorization'] = `Bearer ${token}`;
+        }
+
+        // Ensure origin and referer are present (sometimes stripped by intermediate layers)
         if (!headers['origin']) {
             headers['origin'] = req.nextUrl.origin;
         }
         if (!headers['referer']) {
             headers['referer'] = req.nextUrl.href;
-        }
-        if (!headers['cookie']) {
-            const allCookies = req.cookies.getAll().map(c => `${c.name}=${c.value}`).join('; ');
-            if (allCookies) {
-                headers['cookie'] = allCookies;
-            }
         }
 
         // Forward client IP
@@ -34,14 +38,6 @@ export async function POST(req: NextRequest) {
         if (clientIp) {
             headers['x-forwarded-for'] = clientIp;
             headers['x-real-ip'] = clientIp;
-        }
-
-        // Add Authorization header from cookie if not already present
-        if (!headers['authorization']) {
-            const token = req.cookies.get('access_token')?.value;
-            if (token) {
-                headers['authorization'] = `Bearer ${token}`;
-            }
         }
 
         const res = await fetch(GQL_ENDPOINT, {
