@@ -1,0 +1,43 @@
+.shoppingListPage {
+    display: flex;
+    flex-direction: column;
+}
+
+.shoppingBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+
+    @media (min-width: 1024px) {
+        padding: 32px;
+        gap: 24px;
+    }
+}
+
+.createBtn {
+    width: 100%;
+    height: 48px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+
+    @media (min-width: 1024px) {
+        width: max-content;
+        height: 38px;
+        font-size: 12px;
+        padding: 0 24px;
+        margin-bottom: 0;
+    }
+}
+
+.listsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 1024px) {
+        gap: 20px;
+    }
+}
