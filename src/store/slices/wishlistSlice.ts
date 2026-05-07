@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { addToFavoritesApi, removeFromFavoritesApi, getFavoritesPayloadApi } from '@/lib/graphql/queries/favorites';
+import { RootState } from '../index';
 
 interface WishlistState {
     items: string[]; // List of product IDs
@@ -18,16 +19,22 @@ export const toggleWishlistAsync = createAsyncThunk(
     'wishlist/toggleAsync',
     async (productId: string, { getState, rejectWithValue }) => {
         try {
-            const state = getState() as any;
-            const wishlistItems = state.wishlist.items as string[];
+            const state = getState() as RootState;
+            const wishlistItems = state.wishlist.items;
             const isFavorite = wishlistItems.includes(productId);
+            const { isAuthenticated, isGuest } = state.auth;
             
-            console.log(`[Wishlist] ${isFavorite ? 'Removing' : 'Adding'} product:`, productId);
+
             
-            if (isFavorite) {
-                await removeFromFavoritesApi(Number(productId));
+            // Only call backend if user is fully authenticated (not a guest)
+            if (isAuthenticated && !isGuest) {
+                if (isFavorite) {
+                    await removeFromFavoritesApi(Number(productId));
+                } else {
+                    await addToFavoritesApi(Number(productId));
+                }
             } else {
-                await addToFavoritesApi(Number(productId));
+
             }
             
             return productId;
@@ -43,9 +50,7 @@ export const fetchWishlistPayloadAsync = createAsyncThunk(
     'wishlist/fetchPayloadAsync',
     async (_, { rejectWithValue }) => {
         try {
-            console.log('[Wishlist] Fetching payload from server...');
             const payload = await getFavoritesPayloadApi();
-            console.log('[Wishlist] Fetched payload:', payload);
             return payload.map(String);
         } catch (error: any) {
             console.error('[Wishlist] Failed to fetch payload:', error);
@@ -63,7 +68,7 @@ export const syncWishlistOnAuthAsync = createAsyncThunk(
             const localItems = state.wishlist.items as string[];
             
             if (localItems.length > 0) {
-                console.log('[Wishlist] Syncing local items to server:', localItems);
+
                 // Upload all local items to the backend
                 await Promise.allSettled(
                     localItems.map(id => addToFavoritesApi(Number(id)))
@@ -86,11 +91,13 @@ const wishlistSlice = createSlice({
     initialState,
     reducers: {
         toggleWishlistItem: (state, action: PayloadAction<string>) => {
-            const index = state.items.indexOf(action.payload);
+            const productId = action.payload;
+            const index = state.items.indexOf(productId);
             if (index >= 0) {
-                state.items.splice(index, 1);
+                // Remove all instances if duplicates somehow leaked in
+                state.items = state.items.filter(id => id !== productId);
             } else {
-                state.items.push(action.payload);
+                state.items.push(productId);
             }
         },
         clearWishlist: (state) => {
@@ -111,7 +118,8 @@ const wishlistSlice = createSlice({
                 
                 const index = state.items.indexOf(productId);
                 if (index >= 0) {
-                    state.items.splice(index, 1);
+                    // Remove all instances if duplicates somehow leaked in
+                    state.items = state.items.filter(id => id !== productId);
                 } else {
                     state.items.push(productId);
                 }
@@ -121,7 +129,8 @@ const wishlistSlice = createSlice({
             })
             // fetchWishlistPayloadAsync
             .addCase(fetchWishlistPayloadAsync.fulfilled, (state, action) => {
-                state.items = action.payload;
+                // Deduplicate items from backend
+                state.items = Array.from(new Set(action.payload));
                 state.isInitialized = true;
             });
     },

@@ -22,7 +22,8 @@ import * as Sentry from "@sentry/nextjs";
 export default function AuthInitializerClient() {
     const dispatch = useAppDispatch();
     const initialised = useRef(false);
-    const prevGuestStatus = useRef(true);
+    const prevIsAuthenticated = useRef(false);
+    const prevIsGuest = useRef(true);
     const { user, isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
 
     useEffect(() => {
@@ -46,12 +47,16 @@ export default function AuthInitializerClient() {
     useEffect(() => {
         if (!initialised.current) return;
         
-        // If we transitioned from guest to logged in user
-        if (prevGuestStatus.current && !isGuest && isAuthenticated) {
+        const wasRealUser = prevIsAuthenticated.current && !prevIsGuest.current;
+        const isRealUser = isAuthenticated && !isGuest;
+
+        // If we transitioned from NOT a real user to a real user
+        if (!wasRealUser && isRealUser) {
             void dispatch(syncWishlistOnAuthAsync());
         }
         
-        prevGuestStatus.current = isGuest;
+        prevIsAuthenticated.current = isAuthenticated;
+        prevIsGuest.current = isGuest;
     }, [isGuest, isAuthenticated, dispatch]);
 
     useEffect(() => {

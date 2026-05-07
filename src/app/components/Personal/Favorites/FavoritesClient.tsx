@@ -51,7 +51,12 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                 // We ask for a large limit to cover reasonable wishlists.
                 const response = await getFavoritesApi(100, undefined, lang);
                 if (isMounted) {
-                    setProducts(response.data || []);
+                    const rawData = response.data || [];
+                    // Deduplicate products by ID
+                    const uniqueProducts = Array.from(
+                        new Map(rawData.map((item) => [item.id, item])).values()
+                    );
+                    setProducts(uniqueProducts);
                 }
             } catch (error) {
                 console.error('Failed to fetch favorite products:', error);
