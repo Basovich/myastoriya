@@ -1,0 +1,232 @@
+.orderDetailsPage {
+    display: flex;
+    flex-direction: column;
+}
+
+.detailsBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 16px;
+
+    @media (min-width: 1024px) {
+        padding: 32px;
+        gap: 32px;
+    }
+}
+
+.decorativeDots {
+    display: flex;
+    gap: 4px;
+    margin-top: -12px;
+    margin-bottom: 8px;
+
+    @media (min-width: 1024px) {
+        margin-top: -24px;
+        margin-bottom: 0;
+    }
+
+    span {
+        width: 8px;
+        height: 8px;
+        background-color: #E30613;
+        border-radius: 50%;
+    }
+}
+
+.metaRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+
+    @media (min-width: 1024px) {
+        margin-top: -24px; // Pull up closer to header
+        margin-bottom: 0;
+    }
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #1C1B1B;
+
+    svg {
+        flex-shrink: 0;
+    }
+}
+
+.sourceItem {
+    font-size: 12px;
+    color: #000;
+    
+    @media (min-width: 1024px) {
+        margin-left: auto;
+    }
+
+    strong {
+        font-weight: 700;
+    }
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sectionTitle {
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.productsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+}
+
+.summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 24px 0;
+    border-top: 1px solid #F0F0F0;
+    border-bottom: 1px solid #F0F0F0;
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.summaryItem {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.summaryLabel {
+    font-size: 14px;
+    color: #666;
+}
+
+.summaryValue {
+    font-size: 24px;
+    font-weight: 400;
+    color: #000;
+
+    strong {
+        font-weight: 700;
+    }
+
+    &.negative {
+        color: #000; // In screenshot it's black with minus
+    }
+}
+
+.detailsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+
+    @media (min-width: 1024px) {
+        flex-direction: row;
+        gap: 60px;
+    }
+}
+
+.statusCol {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.infoCol {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.infoBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.infoText {
+    font-size: 14px;
+    color: #000;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.actionsRow {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+
+    @media (min-width: 1024px) {
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 24px;
+    }
+}
+
+.reviewLink {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #000;
+    font-family: inherit;
+
+    @media (any-hover: hover) {
+        &:hover {
+            color: #E30613;
+        }
+    }
+}
+
+.repeatBtn {
+    width: 100%;
+    
+    @media (min-width: 1024px) {
+        width: auto;
+        min-width: 320px;
+    }
+}
+
+.backLinkRow {
+    display: flex;
+    justify-content: center;
+}
+
+.backLink {
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: underline;
+    color: #000;
+
+    @media (any-hover: hover) {
+        &:hover {
+            color: #E30613;
+        }
+    }
+}

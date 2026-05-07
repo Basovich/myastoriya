@@ -163,7 +163,7 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                             time={order.time}
                             dict={dict.card}
                             onRepeatOrder={() => console.log('Repeat order', order.id)}
-                            onDetails={() => console.log('Details order', order.id)}
+                            onDetails={() => router.push(`/${lang}/personal/orders/${order.id}`)}
                             onReview={() => console.log('Review order', order.id)}
                         />
                     ))}
