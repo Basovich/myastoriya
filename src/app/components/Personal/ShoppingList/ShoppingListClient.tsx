@@ -11,6 +11,7 @@ import { logout } from '@/store/slices/authSlice';
 import { logoutApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
 import ShoppingListCard from './ShoppingListCard/ShoppingListCard';
 import s from './ShoppingListClient.module.scss';
@@ -97,9 +98,11 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                     navDict={pDict.navigation}
                 />
 
-                <Button variant="black" className={s.createBtn} onClick={() => console.log('Create new list')}>
-                    {dict.createBtn}
-                </Button>
+                <Link href={`/${lang}/personal/shopping-list/create`} className={s.createLink}>
+                    <Button variant="black" className={s.createBtn}>
+                        {dict.createBtn}
+                    </Button>
+                </Link>
 
                 <div className={s.listsGrid}>
                     {mockShoppingLists.map((item) => (
