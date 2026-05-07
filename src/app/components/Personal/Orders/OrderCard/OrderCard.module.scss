@@ -14,18 +14,38 @@
     }
 }
 
-.topRow {
-    display: flex;
-    justify-content: space-between;
+.headerGroup {
+    display: grid;
+    grid-template-areas: 
+        "status source"
+        "number number";
+    row-gap: 8px;
     align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+
+    @media (min-width: 1024px) {
+        grid-template-areas: "number status source";
+        grid-template-columns: 1fr auto 1fr;
+    }
 }
 
-.statusBadge {
+.statusBlock {
+    grid-area: status;
     display: flex;
     align-items: center;
     gap: 6px;
+    
+    @media (min-width: 1024px) {
+        justify-content: center;
+    }
+}
+
+.sourceBlock {
+    grid-area: source;
+    justify-self: end;
+}
+
+.orderNumberBlock {
+    grid-area: number;
 }
 
 .statusText {
@@ -52,11 +72,6 @@
     strong {
         font-weight: 700;
     }
-}
-
-.orderNumberRow {
-    display: flex;
-    align-items: center;
 }
 
 .orderNumber {
@@ -176,6 +191,7 @@
 
     @media (min-width: 1024px) {
         font-size: 24px;
+        color: #1C1B1B;
     }
 }
 

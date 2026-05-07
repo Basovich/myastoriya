@@ -50,9 +50,12 @@ export default function OrderCard({
 
     return (
         <div className={s.orderCard}>
-            {/* Top row */}
-            <div className={s.topRow}>
-                <div className={s.statusBadge}>
+            {/* Top row / Header */}
+            <div className={s.headerGroup}>
+                <div className={s.orderNumberBlock}>
+                    <span className={s.orderNumber}>{dict.orderPrefix} <strong>№{orderNumber}</strong></span>
+                </div>
+                <div className={s.statusBlock}>
                     {statusVariant === 'success' && (
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M7 0C3.13401 0 0 3.13401 0 7C0 10.866 3.13401 14 7 14C10.866 14 14 10.866 14 7C14 3.13401 10.866 0 7 0ZM10.5986 4.79373L5.92348 9.46884C5.82397 9.56835 5.69467 9.61811 5.56537 9.61811C5.43606 9.61811 5.30676 9.56835 5.20726 9.46884L3.40142 7.663C3.20359 7.46517 3.20359 7.14441 3.40142 6.94658C3.59925 6.74875 3.92002 6.74875 4.11785 6.94658L5.56537 8.3941L9.88215 4.07732C10.08 3.87948 10.4008 3.87948 10.5986 4.07732C10.7964 4.27515 10.7964 4.59591 10.5986 4.79373Z" fill="#13A556"/>
@@ -60,12 +63,9 @@ export default function OrderCard({
                     )}
                     <span className={clsx(s.statusText, s[`status_${statusVariant}`])}>{status}</span>
                 </div>
-                <div className={s.sourceText}>{dict.sourcePrefix}: <strong>{source}</strong></div>
-            </div>
-
-            {/* Title / Order Number */}
-            <div className={s.orderNumberRow}>
-                <span className={s.orderNumber}>{dict.orderPrefix} <strong>{orderNumber}</strong></span>
+                <div className={s.sourceBlock}>
+                    <span className={s.sourceText}>{dict.sourcePrefix}: <strong>{source}</strong></span>
+                </div>
             </div>
 
             {/* Middle row: Products & Price on Desktop */}
