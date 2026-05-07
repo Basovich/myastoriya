@@ -1,0 +1,36 @@
+.ordersPage {
+    display: flex;
+    flex-direction: column;
+}
+
+.ordersBlock {
+    padding: 16px;
+    
+    @media (min-width: 1024px) {
+        padding: 32px;
+    }
+}
+
+.controlsRow {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 16px;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 24px;
+    }
+}
+
+.sortSelect {
+    // any specific overrides for the SortSelect
+}
+
+.ordersList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 1024px) {
+        gap: 24px;
+    }
+}
