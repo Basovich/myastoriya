@@ -1,0 +1,503 @@
+.loyaltyPage {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 1024px) {
+        gap: 24px;
+    }
+}
+
+.dashboardBlock {
+    position: relative;
+    overflow: hidden;
+    padding: 0 !important; /* Reset padding because blockContent will handle it */
+}
+
+.blockBg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.desktopBg {
+    display: none !important;
+    @media (min-width: 1024px) {
+        display: block !important;
+    }
+}
+
+.mobileBg {
+    display: block !important;
+    @media (min-width: 1024px) {
+        display: none !important;
+    }
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.blockContent {
+    position: relative;
+    z-index: 2;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 1024px) {
+        padding: 32px;
+        gap: 32px;
+    }
+}
+
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 1024px) {
+        flex-direction: row;
+        gap: 24px;
+        align-items: stretch;
+    }
+}
+
+.pageHeaderWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+
+.leftColumn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 1024px) {
+        flex: 1.1;
+        gap: 24px;
+    }
+}
+
+.balanceCard, .progressCard {
+    background: #E3051B;
+    border-radius: 12px;
+    padding: 20px;
+    color: #F6F6F6;
+    position: relative;
+    overflow: hidden;
+
+    @media (min-width: 1024px) {
+        padding: 32px 40px;
+    }
+}
+
+.balanceCard {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 99px; /* From Figma */
+    justify-content: center;
+
+    @media (min-width: 1024px) {
+        height: auto;
+        min-height: 130px;
+    }
+}
+
+.balanceLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: var(--font-houschka), sans-serif;
+    text-transform: none;
+    opacity: 1;
+
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.balanceBody {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.balanceValue {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: var(--font-houschka), sans-serif;
+
+    .amount {
+        font-size: 48px;
+        font-weight: 800;
+        line-height: 1;
+
+        @media (min-width: 1024px) {
+            font-size: 56px;
+        }
+    }
+
+    .currency {
+        font-size: 24px;
+        font-weight: 800;
+        
+        @media (min-width: 1024px) {
+            font-size: 28px;
+        }
+    }
+}
+
+.conversionTag {
+    background: transparent;
+    color: #F6F6F6;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 800;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    font-family: var(--font-houschka), sans-serif;
+}
+
+.progressCard {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    min-height: 265px; /* From Figma */
+}
+
+.progressTextWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    z-index: 2;
+}
+
+.progressDesc {
+    font-size: 16px;
+    line-height: 1.4;
+    margin: 0;
+    font-weight: 500;
+    font-family: var(--font-houschka), sans-serif;
+
+    strong {
+        font-weight: 800;
+    }
+
+    .whiteHighlight {
+        color: #fff;
+        font-weight: 800;
+        font-size: 18px;
+    }
+}
+
+.targetAmount {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 28px;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-family: var(--font-houschka), sans-serif;
+
+    @media (min-width: 1024px) {
+        font-size: 32px;
+    }
+    
+    svg {
+        width: 32px;
+        height: 32px;
+        opacity: 1;
+    }
+}
+
+.progressGraphics {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    width: 60%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.giftBox {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.3));
+    animation: float 5s ease-in-out infinite;
+
+    @media (min-width: 1024px) {
+        right: 30px;
+        bottom: 30px;
+    }
+}
+
+.percentSign {
+    position: absolute;
+    right: 40px;
+    bottom: -10px;
+    font-size: 140px;
+    font-weight: 800;
+    color: #fff;
+    opacity: 0.15;
+    transform: rotate(20deg);
+    line-height: 1;
+    font-family: var(--font-houschka), sans-serif;
+
+    @media (min-width: 1024px) {
+        right: 50px;
+        font-size: 180px;
+    }
+}
+
+@keyframes float {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(2deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+/* Steps Card */
+.stepsCard {
+    flex: 1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    box-shadow: 0 14px 18px rgba(0, 0, 0, 0.05);
+
+    @media (min-width: 1024px) {
+        padding: 40px;
+    }
+}
+
+.promoBox {
+    border: 2px dashed #E6000F;
+    border-radius: 8px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.cashbackValue {
+    color: #E6000F;
+    font-size: 40px;
+    font-weight: 800;
+    font-family: var(--font-houschka), sans-serif;
+
+    @media (min-width: 1024px) {
+        font-size: 48px;
+    }
+}
+
+.cashbackLabel {
+    color: #1C1B1B;
+    font-size: 15px;
+    font-weight: 700;
+    max-width: 180px;
+    text-align: left;
+    line-height: 1.3;
+
+    @media (min-width: 1024px) {
+        font-size: 16px;
+    }
+}
+
+.timelineWrapper {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.timelineLabel {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #1C1B1B;
+    line-height: 1.2;
+    text-align: left;
+    width: 80px;
+    font-family: var(--font-houschka), sans-serif;
+    margin-top: 6px;
+}
+
+.timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding-left: 0;
+    flex: 1;
+}
+
+.timelineLine {
+    position: absolute;
+    left: 14px; /* Center of 28px marker */
+    top: 14px;
+    bottom: 14px;
+    width: 2px;
+    border-right: 2px dashed #E6000F;
+    background: transparent;
+    transform: translateX(-50%);
+}
+
+.stepItem {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.stepMarker {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    z-index: 2;
+    flex-shrink: 0;
+    font-family: var(--font-houschka), sans-serif;
+}
+
+.marker01 { background: #0C0101; }
+.marker02 { background: #830C0C; }
+.marker03 { background: #C71616; }
+.marker04 { background: #E6000F; }
+
+.stepInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stepRange {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1C1B1B;
+    font-family: var(--font-houschka), sans-serif;
+    line-height: 1.2;
+
+    strong {
+        font-weight: 800;
+    }
+}
+
+.stepDesc {
+    font-size: 12px;
+    color: #8C8C8C;
+    font-family: var(--font-houschka), sans-serif;
+    line-height: 1.2;
+}
+
+.redText {
+    color: #E6000F;
+    font-weight: 800;
+}
+
+/* Logout Button */
+.logoutBtn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #fff;
+    border-radius: 8px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--font-helios), sans-serif;
+    text-transform: uppercase;
+    transition: background 0.3s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    svg {
+        width: 12px;
+        height: 12px;
+        opacity: 0.8;
+    }
+}
+
+/* Terms Section */
+.termsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sectionTitle {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+
+    @media (min-width: 1024px) {
+        font-size: 20px;
+    }
+}
+
+.termsText {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1C1B1B;
+    white-space: pre-line;
+    max-height: 150px;
+    overflow: hidden;
+    position: relative;
+
+    &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
+        background: linear-gradient(transparent, #fff);
+    }
+
+    &.expanded {
+        max-height: none;
+        
+        &:after {
+            display: none;
+        }
+    }
+}
+
+.showMoreBtn {
+    width: max-content;
+    height: 44px;
+    padding: 0 32px;
+    font-size: 12px;
+    font-weight: 700;
+}

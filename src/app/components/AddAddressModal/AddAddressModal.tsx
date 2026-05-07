@@ -13,7 +13,16 @@ import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE } from '@/lib/constants';
 interface AddAddressModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onAdd: (address: { id: string; title: string; street: string }) => void;
+    onAdd: (address: { 
+        id: string; 
+        title: string; 
+        street: string;
+        city?: string;
+        house?: string;
+        apartment?: string;
+        entrance?: string;
+        floor?: string;
+    }) => void;
 }
 
 const containerStyle = {
@@ -41,6 +50,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
     const { disableScroll, enableScroll } = useScrollLock();
 
     // Form state
+    const [city, setCity] = useState('Київ');
     const [street, setStreet] = useState('');
     const [house, setHouse] = useState('');
     const [apartment, setApartment] = useState('');
@@ -64,6 +74,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
         onClose();
         setTimeout(() => {
             setView('form');
+            setCity('Київ');
             setStreet('');
             setHouse('');
             setApartment('');
@@ -82,7 +93,12 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
         onAdd({
             id: Math.random().toString(36).substr(2, 9),
             title: `Моя адреса №${Math.floor(Math.random() * 10) + 2}`,
-            street: fullAddress
+            street: fullAddress,
+            city,
+            house,
+            apartment,
+            entrance,
+            floor
         });
         handleClose();
     };
@@ -92,7 +108,8 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
         onAdd({
             id: Math.random().toString(36).substr(2, 9),
             title: 'Вибрана на карті',
-            street: mapSearch || `Координати: ${mapMarker.lat.toFixed(4)}, ${mapMarker.lng.toFixed(4)}`
+            street: mapSearch || `Координати: ${mapMarker.lat.toFixed(4)}, ${mapMarker.lng.toFixed(4)}`,
+            city: 'Київ', // Default for map for now
         });
         handleClose();
     };
@@ -160,6 +177,16 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                     <div className={s.modalContent}>
                         <h2 className={s.title}>Додати адресу</h2>
                         <form className={s.form} onSubmit={handleFormSubmit}>
+                            <div className={s.formRow}>
+                                <InputField 
+                                    id="city"
+                                    label="Місто"
+                                    value={city}
+                                    onChange={(e) => setCity(e.target.value)}
+                                    required
+                                    className={s.cityField}
+                                />
+                            </div>
                             <div className={s.formRow}>
                                 <InputField 
                                     id="street"
