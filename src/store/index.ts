@@ -21,6 +21,7 @@ import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
 import authReducer from './slices/authSlice';
 import localityReducer from './slices/localitySlice';
+import viewedProductsReducer from './slices/viewedProductsSlice';
 
 const SIX_HOURS = 6 * 60 * 60 * 1000;
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
@@ -55,7 +56,7 @@ const generalExpireTransform = createTransform(
         }
         return outboundState;
     },
-    { whitelist: ['cart', 'wishlist'] }
+    { whitelist: ['cart', 'wishlist', 'viewedProducts'] }
 );
 
 const localityPersistConfig = {
@@ -69,12 +70,13 @@ const rootReducer = combineReducers({
     wishlist: wishlistReducer,
     auth: authReducer,
     locality: persistReducer(localityPersistConfig, localityReducer),
+    viewedProducts: viewedProductsReducer,
 });
 
 const persistConfig = {
     key: 'myastoriya-root',
     storage,
-    whitelist: ['cart', 'wishlist', 'auth'], // Removed 'locality' from here as it's now nested
+    whitelist: ['cart', 'wishlist', 'auth', 'viewedProducts'], // Removed 'locality' from here as it's now nested
     transforms: [authExpireTransform, generalExpireTransform]
 };
 

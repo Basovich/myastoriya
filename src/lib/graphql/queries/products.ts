@@ -135,6 +135,12 @@ export interface ProductsResponse {
 // Queries
 // ---------------------------------------------------------------------------
 
+const ADD_PRODUCT_VIEW_MUTATION = /* GraphQL */ `
+    mutation AddProductView($id: ID!) {
+        addProductView(id: $id)
+    }
+`;
+
 const PRODUCTS_QUERY = /* GraphQL */ `
     query Products($categoryId: Int, $saleId: Int, $search: String, $limit: Int, $page: Int) {
         products(categoryId: $categoryId, saleId: $saleId, search: $search, limit: $limit, page: $page) {
@@ -282,6 +288,15 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string): Pr
         { next: { revalidate: 3600 }, lang },
     );
     return data.products;
+}
+
+export async function addProductViewApi(id: number | string, lang?: string, token?: string): Promise<boolean> {
+    const data = await gqlRequest<{ addProductView: boolean }>(
+        ADD_PRODUCT_VIEW_MUTATION,
+        { id: String(id) },
+        { lang, token, cache: 'no-store' }
+    );
+    return data.addProductView;
 }
 
 export async function getProductByIdApi(id: number | string, lang?: string): Promise<Product> {

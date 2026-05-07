@@ -14,8 +14,9 @@ import QuantitySelector from '@/app/components/ui/QuantitySelector/QuantitySelec
 import Publications from '@/app/components/Publications';
 import AuthModal from '@/app/components/AuthModal';
 import VideoReviewModal from '@/app/components/VideoReviewModal';
-import { useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { RootState } from '@/store';
+import { recordProductViewAsync } from '@/store/slices/viewedProductsSlice';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { Locale } from '@/i18n/config';
@@ -72,7 +73,15 @@ const ProductClient: React.FC<ProductClientProps> = ({
     lang,
     dict,
 }) => {
-    const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+    const dispatch = useAppDispatch();
+    const { isAuthenticated } = useAppSelector((state: RootState) => state.auth);
+
+    // Record product view on mount
+    React.useEffect(() => {
+        if (product?.id) {
+            void dispatch(recordProductViewAsync(String(product.id)));
+        }
+    }, [product?.id, dispatch]);
 
     const [quantity, setQuantity] = useState(1);
     const [selectedDoneness, setSelectedDoneness] = useState('medium');

@@ -41,7 +41,7 @@ export default function Actions() {
             <div className={s.actions}>
                 {/* Cart */}
                 <button className={s.actionBtn} aria-label="Кошик" onClick={() => setIsCartModalOpen(true)}>
-                    <Image src="/icons/shopping-bag.svg" alt="Cart" width="20" height="20" />
+                    <Image src="/icons/shopping-bag.svg" alt="Cart" width={20} height={20} />
                     {hydrated && totalCartItems > 0 && (
                         <span className={s.badge}>{totalCartItems}</span>
                     )}
@@ -53,7 +53,7 @@ export default function Actions() {
                     aria-label="Обране"
                     onClick={handleFavoritesClick}
                 >
-                    <Image src="/icons/icon-heart.svg" alt="Favorites" width="20" height="20" />
+                    <Image src="/icons/icon-heart.svg" alt="Favorites" width={20} height={20} />
                     {hydrated && totalWishlistItems > 0 && (
                         <span className={s.badge}>{totalWishlistItems}</span>
                     )}

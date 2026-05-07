@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
 import { logoutApi, deleteUserApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { Locale } from '@/i18n/config';
 
 import BonusCard from '@/app/components/Personal/BonusCard/BonusCard';
@@ -103,13 +104,14 @@ const profileDict = {
 };
 
 export default function ProfilePage() {
-    const { user } = useAppSelector((state) => state.auth);
+    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const router = useRouter();
     const params = useParams();
     const lang = (params?.lang as Locale) || 'ua';
     const dict = profileDict[lang as keyof typeof profileDict];
     
+    const hydrated = useIsHydrated();
     const [viewedProducts, setViewedProducts] = React.useState<any[]>([]);
     const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -184,7 +186,7 @@ export default function ProfilePage() {
         };
 
         fetchViewedProducts();
-    }, [lang]);
+    }, [lang, isAuthenticated]);
 
     const handleFormSubmit = async (values: any) => {
         try {
@@ -263,12 +265,16 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            <ProfileForm 
-                user={user} 
-                dict={dict.form} 
-                onSubmit={handleFormSubmit}
-                submitStatus={submitStatus}
-            />
+            {hydrated ? (
+                <ProfileForm 
+                    user={user} 
+                    dict={dict.form} 
+                    onSubmit={handleFormSubmit}
+                    submitStatus={submitStatus}
+                />
+            ) : (
+                <div style={{ height: '400px' }} /> // Placeholder to avoid layout shift
+            )}
 
             <div className={s.sliderWrapper}>
                 <RecentlyViewedSlider title={dict.recommendations.title} products={viewedProducts} />

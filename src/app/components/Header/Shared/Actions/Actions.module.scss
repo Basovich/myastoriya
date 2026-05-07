@@ -35,8 +35,10 @@
         align-items: center;
         justify-content: center;
 
-        img {
+        img, .icon {
             filter: brightness(0) invert(1);
+            width: 20px;
+            height: 20px;
         }
     }
 
@@ -46,6 +48,11 @@
             background: #1a1a1a;
             opacity: 0.9;
         }
+    }
+
+    img {
+        width: 20px;
+        height: 20px;
     }
 }
 

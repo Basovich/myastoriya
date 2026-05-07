@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginAsGuest, setUser, setInitialized } from '@/store/slices/authSlice';
 import { fetchWishlistPayloadAsync, syncWishlistOnAuthAsync } from '@/store/slices/wishlistSlice';
+import { syncViewedProductsOnAuthAsync } from '@/store/slices/viewedProductsSlice';
 import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies, getAccessToken, tryRefreshTokenAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
@@ -53,6 +54,7 @@ export default function AuthInitializerClient() {
         // If we transitioned from NOT a real user to a real user
         if (!wasRealUser && isRealUser) {
             void dispatch(syncWishlistOnAuthAsync());
+            void dispatch(syncViewedProductsOnAuthAsync());
         }
         
         prevIsAuthenticated.current = isAuthenticated;

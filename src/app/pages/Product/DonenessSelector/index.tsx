@@ -57,7 +57,7 @@ const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange }) 
                                 alt={option.label}
                                 width={60}
                                 height={34}
-                                objectFit="cover"
+                                style={{ objectFit: 'cover' }}
                             />
                         </div>
                     </div>
