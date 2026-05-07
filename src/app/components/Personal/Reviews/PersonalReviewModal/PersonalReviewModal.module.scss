@@ -1,0 +1,166 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+
+    &:global(.ReactModal__Overlay--after-open) {
+        opacity: 1;
+    }
+
+    &:global(.ReactModal__Overlay--before-close) {
+        opacity: 0;
+    }
+}
+
+.modalWrapper {
+    outline: none;
+    position: relative;
+    max-width: 90%;
+    width: 500px;
+}
+
+.modal {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px 24px;
+    box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.1);
+
+    @media (min-width: 1024px) {
+        padding: 48px;
+    }
+}
+
+.closeBtn {
+    position: absolute;
+    top: -40px;
+    right: -10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    padding: 10px;
+    
+    @media (min-width: 1024px) {
+        right: -50px;
+    }
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    color: #1C1B1B;
+    line-height: 1.4;
+
+    @media (min-width: 1024px) {
+        font-size: 22px;
+    }
+}
+
+.orderNum {
+    color: #E30613;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.ratingsBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ratingRow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    @media (min-width: 640px) {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.ratingLabel {
+    font-size: 14px;
+    color: #000;
+    font-weight: 400;
+}
+
+.stars {
+    display: flex;
+    gap: 4px;
+}
+
+.starBtn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    
+    svg {
+        width: 32px;
+        height: 32px;
+        
+        path {
+            fill: #fff;
+            stroke: #E30613;
+            transition: fill 0.2s ease;
+        }
+    }
+}
+
+.starBtnFilled {
+    svg {
+        path {
+            fill: #E30613;
+            stroke: #E30613;
+        }
+    }
+}
+
+.submitBtn {
+    margin-top: 12px;
+    height: 56px;
+    font-weight: 700;
+}
+
+.successView {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 24px 0;
+}
+
+.successIcon {
+    margin-bottom: 24px;
+}
+
+.successTitle {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000;
+}
+
+.successText {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 32px;
+}
