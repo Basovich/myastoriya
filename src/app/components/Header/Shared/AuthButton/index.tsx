@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { useAppSelector } from '@/store/hooks';
 import clsx from 'clsx';
@@ -9,18 +9,31 @@ import s from './AuthButton.module.scss';
 import AuthModal from '@/app/components/AuthModal';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 
-export default function AuthButton() {
+function AuthButton() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter();
+    const params = useParams();
+    const lang = params?.lang as string || 'ua';
+
     const { user, isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
     const hydrated = useIsHydrated();
 
     const isReallyLoggedIn = hydrated && isAuthenticated && !isGuest;
-    const firstLetter = user?.email?.charAt(0)?.toUpperCase() || '?';
+
+    useEffect(() => {
+        if (!hydrated || isReallyLoggedIn) return;
+
+        const search = window.location.search;
+        const params = new URLSearchParams(search);
+        if (params.get('auth') === '1') {
+            setIsModalOpen(true);
+        }
+    }, [isReallyLoggedIn, hydrated]);
 
     const handleAuthClick = () => {
         if (isReallyLoggedIn) {
-            router.push('/personal/profile/');
+            const prefix = lang === 'ua' ? '' : `/${lang}`;
+            router.push(`${prefix}/personal/profile/`);
         } else {
             setIsModalOpen(true);
         }
@@ -38,7 +51,7 @@ export default function AuthButton() {
                 ) : (
                     <>
                         <span className={s.label}>
-                            {isReallyLoggedIn ? firstLetter : 'Вхід'}
+                            Вхід
                         </span>
                         <Image src="/icons/icon-profile.svg" alt="Profile" width={20} height={20} className={s.icon} />
                     </>
@@ -52,3 +65,5 @@ export default function AuthButton() {
         </>
     );
 }
+
+export default AuthButton;

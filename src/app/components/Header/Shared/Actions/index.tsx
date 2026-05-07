@@ -10,7 +10,7 @@ import AuthButton from '@/app/components/Header/Shared/AuthButton';
 import AuthModal from '@/app/components/AuthModal';
 import CartModal from '@/app/components/CartModal/CartModal';
 
-export default function Actions() {
+function Actions() {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
     const router = useRouter();
@@ -30,7 +30,8 @@ export default function Actions() {
 
     const handleFavoritesClick = () => {
         if (isReallyLoggedIn) {
-            router.push(`/${lang}/personal/favorites/`);
+            const prefix = lang === 'ua' ? '' : `/${lang}`;
+            router.push(`${prefix}/personal/favorites/`);
         } else {
             setIsAuthModalOpen(true);
         }
@@ -66,7 +67,10 @@ export default function Actions() {
             <AuthModal
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}
-                onSuccess={() => router.push(`/${lang}/personal/favorites/`)}
+                onSuccess={() => {
+                    const prefix = lang === 'ua' ? '' : `/${lang}`;
+                    router.push(`${prefix}/personal/favorites/`);
+                }}
             />
             <CartModal
                 isOpen={isCartModalOpen}
@@ -76,3 +80,5 @@ export default function Actions() {
         </>
     );
 }
+
+export default Actions;
