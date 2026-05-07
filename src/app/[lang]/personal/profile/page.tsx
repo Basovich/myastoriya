@@ -8,16 +8,17 @@ import { logoutApi, deleteUserApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { Locale } from '@/i18n/config';
-
 import BonusCard from '@/app/components/Personal/BonusCard/BonusCard';
 import RecentOrderCard from '@/app/components/Personal/RecentOrderCard/RecentOrderCard';
 import Button from '@/app/components/ui/Button/Button';
 import ProfileForm from '@/app/components/Personal/ProfileForm/ProfileForm';
 import RecentlyViewedSlider from '@/app/components/Personal/RecentlyViewedSlider/RecentlyViewedSlider';
-import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import { getViewedProductsApi, Product as ApiProduct, resolveProductImageUrl } from '@/lib/graphql/queries/products';
 import { updateUserDataApi } from '@/lib/graphql/queries/auth';
 import { setUser } from '@/store/slices/authSlice';
+import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
+import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
+import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import s from './Profile.module.scss';
 
 const profileDict = {
@@ -246,42 +247,55 @@ export default function ProfilePage() {
     };
 
     return (
-        <div className={s.profileContainer}>
-            <div className={s.topCardsRow}>
-                <div className={s.cardWrapper}>
-                    <RecentOrderCard 
-                        status={mockOrder.status}
-                        items={mockOrder.items}
-                        totalItems={mockOrder.totalItems}
-                        dict={dict.recentOrder}
-                    />
-                </div>
-                <div className={s.cardWrapper}>
-                    <BonusCard 
-                        balance={1200} 
-                        percent={3} 
-                        dict={dict.bonusCard} 
-                    />
-                </div>
-            </div>
-
-            {hydrated ? (
-                <ProfileForm 
-                    user={user} 
-                    dict={dict.form} 
-                    onSubmit={handleFormSubmit}
-                    submitStatus={submitStatus}
+        <>
+            <PersonalContentBlock>
+                <PersonalPageHeader 
+                    title={dict.title}
+                    logoutLabel={personalDict[lang].navigation.logout}
+                    onLogout={handleLogout}
+                    user={user}
+                    navDict={personalDict[lang].navigation}
                 />
-            ) : (
-                <div style={{ height: '400px' }} /> // Placeholder to avoid layout shift
-            )}
+                
+                <div className={s.profileContainer}>
+                    <div className={s.topCardsRow}>
+                        <div className={s.cardWrapper}>
+                            <RecentOrderCard 
+                                status={mockOrder.status}
+                                items={mockOrder.items}
+                                totalItems={mockOrder.totalItems}
+                                dict={dict.recentOrder}
+                            />
+                        </div>
+                        <div className={s.cardWrapper}>
+                            <BonusCard 
+                                balance={1200} 
+                                percent={3} 
+                                dict={dict.bonusCard} 
+                            />
+                        </div>
+                    </div>
 
-            <div className={s.sliderWrapper}>
+                    {hydrated ? (
+                        <ProfileForm 
+                            user={user} 
+                            dict={dict.form} 
+                            onSubmit={handleFormSubmit}
+                            submitStatus={submitStatus}
+                        />
+                    ) : (
+                        <div style={{ height: '400px' }} />
+                    )}
+
+                    <Button variant="outline-black" className={s.deleteBtn} onClick={handleDeleteAccount}>
+                        {dict.deleteAccount.button}
+                    </Button>
+                </div>
+            </PersonalContentBlock>
+
+            <PersonalContentBlock>
                 <RecentlyViewedSlider title={dict.recommendations.title} products={viewedProducts} />
-            </div>
-            <Button variant="outline-black" className={s.deleteBtn} onClick={handleDeleteAccount}>
-                {dict.deleteAccount.button}
-            </Button>
-        </div>
+            </PersonalContentBlock>
+        </>
     );
 }

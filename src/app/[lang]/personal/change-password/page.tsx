@@ -8,6 +8,13 @@ import { setUser } from '@/store/slices/authSlice';
 import { getAccessToken } from '@/app/actions/authActions';
 import { Locale } from '@/i18n/config';
 import ChangePasswordForm, { ChangePasswordFormValues } from '@/app/components/Personal/ChangePasswordForm/ChangePasswordForm';
+import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
+import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
+import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
+import { logout } from '@/store/slices/authSlice';
+import { logoutApi } from '@/lib/graphql/queries/auth';
+import { clearAuthCookies } from '@/app/actions/authActions';
+import { useRouter } from 'next/navigation';
 import s from './ChangePassword.module.scss';
 
 const changePasswordDict = {
@@ -102,14 +109,37 @@ export default function ChangePasswordPage() {
         }
     };
 
+    const router = useRouter();
+    const handleLogout = async () => {
+        try {
+            const token = await getAccessToken();
+            if (token) await logoutApi(token);
+        } catch {
+            // Ignore
+        } finally {
+            await clearAuthCookies();
+            dispatch(logout());
+            router.replace('/');
+        }
+    };
+
     return (
-        <div className={s.pageWrapper}>
-            <ChangePasswordForm 
-                user={user} 
-                dict={dict} 
-                onSubmit={handleFormSubmit}
-                submitStatus={submitStatus}
+        <PersonalContentBlock>
+            <PersonalPageHeader 
+                title={dict.title}
+                logoutLabel={personalDict[lang].navigation.logout}
+                onLogout={handleLogout}
+                user={user}
+                navDict={personalDict[lang].navigation}
             />
-        </div>
+            <div className={s.pageWrapper}>
+                <ChangePasswordForm 
+                    user={user} 
+                    dict={dict} 
+                    onSubmit={handleFormSubmit}
+                    submitStatus={submitStatus}
+                />
+            </div>
+        </PersonalContentBlock>
     );
 }
