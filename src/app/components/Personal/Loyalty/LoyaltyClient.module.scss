@@ -3,7 +3,7 @@
     flex-direction: column;
     gap: 16px;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         gap: 24px;
     }
 }
@@ -14,39 +14,6 @@
     padding: 0 !important; /* Reset padding because blockContent will handle it */
 }
 
-.blockBg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-}
-
-.desktopBg {
-    display: none !important;
-    @media (min-width: 1024px) {
-        display: block !important;
-    }
-}
-
-.mobileBg {
-    display: block !important;
-    @media (min-width: 1024px) {
-        display: none !important;
-    }
-}
-
-.overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 1;
-}
-
 .blockContent {
     position: relative;
     z-index: 2;
@@ -54,10 +21,15 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    background-image: url('/images/loyalty_bg_mobile.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         padding: 32px;
         gap: 32px;
+        background-image: url('/images/loyalty_bg_desktop.webp');
     }
 }
 
@@ -66,9 +38,9 @@
     flex-direction: column;
     gap: 16px;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         flex-direction: row;
-        gap: 24px;
+        gap: 30px;
         align-items: stretch;
     }
 }
@@ -86,7 +58,7 @@
     flex-direction: column;
     gap: 16px;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         flex: 1.1;
         gap: 24px;
     }
@@ -100,7 +72,7 @@
     position: relative;
     overflow: hidden;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         padding: 32px 40px;
     }
 }
@@ -112,7 +84,7 @@
     height: 99px; /* From Figma */
     justify-content: center;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         height: auto;
         min-height: 130px;
     }
@@ -151,7 +123,7 @@
         font-weight: 800;
         line-height: 1;
 
-        @media (min-width: 1024px) {
+        @media (min-width: 1280px) {
             font-size: 56px;
         }
     }
@@ -160,7 +132,7 @@
         font-size: 24px;
         font-weight: 800;
         
-        @media (min-width: 1024px) {
+        @media (min-width: 1280px) {
             font-size: 28px;
         }
     }
@@ -219,13 +191,13 @@
     text-transform: uppercase;
     font-family: var(--font-houschka), sans-serif;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         font-size: 32px;
     }
     
     svg {
-        width: 32px;
-        height: 32px;
+        width: 18px;
+        height: 18px;
         opacity: 1;
     }
 }
@@ -247,7 +219,7 @@
     filter: drop-shadow(0 15px 30px rgba(0,0,0,0.3));
     animation: float 5s ease-in-out infinite;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         right: 30px;
         bottom: 30px;
     }
@@ -265,7 +237,7 @@
     line-height: 1;
     font-family: var(--font-houschka), sans-serif;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         right: 50px;
         font-size: 180px;
     }
@@ -282,67 +254,63 @@
     flex: 1;
     background: #fff;
     border-radius: 12px;
-    padding: 24px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 32px;
     box-shadow: 0 14px 18px rgba(0, 0, 0, 0.05);
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         padding: 40px;
     }
 }
 
 .promoBox {
-    border: 2px dashed #E6000F;
-    border-radius: 8px;
-    padding: 20px 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 11px;
+    padding: 10px 10px 7px;
+    border-radius: 8px;
+    border: 1px dashed #E6000F;
+    background: #FFF;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.10);
 }
 
 .cashbackValue {
     color: #E6000F;
-    font-size: 40px;
+    font-size: 24px;
+    font-style: normal;
     font-weight: 800;
+    line-height: 107.143%;
+    text-transform: uppercase;
     font-family: var(--font-houschka), sans-serif;
 
-    @media (min-width: 1024px) {
-        font-size: 48px;
+    @media (min-width: 1280px) {
+        font-size: 28px;
     }
 }
 
 .cashbackLabel {
-    color: #1C1B1B;
-    font-size: 15px;
-    font-weight: 700;
-    max-width: 180px;
-    text-align: left;
-    line-height: 1.3;
-
-    @media (min-width: 1024px) {
-        font-size: 16px;
-    }
+    color: #000;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .timelineWrapper {
     display: flex;
-    gap: 40px;
-    align-items: flex-start;
+    gap: 20px;
+    align-items: center;
 }
 
 .timelineLabel {
-    font-size: 13px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: #1C1B1B;
-    line-height: 1.2;
-    text-align: left;
-    width: 80px;
-    font-family: var(--font-houschka), sans-serif;
-    margin-top: 6px;
+    color: #000;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
 }
 
 .timeline {
@@ -399,7 +367,7 @@
 }
 
 .stepRange {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
     color: #1C1B1B;
     font-family: var(--font-houschka), sans-serif;
@@ -408,13 +376,6 @@
     strong {
         font-weight: 800;
     }
-}
-
-.stepDesc {
-    font-size: 12px;
-    color: #8C8C8C;
-    font-family: var(--font-houschka), sans-serif;
-    line-height: 1.2;
 }
 
 .redText {
@@ -461,7 +422,7 @@
     font-weight: 800;
     margin: 0;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         font-size: 20px;
     }
 }
