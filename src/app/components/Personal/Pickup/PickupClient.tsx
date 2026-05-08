@@ -71,8 +71,20 @@ const MOCK_POINTS: PickupPoint[] = [
     }
 ];
 
+import AddPickupModal from './AddPickupModal';
+
+interface Store {
+    id: string;
+    name: string;
+    address: string;
+    hours: string;
+    lat: number;
+    lng: number;
+}
+
 export default function PickupClient({ user, lang }: PickupClientProps) {
     const [points, setPoints] = useState<PickupPoint[]>(MOCK_POINTS);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     
     const pDict = personalDict[lang];
     const dict = localDict[lang];
@@ -88,6 +100,16 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
         if (window.confirm(lang === 'ua' ? 'Ви впевнені?' : 'Вы уверены?')) {
             setPoints(prev => prev.filter(p => p.id !== id));
         }
+    };
+
+    const handleAddStore = (store: Store) => {
+        const newPoint: PickupPoint = {
+            id: store.id + Math.random(),
+            address: store.address,
+            hours: store.hours,
+            isDefault: points.length === 0
+        };
+        setPoints(prev => [...prev, newPoint]);
     };
 
     const handleLogout = () => {
@@ -158,7 +180,7 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
                         </div>
                     ))}
 
-                    <button className={s.addCard}>
+                    <button className={s.addCard} onClick={() => setIsModalOpen(true)}>
                         <div className={s.plusCircle}>
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                                 <path d="M12 5V19M5 12H19" stroke="#999" strokeWidth="2" strokeLinecap="round" />
@@ -168,6 +190,13 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
                     </button>
                 </div>
             </PersonalContentBlock>
+
+            <AddPickupModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onAdd={handleAddStore}
+                lang={lang}
+            />
         </div>
     );
 }
