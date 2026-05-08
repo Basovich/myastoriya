@@ -147,24 +147,25 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
                 <h2 className={s.subtitle}>{dict.subtitle}</h2>
 
                 <div className={s.grid}>
-                    {addresses.map((address) => (
+                    {addresses.map((address, index) => (
                         <div key={address.id} className={clsx(s.card, address.isDefault && s.defaultCard)}>
                             <div className={s.cardHeader}>
-                                <span className={s.cardTitle}>Моя адреса #{address.id.slice(-2)}</span>
+                                <span className={s.cardTitle}>Моя адреса №{index + 1}</span>
                                 <button 
                                     className={s.deleteBtn}
                                     onClick={() => handleDelete(address.id)}
                                     aria-label="Видалити"
                                 >
-                                    <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
-                                        <path d="M1 3.8H2.33333M2.33333 3.8H13M2.33333 3.8V14.3C2.33333 14.6448 2.4703 14.9754 2.71409 15.2192C2.95789 15.463 3.28855 15.6 3.63333 15.6H10.3667C10.7115 15.6 11.0421 15.463 11.2859 15.2192C11.5297 14.9754 11.6667 14.6448 11.6667 14.3V3.8M4.33333 3.8V2.4C4.33333 2.05522 4.4703 1.72456 4.71409 1.48076C4.95789 1.23696 5.28855 1.1 5.63333 1.1H8.36667C8.71145 1.1 9.04211 1.23696 9.28591 1.48076C9.5297 1.72456 9.66667 2.05522 9.66667 2.4V3.8M5.66667 7.3V12.2M8.33333 7.3V12.2" stroke="#999" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="14" viewBox="0 0 12 14" fill="none">
+                                        <path opacity="0.5" d="M11.3333 2.8H8.66667V2.1C8.66667 1.54305 8.45595 1.0089 8.08088 0.615076C7.70581 0.221249 7.1971 0 6.66667 0H5.33333C4.8029 0 4.29419 0.221249 3.91912 0.615076C3.54405 1.0089 3.33333 1.54305 3.33333 2.1V2.8H0.666667C0.489856 2.8 0.320286 2.87375 0.195262 3.00503C0.0702379 3.1363 0 3.31435 0 3.5C0 3.68565 0.0702379 3.8637 0.195262 3.99497C0.320286 4.12625 0.489856 4.2 0.666667 4.2H1.33333V11.9C1.33333 12.457 1.54405 12.9911 1.91912 13.3849C2.29419 13.7788 2.8029 14 3.33333 14H8.66667C9.1971 14 9.70581 13.7788 10.0809 13.3849C10.456 12.9911 10.6667 12.457 10.6667 11.9V4.2H11.3333C11.5101 4.2 11.6797 4.12625 11.8047 3.99497C11.9298 3.8637 12 3.68565 12 3.5C12 3.31435 11.9298 3.1363 11.8047 3.00503C11.6797 2.87375 11.5101 2.8 11.3333 2.8ZM4.66667 2.1C4.66667 1.91435 4.7369 1.7363 4.86193 1.60503C4.98695 1.47375 5.15652 1.4 5.33333 1.4H6.66667C6.84348 1.4 7.01305 1.47375 7.13807 1.60503C7.2631 1.7363 7.33333 1.91435 7.33333 2.1V2.8H4.66667V2.1ZM9.33333 11.9C9.33333 12.0857 9.2631 12.2637 9.13807 12.395C9.01305 12.5263 8.84348 12.6 8.66667 12.6H3.33333C3.15652 12.6 2.98695 12.5263 2.86193 12.395C2.7369 12.2637 2.66667 12.0857 2.66667 11.9V4.2H9.33333V11.9Z" fill="black"/>
                                     </svg>
                                 </button>
                             </div>
                             
                             <div className={s.cardBody}>
                                 <p className={s.addressText}>
-                                    {address.city}, {address.street}, дім {address.house}
+                                    {address.city}, {address.street?.startsWith('вул.') ? '' : 'вул. '}{address.street}
+                                    {address.house && `, дім ${address.house}`}
                                     {address.apartment && `, кв. ${address.apartment}`}
                                 </p>
                             </div>
@@ -172,9 +173,6 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
                             <div className={s.cardFooter}>
                                 {address.isDefault ? (
                                     <div className={s.primaryTag}>
-                                        <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
-                                            <path d="M1 5.5L4 8.5L11 1.5" stroke="#E6000F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
                                         <span>{dict.primary}</span>
                                     </div>
                                 ) : (

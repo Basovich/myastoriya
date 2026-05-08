@@ -93,13 +93,14 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
         onAdd({
             id: Math.random().toString(36).substr(2, 9),
             title: `Моя адреса №${Math.floor(Math.random() * 10) + 2}`,
-            street: fullAddress,
+            street: street,
             city,
             house,
             apartment,
             entrance,
-            floor
-        });
+            floor,
+            fullAddress
+        } as any);
         handleClose();
     };
 
