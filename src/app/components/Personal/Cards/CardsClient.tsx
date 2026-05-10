@@ -15,15 +15,16 @@ interface BankCard {
     number: string;
     expiry: string;
     type: 'visa' | 'mastercard';
+    isDefault: boolean;
 }
 
 const MOCK_CARDS: BankCard[] = [
-    { id: '1', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-    { id: '2', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-    { id: '3', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-    { id: '4', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-    { id: '5', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-    { id: '6', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
+    { id: '1', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: true },
+    { id: '2', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: false },
+    { id: '3', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: false },
+    { id: '4', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: false },
+    { id: '5', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: false },
+    { id: '6', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: false },
 ];
 
 const localDict = {
@@ -59,6 +60,13 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
         }
     };
 
+    const handleSetDefault = (id: string) => {
+        setCards(prev => prev.map(c => ({
+            ...c,
+            isDefault: c.id === id
+        })));
+    };
+
     const handleLogout = () => {
         // Handled by layout
     };
@@ -78,7 +86,11 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
 
                 <div className={s.grid}>
                     {cards.map((card) => (
-                        <div key={card.id} className={s.card}>
+                        <div 
+                            key={card.id} 
+                            className={clsx(s.card, card.isDefault && s.defaultCard)}
+                            onClick={() => handleSetDefault(card.id)}
+                        >
                             <button 
                                 className={s.deleteBtn}
                                 onClick={() => handleDelete(card.id)}

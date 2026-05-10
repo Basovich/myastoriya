@@ -45,22 +45,33 @@
 }
 
 .card {
-    border: 1px solid #E2E2E2;
+    border: 1px solid transparent;
     border-radius: 12px;
     padding: 20px;
     display: flex;
     flex-direction: column;
     min-height: 180px;
-    transition: border-color 0.2s, box-shadow 0.2s;
     background: #fff;
+    cursor: pointer;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.11);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 
     &.defaultCard {
-        border-color: #E6000F;
+        border: 1.5px solid #E6000F;
+        box-shadow: 0 4px 12px rgba(230, 0, 15, 0.15);
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.15);
+        }
     }
 
     &:focus-visible {
-        outline: 2px solid #E6000F;
-        outline-offset: 2px;
+        outline: 0;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.15);
     }
 }
 
@@ -170,7 +181,7 @@
 }
 
 .addCard {
-    border: 1px solid #E2E2E2;
+    border: none;
     border-radius: 12px;
     background: #fff;
     display: flex;
@@ -180,7 +191,8 @@
     gap: 12px;
     min-height: 180px;
     cursor: pointer;
-    transition: all 0.2s;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.11);
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
 
     span {
         font-size: 13px;
@@ -190,13 +202,9 @@
 
     @media (any-hover: hover) {
         &:hover {
-            border-color: #E6000F;
-            .plusCircle {
-                border-color: #E6000F;
-                svg path {
-                    stroke: #E6000F;
-                }
-            }
+            background: #FAFAFA;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.15);
         }
     }
 }
@@ -204,10 +212,11 @@
 .plusCircle {
     width: 44px;
     height: 44px;
-    border: 1px solid #E2E2E2;
+    background: #F6F6F6;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.20);
     transition: all 0.2s;
 }

@@ -24,14 +24,14 @@ interface PickupPoint {
 const localDict = {
     ua: {
         subtitle: "Ваші точки самовивозу",
-        addPoint: "Додати адресу",
+        addPoint: "Додати точку",
         makePrimary: "ЗРОБИТИ ОСНОВНОЮ",
         primary: "ОСНОВНА",
         storeName: "Заклад М'ясторія",
     },
     ru: {
         subtitle: "Ваши точки самовывоза",
-        addPoint: "Добавить адрес",
+        addPoint: "Добавить точку",
         makePrimary: "СДЕЛАТЬ ОСНОВНЫМ",
         primary: "ОСНОВНОЙ",
         storeName: "Заведение Мястория",
