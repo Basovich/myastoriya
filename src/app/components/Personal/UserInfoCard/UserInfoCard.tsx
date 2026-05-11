@@ -3,7 +3,7 @@ import Image from 'next/image';
 import clsx from 'clsx';
 import { useAppDispatch } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
-import { updateUserAvatarApi } from '@/lib/graphql/queries/auth';
+import { updateUserAvatarApi, resolveAvatarUrl } from '@/lib/graphql/queries/auth';
 import { getAccessToken } from '@/app/actions/authActions';
 import s from './UserInfoCard.module.scss';
 import { AuthUser } from '@/store/slices/authSlice';
@@ -20,7 +20,7 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
     const fullName = user ? `${user.surname || ''} ${user.name || ''} ${user.middleName || ''}`.trim() : 'Гість';
     const displayName = fullName || user?.email || 'Користувач';
 
-    const avatarUrl = user?.avatar?.size2x || user?.avatar?.size1x || '/icons/icon-profile.svg';
+    const avatarUrl = resolveAvatarUrl(user?.avatar);
 
     const handleEditClick = () => {
         if (!user) return;

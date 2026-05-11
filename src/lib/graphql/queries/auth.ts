@@ -336,6 +336,17 @@ const UPDATE_USER_AVATAR_MUTATION = /* GraphQL */ `
 // Helpers
 // ---------------------------------------------------------------------------
 
+/**
+ * Resolves a user avatar URL.
+ * Handles relative paths by adding the API base URL.
+ */
+export function resolveAvatarUrl(avatar: BackendUser['avatar']): string {
+    const url = avatar?.size2x || avatar?.size1x || avatar?.size3x || null;
+    if (!url) return '/icons/icon-profile.svg';
+    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
+    return url;
+}
+
 function formatPhone(phone: string): string {
     const digits = phone.replace(/\D/g, '');
     return digits ? `+${digits}` : phone;

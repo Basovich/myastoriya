@@ -4,17 +4,23 @@ const GQL_ENDPOINT = 'https://dev-api.myastoriya.com.ua/graphql';
 
 export async function POST(req: NextRequest) {
     try {
-        const body = await req.text();
+        const contentType = req.headers.get('content-type') || '';
+        const isMultipart = contentType.includes('multipart/form-data');
+        
+        // Use arrayBuffer for binary data safety (especially for file uploads)
+        const body = await req.arrayBuffer();
         const headers: Record<string, string> = {};
 
         req.headers.forEach((value, key) => {
             const lowerKey = key.toLowerCase();
-            if (!['host', 'content-length', 'cookie', 'authorization'].includes(lowerKey)) {
-                headers[lowerKey] = value;
+            // Don't strip content-type for multipart as it contains the boundary
+            if (['host', 'content-length', 'cookie', 'authorization'].includes(lowerKey)) {
+                return;
             }
+            headers[lowerKey] = value;
         });
 
-        // Re-add cookie and authorization headers explicitly to ensure they are present and unique
+        // Re-add cookie and authorization headers explicitly
         const cookie = req.headers.get('cookie') || req.cookies.getAll().map(c => `${c.name}=${c.value}`).join('; ');
         if (cookie) {
             headers['cookie'] = cookie;
@@ -25,7 +31,7 @@ export async function POST(req: NextRequest) {
             headers['authorization'] = `Bearer ${token}`;
         }
 
-        // Ensure origin and referer are present (sometimes stripped by intermediate layers)
+        // Ensure origin and referer are present
         if (!headers['origin']) {
             headers['origin'] = req.nextUrl.origin;
         }
