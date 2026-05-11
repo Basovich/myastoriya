@@ -18,6 +18,7 @@ import CartSummary from '../components/CartSummary';
 import PromoBlock from '../components/PromoBlock/Index';
 import { useRouter, useParams } from 'next/navigation';
 import CartModal from '@/app/components/CartModal/CartModal';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 
 
 
@@ -52,6 +53,7 @@ interface Touched {
 }
 
 export default function Step1() {
+    const hydrated = useIsHydrated();
     const params = useParams();
     const locale = params?.lang as string;
     const { user, isAuthenticated } = useAppSelector(state => state.auth);
@@ -295,7 +297,7 @@ export default function Step1() {
             <div className={s.formCard}>
                 <StepIndicator current={1} />
 
-                {!isAuthenticated && (
+                {hydrated && !isAuthenticated && (
                     <button
                         className={s.hasAccountBtn}
                         id="has-account-btn"
@@ -440,7 +442,7 @@ export default function Step1() {
                             )}
                         </div>
 
-                        {isAuthenticated && (
+                        {hydrated && isAuthenticated && (
                             <Checkbox
                                 id="checkout-another-recipient"
                                 checked={formData.anotherRecipient}
@@ -469,10 +471,12 @@ export default function Step1() {
                     discountPercent={appliedPromo?.discount || 0}
                     deliveryPrice={125}
                 />
-                <PromoBlock 
-                    onApply={(code, discount) => setAppliedPromo({ code, discount })} 
-                    isApplied={!!appliedPromo}
-                />
+                {hydrated && (
+                    <PromoBlock 
+                        onApply={(code, discount) => setAppliedPromo({ code, discount })} 
+                        isApplied={!!appliedPromo}
+                    />
+                )}
                 
                 <p className={s.packageNote}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">

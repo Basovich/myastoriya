@@ -14,8 +14,7 @@
     }
 
     @media (min-width: 1280px) {
-        padding-left: calc((100% - 1200px)  / 2);
-        padding-right: calc((100% - 1200px) / 2);
+        padding: 40px calc((100% - 1200px)  / 2);
     }
 
     @media (min-width: 1360px) {

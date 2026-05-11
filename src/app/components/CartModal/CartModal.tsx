@@ -203,7 +203,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                         <Button variant='outline-black' className={(s.btnOutline)} onClick={onClose}>
                                             Продовжити покупки
                                         </Button>
-                                        <Button variant='red' className={s.btnSolid} href="/checkout?step=1">
+                                        <Button variant='red' className={s.btnSolid} href="/checkout?step=1" onClick={onClose}>
                                             Оформити замовлення
                                         </Button>
                                     </>

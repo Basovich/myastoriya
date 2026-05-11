@@ -123,8 +123,8 @@ export default function OrderCard({
                 <div className={s.priceBlockMobile}>
                     <span className={s.priceLabel}>{dict.sumLabel}</span>
                     <div className={s.priceValues}>
-                        <span className={s.currentPrice}>{sum.toLocaleString('ru-RU')} ₴</span>
-                        {oldSum && <span className={s.oldPrice}>{oldSum.toLocaleString('ru-RU')} ₴</span>}
+                        <span className={clsx(s.currentPrice, oldSum && s.hasOldPrice)}>{sum.toLocaleString('ru-RU')} <span className={s.currency}>₴</span></span>
+                        {oldSum && <span className={s.oldPrice}>{oldSum.toLocaleString('ru-RU')} <span className={s.currency}>₴</span></span>}
                     </div>
                 </div>
 

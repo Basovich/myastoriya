@@ -263,7 +263,11 @@
     font-size: 13px;
     color: #2a9d5c;
     font-weight: 600;
-    margin-top: -6px; // Adjust placement below the phone input
+    margin-top: -6px;
+
+    svg {
+        margin-top: -5px;
+    }
 }
 
 .sendCodeBtn {
@@ -360,17 +364,16 @@
 .submitBtn {
     width: 100%;
     height: 44px;
-    
-    @media (min-width: 1024px) {
-        height: 46px;
-    }
-    
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 0.05em;
     border-radius: 8px;
     margin: 4px auto 0;
-    max-width: 368px;
+    
+    @media (min-width: 1280px) {
+        height: 46px;
+        min-width: 368px;
+    }
 }
 
 // ── Cart Summary ──────────────────────────────────────────────────────────────
@@ -651,11 +654,11 @@
 .packageNote {
     display: flex;
     align-items: flex-start;
+    justify-content: center;
     gap: 6px;
     font-size: 11px;
     color: #000;
     opacity: 0.7;
-    margin-top: 14px;
     line-height: 1.4;
 
     svg {

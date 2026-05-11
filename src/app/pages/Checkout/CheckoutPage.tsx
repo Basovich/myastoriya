@@ -6,6 +6,7 @@ import { Locale } from '@/i18n/config';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import Step1 from './Step1/Step1';
 import Step2 from './Step2/Step2';
+import Step3 from './Step3/Step3';
 import s from './CheckoutPage.module.scss';
 
 interface CheckoutPageProps {
@@ -38,6 +39,7 @@ function CheckoutContent({ lang }: CheckoutPageProps) {
 
                     {currentStep === 1 && <Step1 />}
                     {currentStep === 2 && <Step2 />}
+                    {currentStep === 3 && <Step3 lang={lang} />}
                 </div>
             </main>
         </>

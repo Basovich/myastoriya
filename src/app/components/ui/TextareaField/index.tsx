@@ -5,11 +5,12 @@ import clsx from 'clsx';
 import s from './TextareaField.module.scss';
 
 interface TextareaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-    id: string;
-    label: string;
+    id?: string;
+    label?: string;
     required?: boolean;
     error?: string;
     touched?: boolean;
+    textareaClassName?: string;
 }
 
 export default function Index({
@@ -19,6 +20,7 @@ export default function Index({
     error,
     touched = false,
     className,
+    textareaClassName,
     onFocus,
     ...rest
 }: TextareaFieldProps) {
@@ -29,22 +31,24 @@ export default function Index({
     };
 
     return (
-        <div className={s.fieldWrapper}>
+        <div className={clsx(s.fieldWrapper, className)}>
             <textarea
                 id={id}
-                className={clsx(s.textarea, hasError && s.textareaError, className)}
+                className={clsx(s.textarea, hasError && s.textareaError, textareaClassName)}
                 placeholder=" "
                 onFocus={handleFocus}
                 aria-invalid={hasError}
                 aria-describedby={hasError ? `${id}-error` : undefined}
                 {...rest}
             />
-            <label className={s.label} htmlFor={id}>
-                {label}
-                {required && <span className={s.asterisk}>*</span>}
-            </label>
+            {label && (
+                <label className={s.label} htmlFor={id}>
+                    {label}
+                    {required && <span className={s.asterisk}>*</span>}
+                </label>
+            )}
             {hasError && (
-                <span id={`${id}-error`} className={s.errorText} role="alert">
+                <span id={id ? `${id}-error` : undefined} className={s.errorText} role="alert">
                     {error}
                 </span>
             )}

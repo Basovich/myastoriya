@@ -18,6 +18,7 @@ import AddAddressModal from '@/app/components/AddAddressModal/AddAddressModal';
 import { addAddress } from '@/store/slices/authSlice';
 import { useDispatch } from 'react-redux';
 import Image from 'next/image';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 
 // ── Mock Data ────────────────────────────────────────────────────────────────
 
@@ -58,6 +59,7 @@ function isTodayDate(date: Date | null) {
 // ── Main Step2 Component ──────────────────────────────────────────────────────
 
 export default function Step2() {
+    const hydrated = useIsHydrated();
     const dispatch = useDispatch();
     const { isAuthenticated, user } = useAppSelector(state => state.auth);
     const [guestAddresses, setGuestAddresses] = useState<{ id: string; title: string; street: string }[]>([]);
@@ -219,7 +221,7 @@ export default function Step2() {
                                         </span>
                                     </label>
                                     
-                                    {(isSelected && isCourier) && (
+                                    {(hydrated && isSelected && isCourier) && (
                                         <div className={s.nestedAddressRow}>
                                             <AddressRow 
                                                 addresses={addresses}
@@ -243,26 +245,28 @@ export default function Step2() {
 
                 <div className={s.formSection}>
                     <h2 className={s.sectionTitle}>Оберіть бажаний час доставки чи самовивозу</h2>
-                    <div className={s.timeSelectors}>
-                        <DatePicker 
-                            selected={deliveryDate}
-                            onChange={(date: Date | null) => setDeliveryDate(date)}
-                            className={s.timeSelect}
-                        />
-                        <CustomSelect 
-                            options={availableTimeSlots}
-                            value={deliveryTime}
-                            onChange={setDeliveryTime}
-                            className={s.timeSelect}
-                            arrowVariant="right"
-                            leftIcon={
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-                                    <path fillRule="evenodd" clipRule="evenodd" d="M9 2.625C5.48475 2.625 2.625 5.48475 2.625 9C2.625 12.5153 5.48475 15.375 9 15.375C12.5153 15.375 15.375 12.5153 15.375 9C15.375 5.48475 12.5153 2.625 9 2.625ZM9 16.5C4.8645 16.5 1.5 13.1355 1.5 9C1.5 4.8645 4.8645 1.5 9 1.5C13.1355 1.5 16.5 4.8645 16.5 9C16.5 13.1355 13.1355 16.5 9 16.5Z" fill="#E3051B"/>
-                                    <path fillRule="evenodd" clipRule="evenodd" d="M11.5736 11.7695C11.4753 11.7695 11.3763 11.744 11.2856 11.6908L8.45809 10.004C8.28859 9.90203 8.18359 9.71828 8.18359 9.52028V5.88428C8.18359 5.57378 8.43559 5.32178 8.74609 5.32178C9.05734 5.32178 9.30859 5.57378 9.30859 5.88428V9.20078L11.8623 10.7233C12.1286 10.883 12.2163 11.228 12.0573 11.495C11.9516 11.6713 11.7648 11.7695 11.5736 11.7695Z" fill="#E3051B"/>
-                                </svg>
-                            }
-                        />
-                    </div>
+                    {hydrated && (
+                        <div className={s.timeSelectors}>
+                            <DatePicker 
+                                selected={deliveryDate}
+                                onChange={(date: Date | null) => setDeliveryDate(date)}
+                                className={s.timeSelect}
+                            />
+                            <CustomSelect 
+                                options={availableTimeSlots}
+                                value={deliveryTime}
+                                onChange={setDeliveryTime}
+                                className={s.timeSelect}
+                                arrowVariant="right"
+                                leftIcon={
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M9 2.625C5.48475 2.625 2.625 5.48475 2.625 9C2.625 12.5153 5.48475 15.375 9 15.375C12.5153 15.375 15.375 12.5153 15.375 9C15.375 5.48475 12.5153 2.625 9 2.625ZM9 16.5C4.8645 16.5 1.5 13.1355 1.5 9C1.5 4.8645 4.8645 1.5 9 1.5C13.1355 1.5 16.5 4.8645 16.5 9C16.5 13.1355 13.1355 16.5 9 16.5Z" fill="#E3051B"/>
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M11.5736 11.7695C11.4753 11.7695 11.3763 11.744 11.2856 11.6908L8.45809 10.004C8.28859 9.90203 8.18359 9.71828 8.18359 9.52028V5.88428C8.18359 5.57378 8.43559 5.32178 8.74609 5.32178C9.05734 5.32178 9.30859 5.57378 9.30859 5.88428V9.20078L11.8623 10.7233C12.1286 10.883 12.2163 11.228 12.0573 11.495C11.9516 11.6713 11.7648 11.7695 11.5736 11.7695Z" fill="#E3051B"/>
+                                    </svg>
+                                }
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <div className={s.actions}>
@@ -290,10 +294,12 @@ export default function Step2() {
                     discountPercent={appliedPromo?.discount || 0}
                     deliveryPrice={deliveryMethods.find(m => m.id === deliveryMethod)?.price || 0}
                 />
-                <PromoBlock 
-                    onApply={(code, discount) => setAppliedPromo({ code, discount })} 
-                    isApplied={!!appliedPromo}
-                />
+                {hydrated && (
+                    <PromoBlock 
+                        onApply={(code, discount) => setAppliedPromo({ code, discount })} 
+                        isApplied={!!appliedPromo}
+                    />
+                )}
                 
                 <p className={s.packageNote}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

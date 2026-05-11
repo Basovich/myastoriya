@@ -4,11 +4,10 @@
     overflow-x: auto;
     padding-bottom: 12px;
     scrollbar-width: none;
+
     &::-webkit-scrollbar {
         display: none;
     }
-
-    margin-top: 16px;
 
     @media (min-width: 1024px) {
         flex-wrap: wrap;

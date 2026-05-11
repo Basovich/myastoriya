@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import s from './AddCardModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import Button from '@/app/components/ui/Button/Button';
+import InputField from '@/app/components/ui/InputField';
 
 interface AddCardModalProps {
     isOpen: boolean;
@@ -14,19 +15,26 @@ interface AddCardModalProps {
 
 const dict = {
     ua: {
-        title: "Додати банківську картку",
-        description: "Цей розділ наразі знаходиться в стадії розробки. Ви зможете додати карту під час оплати замовлення.",
-        close: "ЗАКРИТИ"
+        title: "ДОДАТИ БАНКІВСЬКУ КАРТКУ",
+        cardNumber: "Номер банківської картки",
+        expiry: "Період дії картки",
+        cvv: "CVV код",
+        submit: "Підтвердити"
     },
     ru: {
-        title: "Добавить банковскую карту",
-        description: "Этот раздел сейчас находится в стадии разработки. Вы сможете добавить карту при оплате заказа.",
-        close: "ЗАКРЫТЬ"
+        title: "ДОБАВИТЬ БАНКОВСКУЮ КАРТУ",
+        cardNumber: "Номер банковской карты",
+        expiry: "Период действия карты",
+        cvv: "CVV код",
+        submit: "Подтвердить"
     }
 };
 
 export default function AddCardModal({ isOpen, onClose, lang }: AddCardModalProps) {
     const { disableScroll, enableScroll } = useScrollLock();
+    const [cardNumber, setCardNumber] = useState('');
+    const [expiry, setExpiry] = useState('');
+    const [cvv, setCvv] = useState('');
 
     useEffect(() => {
         if (isOpen) {
@@ -36,6 +44,12 @@ export default function AddCardModal({ isOpen, onClose, lang }: AddCardModalProp
     }, [isOpen, disableScroll, enableScroll]);
 
     const t = dict[lang];
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // UI only demonstration
+        onClose();
+    };
 
     return (
         <Modal
@@ -48,17 +62,45 @@ export default function AddCardModal({ isOpen, onClose, lang }: AddCardModalProp
         >
             <div className={s.modal}>
                 <button className={s.closeBtn} onClick={onClose} aria-label="Закрити">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <path d="M1 1L17 17M17 1L1 17" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                 </button>
 
                 <div className={s.content}>
                     <h2 className={s.title}>{t.title}</h2>
-                    <p className={s.description}>{t.description}</p>
-                    <Button variant="red" onClick={onClose} className={s.closeActionBtn}>
-                        {t.close}
-                    </Button>
+                    
+                    <form className={s.form} onSubmit={handleSubmit}>
+                        <InputField 
+                            id="cardNumber"
+                            label={t.cardNumber}
+                            required
+                            value={cardNumber}
+                            onChange={(e) => setCardNumber(e.target.value)}
+                            placeholder="0000 0000 0000 0000"
+                        />
+                        <InputField 
+                            id="expiry"
+                            label={t.expiry}
+                            required
+                            value={expiry}
+                            onChange={(e) => setExpiry(e.target.value)}
+                            placeholder="03/26"
+                        />
+                        <InputField 
+                            id="cvv"
+                            label={t.cvv}
+                            required
+                            type="password"
+                            maxLength={3}
+                            value={cvv}
+                            onChange={(e) => setCvv(e.target.value)}
+                            placeholder="***"
+                        />
+                        <Button type="submit" variant="black" className={s.submitBtn}>
+                            {t.submit}
+                        </Button>
+                    </form>
                 </div>
             </div>
         </Modal>

@@ -6,6 +6,8 @@ import { useAppSelector } from '@/store/hooks';
 import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from '@/app/components/CartModal/products_mock';
 import s from './CheckoutShared.module.scss';
 
+import { useIsHydrated } from '@/hooks/useIsHydrated';
+
 interface CartSummaryProps {
     onEditCart: () => void;
     discountPercent?: number;
@@ -13,6 +15,7 @@ interface CartSummaryProps {
 }
 
 export default function CartSummary({ onEditCart, discountPercent = 0, deliveryPrice = 0 }: CartSummaryProps) {
+    const hydrated = useIsHydrated();
     const cartItems = useAppSelector(state => state.cart.items);
 
     const populatedItems = useMemo(() => {
@@ -25,6 +28,8 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
     const totalSum = useMemo(() => {
         return populatedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
     }, [populatedItems]);
+
+    if (!hydrated) return null;
 
     const delivery = deliveryPrice;
     const discountAmount = Math.round(totalSum * (discountPercent / 100));

@@ -3,8 +3,6 @@
     border-radius: 14px;
     box-shadow: 0 14px 18px 0 rgba(0, 0, 0, 0.05);
     padding: 20px 16px;
-    margin-top: 16px;
-    transition: all 0.3s ease;
 
     @media (min-width: 768px) {
         padding: 24px 28px;
@@ -25,12 +23,6 @@
     height: 44px;
     line-height: 44px;
     padding: 0 16px;
-    
-    @media (min-width: 1024px) {
-        height: 46px;
-        line-height: 46px;
-    }
-
     background: #000;
     color: #fff;
     border: none;
@@ -47,6 +39,11 @@
         &:hover {
             opacity: 0.8;
         }
+    }
+
+    @media (min-width: 1024px) {
+        height: 46px;
+        line-height: 46px;
     }
 
     &:focus-visible {
