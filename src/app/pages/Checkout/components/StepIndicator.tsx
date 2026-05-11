@@ -27,15 +27,9 @@ export default function StepIndicator({ current }: StepIndicatorProps) {
                             })}
                         >
                             {current > step.num ? (
-                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                                    <path
-                                        d="M1 3.5L3.8 6.5L9 1"
-                                        stroke="white"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="11" viewBox="0 0 14 11" fill="none">
+                                        <path d="M5 10.42L0 5.42L1.41 4.01L5 7.59L12.59 0L14 1.42L5 10.42Z" fill="white"/>
+                                    </svg>
                             ) : (
                                 step.num
                             )}

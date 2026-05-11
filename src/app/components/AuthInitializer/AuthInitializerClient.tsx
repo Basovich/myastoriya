@@ -23,9 +23,11 @@ import * as Sentry from "@sentry/nextjs";
 function AuthInitializerClient() {
     const dispatch = useAppDispatch();
     const initialised = useRef(false);
-    const prevIsAuthenticated = useRef(false);
-    const prevIsGuest = useRef(true);
     const { user, isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
+    
+    // Track previous state to detect guest -> user transition
+    const prevIsAuthenticated = useRef(isAuthenticated);
+    const prevIsGuest = useRef(isGuest);
 
     useEffect(() => {
         if (isAuthenticated && user) {

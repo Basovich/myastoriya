@@ -75,10 +75,8 @@ export default function Step3({ lang }: Step3Props) {
                     <h2 className={s.sectionTitle}>Додати коментар</h2>
                     <TextareaField 
                         id="checkout-comment"
-                        label="Коментар"
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
-                        placeholder="Ваш коментар до замовлення"
                         className={s.commentField}
                         textareaClassName={s.commentTextarea}
                     />

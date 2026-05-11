@@ -59,17 +59,24 @@ export const fetchWishlistPayloadAsync = createAsyncThunk(
     }
 );
 
+// Keep track of sync status per session to avoid loops
+let isSyncingCurrentSession = false;
+
 // Sync local items to backend (used after login/register)
 export const syncWishlistOnAuthAsync = createAsyncThunk(
     'wishlist/syncOnAuthAsync',
     async (_, { getState, dispatch, rejectWithValue }) => {
+        if (isSyncingCurrentSession) return false;
+        
         try {
-            const state = getState() as any;
-            const localItems = state.wishlist.items as string[];
+            const state = getState() as RootState;
+            const localItems = state.wishlist.items;
             
             if (localItems.length > 0) {
+                isSyncingCurrentSession = true;
 
                 // Upload all local items to the backend
+                // Using map instead of for-loop for parallel requests (as per current design)
                 await Promise.allSettled(
                     localItems.map(id => addToFavoritesApi(Number(id)))
                 );
@@ -82,6 +89,8 @@ export const syncWishlistOnAuthAsync = createAsyncThunk(
         } catch (error) {
             console.error('[Wishlist] Failed to sync wishlist on auth:', error);
             return rejectWithValue('Failed to sync wishlist');
+        } finally {
+            isSyncingCurrentSession = false;
         }
     }
 );
