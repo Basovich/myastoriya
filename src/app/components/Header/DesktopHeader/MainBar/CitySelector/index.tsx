@@ -17,6 +17,7 @@ import {
     getLocalitiesApi,
     Locality, 
     getSelectedLocalityApi,
+    selectLocalityApi,
 } from '@/lib/graphql';
 import s from './CitySelector.module.scss';
 import clsx from 'clsx';
@@ -246,6 +247,14 @@ export default function CitySelector({
         dispatch(setPromptVisible(false));
         dispatch(setPromptInteractionDone(true));
         dispatch(setManualSelectionOpen(false));
+
+        // Sync with server
+        try {
+            await selectLocalityApi(city.id, lang);
+        } catch (error) {
+            console.warn('[CitySelector] Failed to sync city with server:', error);
+            // We don't block the UI if this fails, as the local state is already updated
+        }
     };
 
     const handleConfirmYes = () => {
