@@ -15,6 +15,8 @@ import AddCardModal from '@/app/components/Personal/Cards/AddCardModal';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
+import BankCardItem from '@/app/components/Personal/Cards/BankCardItem';
+import AddBankCardBtn from '@/app/components/Personal/Cards/AddBankCardBtn';
 
 // ── Mock Data ────────────────────────────────────────────────────────────────
 
@@ -135,33 +137,20 @@ export default function Step3({ lang }: Step3Props) {
                                         <div className={s.cardsSection}>
                                             <div className={s.cardsList}>
                                                 {SAVED_CARDS.map(card => (
-                                                    <div 
+                                                    <BankCardItem 
                                                         key={card.id}
-                                                        className={clsx(s.cardItem, selectedCardId === card.id && s.cardSelected)}
-                                                        onClick={() => setSelectedCardId(card.id)}
-                                                    >
-                                                        <div className={s.cardNumber}>Номер картки</div>
-                                                        <div className={s.cardValue}>{card.number}</div>
-                                                        <div className={s.cardBottom}>
-                                                            <div className={s.cardExpiry}>
-                                                                <div>Термін дії</div>
-                                                                <div className={s.cardValue}>{card.expiry}</div>
-                                                            </div>
-                                                            <Image src="/icons/visa_logo_card.svg" alt="Visa" width={36} height={22} className={s.visaLogo} />
-                                                        </div>
-                                                    </div>
+                                                        card={card as any}
+                                                        isSelected={selectedCardId === card.id}
+                                                        onSelect={setSelectedCardId}
+                                                        lang={lang as 'ua' | 'ru'}
+                                                        className={s.checkoutCard}
+                                                    />
                                                 ))}
-                                                <div 
-                                                    className={clsx(s.cardItem, s.addCardBtn)}
-                                                    onClick={() => setIsAddCardModalOpen(true)}
-                                                >
-                                                    <div className={s.plusIcon}>
-                                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                                            <path d="M7 1V13M1 7H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                                        </svg>
-                                                    </div>
-                                                    <span>Додати картку</span>
-                                                </div>
+                                                    <AddBankCardBtn 
+                                                        onClick={() => setIsAddCardModalOpen(true)}
+                                                        lang={lang as 'ua' | 'ru'}
+                                                        className={s.checkoutAddCard}
+                                                    />
                                             </div>
                                         </div>
                                     )}

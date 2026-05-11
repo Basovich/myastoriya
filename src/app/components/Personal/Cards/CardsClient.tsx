@@ -9,35 +9,25 @@ import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHea
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
 import { AuthUser } from '@/store/slices/authSlice';
 import AddCardModal from './AddCardModal';
-
-interface BankCard {
-    id: string;
-    number: string;
-    expiry: string;
-    type: 'visa' | 'mastercard';
-    isDefault: boolean;
-}
+import BankCardItem, { type BankCard } from './BankCardItem';
+import AddBankCardBtn from './AddBankCardBtn';
 
 const MOCK_CARDS: BankCard[] = [
-    { id: '1', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: true },
-    { id: '2', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: false },
-    { id: '3', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: false },
-    { id: '4', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: false },
-    { id: '5', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: false },
-    { id: '6', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa', isDefault: false },
+    { id: '1', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
+    { id: '2', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
+    { id: '3', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
+    { id: '4', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
+    { id: '5', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
+    { id: '6', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
 ];
 
 const localDict = {
     ua: {
         subtitle: "Ваші банківські картки",
-        cardNumber: "Номер картки",
-        expiry: "Термін дії",
         addCard: "Додати картку",
     },
     ru: {
         subtitle: "Ваши банковские карты",
-        cardNumber: "Номер карты",
-        expiry: "Срок действия",
         addCard: "Добавить карту",
     }
 };
@@ -49,6 +39,7 @@ interface CardsClientProps {
 
 export default function CardsClient({ user, lang }: CardsClientProps) {
     const [cards, setCards] = useState<BankCard[]>(MOCK_CARDS);
+    const [selectedCardId, setSelectedCardId] = useState<string>(MOCK_CARDS[0].id);
     const [isModalOpen, setIsModalOpen] = useState(false);
     
     const pDict = personalDict[lang];
@@ -60,11 +51,8 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
         }
     };
 
-    const handleSetDefault = (id: string) => {
-        setCards(prev => prev.map(c => ({
-            ...c,
-            isDefault: c.id === id
-        })));
+    const handleSelect = (id: string) => {
+        setSelectedCardId(id);
     };
 
     const handleLogout = () => {
@@ -86,57 +74,21 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
 
                 <div className={s.grid}>
                     {cards.map((card) => (
-                        <div 
-                            key={card.id} 
-                            className={clsx(s.card, card.isDefault && s.defaultCard)}
-                            onClick={() => handleSetDefault(card.id)}
-                        >
-                            <button 
-                                className={s.deleteBtn}
-                                onClick={() => handleDelete(card.id)}
-                                aria-label="Delete"
-                            >
-                                <Image 
-                                    src="/icons/icon-trash.svg" 
-                                    alt="Delete" 
-                                    width={12} 
-                                    height={14} 
-                                />
-                            </button>
-                            
-                            <div className={s.cardContent}>
-                                <div className={s.field}>
-                                    <div className={s.label}>{dict.cardNumber}</div>
-                                    <div className={s.value}>{card.number}</div>
-                                </div>
-                                
-                                <div className={s.bottomRow}>
-                                    <div className={s.field}>
-                                        <div className={s.label}>{dict.expiry}</div>
-                                        <div className={s.value}>{card.expiry}</div>
-                                    </div>
-                                    <div className={s.cardLogo}>
-                                        <Image 
-                                            src={card.type === 'visa' ? '/icons/visa_logo_card.svg' : '/icons/MC.png'}
-                                            alt={card.type} 
-                                            width={card.type === 'visa' ? 44 : 32} 
-                                            height={card.type === 'visa' ? 28 : 26}
-                                            style={{ objectFit: 'contain' }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <BankCardItem 
+                            key={card.id}
+                            card={card}
+                            isSelected={selectedCardId === card.id}
+                            onSelect={handleSelect}
+                            onDelete={handleDelete}
+                            lang={lang}
+                            showDelete
+                        />
                     ))}
 
-                    <button className={s.addCard} onClick={() => setIsModalOpen(true)}>
-                        <div className={s.plusCircle}>
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 5V19M5 12H19" stroke="#999" strokeWidth="2" strokeLinecap="round" />
-                            </svg>
-                        </div>
-                        <span>{dict.addCard}</span>
-                    </button>
+                    <AddBankCardBtn 
+                        onClick={() => setIsModalOpen(true)}
+                        lang={lang}
+                    />
                 </div>
             </PersonalContentBlock>
 

@@ -165,17 +165,53 @@
 
 .cardsSection {
     margin-top: 16px;
-    padding-left: 36px;
 }
 
 .cardsList {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 16px;
-    overflow-x: auto;
     padding-bottom: 8px;
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-        display: none;
+}
+
+.checkoutCard {
+    width: 180px !important;
+    height: 110px !important;
+    flex-shrink: 0;
+    padding: 12px !important;
+
+    .label {
+        font-size: 10px !important;
+    }
+
+    .value {
+        font-size: 13px !important;
+    }
+
+    .cardContent {
+        gap: 8px !important;
+    }
+}
+
+.checkoutAddCard {
+    width: 180px !important;
+    height: 110px !important;
+    flex-shrink: 0;
+    padding: 12px !important;
+    
+    .plusCircle {
+        width: 32px !important;
+        height: 32px !important;
+        
+        svg {
+            width: 18px !important;
+            height: 18px !important;
+        }
+    }
+
+    span {
+        font-size: 11px !important;
     }
 }
 
