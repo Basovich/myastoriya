@@ -124,8 +124,8 @@ export default function Step3({ lang }: Step3Props) {
                                             {method.label}
                                             {method.hasLogos && (
                                                 <div className={s.paymentLogos}>
-                                                    <Image src="/icons/visa.png" alt="Visa" width={32} height={20} />
-                                                    <Image src="/icons/MC.png" alt="MasterCard" width={32} height={26} />
+                                                    <Image src="/icons/visa_logo_card.svg" alt="Visa" width={46} height={15} />
+                                                    <Image src="/icons/MC_logo.svg" alt="MasterCard" width={36} height={22} />
                                                 </div>
                                             )}
                                         </span>
@@ -147,7 +147,7 @@ export default function Step3({ lang }: Step3Props) {
                                                                 <div>Термін дії</div>
                                                                 <div className={s.cardValue}>{card.expiry}</div>
                                                             </div>
-                                                            <Image src="/icons/visa.png" alt="Visa" width={36} height={22} className={s.visaLogo} />
+                                                            <Image src="/icons/visa_logo_card.svg" alt="Visa" width={36} height={22} className={s.visaLogo} />
                                                         </div>
                                                     </div>
                                                 ))}

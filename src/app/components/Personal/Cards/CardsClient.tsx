@@ -117,7 +117,7 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
                                     </div>
                                     <div className={s.cardLogo}>
                                         <Image 
-                                            src={card.type === 'visa' ? '/icons/visa.png' : '/icons/MC.png'} 
+                                            src={card.type === 'visa' ? '/icons/visa_logo_card.svg' : '/icons/MC.png'}
                                             alt={card.type} 
                                             width={card.type === 'visa' ? 44 : 32} 
                                             height={card.type === 'visa' ? 28 : 26}

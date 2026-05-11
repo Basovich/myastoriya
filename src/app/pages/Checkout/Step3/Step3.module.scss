@@ -109,7 +109,7 @@
     align-items: center;
     gap: 12px;
     cursor: pointer;
-    padding: 10px 0;
+    padding: 8px 0;
 
     @media (any-hover: hover) {
         &:hover {
@@ -132,8 +132,8 @@
 }
 
 .radioCircle {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     border: 2px solid #c4c4c4;
     border-radius: 50%;
     position: relative;
@@ -145,13 +145,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    color: #060606;
+    font-feature-settings: 'liga' off, 'clig' off;
     font-size: 14px;
-    font-weight: 700;
-    color: #000;
-
-    @media (min-width: 768px) {
-        font-size: 15px;
-    }
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;
+    padding-top: 4px;
 }
 
 .paymentLogos {

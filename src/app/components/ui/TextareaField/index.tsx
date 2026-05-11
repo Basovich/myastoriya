@@ -39,6 +39,7 @@ export default function Index({
                 onFocus={handleFocus}
                 aria-invalid={hasError}
                 aria-describedby={hasError ? `${id}-error` : undefined}
+                suppressHydrationWarning
                 {...rest}
             />
             {label && (
