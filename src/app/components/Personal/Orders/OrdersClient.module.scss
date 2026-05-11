@@ -14,11 +14,6 @@
 .controlsRow {
     display: flex;
     justify-content: flex-start;
-    margin-bottom: 16px;
-
-    @media (min-width: 1024px) {
-        margin-bottom: 24px;
-    }
 }
 
 .sortSelect {

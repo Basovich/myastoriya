@@ -26,20 +26,19 @@ import viewedProductsReducer from './slices/viewedProductsSlice';
 const SIX_HOURS = 6 * 60 * 60 * 1000;
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
-// Auth session expiration transform — applies only to the auth slice.
+// Auth session expiration transform — now applied directly to the auth slice.
 const authExpireTransform = createTransform(
-    (inboundState: object) => ({
+    (inboundState: any) => ({
         ...inboundState,
         _persistedAt: Date.now(),
     }),
-    (outboundState: object & { _persistedAt?: number }) => {
+    (outboundState: any) => {
         const persistedAt = outboundState?._persistedAt;
         if (persistedAt && Date.now() - persistedAt > SIX_HOURS) {
-            return { user: null, isAuthenticated: false };
+            return { user: null, isAuthenticated: false, isGuest: false, isInitialized: false };
         }
         return outboundState;
-    },
-    { whitelist: ['auth'] }
+    }
 );
 
 // General expiration transform for cart and wishlist
@@ -65,10 +64,17 @@ const localityPersistConfig = {
     blacklist: ['isManualSelectionOpen', 'isPromptVisible'],
 };
 
+const authPersistConfig = {
+    key: 'auth',
+    storage,
+    blacklist: ['isInitialized'],
+    transforms: [authExpireTransform],
+};
+
 const rootReducer = combineReducers({
     cart: cartReducer,
     wishlist: wishlistReducer,
-    auth: authReducer,
+    auth: persistReducer(authPersistConfig, authReducer),
     locality: persistReducer(localityPersistConfig, localityReducer),
     viewedProducts: viewedProductsReducer,
 });
@@ -76,8 +82,8 @@ const rootReducer = combineReducers({
 const persistConfig = {
     key: 'myastoriya-root',
     storage,
-    whitelist: ['cart', 'wishlist', 'auth', 'viewedProducts'], // Removed 'locality' from here as it's now nested
-    transforms: [authExpireTransform, generalExpireTransform]
+    whitelist: ['cart', 'wishlist', 'viewedProducts'], // auth and locality are nested
+    transforms: [generalExpireTransform]
 };
 
 const persistedReducer = persistReducer<ReturnType<typeof rootReducer>>(persistConfig, rootReducer);

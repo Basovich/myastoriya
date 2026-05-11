@@ -41,7 +41,6 @@ export function middleware(request: NextRequest) {
         const token = request.cookies.get('access_token')?.value;
         if (!token) {
             const redirectUrl = new URL('/', request.url);
-            redirectUrl.searchParams.set('auth', '1');
             return NextResponse.redirect(redirectUrl);
         }
     }

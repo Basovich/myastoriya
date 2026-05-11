@@ -20,15 +20,7 @@ function AuthButton() {
 
     const isReallyLoggedIn = hydrated && isAuthenticated && !isGuest;
 
-    useEffect(() => {
-        if (!hydrated || isReallyLoggedIn) return;
 
-        const search = window.location.search;
-        const params = new URLSearchParams(search);
-        if (params.get('auth') === '1') {
-            setIsModalOpen(true);
-        }
-    }, [isReallyLoggedIn, hydrated]);
 
     const handleAuthClick = () => {
         if (isReallyLoggedIn) {

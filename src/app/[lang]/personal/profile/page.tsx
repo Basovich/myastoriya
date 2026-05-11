@@ -105,7 +105,7 @@ const profileDict = {
 };
 
 export default function ProfilePage() {
-    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+    const { user, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const router = useRouter();
     const params = useParams();
@@ -162,6 +162,8 @@ export default function ProfilePage() {
     };
 
     React.useEffect(() => {
+        if (!isInitialized || !isAuthenticated) return;
+
         const fetchViewedProducts = async () => {
             try {
                 const { getAccessToken } = await import('@/app/actions/authActions');
@@ -187,7 +189,7 @@ export default function ProfilePage() {
         };
 
         fetchViewedProducts();
-    }, [lang, isAuthenticated]);
+    }, [lang, isAuthenticated, isInitialized]);
 
     const handleFormSubmit = async (values: any) => {
         try {
