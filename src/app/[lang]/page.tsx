@@ -24,7 +24,7 @@ export default async function Home({
     getReviewsApi(lang),
     getProductsApi({ categoryId: firstCategoryId, limit: 8 }, lang),
     getSalesApi(6, 1, lang),
-    getSpecialsApi(10, lang)
+    getSpecialsApi(10, 1, lang)
   ]);
 
   return (
@@ -38,7 +38,7 @@ export default async function Home({
           initialProducts={initialProductsResponse.data}
           initialHasMore={initialProductsResponse.has_more_pages}
           sales={salesResponse.data}
-          specials={specialsResponse}
+          specials={specialsResponse.data}
       />
   );
 }

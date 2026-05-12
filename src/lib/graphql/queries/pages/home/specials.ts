@@ -1,41 +1,112 @@
 import { gqlRequest } from "../../../client";
 
-export interface Special {
+export interface SpecialImage {
+    size1x: string | null;
+    size2x: string | null;
+    size3x: string | null;
+}
+
+export interface SpecialProduct {
     id: string;
-    title: string;
-    oldCost?: number | null;
-    cost?: number | null;
-    amount?: number | null;
-    discountType?: string | null;
+    name: string;
+    slug: string;
+    cost: number;
+    oldCost: number | null;
+    unit: string | null;
+    available: boolean;
+    image?: {
+        url: {
+            grid1x: string | null;
+            grid2x: string | null;
+        };
+    } | null;
     images?: {
         url: {
-            grid1x?: string | null;
-            grid2x?: string | null;
-            grid3x?: string | null;
-        } | null;
+            grid1x: string | null;
+            grid2x: string | null;
+        };
     }[] | null;
+}
+
+export interface Special {
+    id: string;
+    slug: string | null;
+    title: string;
+    description: string | null;
+    oldCost: number | null;
+    cost: number | null;
+    unit: string | null;
+    amount: number | null;
+    discountType: string | null;
+    productsCount: number;
+    publishedAt: string | null;
+    expiresAt: string | null;
+    image: SpecialImage | null;
+    banner: SpecialImage | null;
+    products: SpecialProduct[];
 }
 
 export interface SpecialsResponse {
     specials: {
+        per_page: number;
+        current_page: number;
+        from: number | null;
+        to: number | null;
+        has_more_pages: boolean;
         data: Special[];
     };
 }
 
 const SPECIALS_QUERY = /* GraphQL */ `
-    query Specials($limit: Int) {
-        specials(limit: $limit) {
+    query Specials($limit: Int, $page: Int) {
+        specials(limit: $limit, page: $page) {
+            per_page
+            current_page
+            from
+            to
+            has_more_pages
             data {
                 id
+                slug
                 title
+                description
                 oldCost
                 cost
+                unit
                 amount
                 discountType
-                images {
-                    url {
-                        grid2x
-                        grid3x
+                productsCount
+                publishedAt
+                expiresAt
+                image {
+                    size1x
+                    size2x
+                    size3x
+                }
+                banner {
+                    size1x
+                    size2x
+                    size3x
+                }
+                products {
+                    id
+                    name
+                    slug
+                    cost
+                    oldCost
+                    unit
+                    available
+                    image {
+                        url {
+                            grid1x
+                            grid2x
+                        }
+                    }
+                    images {
+                        url {
+                            grid1x
+                            grid2x
+                        }
                     }
                 }
             }
@@ -43,11 +114,90 @@ const SPECIALS_QUERY = /* GraphQL */ `
     }
 `;
 
-export async function getSpecialsApi(limit = 10, lang?: string): Promise<Special[]> {
+export const SPECIAL_BY_ID_QUERY = /* GraphQL */ `
+    query Special($id: Int!) {
+        special(id: $id) {
+            id
+            slug
+            title
+            description
+            oldCost
+            cost
+            unit
+            amount
+            discountType
+            productsCount
+            publishedAt
+            expiresAt
+            image {
+                size1x
+                size2x
+                size3x
+            }
+            banner {
+                size1x
+                size2x
+                size3x
+            }
+            products {
+                id
+                name
+                slug
+                cost
+                oldCost
+                unit
+                available
+                image {
+                    url {
+                        grid1x
+                        grid2x
+                    }
+                }
+                images {
+                    url {
+                        grid1x
+                        grid2x
+                    }
+                }
+            }
+        }
+    }
+`;
+
+export async function getSpecialsApi(limit = 10, page = 1, lang?: string): Promise<SpecialsResponse['specials']> {
     const data = await gqlRequest<SpecialsResponse>(
         SPECIALS_QUERY,
-        { limit },
+        { limit, page },
         { next: { revalidate: 3600 }, lang }
     );
-    return data.specials?.data || [];
+    return data.specials;
+}
+
+export async function getSpecialApi(id: string | number, lang?: string): Promise<Special | null> {
+    try {
+        const data = await gqlRequest<{ special: Special | null }>(
+            SPECIAL_BY_ID_QUERY,
+            { id: parseInt(String(id)) },
+            { next: { revalidate: 3600 }, lang }
+        );
+        return data.special;
+    } catch (error) {
+        console.error(`[Special] Failed to fetch special by id: ${id}`, error);
+        return null;
+    }
+}
+
+/**
+ * Resolves a special slug to its ID by scanning the list of specials.
+ */
+export async function findSpecialIdBySlug(slug: string, lang?: string): Promise<string | null> {
+    try {
+        // Fetch a large number of specials to find the matching slug
+        const response = await getSpecialsApi(100, 1, lang);
+        const special = response.data.find(s => s.slug === slug);
+        return special ? special.id : null;
+    } catch (error) {
+        console.error(`[Special] Failed to resolve slug: ${slug}`, error);
+        return null;
+    }
 }

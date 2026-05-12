@@ -39,12 +39,13 @@ export default function ComplexDiscounts({ dict, lang, specials }: ComplexDiscou
             return specials
                 .slice(0, 6)
                 .map(special => {
-                    let image = special.images?.[0]?.url?.grid2x || special.images?.[0]?.url?.grid3x || null;
+                    let image = special.image?.size2x || special.image?.size3x || special.image?.size1x || null;
                     if (image && image.startsWith('/')) {
                         image = `https://dev-api.myastoriya.com.ua${image}`;
                     }
                     return {
                         id: parseInt(special.id),
+                        slug: special.slug,
                         title: special.title || "",
                         image: image,
                         dateRange: "", 
@@ -97,7 +98,7 @@ export default function ComplexDiscounts({ dict, lang, specials }: ComplexDiscou
                 >
                     {itemsToRender.map((discount: any, idx: number) => (
                         <SwiperSlide key={`${discount.id}-${idx}`} className={s.slide}>
-                            <AppLink href={`/complex-discounts/${discount.id}`} className={s.cardLink}>
+                            <AppLink href={`/complex-discounts/${discount.slug || discount.id}`} className={s.cardLink}>
                                 <div className={s.card}>
                                     <div className={s.cardImage}>
                                         {discount.image ? (

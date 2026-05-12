@@ -257,9 +257,18 @@ export default function CitySelector({
         }
     };
 
-    const handleConfirmYes = () => {
+    const handleConfirmYes = async () => {
         dispatch(setPromptVisible(false));
         dispatch(setPromptInteractionDone(true));
+        
+        // Sync detected city with server
+        if (selectedCity) {
+            try {
+                await selectLocalityApi(selectedCity.id, lang);
+            } catch (error) {
+                console.warn('[CitySelector] Failed to sync confirmed city with server:', error);
+            }
+        }
     };
 
     const handleConfirmNo = () => {

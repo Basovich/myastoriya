@@ -12,24 +12,21 @@ import { useAppDispatch } from '@/store/hooks';
 import { addToCart } from '@/store/slices/cartSlice';
 import { type Dictionary } from '@/i18n/types';
 
+import { type Special, resolveProductImageUrl } from '@/lib/graphql';
+
 interface ComplexDiscountDetailProps {
     dict: Dictionary;
     lang: string;
-    id: string;
+    initialData: Special;
 }
 
-export default function ComplexDiscountDetail({ dict, lang, id }: ComplexDiscountDetailProps) {
-    const list = dict.home.discounts.items;
-    const parsedId = Number(id);
-    const baseId = isNaN(parsedId) ? 1 : (parsedId > 1000 ? parsedId % 1000 : parsedId);
-    const safeBaseId = baseId === 0 ? 1 : baseId;
-
-    let item = list?.find((i) => i.id === safeBaseId);
-    if (!item && list?.length > 0) item = list[0];
-
-    const title = item?.title ?? 'Steak Days щовівторка!';
-    const endDate = item?.endDate ?? '12.10.2026';
-    const discountPercent = item?.discount ?? '-15%';
+export default function ComplexDiscountDetail({ dict, lang, initialData }: ComplexDiscountDetailProps) {
+    const item = initialData;
+    
+    const title = item?.title ?? '';
+    const endDate = item?.expiresAt ?? '';
+    const discountPercent = item?.amount ? `-${item.amount}%` : '0%';
+    const description = item?.description ?? '';
 
     const breadcrumbItems = [
         { label: dict.home.actionsPage.breadcrumbs.home, href: '/' },
@@ -37,14 +34,13 @@ export default function ComplexDiscountDetail({ dict, lang, id }: ComplexDiscoun
         { label: title },
     ];
 
-    // Pick 3 products to display in the bundle set
-    const allProducts = dict.home.products.items;
-    const bundleProducts = allProducts.slice(0, 3);
+    // Use products from the special
+    const bundleProducts = item?.products ?? [];
 
     // Calculate total bundle price and discounted price
-    const totalPrice = bundleProducts.reduce((sum, p) => sum + p.price, 0);
+    const totalPrice = bundleProducts.reduce((sum, p) => sum + (p.cost || 0), 0);
     const discountFactor = 1 - (Math.abs(parseInt(discountPercent)) / 100);
-    const discountedPrice = Math.round(totalPrice * discountFactor);
+    const discountedPrice = item?.cost || Math.round(totalPrice * discountFactor);
 
     const dispatch = useAppDispatch();
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -56,6 +52,12 @@ export default function ComplexDiscountDetail({ dict, lang, id }: ComplexDiscoun
         setIsCartOpen(true);
     };
 
+    const heroImage = item?.banner?.size3x || item?.banner?.size2x || item?.banner?.size1x || 
+                    item?.image?.size3x || item?.image?.size2x || item?.image?.size1x ||
+                    "/images/promotions/promo-hero-bg2.png";
+    
+    const displayHeroImage = heroImage.startsWith('/') && !heroImage.startsWith('/images') ? `https://dev-api.myastoriya.com.ua${heroImage}` : heroImage;
+
     return (
         <>
             <section className={s.section}>
@@ -65,7 +67,7 @@ export default function ComplexDiscountDetail({ dict, lang, id }: ComplexDiscoun
                 <div className={s.heroWrapper}>
                     <div className={s.heroImageWrapper}>
                         <Image
-                            src="/images/promotions/promo-hero-bg2.png"
+                            src={displayHeroImage}
                             alt={title}
                             fill
                             className={s.heroImage}
@@ -88,32 +90,36 @@ export default function ComplexDiscountDetail({ dict, lang, id }: ComplexDiscoun
                 <div className={s.card}>
                     <h1 className={s.title}>{title.toUpperCase()}</h1>
                     <p className={s.description}>
-                        Улюблені стейки – зі знижкою щовівторка!<br />
-                        Щовівторка даруємо 20% знижки на всі стейки з нашого гриль меню. Це чудова нагода скуштувати улюблений
-                        стейк сухої чи вологої витримки або стейк від Бренд Шефа за ще приємнішою ціною. Акція діє лише офлайн у
-                        ресторанах «М&apos;ясторія».
+                        {description}
                     </p>
 
                     {/* Product set */}
                     <div className={s.productSet}>
-                        {bundleProducts.map((product, idx) => (
-                            <React.Fragment key={product.id}>
-                                <div className={s.productCardWrapper}>
-                                    <ProductCard
-                                        id={product.id}
-                                        title={product.title}
-                                        weight={product.weight}
-                                        price={product.price}
-                                        unit={product.unit}
-                                        badge={product.badge}
-                                        image={product.image}
-                                    lang="ua" />
+                        {bundleProducts.map((product, idx) => {
+                            let productImage = product.image?.url?.grid2x || product.image?.url?.grid1x || 
+                                              product.images?.[0]?.url?.grid2x || product.images?.[0]?.url?.grid1x || "";
+                            if (productImage && productImage.startsWith('/')) {
+                                productImage = `https://dev-api.myastoriya.com.ua${productImage}`;
+                            }
+                            return (
+                                <React.Fragment key={product.id}>
+                                    <div className={s.productCardWrapper}>
+                                        <ProductCard
+                                            id={product.id}
+                                            title={product.name}
+                                            weight={""}
+                                            price={product.cost || 0}
+                                            unit={product.unit || "кг"}
+                                            badge={null}
+                                            image={productImage}
+                                        lang="ua" />
                                 </div>
                                 {idx < bundleProducts.length - 1 && (
                                     <span className={s.plus}>+</span>
                                 )}
                             </React.Fragment>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {/* Discount summary */}
