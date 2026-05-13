@@ -5,13 +5,12 @@ import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import { PolicyPageContentItem } from '@/i18n/types';
 
 interface PolicyPageProps {
-    title?: string;
     breadcrumbs: { label: string; href?: string }[];
     content: PolicyPageContentItem[];
     lang: Locale;
 }
 
-export default function PolicyPage({ title, breadcrumbs, content, lang }: PolicyPageProps) {
+export default function PolicyPage({ breadcrumbs, content, lang }: PolicyPageProps) {
     const renderTextWithLinks = (text: string) => {
         if (typeof text !== 'string') return text;
         const parts = text.split(/(\[\[.*?\]\])/g);
@@ -39,9 +38,6 @@ export default function PolicyPage({ title, breadcrumbs, content, lang }: Policy
         <>
             <main className={s.main}>
                 <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
-
-                {title && <h1 className={s.title}>{title}</h1>}
-
                 <div className={s.content}>
                     {content.map((item, index) => (
                         <React.Fragment key={index}>
