@@ -8,7 +8,6 @@ import { useAppSelector } from "@/store/hooks";
 import Image from "next/image";
 import LanguageSwitch from "@/app/components/Header/Shared/LanguageSwitch";
 import PointsInfo from "@/app/components/Header/DesktopHeader/MainBar/PointsInfo";
-import { useHasBlogs } from "@/hooks/useHasBlogs";
 
 interface TopBarProps {
     lang: Locale;
@@ -17,6 +16,7 @@ interface TopBarProps {
 const TOP_NAV_ITEMS = [
     { label: "Заклади", href: "/our-stores" },
     { label: "Акції", href: "/actions" },
+    { label: "Блог", href: "/blog" },
     { label: "Доставка та Оплата", href: "/delivery" },
     { label: "Франшиза", href: "https://f.myastoriya.ua/" },
     { label: "Контакти", href: "/contacts" },
@@ -28,13 +28,7 @@ export default function TopBar({ lang }: TopBarProps) {
     const { isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
     const hydrated = useIsHydrated();
     const isReallyLoggedIn = hydrated && isAuthenticated && !isGuest;
-    const hasBlogs = useHasBlogs(lang);
-
     const navItems = [...TOP_NAV_ITEMS];
-    if (hasBlogs) {
-        // Insert Blog after Actions
-        navItems.splice(2, 0, { label: "Блог", href: "/blog" });
-    }
 
     return (
         <nav className={s.secondaryNav}>

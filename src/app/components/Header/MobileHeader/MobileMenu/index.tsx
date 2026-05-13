@@ -11,7 +11,6 @@ import { siteData } from "@/config/site";
 import { usePathname } from "next/navigation";
 import { useToggleOpenWithAnimation } from "@/hooks/useToggleOpenWithAnimation";
 import CitySelector from "@/app/components/Header/DesktopHeader/MainBar/CitySelector";
-import { useHasBlogs } from "@/hooks/useHasBlogs";
 import { ProductCategory } from "@/lib/graphql/queries/products";
 
 interface MobileMenuProps {
@@ -22,13 +21,7 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose, lang, categories }: MobileMenuProps) {
-    const hasBlogs = useHasBlogs(lang);
     const navItems = [...siteData.navigation];
-
-    if (hasBlogs) {
-        // Insert Blog after Actions
-        navItems.splice(2, 0, { label: "Блог", href: "/blog" });
-    }
     // Menu Transition (Slide In/Out)
     const menuTransition = useTransition(isOpen, {
         from: { transform: "translateX(-100%)" },

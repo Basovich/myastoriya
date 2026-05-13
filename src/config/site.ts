@@ -29,6 +29,10 @@ export const siteData =
             "href": "/actions"
         },
         {
+            "label": "Блог",
+            "href": "/blog"
+        },
+        {
             "label": "Доставка та Оплата",
             "href": "/delivery"
         },
@@ -64,6 +68,10 @@ export const siteData =
             {
                 "label": "Акції",
                 "href": "/actions"
+            },
+            {
+                "label": "Блог",
+                "href": "/blog"
             },
             {
                 "label": "Доставка та Оплата",

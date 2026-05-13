@@ -7,7 +7,6 @@ import Image from "next/image";
 import Logo from "@/app/components/Header/Shared/Logo";
 import { type Locale } from "@/i18n/config";
 import clsx from "clsx";
-import { useHasBlogs } from "@/hooks/useHasBlogs";
 import { type SocialLink } from "@/lib/graphql";
 
 const ALLOWED_SOCIAL_ICONS = ["facebook", "youtube", "instagram"];
@@ -18,7 +17,6 @@ interface FooterProps {
 }
 
 export default function FooterClient({ lang, initialSocialLinks }: FooterProps) {
-    const hasBlogs = useHasBlogs(lang);
     const { footer, contact } = siteData;
     
     const socialLinks = (initialSocialLinks || [])
@@ -30,10 +28,6 @@ export default function FooterClient({ lang, initialSocialLinks }: FooterProps) 
         .filter(link => ALLOWED_SOCIAL_ICONS.includes(link.icon));
 
     const allLinks = [...footer.siteLinks];
-    if (hasBlogs) {
-        // Insert Blog after Actions (index 3 in footer.siteLinks)
-        allLinks.splice(4, 0, { label: "Блог", href: "/blog" });
-    }
 
     const siteLinks = allLinks.slice(0, 8);
     const legalLinks = allLinks.slice(8);
