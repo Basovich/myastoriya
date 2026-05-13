@@ -52,7 +52,48 @@ export default function ActionsGrid({ dict, initialItems, lang, pageType, initia
         if (loading || !hasMore) return;
         
         if (pageType === 'complex-discounts') {
-            setHasMore(false);
+            setLoading(true);
+            try {
+                const nextPage = page + 1;
+                const res = await fetch("/api/specials", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Content-Language": lang === "ru" ? "ru_RU" : "uk_UA"
+                    },
+                    body: JSON.stringify({ page: nextPage, limit: 12 }),
+                });
+                const data = await res.json();
+
+                if (data.data && data.data.length > 0) {
+                    const newItems: ActionItem[] = data.data.map((special: any) => {
+                        let image = special.image?.size2x || special.image?.size1x || "";
+                        if (image && image.startsWith('/')) {
+                            image = `https://dev-api.myastoriya.com.ua${image}`;
+                        }
+                        return {
+                            id: parseInt(special.id),
+                            slug: special.slug || special.id,
+                            title: special.title || "",
+                            image,
+                            date: special.expiresAt
+                                ? new Date(special.expiresAt).toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uk-UA')
+                                : "",
+                            discount: special.amount ? `-${special.amount}%` : null
+                        };
+                    });
+
+                    setItems(prev => [...prev, ...newItems]);
+                    setHasMore(data.has_more_pages);
+                    setPage(nextPage);
+                } else {
+                    setHasMore(false);
+                }
+            } catch (error) {
+                console.error("Failed to load more specials:", error);
+            } finally {
+                setLoading(false);
+            }
             return;
         }
 
@@ -172,12 +213,14 @@ export default function ActionsGrid({ dict, initialItems, lang, pageType, initia
 
             {hasMore && (
                 <div className={s.loadMoreWrapper}>
-                    <Button variant="outline-black" onClick={loadMore} className={s.loadMoreBtn}>
-                        <span className={s.loadMoreBtnText}>{dict.showBtn}</span>
+                    <Button variant="outline-black" onClick={loadMore} className={s.loadMoreBtn} disabled={loading}>
+                        <span className={s.loadMoreBtnText}>{loading ? "Завантаження..." : dict.showBtn}</span>
+                        {!loading && (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                             <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" strokeWidth="2" strokeLinecap="round" />
                             <line x1="15" y1="7.17139" x2="1" y2="7.17139" stroke="black" strokeWidth="2" strokeLinecap="round" />
                         </svg>
+                        )}
                     </Button>
                 </div>
             )}
