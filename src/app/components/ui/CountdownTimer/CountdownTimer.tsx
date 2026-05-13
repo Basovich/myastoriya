@@ -20,7 +20,15 @@ interface CountdownTimerProps {
 }
 
 function parseDate(dateStr: string): Date {
-    const [day, month, year] = dateStr.split(".").map(Number);
+    if (!dateStr) return new Date(0);
+    // ISO format: "YYYY-MM-DD HH:MM:SS" or "YYYY-MM-DD"
+    if (dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
+        const date = new Date(dateStr.replace(' ', 'T'));
+        return isNaN(date.getTime()) ? new Date(0) : date;
+    }
+    // Legacy format: "DD.MM.YYYY"
+    const [day, month, year] = dateStr.split('.').map(Number);
+    if (!day || !month || !year) return new Date(0);
     // End of the target day (23:59:59)
     return new Date(year, month - 1, day, 23, 59, 59);
 }
