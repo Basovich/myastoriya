@@ -54,11 +54,7 @@ export const siteData =
         "copyright": "© 2026 М'ясторія. Усі права захищені.",
         "siteLinks": [
             {
-                "label": "Сира продукція",
-                "href": "/catalog"
-            },
-            {
-                "label": "Готова продукція",
+                "label": "Каталог продукції",
                 "href": "/catalog"
             },
             {
@@ -96,10 +92,6 @@ export const siteData =
             {
                 "label": "Правила програми лояльності",
                 "href": "/loyalty-program-rules"
-            },
-            {
-                "label": "Доставка по Київській області",
-                "href": "/delivery"
             },
             {
                 "label": "Кар'єра в \"М'ясторія\"",
