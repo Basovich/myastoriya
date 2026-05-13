@@ -149,7 +149,6 @@ export interface HomeDict {
   contactsPage: ContactsPageDict;
   ourStoresPage: OurStoresPageDict;
   deliveryPage: DeliveryPageDict;
-  loyaltyProgramRulesPage?: LoyaltyProgramRulesPageDict;
   notFoundPage: NotFoundPageDict;
 }
 
@@ -280,15 +279,6 @@ export interface OurStoresPageDict {
 export interface PolicyPageContentItem {
   type: "text" | "header" | "list" | "html";
   value: string | string[];
-}
-
-export interface LoyaltyProgramRulesPageDict {
-  title: string;
-  breadcrumbs: {
-    home: string;
-    loyalty: string;
-  };
-  content: PolicyPageContentItem[];
 }
 
 export interface DeliveryMethodCard {

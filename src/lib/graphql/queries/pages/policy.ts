@@ -33,3 +33,20 @@ export async function getPrivacyPolicyApi(): Promise<PrivacyPolicy | null> {
     const response = await gqlRequest<{ privacyPolicy: PrivacyPolicy }>(PRIVACY_POLICY_QUERY);
     return response.privacyPolicy || null;
 }
+
+export const TERMS_OF_USE_QUERY = `
+  query getTermsOfUse {
+    termsOfUse {
+      webText
+    }
+  }
+`;
+
+export interface TermsOfUse {
+    webText: string;
+}
+
+export async function getTermsOfUseApi(): Promise<TermsOfUse | null> {
+    const response = await gqlRequest<{ termsOfUse: TermsOfUse }>(TERMS_OF_USE_QUERY);
+    return response.termsOfUse || null;
+}

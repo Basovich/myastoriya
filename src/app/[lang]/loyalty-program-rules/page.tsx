@@ -1,6 +1,7 @@
 import { Locale } from "@/i18n/config";
 import PolicyPage from "@/app/pages/PolicyPage/PolicyPage";
-import { loyaltyRulesContent } from "@/app/pages/PolicyPage/loyalty-rules.content";
+import { getTermsOfUseApi } from "@/lib/graphql";
+import { PolicyPageContentItem } from "@/i18n/types";
 
 export default async function LoyaltyProgramRules({
   params,
@@ -8,19 +9,29 @@ export default async function LoyaltyProgramRules({
   params: Promise<{ lang: Locale }>;
 }) {
   const { lang } = await params;
-  const data = (loyaltyRulesContent as any)[lang] || loyaltyRulesContent.ua;
+  
+  const apiData = await getTermsOfUseApi();
+  const webContent = apiData?.webText;
+
+  const labels = {
+    ua: { home: "Головна", loyalty: "Правила програми лояльності" },
+    ru: { home: "Главная", loyalty: "Правила программы лояльности" }
+  }[lang] || { home: "Головна", loyalty: "Правила програми лояльності" };
 
   const breadcrumbs = [
-    { label: data.breadcrumbs.home, href: "/" },
-    { label: data.breadcrumbs.loyalty }
+    { label: labels.home, href: "/" },
+    { label: labels.loyalty }
   ];
 
+  const content: PolicyPageContentItem[] = webContent
+    ? [{ type: 'html', value: webContent }]
+    : [];
+
   return (
-      <PolicyPage 
-        lang={lang} 
-        title={data.title}
-        breadcrumbs={breadcrumbs}
-        content={data.content as any}
-      />
+    <PolicyPage 
+      lang={lang} 
+      breadcrumbs={breadcrumbs}
+      content={content}
+    />
   );
 }

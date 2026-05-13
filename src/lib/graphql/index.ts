@@ -106,5 +106,5 @@ export { getSocialLinksApi, SOCIAL_LINKS_QUERY } from './queries/settings';
 export type { SocialLink } from './queries/settings';
 
 // Re-export policy
-export { getContractOfferApi, getPrivacyPolicyApi } from './queries/pages/policy';
-export type { ContractOffer, PrivacyPolicy } from './queries/pages/policy';
+export { getContractOfferApi, getPrivacyPolicyApi, getTermsOfUseApi } from './queries/pages/policy';
+export type { ContractOffer, PrivacyPolicy, TermsOfUse } from './queries/pages/policy';
