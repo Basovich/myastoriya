@@ -1,6 +1,7 @@
-import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import PolicyPage from "@/app/pages/PolicyPage/PolicyPage";
+import { getPrivacyPolicyApi } from "@/lib/graphql";
+import { PolicyPageContentItem } from "@/i18n/types";
 
 export default async function Privacy({
   params,
@@ -8,20 +9,29 @@ export default async function Privacy({
   params: Promise<{ lang: Locale }>;
 }) {
   const { lang } = await params;
-  const dict = await getDictionary(lang);
-  const data = dict.home.privacyPolicyPage;
+  
+  const apiData = await getPrivacyPolicyApi();
+  const webContent = apiData?.webText;
+
+  const labels = {
+    ua: { home: "Головна", privacy: "Політика конфіденційності" },
+    ru: { home: "Главная", privacy: "Политика конфиденциальности" }
+  }[lang] || { home: "Головна", privacy: "Політика конфіденційності" };
 
   const breadcrumbs = [
-    { label: data.breadcrumbs.home, href: "/" },
-    { label: data.breadcrumbs.privacy }
+    { label: labels.home, href: "/" },
+    { label: labels.privacy }
   ];
 
+  const content: PolicyPageContentItem[] = webContent
+    ? [{ type: 'html', value: webContent }]
+    : [];
+
   return (
-      <PolicyPage 
-        lang={lang} 
-        title={data.title}
-        breadcrumbs={breadcrumbs}
-        content={data.content as any}
-      />
+    <PolicyPage 
+      lang={lang} 
+      breadcrumbs={breadcrumbs}
+      content={content}
+    />
   );
 }
