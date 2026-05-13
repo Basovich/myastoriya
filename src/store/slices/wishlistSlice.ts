@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { addToFavoritesApi, removeFromFavoritesApi, getFavoritesPayloadApi } from '@/lib/graphql/queries/favorites';
+import { addToFavoritesApi, removeFromFavoritesApi, getFavoritesApi } from '@/lib/graphql/queries/favorites';
+import { GraphQLError } from '@/lib/graphql/client';
 import { RootState } from '../index';
 
 interface WishlistState {
@@ -50,8 +51,8 @@ export const fetchWishlistPayloadAsync = createAsyncThunk(
     'wishlist/fetchPayloadAsync',
     async (_, { rejectWithValue }) => {
         try {
-            const payload = await getFavoritesPayloadApi();
-            return payload.map(String);
+            const response = await getFavoritesApi({ full: false });
+            return response.data.map(item => item.id);
         } catch (error: any) {
             console.error('[Wishlist] Failed to fetch payload:', error);
             return rejectWithValue('Failed to fetch wishlist');
@@ -72,14 +73,29 @@ export const syncWishlistOnAuthAsync = createAsyncThunk(
             const state = getState() as RootState;
             const localItems = state.wishlist.items;
             
-            if (localItems.length > 0) {
+            // Deduplicate items before syncing
+            const uniqueIds = Array.from(new Set(localItems));
+            
+            if (uniqueIds.length > 0) {
                 isSyncingCurrentSession = true;
 
-                // Upload all local items to the backend
-                // Using map instead of for-loop for parallel requests (as per current design)
-                await Promise.allSettled(
-                    localItems.map(id => addToFavoritesApi(Number(id)))
-                );
+                // Upload local items to the backend sequentially to avoid 504 Gateway Timeouts
+                for (const id of uniqueIds) {
+                    try {
+                        await addToFavoritesApi(Number(id));
+                        // Add a small delay between sequential mutations to avoid 504 Gateway Timeouts on dev-api
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    } catch (error) {
+                        if (error instanceof GraphQLError) {
+                            // Product no longer exists on server — remove stale ID from local state
+                            dispatch(toggleWishlistItem(id));
+                            console.warn(`[Wishlist Sync] Product ${id} not found on server, removing from local state.`);
+                        } else {
+                            console.error(`[Wishlist Sync] Failed to add product ${id}:`, error);
+                        }
+                        // Continue with next items even if one fails
+                    }
+                }
             }
             
             // Fetch the combined result from the backend

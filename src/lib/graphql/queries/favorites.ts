@@ -20,24 +20,14 @@ const REMOVE_FROM_FAVORITES_MUTATION = /* GraphQL */ `
     }
 `;
 
-const GET_FAVORITES_PAYLOAD_QUERY = /* GraphQL */ `
-    query GetFavoritesIds {
-        favorites(limit: 1000) {
-            data {
-                id
-            }
-        }
-    }
-`;
-
 const GET_FAVORITES_QUERY = /* GraphQL */ `
-    query GetFavorites($limit: Int) {
-        favorites(limit: $limit) {
+    query GetFavorites($limit: Int, $page: Int, $full: Boolean!) {
+        favorites(limit: $limit, page: $page) {
             data {
                 id
-                name
-                slug
-                image {
+                name @include(if: $full)
+                slug @include(if: $full)
+                image @include(if: $full) {
                     url {
                         grid2x
                         grid1x
@@ -46,7 +36,7 @@ const GET_FAVORITES_QUERY = /* GraphQL */ `
                         big
                     }
                 }
-                images {
+                images @include(if: $full) {
                     url {
                         grid2x
                         grid1x
@@ -55,20 +45,20 @@ const GET_FAVORITES_QUERY = /* GraphQL */ `
                         big
                     }
                 }
-                cost
-                oldCost
-                unit
-                multiplier
-                is_new
-                available
-                specifications {
+                cost @include(if: $full)
+                oldCost @include(if: $full)
+                unit @include(if: $full)
+                multiplier @include(if: $full)
+                is_new @include(if: $full)
+                available @include(if: $full)
+                specifications @include(if: $full) {
                     name
                     values
                 }
             }
-            per_page
-            current_page
-            has_more_pages
+            per_page @include(if: $full)
+            current_page @include(if: $full)
+            has_more_pages @include(if: $full)
         }
     }
 `;
@@ -92,7 +82,6 @@ function generateFavoritePayload(productId: number | string): string {
 
 /**
  * Adds a product to the user's favorites.
- * The payload is a base64 encoded JSON object: {"type":"WezomCms\\Catalog\\Models\\Product","id":<productId>}
  */
 export async function addToFavoritesApi(productId: number | string, token?: string, lang?: string): Promise<boolean> {
     const payload = generateFavoritePayload(productId);
@@ -120,22 +109,21 @@ export async function removeFromFavoritesApi(productId: number | string, token?:
 }
 
 /**
- * Fetches the list of favorites as raw payload strings (IDs)
+ * Unified API to fetch favorites. 
+ * Can return either just IDs (default) or full product data.
  */
-export async function getFavoritesPayloadApi(token?: string, lang?: string): Promise<string[]> {
-    const data = await gqlRequest<{ favorites: { data: Array<{ id: string }> } }>(
-        GET_FAVORITES_PAYLOAD_QUERY,
-        {},
-        { token, lang }
-    );
-    return data.favorites.data.map(item => item.id);
-}
+export async function getFavoritesApi(
+    options: { limit?: number; page?: number; full?: boolean } = {},
+    token?: string,
+    lang?: string
+): Promise<ProductSimplePagination> {
+    const { limit = 1000, page = 1, full = false } = options;
 
-export async function getFavoritesApi(limit?: number, token?: string, lang?: string): Promise<ProductSimplePagination> {
     const data = await gqlRequest<{ favorites: ProductSimplePagination }>(
         GET_FAVORITES_QUERY,
-        { limit },
-        { token, lang, cache: 'no-store' }
+        { limit, page, full },
+        { token, lang, cache: full ? 'no-store' : 'default' }
     );
     return data.favorites;
 }
+

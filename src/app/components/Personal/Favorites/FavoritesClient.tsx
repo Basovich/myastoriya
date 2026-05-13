@@ -57,7 +57,7 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                 }
                 setIsLoading(true);
                 // We ask for a large limit to cover reasonable wishlists.
-                const response = await getFavoritesApi(100, undefined, lang);
+                const response = await getFavoritesApi({ limit: 100, full: true }, undefined, lang);
                 if (isMounted) {
                     const rawData = response.data || [];
                     // Deduplicate products by ID

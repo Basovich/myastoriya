@@ -143,9 +143,7 @@ export async function gqlRequest<T>(
                 // Add jitter: base delay * retry + random(0-500ms)
                 const delay = (RETRY_DELAY_MS * nextRetry) + Math.floor(Math.random() * 500);
                 
-                if (isServer) {
-                    console.warn(`[GQL] ${res.status} error on ${GQL_ENDPOINT}. Retrying in ${delay}ms... (${nextRetry}/${MAX_RETRIES})`);
-                }
+                console.warn(`[GQL] ${res.status} error on ${GQL_ENDPOINT}. Retrying in ${delay}ms... (${nextRetry}/${MAX_RETRIES})`);
                 
                 await new Promise(resolve => setTimeout(resolve, delay));
                 return gqlRequest(query, variables, { ...options, _retryCount: nextRetry });
@@ -209,9 +207,7 @@ export async function gqlRequest<T>(
             const nextRetry = currentRetry + 1;
             const delay = (RETRY_DELAY_MS * nextRetry) + Math.floor(Math.random() * 500);
             
-            if (isServer) {
-                console.warn(`[GQL] Network/Timeout error on ${query.split('\n')[0].substring(0, 50)}... Retrying in ${delay}ms... (${nextRetry}/${MAX_RETRIES})`);
-            }
+            console.warn(`[GQL] Network/Timeout error on ${query.split('{')[0].trim()}... Retrying in ${delay}ms... (${nextRetry}/${MAX_RETRIES})`);
             
             await new Promise(resolve => setTimeout(resolve, delay));
             return gqlRequest(query, variables, { ...options, _retryCount: nextRetry });
