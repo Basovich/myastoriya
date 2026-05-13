@@ -118,3 +118,36 @@
         font-size: 16px;
     }
 }
+
+.htmlContent {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #000;
+
+    @media (min-width: 1024px) {
+        font-size: 16px;
+    }
+
+    p {
+        margin-bottom: 12px;
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    a {
+        color: #E30613;
+        text-decoration: none;
+        transition: opacity 0.2s ease;
+
+        @media (any-hover: hover) {
+            &:hover {
+                opacity: 0.8;
+            }
+        }
+    }
+
+    strong {
+        font-weight: 700;
+    }
+}

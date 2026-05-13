@@ -1,0 +1,18 @@
+import { gqlRequest } from "../../client";
+
+export const CONTRACT_OFFER_QUERY = `
+  query getContractOffer {
+    contractOffer {
+      webText
+    }
+  }
+`;
+
+export interface ContractOffer {
+    webText: string;
+}
+
+export async function getContractOfferApi(): Promise<ContractOffer | null> {
+    const response = await gqlRequest<{ contractOffer: ContractOffer }>(CONTRACT_OFFER_QUERY);
+    return response.contractOffer || null;
+}

@@ -279,7 +279,7 @@ export interface OurStoresPageDict {
 }
 
 export interface PolicyPageContentItem {
-  type: "text" | "header" | "list";
+  type: "text" | "header" | "list" | "html";
   value: string | string[];
 }
 

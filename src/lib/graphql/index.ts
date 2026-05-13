@@ -104,3 +104,7 @@ export type { Shop, ShopSchedule, ShopsResponse } from './queries/shops';
 // Re-export settings
 export { getSocialLinksApi, SOCIAL_LINKS_QUERY } from './queries/settings';
 export type { SocialLink } from './queries/settings';
+
+// Re-export policy
+export { getContractOfferApi } from './queries/pages/policy';
+export type { ContractOffer } from './queries/pages/policy';

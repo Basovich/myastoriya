@@ -5,7 +5,7 @@ import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import { PolicyPageContentItem } from '@/i18n/types';
 
 interface PolicyPageProps {
-    title: string;
+    title?: string;
     breadcrumbs: { label: string; href?: string }[];
     content: PolicyPageContentItem[];
     lang: Locale;
@@ -40,13 +40,19 @@ export default function PolicyPage({ title, breadcrumbs, content, lang }: Policy
             <main className={s.main}>
                 <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
 
-                <h1 className={s.title}>{title}</h1>
+                {title && <h1 className={s.title}>{title}</h1>}
 
                 <div className={s.content}>
                     {content.map((item, index) => (
                         <React.Fragment key={index}>
                             {item.type === 'header' && typeof item.value === 'string' && (
+                                <h1 className={s.sectionHeader}>{item.value}</h1>
+                            )}
+                            {item.type === 'header' && typeof item.value === 'string' && (
                                 <h2 className={s.sectionHeader}>{item.value}</h2>
+                            )}
+                            {item.type === 'header' && typeof item.value === 'string' && (
+                                <h3 className={s.sectionHeader}>{item.value}</h3>
                             )}
                             {item.type === 'text' && typeof item.value === 'string' && (
                                 <p className={s.paragraph}>{renderTextWithLinks(item.value)}</p>
@@ -59,6 +65,12 @@ export default function PolicyPage({ title, breadcrumbs, content, lang }: Policy
                                         </li>
                                     ))}
                                 </ul>
+                            )}
+                            {item.type === 'html' && typeof item.value === 'string' && (
+                                <div 
+                                    className={s.htmlContent} 
+                                    dangerouslySetInnerHTML={{ __html: item.value }} 
+                                />
                             )}
                         </React.Fragment>
                     ))}
