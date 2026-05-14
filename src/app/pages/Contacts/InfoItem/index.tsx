@@ -6,7 +6,7 @@ import Image from "next/image";
 interface InfoItemProps {
     icon: string;
     label: string;
-    value: string;
+    value: React.ReactNode;
     isLink?: boolean;
     href?: string;
 }

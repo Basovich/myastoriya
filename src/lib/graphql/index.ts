@@ -108,3 +108,7 @@ export type { SocialLink } from './queries/settings';
 // Re-export policy
 export { getContractOfferApi, getPrivacyPolicyApi, getTermsOfUseApi } from './queries/pages/policy';
 export type { ContractOffer, PrivacyPolicy, TermsOfUse } from './queries/pages/policy';
+
+// Re-export contacts
+export { getContactsCategoriesApi } from './queries/contacts';
+export type { Contact, ContactCategory, ContactSchedule, ContactsCategoriesResponse } from './queries/contacts';
