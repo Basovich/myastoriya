@@ -5,7 +5,7 @@ import { type Dictionary } from "@/i18n/types";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import HeroBanner from "@/app/components/ui/HeroBanner/HeroBanner";
 import { ContactCard } from "@/app/pages/Contacts/RestaurantCard";
-import { type ContactCategory } from "@/lib/graphql/queries/contacts";
+import { type ContactCategory } from "../../../lib/graphql/queries/pages/contacts";
 
 interface ContactsPageProps {
     dict: Dictionary;

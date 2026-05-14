@@ -2,7 +2,7 @@ import s from "@/app/pages/Contacts/Contacts.module.scss";
 import React from "react";
 import {InfoItem} from "@/app/pages/Contacts/InfoItem";
 import Button from "@/app/components/ui/Button/Button";
-import { type Contact } from "@/lib/graphql/queries/contacts";
+import { type Contact } from "../../../../lib/graphql/queries/pages/contacts";
 import { type Locale } from "@/i18n/config";
 
 const localLabels = {

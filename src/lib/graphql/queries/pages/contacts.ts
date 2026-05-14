@@ -1,4 +1,4 @@
-import { gqlRequest } from "../client";
+import { gqlRequest } from "../../client";
 
 export const GET_CONTACT_CATEGORIES_QUERY = `
   query GetContactsCategories {

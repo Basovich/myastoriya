@@ -110,5 +110,5 @@ export { getContractOfferApi, getPrivacyPolicyApi, getTermsOfUseApi } from './qu
 export type { ContractOffer, PrivacyPolicy, TermsOfUse } from './queries/pages/policy';
 
 // Re-export contacts
-export { getContactsCategoriesApi } from './queries/contacts';
-export type { Contact, ContactCategory, ContactSchedule, ContactsCategoriesResponse } from './queries/contacts';
+export { getContactsCategoriesApi } from './queries/pages/contacts';
+export type { Contact, ContactCategory, ContactSchedule, ContactsCategoriesResponse } from './queries/pages/contacts';
