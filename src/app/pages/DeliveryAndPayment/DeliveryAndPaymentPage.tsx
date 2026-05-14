@@ -11,6 +11,7 @@ import DeliveryZones from '@/app/components/Delivery/DeliveryZones/DeliveryZones
 import PolicySections from '@/app/components/Delivery/PolicySections/PolicySections';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import { Shop } from '@/lib/graphql/queries/shops';
+import { OrderingInfoBlock } from '@/lib/graphql/index';
 import Button from "@/app/components/ui/Button/Button";
 import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
 
@@ -19,6 +20,7 @@ interface DeliveryAndPaymentPageProps {
     lang: Locale;
     initialShops: Shop[];
     isMeatBar?: boolean;
+    policyBlocks: OrderingInfoBlock[];
 }
 
 const parseShopData = (shop: Shop): Store => {
@@ -44,7 +46,7 @@ const parseShopData = (shop: Shop): Store => {
     };
 };
 
-export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMeatBar = false }: DeliveryAndPaymentPageProps) {
+export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMeatBar = false, policyBlocks }: DeliveryAndPaymentPageProps) {
     const stores = initialShops.map(parseShopData);
     const { deliveryPage, ourStoresPage } = dict.home;
     const breadcrumbs = [
@@ -119,7 +121,7 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
                     </div>
                 </section>
 
-                <PolicySections dict={deliveryPage.policies} />
+                <PolicySections blocks={policyBlocks} />
             </main>
         </>
     );

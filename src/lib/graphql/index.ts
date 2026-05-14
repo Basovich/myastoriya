@@ -88,6 +88,14 @@ export type { Sale, SaleImages, SalesResponse } from './queries/pages/home/sales
 // Re-export specials
 export * from "./queries/pages/home/specials";
 
+// Re-export policy
+export { getContractOfferApi, getPrivacyPolicyApi, getTermsOfUseApi } from './queries/pages/policy';
+export type { ContractOffer, PrivacyPolicy, TermsOfUse } from './queries/pages/policy';
+
+// Re-export delivery
+export { getPolicyBlocksApi } from './queries/pages/delivery';
+export type { OrderingInfoBlock } from './queries/pages/delivery';
+
 // Re-export localities
 export {
     autoDetectLocalityApi,
@@ -104,10 +112,6 @@ export type { Shop, ShopSchedule, ShopsResponse } from './queries/shops';
 // Re-export settings
 export { getSocialLinksApi, SOCIAL_LINKS_QUERY } from './queries/settings';
 export type { SocialLink } from './queries/settings';
-
-// Re-export policy
-export { getContractOfferApi, getPrivacyPolicyApi, getTermsOfUseApi } from './queries/pages/policy';
-export type { ContractOffer, PrivacyPolicy, TermsOfUse } from './queries/pages/policy';
 
 // Re-export contacts
 export { getContactsCategoriesApi } from './queries/pages/contacts';
