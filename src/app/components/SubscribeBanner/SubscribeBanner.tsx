@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Button from '../ui/Button/Button';
+import { subscribeApi } from '@/lib/graphql/index';
 
 interface SubscribeBannerProps {
     image: string;
@@ -16,6 +17,8 @@ interface SubscribeBannerProps {
 
 export default function SubscribeBanner({ image, title, lang = 'ua' }: SubscribeBannerProps) {
     const [success, setSuccess] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [apiError, setApiError] = useState('');
 
     const formik = useFormik({
         initialValues: {
@@ -28,11 +31,24 @@ export default function SubscribeBanner({ image, title, lang = 'ua' }: Subscribe
                 .required(lang === 'ru' ? 'Введите email' : 'Введіть email')
                 .email(lang === 'ru' ? 'Неверный формат email' : 'Невірний формат email'),
         }),
-        onSubmit: (values, { resetForm }) => {
-            // Simulate API call
-            setSuccess(true);
-            resetForm();
-            setTimeout(() => setSuccess(false), 3000); // optional: hide success msg after 3s
+        onSubmit: async (values, { resetForm }) => {
+            setLoading(true);
+            setApiError('');
+            try {
+                const result = await subscribeApi(values.email, lang);
+                if (result) {
+                    setSuccess(true);
+                    resetForm();
+                    setTimeout(() => setSuccess(false), 3000);
+                } else {
+                    setApiError(lang === 'ru' ? 'Произошла ошибка при подписке' : 'Виникла помилка під час підписки');
+                }
+            } catch (error) {
+                console.error('Subscription error:', error);
+                setApiError(lang === 'ru' ? 'Произошла ошибка при подписке' : 'Виникла помилка під час підписки');
+            } finally {
+                setLoading(false);
+            }
         },
     });
 
@@ -74,11 +90,15 @@ export default function SubscribeBanner({ image, title, lang = 'ua' }: Subscribe
                                     }
                                 }}
                             />
-                            <Button type="submit" variant="red" className={s.subscribeSubmitBtn}>
-                                {lang === 'ru' ? 'Подписаться' : 'Підписатись'}
+                            <Button type="submit" variant="red" className={s.subscribeSubmitBtn} disabled={loading}>
+                                {loading 
+                                    ? (lang === 'ru' ? 'Подписка...' : 'Підписка...') 
+                                    : (lang === 'ru' ? 'Подписаться' : 'Підписатись')
+                                }
                             </Button>
                         </div>
                         {hasError && <span className={s.errorText}>{formik.errors.email as string}</span>}
+                        {apiError && <span className={s.errorText}>{apiError}</span>}
                         {success && <span className={s.successText}>{lang === 'ru' ? 'Вы успешно подписались!' : 'Ви успішно підписалися!'}</span>}
                     </form>
                 </div>

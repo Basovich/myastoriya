@@ -110,7 +110,7 @@ export { getShopsApi, getContactsShopsApi, SHOPS_QUERY } from './queries/shops';
 export type { Shop, ShopSchedule, ShopsResponse } from './queries/shops';
 
 // Re-export settings
-export { getSocialLinksApi, SOCIAL_LINKS_QUERY } from './queries/settings';
+export { getSocialLinksApi, subscribeApi, SOCIAL_LINKS_QUERY } from './queries/settings';
 export type { SocialLink } from './queries/settings';
 
 // Re-export contacts
