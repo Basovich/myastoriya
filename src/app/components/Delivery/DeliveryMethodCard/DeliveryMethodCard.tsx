@@ -1,21 +1,18 @@
 import React from 'react';
 import Image from 'next/image';
 import s from './DeliveryMethodCard.module.scss';
-import { DeliveryMethodCard as DeliveryMethodCardType } from '@/i18n/types';
+import { OrderingInfoBlock } from '@/lib/graphql/index';
 import clsx from "clsx";
 
 interface DeliveryMethodCardProps {
-    item: DeliveryMethodCardType;
+    block: OrderingInfoBlock;
     hasBackground?: boolean;
 }
 
-
-
-const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item, hasBackground }) => {
+const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ block, hasBackground }) => {
     // Helper to render text with bold parts and red highlighting
     const renderStyledText = (text: string, className?: string) => {
         // Match both **bold** and keyword variations for free delivery
-        // Keywords: "доставка безкоштовна", "безкоштовна доставка", "доставка бесплатная", "бесплатная доставка"
         const keywords = [
             "доставка безкоштовна", 
             "безкоштовна доставка", 
@@ -42,12 +39,8 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item, hasBackgr
         );
     };
 
-    const firstFeature = item.features[0];
-    const isPromo = firstFeature && (
-        firstFeature.toLowerCase().includes("безкоштовна") || 
-        firstFeature.toLowerCase().includes("бесплатная")
-    );
-    const otherFeatures = isPromo ? item.features.slice(1) : item.features;
+    const isPickup = block.name.toLowerCase().includes('самовивіз');
+    const imageSrc = block.image?.size2x || "/images/store/herobanner.png";
 
     const LocationIcon = () => (
         <svg xmlns="http://www.w3.org/2000/svg" width="8" height="9" viewBox="0 0 8 9" fill="none">
@@ -57,12 +50,11 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item, hasBackgr
 
     return (
         <div className={s.cadrWrap}>
-            {item.badge && <div className={s.badge}>{item.badge}</div>}
             <div className={s.card}>
                 <div className={s.imageWrapper}>
                     <Image
-                        src={item.image}
-                        alt={item.title}
+                        src={imageSrc}
+                        alt={block.name}
                         fill
                         className={s.image}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
@@ -70,30 +62,14 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ item, hasBackgr
                 </div>
                 <div className={clsx(s.overflowBlock, hasBackground && s.hasBackground)}>
                     <div className={s.content}>
-                        <h3 className={s.title}>{item.title}</h3>
+                        <h3 className={s.title}>{block.name}</h3>
 
                         <div className={s.cardBody}>
-                            {item.shippingCostLabel && (
-                                <div className={s.infoRow}>
-                                    {renderStyledText(item.shippingCostLabel, s.label)}
-                                    {item.shippingCostValue && <div className={s.value}>{renderStyledText(item.shippingCostValue)}</div>}
-                                </div>
-                            )}
-
-                            {item.minOrderLabel && (
-                                <div className={s.infoRow}>
-                                    {renderStyledText(item.minOrderLabel, s.label)}
-                                    {item.minOrderValue && <div className={s.value}>{renderStyledText(item.minOrderValue)}</div>}
-                                </div>
-                            )}
-
-                            {isPromo && renderStyledText(firstFeature, s.promoText)}
-
-                            {otherFeatures.length > 0 && (
-                                <ul className={`${s.features} ${item.isPickup ? s.pickupList : ''}`}>
-                                    {otherFeatures.map((feature, index) => (
+                            {block.text.length > 0 && (
+                                <ul className={clsx(s.features, isPickup && s.pickupList)}>
+                                    {block.text.map((feature, index) => (
                                         <li key={index} className={s.featureItem}>
-                                            {item.isPickup && <div className={s.icon}><LocationIcon /></div>}
+                                            {isPickup && <div className={s.icon}><LocationIcon /></div>}
                                             {renderStyledText(feature)}
                                         </li>
                                     ))}

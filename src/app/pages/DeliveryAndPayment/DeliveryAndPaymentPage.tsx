@@ -21,6 +21,7 @@ interface DeliveryAndPaymentPageProps {
     initialShops: Shop[];
     isMeatBar?: boolean;
     policyBlocks: OrderingInfoBlock[];
+    deliveryBlocks: OrderingInfoBlock[];
 }
 
 const parseShopData = (shop: Shop): Store => {
@@ -46,7 +47,7 @@ const parseShopData = (shop: Shop): Store => {
     };
 };
 
-export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMeatBar = false, policyBlocks }: DeliveryAndPaymentPageProps) {
+export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMeatBar = false, policyBlocks, deliveryBlocks }: DeliveryAndPaymentPageProps) {
     const stores = initialShops.map(parseShopData);
     const { deliveryPage, ourStoresPage } = dict.home;
     const breadcrumbs = [
@@ -100,23 +101,13 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
                 <section className={s.methodsSection}>
                     <div className={s.container}>
                         <div className={s.methodsGrid}>
-                            {(() => {
-                                // Reorder items: move "Самовивіз" (idx 3) to the end
-                                const originalItems = [...deliveryPage.methods.items];
-                                const reorderedItems = [...originalItems];
-                                if (reorderedItems.length > 4) {
-                                    const pickupItem = reorderedItems.splice(3, 1)[0];
-                                    reorderedItems.push(pickupItem);
-                                }
-                                
-                                return reorderedItems.map((item, idx) => (
-                                    <DeliveryMethodCard 
-                                        key={idx} 
-                                        item={item} 
-                                        hasBackground={idx === 0 || idx === 2 || idx === 4}
-                                    />
-                                ));
-                            })()}
+                            {deliveryBlocks.map((block, idx) => (
+                                <DeliveryMethodCard 
+                                    key={block.id} 
+                                    block={block} 
+                                    hasBackground={idx === 0 || idx === 2 || idx === 4}
+                                />
+                            ))}
                         </div>
                     </div>
                 </section>

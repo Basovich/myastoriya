@@ -93,8 +93,8 @@ export { getContractOfferApi, getPrivacyPolicyApi, getTermsOfUseApi } from './qu
 export type { ContractOffer, PrivacyPolicy, TermsOfUse } from './queries/pages/policy';
 
 // Re-export delivery
-export { getPolicyBlocksApi } from './queries/pages/delivery';
-export type { OrderingInfoBlock } from './queries/pages/delivery';
+export { getPolicyBlocksApi, getDeliveryBlocksApi } from './queries/pages/delivery';
+export type { OrderingInfoBlock, OrderingInfoBlockImage } from './queries/pages/delivery';
 
 // Re-export localities
 export {
