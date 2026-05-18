@@ -17,6 +17,7 @@ export interface BackendUser {
         size2x?: string;
         size3x?: string;
     } | null;
+    bonuses?: number;
 }
 
 export interface AuthFields {
@@ -103,6 +104,7 @@ const LOGIN_MUTATION = /* GraphQL */ `
                     size2x
                     size3x
                 }
+                bonuses
             }
         }
     }
@@ -144,6 +146,7 @@ const REGISTRATION_MUTATION = /* GraphQL */ `
                     size2x
                     size3x
                 }
+                bonuses
             }
         }
     }
@@ -203,6 +206,7 @@ const SOCIAL_AUTH_MUTATION = /* GraphQL */ `
                     size2x
                     size3x
                 }
+                bonuses
             }
         }
     }
@@ -280,6 +284,7 @@ const ME_QUERY = /* GraphQL */ `
                 size2x
                 size3x
             }
+            bonuses
         }
     }
 `;
@@ -315,6 +320,7 @@ const UPDATE_USER_DATA_MUTATION = /* GraphQL */ `
                 size2x
                 size3x
             }
+            bonuses
         }
     }
 `;

@@ -25,7 +25,7 @@ const TOP_NAV_ITEMS = [
 import { useIsHydrated } from "@/hooks/useIsHydrated";
 
 export default function TopBar({ lang }: TopBarProps) {
-    const { isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
+    const { isAuthenticated, isGuest, user } = useAppSelector((state) => state.auth);
     const hydrated = useIsHydrated();
     const isReallyLoggedIn = hydrated && isAuthenticated && !isGuest;
     const navItems = [...TOP_NAV_ITEMS];
@@ -55,7 +55,7 @@ export default function TopBar({ lang }: TopBarProps) {
                 </div>
 
                 <div className={s.navRight}>
-                    {isReallyLoggedIn && <PointsInfo />}
+                    {isReallyLoggedIn && <PointsInfo points={user?.bonuses || 0} lang={lang} />}
                     <a href={`tel:${siteData.contact.phone.replace(/\s+/g, '')}`} className={s.navPhone}>
                         <Image
                             src="/icons/icon-phone-outline.svg"
