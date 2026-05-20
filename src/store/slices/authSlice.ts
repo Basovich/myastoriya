@@ -18,6 +18,7 @@ export interface AuthUser {
     sex?: string;
     avatar?: UserAvatars | null;
     addresses?: { id: string; title: string; street: string }[];
+    bonuses?: number;
 }
 
 interface AuthState {
