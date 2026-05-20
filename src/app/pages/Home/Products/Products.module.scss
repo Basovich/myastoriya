@@ -87,6 +87,16 @@
             right: 0;
         }
     }
+
+    &.locked {
+        &::after {
+            display: none !important;
+        }
+
+        .tabArrow {
+            display: none;
+        }
+    }
 }
 
 .tabs {

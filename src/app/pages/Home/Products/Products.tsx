@@ -36,6 +36,7 @@ export default function Products({ dict, categories, initialProducts, initialHas
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
     const [hasMore, setHasMore] = useState(initialHasMore ?? true);
     const [page, setPage] = useState(1);
+    const [isLocked, setIsLocked] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
@@ -127,6 +128,7 @@ export default function Products({ dict, categories, initialProducts, initialHas
 
     if (!dict || !categories) return null;
 
+
     return (
         <section className={s.wrapper}>
             <Image
@@ -137,7 +139,7 @@ export default function Products({ dict, categories, initialProducts, initialHas
                 className={s.bgLogo}
             />
             <div className={s.section} id="products">
-                <div className={s.tabsWrapper}>
+                <div className={clsx(s.tabsWrapper, isLocked && s.locked)}>
                     <SliderArrow
                         direction="left"
                         className={clsx(s.tabArrow, s.left)}
@@ -148,9 +150,15 @@ export default function Products({ dict, categories, initialProducts, initialHas
                     <Swiper
                         modules={[Navigation]}
                         navigation={{ prevEl, nextEl }}
-                        loop={true}
+                        loop={false}
                         slidesPerView="auto"
                         spaceBetween={8}
+                        onInit={(swiper) => {
+                            setIsLocked(swiper.isLocked);
+                        }}
+                        onUpdate={(swiper) => {
+                            setIsLocked(swiper.isLocked);
+                        }}
                         className={clsx(s.tabs, "products-tabs-swiper")}
                     >
                         {categories.map((cat, i) => (
