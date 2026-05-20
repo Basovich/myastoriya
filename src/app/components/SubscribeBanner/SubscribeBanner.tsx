@@ -29,7 +29,10 @@ export default function SubscribeBanner({ image, title, lang = 'ua' }: Subscribe
         validationSchema: Yup.object({
             email: Yup.string()
                 .required(lang === 'ru' ? 'Введите email' : 'Введіть email')
-                .email(lang === 'ru' ? 'Неверный формат email' : 'Невірний формат email'),
+                .matches(
+                    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+                    lang === 'ru' ? 'Неверный формат email' : 'Невірний формат email'
+                ),
         }),
         onSubmit: async (values, { resetForm }) => {
             setLoading(true);
