@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -18,7 +18,6 @@ import { type PopularCategory, type Product, resolveProductImageUrl } from "@/li
 interface ProductsProps {
     dict: {
         tabs?: string[];
-        items: any[]; // Mock items no longer used
         showMoreButton: string;
     };
     categories: PopularCategory[];
