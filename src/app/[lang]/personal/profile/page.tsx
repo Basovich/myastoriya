@@ -299,9 +299,11 @@ export default function ProfilePage() {
                 </div>
             </PersonalContentBlock>
 
-            <PersonalContentBlock>
-                <RecentlyViewedSlider title={dict.recommendations.title} products={viewedProducts} />
-            </PersonalContentBlock>
+            {viewedProducts.length > 0 && (
+                <PersonalContentBlock>
+                    <RecentlyViewedSlider title={dict.recommendations.title} products={viewedProducts} />
+                </PersonalContentBlock>
+            )}
         </>
     );
 }
