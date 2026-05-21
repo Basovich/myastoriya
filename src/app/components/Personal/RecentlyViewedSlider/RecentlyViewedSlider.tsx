@@ -11,7 +11,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/grid';
 
-interface Product {
+export interface RecentlyViewedProduct {
     id: number | string;
     title: string;
     weight: string;
@@ -23,7 +23,7 @@ interface Product {
 
 interface RecentlyViewedSliderProps {
     title: string;
-    products: Product[];
+    products: RecentlyViewedProduct[];
 }
 
 export default function RecentlyViewedSlider({ title, products }: RecentlyViewedSliderProps) {

@@ -20,6 +20,7 @@
 | `product(id: Int!)` | `id` | `Product` | Товар |
 | `productsCount(search: String, categoryId: Int, state: [FilterState], viewed: Boolean)` | `search, categoryId, state, viewed` | `Int` | Количество товаров соответствующих фильтру |
 | `products(categoryId: Int, showcaseId: Int, saleId: Int, recipeId: Int, search: String, saveSearchSentence: Boolean, filter: [FilterState], viewed: Boolean, sort: String, limit: Int, page: Int)` | `categoryId, showcaseId, saleId, recipeId, search, saveSearchSentence, filter, viewed, sort, limit, page` | `ProductSimplePagination` | Товары |
+| `productsByIds(ids: [Int!]!)` | `ids` | `[Product!]!` | Получение товаров по массиву ID |
 | `searchPopularQueries(search: String, limit: Int)` | `search, limit` | `[String]` | Популярные поисковые запросы |
 | `searchProductByBarcode(barcode: String!)` | `barcode` | `Product` | Поиск товара по штрихкоду |
 | `showcaseSeoMeta()` | `—` | `SeoMeta` | SEO Витрин |

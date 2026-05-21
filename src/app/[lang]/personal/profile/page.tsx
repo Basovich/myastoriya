@@ -11,9 +11,9 @@ import { Locale } from '@/i18n/config';
 import BonusCard from '@/app/components/Personal/BonusCard/BonusCard';
 import RecentOrderCard from '@/app/components/Personal/RecentOrderCard/RecentOrderCard';
 import Button from '@/app/components/ui/Button/Button';
-import ProfileForm from '@/app/components/Personal/ProfileForm/ProfileForm';
-import RecentlyViewedSlider from '@/app/components/Personal/RecentlyViewedSlider/RecentlyViewedSlider';
-import { getViewedProductsApi, Product as ApiProduct, resolveProductImageUrl } from '@/lib/graphql/queries/products';
+import ProfileForm, { ProfileFormValues } from '@/app/components/Personal/ProfileForm/ProfileForm';
+import RecentlyViewedSlider, { RecentlyViewedProduct } from '@/app/components/Personal/RecentlyViewedSlider/RecentlyViewedSlider';
+import { getProductsByIdsApi, Product as ApiProduct, resolveProductImageUrl } from '@/lib/graphql/queries/products';
 import { updateUserDataApi } from '@/lib/graphql/queries/auth';
 import { setUser } from '@/store/slices/authSlice';
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
@@ -106,6 +106,7 @@ const profileDict = {
 
 export default function ProfilePage() {
     const { user, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
+    const localViewedIds = useAppSelector((state) => state.viewedProducts.items);
     const dispatch = useAppDispatch();
     const router = useRouter();
     const params = useParams();
@@ -113,7 +114,7 @@ export default function ProfilePage() {
     const dict = profileDict[lang as keyof typeof profileDict];
     
     const hydrated = useIsHydrated();
-    const [viewedProducts, setViewedProducts] = React.useState<any[]>([]);
+    const [viewedProducts, setViewedProducts] = React.useState<RecentlyViewedProduct[]>([]);
     const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
     React.useEffect(() => {
@@ -162,22 +163,25 @@ export default function ProfilePage() {
     };
 
     React.useEffect(() => {
-        if (!isInitialized || !isAuthenticated) return;
+        if (!hydrated) return;
 
         const fetchViewedProducts = async () => {
             try {
-                const { getAccessToken } = await import('@/app/actions/authActions');
-                const token = await getAccessToken();
+                if (!localViewedIds || localViewedIds.length === 0) {
+                    setViewedProducts([]);
+                    return;
+                }
                 
-                const products = await getViewedProductsApi(12, lang, token || undefined);
-                const mappedProducts = products.map((p: ApiProduct) => ({
+                const idsToFetch = localViewedIds.slice(0, 12).map(Number);
+                const products = await getProductsByIdsApi(idsToFetch, lang);
+                const mappedProducts = (products || []).map((p: ApiProduct) => ({
                     id: p.id,
                     title: p.name,
                     price: p.cost,
                     unit: p.unit,
                     image: resolveProductImageUrl(p),
                     badge: p.is_new ? "NEW" : null,
-                    weight: p.specifications?.find((s: any) => 
+                    weight: p.specifications?.find((s) => 
                         s.name.toLowerCase().includes('важ') || 
                         s.name.toLowerCase().includes('вес')
                     )?.values[0] || p.multiplier?.toString() || ""
@@ -189,9 +193,9 @@ export default function ProfilePage() {
         };
 
         fetchViewedProducts();
-    }, [lang, isAuthenticated, isInitialized]);
+    }, [lang, localViewedIds, hydrated]);
 
-    const handleFormSubmit = async (values: any) => {
+    const handleFormSubmit = async (values: ProfileFormValues) => {
         try {
             const token = await getAccessToken();
             if (!token) {
