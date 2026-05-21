@@ -271,6 +271,46 @@ const VIEWED_PRODUCTS_QUERY = /* GraphQL */ `
     }
 `;
 
+const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
+    query ProductsByIds($ids: [Int!]!) {
+        productsByIds(ids: $ids) {
+            id
+            slug
+            categoryId
+            name
+            cost
+            oldCost
+            unit
+            multiplier
+            is_new
+            available
+            specifications {
+                name
+                values
+            }
+            image {
+                url {
+                    grid2x
+                    grid1x
+                    main2x
+                    main1x
+                    big
+                }
+            }
+            images {
+                url {
+                    grid2x
+                    grid1x
+                    main2x
+                    main1x
+                    big
+                }
+            }
+        }
+    }
+`;
+
+
 // ---------------------------------------------------------------------------
 // API functions
 // ---------------------------------------------------------------------------
@@ -436,6 +476,16 @@ export async function getViewedProductsApi(limit: number = 10, lang?: string, to
     );
     return data.products.data;
 }
+
+export async function getProductsByIdsApi(ids: number[], lang?: string): Promise<Product[]> {
+    const data = await gqlRequest<{ productsByIds: Product[] }>(
+        PRODUCTS_BY_IDS_QUERY,
+        { ids },
+        { next: { revalidate: 60 }, lang }
+    );
+    return data.productsByIds;
+}
+
 
 const SEARCH_POPULAR_QUERIES_QUERY = /* GraphQL */ `
     query SearchPopularQueries($search: String, $limit: Int) {

@@ -4,8 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { Locale } from '@/i18n/config';
 import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
-import { getFavoritesApi } from '@/lib/graphql/queries/favorites';
-import { Product, resolveProductImageUrl } from '@/lib/graphql/queries/products';
+import { Product, resolveProductImageUrl, getProductsByIdsApi } from '@/lib/graphql/queries/products';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
@@ -56,13 +55,12 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                     return;
                 }
                 setIsLoading(true);
-                // We ask for a large limit to cover reasonable wishlists.
-                const response = await getFavoritesApi({ limit: 100, full: true }, undefined, lang);
+                const rawData = await getProductsByIdsApi(wishlistIds.map(Number), lang);
                 if (isMounted) {
-                    const rawData = response.data || [];
+                    const productsList = rawData || [];
                     // Deduplicate products by ID
                     const uniqueProducts = Array.from(
-                        new Map(rawData.map((item) => [item.id, item])).values()
+                        new Map(productsList.map((item) => [item.id, item])).values()
                     );
                     setProducts(uniqueProducts);
                 }
