@@ -33,7 +33,9 @@ export const parseShopData = (shop: Shop): Store => {
         lat: shop.lat || 0,
         lng: shop.lng || 0,
         image: shop.image?.size2x || "/images/store/herobanner.png",
-        mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address || fullName)}`,
+        mapUrl: shop.lat && shop.lng 
+            ? `https://www.google.com/maps/search/?api=1&query=${shop.lat},${shop.lng}`
+            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address || fullName)}`,
         isOpen: shop.isOpen
     };
 };

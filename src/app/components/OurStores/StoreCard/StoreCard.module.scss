@@ -84,6 +84,18 @@
     }
 }
 
+.nameLink {
+    text-decoration: none;
+    
+    @media (any-hover: hover) {
+        &:hover {
+            .name {
+                color: #E3051B;
+            }
+        }
+    }
+}
+
 .name {
     color: #060606;
     font-feature-settings: 'liga' off, 'clig' off;
@@ -92,6 +104,7 @@
     font-weight: 800;
     line-height: 120%;
     text-transform: uppercase;
+    transition: color 0.3s ease;
 
     @media (min-width: 1280px) {
         font-size: 16px;
@@ -393,6 +406,40 @@
         @media (any-hover: hover) {
             background: #000;
             color: #FFF;
+        }
+    }
+}
+
+.addressLink {
+    color: #000;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 142.857%;
+    letter-spacing: 0.28px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    @media (any-hover: hover) {
+        &:hover {
+            color: #E3051B;
+        }
+    }
+}
+
+.phoneLink {
+    color: #000;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 142.857%;
+    letter-spacing: 0.28px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+
+    @media (any-hover: hover) {
+        &:hover {
+            color: #E3051B;
         }
     }
 }

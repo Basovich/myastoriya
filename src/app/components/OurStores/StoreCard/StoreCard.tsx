@@ -107,7 +107,9 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                     </div>
 
                     <div className={s.nameWrapper}>
-                        <h4 className={s.name}>{store.name.toUpperCase()}</h4>
+                        <Link href={`/our-stores/${store.id}`} className={s.nameLink}>
+                            <h4 className={s.name}>{store.name.toUpperCase()}</h4>
+                        </Link>
                         <div className={`${s.statusBadge} ${isOpen ? s.open : s.closed}`}>
                             {isOpen ? dict.open : dict.closed}
                         </div>
@@ -124,7 +126,14 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                             </div>
                             <p className={s.label}>{dict.address.toUpperCase()}</p>
                         </div>
-                        <p className={s.value}>{store.address}</p>
+                        <a 
+                            href={store.mapUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className={s.addressLink}
+                        >
+                            {store.address}
+                        </a>
                     </div>
 
                     <div className={s.detailCol}>
@@ -153,7 +162,12 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                             </div>
                             <p className={s.label}>{dict.phoneLabel.toUpperCase()}</p>
                         </div>
-                        <p className={s.value}>{store.phone}</p>
+                        <a 
+                            href={`tel:${store.phone.replace(/\s+/g, "")}`} 
+                            className={s.phoneLink}
+                        >
+                            {store.phone}
+                        </a>
                     </div>
                 </div>
 
