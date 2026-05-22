@@ -17,6 +17,15 @@ export const SHOPS_QUERY = `
         }
         lat
         lng
+        description
+        googleReviewsUrl
+        images {
+          url {
+            size1x
+            size2x
+            size3x
+          }
+        }
         image {
           size1x
           size2x
@@ -116,7 +125,7 @@ export interface Shop {
   lng: number | null;
   description?: string | null;
   googleReviewsUrl?: string | null;
-  images?: { url: ShopSizeImages }[] | null;
+  images?: { title?: string | null; alt?: string | null; url: ShopSizeImages }[] | null;
   image?: ShopSizeImages | null;
   icon?: ShopSizeImages | null;
 }

@@ -30,7 +30,7 @@ const parseShopData = (shop: Shop): Store => {
     const brand = match ? match[1].trim() : fullName;
     const address = match ? match[2].trim() : '';
     
-    const isMeatBarBrand = brand.toLowerCase().includes('meat bar') || brand.toLowerCase().includes('meatbar');
+    const isMeatBarBrand = !shop.isCompanyStore;
     
     return {
         id: shop.id,
