@@ -33,6 +33,7 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
     const { ourStoresPage } = dict.home;
     const [activeFilter, setActiveFilter] = useState<StoreType>("restaurant");
     const [searchQuery, setSearchQuery] = useState("");
+    const [localSearchQuery, setLocalSearchQuery] = useState("");
     const [viewMode, setViewMode] = useState<ViewMode>("map");
     const [visibleCount, setVisibleCount] = useState(STORES_PER_PAGE);
 
@@ -91,8 +92,14 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
                                     className={s.filter}
                                 />
                                 <Search
-                                    value={searchQuery}
-                                    onChange={setSearchQuery}
+                                    value={localSearchQuery}
+                                    onChange={(val) => {
+                                        setLocalSearchQuery(val);
+                                        if (!val) {
+                                            setSearchQuery("");
+                                        }
+                                    }}
+                                    onSubmit={() => setSearchQuery(localSearchQuery)}
                                     placeholder={ourStoresPage.search.placeholder}
                                     buttonText={ourStoresPage.search.button}
                                     buttonColor="red"

@@ -10,6 +10,7 @@ interface SearchProps {
     buttonColor?: "red" | "black";
     className?: string;
     showButton?: boolean;
+    onSubmit?: () => void;
 }
 
 const Search = React.forwardRef<HTMLInputElement, SearchProps>(({ 
@@ -19,10 +20,16 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(({
     buttonText = "ПОШУК", 
     buttonColor = "red",
     className,
-    showButton = true
+    showButton = true,
+    onSubmit
 }, ref) => {
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSubmit?.();
+    };
+
     return (
-        <div className={clsx(s.searchWrapper, className, !showButton && s.noButton)}>
+        <form onSubmit={handleSubmit} className={clsx(s.searchWrapper, className, !showButton && s.noButton)}>
             <div className={s.inputContainer}>
                 <div className={s.icon}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -40,11 +47,11 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(({
                 />
             </div>
             {showButton && (
-                <button className={clsx(s.searchBtn, s[buttonColor])}>
+                <button type="submit" className={clsx(s.searchBtn, s[buttonColor])}>
                     {buttonText}
                 </button>
             )}
-        </div>
+        </form>
     );
 });
 
