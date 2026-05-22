@@ -88,6 +88,7 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
                                     activeFilter={activeFilter} 
                                     onFilterChange={setActiveFilter} 
                                     dict={ourStoresPage.filters}
+                                    className={s.filter}
                                 />
                                 <Search
                                     value={searchQuery}
@@ -101,6 +102,7 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
                                     viewMode={viewMode} 
                                     onViewChange={setViewMode} 
                                     dict={ourStoresPage.viewToggle}
+                                    className={s.viewToggle}
                                 />
                             </div>
                         </div>

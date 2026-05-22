@@ -10,11 +10,12 @@ interface StoreViewToggleProps {
         list: string;
         map: string;
     };
+    className?: string;
 }
 
-export default function StoreViewToggle({ viewMode, onViewChange, dict }: StoreViewToggleProps) {
+export default function StoreViewToggle({ viewMode, onViewChange, dict, className }: StoreViewToggleProps) {
     return (
-        <div className={s.toggleWrapper}>
+        <div className={clsx(s.toggleWrapper, className)}>
             <button
                 className={clsx(s.toggleBtn, viewMode === "list" && s.active)}
                 onClick={() => onViewChange("list")}

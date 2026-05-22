@@ -11,9 +11,10 @@ interface StoreFilterProps {
         restaurants: string;
         meatbar: string;
     };
+    className?: string;
 }
 
-export default function StoreFilter({ activeFilter, onFilterChange, dict }: StoreFilterProps) {
+export default function StoreFilter({ activeFilter, onFilterChange, dict, className }: StoreFilterProps) {
     const filters: { id: StoreType, label: string, icon: React.ReactNode }[] = [
         { 
             id: "restaurant", 
@@ -38,7 +39,7 @@ export default function StoreFilter({ activeFilter, onFilterChange, dict }: Stor
 
 
     return (
-        <div className={s.filterWrapper}>
+        <div className={`${s.filterWrapper} ${className || ""}`}>
             {filters.map((filter) => (
                 <Button
                     key={filter.id}

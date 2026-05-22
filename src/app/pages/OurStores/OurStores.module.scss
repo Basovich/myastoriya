@@ -96,7 +96,7 @@
 
     @media (min-width: 1280px) {
         margin-top: 30px;
-        margin-bottom: 32px;
+        margin-bottom: 26px;
     }
 }
 
@@ -118,12 +118,21 @@
         flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        gap: 20px;
+        gap: 14px;
     }
 
     @media (min-width: 1280px) {
         flex-wrap: nowrap;
         gap: 24px;
+        align-items: flex-end;
+    }
+}
+
+.filter {
+    @media (min-width: 1280px) {
+        button {
+            height: 36px !important;
+        }
     }
 }
 
@@ -135,9 +144,54 @@
     }
 
     @media (min-width: 1280px) {
-        flex: 1;
-        max-width: 480px;
+        width: 330px !important;
         order: 0;
+        height: 36px !important;
+        padding: 4px 4px 4px 16px !important;
+        border-radius: 8px !important;
+
+        input {
+            font-size: 13px !important;
+            padding: 2px 0 !important;
+        }
+
+        button {
+            height: 28px !important;
+            padding: 0 20px !important;
+            font-size: 11px !important;
+            border-radius: 6px !important;
+        }
+
+        svg {
+            width: 16px !important;
+            height: 16px !important;
+        }
+    }
+}
+
+div.viewToggle {
+    @media (min-width: 1280px) {
+        width: 340px;
+        height: 46px;
+        padding: 4px 6px;
+        border-radius: 12px;
+        
+        button {
+            padding: 0 24px;
+            height: 38px;
+            min-width: 140px;
+            border-radius: 10px;
+            font-size: 12px;
+
+            span {
+                margin-top: 2px;
+            }
+
+            svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
     }
 }
 
