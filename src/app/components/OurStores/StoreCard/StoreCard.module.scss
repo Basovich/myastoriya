@@ -367,45 +367,49 @@
     gap: 4px;
 }
 
-.detailsBtnFull,
-.routeBtnFull {
-    width: 100%;
-    height: 28px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #FFF;
-    font-size: 9px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
+.card,
+.mapVariant {
+    .detailsBtnFull,
+    .routeBtnFull {
+        width: 100%;
+        height: 28px;
+        padding: 0;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #FFF;
+        font-size: 9px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
 
-.detailsBtnFull {
-    background: #000;
-    color: #FFF;
-    border: none;
+    .detailsBtnFull {
+        background: #000;
+        color: #FFF;
+        border: none;
 
-    &:hover {
-        @media (any-hover: hover) {
-            background: #252525;
+        &:hover {
+            @media (any-hover: hover) {
+                background: #252525;
+            }
         }
     }
-}
 
-.routeBtnFull {
-    background: #FFF;
-    color: #000;
-    border: 1px solid #000;
+    .routeBtnFull {
+        background: #FFF;
+        color: #000;
+        border: 1px solid #000;
 
-    &:hover {
-        @media (any-hover: hover) {
-            background: #000;
-            color: #FFF;
+        &:hover {
+            @media (any-hover: hover) {
+                background: #000;
+                color: #FFF;
+            }
         }
     }
 }
