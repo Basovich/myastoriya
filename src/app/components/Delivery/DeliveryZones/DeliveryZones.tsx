@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 import s from './DeliveryZones.module.scss';
 import { Store } from '../../OurStores/StoreCard/StoreCard';
@@ -39,21 +39,35 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
 
     const activeTab = isMeatBar ? 'meatbar' : 'restaurants';
     const [searchQuery, setSearchQuery] = useState('');
+    const [map, setMap] = useState<google.maps.Map | null>(null);
     const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 
     const filteredStores = stores.filter(store => 
         activeTab === 'restaurants' ? store.type !== 'meatbar' : store.type === 'meatbar'
     );
 
-    const onMapLoad = useCallback((map: google.maps.Map) => {
-        if (filteredStores.length > 0) {
+    const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
+        setMap(mapInstance);
+    }, []);
+
+    // Fit map bounds whenever the active list of stores changes
+    useEffect(() => {
+        if (map && filteredStores.length > 0) {
             const bounds = new window.google.maps.LatLngBounds();
             filteredStores.forEach((store) => {
                 bounds.extend({ lat: store.lat, lng: store.lng });
             });
             map.fitBounds(bounds);
         }
-    }, [filteredStores]);
+    }, [map, filteredStores]);
+
+    // Close InfoWindow if the selected store is filtered out
+    useEffect(() => {
+        if (selectedStore && !filteredStores.some(s => s.id === selectedStore.id)) {
+            setSelectedStore(null);
+        }
+    }, [filteredStores, selectedStore]);
+
 
 
     return (

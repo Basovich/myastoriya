@@ -15,6 +15,7 @@ import StoreViewToggle from "@/app/components/OurStores/StoreViewToggle/StoreVie
 import StoreList from "@/app/components/OurStores/StoreList/StoreList";
 import StoreMap from "@/app/components/OurStores/StoreMap/StoreMap";
 import { Store } from "@/app/components/OurStores/StoreCard/StoreCard";
+import { parseShopData } from "@/lib/utils/shops";
 
 interface OurStoresPageProps {
     dict: Dictionary;
@@ -27,30 +28,6 @@ export type ViewMode = "list" | "map";
 
 const STORES_PER_PAGE = 10;
 
-const parseShopData = (shop: Shop): Store => {
-    const fullName = shop.name;
-    // Regex to extract brand and address from "Brand (Address)"
-    const match = fullName.match(/^(.*?)\((.*?)\)$/);
-    const brand = match ? match[1].trim() : fullName;
-    const address = match ? match[2].trim() : '';
-    
-    // Determine type (restaurant or meatbar) based on isCompanyStore status
-    const isMeatBar = !shop.isCompanyStore;
-    
-    return {
-        id: shop.id,
-        name: brand,
-        type: isMeatBar ? "meatbar" : "restaurant",
-        address: address || brand,
-        workingHours: shop.schedule?.[0] ? `${shop.schedule[0].days}: ${shop.schedule[0].workTime}` : "",
-        phone: shop.phones?.[0] || "",
-        email: shop.email || "",
-        lat: shop.lat || 0,
-        lng: shop.lng || 0,
-        image: shop.image?.size2x || "/images/store/herobanner.png",
-        mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address || brand)}`
-    };
-};
 
 export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPageProps) {
     const { ourStoresPage } = dict.home;

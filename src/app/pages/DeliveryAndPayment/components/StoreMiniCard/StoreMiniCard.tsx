@@ -63,7 +63,13 @@ export default function StoreMiniCard({ store, isPromo = false }: StoreMiniCardP
                         <path fillRule="evenodd" clipRule="evenodd" d="M10.2868 10.4608C10.1994 10.4608 10.1114 10.4382 10.0308 10.3908L7.51744 8.89149C7.36677 8.80083 7.27344 8.63749 7.27344 8.46149V5.22949C7.27344 4.95349 7.49744 4.72949 7.77344 4.72949C8.0501 4.72949 8.27344 4.95349 8.27344 5.22949V8.17749L10.5434 9.53083C10.7801 9.67283 10.8581 9.97949 10.7168 10.2168C10.6228 10.3735 10.4568 10.4608 10.2868 10.4608Z" fill="black"/>
                     </svg>
                     <div className={s.textCol}>
-                        <p>{store.workingHours}</p>
+                        {Array.isArray(store.workingHours) ? (
+                            store.workingHours.map((hours, idx) => (
+                                <p key={idx}>{hours}</p>
+                            ))
+                        ) : (
+                            <p>{store.workingHours}</p>
+                        )}
                         {store.kitchenHours && <span className={s.subText}>{store.kitchenHours}</span>}
                     </div>
                 </div>

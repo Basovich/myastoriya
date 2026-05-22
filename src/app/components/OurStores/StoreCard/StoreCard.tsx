@@ -9,13 +9,14 @@ export interface Store {
     name: string;
     type: string;
     address: string;
-    workingHours: string;
+    workingHours: string[];
     phone: string;
     email: string;
     lat: number;
     lng: number;
     image: string;
     mapUrl: string;
+    isOpen?: boolean;
 }
 
 interface StoreCardProps {
@@ -35,8 +36,8 @@ interface StoreCardProps {
 }
 
 export default function StoreCard({ store, dict, variant = "list", onClose }: StoreCardProps) {
-    // Determine if store is open based on status from data (mocking isOpen for now as data doesn't have it)
-    const isOpen = true; 
+    // Determine if store is open based on status from data
+    const isOpen = store.isOpen ?? true; 
 
     if (variant === 'map') {
         return (
@@ -48,7 +49,7 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                 </button>
                 <div className={s.mapImageWrapper}>
                     <Image 
-                        src="/images/store/map-point.png" 
+                        src={store.image && store.image !== "/images/store/herobanner.png" ? store.image : "/images/store/map-point.png"} 
                         alt={store.name}
                         width={164}
                         height={76}
@@ -64,7 +65,11 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                             <circle cx="12" cy="12" r="9" stroke="#E3051B" strokeWidth="2"/>
                             <path d="M12 7V12L15 15" stroke="#E3051B" strokeWidth="2" strokeLinecap="round"/>
                         </svg>
-                        <span>з 10:00 до 22:00</span>
+                        <div className={s.hoursLines}>
+                            {store.workingHours.map((hours, idx) => (
+                                <span key={idx} className={s.hoursLine}>{hours}</span>
+                            ))}
+                        </div>
                     </div>
                     
                     <div className={s.mapActions}>
@@ -132,7 +137,11 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                             </div>
                             <p className={s.label}>{dict.workingHoursLabel.toUpperCase()}</p>
                         </div>
-                        <p className={s.value}>{store.workingHours}</p>
+                        <div className={s.hoursList}>
+                            {store.workingHours.map((hours, idx) => (
+                                <p key={idx} className={s.value}>{hours}</p>
+                            ))}
+                        </div>
                     </div>
 
                     <div className={s.detailCol}>

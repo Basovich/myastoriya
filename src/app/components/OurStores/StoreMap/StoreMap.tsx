@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import s from "./StoreMap.module.scss";
 import { type Store } from "../StoreCard/StoreCard";
@@ -39,16 +39,33 @@ export default function StoreMap({ stores, dict }: StoreMapProps) {
         googleMapsApiKey: GOOGLE_MAPS_API_KEY
     });
 
+    const [map, setMap] = useState<google.maps.Map | null>(null);
     const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-    const onMapLoad = useCallback((map: google.maps.Map) => {
-        const bounds = new window.google.maps.LatLngBounds();
-        stores.forEach((store) => {
-            bounds.extend({ lat: store.lat, lng: store.lng });
-        });
-        if (stores.length > 0) {
+
+    const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
+        setMap(mapInstance);
+    }, []);
+
+    // Fit map bounds whenever the active list of stores changes
+    useEffect(() => {
+        if (map && stores.length > 0) {
+            const bounds = new window.google.maps.LatLngBounds();
+            stores.forEach((store) => {
+                if (store.lat && store.lng) {
+                    bounds.extend({ lat: store.lat, lng: store.lng });
+                }
+            });
             map.fitBounds(bounds);
         }
-    }, [stores]);
+    }, [map, stores]);
+
+    // Close InfoWindow if the selected store is filtered out
+    useEffect(() => {
+        if (selectedStore && !stores.some(s => s.id === selectedStore.id)) {
+            setSelectedStore(null);
+        }
+    }, [stores, selectedStore]);
+
 
     return isLoaded ? (
         <div className={s.mapWrapper}>

@@ -14,6 +14,7 @@ import { Shop } from '@/lib/graphql/queries/shops';
 import { OrderingInfoBlock } from '@/lib/graphql/index';
 import Button from "@/app/components/ui/Button/Button";
 import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
+import { parseShopData } from '@/lib/utils/shops';
 
 interface DeliveryAndPaymentPageProps {
     dict: Dictionary;
@@ -23,29 +24,6 @@ interface DeliveryAndPaymentPageProps {
     policyBlocks: OrderingInfoBlock[];
     deliveryBlocks: OrderingInfoBlock[];
 }
-
-const parseShopData = (shop: Shop): Store => {
-    const fullName = shop.name;
-    const match = fullName.match(/^(.*?)\((.*?)\)$/);
-    const brand = match ? match[1].trim() : fullName;
-    const address = match ? match[2].trim() : '';
-    
-    const isMeatBarBrand = !shop.isCompanyStore;
-    
-    return {
-        id: shop.id,
-        name: brand,
-        type: isMeatBarBrand ? "meatbar" : "restaurant",
-        address: address || brand,
-        workingHours: shop.schedule?.[0] ? `${shop.schedule[0].days}: ${shop.schedule[0].workTime}` : "",
-        phone: shop.phones?.[0] || "",
-        email: shop.email || "",
-        lat: shop.lat || 0,
-        lng: shop.lng || 0,
-        image: shop.image?.size2x || "/images/store/herobanner.png",
-        mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address || brand)}`
-    };
-};
 
 export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMeatBar = false, policyBlocks, deliveryBlocks }: DeliveryAndPaymentPageProps) {
     const stores = initialShops.map(parseShopData);
