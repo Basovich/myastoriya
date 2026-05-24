@@ -297,6 +297,21 @@
     position: relative !important;
 }
 
+.mapImagePlaceholder {
+    width: 164px;
+    height: 76px;
+    background: #000;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholderLogo {
+    width: 27px;
+    height: 36px;
+}
+
 .mapContent {
     display: flex;
     flex-direction: column;

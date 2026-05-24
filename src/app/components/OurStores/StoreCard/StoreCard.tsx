@@ -48,13 +48,25 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                     </svg>
                 </button>
                 <div className={s.mapImageWrapper}>
-                    <Image 
-                        src={store.image && store.image !== "/images/store/herobanner.png" ? store.image : "/images/store/map-point.png"} 
-                        alt={store.name}
-                        width={164}
-                        height={76}
-                        className={s.mapImage}
-                    />
+                    {store.image && store.image !== "/images/store/herobanner.png" && store.image !== "/images/store/map-point.png" ? (
+                        <Image 
+                            src={store.image} 
+                            alt={store.name}
+                            width={164}
+                            height={76}
+                            className={s.mapImage}
+                        />
+                    ) : (
+                        <div className={s.mapImagePlaceholder}>
+                            <Image 
+                                src="/icons/logo-red.svg" 
+                                alt="Logo" 
+                                width={27}
+                                height={36}
+                                className={s.placeholderLogo}
+                            />
+                        </div>
+                    )}
                 </div>
                 
                 <div className={s.mapContent}>
