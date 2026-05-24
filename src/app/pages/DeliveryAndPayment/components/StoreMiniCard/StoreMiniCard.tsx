@@ -1,6 +1,7 @@
 import React from 'react';
 import s from './StoreMiniCard.module.scss';
 import Image from 'next/image';
+import Link from 'next/link';
 import clsx from 'clsx';
 import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
 
@@ -35,7 +36,7 @@ export default function StoreMiniCard({ store, isPromo = false }: StoreMiniCardP
     if (!store) return null;
 
     return (
-        <div className={s.card}>
+        <Link href={`/our-stores/${store.id}`} className={s.card}>
             <div className={s.header}>
                 <div className={s.titleGroup}>
                     <h4 className={s.name}>{store.name}</h4>
@@ -85,6 +86,6 @@ export default function StoreMiniCard({ store, isPromo = false }: StoreMiniCardP
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }
