@@ -9,7 +9,7 @@ import s from './AddPickupModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import Search from '@/app/components/ui/Search/Search';
 import Button from '@/app/components/ui/Button/Button';
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE } from '@/lib/constants';
+import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
 
 interface Store {
     id: string;
@@ -72,8 +72,6 @@ const defaultCenter = {
     lng: 30.5234
 };
 
-const libraries: ("places" | "drawing" | "geometry" | "visualization")[] = ['places'];
-
 const dict = {
     ua: {
         title: "ОБРАТИ ЗАКЛАД",
@@ -103,7 +101,7 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang }: AddPick
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries
+        libraries: GOOGLE_MAPS_LIBRARIES
     });
 
     const [view, setView] = useState<'list' | 'map'>('list');

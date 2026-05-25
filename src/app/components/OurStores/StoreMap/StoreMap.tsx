@@ -3,7 +3,7 @@ import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-map
 import s from "./StoreMap.module.scss";
 import { type Store } from "../StoreCard/StoreCard";
 import StoreCard from "../StoreCard/StoreCard";
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE } from "@/lib/constants";
+import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from "@/lib/constants";
 
 // Dark map style
 
@@ -36,7 +36,8 @@ interface StoreMapProps {
 export default function StoreMap({ stores, dict }: StoreMapProps) {
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script",
-        googleMapsApiKey: GOOGLE_MAPS_API_KEY
+        googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+        libraries: GOOGLE_MAPS_LIBRARIES
     });
 
     const [map, setMap] = useState<google.maps.Map | null>(null);

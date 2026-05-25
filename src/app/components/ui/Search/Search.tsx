@@ -11,6 +11,7 @@ interface SearchProps {
     className?: string;
     showButton?: boolean;
     onSubmit?: () => void;
+    fullWidthDropdown?: boolean;
 }
 
 const Search = React.forwardRef<HTMLInputElement, SearchProps>(({ 
@@ -21,7 +22,8 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(({
     buttonColor = "red",
     className,
     showButton = true,
-    onSubmit
+    onSubmit,
+    fullWidthDropdown = false
 }, ref) => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,7 +31,15 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(({
     };
 
     return (
-        <form onSubmit={handleSubmit} className={clsx(s.searchWrapper, className, !showButton && s.noButton)}>
+        <form 
+            onSubmit={handleSubmit} 
+            className={clsx(
+                s.searchWrapper, 
+                className, 
+                !showButton && s.noButton,
+                fullWidthDropdown && s.fullWidthDropdown
+            )}
+        >
             <div className={s.inputContainer}>
                 <div className={s.icon}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

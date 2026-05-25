@@ -8,7 +8,7 @@ import useScrollLock from '@/hooks/useScrollLock';
 import InputField from '@/app/components/ui/InputField';
 import Button from '@/app/components/ui/Button/Button';
 import Search from '@/app/components/ui/Search/Search';
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE } from '@/lib/constants';
+import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
 
 interface AddAddressModalProps {
     isOpen: boolean;
@@ -35,15 +35,11 @@ const center = {
     lng: 30.5234
 };
 
-const libraries: ("places" | "drawing" | "geometry" | "visualization")[] = ['places'];
-
-
-
 export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressModalProps) {
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries
+        libraries: GOOGLE_MAPS_LIBRARIES
     });
 
     const [view, setView] = useState<'form' | 'map'>('form');
@@ -262,6 +258,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                                             placeholder="Пошук по вулиці"
                                             showButton={false}
                                             className={s.mapSearch}
+                                            fullWidthDropdown
                                         />
                                     </Autocomplete>
                                 </div>

@@ -48,12 +48,16 @@
   }
 }
 
-div.search {
+.search {
   flex: 1;
+  
+  form {
+    height: 44px !important;
+  }
   
   @media (min-width: 1024px) {
     flex: initial;
-    width: 369px;
+    width: 370px;
   }
 }
 
@@ -112,7 +116,7 @@ div.search {
 }
 
 .mapPlaceholder {
-  height: 450px;
+  height: 100%;
   background: #212121;
   border-radius: 20px;
   display: flex;
@@ -145,5 +149,76 @@ div.search {
   position: relative;
   padding: 0;
   margin: 0;
+}
+
+.resultCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  margin-top: 16px;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+
+  &.free {
+    background: #E8F5E9;
+    border: 1px solid #4CAF50;
+    color: #2E7D32;
+  }
+
+  &.paid {
+    background: #FFF3E0;
+    border: 1px solid #FF9800;
+    color: #E65100;
+  }
+}
+
+.resultIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.resultText {
+  font-size: 14px;
+  line-height: 1.4;
+  flex-grow: 1;
+  font-family: var(--font-houschka), sans-serif;
+  
+  strong {
+    font-weight: 800;
+  }
+}
+
+.clearResultBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  
+  &:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
