@@ -9,6 +9,35 @@ import clsx from 'clsx';
 import StoreGalleryClient from './StoreGalleryClient';
 import GeocodedAddressClient from '@/app/components/ui/GeocodedAddress/GeocodedAddressClient';
 
+const LOCALIZED_TEXTS = {
+    ua: {
+        buildRoute: "Прокласти маршрут",
+        viewOnMap: "Дивитись на карті",
+        viewMenu: "Переглянути меню",
+        email: "E-MAIL",
+        workingHours: "ЧАС РОБОТИ:",
+        phone: "ТЕЛЕФОН",
+        address: "АДРЕСА",
+        leaveReview: "Залишити відгук на Google карті",
+        aboutStore: "ПРО ЗАКЛАД",
+        defaultDescLine1: "Улюблені стейки — зі знижкою щовівторка!",
+        defaultDescLine2: "Щовівторка даруємо 20% знижки на всі стейки з нашого гриль меню."
+    },
+    ru: {
+        buildRoute: "Проложить маршрут",
+        viewOnMap: "Смотреть на карте",
+        viewMenu: "Посмотреть меню",
+        email: "E-MAIL",
+        workingHours: "ВРЕМЯ РАБОТЫ:",
+        phone: "ТЕЛЕФОН",
+        address: "АДРЕС",
+        leaveReview: "Оставить отзыв на Google карте",
+        aboutStore: "О ЗАВЕДЕНИИ",
+        defaultDescLine1: "Любимые стейки — со скидкой каждый вторник!",
+        defaultDescLine2: "Каждый вторник дарим 20% скидки на все стейки из нашего гриль меню."
+    }
+};
+
 interface StoreDetailPageProps {
     shop: Shop;
     lang: Locale;
@@ -42,6 +71,7 @@ function groupSchedule(schedule: Shop["schedule"]) {
 
 const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) => {
     const { ourStoresPage } = dict.home;
+    const texts = LOCALIZED_TEXTS[lang] || LOCALIZED_TEXTS.ua;
 
     const match = shop.name.match(/^(.*?)\((.*?)\)$/);
     const brandName = match ? match[1].trim() : shop.name;
@@ -89,7 +119,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
                                     <path d="M11.9958 3.49304C11.9987 3.4551 11.9987 3.417 11.9958 3.37906L10.7962 0.379426C10.7494 0.260854 10.666 0.160294 10.5581 0.0923342C10.4503 0.0243742 10.3236 -0.00745224 10.1964 0.00147186H1.79937C1.67924 0.00135554 1.56185 0.0373203 1.4624 0.104708C1.36294 0.172095 1.28601 0.2678 1.24156 0.379426L0.0419852 3.37906C0.039094 3.417 0.039094 3.4551 0.0419852 3.49304C0.0220547 3.52644 0.00786297 3.56294 0 3.60103C0.00667601 4.01572 0.120693 4.42161 0.330931 4.77909C0.541168 5.13658 0.840448 5.43346 1.19958 5.64078V11.4001C1.19958 11.5592 1.26277 11.7118 1.37525 11.8243C1.48774 11.9368 1.64029 12 1.79937 12H10.1964C10.3555 12 10.5081 11.9368 10.6205 11.8243C10.733 11.7118 10.7962 11.5592 10.7962 11.4001V5.66478C11.1588 5.45539 11.4603 5.15473 11.6708 4.79269C11.8812 4.43064 11.9933 4.01981 11.9958 3.60103C12.0014 3.56525 12.0014 3.52882 11.9958 3.49304Z" fill="white" />
                                 </svg>
-                                Прокласти маршрут
+                                {texts.buildRoute}
                             </Button>
                             <Button
                                 variant="outline-black"
@@ -97,14 +127,14 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                                 href={createGoogleMapsLink(address)}
                                 target="_blank"
                             >
-                                Дивитись на карті
+                                {texts.viewOnMap}
                             </Button>
                             <Button
                                 variant="outline-black"
                                 className={s.actionBtn}
                                 href={`/our-stores/${shop.id}/menu`}
                             >
-                                Переглянути меню
+                                {texts.viewMenu}
                             </Button>
                         </div>
 
@@ -118,7 +148,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                                 {shop.email && (
                                     <div className={s.detailItem}>
                                         <div className={s.detailItemHeader}>
-                                            <p className={s.title}>E-MAIL</p>
+                                            <p className={s.title}>{texts.email}</p>
                                         </div>
                                         <a href={`mailto:${shop.email}`} className={s.text}>{shop.email}</a>
                                     </div>
@@ -126,7 +156,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                                 {groupedSchedule.length > 0 && (
                                     <div className={s.detailItem}>
                                         <div className={s.detailItemHeader}>
-                                            <p className={s.title}>ЧАС РОБОТИ:</p>
+                                            <p className={s.title}>{texts.workingHours}</p>
                                         </div>
                                         <div className={s.scheduleList}>
                                             {groupedSchedule.map((line, idx) => (
@@ -138,14 +168,14 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                                 {phone && (
                                     <div className={s.detailItem}>
                                         <div className={s.detailItemHeader}>
-                                            <p className={s.title}>ТЕЛЕФОН</p>
+                                            <p className={s.title}>{texts.phone}</p>
                                         </div>
                                         <a href={`tel:${phone}`} className={s.text}>{phone}</a>
                                     </div>
                                 )}
                                 <div className={clsx(s.detailItem, s.lastItem)}>
                                     <div className={s.detailItemHeader}>
-                                        <p className={s.title}>АДРЕСА</p>
+                                        <p className={s.title}>{texts.address}</p>
                                     </div>
                                     <p className={s.text}>
                                         <GeocodedAddressClient lat={shop.lat} lng={shop.lng} fallbackAddress={address} />
@@ -161,17 +191,17 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                                 className={s.googleReviewBtn}
                                 target="_blank"
                             >
-                                Залишити відгук на Google карті
+                                {texts.leaveReview}
                             </Button>
                         )}
 
                         <div className={s.about}>
-                            <h2 className={s.sectionTitle}>ПРО ЗАКЛАД</h2>
+                            <h2 className={s.sectionTitle}>{texts.aboutStore}</h2>
                             <p className={s.aboutText}>
                                 {shop.description || (
                                     <>
-                                        Улюблені стейки — зі знижкою щовівторка!<br />
-                                        Щовівторка даруємо 20% знижки на всі стейки з нашого гриль меню.
+                                        {texts.defaultDescLine1}<br />
+                                        {texts.defaultDescLine2}
                                     </>
                                 )}
                             </p>

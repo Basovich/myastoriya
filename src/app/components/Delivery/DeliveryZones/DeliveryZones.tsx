@@ -9,6 +9,29 @@ import { Locale } from '@/i18n/config';
 import StoreMiniCard from '@/app/pages/DeliveryAndPayment/components/StoreMiniCard/StoreMiniCard';
 import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
 
+const LOCALIZED_TEXTS = {
+    ua: {
+        loadingMap: "Завантаження карти...",
+        freeCheckLabel: "А мені безкоштовно по Києву?",
+        freeTitle: "Доставка безкоштовна!",
+        freeText: "Ваша адреса знаходиться в межах 3 км від найближчого закладу",
+        distance: "відстань",
+        km: "км",
+        paidTitle: "Доставка платна.",
+        paidText: "Ваша адреса знаходиться за межами 3 км від найближчого закладу"
+    },
+    ru: {
+        loadingMap: "Загрузка карты...",
+        freeCheckLabel: "А мне бесплатно по Киеву?",
+        freeTitle: "Доставка бесплатная!",
+        freeText: "Ваш адрес находится в пределах 3 км от ближайшего заведения",
+        distance: "расстояние",
+        km: "км",
+        paidTitle: "Доставка платная.",
+        paidText: "Ваш адрес находится за пределами 3 км от ближайшего заведения"
+    }
+};
+
 interface DeliveryZonesProps {
     stores: Store[];
     dict: DeliveryPageDict;
@@ -49,6 +72,7 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
 }
 
 export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar }: DeliveryZonesProps) {
+    const texts = LOCALIZED_TEXTS[lang] || LOCALIZED_TEXTS.ua;
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -217,14 +241,14 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                         )}
                     </GoogleMap>
                 ) : (
-                    <div className={s.mapPlaceholder}>Loading Map...</div>
+                    <div className={s.mapPlaceholder}>{texts.loadingMap}</div>
                 )}
             </div>
 
             {!isMeatBar && (
                 <div className={s.searchRow}>
                     <p className={s.infoBadge}>
-                        А мені безкоштовно?
+                        {texts.freeCheckLabel}
                     </p>
                     {isLoaded ? (
                         <div className={s.search}>
@@ -285,11 +309,11 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                     <div className={s.resultText}>
                         {checkResult.isFree ? (
                             <>
-                                <strong>Доставка безкоштовна!</strong> Ваша адреса знаходиться в межах 3 км від найближчого закладу <strong>{checkResult.closestStoreName}</strong> (відстань: {checkResult.distanceKm.toFixed(2)} км).
+                                <strong>{texts.freeTitle}</strong> {texts.freeText} <strong>{checkResult.closestStoreName}</strong> ({texts.distance}: {checkResult.distanceKm.toFixed(2)} {texts.km}).
                             </>
                         ) : (
                             <>
-                                <strong>Доставка платна.</strong> Ваша адреса знаходиться за межами 3 км від найближчого закладу <strong>{checkResult.closestStoreName}</strong> (відстань: {checkResult.distanceKm.toFixed(2)} км).
+                                <strong>{texts.paidTitle}</strong> {texts.paidText} <strong>{checkResult.closestStoreName}</strong> ({texts.distance}: {checkResult.distanceKm.toFixed(2)} {texts.km}).
                             </>
                         )}
                     </div>
