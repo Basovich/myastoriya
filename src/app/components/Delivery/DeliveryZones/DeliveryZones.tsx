@@ -76,7 +76,8 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries: GOOGLE_MAPS_LIBRARIES
+        libraries: GOOGLE_MAPS_LIBRARIES,
+        language: typeof window !== 'undefined' ? (lang === 'ua' ? 'uk' : 'ru') : 'uk'
     });
 
     const activeTab = isMeatBar ? 'meatbar' : 'restaurants';
@@ -256,7 +257,12 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                                 onLoad={onAutocompleteLoad}
                                 onPlaceChanged={onPlaceChanged}
                                 options={{
-                                    componentRestrictions: { country: 'UA' }
+                                    componentRestrictions: { country: 'UA' },
+                                    bounds: new window.google.maps.LatLngBounds(
+                                        new window.google.maps.LatLng(50.25, 30.20),
+                                        new window.google.maps.LatLng(50.60, 30.85)
+                                    ),
+                                    strictBounds: true
                                 }}
                             >
                                 <Search

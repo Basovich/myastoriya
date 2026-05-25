@@ -4,6 +4,8 @@ import s from "./StoreMap.module.scss";
 import { type Store } from "../StoreCard/StoreCard";
 import StoreCard from "../StoreCard/StoreCard";
 import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from "@/lib/constants";
+import { useParams } from 'next/navigation';
+import { Locale } from '@/i18n/config';
 
 // Dark map style
 
@@ -34,10 +36,14 @@ interface StoreMapProps {
 }
 
 export default function StoreMap({ stores, dict }: StoreMapProps) {
+    const params = useParams();
+    const lang = (params?.lang as Locale) || 'ua';
+
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script",
         googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries: GOOGLE_MAPS_LIBRARIES
+        libraries: GOOGLE_MAPS_LIBRARIES,
+        language: typeof window !== 'undefined' ? (lang === 'ua' ? 'uk' : 'ru') : 'uk'
     });
 
     const [map, setMap] = useState<google.maps.Map | null>(null);

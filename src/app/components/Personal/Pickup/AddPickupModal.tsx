@@ -101,7 +101,8 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang }: AddPick
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries: GOOGLE_MAPS_LIBRARIES
+        libraries: GOOGLE_MAPS_LIBRARIES,
+        language: typeof window !== 'undefined' ? (lang === 'ua' ? 'uk' : 'ru') : 'uk'
     });
 
     const [view, setView] = useState<'list' | 'map'>('list');
