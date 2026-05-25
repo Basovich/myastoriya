@@ -221,50 +221,52 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                 )}
             </div>
 
-            <div className={s.searchRow}>
-                <p className={s.infoBadge}>
-                    А мені безкоштовно?
-                </p>
-                {isLoaded ? (
-                    <div className={s.search}>
-                        <Autocomplete
-                            onLoad={onAutocompleteLoad}
-                            onPlaceChanged={onPlaceChanged}
-                            options={{
-                                componentRestrictions: { country: 'UA' }
-                            }}
-                        >
+            {!isMeatBar && (
+                <div className={s.searchRow}>
+                    <p className={s.infoBadge}>
+                        А мені безкоштовно?
+                    </p>
+                    {isLoaded ? (
+                        <div className={s.search}>
+                            <Autocomplete
+                                onLoad={onAutocompleteLoad}
+                                onPlaceChanged={onPlaceChanged}
+                                options={{
+                                    componentRestrictions: { country: 'UA' }
+                                }}
+                            >
+                                <Search
+                                    value={searchQuery}
+                                    onChange={(val) => {
+                                        setSearchQuery(val);
+                                        if (!val) {
+                                            setCheckResult(null);
+                                            setUserMarker(null);
+                                        }
+                                    }}
+                                    placeholder={dict.zones.search.placeholder}
+                                    buttonText={dict.zones.search.button}
+                                    buttonColor="black"
+                                    onSubmit={handleSearchSubmit}
+                                    fullWidthDropdown
+                                />
+                            </Autocomplete>
+                        </div>
+                    ) : (
+                        <div className={s.search}>
                             <Search
                                 value={searchQuery}
-                                onChange={(val) => {
-                                    setSearchQuery(val);
-                                    if (!val) {
-                                        setCheckResult(null);
-                                        setUserMarker(null);
-                                    }
-                                }}
+                                onChange={setSearchQuery}
                                 placeholder={dict.zones.search.placeholder}
                                 buttonText={dict.zones.search.button}
                                 buttonColor="black"
-                                onSubmit={handleSearchSubmit}
-                                fullWidthDropdown
                             />
-                        </Autocomplete>
-                    </div>
-                ) : (
-                    <div className={s.search}>
-                        <Search
-                            value={searchQuery}
-                            onChange={setSearchQuery}
-                            placeholder={dict.zones.search.placeholder}
-                            buttonText={dict.zones.search.button}
-                            buttonColor="black"
-                        />
-                    </div>
-                )}
-            </div>
+                        </div>
+                    )}
+                </div>
+            )}
 
-            {checkResult && (
+            {!isMeatBar && checkResult && (
                 <div className={`${s.resultCard} ${checkResult.isFree ? s.free : s.paid}`}>
                     <div className={s.resultIcon}>
                         {checkResult.isFree ? (

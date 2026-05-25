@@ -7,6 +7,7 @@ import Button from '@/app/components/ui/Button/Button';
 import { Shop } from '@/lib/graphql/queries/shops';
 import clsx from 'clsx';
 import StoreGalleryClient from './StoreGalleryClient';
+import GeocodedAddressClient from '@/app/components/ui/GeocodedAddress/GeocodedAddressClient';
 
 interface StoreDetailPageProps {
     shop: Shop;
@@ -146,7 +147,9 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                                     <div className={s.detailItemHeader}>
                                         <p className={s.title}>АДРЕСА</p>
                                     </div>
-                                    <p className={s.text}>{address}</p>
+                                    <p className={s.text}>
+                                        <GeocodedAddressClient lat={shop.lat} lng={shop.lng} fallbackAddress={address} />
+                                    </p>
                                 </div>
                             </div>
                         </div>

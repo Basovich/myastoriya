@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import s from "./StoreCard.module.scss";
 import Button from "@/app/components/ui/Button/Button";
+import GeocodedAddressClient from "@/app/components/ui/GeocodedAddress/GeocodedAddressClient";
 
 export interface Store {
     id: string;
@@ -141,7 +142,7 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                             rel="noopener noreferrer" 
                             className={s.addressLink}
                         >
-                            {store.address}
+                            <GeocodedAddressClient lat={store.lat} lng={store.lng} fallbackAddress={store.address} />
                         </a>
                     </div>
 
