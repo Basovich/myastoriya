@@ -1,6 +1,5 @@
 import React from 'react';
 import s from './StoreMiniCard.module.scss';
-import Image from 'next/image';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
