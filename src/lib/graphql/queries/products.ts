@@ -397,8 +397,8 @@ export async function getCategoriesApi(lang?: string): Promise<ProductCategory[]
 }
 
 const CATEGORY_TREE_QUERY = /* GraphQL */ `
-    query CategoriesTree {
-        categories {
+    query CategoriesTree($parentId: Int) {
+        categories(parentId: $parentId) {
             id
             name
             slug
@@ -459,10 +459,10 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
     }
 `;
 
-export async function getCatalogTreeApi(lang?: string): Promise<ProductCategory[]> {
+export async function getCatalogTreeApi(lang?: string, parentId: number = 768): Promise<ProductCategory[]> {
     const data = await gqlRequest<{ categories: ProductCategory[] }>(
         CATEGORY_TREE_QUERY,
-        undefined,
+        { parentId },
         { next: { revalidate: 3600 }, lang },
     );
     return data.categories;
