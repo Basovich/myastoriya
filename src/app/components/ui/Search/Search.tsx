@@ -12,6 +12,7 @@ interface SearchProps {
     showButton?: boolean;
     onSubmit?: () => void;
     fullWidthDropdown?: boolean;
+    disabled?: boolean;
 }
 
 const Search = React.forwardRef<HTMLInputElement, SearchProps>(({ 
@@ -23,7 +24,8 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(({
     className,
     showButton = true,
     onSubmit,
-    fullWidthDropdown = false
+    fullWidthDropdown = false,
+    disabled = false,
 }, ref) => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,6 +56,7 @@ const Search = React.forwardRef<HTMLInputElement, SearchProps>(({
                     placeholder={placeholder}
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
+                    disabled={disabled}
                 />
             </div>
             {showButton && (

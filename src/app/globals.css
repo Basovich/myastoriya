@@ -144,10 +144,9 @@ button.swiper-button-lock {
   padding: 10px 20px;
   border-top: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
   transition: background 0.2s;
+  overflow: hidden;
+  line-height: 1.4;
 }
 
 .pac-item:hover {
@@ -155,23 +154,25 @@ button.swiper-button-lock {
 }
 
 .pac-item .pac-icon {
-  margin-top: 0;
   display: none;
 }
 
 .pac-item .pac-item-query {
   font-size: 14px;
   color: var(--color-text-primary);
-  padding-right: 0;
-  font-weight: 600;
+  font-weight: 500;
+  display: inline;
 }
 
 .pac-item span:not(.pac-item-query) {
   font-size: 13px;
   color: var(--color-text-secondary);
+  display: inline;
+  margin-left: 4px;
+  white-space: normal;
 }
 
 .pac-matched {
   font-weight: 700;
-  color: var(--color-accent);
+  color: var(--color-text-primary);
 }

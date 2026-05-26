@@ -11,6 +11,8 @@ import Search from '@/app/components/ui/Search/Search';
 import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
 import { useParams } from 'next/navigation';
 import { Locale } from '@/i18n/config';
+import { cleanAddressText } from '@/lib/utils/address';
+import { useAutocompleteCleaner } from '@/hooks/useAutocompleteCleaner';
 
 interface AddAddressModalProps {
     isOpen: boolean;
@@ -40,6 +42,7 @@ const center = {
 export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressModalProps) {
     const params = useParams();
     const lang = (params?.lang as Locale) || 'ua';
+    useAutocompleteCleaner();
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
@@ -147,7 +150,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                     map.panTo(newPos);
                     map.setZoom(16);
                 }
-                setMapSearch(place.formatted_address || '');
+                setMapSearch(cleanAddressText(place.formatted_address || ''));
             }
         }
     };
@@ -255,7 +258,13 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                                         onLoad={onAutocompleteLoad}
                                         onPlaceChanged={onPlaceChanged}
                                         options={{
-                                            componentRestrictions: { country: 'UA' }
+                                            componentRestrictions: { country: 'UA' },
+                                            bounds: new window.google.maps.LatLngBounds(
+                                                new window.google.maps.LatLng(50.25, 30.20),
+                                                new window.google.maps.LatLng(50.60, 30.85)
+                                            ),
+                                            strictBounds: true,
+                                            types: ['address']
                                         }}
                                     >
                                         <Search 

@@ -50,11 +50,11 @@
 
 .search {
   flex: 1;
-  
+
   form {
     height: 44px !important;
   }
-  
+
   @media (min-width: 1024px) {
     flex: initial;
     width: 370px;

@@ -8,6 +8,8 @@ import Search from '@/app/components/ui/Search/Search';
 import { Locale } from '@/i18n/config';
 import StoreMiniCard from '@/app/pages/DeliveryAndPayment/components/StoreMiniCard/StoreMiniCard';
 import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
+import { cleanAddressText } from '@/lib/utils/address';
+import { useAutocompleteCleaner } from '@/hooks/useAutocompleteCleaner';
 
 const LOCALIZED_TEXTS = {
     ua: {
@@ -18,7 +20,7 @@ const LOCALIZED_TEXTS = {
         distance: "відстань",
         km: "км",
         paidTitle: "Доставка платна.",
-        paidText: "Ваша адреса знаходиться за межами 3 км від найближчого закладу"
+        paidText: "Ваша адреса знаходиться за межами 3 км від найближчого закладу",
     },
     ru: {
         loadingMap: "Загрузка карты...",
@@ -28,7 +30,7 @@ const LOCALIZED_TEXTS = {
         distance: "расстояние",
         km: "км",
         paidTitle: "Доставка платная.",
-        paidText: "Ваш адрес находится за пределами 3 км от ближайшего заведения"
+        paidText: "Ваш адрес находится за пределами 3 км от ближайшего заведения",
     }
 };
 
@@ -73,6 +75,7 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
 
 export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar }: DeliveryZonesProps) {
     const texts = LOCALIZED_TEXTS[lang] || LOCALIZED_TEXTS.ua;
+    useAutocompleteCleaner();
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -93,13 +96,16 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
         distanceKm: number;
     } | null>(null);
 
-    const filteredStores = stores.filter(store => 
+    const filteredStores = stores.filter(store =>
         activeTab === 'restaurants' ? store.type !== 'meatbar' : store.type === 'meatbar'
     );
 
-    const onAutocompleteLoad = (autocomplete: google.maps.places.Autocomplete) => {
-        autocompleteRef.current = autocomplete;
-    };
+    const KYIV_BOUNDS = isLoaded
+        ? new window.google.maps.LatLngBounds(
+            new window.google.maps.LatLng(50.25, 30.20),
+            new window.google.maps.LatLng(50.60, 30.85)
+        )
+        : undefined;
 
     const performDeliveryCheck = useCallback((lat: number, lng: number) => {
         if (filteredStores.length === 0) return;
@@ -117,11 +123,7 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
         }
 
         const isFree = minDistance <= 3.0;
-        setCheckResult({
-            isFree,
-            closestStoreName: closestStore.name,
-            distanceKm: minDistance
-        });
+        setCheckResult({ isFree, closestStoreName: closestStore.name, distanceKm: minDistance });
 
         setUserMarker({ lat, lng });
         if (map) {
@@ -131,38 +133,36 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
     }, [filteredStores, map]);
 
     const onPlaceChanged = () => {
-        const autocomplete = autocompleteRef.current;
-        if (autocomplete) {
-            const place = autocomplete.getPlace();
-            if (place.geometry && place.geometry.location) {
-                const lat = place.geometry.location.lat();
-                const lng = place.geometry.location.lng();
-                setSearchQuery(place.formatted_address || place.name || '');
-                performDeliveryCheck(lat, lng);
-            }
+        const ac = autocompleteRef.current;
+        if (!ac) return;
+        const place = ac.getPlace();
+        if (place.geometry?.location) {
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+            setSearchQuery(cleanAddressText(place.formatted_address || place.name || ''));
+            performDeliveryCheck(lat, lng);
         }
     };
 
     const handleSearchSubmit = () => {
-        const autocomplete = autocompleteRef.current;
-        if (autocomplete) {
-            const place = autocomplete.getPlace();
-            if (place && place.geometry && place.geometry.location) {
-                performDeliveryCheck(place.geometry.location.lat(), place.geometry.location.lng());
-                return;
-            }
-        }
-
-        if (searchQuery && typeof window !== 'undefined' && window.google) {
-            const geocoder = new window.google.maps.Geocoder();
-            geocoder.geocode({ address: searchQuery, componentRestrictions: { country: 'UA' } }, (results, status) => {
-                if (status === 'OK' && results && results[0] && results[0].geometry) {
+        if (!searchQuery || typeof window === 'undefined' || !window.google) return;
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode(
+            { address: `${searchQuery}, Київ`, componentRestrictions: { country: 'UA' } },
+            (results, status) => {
+                if (status === 'OK' && results?.[0]?.geometry) {
                     const loc = results[0].geometry.location;
-                    setSearchQuery(results[0].formatted_address);
+                    setSearchQuery(cleanAddressText(results[0].formatted_address));
                     performDeliveryCheck(loc.lat(), loc.lng());
                 }
-            });
-        }
+            }
+        );
+    };
+
+    const resetSearch = () => {
+        setSearchQuery('');
+        setCheckResult(null);
+        setUserMarker(null);
     };
 
     const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
@@ -254,25 +254,20 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                     {isLoaded ? (
                         <div className={s.search}>
                             <Autocomplete
-                                onLoad={onAutocompleteLoad}
+                                onLoad={(ac) => { autocompleteRef.current = ac; }}
                                 onPlaceChanged={onPlaceChanged}
                                 options={{
                                     componentRestrictions: { country: 'UA' },
-                                    bounds: new window.google.maps.LatLngBounds(
-                                        new window.google.maps.LatLng(50.25, 30.20),
-                                        new window.google.maps.LatLng(50.60, 30.85)
-                                    ),
-                                    strictBounds: true
+                                    bounds: KYIV_BOUNDS,
+                                    strictBounds: true,
+                                    types: ['address'],
                                 }}
                             >
                                 <Search
                                     value={searchQuery}
                                     onChange={(val) => {
                                         setSearchQuery(val);
-                                        if (!val) {
-                                            setCheckResult(null);
-                                            setUserMarker(null);
-                                        }
+                                        if (!val) resetSearch();
                                     }}
                                     placeholder={dict.zones.search.placeholder}
                                     buttonText={dict.zones.search.button}
@@ -319,11 +314,11 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                             </>
                         ) : (
                             <>
-                                <strong>{texts.paidTitle}</strong> {texts.paidText} <strong>{checkResult.closestStoreName}</strong> ({texts.distance}: {checkResult.distanceKm.toFixed(2)} {texts.km}).
+                                <strong>{texts.paidTitle}</strong> {texts.paidText}.
                             </>
                         )}
                     </div>
-                    <button className={s.clearResultBtn} onClick={() => { setCheckResult(null); setUserMarker(null); setSearchQuery(''); }}>
+                    <button className={s.clearResultBtn} onClick={resetSearch}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                             <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>

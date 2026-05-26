@@ -255,6 +255,10 @@
     font-weight: 700;
     color: #000;
     flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .footerButtons {
