@@ -357,14 +357,14 @@ a.actionBtn {
 .detailsGrid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 18px;
     flex: 1;
 
     @media (min-width: 768px) {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
-        gap: 30px;
+        gap: 24px;
     }
 
     @media (min-width: 1024px) {
@@ -413,6 +413,22 @@ a.actionBtn {
     line-height: 166.667%;
     letter-spacing: 0.24px;
     margin-top: 6px;
+}
+
+a.text {
+    text-decoration: none;
+    transition: color 0.2s linear;
+
+    @media (any-hover: hover) {
+        &:hover {
+            color: var(--color-accent);
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+    }
 }
 
 .scheduleList {
