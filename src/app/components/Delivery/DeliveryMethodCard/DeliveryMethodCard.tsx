@@ -65,7 +65,16 @@ const DeliveryMethodCard: React.FC<DeliveryMethodCardProps> = ({ block, hasBackg
                         <h3 className={s.title}>{block.name}</h3>
 
                         <div className={s.cardBody}>
-                            {block.text.length > 0 && (
+                            {block.textWeb && block.textWeb.length > 0 ? (
+                                <div 
+                                    className={s.htmlContent}
+                                    dangerouslySetInnerHTML={{ 
+                                        __html: Array.isArray(block.textWeb) 
+                                            ? block.textWeb.join('') 
+                                            : block.textWeb 
+                                    }}
+                                />
+                            ) : block.text.length > 0 && (
                                 <ul className={clsx(s.features, isPickup && s.pickupList)}>
                                     {block.text.map((feature, index) => (
                                         <li key={index} className={s.featureItem}>

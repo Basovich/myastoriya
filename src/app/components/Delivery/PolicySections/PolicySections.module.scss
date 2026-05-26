@@ -144,3 +144,50 @@
     object-fit: contain;
   }
 }
+
+.htmlContent {
+  color: #000;
+  font-size: 12px;
+  line-height: 180%;
+
+  @media (min-width: 1024px) {
+    line-height: 1.6;
+  }
+
+  p {
+    margin: 0 0 8px 0;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    li {
+      position: relative;
+      padding-left: 14px;
+
+      &::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #1a1a1a;
+      }
+
+      strong, b {
+        font-weight: 700;
+      }
+    }
+  }
+
+  strong, b {
+    font-weight: 700;
+  }
+}
+

@@ -28,7 +28,16 @@ export default function PolicySections({ blocks }: PolicySectionsProps) {
                                 <div className={s.cardBody}>
                                     <h3 className={s.title}>{block.name}</h3>
                                     <div className={s.content}>
-                                        {block.text && block.text.length > 1 ? (
+                                        {block.textWeb && block.textWeb.length > 0 ? (
+                                            <div 
+                                                className={s.htmlContent}
+                                                dangerouslySetInnerHTML={{ 
+                                                    __html: Array.isArray(block.textWeb) 
+                                                        ? block.textWeb.join('') 
+                                                        : block.textWeb 
+                                                }}
+                                            />
+                                        ) : block.text && block.text.length > 1 ? (
                                             <ul className={s.list}>
                                                 {block.text.map((item, idx) => (
                                                     <li key={idx}>{item}</li>

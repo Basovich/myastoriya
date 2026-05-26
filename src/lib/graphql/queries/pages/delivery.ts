@@ -10,6 +10,7 @@ export interface OrderingInfoBlock {
     id: string;
     name: string;
     text: string[];
+    textWeb?: string[];
     type: string;
     icon?: string;
     image?: OrderingInfoBlockImage;
@@ -25,6 +26,7 @@ export const GET_ORDERING_INFO_BLOCKS = `
             id
             name
             text
+            textWeb
             type
             icon
             image {
