@@ -1,7 +1,7 @@
 import s from './CatalogContent.module.scss';
 import HeroBanner from '../../../components/ui/HeroBanner/HeroBanner';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs/Breadcrumbs';
-import CategoryCircles from '@/app/components/CategoryCircles/CategoryCircles';
+import CategoryCircles, { type CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
 import Image from 'next/image';
 import ProductCardRow from '@/app/components/ui/ProductCardRow';
 import CatalogSidebar from '@/app/pages/Catalog/CatalogSidebar';
@@ -11,8 +11,9 @@ import clsx from 'clsx';
 import CategorySwitcher from "@/app/components/ui/CategorySwitcher/CategorySwitcher";
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
-import type { Product, ProductsResponse, PopularCategory, ProductCategory } from '@/lib/graphql';
+import type { Product, ProductsResponse } from '@/lib/graphql';
 import { resolveProductImageUrl } from '@/lib/graphql';
+import type { BreadcrumbItem } from '@/utils/category-url';
 
 
 // Client Islands
@@ -61,36 +62,38 @@ interface CatalogContentProps {
     lang: Locale;
     dict: Dictionary;
     initialProducts: ProductsResponse;
-    popularCategories: PopularCategory[];
-    allCategories: ProductCategory[];
-    categorySlug?: string;
     categoryName?: string;
+    /** Pre-built breadcrumb items. Built by the page server component. */
+    breadcrumbItems?: BreadcrumbItem[];
+    /** Subcategories of the current category for CategoryCircles. Omit to hide the block. */
+    subcategoryItems?: CategoryCircleItem[];
     view?: 'list' | 'grid';
     sortBy?: string;
+    hideSidebar?: boolean;
+    hideCategorySwitcher?: boolean;
 }
 
 export default async function CatalogContent({
     lang,
     initialProducts,
-    popularCategories,
-    allCategories,
-    categorySlug,
     categoryName,
+    breadcrumbItems: breadcrumbItemsProp,
+    subcategoryItems,
     view = 'list',
     sortBy = 'За популярністю',
+    hideSidebar = false,
+    hideCategorySwitcher = false,
 }: CatalogContentProps) {
     const products = initialProducts.data;
     const activePage = initialProducts.current_page;
     const hasMorePages = initialProducts.has_more_pages;
 
-    const breadcrumbItems = [
+    const breadcrumbItems = breadcrumbItemsProp ?? [
         { label: 'Головна', href: '/' },
-        ...(categoryName
-            ? [{ label: 'Каталог', href: '/catalog' }, { label: categoryName }]
-            : [{ label: 'Каталог' }]),
+        ...(categoryName ? [{ label: categoryName }] : []),
     ];
 
-    const pageTitle = categoryName ? categoryName.toUpperCase() : 'ГОТОВА ПРОДУКЦІЯ';
+    const pageTitle = categoryName ? categoryName.toUpperCase() : '';
 
     // Prepare related slider data
     const relatedProducts = products.slice(0, 8).map(product => ({
@@ -135,13 +138,10 @@ export default async function CatalogContent({
                     title={pageTitle}
                     className={clsx(s.heroBanner, categoryName && s.heroBannerCategory)}
                 />
-                {categoryName ? (
-                    <Breadcrumbs items={breadcrumbItems} className={clsx(s.breadcrumbs, s.breadcrumbsCategory)} />
-                ) : (
+                <Breadcrumbs items={breadcrumbItems} className={clsx(s.breadcrumbs, categoryName && s.breadcrumbsCategory)} />
+                {subcategoryItems && subcategoryItems.length > 0 && (
                     <div className={s.categoriesSection}>
-                        <CategoryCircles
-                            headerLeft={<Breadcrumbs items={breadcrumbItems} className={s.breadcrumbs} />}
-                        />
+                        <CategoryCircles categories={subcategoryItems} />
                     </div>
                 )}
             </div>
@@ -162,15 +162,18 @@ export default async function CatalogContent({
                         view={view} 
                         sortOptions={SORT_OPTIONS}
                         categoryName={categoryName}
+                        hideFilter={hideSidebar}
                     />
 
                     <div className={s.contentLayout}>
-                        <aside className={s.sidebar}>
-                            {categoryName && <CategorySwitcher />}
-                            <CatalogSidebar
-                                sortBy={sortBy}
-                            />
-                        </aside>
+                        {!hideSidebar && (
+                            <aside className={s.sidebar}>
+                                {categoryName && !hideCategorySwitcher && <CategorySwitcher />}
+                                <CatalogSidebar
+                                    sortBy={sortBy}
+                                />
+                            </aside>
+                        )}
 
                         <div className={s.results}>
                             <div className={clsx(s.productList, view === 'grid' && s.productListGrid)}>

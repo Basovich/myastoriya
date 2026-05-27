@@ -1,17 +1,16 @@
 'use client';
-
-import React, { useState, useRef, useEffect } from 'react';
-import anime from 'animejs';
+ 
+import React, { useState } from 'react';
 import s from './FilterGroup.module.scss';
 import clsx from 'clsx';
-
+ 
 interface FilterGroupProps {
     title: string;
     children: React.ReactNode;
     initialOpen?: boolean;
     className?: string;
 }
-
+ 
 export default function FilterGroup({
     title,
     children,
@@ -19,24 +18,11 @@ export default function FilterGroup({
     className = '',
 }: FilterGroupProps) {
     const [isOpen, setIsOpen] = useState(initialOpen);
-    const contentRef = useRef<HTMLDivElement>(null);
-    const innerRef = useRef<HTMLDivElement>(null);
-
+ 
     const toggleOpen = () => {
         setIsOpen(!isOpen);
     };
-
-    useEffect(() => {
-        if (!contentRef.current || !innerRef.current) return;
-        
-        anime({
-            targets: contentRef.current,
-            height: isOpen ? innerRef.current.scrollHeight : 0,
-            duration: 350,
-            easing: 'easeInOutQuad'
-        });
-    }, [isOpen]);
-
+ 
     return (
         <div className={clsx(s.filterGroup, className)}>
             <button
@@ -57,12 +43,8 @@ export default function FilterGroup({
                     <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             </button>
-            <div 
-                className={s.groupOptionsWrap} 
-                ref={contentRef}
-                style={{ height: initialOpen ? 'auto' : 0, overflow: 'hidden' }}
-            >
-                <div className={s.groupOptions} ref={innerRef}>
+            <div className={clsx(s.groupOptionsWrap, isOpen && s.groupOptionsWrapOpen)}>
+                <div className={s.groupOptions}>
                     {children}
                 </div>
             </div>

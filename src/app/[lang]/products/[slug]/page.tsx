@@ -7,8 +7,10 @@ import {
     getProductsApi,
     getPopularCategoriesApi,
     findProductIdBySlug,
+    getCatalogTreeApi,
 } from "@/lib/graphql";
 import { notFound } from "next/navigation";
+import { buildCategoryIndex, buildCategoryBreadcrumbs } from "@/utils/category-url";
 
 type Props = {
     params: Promise<{ slug: string; lang: string }>;
@@ -23,7 +25,7 @@ export default async function ProductPage({ params }: Props) {
     const productId = await findProductIdBySlug(slug, lang);
     if (!productId) notFound();
 
-    const [product, blogsResponse, relatedResponse] = await Promise.all([
+    const [product, blogsResponse, relatedResponse, catalogTree] = await Promise.all([
         getProductByIdApi(productId, lang),
         getBlogsApi({ limit: 3 }, lang),
         getPopularCategoriesApi(lang).then(async (cats) => {
@@ -31,9 +33,13 @@ export default async function ProductPage({ params }: Props) {
             if (!firstCatId) return { data: [] };
             return getProductsApi({ categoryId: firstCatId, limit: 8 }, lang);
         }),
+        getCatalogTreeApi(lang),
     ]);
 
     if (!product) notFound();
+
+    const categoryIndex = buildCategoryIndex(catalogTree);
+    const breadcrumbs = buildCategoryBreadcrumbs(product.categoryId, categoryIndex);
 
     return (
         <main>
@@ -43,6 +49,7 @@ export default async function ProductPage({ params }: Props) {
                 relatedProducts={relatedResponse.data ?? []}
                 lang={lang as Locale}
                 dict={dict}
+                breadcrumbs={breadcrumbs}
             />
         </main>
     );

@@ -86,7 +86,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                 }}
                             >
                                 <AppLink
-                                    href={`/catalog/${cat.slug}`}
+                                    href={`/${cat.slug}`}
                                     className={s.categoryLink}
                                     onClick={onClose}
                                 >
@@ -177,7 +177,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                             onMouseEnter={() => setHoveredSubCategory(sub)}
                                         >
                                             <AppLink
-                                                href={`/catalog/${sub.slug}`}
+                                                href={`/${activeCategory.slug}/${sub.slug}`}
                                                 className={s.subLink}
                                                 onClick={onClose}
                                             >

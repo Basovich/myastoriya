@@ -23,6 +23,7 @@ import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import type { BlogPost, Product } from '@/lib/graphql';
 import { resolveProductImageUrl } from '@/lib/graphql';
+import type { BreadcrumbItem } from '@/utils/category-url';
 
 
 // ---------------------------------------------------------------------------
@@ -60,6 +61,8 @@ interface ProductClientProps {
     relatedProducts: Product[];
     lang: Locale;
     dict: Dictionary;
+    /** Pre-built breadcrumbs from server component (uses real category tree). */
+    breadcrumbs?: BreadcrumbItem[];
 }
 
 // ---------------------------------------------------------------------------
@@ -72,6 +75,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
     relatedProducts,
     lang,
     dict,
+    breadcrumbs: breadcrumbsProp,
 }) => {
     const dispatch = useAppDispatch();
     const { isAuthenticated } = useAppSelector((state: RootState) => state.auth);
@@ -143,10 +147,9 @@ const ProductClient: React.FC<ProductClientProps> = ({
     const weight = getProductWeight(product);
     const badge = getProductBadge(product);
 
-    const breadcrumbs = [
-        { label: 'Головна', href: `/${lang === 'ua' ? '' : lang}` },
-        { label: 'Каталог', href: `/${lang === 'ua' ? '' : lang + '/'}catalog` },
-        { label: product.name, href: '' },
+    const breadcrumbs: BreadcrumbItem[] = breadcrumbsProp ?? [
+        { label: 'Головна', href: '/' },
+        { label: product.name },
     ];
 
     const mappedRelated = relatedProducts.slice(0, 8).map(p => ({

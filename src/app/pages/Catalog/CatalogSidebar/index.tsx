@@ -121,11 +121,11 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
             <div className={s.filtersWrapper}>
                 <div className={s.onlyMobile}>
                     {category && (
-                        <FilterGroup title="КАТЕГОРІЇ">
+                        <FilterGroup title="КАТЕГОРІЇ" initialOpen={true}>
                             <CategorySwitcher isSidebar />
                         </FilterGroup>
                     )}
-                    <FilterGroup title={sortBy || "За популярністю"}>
+                    <FilterGroup title={sortBy || "За популярністю"} initialOpen={true}>
                         <div className={s.sortOptions}>
                             {SORT_OPTIONS.map(option => (
                                 <button
@@ -155,7 +155,7 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                     showClear={filters.priceFrom !== MIN_PRICE || filters.priceTo !== MAX_PRICE}
                 />
 
-                <FilterGroup title="М'ЯСНА ЧАСТИНА">
+                <FilterGroup title="М'ЯСНА ЧАСТИНА" initialOpen={true}>
                     {MEAT_PARTS.map(option => (
                         <FilterPill
                             key={option}
@@ -166,8 +166,8 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                         </FilterPill>
                     ))}
                 </FilterGroup>
-
-                <FilterGroup title="ТИП М'ЯСА">
+ 
+                <FilterGroup title="ТИП М'ЯСА" initialOpen={true}>
                     {MEAT_TYPES.map(option => (
                         <FilterCheckbox
                             key={option}
@@ -178,8 +178,8 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                         </FilterCheckbox>
                     ))}
                 </FilterGroup>
-
-                <FilterGroup title="ВИТРИМКА">
+ 
+                <FilterGroup title="ВИТРИМКА" initialOpen={true}>
                     {AGING_OPTIONS.map(option => (
                         <FilterPill
                             key={option}
@@ -190,8 +190,8 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                         </FilterPill>
                     ))}
                 </FilterGroup>
-
-                <FilterGroup title="МАРМУРОВІСТЬ">
+ 
+                <FilterGroup title="МАРМУРОВІСТЬ" initialOpen={true}>
                     {MARBLING_OPTIONS.map(option => (
                         <FilterPill
                             key={option}
@@ -202,8 +202,8 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                         </FilterPill>
                     ))}
                 </FilterGroup>
-
-                <FilterGroup title="КРАЇНА ПОХОДЖЕННЯ">
+ 
+                <FilterGroup title="КРАЇНА ПОХОДЖЕННЯ" initialOpen={true}>
                     {COUNTRY_OPTIONS.map(option => (
                         <FilterPill
                             key={option}
@@ -214,8 +214,8 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                         </FilterPill>
                     ))}
                 </FilterGroup>
-
-                <FilterGroup title="ПОРОДА">
+ 
+                <FilterGroup title="ПОРОДА" initialOpen={true}>
                     {BREED_OPTIONS.map(option => (
                         <FilterPill
                             key={option}

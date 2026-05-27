@@ -17,9 +17,10 @@ import { Locale } from "@/i18n/config";
 interface CategoriesProps {
     lang: Locale;
     popularCategories: PopularCategory[];
+    categoryHrefs: Record<string, string>;
 }
 
-export default function Categories({ lang, popularCategories }: CategoriesProps) {
+export default function Categories({ lang, popularCategories, categoryHrefs }: CategoriesProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
@@ -65,7 +66,7 @@ export default function Categories({ lang, popularCategories }: CategoriesProps)
                 >
                     {popularCategories.map((cat) => (
                         <SwiperSlide key={cat.id} className={s.slide}>
-                            <AppLink href={`/catalog/${cat.slug || cat.id}`} className={s.item}>
+                            <AppLink href={categoryHrefs[cat.id] ?? `/${cat.slug ?? cat.id}`} className={s.item}>
                                 <div className={s.circle}>
                                     {(cat.image?.square2x || cat.image?.big2x || cat.image?.square1x || cat.image?.big1x) ? (
                                         <Image

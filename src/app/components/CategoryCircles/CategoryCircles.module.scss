@@ -140,6 +140,26 @@
     object-fit: cover;
 }
 
+.imageFallback {
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+
+        @media (min-width: 1280px) {
+            width: 44px;
+            height: 44px;
+        }
+    }
+}
+
 .name {
     color: #000;
     text-align: center;

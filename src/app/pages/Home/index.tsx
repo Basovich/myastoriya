@@ -17,6 +17,7 @@ interface HomePageProps {
   publications: BlogPost[];
   slides: Slide[];
   popularCategories: PopularCategory[];
+  categoryHrefs: Record<string, string>;
   reviews: HomeReview[];
   initialProducts: Product[];
   initialHasMore: boolean;
@@ -30,6 +31,7 @@ export default function HomePage({
     publications, 
     slides, 
     popularCategories, 
+    categoryHrefs,
     reviews, 
     initialProducts, 
     initialHasMore,
@@ -39,7 +41,7 @@ export default function HomePage({
     return (
         <main>
             <Hero slides={slides} lang={lang} />
-            <Categories lang={lang} popularCategories={popularCategories} />
+            <Categories lang={lang} popularCategories={popularCategories} categoryHrefs={categoryHrefs} />
             <Products dict={dict.home.products} categories={popularCategories} initialProducts={initialProducts} initialHasMore={initialHasMore} />
             <Actions dict={dict.home.actions} lang={lang} sales={sales} />
             <AppPromo />

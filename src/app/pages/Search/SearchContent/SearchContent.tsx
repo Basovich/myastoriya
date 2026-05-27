@@ -62,15 +62,26 @@ export default function SearchContent() {
     ];
 
     const categoryCircleItems = (() => {
-        const items: any[] = [];
-        const process = (list: ProductCategory[]) => {
+        const items: { name: string; image: string; href: string }[] = [];
+        const process = (list: ProductCategory[], parentSlug?: string) => {
             list.forEach(cat => {
+                // Determine href based on available parent context
+                let href: string;
+                if (parentSlug) {
+                    // Level 2: /{parentSlug}/{slug}  or level 3: /catalog/{slug}
+                    href = `/catalog/${cat.slug}`;
+                } else {
+                    // Level 1: /{slug}
+                    href = `/${cat.slug}`;
+                }
                 items.push({
                     name: cat.name,
                     image: resolveCategoryImageUrl(cat) || "/images/no-image.png",
-                    href: getLocalizedHref(`/catalog/${cat.slug}`, (lang as Locale) || "ua")
+                    href: getLocalizedHref(href, (lang as Locale) || "ua")
                 });
-                if (cat.children) process(cat.children);
+                if (cat.children && cat.children.length > 0) {
+                    process(cat.children, cat.slug);
+                }
             });
         };
         process(categories);

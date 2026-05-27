@@ -129,7 +129,7 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
                             return toRender.map((cat) => (
                                 <AppLink 
                                     key={cat.id} 
-                                    href={`/catalog/${cat.slug}`} 
+                                    href={`/${cat.slug}`} 
                                     className={s.categoryItem} 
                                     onClick={onClose}
                                 >

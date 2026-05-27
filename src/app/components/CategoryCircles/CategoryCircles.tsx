@@ -12,21 +12,6 @@ import "swiper/css/navigation";
 import SliderArrow from "../ui/SliderArrow/SliderArrow";
 import SectionHeader from "@/app/components/ui/SectionHeader/SectionHeader";
 
-const searchCategories: CategoryCircleItem[] = [
-    { name: "Сезонне меню", image: "/images/cat-grill.png", href: "/catalog/litne-menu" },
-    { name: "Ресторанне меню", image: "/images/cat-restaurant.png", href: "/catalog/restoranne-menu" },
-    { name: "Бургери", image: "/images/cat-burgers.png", href: "/catalog/burgery" },
-    { name: "Піца", image: "/images/cat-shashlik.png", href: "/catalog/pitsa" },
-    { name: "Смакуй одразу", image: "/images/cat-sets.png", href: "/catalog/vizmy-z-soboyu" },
-    { name: "Набори для компаній", image: "/images/cat-branded.png", href: "/catalog/nabory-dlya-kompaniyi" },
-    { name: "Гриль меню", image: "/images/cat-grill.png", href: "/catalog/gryl-menu" },
-    { name: "Дитяче меню", image: "/images/cat-restaurant.png", href: "/catalog/dytyache-menu" },
-    { name: "Власне виробництво", image: "/images/cat-burgers.png", href: "/catalog/vlasne-vyrobnytstvo" },
-    { name: "М'ясна продукція", image: "/images/cat-shashlik.png", href: "/catalog/myasna-produktsiya" },
-    { name: "Консервація", image: "/images/cat-sets.png", href: "/catalog/konservatsiya" },
-    { name: "Сир", image: "/images/cat-branded.png", href: "/catalog/syry" },
-];
-
 export interface CategoryCircleItem {
     name: string;
     image: string;
@@ -46,7 +31,7 @@ export default function CategoryCircles({
     className,
     withDots,
     headerLeft,
-    categories = searchCategories
+    categories = [],
 }: CategoryCirclesProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
@@ -96,13 +81,24 @@ export default function CategoryCircles({
                     <SwiperSlide key={index} className={s.slide}>
                         <AppLink href={item.href} className={s.item}>
                             <div className={s.circle}>
-                                <Image
-                                    src={item.image}
-                                    alt={item.name}
-                                    fill
-                                    sizes="(max-width: 768px) 100px, 178px"
-                                    className={s.circleImg}
-                                />
+                                {item.image && item.image !== "/icons/icon-category.svg" ? (
+                                    <Image
+                                        src={item.image}
+                                        alt={item.name}
+                                        fill
+                                        sizes="(max-width: 768px) 100px, 178px"
+                                        className={s.circleImg}
+                                    />
+                                ) : (
+                                    <div className={s.imageFallback}>
+                                        <Image
+                                            src="/icons/logo-red.svg"
+                                            alt={item.name}
+                                            width={36}
+                                            height={36}
+                                        />
+                                    </div>
+                                )}
                             </div>
                             <span className={s.name}>{item.name}</span>
                         </AppLink>
