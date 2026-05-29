@@ -18,7 +18,7 @@ import type { BreadcrumbItem } from '@/utils/category-url';
 
 // Client Islands
 import CatalogToolbarClient from '../CatalogToolbarClient';
-import CatalogPaginationClient from '../CatalogPaginationClient';
+import CatalogProductsClient from '../CatalogProductsClient';
 import CatalogRelatedSlidersClient from '../CatalogRelatedSlidersClient';
 
 
@@ -57,6 +57,7 @@ interface CatalogContentProps {
     lang: Locale;
     dict: Dictionary;
     initialProducts: ProductsResponse;
+    categoryId?: number;
     categoryName?: string;
     /** Pre-built breadcrumb items. Built by the page server component. */
     breadcrumbItems?: BreadcrumbItem[];
@@ -72,6 +73,7 @@ export default async function CatalogContent({
     lang,
     dict,
     initialProducts,
+    categoryId,
     categoryName,
     breadcrumbItems: breadcrumbItemsProp,
     subcategoryItems,
@@ -199,49 +201,13 @@ export default async function CatalogContent({
                             </aside>
                         )}
 
-                        <div className={s.results}>
-                            <div className={clsx(s.productList, view === 'grid' && s.productListGrid)}>
-                                {products.length > 0 ? (
-                                    products.map(product => (
-                                        view === 'grid' ? (
-                                            <ProductCard
-                                                key={product.id}
-                                                id={product.id}
-                                                slug={product.slug}
-                                                title={product.name}
-                                                weight={getWeight(product)}
-                                                price={product.cost}
-                                                unit={product.unit}
-                                                badge={getBadge(product)}
-                                                image={resolveProductImageUrl(product)}
-                                                lang={lang}
-                                            />
-                                        ) : (
-                                            <ProductCardRow
-                                                key={product.id}
-                                                id={product.id}
-                                                slug={product.slug}
-                                                title={product.name}
-                                                weight={getWeight(product)}
-                                                price={product.cost}
-                                                oldPrice={product.oldCost ?? undefined}
-                                                unit={product.unit}
-                                                badge={getBadge(product)}
-                                                image={resolveProductImageUrl(product)}
-                                                lang={lang}
-                                            />
-                                        )
-                                    ))
-                                ) : (
-                                    <div className={s.noResults}>Товарів не знайдено</div>
-                                )}
-                            </div>
-
-                            <CatalogPaginationClient 
-                                currentPage={activePage} 
-                                hasMorePages={hasMorePages} 
-                            />
-                        </div>
+                        <CatalogProductsClient
+                            initialProducts={initialProducts}
+                            categoryId={categoryId}
+                            view={view}
+                            lang={lang}
+                            sort={currentSort}
+                        />
                     </div>
                 </div>
             </div>

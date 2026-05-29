@@ -218,6 +218,7 @@ div.sortWrap {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    overflow-anchor: none;
 }
 
 .productListGrid {
@@ -262,6 +263,15 @@ div.sortWrap {
 
     svg {
         margin-top: -3px;
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            svg path {
+                fill: none !important;
+                stroke: #fff !important;
+            }
+        }
     }
 }
 

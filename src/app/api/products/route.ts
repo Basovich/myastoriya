@@ -8,11 +8,12 @@ export async function POST(req: NextRequest) {
         const saleId = body.saleId ? parseInt(body.saleId) : null;
         const limit = body.limit ?? 8;
         const page = body.page ?? 1;
+        const sort = body.sort ?? undefined;
 
         const langHeader = req.headers.get('content-language');
         const lang = langHeader === 'ru_RU' ? 'ru' : 'ua';
 
-        const result = await getProductsApi({ categoryId, saleId, limit, page }, lang);
+        const result = await getProductsApi({ categoryId, saleId, limit, page, sort }, lang);
 
         return NextResponse.json(result);
     } catch (err) {

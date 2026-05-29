@@ -37,9 +37,10 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
     const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
 
     const productsResponse = await getProductsApi(
-        { categoryId: parseInt(matchedCat.id), limit: 12, page, sort },
+        { categoryId: parseInt(matchedCat.id), limit: 12 * page, page: 1, sort },
         lang,
     );
+    productsResponse.current_page = page;
 
     // Build breadcrumbs: Головна > [GrandParent] > [Parent] > CurrentCategory
     const breadcrumbItems: { label: string; href?: string }[] = [
@@ -62,6 +63,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
                 lang={lang as Locale}
                 dict={dict}
                 initialProducts={productsResponse}
+                categoryId={parseInt(matchedCat.id)}
                 categoryName={matchedCat.name}
                 breadcrumbItems={breadcrumbItems}
                 view={view}
