@@ -10,16 +10,19 @@ interface FilterModalProps {
     sortBy?: string;
     onSortChange?: (value: string) => void;
     category?: string;
+    sortOptions?: string[];
+    filterLabel?: string;
+    clearLabel?: string;
 }
 
-export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, category }: FilterModalProps) {
+export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, category, sortOptions, filterLabel = "Фільтр", clearLabel = "Очистити" }: FilterModalProps) {
     const [clearTrigger, setClearTrigger] = useState(0);
     const [isModified, setIsModified] = useState(false);
 
     const handleClearAll = () => {
         setClearTrigger((prev: number) => prev + 1);
         if (onSortChange) {
-            onSortChange('За популярністю');
+            onSortChange(sortOptions?.[0] || 'За популярністю');
         }
     };
 
@@ -49,7 +52,7 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, c
             onClick={onClose} 
             role="dialog" 
             aria-modal="true" 
-            aria-label="Фільтри"
+            aria-label={filterLabel}
             style={{ opacity: style.opacity }}
         >
             <animated.div 
@@ -62,20 +65,20 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, c
                         type="button"
                         className={s.closeBtn}
                         onClick={onClose}
-                        aria-label="Закрити фільтри"
+                        aria-label={filterLabel}
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M1 1L19 19M19 1L1 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                         </svg>
                     </button>
-                    <h2 className={s.title}>Фільтр</h2>
+                    <h2 className={s.title}>{filterLabel}</h2>
                     {isModified && (
                         <button
                             type="button"
                             className={s.clearBtn}
                             onClick={handleClearAll}
                         >
-                            Очистити
+                            {clearLabel}
                         </button>
                     )}
                 </div>
@@ -88,6 +91,7 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, c
                         onModifiedChange={setIsModified}
                         key={clearTrigger} 
                         category={category}
+                        sortOptions={sortOptions}
                     />
                 </div>
             </animated.div>

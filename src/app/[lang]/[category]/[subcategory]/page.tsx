@@ -61,7 +61,7 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
                 breadcrumbItems={breadcrumbItems}
                 subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                 view={view}
-                sortBy={(resolvedSearchParams.sort as string) || 'За популярністю'}
+                sortBy={resolvedSearchParams.sort as string || undefined}
             />
         </main>
     );

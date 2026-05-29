@@ -56,7 +56,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 breadcrumbItems={breadcrumbItems}
                 subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                 view={view}
-                sortBy={(resolvedSearchParams.sort as string) || 'За популярністю'}
+                sortBy={resolvedSearchParams.sort as string || undefined}
                 hideCategorySwitcher={true}
             />
         </main>

@@ -40,15 +40,22 @@ interface CatalogSidebarProps {
     onClearAll?: () => void;
     onModifiedChange?: (modified: boolean) => void;
     category?: string;
+    sortOptions?: string[];
 }
 
 const SORT_OPTIONS = [
     'За популярністю',
-    'Від дешевих до дорогих',
-    'Від дорогих до дешевих',
+    'За зниженням ціни',
+    'За зростанням ціни',
+    'За рейтингом',
+    'За обговорюваністю',
+    'За датою',
 ];
 
-export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange, onClearAll, onModifiedChange, category }: CatalogSidebarProps) {
+export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange, onClearAll, onModifiedChange, category, sortOptions }: CatalogSidebarProps) {
+    const optionsToUse = sortOptions || SORT_OPTIONS;
+    const defaultSortOption = optionsToUse[0] || 'За популярністю';
+
     const [filters, setFilters] = useState<FilterState>({
         priceFrom: MIN_PRICE,
         priceTo: MAX_PRICE,
@@ -125,13 +132,13 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                             <CategorySwitcher isSidebar />
                         </FilterGroup>
                     )}
-                    <FilterGroup title={sortBy || "За популярністю"} initialOpen={true}>
+                    <FilterGroup title={sortBy || defaultSortOption} initialOpen={true}>
                         <div className={s.sortOptions}>
-                            {SORT_OPTIONS.map(option => (
+                            {optionsToUse.map(option => (
                                 <button
                                     key={option}
                                     type="button"
-                                    className={clsx(s.sortOption, (sortBy === option || (!sortBy && option === 'За популярністю')) && s.sortOptionActive)}
+                                    className={clsx(s.sortOption, (sortBy === option || (!sortBy && option === defaultSortOption)) && s.sortOptionActive)}
                                     onClick={() => {
                                         onSortChange?.(option);
                                     }}

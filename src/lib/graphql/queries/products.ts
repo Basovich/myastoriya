@@ -321,13 +321,26 @@ function mapSortOption(sort?: string | null): string | null {
     switch (sort) {
         case 'За популярністю':
         case 'По популярности':
-            return 'rating';
+            return 'default';
+        case 'За зростанням ціни':
+        case 'По возрастанию цены':
         case 'Від дешевих до дорогих':
         case 'От дешевых к дорогим':
             return 'cost-asc';
+        case 'За зниженням ціни':
+        case 'По снижению цены':
         case 'Від дорогих до дешевих':
         case 'От дорогих к дешевым':
             return 'cost-desc';
+        case 'За рейтингом':
+        case 'По рейтингу':
+            return 'rating';
+        case 'За обговорюваністю':
+        case 'По обсуждаемости':
+            return 'most-discussed';
+        case 'За датою':
+        case 'По дате':
+            return 'created-at';
         default:
             return sort;
     }

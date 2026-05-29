@@ -21,11 +21,6 @@ import CatalogToolbarClient from '../CatalogToolbarClient';
 import CatalogPaginationClient from '../CatalogPaginationClient';
 import CatalogRelatedSlidersClient from '../CatalogRelatedSlidersClient';
 
-const SORT_OPTIONS = [
-    'За популярністю',
-    'Від дешевих до дорогих',
-    'Від дорогих до дешевих',
-];
 
 const FAQ_DATA = [
     {
@@ -75,15 +70,40 @@ interface CatalogContentProps {
 
 export default async function CatalogContent({
     lang,
+    dict,
     initialProducts,
     categoryName,
     breadcrumbItems: breadcrumbItemsProp,
     subcategoryItems,
     view = 'list',
-    sortBy = 'За популярністю',
+    sortBy,
     hideSidebar = false,
     hideCategorySwitcher = false,
 }: CatalogContentProps) {
+    const sortLabel = lang === 'ua' ? 'Сортувати:' : 'Сортировать:';
+    const filterLabel = lang === 'ua' ? 'Фільтр' : 'Фильтр';
+    const clearLabel = lang === 'ua' ? 'Очистити' : 'Очистить';
+
+    const sortOptions = lang === 'ua'
+        ? [
+            'За популярністю',
+            'За зниженням ціни',
+            'За зростанням ціни',
+            'За рейтингом',
+            'За обговорюваністю',
+            'За датою',
+          ]
+        : [
+            'По популярности',
+            'По снижению цены',
+            'По возрастанию цены',
+            'По рейтингу',
+            'По обсуждаемости',
+            'По дате',
+          ];
+
+    const currentSort = sortBy || sortOptions[0];
+
     const products = initialProducts.data;
     const activePage = initialProducts.current_page;
     const hasMorePages = initialProducts.has_more_pages;
@@ -158,11 +178,14 @@ export default async function CatalogContent({
 
                 <div className={s.mainInner}>
                     <CatalogToolbarClient 
-                        sortBy={sortBy} 
+                        sortBy={currentSort} 
                         view={view} 
-                        sortOptions={SORT_OPTIONS}
+                        sortOptions={sortOptions}
                         categoryName={categoryName}
                         hideFilter={hideSidebar}
+                        sortLabel={sortLabel}
+                        filterLabel={filterLabel}
+                        clearLabel={clearLabel}
                     />
 
                     <div className={s.contentLayout}>
@@ -170,7 +193,8 @@ export default async function CatalogContent({
                             <aside className={s.sidebar}>
                                 {categoryName && !hideCategorySwitcher && <CategorySwitcher />}
                                 <CatalogSidebar
-                                    sortBy={sortBy}
+                                    sortBy={currentSort}
+                                    sortOptions={sortOptions}
                                 />
                             </aside>
                         )}

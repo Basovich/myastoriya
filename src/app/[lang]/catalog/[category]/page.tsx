@@ -65,7 +65,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
                 categoryName={matchedCat.name}
                 breadcrumbItems={breadcrumbItems}
                 view={view}
-                sortBy={(resolvedSearchParams.sort as string) || 'За популярністю'}
+                sortBy={resolvedSearchParams.sort as string || undefined}
             />
         </main>
     );

@@ -16,6 +16,9 @@ interface CatalogToolbarProps {
     categoryName?: string;
     className?: string;
     hideFilter?: boolean;
+    sortLabel?: string;
+    filterLabel?: string;
+    clearLabel?: string;
 }
 
 export default function CatalogToolbarClient({
@@ -25,6 +28,9 @@ export default function CatalogToolbarClient({
     categoryName,
     className,
     hideFilter = false,
+    sortLabel = "Сортувати:",
+    filterLabel = "Фільтр",
+    clearLabel = "Очистити",
 }: CatalogToolbarProps) {
     const router = useRouter();
     const pathname = usePathname();
@@ -46,7 +52,7 @@ export default function CatalogToolbarClient({
         <>
             <div className={clsx(s.toolbar, className)}>
                 <SortSelect
-                    label="Сортувати:"
+                    label={sortLabel}
                     value={sortBy || sortOptions[0]}
                     options={sortOptions}
                     onChange={(val) => updateParams("sort", val)}
@@ -71,7 +77,7 @@ export default function CatalogToolbarClient({
                                 </clipPath>
                             </defs>
                         </svg>
-                        <span className={s.filterBtnText}>Фільтр</span>
+                        <span className={s.filterBtnText}>{filterLabel}</span>
                     </button>
                 )}
 
@@ -88,6 +94,9 @@ export default function CatalogToolbarClient({
                 sortBy={sortBy}
                 onSortChange={(val) => updateParams("sort", val)}
                 category={categoryName}
+                sortOptions={sortOptions}
+                filterLabel={filterLabel}
+                clearLabel={clearLabel}
             />
         </>
     );
