@@ -34,9 +34,10 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
 
     const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page as string) : 1;
     const view = (resolvedSearchParams.view as 'list' | 'grid') || 'list';
+    const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
 
     const productsResponse = await getProductsApi(
-        { categoryId: parseInt(matchedCat.id), limit: 12, page },
+        { categoryId: parseInt(matchedCat.id), limit: 12, page, sort },
         lang,
     );
 

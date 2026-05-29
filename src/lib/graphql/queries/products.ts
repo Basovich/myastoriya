@@ -122,6 +122,7 @@ export interface ProductsFilter {
     search?: string | null;
     limit?: number | null;
     page?: number | null;
+    sort?: string | null;
 }
 
 export interface ProductsResponse {
@@ -142,8 +143,8 @@ const ADD_PRODUCT_VIEW_MUTATION = /* GraphQL */ `
 `;
 
 const PRODUCTS_QUERY = /* GraphQL */ `
-    query Products($categoryId: Int, $saleId: Int, $search: String, $limit: Int, $page: Int) {
-        products(categoryId: $categoryId, saleId: $saleId, search: $search, limit: $limit, page: $page) {
+    query Products($categoryId: Int, $saleId: Int, $search: String, $limit: Int, $page: Int, $sort: String) {
+        products(categoryId: $categoryId, saleId: $saleId, search: $search, limit: $limit, page: $page, sort: $sort) {
             per_page
             current_page
             has_more_pages
@@ -315,15 +316,34 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
 // API functions
 // ---------------------------------------------------------------------------
 
+function mapSortOption(sort?: string | null): string | null {
+    if (!sort) return null;
+    switch (sort) {
+        case 'За популярністю':
+        case 'По популярности':
+            return 'rating';
+        case 'Від дешевих до дорогих':
+        case 'От дешевых к дорогим':
+            return 'cost-asc';
+        case 'Від дорогих до дешевих':
+        case 'От дорогих к дешевым':
+            return 'cost-desc';
+        default:
+            return sort;
+    }
+}
+
 export async function getProductsApi(filter?: ProductsFilter, lang?: string): Promise<ProductsResponse> {
+    const sortedValue = mapSortOption(filter?.sort);
     const data = await gqlRequest<{ products: ProductsResponse }>(
         PRODUCTS_QUERY,
         {
-            categoryId: filter?.categoryId ?? null,
-            saleId: filter?.saleId ?? null,
-            search: filter?.search ?? null,
-            limit: filter?.limit ?? null,
-            page: filter?.page ?? null,
+            categoryId: filter?.categoryId ?? undefined,
+            saleId: filter?.saleId ?? undefined,
+            search: filter?.search || undefined,
+            limit: filter?.limit ?? undefined,
+            page: filter?.page ?? undefined,
+            sort: sortedValue ?? undefined,
         },
         { next: { revalidate: 3600 }, lang },
     );
