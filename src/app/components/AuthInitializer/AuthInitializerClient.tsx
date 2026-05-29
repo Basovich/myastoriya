@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginAsGuest, setUser, setInitialized } from '@/store/slices/authSlice';
 import { fetchWishlistPayloadAsync, syncWishlistOnAuthAsync } from '@/store/slices/wishlistSlice';
 import { syncViewedProductsOnAuthAsync } from '@/store/slices/viewedProductsSlice';
+import { fetchCartAsync, syncCartOnAuthAsync } from '@/store/slices/cartSlice';
 import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies, getAccessToken, tryRefreshTokenAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
@@ -57,6 +58,7 @@ function AuthInitializerClient() {
         if (!wasRealUser && isRealUser) {
             void dispatch(syncWishlistOnAuthAsync());
             void dispatch(syncViewedProductsOnAuthAsync());
+            void dispatch(syncCartOnAuthAsync());
         }
         
         prevIsAuthenticated.current = isAuthenticated;
@@ -70,6 +72,7 @@ function AuthInitializerClient() {
         void initAuth(dispatch).finally(() => {
             // Once auth is initialized (either as user or guest), fetch the wishlist payload
             void dispatch(fetchWishlistPayloadAsync());
+            void dispatch(fetchCartAsync());
         });
     }, [dispatch]);
 

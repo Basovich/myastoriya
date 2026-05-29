@@ -6,8 +6,9 @@ import Image from 'next/image';
 import s from './CartModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { addToCart, updateQuantity, removeFromCart } from '@/store/slices/cartSlice';
+import { addToCartAsync, updateQuantityAsync, removeFromCartAsync } from '@/store/slices/cartSlice';
 import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from './products_mock';
+import { useCartProducts } from '@/hooks/useCartProducts';
 import clsx from 'clsx';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
@@ -29,16 +30,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
-    // Catalog out invalid items and map to mock product data
-    const populatedItems = useMemo(() => {
-        return cartItems.map(item => {
-            const product = MOCK_PRODUCTS[item.id] || FALLBACK_PRODUCT;
-            return {
-                ...item,
-                product
-            };
-        });
-    }, [cartItems]);
+    const { populatedItems } = useCartProducts();
 
     // Calculate total
     const totalSum = useMemo(() => {
@@ -56,15 +48,15 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
 
     const handleUpdateQuantity = (id: string, newQuantity: number) => {
         if (newQuantity < 1) return;
-        dispatch(updateQuantity({ id, quantity: newQuantity }));
+        void dispatch(updateQuantityAsync({ id, quantity: newQuantity }));
     };
 
     const handleRemove = (id: string) => {
-        dispatch(removeFromCart(id));
+        void dispatch(removeFromCartAsync(id));
     };
 
     const handleAddToCart = (id: string) => {
-        dispatch(addToCart({ id, quantity: 1 }));
+        void dispatch(addToCartAsync({ id, quantity: 1 }));
     };
 
     // Catalog MOCK_PRODUCTS to show as suggestions (those not already in cart)

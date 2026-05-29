@@ -2,8 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Image from 'next/image';
-import { useAppSelector } from '@/store/hooks';
-import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from '@/app/components/CartModal/products_mock';
+import { useCartProducts } from '@/hooks/useCartProducts';
 import s from './CheckoutShared.module.scss';
 
 import { useIsHydrated } from '@/hooks/useIsHydrated';
@@ -16,14 +15,7 @@ interface CartSummaryProps {
 
 export default function CartSummary({ onEditCart, discountPercent = 0, deliveryPrice = 0 }: CartSummaryProps) {
     const hydrated = useIsHydrated();
-    const cartItems = useAppSelector(state => state.cart.items);
-
-    const populatedItems = useMemo(() => {
-        return cartItems.map(item => {
-            const product = MOCK_PRODUCTS[item.id] || FALLBACK_PRODUCT;
-            return { ...item, product };
-        });
-    }, [cartItems]);
+    const { populatedItems } = useCartProducts();
 
     const totalSum = useMemo(() => {
         return populatedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);

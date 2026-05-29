@@ -89,6 +89,17 @@
         background: var(--color-accent);
     }
 
+    .checkIcon {
+        width: 10px;
+        height: 10px;
+        flex-shrink: 0;
+
+        @media (min-width: 768px) {
+            width: 12px;
+            height: 12px;
+        }
+    }
+
     .btnText {
         color: #FFF;
         text-align: center;
