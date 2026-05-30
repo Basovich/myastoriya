@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import s from './FilterSidebar.module.scss';
 import FilterGroup from '@/app/components/ui/FilterGroup/FilterGroup';
 import FilterCheckbox from '@/app/components/ui/FilterCheckbox/FilterCheckbox';
@@ -40,6 +41,7 @@ interface CatalogSidebarProps {
     onClearAll?: () => void;
     onModifiedChange?: (modified: boolean) => void;
     category?: string;
+    categoryId?: number;
     sortOptions?: string[];
 }
 
@@ -52,7 +54,9 @@ const SORT_OPTIONS = [
     'За датою',
 ];
 
-export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange, onClearAll, onModifiedChange, category, sortOptions }: CatalogSidebarProps) {
+export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange, onClearAll, onModifiedChange, category, categoryId, sortOptions }: CatalogSidebarProps) {
+    const routeParams = useParams();
+    const lang = routeParams?.lang === 'ru' ? 'ru' : 'ua';
     const optionsToUse = sortOptions || SORT_OPTIONS;
     const defaultSortOption = optionsToUse[0] || 'За популярністю';
 
@@ -129,7 +133,7 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                 <div className={s.onlyMobile}>
                     {category && (
                         <FilterGroup title="КАТЕГОРІЇ" initialOpen={true}>
-                            <CategorySwitcher isSidebar />
+                            <CategorySwitcher isSidebar categoryId={categoryId} lang={lang} />
                         </FilterGroup>
                     )}
                     <FilterGroup title={sortBy || defaultSortOption} initialOpen={true}>

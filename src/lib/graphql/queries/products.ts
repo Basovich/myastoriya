@@ -11,6 +11,7 @@ export interface ProductImage {
 
 export interface ProductCategory {
     id: string;
+    parentId?: number | null;
     name: string;
     slug: string;
     menuIcon?: {
@@ -596,3 +597,97 @@ export async function getSearchCategoriesApi(search: string, lang?: string, pare
     );
     return data.categories;
 }
+
+const SUBCATEGORIES_QUERY = /* GraphQL */ `
+    query Subcategories($parentId: Int) {
+        categories(parentId: $parentId) {
+            id
+            name
+            slug
+            menuIcon {
+                icon1x
+                icon2x
+                icon3x
+            }
+            image {
+                square1x
+                square2x
+                square3x
+                rectangle1x
+                rectangle2x
+                rectangle3x
+                big1x
+                big2x
+                big3x
+            }
+            children {
+                id
+                name
+                slug
+                menuIcon {
+                    icon1x
+                    icon2x
+                    icon3x
+                }
+                image {
+                    square1x
+                    square2x
+                    square3x
+                    rectangle1x
+                    rectangle2x
+                    rectangle3x
+                    big1x
+                    big2x
+                    big3x
+                }
+                children {
+                    id
+                    name
+                    slug
+                    image {
+                        square1x
+                        square2x
+                        square3x
+                        rectangle1x
+                        rectangle2x
+                        rectangle3x
+                        big1x
+                        big2x
+                        big3x
+                    }
+                }
+            }
+        }
+    }
+`;
+
+export async function getSubcategoriesApi(parentId: number, lang?: string): Promise<ProductCategory[]> {
+    const data = await gqlRequest<{ categories: ProductCategory[] }>(
+        SUBCATEGORIES_QUERY,
+        { parentId },
+        { next: { revalidate: 3600 }, lang }
+    );
+    return data.categories;
+}
+
+const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
+    query GetCategoryById($id: Int!) {
+        category(id: $id) {
+            id
+            parentId
+            name
+            slug
+        }
+    }
+`;
+
+export async function getCategoryByIdApi(id: number, lang?: string): Promise<ProductCategory | null> {
+    const data = await gqlRequest<{ category: ProductCategory | null }>(
+        CATEGORY_BY_ID_QUERY,
+        { id },
+        { next: { revalidate: 3600 }, lang }
+    );
+    return data.category;
+}
+
+

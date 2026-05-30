@@ -34,6 +34,8 @@ export {
     getCategoriesApi,
     resolveProductImageUrl,
     getCatalogTreeApi,
+    getSubcategoriesApi,
+    getCategoryByIdApi,
 } from './queries/products';
 export type {
     Product,

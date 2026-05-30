@@ -184,6 +184,7 @@ export default async function CatalogContent({
                         view={view} 
                         sortOptions={sortOptions}
                         categoryName={categoryName}
+                        categoryId={categoryId}
                         hideFilter={hideSidebar}
                         sortLabel={sortLabel}
                         filterLabel={filterLabel}
@@ -193,10 +194,11 @@ export default async function CatalogContent({
                     <div className={s.contentLayout}>
                         {!hideSidebar && (
                             <aside className={s.sidebar}>
-                                {categoryName && !hideCategorySwitcher && <CategorySwitcher />}
+                                {categoryName && !hideCategorySwitcher && <CategorySwitcher categoryId={categoryId} lang={lang} />}
                                 <CatalogSidebar
                                     sortBy={currentSort}
                                     sortOptions={sortOptions}
+                                    categoryId={categoryId}
                                 />
                             </aside>
                         )}

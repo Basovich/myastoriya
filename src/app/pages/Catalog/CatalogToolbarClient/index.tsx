@@ -14,6 +14,7 @@ interface CatalogToolbarProps {
     view: ViewType;
     sortOptions: string[];
     categoryName?: string;
+    categoryId?: number;
     className?: string;
     hideFilter?: boolean;
     sortLabel?: string;
@@ -26,6 +27,7 @@ export default function CatalogToolbarClient({
     view,
     sortOptions,
     categoryName,
+    categoryId,
     className,
     hideFilter = false,
     sortLabel = "Сортувати:",
@@ -94,6 +96,7 @@ export default function CatalogToolbarClient({
                 sortBy={sortBy}
                 onSortChange={(val) => updateParams("sort", val)}
                 category={categoryName}
+                categoryId={categoryId}
                 sortOptions={sortOptions}
                 filterLabel={filterLabel}
                 clearLabel={clearLabel}

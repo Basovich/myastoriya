@@ -10,12 +10,13 @@ interface FilterModalProps {
     sortBy?: string;
     onSortChange?: (value: string) => void;
     category?: string;
+    categoryId?: number;
     sortOptions?: string[];
     filterLabel?: string;
     clearLabel?: string;
 }
 
-export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, category, sortOptions, filterLabel = "Фільтр", clearLabel = "Очистити" }: FilterModalProps) {
+export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, category, categoryId, sortOptions, filterLabel = "Фільтр", clearLabel = "Очистити" }: FilterModalProps) {
     const [clearTrigger, setClearTrigger] = useState(0);
     const [isModified, setIsModified] = useState(false);
 
@@ -91,6 +92,7 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, c
                         onModifiedChange={setIsModified}
                         key={clearTrigger} 
                         category={category}
+                        categoryId={categoryId}
                         sortOptions={sortOptions}
                     />
                 </div>
