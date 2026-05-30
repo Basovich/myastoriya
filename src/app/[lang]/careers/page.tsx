@@ -1,6 +1,7 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import CareersPage from "@/app/pages/Careers";
+import { getCareerApi } from "@/lib/graphql";
 
 export default async function Careers({
   params,
@@ -9,8 +10,9 @@ export default async function Careers({
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
+  const careerData = await getCareerApi(lang);
 
   return (
-      <CareersPage lang={lang} dict={dict} />
+      <CareersPage lang={lang} dict={dict} careerData={careerData} />
   );
 }

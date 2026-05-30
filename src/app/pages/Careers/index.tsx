@@ -4,13 +4,15 @@ import { Dictionary } from "@/i18n/types";
 import s from "./Careers.module.scss";
 import Image from "next/image";
 import Button from "@/app/components/ui/Button/Button";
+import { Career } from "@/lib/graphql";
 
 interface CareersPageProps {
     dict: Dictionary;
     lang: Locale;
+    careerData?: Career | null;
 }
 
-export default function CareersPage({ dict, lang }: CareersPageProps) {
+export default function CareersPage({ dict, lang, careerData }: CareersPageProps) {
     const careersPage = dict.home.careersPage;
 
     return (
@@ -25,17 +27,30 @@ export default function CareersPage({ dict, lang }: CareersPageProps) {
                 />
                 <section className={s.container}>
                     <h1 className={s.title}>
-                        {careersPage.hero.title}
-                        <br/>
-                        {careersPage.hero.subtitle}
+                        {careerData?.title ? (
+                            <span dangerouslySetInnerHTML={{ __html: careerData.title }} />
+                        ) : (
+                            <>
+                                {careersPage.hero.title}
+                                <br/>
+                                {careersPage.hero.subtitle}
+                            </>
+                        )}
                     </h1>
-                    <p className={s.text}>{careersPage.about.text}</p>
+                    {careerData?.text ? (
+                        <div
+                            className={s.text}
+                            dangerouslySetInnerHTML={{ __html: careerData.text }}
+                        />
+                    ) : (
+                        <p className={s.text}>{careersPage.about.text}</p>
+                    )}
                     <Button
                         variant="red"
                         href="/careers/apply"
                         className={s.button}
                     >
-                        {careersPage.form.button}
+                        {careerData?.buttonText || careersPage.form.button}
                     </Button>
                     <div className={s.imageWrapper}>
                         <Image

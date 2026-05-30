@@ -116,3 +116,8 @@ export type { SocialLink } from './queries/settings';
 // Re-export contacts
 export { getContactsCategoriesApi } from './queries/pages/contacts';
 export type { Contact, ContactCategory, ContactSchedule, ContactsCategoriesResponse } from './queries/pages/contacts';
+
+// Re-export career
+export { getCareerApi } from './queries/pages/career';
+export type { Career } from './queries/pages/career';
+
