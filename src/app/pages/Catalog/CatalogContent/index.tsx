@@ -154,7 +154,11 @@ export default async function CatalogContent({
 
     return (
         <div className={s.container}>
-            <div className={clsx(s.topSection, categoryName && s.topSectionCategory)}>
+            <div className={clsx(
+                s.topSection,
+                categoryName && s.topSectionCategory,
+                (!subcategoryItems || subcategoryItems.length === 0) && s.topSectionNoSubcategories
+            )}>
                 <HeroBanner
                     prefix=""
                     title={pageTitle}

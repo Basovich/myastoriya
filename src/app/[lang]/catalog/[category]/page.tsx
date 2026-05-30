@@ -3,7 +3,8 @@ import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
 import { getCatalogTreeApi, getProductsApi } from '@/lib/graphql';
-import { buildCategoryIndex } from '@/utils/category-url';
+import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
+import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 
 interface CategoryCatalogPageProps {
     params: Promise<{ lang: string; category: string }>;
@@ -57,6 +58,15 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
     }
     breadcrumbItems.push({ label: matchedCat.name });
 
+    // Sibling categories of the 3rd level for CategoryCircles
+    const subcategoryItems = parent
+        ? (parent.children ?? []).map(sub => ({
+              name: sub.name,
+              image: resolveCategoryImageUrl(sub) || '/icons/icon-category.svg',
+              href: getCategoryHref(sub, parent, grandParent),
+          }))
+        : [];
+
     return (
         <main>
             <CatalogContent
@@ -66,6 +76,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
                 categoryId={parseInt(matchedCat.id)}
                 categoryName={matchedCat.name}
                 breadcrumbItems={breadcrumbItems}
+                subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                 view={view}
                 sortBy={resolvedSearchParams.sort as string || undefined}
             />

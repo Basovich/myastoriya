@@ -13,6 +13,14 @@
     &.topSectionCategory {
         background-color: #fff;
     }
+
+    &.topSectionNoSubcategories {
+        padding-bottom: 26px;
+
+        @media (min-width: 1280px) {
+            padding-bottom: 38px;
+        }
+    }
 }
 
 section.heroBanner {
