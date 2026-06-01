@@ -16,12 +16,14 @@ export interface CartItem {
 
 interface CartState {
     items: CartItem[];
+    deletingIds: string[];
     isInitialized: boolean;
     loading: boolean;
 }
 
 const initialState: CartState = {
     items: [],
+    deletingIds: [],
     isInitialized: false,
     loading: false,
 };
@@ -33,6 +35,20 @@ const mapCartItems = (cart: CartGql): CartItem[] => {
         rowId: item.rowId,
         quantity: item.quantity,
     }));
+};
+
+// Helper to merge optimistic items with backend state
+const mergeCartItems = (currentItems: CartItem[], backendItems: CartItem[]): CartItem[] => {
+    const backendMap = new Map(backendItems.map(item => [item.id, item]));
+    const optimisticItems = currentItems.filter(item => !item.rowId);
+    const merged = [...backendItems];
+
+    for (const optItem of optimisticItems) {
+        if (!backendMap.has(optItem.id)) {
+            merged.push(optItem);
+        }
+    }
+    return merged;
 };
 
 // Async Thunks
@@ -53,7 +69,7 @@ export const addToCartAsync = createAsyncThunk(
     'cart/add',
     async (
         payload: { id: string; quantity: number; costVariantId?: number },
-        { dispatch, rejectWithValue }
+        { rejectWithValue }
     ) => {
         try {
             const response = await addProductToCartApi({
@@ -64,8 +80,6 @@ export const addToCartAsync = createAsyncThunk(
             return mapCartItems(response);
         } catch (error: any) {
             console.error('[Cart] Failed to add product to backend cart:', error);
-            // Optimistic / fallback: update locally if backend request fails
-            dispatch(addToCart(payload));
             return rejectWithValue('Failed to add product to cart');
         }
     }
@@ -88,14 +102,11 @@ export const updateQuantityAsync = createAsyncThunk(
                 });
                 return mapCartItems(response);
             } else {
-                // No rowId, update locally
-                dispatch(updateQuantity(payload));
                 return rejectWithValue('No rowId found');
             }
         } catch (error: any) {
             console.error('[Cart] Failed to update cart item quantity:', error);
-            // Fallback: update locally if backend request fails
-            dispatch(updateQuantity(payload));
+            void dispatch(fetchCartAsync());
             return rejectWithValue('Failed to update quantity');
         }
     }
@@ -104,27 +115,23 @@ export const updateQuantityAsync = createAsyncThunk(
 export const removeFromCartAsync = createAsyncThunk(
     'cart/remove',
     async (
-        productId: string,
+        payload: { id: string; rowId?: string },
         { getState, dispatch, rejectWithValue }
     ) => {
         try {
-            const state = getState() as RootState;
-            const item = state.cart.items.find(i => i.id === productId);
+            const rowId = payload.rowId || (getState() as RootState).cart.items.find(i => i.id === payload.id)?.rowId;
 
-            if (item?.rowId) {
+            if (rowId) {
                 const response = await removeCartItemApi({
-                    rowId: item.rowId,
+                    rowId,
                 });
                 return mapCartItems(response);
             } else {
-                // No rowId, remove locally
-                dispatch(removeFromCart(productId));
                 return rejectWithValue('No rowId found');
             }
         } catch (error: any) {
             console.error('[Cart] Failed to remove cart item from backend:', error);
-            // Fallback: remove locally if backend request fails
-            dispatch(removeFromCart(productId));
+            void dispatch(fetchCartAsync());
             return rejectWithValue('Failed to remove from cart');
         }
     }
@@ -213,7 +220,12 @@ const cartSlice = createSlice({
                 state.loading = true;
             })
             .addCase(fetchCartAsync.fulfilled, (state, action) => {
-                state.items = action.payload;
+                if (!state.deletingIds) {
+                    state.deletingIds = [];
+                }
+                state.items = action.payload.filter(
+                    item => !state.deletingIds.includes(item.id)
+                );
                 state.isInitialized = true;
                 state.loading = false;
             })
@@ -221,16 +233,83 @@ const cartSlice = createSlice({
                 state.loading = false;
             })
             // addToCartAsync
+            .addCase(addToCartAsync.pending, (state, action) => {
+                const { id, quantity } = action.meta.arg;
+                const existingItem = state.items.find(item => item.id === id);
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    state.items.push({
+                        id,
+                        quantity,
+                    });
+                }
+            })
             .addCase(addToCartAsync.fulfilled, (state, action) => {
-                state.items = action.payload;
+                if (!state.deletingIds) {
+                    state.deletingIds = [];
+                }
+                state.items = mergeCartItems(state.items, action.payload).filter(
+                    item => !state.deletingIds.includes(item.id)
+                );
+            })
+            .addCase(addToCartAsync.rejected, (state, action) => {
+                if (action.meta.arg) {
+                    const { id, quantity } = action.meta.arg;
+                    const existingItem = state.items.find(item => item.id === id);
+                    if (existingItem) {
+                        existingItem.quantity -= quantity;
+                        if (existingItem.quantity <= 0) {
+                            state.items = state.items.filter(item => item.id !== id);
+                        }
+                    }
+                }
             })
             // updateQuantityAsync
+            .addCase(updateQuantityAsync.pending, (state, action) => {
+                const { id, quantity } = action.meta.arg;
+                const item = state.items.find(item => item.id === id);
+                if (item) {
+                    item.quantity = quantity;
+                }
+            })
             .addCase(updateQuantityAsync.fulfilled, (state, action) => {
-                state.items = action.payload;
+                if (!state.deletingIds) {
+                    state.deletingIds = [];
+                }
+                state.items = mergeCartItems(state.items, action.payload).filter(
+                    item => !state.deletingIds.includes(item.id)
+                );
             })
             // removeFromCartAsync
+            .addCase(removeFromCartAsync.pending, (state, action) => {
+                const { id } = action.meta.arg;
+                if (!state.deletingIds) {
+                    state.deletingIds = [];
+                }
+                if (!state.deletingIds.includes(id)) {
+                    state.deletingIds.push(id);
+                }
+                state.items = state.items.filter(item => item.id !== id);
+            })
             .addCase(removeFromCartAsync.fulfilled, (state, action) => {
-                state.items = action.payload;
+                const { id } = action.meta.arg;
+                if (!state.deletingIds) {
+                    state.deletingIds = [];
+                }
+                state.deletingIds = state.deletingIds.filter(dId => dId !== id);
+                state.items = mergeCartItems(state.items, action.payload).filter(
+                    item => !state.deletingIds.includes(item.id)
+                );
+            })
+            .addCase(removeFromCartAsync.rejected, (state, action) => {
+                if (action.meta.arg) {
+                    const { id } = action.meta.arg;
+                    if (!state.deletingIds) {
+                        state.deletingIds = [];
+                    }
+                    state.deletingIds = state.deletingIds.filter(dId => dId !== id);
+                }
             });
     }
 });

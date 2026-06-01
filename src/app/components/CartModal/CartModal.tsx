@@ -52,7 +52,8 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     };
 
     const handleRemove = (id: string) => {
-        void dispatch(removeFromCartAsync(id));
+        const item = cartItems.find(i => i.id === id);
+        void dispatch(removeFromCartAsync({ id, rowId: item?.rowId }));
     };
 
     const handleAddToCart = (id: string) => {

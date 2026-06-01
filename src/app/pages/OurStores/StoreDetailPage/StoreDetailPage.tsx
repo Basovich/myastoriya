@@ -77,8 +77,8 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
     const texts = LOCALIZED_TEXTS[lang] || LOCALIZED_TEXTS.ua;
 
     const match = shop.name.match(/^(.*?)\((.*?)\)$/);
-    const brandName = match ? match[1].trim() : shop.name;
-    const address = match ? match[2].trim() : (shop.name || '');
+    const brandName = shop.siteName || (match ? match[1].trim() : shop.name);
+    const address = shop.siteAddress || (match ? match[2].trim() : (shop.name || ''));
 
     const breadcrumbs = [
         { label: ourStoresPage.breadcrumbs.home, href: '/' },

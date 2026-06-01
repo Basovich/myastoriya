@@ -6,6 +6,8 @@ export const SHOPS_QUERY = `
       data {
         id
         name
+        siteName
+        siteAddress
         status
         phones
         email
@@ -48,6 +50,8 @@ export const SHOP_BY_ID_QUERY = `
     shop(id: $id) {
       id
       name
+      siteName
+      siteAddress
       status
       phones
       email
@@ -88,6 +92,8 @@ export const CONTACTS_SHOPS_QUERY = `
       data {
         id
         name
+        siteName
+        siteAddress
         phones
         email
         lat
@@ -115,6 +121,8 @@ export interface ShopSizeImages {
 export interface Shop {
   id: string;
   name: string;
+  siteName?: string | null;
+  siteAddress?: string | null;
   status: string | null;
   phones: string[];
   email: string | null;
