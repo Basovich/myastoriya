@@ -25,7 +25,7 @@ const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange, op
         ? options.map(v => ({
             id: v.id,
             label: v.name ?? v.id,
-            image: v.image?.url?.thumb2x || v.image?.url?.thumb1x || null,
+            image: v.image?.size2x || v.image?.size1x || v.image?.size3x || null,
             cost: v.cost,
         }))
         : STATIC_OPTIONS.map(o => ({ ...o, cost: undefined }));

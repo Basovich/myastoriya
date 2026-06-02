@@ -67,12 +67,12 @@ export interface ProductCostVariant {
     cost?: number | null;
     oldCost?: number | null;
     purchaseCost: number;
+    purchaseOldCost?: number | null;
     isDefault?: boolean | null;
     image?: {
-        url?: {
-            thumb1x?: string | null;
-            thumb2x?: string | null;
-        } | null;
+        size1x?: string | null;
+        size2x?: string | null;
+        size3x?: string | null;
     } | null;
 }
 
@@ -240,6 +240,8 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
             name
             cost
             oldCost
+            purchaseCost
+            purchaseOldCost
             unit
             multiplier
             is_new
@@ -311,12 +313,12 @@ const PRODUCT_COST_VARIANTS_QUERY = /* GraphQL */ `
             cost
             oldCost
             purchaseCost
+            purchaseOldCost
             isDefault
             image {
-                url {
-                    thumb1x
-                    thumb2x
-                }
+                size1x
+                size2x
+                size3x
             }
         }
     }

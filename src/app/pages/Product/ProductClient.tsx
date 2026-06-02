@@ -17,12 +17,14 @@ import VideoReviewModal from '@/app/components/VideoReviewModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { RootState } from '@/store';
 import { recordProductViewAsync } from '@/store/slices/viewedProductsSlice';
+import { addToCartAsync } from '@/store/slices/cartSlice';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import type { BlogPost, Product, ProductCostVariant, OrderingInfoBlock } from '@/lib/graphql';
-import { resolveProductImageUrl } from '@/lib/graphql';
+import { resolveProductImageUrl, getProductCostVariantsApi } from '@/lib/graphql';
 import type { BreadcrumbItem } from '@/utils/category-url';
 
 
@@ -50,6 +52,28 @@ function getProductWeight(product: Product): string {
     if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
     return product.multiplier ? `${product.multiplier}` : '';
 }
+
+function formatPrice(price: number): string {
+    return Math.round(price).toLocaleString('uk-UA').replace(/\u00a0/g, ' ');
+}
+
+function getWeightInGrams(weightStr: string): number {
+    if (!weightStr) return 0;
+    const cleanStr = weightStr.toLowerCase().replace(/\s+/g, '');
+    const num = parseFloat(cleanStr);
+    if (isNaN(num)) return 0;
+    if (cleanStr.includes('кг') || cleanStr.includes('kg')) {
+        return num * 1000;
+    }
+    if (cleanStr.includes('г') || cleanStr.includes('g')) {
+        return num;
+    }
+    if (num < 10) {
+        return num * 1000;
+    }
+    return num;
+}
+
 
 /** Resolves availability status: 1 = in stock, 2 = out of stock, 3 = discontinued */
 function getAvailabilityLabel(available: number | null | undefined): { label: string; inStock: boolean } {
@@ -91,7 +115,8 @@ const ProductClient: React.FC<ProductClientProps> = ({
     deliveryBlocks,
 }) => {
     const dispatch = useAppDispatch();
-    const { isAuthenticated } = useAppSelector((state: RootState) => state.auth);
+    const { isAuthenticated, isGuest, user } = useAppSelector((state: RootState) => state.auth);
+    const hydrated = useIsHydrated();
 
     // Record product view on mount
     React.useEffect(() => {
@@ -101,33 +126,63 @@ const ProductClient: React.FC<ProductClientProps> = ({
     }, [product?.id, dispatch]);
 
     const [quantity, setQuantity] = useState(1);
-    const [selectedCostVariantId, setSelectedCostVariantId] = useState<string>(
-        costVariants.find(v => v.isDefault)?.id ?? costVariants[0]?.id ?? ''
-    );
+    const [variants, setVariants] = useState<ProductCostVariant[]>(costVariants ?? []);
+    const [selectedCostVariantId, setSelectedCostVariantId] = useState<string>('');
+
+    React.useEffect(() => {
+        if (product.hasCostVariants) {
+            getProductCostVariantsApi(product.id, lang)
+                .then(res => {
+                    setVariants(res);
+                    const defaultId = res.find(v => v.isDefault)?.id ?? res[0]?.id ?? '';
+                    setSelectedCostVariantId(defaultId);
+                })
+                .catch(err => {
+                    console.error('[ProductClient] Failed to load cost variants:', err);
+                });
+        }
+    }, [product.id, product.hasCostVariants, lang]);
+
     const [selectedMods, setSelectedMods] = useState<string[]>([]);
     const [selectedSouces, setSelectedSouces] = useState<string[]>([]);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isVideoReviewModalOpen, setIsVideoReviewModalOpen] = useState(false);
 
-    // Hardcoded modifications (until API provides them)
+    // Optional products/modifications (currently empty as they are not supported by the API yet)
+    const productModifications: { id: string; name: string; price: number }[] = [];
+    /* Commented out hardcoded options:
     const productModifications = [
         { id: 'm1', name: 'Додаткова картопля фрі', price: 125 },
         { id: 'm2', name: 'Картопля по селянські', price: 125 },
         { id: 'm3', name: 'Батат фрі', price: 95 },
         { id: 'm4', name: 'Овочевий салат', price: 130 },
     ];
+    */
 
+    const productSouces: { id: string; name: string; price: number }[] = [];
+    /* Commented out hardcoded sauces:
     const productSouces = [
         { id: 's1', name: 'Соус гострий Табаско', price: 35 },
         { id: 's2', name: 'Ворчестер Німеччина 140 мл', price: 25 },
         { id: 's3', name: 'Кіккоман соєвий соус 150 мл', price: 95 },
     ];
+    */
 
     const toggleMod = (id: string) => {
         setSelectedMods(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
     };
     const toggleSouce = (id: string) => {
         setSelectedSouces(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    };
+
+    const handleAddToCart = () => {
+        void dispatch(
+            addToCartAsync({
+                id: String(product.id),
+                quantity,
+                costVariantId: selectedCostVariantId ? Number(selectedCostVariantId) : undefined,
+            })
+        );
     };
 
     // Build display data from real product — читаємо з images[], бо image завжди null
@@ -161,7 +216,16 @@ const ProductClient: React.FC<ProductClientProps> = ({
     }
 
     const weight = getProductWeight(product);
-    const badge = getProductBadge(product);
+    const selectedVariant = variants.find(v => v.id === selectedCostVariantId);
+
+    const activeCost = selectedVariant?.cost ?? product.cost;
+    const activeOldCost = selectedVariant?.oldCost ?? product.oldCost;
+    const activePurchaseCost = selectedVariant?.purchaseCost ?? product.purchaseCost ?? activeCost;
+    const activePurchaseOldCost = selectedVariant?.purchaseOldCost ?? product.purchaseOldCost ?? activeOldCost;
+    const activeUnit = product.unit;
+
+    const hasDiscount = activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost;
+    const badge = product.is_new ? 'NEW' : (hasDiscount ? 'АКЦІЯ' : null);
     const { label: availabilityLabel, inStock } = getAvailabilityLabel(product.available);
 
     const breadcrumbs: BreadcrumbItem[] = breadcrumbsProp ?? [
@@ -231,12 +295,39 @@ const ProductClient: React.FC<ProductClientProps> = ({
 
                     <div className={s.priceSection}>
                         <div className={s.priceWrapper}>
-                            <span className={clsx(s.price, product.oldCost && s.newPrice)}>{product.cost} ₴</span>
-                            {product.oldCost && <span className={s.oldPrice}>{product.oldCost} ₴</span>}
+                            <span className={clsx(s.price, activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost && s.newPrice)}>
+                                {formatPrice(activePurchaseCost)} ₴
+                            </span>
+                            {activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost && (
+                                <span className={s.oldPrice}>
+                                    {formatPrice(activePurchaseOldCost)} ₴
+                                </span>
+                            )}
                         </div>
                         {weight && (
                             <div className={s.priceSubtitle}>
-                                Вага: <span className={s.weight}>{weight}</span>
+                                {product.unit?.toLowerCase() === 'шт' ? (
+                                    <>
+                                        {lang === 'ru' ? 'Количество:' : 'Кількість:'}{' '}
+                                        <span className={s.weight}>{weight} {product.unit}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        {lang === 'ru' ? 'Вес:' : 'Вага:'}{' '}
+                                        <span className={s.weight}>{weight}</span>
+                                        {((activePurchaseCost !== activeCost) || (getWeightInGrams(weight) >= 200)) && activeUnit && (
+                                            <>
+                                                {' '}({formatPrice(activeCost)} {lang === 'ru' ? 'грн' : 'грн'}/{activeUnit.replace(/\s+/g, '')})
+                                            </>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                        )}
+                        {hydrated && isAuthenticated && !isGuest && user?.bonuses != null && (
+                            <div className={s.bonusesSubtitle}>
+                                {lang === 'ru' ? 'Доступно бонусов:' : 'Доступно бонусів:'}{' '}
+                                <span className={s.bonusesValue}>{user.bonuses}</span>
                             </div>
                         )}
                     </div>
@@ -244,7 +335,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                     <div className={s.actionsBlock}>
                         {inStock ? (
                             <>
-                                <Button variant="primary" className={s.mainBuyBtn}>Додати у кошик</Button>
+                                <Button variant="primary" className={s.mainBuyBtn} onClick={handleAddToCart}>Додати у кошик</Button>
                                 <QuantitySelector value={quantity} onChange={setQuantity} className={s.quantitySelector} />
                             </>
                         ) : (
@@ -286,27 +377,31 @@ const ProductClient: React.FC<ProductClientProps> = ({
                     </div>
 
                     {/* Doneness selector — shown only when product has cost variants */}
-                    {product.hasCostVariants && costVariants.length > 0 && (
+                    {product.hasCostVariants && variants.length > 1 && (
                         <DonenessSelector
                             value={selectedCostVariantId}
                             onChange={setSelectedCostVariantId}
-                            options={costVariants}
+                            options={variants}
                         />
                     )}
 
-                    <ProductModifications
-                        title="Додати до замовлення:"
-                        items={productModifications}
-                        selectedItems={selectedMods}
-                        onToggle={toggleMod}
-                        className={s.productModifications}
-                    />
-                    <ProductModifications
-                        title="Додати соус до замовлення:"
-                        items={productSouces}
-                        selectedItems={selectedSouces}
-                        onToggle={toggleSouce}
-                    />
+                    {productModifications && productModifications.length > 0 && (
+                        <ProductModifications
+                            title="Додати до замовлення:"
+                            items={productModifications}
+                            selectedItems={selectedMods}
+                            onToggle={toggleMod}
+                            className={s.productModifications}
+                        />
+                    )}
+                    {productSouces && productSouces.length > 0 && (
+                        <ProductModifications
+                            title="Додати соус до замовлення:"
+                            items={productSouces}
+                            selectedItems={selectedSouces}
+                            onToggle={toggleSouce}
+                        />
+                    )}
                 </section>
 
                 <ProductTabs

@@ -4,7 +4,6 @@ import ProductClient from "@/app/pages/Product/ProductClient";
 import {
     getBlogsApi,
     getProductByIdApi,
-    getProductCostVariantsApi,
     getPopularProductsApi,
     getSpecialsByProductApi,
     findProductIdBySlug,
@@ -38,10 +37,8 @@ export default async function ProductPage({ params }: Props) {
 
     if (!product) notFound();
 
-    // Load cost variants only if the product has them (avoid extra request)
-    const costVariants = product.hasCostVariants
-        ? await getProductCostVariantsApi(productId, lang)
-        : [];
+    // Cost variants are loaded client-side in ProductClient to avoid unauthorized SSR errors
+    const costVariants: any[] = [];
 
     // Load related (specials) + popular products in parallel
     const [specialsProducts, popularProducts] = await Promise.all([

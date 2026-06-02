@@ -96,8 +96,8 @@ export default function ProductCardRow({
                 <div className={s.footer}>
                     <div className={s.priceGroup}>
                         <div className={s.priceRow}>
-                            <span className={clsx(s.price, oldPrice && s.newPrice)}>{price.toLocaleString('uk-UA')} ₴</span>
-                            {oldPrice && (
+                            <span className={clsx(s.price, oldPrice && oldPrice > price && s.newPrice)}>{price.toLocaleString('uk-UA')} ₴</span>
+                            {oldPrice && oldPrice > price && (
                                 <span className={s.oldPrice}>{oldPrice.toLocaleString('uk-UA')} ₴</span>
                             )}
                         </div>
