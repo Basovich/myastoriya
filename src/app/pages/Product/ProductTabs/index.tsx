@@ -60,8 +60,8 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
         { id: 'delivery', label: 'Доставка', icon: '/images/product/tab-delivery.svg' },
     ] as const;
 
-    // Nutritional data
-    const nutritionInfo = {
+    // Static fallback nutrition data if API doesn't have it
+    const fallbackNutrition = {
         per100g: [
             { key: "Жири (на 100 г)", value: "12.4" },
             { key: "Білки (на 100 г)", value: "14.7" },
@@ -76,12 +76,52 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
         ]
     };
 
-    // Allergens data
+    // Allergens static data
     const allergensInfo = [
         { key: "Цитрусовий", value: "Апельсинова цедра" },
         { key: "Морепродукти", value: "М'ясо краба" },
         { key: "Тип соусу", value: "Соус для бургерів" },
     ];
+
+    // Parse characteristics from API
+    const parsedSpecs = Object.entries(characteristics);
+
+    const isNutritionKey = (key: string) => {
+        const lower = key.toLowerCase();
+        return lower.includes('калорій') || lower.includes('калорий') ||
+               lower.includes('білк') || lower.includes('белк') ||
+               lower.includes('жир') ||
+               lower.includes('вуглев') || lower.includes('углев');
+    };
+
+    const is100gKey = (key: string) => {
+        return key.includes('100');
+    };
+
+    const isPortionKey = (key: string) => {
+        const lower = key.toLowerCase();
+        return lower.includes('порц') || lower.includes('порці') || lower.includes('порци') || lower.includes('порцію') || lower.includes('порцию');
+    };
+
+    // Filter specifications
+    const generalSpecs = parsedSpecs.filter(([key]) => !isNutritionKey(key));
+    
+    const apiNutrition100g = parsedSpecs
+        .filter(([key]) => isNutritionKey(key) && is100gKey(key))
+        .map(([key, value]) => ({ key, value }));
+        
+    const apiNutritionPortion = parsedSpecs
+        .filter(([key]) => isNutritionKey(key) && isPortionKey(key))
+        .map(([key, value]) => ({ key, value }));
+
+    // Fallbacks if no data in API
+    const displayNutrition100g = apiNutrition100g.length > 0 
+        ? apiNutrition100g 
+        : fallbackNutrition.per100g;
+
+    const displayNutritionPortion = apiNutritionPortion.length > 0 
+        ? apiNutritionPortion 
+        : fallbackNutrition.perPortion;
 
     // Helper to extract YouTube ID and get thumbnail
     const getYouTubeThumbnail = (url: string) => {
@@ -196,9 +236,28 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                 {activeTab === 'characteristics' && (
                     <div className={styles.characteristics}>
                         <div className={styles.nutritionGroup}>
+                            <p className={styles.nutritionTitle}>Характеристики товару</p>
+                            <div className={styles.nutritionList}>
+                                {generalSpecs.length > 0 ? (
+                                    generalSpecs.map(([key, value]) => (
+                                        <div key={key} className={styles.nutritionRow}>
+                                            <span className={styles.nutritionKey}>{key}</span>
+                                            <span className={styles.nutritionValue}>{value}</span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className={styles.nutritionKey}>Характеристики відсутні</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {activeTab === 'allergens' && (
+                    <div className={styles.allergens}>
+                        <div className={styles.nutritionGroup}>
                             <p className={styles.nutritionTitle}>Калорійність (на 100 г продукту)</p>
                             <div className={styles.nutritionList}>
-                                {nutritionInfo.per100g.map((item) => (
+                                {displayNutrition100g.map((item) => (
                                     <div key={item.key} className={styles.nutritionRow}>
                                         <span className={styles.nutritionKey}>{item.key}</span>
                                         <span className={styles.nutritionValue}>{item.value}</span>
@@ -210,7 +269,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                         <div className={styles.nutritionGroup}>
                             <p className={styles.nutritionTitle}>Калорійність (на 1 порцію)</p>
                             <div className={styles.nutritionList}>
-                                {nutritionInfo.perPortion.map((item) => (
+                                {displayNutritionPortion.map((item) => (
                                     <div key={item.key} className={styles.nutritionRow}>
                                         <span className={styles.nutritionKey}>{item.key}</span>
                                         <span className={styles.nutritionValue}>{item.value}</span>
@@ -218,10 +277,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                                 ))}
                             </div>
                         </div>
-                    </div>
-                )}
-                {activeTab === 'allergens' && (
-                    <div className={styles.allergens}>
+
                         <div className={styles.nutritionGroup}>
                             <p className={styles.nutritionTitle}>Алергени</p>
                             <div className={styles.nutritionList}>
