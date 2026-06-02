@@ -49,39 +49,17 @@ const CarIcon = () => (
     </svg>
 );
 
+type TabId = 'description' | 'characteristics' | 'allergens' | 'delivery';
+
+interface TabItem {
+    id: TabId;
+    label: string;
+    icon: string;
+}
+
 const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics, delivery }) => {
-    const [activeTab, setActiveTab] = useState<'description' | 'characteristics' | 'allergens' | 'delivery'>('description');
+    const [activeTab, setActiveTab] = useState<TabId>('description');
     const [isVideoOpen, setIsVideoOpen] = useState(false);
-
-    const tabs = [
-        { id: 'description', label: 'Опис', icon: '/images/product/tab-description.svg' },
-        { id: 'characteristics', label: 'Характеристики', icon: '/images/product/tab-characteristics.svg' },
-        { id: 'allergens', label: 'АЛЕРГЕНИ / КАЛОРІЙНІСТЬ', icon: '/images/product/tab-characteristics.svg' },
-        { id: 'delivery', label: 'Доставка', icon: '/images/product/tab-delivery.svg' },
-    ] as const;
-
-    // Static fallback nutrition data if API doesn't have it
-    const fallbackNutrition = {
-        per100g: [
-            { key: "Жири (на 100 г)", value: "12.4" },
-            { key: "Білки (на 100 г)", value: "14.7" },
-            { key: "Вуглеводи (на 100 г)", value: "16.3" },
-            { key: "Калорійність (на 100 г)", value: "345.9" },
-        ],
-        perPortion: [
-            { key: "Жири (на 1 порцію)", value: "45.4" },
-            { key: "Білки (на 1 порцію)", value: "89.7" },
-            { key: "Вуглеводи (на 1 порцію)", value: "78.3" },
-            { key: "Калорійність (на 1 порцію)", value: "2345.9" },
-        ]
-    };
-
-    // Allergens static data
-    const allergensInfo = [
-        { key: "Цитрусовий", value: "Апельсинова цедра" },
-        { key: "Морепродукти", value: "М'ясо краба" },
-        { key: "Тип соусу", value: "Соус для бургерів" },
-    ];
 
     // Parse characteristics from API
     const parsedSpecs = Object.entries(characteristics);
@@ -103,8 +81,13 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
         return lower.includes('порц') || lower.includes('порці') || lower.includes('порци') || lower.includes('порцію') || lower.includes('порцию');
     };
 
+    const isAllergensKey = (key: string) => {
+        const lower = key.toLowerCase();
+        return lower.includes('алерген') || lower.includes('аллерген');
+    };
+
     // Filter specifications
-    const generalSpecs = parsedSpecs.filter(([key]) => !isNutritionKey(key));
+    const generalSpecs = parsedSpecs.filter(([key]) => !isNutritionKey(key) && !isAllergensKey(key));
     
     const apiNutrition100g = parsedSpecs
         .filter(([key]) => isNutritionKey(key) && is100gKey(key))
@@ -114,14 +97,19 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
         .filter(([key]) => isNutritionKey(key) && isPortionKey(key))
         .map(([key, value]) => ({ key, value }));
 
-    // Fallbacks if no data in API
-    const displayNutrition100g = apiNutrition100g.length > 0 
-        ? apiNutrition100g 
-        : fallbackNutrition.per100g;
+    const apiAllergens = parsedSpecs
+        .filter(([key]) => isAllergensKey(key))
+        .map(([key, value]) => ({ key, value }));
 
-    const displayNutritionPortion = apiNutritionPortion.length > 0 
-        ? apiNutritionPortion 
-        : fallbackNutrition.perPortion;
+    const hasNutritionOrAllergens = apiNutrition100g.length > 0 || apiNutritionPortion.length > 0 || apiAllergens.length > 0;
+
+    // Create dynamic tabs list
+    const tabs: TabItem[] = [
+        { id: 'description', label: 'Опис', icon: '/images/product/tab-description.svg' },
+        ...(generalSpecs.length > 0 ? [{ id: 'characteristics', label: 'Характеристики', icon: '/images/product/tab-characteristics.svg' } as TabItem] : []),
+        ...(hasNutritionOrAllergens ? [{ id: 'allergens', label: 'АЛЕРГЕНИ / КАЛОРІЙНІСТЬ', icon: '/images/product/tab-characteristics.svg' } as TabItem] : []),
+        { id: 'delivery', label: 'Доставка', icon: '/images/product/tab-delivery.svg' },
+    ];
 
     // Helper to extract YouTube ID and get thumbnail
     const getYouTubeThumbnail = (url: string) => {
@@ -233,62 +221,64 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                         dangerouslySetInnerHTML={{ __html: description }}
                     />
                 )}
-                {activeTab === 'characteristics' && (
+                {activeTab === 'characteristics' && generalSpecs.length > 0 && (
                     <div className={styles.characteristics}>
                         <div className={styles.nutritionGroup}>
                             <p className={styles.nutritionTitle}>Характеристики товару</p>
                             <div className={styles.nutritionList}>
-                                {generalSpecs.length > 0 ? (
-                                    generalSpecs.map(([key, value]) => (
-                                        <div key={key} className={styles.nutritionRow}>
-                                            <span className={styles.nutritionKey}>{key}</span>
-                                            <span className={styles.nutritionValue}>{value}</span>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className={styles.nutritionKey}>Характеристики відсутні</p>
-                                )}
+                                {generalSpecs.map(([key, value]) => (
+                                    <div key={key} className={styles.nutritionRow}>
+                                        <span className={styles.nutritionKey}>{key}</span>
+                                        <span className={styles.nutritionValue}>{value}</span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
                 )}
-                {activeTab === 'allergens' && (
+                {activeTab === 'allergens' && hasNutritionOrAllergens && (
                     <div className={styles.allergens}>
-                        <div className={styles.nutritionGroup}>
-                            <p className={styles.nutritionTitle}>Калорійність (на 100 г продукту)</p>
-                            <div className={styles.nutritionList}>
-                                {displayNutrition100g.map((item) => (
-                                    <div key={item.key} className={styles.nutritionRow}>
-                                        <span className={styles.nutritionKey}>{item.key}</span>
-                                        <span className={styles.nutritionValue}>{item.value}</span>
-                                    </div>
-                                ))}
+                        {apiNutrition100g.length > 0 && (
+                            <div className={styles.nutritionGroup}>
+                                <p className={styles.nutritionTitle}>Калорійність (на 100 г продукту)</p>
+                                <div className={styles.nutritionList}>
+                                    {apiNutrition100g.map((item) => (
+                                        <div key={item.key} className={styles.nutritionRow}>
+                                            <span className={styles.nutritionKey}>{item.key}</span>
+                                            <span className={styles.nutritionValue}>{item.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
-                        <div className={styles.nutritionGroup}>
-                            <p className={styles.nutritionTitle}>Калорійність (на 1 порцію)</p>
-                            <div className={styles.nutritionList}>
-                                {displayNutritionPortion.map((item) => (
-                                    <div key={item.key} className={styles.nutritionRow}>
-                                        <span className={styles.nutritionKey}>{item.key}</span>
-                                        <span className={styles.nutritionValue}>{item.value}</span>
-                                    </div>
-                                ))}
+                        {apiNutritionPortion.length > 0 && (
+                            <div className={styles.nutritionGroup}>
+                                <p className={styles.nutritionTitle}>Калорійність (на 1 порцію)</p>
+                                <div className={styles.nutritionList}>
+                                    {apiNutritionPortion.map((item) => (
+                                        <div key={item.key} className={styles.nutritionRow}>
+                                            <span className={styles.nutritionKey}>{item.key}</span>
+                                            <span className={styles.nutritionValue}>{item.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
-                        <div className={styles.nutritionGroup}>
-                            <p className={styles.nutritionTitle}>Алергени</p>
-                            <div className={styles.nutritionList}>
-                                {allergensInfo.map((item) => (
-                                    <div key={item.key} className={styles.nutritionRow}>
-                                        <span className={styles.nutritionKey}>{item.key}</span>
-                                        <span className={styles.nutritionValue}>{item.value}</span>
-                                    </div>
-                                ))}
+                        {apiAllergens.length > 0 && (
+                            <div className={styles.nutritionGroup}>
+                                <p className={styles.nutritionTitle}>Алергени</p>
+                                <div className={styles.nutritionList}>
+                                    {apiAllergens.map((item) => (
+                                        <div key={item.key} className={styles.nutritionRow}>
+                                            <span className={styles.nutritionKey}>{item.key}</span>
+                                            <span className={styles.nutritionValue}>{item.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 )}
                 {activeTab === 'delivery' && (
