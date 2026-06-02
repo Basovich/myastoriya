@@ -19,10 +19,10 @@ export const recordProductViewAsync = createAsyncThunk(
     async (productId: string, { getState, rejectWithValue }) => {
         try {
             const state = getState() as RootState;
-            const { isAuthenticated } = state.auth;
+            const { isAuthenticated, isGuest } = state.auth;
             
-            // Call backend if we have any authentication (guest or user)
-            if (isAuthenticated) {
+            // Call backend if user is fully authenticated (not a guest)
+            if (isAuthenticated && !isGuest) {
                 await addProductViewApi(productId);
             }
             
