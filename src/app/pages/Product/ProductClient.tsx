@@ -199,6 +199,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         id={String(product.id)}
                         images={displayImages}
                         discount={badge === 'АКЦІЯ' ? '-20%' : undefined}
+                        videoUrl={product.video}
                     />
                 </section>
 
