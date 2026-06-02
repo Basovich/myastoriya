@@ -187,9 +187,11 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
             </div>
             <div className={styles.tabContent}>
                 {activeTab === 'description' && (
-                    <div className={styles.description}>
-                        <p>{description}</p>
-                    </div>
+                    <div
+                        className={styles.description}
+                        // eslint-disable-next-line react/no-danger
+                        dangerouslySetInnerHTML={{ __html: description }}
+                    />
                 )}
                 {activeTab === 'characteristics' && (
                     <div className={styles.characteristics}>

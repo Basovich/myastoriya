@@ -1,36 +1,181 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import styles from '../Product.module.scss';
 import Button from '@/app/components/ui/Button/Button';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import Image from 'next/image';
-
 import ReviewModal from '@/app/components/ReviewModal';
-import { Review as BaseReview } from '@/i18n/types';
 
-interface Review extends BaseReview {
-    scores?: Record<string, number>;
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface ReviewUser {
+    id: string;
+    name?: string | null;
+    surname?: string | null;
 }
 
+interface ProductReview {
+    id: string;
+    rating?: number | null;
+    text?: string | null;
+    created_at?: string | null;
+    published: boolean;
+    user?: ReviewUser | null;
+}
+
+interface ProductReviewsResponse {
+    data: ProductReview[];
+    per_page: number;
+    current_page: number;
+    has_more_pages: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// API helpers (client-side, through /api/graphql proxy)
+// ---------------------------------------------------------------------------
+
+const PRODUCT_REVIEWS_QUERY = /* GraphQL */ `
+    query ProductReviews($productId: Int, $limit: Int, $page: Int) {
+        productReviews(productId: $productId, limit: $limit, page: $page) {
+            per_page
+            current_page
+            has_more_pages
+            data {
+                id
+                rating
+                text
+                created_at
+                published
+                user {
+                    id
+                    name
+                    surname
+                }
+            }
+        }
+    }
+`;
+
+const PRODUCT_REVIEWS_COUNT_QUERY = /* GraphQL */ `
+    query ProductReviewsCount($productId: Int!) {
+        productReviewsCount(productId: $productId)
+    }
+`;
+
+async function fetchProductReviews(
+    productId: number,
+    limit: number,
+    page: number,
+): Promise<ProductReviewsResponse> {
+    const res = await fetch('/api/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            query: PRODUCT_REVIEWS_QUERY,
+            variables: { productId, limit, page },
+        }),
+        cache: 'no-store',
+    });
+    const json = await res.json() as { data?: { productReviews?: ProductReviewsResponse } };
+    return json.data?.productReviews ?? { data: [], per_page: limit, current_page: 1, has_more_pages: false };
+}
+
+async function fetchReviewsCount(productId: number): Promise<number> {
+    const res = await fetch('/api/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            query: PRODUCT_REVIEWS_COUNT_QUERY,
+            variables: { productId },
+        }),
+        cache: 'no-store',
+    });
+    const json = await res.json() as { data?: { productReviewsCount?: number } };
+    return json.data?.productReviewsCount ?? 0;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function formatReviewDate(dateStr?: string | null): string {
+    if (!dateStr) return '';
+    try {
+        return new Date(dateStr).toLocaleDateString('uk-UA', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    } catch {
+        return dateStr;
+    }
+}
+
+function getAuthorName(user?: ReviewUser | null): string {
+    if (!user) return 'Анонім';
+    const parts = [user.name, user.surname].filter(Boolean);
+    return parts.length > 0 ? parts.join(' ') : 'Анонім';
+}
+
+// ---------------------------------------------------------------------------
+// Props
+// ---------------------------------------------------------------------------
+
 interface ProductReviewsProps {
-    reviews: Review[];
+    productId: number;
     isAuthenticated?: boolean;
     onAuthRequired?: () => void;
     onVideoReviewRequired?: () => void;
 }
 
-const ProductReviews: React.FC<ProductReviewsProps> = ({ 
-    reviews, 
-    isAuthenticated, 
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
+const PAGE_SIZE = 5;
+
+const ProductReviews: React.FC<ProductReviewsProps> = ({
+    productId,
+    isAuthenticated,
     onAuthRequired,
-    onVideoReviewRequired
+    onVideoReviewRequired,
 }) => {
     const [activeTab, setActiveTab] = useState<'text' | 'video'>('text');
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-    const [visibleCount, setVisibleCount] = useState(3);
+    const [reviews, setReviews] = useState<ProductReview[]>([]);
+    const [totalCount, setTotalCount] = useState(0);
+    const [hasMore, setHasMore] = useState(false);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(true);
 
-    const showMore = () => {
-        setVisibleCount(prev => prev + 5);
+    const loadReviews = useCallback(async (nextPage: number, append: boolean) => {
+        setLoading(true);
+        try {
+            const [response, count] = await Promise.all([
+                fetchProductReviews(productId, PAGE_SIZE, nextPage),
+                nextPage === 1 ? fetchReviewsCount(productId) : Promise.resolve(totalCount),
+            ]);
+            setReviews(prev => append ? [...prev, ...response.data] : response.data);
+            setHasMore(response.has_more_pages);
+            if (nextPage === 1) setTotalCount(count);
+        } finally {
+            setLoading(false);
+        }
+    }, [productId, totalCount]);
+
+    useEffect(() => {
+        void loadReviews(1, false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [productId]);
+
+    const handleShowMore = () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        void loadReviews(nextPage, true);
     };
 
     const handleVideoReviewClick = () => {
@@ -43,11 +188,14 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
 
     return (
         <div className={styles.reviewsSection} id="reviews">
-            <SectionHeader title="ВІДГУКИ НАШИХ КЛІЄНТІВ" classNameWrapper={styles.reviewsTitle} />
-            
+            <SectionHeader
+                title={`ВІДГУКИ НАШИХ КЛІЄНТІВ${totalCount > 0 ? ` (${totalCount})` : ''}`}
+                classNameWrapper={styles.reviewsTitle}
+            />
+
             <div className={styles.reviewsControls}>
                 <div className={styles.reviewsTabs}>
-                    <Button 
+                    <Button
                         variant={activeTab === 'text' ? 'black' : 'outline-black'}
                         className={clsx(styles.reviewTabBtn, activeTab === 'text' && styles.active)}
                         onClick={() => setActiveTab('text')}
@@ -57,94 +205,81 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                         </svg>
                         Відгуки
                     </Button>
-                    <Button 
-                        variant={activeTab === 'video' ? 'black' : 'outline-black'}
-                        className={clsx(styles.reviewTabBtn, activeTab === 'video' && styles.active)}
-                        onClick={() => setActiveTab('video')}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="14" viewBox="0 0 18 14" fill="none">
-                            <path d="M11.601 5.67L8.901 4.1475C8.66112 4.00971 8.38761 3.93703 8.109 3.93703C7.83039 3.93703 7.55688 4.00971 7.317 4.1475C7.07529 4.27997 6.87491 4.47352 6.73707 4.70765C6.59924 4.94177 6.52907 5.20778 6.534 5.4775V8.5225C6.52907 8.79222 6.59924 9.05823 6.73707 9.29235C6.87491 9.52648 7.07529 9.72003 7.317 9.8525C7.55688 9.99029 7.83039 10.063 8.109 10.063C8.38761 10.063 8.66112 9.99029 8.901 9.8525L11.601 8.33C11.8318 8.19226 12.0225 7.99929 12.1547 7.7695C12.287 7.53972 12.3564 7.28081 12.3564 7.0175C12.3564 6.75419 12.287 6.49528 12.1547 6.2655C12.0225 6.03571 11.8318 5.84274 11.601 5.705V5.67ZM8.316 8.155V5.845L10.368 7L8.316 8.155ZM15.3 0H2.7C1.98392 0 1.29716 0.276562 0.790812 0.768845C0.284464 1.26113 0 1.92881 0 2.625V11.375C0 12.0712 0.284464 12.7389 0.790812 13.2312C1.29716 13.7234 1.98392 14 2.7 14H15.3C16.0161 14 16.7028 13.7234 17.2092 13.2312C17.7155 12.7389 18 12.0712 18 11.375V2.625C18 1.92881 17.7155 1.26113 17.2092 0.768845C16.7028 0.276562 16.0161 0 15.3 0ZM16.2 11.375C16.2 11.6071 16.1052 11.8296 15.9364 11.9937C15.7676 12.1578 15.5387 12.25 15.3 12.25H2.7C2.46131 12.25 2.23239 12.1578 2.0636 11.9937C1.89482 11.8296 1.8 11.6071 1.8 11.375V2.625C1.8 2.39294 1.89482 2.17038 2.0636 2.00628C2.23239 1.84219 2.46131 1.75 2.7 1.75H15.3C15.5387 1.75 15.7676 1.84219 15.9364 2.00628C16.1052 2.17038 16.2 2.39294 16.2 2.625V11.375Z" fill="black"/>
-                        </svg>
-                        Відео відгуки
-                    </Button>
+                    {/* Кнопка "Відео відгуки" прихована */}
                 </div>
 
                 <div className={styles.rewardsBanner}>
-                    <Button variant="outline-black" className={styles.bannerLink} onClick={handleVideoReviewClick}>
-                        ЗАЛИШАЙТЕ ВІДЕО ВІДГУК І ОТРИМУЙТЕ 100 БАЛІВ
+                    <Button
+                        variant="black"
+                        className={styles.leaveReviewBtn}
+                        onClick={() => setIsReviewModalOpen(true)}
+                    >
+                        ЗАЛИШИТИ ВІДГУК
                     </Button>
                 </div>
             </div>
-            
+
             <div className={styles.reviewsBlock}>
                 <div className={styles.reviewsList}>
-                    {reviews.slice(0, visibleCount).map((review) => (
-                        <div key={review.id} className={clsx(styles.reviewCard)}>
-                            <div className={styles.reviewMain}>
-                                <div className={styles.authorAvatar}>
-                                    <Image src={review.avatar || "/images/reviews/avatar-1.png"} alt={review.name} width={48} height={48} className={styles.avatarImg} />
-                                </div>
-                                <div className={styles.reviewContent}>
-                                    <div className={styles.reviewHeader}>
-                                        <div className={styles.authorMeta}>
-                                            <span className={styles.reviewAuthor}>{review.name}</span>
-                                            <span className={styles.reviewDate}>{review.date}</span>
-                                        </div>
-                                        <div className={styles.overallRating}>
-                                            {[...Array(5)].map((_, i) => (
-                                                <svg
-                                                    key={i}
-                                                    className={clsx(styles.star, i < review.rating && styles.filled)}
-                                                    width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path d="M16 2.66667L20.12 11.0267L29.3333 12.36L22.6667 18.8533L24.24 28.0267L16 23.6933L7.76 28.0267L9.33333 18.8533L2.66667 12.36L11.88 11.0267L16 2.66667Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                            ))}
-                                        </div>
+                    {loading && reviews.length === 0 ? (
+                        <p className={styles.reviewsLoading}>Завантаження відгуків...</p>
+                    ) : reviews.length === 0 ? (
+                        <p className={styles.reviewsEmpty}>Відгуків поки немає. Будьте першим!</p>
+                    ) : (
+                        reviews.map((review) => (
+                            <div key={review.id} className={clsx(styles.reviewCard)}>
+                                <div className={styles.reviewMain}>
+                                    <div className={styles.authorAvatar}>
+                                        <Image
+                                            src="/images/reviews/avatar-1.png"
+                                            alt={getAuthorName(review.user)}
+                                            width={48}
+                                            height={48}
+                                            className={styles.avatarImg}
+                                        />
                                     </div>
-                                    
-                                    <div className={styles.reviewText}>
-                                        <p>{review.text}</p>
-                                    </div>
-
-                                    {review.scores && (
-                                        <div className={styles.reviewScores}>
-                                            {Object.entries(review.scores).map(([key, value]) => (
-                                                <div key={key} className={styles.ratingRow}>
-                                                    <span className={styles.ratingLabel}>{key}</span>
-                                                    <div className={styles.stars}>
-                                                        {[...Array(5)].map((_, i) => (
-                                                            <svg 
-                                                                key={i} 
-                                                                className={clsx(styles.star, styles.mini, i < value && styles.filled)}
-                                                                width="14" height="14" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"
-                                                            >
-                                                                <path d="M16 2.66667L20.12 11.0267L29.3333 12.36L22.6667 18.8533L24.24 28.0267L16 23.6933L7.76 28.0267L9.33333 18.8533L2.66667 12.36L11.88 11.0267L16 2.66667Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                            </svg>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ))}
+                                    <div className={styles.reviewContent}>
+                                        <div className={styles.reviewHeader}>
+                                            <div className={styles.authorMeta}>
+                                                <span className={styles.reviewAuthor}>{getAuthorName(review.user)}</span>
+                                                <span className={styles.reviewDate}>{formatReviewDate(review.created_at)}</span>
+                                            </div>
+                                            <div className={styles.overallRating}>
+                                                {[...Array(5)].map((_, i) => (
+                                                    <svg
+                                                        key={i}
+                                                        className={clsx(styles.star, i < (review.rating ?? 0) && styles.filled)}
+                                                        width="20" height="20" viewBox="0 0 32 32" fill="none"
+                                                    >
+                                                        <path d="M16 2.66667L20.12 11.0267L29.3333 12.36L22.6667 18.8533L24.24 28.0267L16 23.6933L7.76 28.0267L9.33333 18.8533L2.66667 12.36L11.88 11.0267L16 2.66667Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                    </svg>
+                                                ))}
+                                            </div>
                                         </div>
-                                    )}
+                                        {review.text && (
+                                            <div className={styles.reviewText}>
+                                                <p>{review.text}</p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
 
                 <div className={styles.reviewsFooter}>
-                    {visibleCount < reviews.length && (
-                        <Button 
-                            variant="outline-black" 
+                    {hasMore && (
+                        <Button
+                            variant="outline-black"
                             className={styles.showMoreBtn}
-                            onClick={showMore}
+                            onClick={handleShowMore}
                         >
-                            ПОКАЗАТИ ЩЕ ВІДГУКИ
+                            {loading ? 'Завантаження...' : 'ПОКАЗАТИ ЩЕ ВІДГУКИ'}
                         </Button>
                     )}
-                    <Button 
-                        variant="black" 
+                    <Button
+                        variant="black"
                         className={styles.leaveReviewBtn}
                         onClick={() => setIsReviewModalOpen(true)}
                     >
@@ -154,14 +289,18 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
             </div>
 
             <div className={styles.mobileRewardsBanner}>
-                <Button variant="outline-black" className={styles.mobileBannerLink} onClick={handleVideoReviewClick}>
-                    ЗАЛИШАЙТЕ ВІДЕО ВІДГУК І ОТРИМУЙТЕ 100 БАЛІВ
+                <Button
+                    variant="black"
+                    className={styles.mobileBannerLink}
+                    onClick={() => setIsReviewModalOpen(true)}
+                >
+                    ЗАЛИШИТИ ВІДГУК
                 </Button>
             </div>
 
-            <ReviewModal 
-                isOpen={isReviewModalOpen} 
-                onClose={() => setIsReviewModalOpen(false)} 
+            <ReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
             />
         </div>
     );

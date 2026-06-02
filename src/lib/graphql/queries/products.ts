@@ -53,17 +53,59 @@ export interface ProductImageEntry {
     alt?: string | null;
 }
 
+export interface MeatType {
+    image?: {
+        size1x?: string | null;
+        size2x?: string | null;
+        size3x?: string | null;
+    } | null;
+}
+
+export interface ProductCostVariant {
+    id: string;
+    name?: string | null;
+    cost?: number | null;
+    oldCost?: number | null;
+    purchaseCost: number;
+    isDefault?: boolean | null;
+    image?: {
+        url?: {
+            thumb1x?: string | null;
+            thumb2x?: string | null;
+        } | null;
+    } | null;
+}
+
 export interface Product {
     id: string;
     slug?: string;
     categoryId?: number;
+    siteId?: number | null;
+    productType?: string | null;
     name: string;
     cost: number;
-    oldCost?: number;
+    oldCost?: number | null;
+    purchaseCost?: number;
+    purchaseOldCost?: number | null;
     unit: string;
     multiplier?: number;
-    is_new?: boolean;
-    available?: boolean;
+    is_new?: boolean | null;
+    pre_order?: boolean | null;
+    /** 1 = В наявності, 2 = Немає в наявності, 3 = Знято з виробництва */
+    available?: number | null;
+    availabilityTracked?: boolean | null;
+    text?: string | null;
+    image_alt?: string | null;
+    image_title?: string | null;
+    hasCostVariants?: boolean;
+    hasGift?: boolean | null;
+    gift?: Product | null;
+    giftText?: string | null;
+    video?: string | null;
+    inLikes?: boolean;
+    rating?: number | null;
+    favoritesPayload?: string;
+    meatType?: MeatType | null;
     /** @deprecated Завжди null на бекенді — використовуйте images[0] */
     image?: ProductImageEntry | null;
     /** Масив зображень товару (основне джерело) */
@@ -193,20 +235,45 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
             id
             slug
             categoryId
+            siteId
+            productType
             name
             cost
             oldCost
             unit
             multiplier
             is_new
+            pre_order
             available
+            availabilityTracked
             text
             image_alt
             image_title
             hasCostVariants
             hasGift
             giftText
+            video
+            inLikes
             rating
+            favoritesPayload
+            meatType {
+                image {
+                    size1x
+                    size2x
+                    size3x
+                }
+            }
+            gift {
+                id
+                name
+                cost
+                images {
+                    url {
+                        grid2x
+                        grid1x
+                    }
+                }
+            }
             specifications {
                 name
                 values
@@ -229,8 +296,94 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                     main3x
                     big
                 }
+                title
+                alt
             }
         }
+    }
+`;
+
+const PRODUCT_COST_VARIANTS_QUERY = /* GraphQL */ `
+    query ProductCostVariants($productId: ID!) {
+        productCostVariants(productId: $productId) {
+            id
+            name
+            cost
+            oldCost
+            purchaseCost
+            isDefault
+            image {
+                url {
+                    thumb1x
+                    thumb2x
+                }
+            }
+        }
+    }
+`;
+
+const POPULAR_PRODUCTS_QUERY = /* GraphQL */ `
+    query PopularProducts($productId: Int, $limit: Int) {
+        popularProducts(productId: $productId, limit: $limit) {
+            data {
+                id
+                slug
+                name
+                cost
+                oldCost
+                unit
+                multiplier
+                is_new
+                available
+                specifications {
+                    name
+                    values
+                }
+                images {
+                    url {
+                        grid2x
+                        grid1x
+                    }
+                }
+            }
+        }
+    }
+`;
+
+const SPECIALS_BY_PRODUCT_QUERY = /* GraphQL */ `
+    query SpecialsByProduct($productId: Int, $limit: Int) {
+        specials(productId: $productId, limit: $limit) {
+            data {
+                id
+                products {
+                    id
+                    slug
+                    name
+                    cost
+                    oldCost
+                    unit
+                    multiplier
+                    is_new
+                    available
+                    specifications {
+                        name
+                        values
+                    }
+                    images {
+                        url {
+                            grid2x
+                            grid1x
+                        }
+                    }
+                }
+            }
+        }
+    }
+`;
+
+const ADD_TO_AVAILABILITY_TRACKER_MUTATION = /* GraphQL */ `
+    mutation AddProductToAvailabilityTracker($productId: Int!) {
+        addProductToAvailabilityTracker(productId: $productId)
     }
 `;
 
@@ -380,6 +533,71 @@ export async function getProductByIdApi(id: number | string, lang?: string): Pro
         { next: { revalidate: 60 }, lang },
     );
     return data.product;
+}
+
+export async function getProductCostVariantsApi(
+    productId: number | string,
+    lang?: string,
+): Promise<ProductCostVariant[]> {
+    const data = await gqlRequest<{ productCostVariants: ProductCostVariant[] }>(
+        PRODUCT_COST_VARIANTS_QUERY,
+        { productId: String(productId) },
+        { next: { revalidate: 60 }, lang },
+    );
+    return data.productCostVariants ?? [];
+}
+
+export async function getPopularProductsApi(
+    productId?: number,
+    limit: number = 12,
+    lang?: string,
+): Promise<Product[]> {
+    const data = await gqlRequest<{ popularProducts: { data: Product[] } }>(
+        POPULAR_PRODUCTS_QUERY,
+        { productId: productId ?? null, limit },
+        { next: { revalidate: 3600 }, lang },
+    );
+    return data.popularProducts?.data ?? [];
+}
+
+export async function getSpecialsByProductApi(
+    productId: number,
+    limit: number = 8,
+    lang?: string,
+): Promise<Product[]> {
+    const data = await gqlRequest<{
+        specials: { data: Array<{ id: string; products?: Product[] | null }> };
+    }>(
+        SPECIALS_BY_PRODUCT_QUERY,
+        { productId, limit },
+        { next: { revalidate: 3600 }, lang },
+    );
+    const items = data.specials?.data ?? [];
+    // Flatten: collect all products from all specials, deduplicate by id
+    const seen = new Set<string>();
+    const result: Product[] = [];
+    for (const special of items) {
+        for (const p of special.products ?? []) {
+            if (!seen.has(p.id)) {
+                seen.add(p.id);
+                result.push(p);
+            }
+        }
+    }
+    return result;
+}
+
+export async function addProductToAvailabilityTrackerApi(
+    productId: number,
+    lang?: string,
+    token?: string,
+): Promise<boolean> {
+    const data = await gqlRequest<{ addProductToAvailabilityTracker: boolean }>(
+        ADD_TO_AVAILABILITY_TRACKER_MUTATION,
+        { productId },
+        { cache: 'no-store', lang, token },
+    );
+    return data.addProductToAvailabilityTracker;
 }
 
 /**

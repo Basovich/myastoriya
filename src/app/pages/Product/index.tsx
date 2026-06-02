@@ -222,16 +222,8 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }>; publ
                         delivery={product.delivery}
                     />
 
-                    <ProductReviews 
-                        reviews={dict.home.reviews.items.map(review => ({
-                            ...review,
-                            scores: {
-                                "Якість обслуговування": review.rating,
-                                "Ввічливість персоналу": review.rating,
-                                "Швидкість доставки": review.rating,
-                                "Якість продукції": review.rating
-                            }
-                        }))} 
+                    <ProductReviews
+                        productId={Number(product.id) || 1}
                         isAuthenticated={isAuthenticated}
                         onAuthRequired={() => setIsAuthModalOpen(true)}
                         onVideoReviewRequired={() => setIsVideoReviewModalOpen(true)}

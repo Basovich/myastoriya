@@ -4,8 +4,9 @@ import ProductClient from "@/app/pages/Product/ProductClient";
 import {
     getBlogsApi,
     getProductByIdApi,
-    getProductsApi,
-    getPopularCategoriesApi,
+    getProductCostVariantsApi,
+    getPopularProductsApi,
+    getSpecialsByProductApi,
     findProductIdBySlug,
     getCatalogTreeApi,
 } from "@/lib/graphql";
@@ -25,18 +26,26 @@ export default async function ProductPage({ params }: Props) {
     const productId = await findProductIdBySlug(slug, lang);
     if (!productId) notFound();
 
-    const [product, blogsResponse, relatedResponse, catalogTree] = await Promise.all([
+    const numericId = parseInt(productId);
+
+    const [product, blogsResponse, catalogTree] = await Promise.all([
         getProductByIdApi(productId, lang),
         getBlogsApi({ limit: 3 }, lang),
-        getPopularCategoriesApi(lang).then(async (cats) => {
-            const firstCatId = cats.length > 0 ? parseInt(cats[0].id) : null;
-            if (!firstCatId) return { data: [] };
-            return getProductsApi({ categoryId: firstCatId, limit: 8 }, lang);
-        }),
         getCatalogTreeApi(lang),
     ]);
 
     if (!product) notFound();
+
+    // Load cost variants only if the product has them (avoid extra request)
+    const costVariants = product.hasCostVariants
+        ? await getProductCostVariantsApi(productId, lang)
+        : [];
+
+    // Load related (specials) + popular products in parallel
+    const [specialsProducts, popularProducts] = await Promise.all([
+        getSpecialsByProductApi(numericId, 8, lang),
+        getPopularProductsApi(numericId, 12, lang),
+    ]);
 
     const categoryIndex = buildCategoryIndex(catalogTree);
     const breadcrumbs = buildCategoryBreadcrumbs(product.categoryId, categoryIndex);
@@ -45,8 +54,10 @@ export default async function ProductPage({ params }: Props) {
         <main>
             <ProductClient
                 product={product}
+                costVariants={costVariants}
                 publications={blogsResponse.data}
-                relatedProducts={relatedResponse.data ?? []}
+                relatedProducts={specialsProducts}
+                popularProducts={popularProducts}
                 lang={lang as Locale}
                 dict={dict}
                 breadcrumbs={breadcrumbs}
@@ -61,16 +72,12 @@ export default async function ProductPage({ params }: Props) {
  */
 export const dynamic = 'force-dynamic';
 
-/**
- * Generate static params for all products.
- * Now safer with limited build concurrency (cpus: 2 in next.config.ts)
- */
 export async function generateStaticParams() {
     /**
-     * [LIGHTWEIGHT BUILD] 
-     * To avoid overwhelming the dev-API with thousands of requests during build 
+     * [LIGHTWEIGHT BUILD]
+     * To avoid overwhelming the dev-API with thousands of requests during build
      * (causing 504 Gateway Timeouts), we return an empty array here.
-     * 
+     *
      * Product pages will be generated on-demand when first visited (ISR).
      */
     return [];
