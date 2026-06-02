@@ -21,7 +21,7 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
-import type { BlogPost, Product, ProductCostVariant } from '@/lib/graphql';
+import type { BlogPost, Product, ProductCostVariant, OrderingInfoBlock } from '@/lib/graphql';
 import { resolveProductImageUrl } from '@/lib/graphql';
 import type { BreadcrumbItem } from '@/utils/category-url';
 
@@ -72,6 +72,7 @@ interface ProductClientProps {
     dict: Dictionary;
     /** Pre-built breadcrumbs from server component (uses real category tree). */
     breadcrumbs?: BreadcrumbItem[];
+    deliveryBlocks: OrderingInfoBlock[];
 }
 
 // ---------------------------------------------------------------------------
@@ -87,6 +88,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
     lang,
     dict,
     breadcrumbs: breadcrumbsProp,
+    deliveryBlocks,
 }) => {
     const dispatch = useAppDispatch();
     const { isAuthenticated } = useAppSelector((state: RootState) => state.auth);
@@ -309,7 +311,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                 <ProductTabs
                     description={product.text ?? product.name}
                     characteristics={characteristics}
-                    delivery="Доставка здійснюється по всьому Києву та області. Вартість доставки згідно з тарифами перевізника."
+                    deliveryBlocks={deliveryBlocks}
                 />
 
                 <ProductReviews

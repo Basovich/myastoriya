@@ -9,13 +9,13 @@ import VideoModal from '@/app/components/VideoModal/VideoModal';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/free-mode';
+import type { OrderingInfoBlock } from '@/lib/graphql';
 
 interface ProductTabsProps {
     description: string;
     characteristics: Record<string, string>;
-    delivery: string;
+    deliveryBlocks: OrderingInfoBlock[];
 }
-
 
 // --- Icons ---
 const BoxIcon = () => (
@@ -57,7 +57,7 @@ interface TabItem {
     icon: string;
 }
 
-const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics, delivery }) => {
+const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics, deliveryBlocks }) => {
     const [activeTab, setActiveTab] = useState<TabId>('description');
     const [isVideoOpen, setIsVideoOpen] = useState(false);
 
@@ -111,81 +111,93 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
         { id: 'delivery', label: 'Доставка', icon: '/images/product/tab-delivery.svg' },
     ];
 
-    // Helper to extract YouTube ID and get thumbnail
-    const getYouTubeThumbnail = (url: string) => {
-        const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-        const match = url.match(regExp);
-        const videoId = (match && match[7].length === 11) ? match[7] : null;
-        return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
+    // Helper to render text with bold parts and red highlighting (similar to DeliveryMethodCard)
+    const renderStyledText = (text: string) => {
+        const keywords = [
+            "доставка безкоштовна", 
+            "безкоштовна доставка", 
+            "доставка бесплатная", 
+            "бесплатная доставка"
+        ];
+        
+        const regex = new RegExp(`(\\*\\*.*?\\*\\*|${keywords.join('|')})`, 'gi');
+        const parts = text.split(regex);
+
+        return (
+            <>
+                {parts.map((part, i) => {
+                    const lowerPart = part.toLowerCase();
+                    if (keywords.includes(lowerPart)) {
+                        return <strong key={i} style={{ color: '#E31E24' }}>{part}</strong>;
+                    }
+                    if (part.startsWith('**') && part.endsWith('**')) {
+                        return <strong key={i}>{part.slice(2, -2)}</strong>;
+                    }
+                    return <span key={i}>{part}</span>;
+                })}
+            </>
+        );
     };
 
-    const deliveryVideoUrl = "https://www.youtube.com/watch?v=ixeV2E3by60";
-    const deliveryThumbnailUrl = getYouTubeThumbnail(deliveryVideoUrl);
-
-    // Delivery items
-    const deliveryItems = [
-        {
-            icon: <BoxIcon />,
-            title: "Доставка по Києву",
-            content: (
-                <ul>
-                    <li>Вартість доставки: 100 грн.</li>
-                    <li>Мінімальна сума замовлення: 400 грн.</li>
-                    <li>При замовленні на суму від 1200 грн доставка безкоштовна.</li>
-                    <li>Термін доставки по Києву — 60-90 хвилин при замовленні з 10:00 до 21:00. <br/> Замовлення, зроблені після 21:00, доставляються наступного дня.</li>
-                    <li>Термін доставки може бути збільшено, залежно від завантаженості доріг та рівня безпеки у місті.</li>
-                    <li>Страви категорії «Набори для компанії» готуються 1.5-2 години, тому час доставки може бути збільшено з урахуванням часу на приготування.</li>
-                </ul>
-            )
-        },
-        {
-            icon: <TruckIcon />,
-            title: "Доставка по Україні",
-            content: (
-                <div className={styles.videoContent}>
-                    <div className={styles.videoPreview} onClick={() => setIsVideoOpen(true)}>
-                        <Image 
-                            src={deliveryThumbnailUrl} 
-                            alt="Video Preview" 
-                            width={280} 
-                            height={158}
-                            unoptimized // YouTube images often need this to avoid issues with Next.js optimization for external domains without config
-                        />
-                        <div className={styles.playBtn}>
-                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M15 9L5 15L5 3L15 9Z" fill="currentColor"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <ul>
-                        <li>У регіони, де не поновила роботу «Нова Пошта» та ведуться активні бойові дії, доставка тимчасово не здійснюється.</li>
-                        <li>Мінімальна сума замовлення — 1500 грн. При замовленні на суму до 3000 грн вартість доставки — 260 грн. Якщо сума перевищує 3000 грн — доставка безкоштовна.</li>
-                        <li>Доставка по Україні здійснюється після 100% передплати.</li>
-                        <li>До вартості доставки входить термобокс із холодоагентом, щоб ви гарантовано отримали свіжу продукцію.</li>
-                        <li>Товар відправляємо після 100% передплати цього ж дня, якщо ваше замовлення підтверджене та оплачене до 13:00.</li>
-                        <li>Термін доставки по Україні — 1-3 дні. Продукти залишаться свіжими завдяки термобоксу та холодоагенту.</li>
-                        <li>Доставка продукції по Україні здійснюється тільки в сирому вигляді.</li>
-                        <li>До замовлень на суму понад 6000 грн додається термосумка у подарунок.</li>
-                    </ul>
-                </div>
-            )
-        },
-        {
-            icon: <StoreIcon />,
-            title: "Самовивіз з ресторанів",
-            content: <p>Ви можете забрати своє замовлення самостійно з будь-якого нашого магазину-ресторану.</p>
-        },
-        {
-            icon: <BagIcon />,
-            title: "Безкоштовна доставка в радіусі 2-3 км від магазину-ресторану",
-            content: <p>При сумі замовлення від 500 грн доставка в межах 2-3 км від ресторану безкоштовна.</p>
-        },
-        {
-            icon: <CarIcon />,
-            title: "Доставка за Київ",
-            content: <p>Доставка за межі Києва здійснюється за тарифами таксі або за домовленістю з кур'єром.</p>
+    // Map API delivery blocks to accordion items
+    const deliveryItems = deliveryBlocks.map((block) => {
+        const iconUrl = block.icon;
+        const nameLower = block.name.toLowerCase();
+        
+        // Find appropriate icon or fallback to default
+        let iconElement: React.ReactNode = <CarIcon />;
+        if (iconUrl) {
+            iconElement = (
+                <Image 
+                    src={iconUrl.startsWith('/') ? `https://dev-api.myastoriya.com.ua${iconUrl}` : iconUrl} 
+                    alt={block.name} 
+                    width={24} 
+                    height={24} 
+                />
+            );
+        } else if (nameLower.includes('самовивіз') || nameLower.includes('ресторан') || nameLower.includes('магазин')) {
+            iconElement = <StoreIcon />;
+        } else if (nameLower.includes('києв') || nameLower.includes('київ')) {
+            iconElement = <BoxIcon />;
+        } else if (nameLower.includes('україна') || nameLower.includes('украина')) {
+            iconElement = <TruckIcon />;
+        } else if (nameLower.includes('безкоштовна') || nameLower.includes('2-3 км')) {
+            iconElement = <BagIcon />;
         }
-    ];
+
+        // Render content (HTML or plain list)
+        let contentElement: React.ReactNode;
+        if (block.textWeb && block.textWeb.length > 0) {
+            contentElement = (
+                <div 
+                    className={styles.description}
+                    dangerouslySetInnerHTML={{ 
+                        __html: Array.isArray(block.textWeb) 
+                            ? block.textWeb.join('') 
+                            : block.textWeb 
+                    }}
+                />
+            );
+        } else if (block.text && block.text.length > 0) {
+            contentElement = (
+                <ul style={{ listStyleType: 'disc', paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {block.text.map((feature, index) => (
+                        <li key={index} style={{ lineHeight: '1.65' }}>
+                            {renderStyledText(feature)}
+                        </li>
+                    ))}
+                </ul>
+            );
+        } else {
+            contentElement = null;
+        }
+
+        return {
+            icon: iconElement,
+            title: block.name,
+            content: contentElement
+        };
+    });
 
     return (
         <div className={styles.tabsWrapper}>

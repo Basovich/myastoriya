@@ -9,6 +9,7 @@ import {
     getSpecialsByProductApi,
     findProductIdBySlug,
     getCatalogTreeApi,
+    getDeliveryBlocksApi,
 } from "@/lib/graphql";
 import { notFound } from "next/navigation";
 import { buildCategoryIndex, buildCategoryBreadcrumbs } from "@/utils/category-url";
@@ -28,10 +29,11 @@ export default async function ProductPage({ params }: Props) {
 
     const numericId = parseInt(productId);
 
-    const [product, blogsResponse, catalogTree] = await Promise.all([
+    const [product, blogsResponse, catalogTree, deliveryBlocks] = await Promise.all([
         getProductByIdApi(productId, lang),
         getBlogsApi({ limit: 3 }, lang),
         getCatalogTreeApi(lang),
+        getDeliveryBlocksApi(lang),
     ]);
 
     if (!product) notFound();
@@ -61,6 +63,7 @@ export default async function ProductPage({ params }: Props) {
                 lang={lang as Locale}
                 dict={dict}
                 breadcrumbs={breadcrumbs}
+                deliveryBlocks={deliveryBlocks}
             />
         </main>
     );

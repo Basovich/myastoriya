@@ -219,7 +219,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }>; publ
                     <ProductTabs
                         description={product.description}
                         characteristics={product.characteristics}
-                        delivery={product.delivery}
+                        deliveryBlocks={[]}
                     />
 
                     <ProductReviews
