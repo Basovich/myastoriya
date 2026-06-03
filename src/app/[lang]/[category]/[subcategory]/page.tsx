@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
-import { getCatalogTreeApi, getProductsApi } from '@/lib/graphql';
+import { getCatalogTreeApi, getProductsApi, getPopularProductsApi } from '@/lib/graphql';
 import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
@@ -32,10 +32,13 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
     const view = (resolvedSearchParams.view as 'list' | 'grid') || 'list';
     const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
 
-    const productsResponse = await getProductsApi(
-        { categoryId: parseInt(matchedCat.id), limit: 12 * page, page: 1, sort },
-        lang,
-    );
+    const [productsResponse, popularProducts] = await Promise.all([
+        getProductsApi(
+            { categoryId: parseInt(matchedCat.id), limit: 12 * page, page: 1, sort },
+            lang,
+        ),
+        getPopularProductsApi(undefined, 12, lang),
+    ]);
     productsResponse.current_page = page;
 
     // Breadcrumbs: Головна > ParentName > SubcategoryName
@@ -64,6 +67,7 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
                 subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                 view={view}
                 sortBy={resolvedSearchParams.sort as string || undefined}
+                popularProducts={popularProducts}
             />
         </main>
     );

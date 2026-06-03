@@ -67,6 +67,8 @@ interface CatalogContentProps {
     sortBy?: string;
     hideSidebar?: boolean;
     hideCategorySwitcher?: boolean;
+    /** 12 найпопулярніших товарів на сайті (без прив'язки до категорії). */
+    popularProducts?: Product[];
 }
 
 export default async function CatalogContent({
@@ -81,6 +83,7 @@ export default async function CatalogContent({
     sortBy,
     hideSidebar = false,
     hideCategorySwitcher = false,
+    popularProducts,
 }: CatalogContentProps) {
     const sortLabel = lang === 'ua' ? 'Сортувати:' : 'Сортировать:';
     const filterLabel = lang === 'ua' ? 'Фільтр' : 'Фильтр';
@@ -135,7 +138,8 @@ export default async function CatalogContent({
         )
     }));
 
-    const orderedProducts = products.slice(0, 8).map(product => ({
+    const popularProductsList = popularProducts ?? products.slice(0, 12);
+    const orderedProducts = popularProductsList.map(product => ({
         id: product.id,
         element: (
             <ProductCard
