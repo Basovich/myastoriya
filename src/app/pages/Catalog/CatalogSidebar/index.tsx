@@ -226,6 +226,7 @@ export default function CatalogSidebar({
                                     label={block.label ? block.label.toUpperCase() : undefined}
                                     onClear={() => clearPriceRange(blockKey)}
                                     showClear={showClear}
+                                    onOk={handleApply}
                                 />
                             );
                         }

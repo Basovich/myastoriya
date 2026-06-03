@@ -13,6 +13,7 @@ interface PriceRangeProps {
     label?: string;
     onClear?: () => void;
     showClear?: boolean;
+    onOk?: () => void;
 }
 
 export default function PriceRange({
@@ -25,6 +26,7 @@ export default function PriceRange({
     label,
     onClear,
     showClear,
+    onOk,
 }: PriceRangeProps) {
     const fromPercent = useMemo(() => ((from - min) / (max - min)) * 100, [from, min, max]);
     const toPercent = useMemo(() => ((to - min) / (max - min)) * 100, [to, min, max]);
@@ -37,6 +39,12 @@ export default function PriceRange({
     const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = Math.max(Number(e.target.value), from + (step || 1));
         onChange(from, val);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            onOk?.();
+        }
     };
 
     return (
@@ -62,6 +70,7 @@ export default function PriceRange({
                         min={min}
                         max={to - step}
                         onChange={handleFromChange}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
                 <div className={s.priceInputWrap}>
@@ -73,9 +82,10 @@ export default function PriceRange({
                         min={from + step}
                         max={max}
                         onChange={handleToChange}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
-                <button type="button" className={s.okBtn}>OK</button>
+                <button type="button" className={s.okBtn} onClick={onOk}>OK</button>
             </div>
 
             <div className={s.sliderWrap}>
