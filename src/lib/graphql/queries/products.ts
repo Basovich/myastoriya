@@ -159,6 +159,44 @@ export function resolveCategoryImageUrl(category: ProductCategory): string {
     return url;
 }
 
+// ---------------------------------------------------------------------------
+// Filter types
+// ---------------------------------------------------------------------------
+
+export interface FilterOption {
+    key: string | null;
+    label: string | null;
+    selected: boolean | null;
+    disabled: boolean | null;
+}
+
+export interface FilterBlock {
+    /** "range" для цінового слайдера, "list" або інший для checkbox/pill */
+    type: string;
+    label: string | null;
+    key: string | null;
+    values: FilterOption[] | null;
+    min: number | null;
+    max: number | null;
+    minValue: number | null;
+    maxValue: number | null;
+}
+
+export interface ProductsFilterResponse {
+    blocks: FilterBlock[];
+    productsCount: number;
+}
+
+/** Вхідний тип для передачі у products(filter: [FilterState]) */
+export interface FilterStateInput {
+    key: string;
+    values?: string[] | null;
+    minValue?: number | null;
+    maxValue?: number | null;
+}
+
+// ---------------------------------------------------------------------------
+
 export interface ProductsFilter {
     categoryId?: number | null;
     saleId?: number | null;
@@ -166,6 +204,7 @@ export interface ProductsFilter {
     limit?: number | null;
     page?: number | null;
     sort?: string | null;
+    filter?: FilterStateInput[] | null;
 }
 
 export interface ProductsResponse {
@@ -186,8 +225,8 @@ const ADD_PRODUCT_VIEW_MUTATION = /* GraphQL */ `
 `;
 
 const PRODUCTS_QUERY = /* GraphQL */ `
-    query Products($categoryId: Int, $saleId: Int, $search: String, $limit: Int, $page: Int, $sort: String) {
-        products(categoryId: $categoryId, saleId: $saleId, search: $search, limit: $limit, page: $page, sort: $sort) {
+    query Products($categoryId: Int, $saleId: Int, $search: String, $filter: [FilterState], $limit: Int, $page: Int, $sort: String) {
+        products(categoryId: $categoryId, saleId: $saleId, search: $search, filter: $filter, limit: $limit, page: $page, sort: $sort) {
             per_page
             current_page
             has_more_pages
@@ -467,6 +506,28 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
     }
 `;
 
+const PRODUCTS_FILTER_QUERY = /* GraphQL */ `
+    mutation ProductsFilter($categoryId: Int, $state: [FilterState]) {
+        productsFilter(categoryId: $categoryId, state: $state) {
+            productsCount
+            blocks {
+                type
+                label
+                key
+                min
+                max
+                minValue
+                maxValue
+                values {
+                    key
+                    label
+                    selected
+                    disabled
+                }
+            }
+        }
+    }
+`;
 
 // ---------------------------------------------------------------------------
 // API functions
@@ -504,12 +565,16 @@ function mapSortOption(sort?: string | null): string | null {
 
 export async function getProductsApi(filter?: ProductsFilter, lang?: string): Promise<ProductsResponse> {
     const sortedValue = mapSortOption(filter?.sort);
+    // Передаємо фільтри тільки якщо масив непустий
+    const filterInput =
+        filter?.filter && filter.filter.length > 0 ? filter.filter : undefined;
     const data = await gqlRequest<{ products: ProductsResponse }>(
         PRODUCTS_QUERY,
         {
             categoryId: filter?.categoryId ?? undefined,
             saleId: filter?.saleId ?? undefined,
             search: filter?.search || undefined,
+            filter: filterInput ?? undefined,
             limit: filter?.limit ?? undefined,
             page: filter?.page ?? undefined,
             sort: sortedValue ?? undefined,
@@ -517,6 +582,23 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string): Pr
         { next: { revalidate: 3600 }, lang },
     );
     return data.products;
+}
+
+export async function getProductsFilterApi(
+    categoryId?: number,
+    lang?: string,
+): Promise<ProductsFilterResponse> {
+    try {
+        const data = await gqlRequest<{ productsFilter: ProductsFilterResponse }>(
+            PRODUCTS_FILTER_QUERY,
+            { categoryId: categoryId ?? undefined, state: undefined },
+            { next: { revalidate: 60 }, lang },
+        );
+        return data.productsFilter ?? { blocks: [], productsCount: 0 };
+    } catch {
+        // API може не підтримувати productsFilter на dev-бекенді — повертаємо порожній стан
+        return { blocks: [], productsCount: 0 };
+    }
 }
 
 export async function addProductViewApi(id: number | string, lang?: string, token?: string): Promise<boolean> {

@@ -1,48 +1,37 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
 import s from './FilterSidebar.module.scss';
 import FilterGroup from '@/app/components/ui/FilterGroup/FilterGroup';
 import FilterCheckbox from '@/app/components/ui/FilterCheckbox/FilterCheckbox';
 import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
 import Button from "@/app/components/ui/Button/Button";
-import CategorySwitcher from "@/app/components/ui/CategorySwitcher/CategorySwitcher";
 import clsx from 'clsx';
-
-interface FilterState {
-    priceFrom: number;
-    priceTo: number;
-    meatPart: string[];
-    meatType: string[];
-    aging: string[];
-    marbling: string[];
-    country: string[];
-    breed: string[];
-}
-
-const MEAT_PARTS = ['Антрекот', 'Стегно', 'Биток', 'Вирізка', 'Філе', 'Ошийок'];
-const MEAT_TYPES = ['Фермерська курка', 'Яловичина', 'Асорті', 'Кролятина', "М'ясо індички", "М'ясо качки", 'Ягня'];
-const AGING_OPTIONS = ['Тижень', '2 тижні', 'Місяць', '2 місяці'];
-const MARBLING_OPTIONS = ['Choice', 'Select', 'Prime'];
-const COUNTRY_OPTIONS = ['Україна', 'США', 'Австралія', 'Аргентина'];
-const BREED_OPTIONS = ['Ангус', 'Герефорд', 'Вагю', 'Симентальська'];
-
-
-const MIN_PRICE = 0;
-const MAX_PRICE = 10000;
+import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
+import {
+    isRangeBlock,
+    buildFilterParams,
+    clearFilterParams,
+    countActiveFilterValues,
+    getFilterForBlock,
+    setFilterValue,
+    removeFilter,
+    hasActiveFilters,
+} from '@/utils/filter-params';
 
 interface CatalogSidebarProps {
-    onApply?: (filters: FilterState) => void;
+    onApply?: () => void;
     onClose?: () => void;
     sortBy?: string;
     onSortChange?: (value: string) => void;
     onClearAll?: () => void;
     onModifiedChange?: (modified: boolean) => void;
-    category?: string;
     categoryId?: number;
     sortOptions?: string[];
+    filterBlocks?: FilterBlock[];
+    activeFilters?: FilterStateInput[];
 }
 
 const SORT_OPTIONS = [
@@ -54,88 +43,122 @@ const SORT_OPTIONS = [
     'За датою',
 ];
 
-export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange, onClearAll, onModifiedChange, category, categoryId, sortOptions }: CatalogSidebarProps) {
+export default function CatalogSidebar({
+    onApply,
+    onClose,
+    sortBy,
+    onSortChange,
+    onClearAll,
+    onModifiedChange,
+    categoryId,
+    sortOptions,
+    filterBlocks,
+    activeFilters,
+}: CatalogSidebarProps) {
     const routeParams = useParams();
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     const lang = routeParams?.lang === 'ru' ? 'ru' : 'ua';
     const optionsToUse = sortOptions || SORT_OPTIONS;
     const defaultSortOption = optionsToUse[0] || 'За популярністю';
 
-    const [filters, setFilters] = useState<FilterState>({
-        priceFrom: MIN_PRICE,
-        priceTo: MAX_PRICE,
-        meatPart: [],
-        meatType: [],
-        aging: [],
-        marbling: [],
-        country: [],
-        breed: [],
-    });
+    // Локальний стан фільтрів (pending до натискання «Застосувати»)
+    const [pendingFilters, setPendingFilters] = useState<FilterStateInput[]>(activeFilters ?? []);
 
-    type FilterArrayKeys = { [K in keyof FilterState]: FilterState[K] extends string[] ? K : never }[keyof FilterState];
+    // Динамічні блоки фільтрів, отримані через /api/catalog/products-filter (з forwarded cookies)
+    const [dynamicBlocks, setDynamicBlocks] = useState<FilterBlock[]>(filterBlocks ?? []);
+    const [isLoadingFilters, setIsLoadingFilters] = useState(!filterBlocks || filterBlocks.length === 0);
 
-    const toggleOption = useCallback((key: FilterArrayKeys, value: string) => {
-        setFilters(prev => {
-            const arr = prev[key];
-            return {
-                ...prev,
-                [key]: arr.includes(value)
-                    ? arr.filter(v => v !== value)
-                    : [...arr, value],
-            };
+    useEffect(() => {
+        if (!categoryId) {
+            setIsLoadingFilters(false);
+            return;
+        }
+        setIsLoadingFilters(true);
+        const langParam = routeParams?.lang === 'ru' ? 'ru' : 'ua';
+        fetch(`/api/catalog/products-filter?categoryId=${categoryId}&lang=${langParam}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.blocks && Array.isArray(data.blocks)) {
+                    setDynamicBlocks(data.blocks);
+                }
+            })
+            .catch(() => { /* залишаємо dynamicBlocks порожніми */ })
+            .finally(() => setIsLoadingFilters(false));
+    }, [categoryId, routeParams?.lang]);
+
+    // Синхронізуємо з props при скиданні через key={clearTrigger}
+    useEffect(() => {
+        setPendingFilters(activeFilters ?? []);
+    }, [activeFilters]);
+
+    // --- Helpers ---
+
+    const toggleListOption = useCallback((blockKey: string, optionKey: string) => {
+        setPendingFilters(prev => {
+            const current = getFilterForBlock(prev, blockKey);
+            const currentValues = current?.values ?? [];
+            const newValues = currentValues.includes(optionKey)
+                ? currentValues.filter(v => v !== optionKey)
+                : [...currentValues, optionKey];
+
+            if (newValues.length === 0) {
+                return removeFilter(prev, blockKey);
+            }
+            return setFilterValue(prev, { key: blockKey, values: newValues });
         });
     }, []);
 
-    const selectedCount =
-        filters.meatPart.length +
-        filters.meatType.length +
-        filters.aging.length +
-        filters.marbling.length +
-        filters.country.length +
-        filters.breed.length;
+    const setPriceRange = useCallback((blockKey: string, min: number, max: number, blockMin: number, blockMax: number) => {
+        // Якщо значення = межам блоку — видаляємо фільтр (скидаємо)
+        if (min === blockMin && max === blockMax) {
+            setPendingFilters(prev => removeFilter(prev, blockKey));
+        } else {
+            setPendingFilters(prev => setFilterValue(prev, { key: blockKey, minValue: min, maxValue: max }));
+        }
+    }, []);
 
-    const isModified = 
-        selectedCount > 0 || 
-        filters.priceFrom !== MIN_PRICE || 
-        filters.priceTo !== MAX_PRICE || 
-        (sortBy !== undefined && sortBy !== 'За популярністю');
+    const clearPriceRange = useCallback((blockKey: string) => {
+        setPendingFilters(prev => removeFilter(prev, blockKey));
+    }, []);
+
+    // --- isModified ---
+
+    const isPendingChanged = JSON.stringify(pendingFilters) !== JSON.stringify(activeFilters ?? []);
+    const isSortChanged = sortBy !== undefined && sortBy !== defaultSortOption;
+    const isModified = isPendingChanged || isSortChanged || hasActiveFilters(pendingFilters);
 
     useEffect(() => {
         onModifiedChange?.(isModified);
     }, [isModified, onModifiedChange]);
 
-    const handleClear = () => {
-        setFilters({
-            priceFrom: MIN_PRICE,
-            priceTo: MAX_PRICE,
-            meatPart: [],
-            meatType: [],
-            aging: [],
-            marbling: [],
-            country: [],
-            breed: [],
-        });
-        onClearAll?.();
-    };
-
-    const handlePriceClear = () => {
-        setFilters(prev => ({ ...prev, priceFrom: MIN_PRICE, priceTo: MAX_PRICE }));
-    };
+    // --- Actions ---
 
     const handleApply = () => {
-        if (!isModified) return;
-        onApply?.(filters);
+        if (!isPendingChanged && !isSortChanged) return;
+        const params = buildFilterParams(pendingFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        onApply?.();
         onClose?.();
     };
+
+    const handleClear = () => {
+        setPendingFilters([]);
+        const params = clearFilterParams(new URLSearchParams(searchParams.toString()));
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        onClearAll?.();
+        onClose?.();
+    };
+
+    const selectedCount = countActiveFilterValues(pendingFilters);
 
     return (
         <div className={s.sidebar}>
             <div className={s.filtersWrapper}>
+                {/* Мобільний блок: Сортування */}
                 <div className={s.onlyMobile}>
-                    {category && (
-                        <FilterGroup title="КАТЕГОРІЇ" initialOpen={true}>
-                            <CategorySwitcher isSidebar categoryId={categoryId} lang={lang} />
-                        </FilterGroup>
-                    )}
                     <FilterGroup title={sortBy || defaultSortOption} initialOpen={true}>
                         <div className={s.sortOptions}>
                             {optionsToUse.map(option => (
@@ -143,9 +166,7 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                                     key={option}
                                     type="button"
                                     className={clsx(s.sortOption, (sortBy === option || (!sortBy && option === defaultSortOption)) && s.sortOptionActive)}
-                                    onClick={() => {
-                                        onSortChange?.(option);
-                                    }}
+                                    onClick={() => onSortChange?.(option)}
                                 >
                                     {option}
                                 </button>
@@ -154,95 +175,93 @@ export default function CatalogSidebar({ onApply, onClose, sortBy, onSortChange,
                     </FilterGroup>
                 </div>
 
-                <PriceRange
-                    min={MIN_PRICE}
-                    max={MAX_PRICE}
-                    from={filters.priceFrom}
-                    to={filters.priceTo}
-                    step={50}
-                    onChange={(from, to) => setFilters(prev => ({ ...prev, priceFrom: from, priceTo: to }))}
-                    label="ЦІНА (ГРН)"
-                    onClear={handlePriceClear}
-                    showClear={filters.priceFrom !== MIN_PRICE || filters.priceTo !== MAX_PRICE}
-                />
+                {/* Динамічні блоки фільтрів з API */}
+                {isLoadingFilters ? (
+                    <div className={s.filtersLoading} />
+                ) : dynamicBlocks.length > 0 ? (
+                    dynamicBlocks.map((block, idx) => {
+                        if (!block.key || block.key === 'categories') return null;
+                        const blockKey = block.key;
 
-                <FilterGroup title="М'ЯСНА ЧАСТИНА" initialOpen={true}>
-                    {MEAT_PARTS.map(option => (
-                        <FilterPill
-                            key={option}
-                            active={filters.meatPart.includes(option)}
-                            onClick={() => toggleOption('meatPart', option)}
-                        >
-                            {option}
-                        </FilterPill>
-                    ))}
-                </FilterGroup>
- 
-                <FilterGroup title="ТИП М'ЯСА" initialOpen={true}>
-                    {MEAT_TYPES.map(option => (
-                        <FilterCheckbox
-                            key={option}
-                            active={filters.meatType.includes(option)}
-                            onClick={() => toggleOption('meatType', option)}
-                        >
-                            {option}
-                        </FilterCheckbox>
-                    ))}
-                </FilterGroup>
- 
-                <FilterGroup title="ВИТРИМКА" initialOpen={true}>
-                    {AGING_OPTIONS.map(option => (
-                        <FilterPill
-                            key={option}
-                            active={filters.aging.includes(option)}
-                            onClick={() => toggleOption('aging', option)}
-                        >
-                            {option}
-                        </FilterPill>
-                    ))}
-                </FilterGroup>
- 
-                <FilterGroup title="МАРМУРОВІСТЬ" initialOpen={true}>
-                    {MARBLING_OPTIONS.map(option => (
-                        <FilterPill
-                            key={option}
-                            active={filters.marbling.includes(option)}
-                            onClick={() => toggleOption('marbling', option)}
-                        >
-                            {option}
-                        </FilterPill>
-                    ))}
-                </FilterGroup>
- 
-                <FilterGroup title="КРАЇНА ПОХОДЖЕННЯ" initialOpen={true}>
-                    {COUNTRY_OPTIONS.map(option => (
-                        <FilterPill
-                            key={option}
-                            active={filters.country.includes(option)}
-                            onClick={() => toggleOption('country', option)}
-                        >
-                            {option}
-                        </FilterPill>
-                    ))}
-                </FilterGroup>
- 
-                <FilterGroup title="ПОРОДА" initialOpen={true}>
-                    {BREED_OPTIONS.map(option => (
-                        <FilterPill
-                            key={option}
-                            active={filters.breed.includes(option)}
-                            onClick={() => toggleOption('breed', option)}
-                        >
-                            {option}
-                        </FilterPill>
-                    ))}
-                </FilterGroup>
+                        // --- Range block (double_range) → PriceRange ---
+                        if (isRangeBlock(block)) {
+                            const blockMin = block.min ?? 0;
+                            const blockMax = block.max ?? 10000;
+                            const currentFilter = getFilterForBlock(pendingFilters, blockKey);
+                            const from = currentFilter?.minValue ?? blockMin;
+                            const to = currentFilter?.maxValue ?? blockMax;
+                            const showClear = from !== blockMin || to !== blockMax;
+
+                            return (
+                                <PriceRange
+                                    key={blockKey}
+                                    min={blockMin}
+                                    max={blockMax}
+                                    from={from}
+                                    to={to}
+                                    step={10}
+                                    onChange={(f, t) => setPriceRange(blockKey, f, t, blockMin, blockMax)}
+                                    label={block.label ? block.label.toUpperCase() : undefined}
+                                    onClear={() => clearPriceRange(blockKey)}
+                                    showClear={showClear}
+                                />
+                            );
+                        }
+
+                        // --- List/Buttons block → FilterPill або FilterCheckbox ---
+                        const options = block.values ?? [];
+                        if (options.length === 0) return null;
+                        if (!block.label) return null;
+
+                        const currentFilter = getFilterForBlock(pendingFilters, blockKey);
+                        const selectedValues = currentFilter?.values ?? [];
+
+                        // "buttons" → FilterPill, "list" → FilterCheckbox
+                        const usePill = block.type === 'buttons';
+
+                        return (
+                            <FilterGroup key={blockKey} title={block.label.toUpperCase()} initialOpen={idx < 2}>
+                                {options.map(option => {
+                                    if (!option.key) return null;
+                                    const isActive = selectedValues.includes(option.key);
+                                    const isDisabled = option.disabled === true;
+
+                                    if (usePill) {
+                                        return (
+                                            <FilterPill
+                                                key={option.key}
+                                                active={isActive}
+                                                onClick={isDisabled ? undefined : () => toggleListOption(blockKey, option.key!)}
+                                                className={isDisabled ? s.disabledOption : undefined}
+                                            >
+                                                {option.label ?? option.key}
+                                            </FilterPill>
+                                        );
+                                    }
+
+                                    return (
+                                        <FilterCheckbox
+                                            key={option.key}
+                                            active={isActive}
+                                            onClick={isDisabled ? undefined : () => toggleListOption(blockKey, option.key!)}
+                                            className={isDisabled ? s.disabledOption : undefined}
+                                        >
+                                            {option.label ?? option.key}
+                                        </FilterCheckbox>
+                                    );
+                                })}
+                            </FilterGroup>
+                        );
+                    })
+                ) : null}
+
+
                 <Button
                     variant="red"
                     type="button"
                     className={s.applyBtn}
                     onClick={handleApply}
-                    disabled={!isModified}
+                    disabled={!isPendingChanged && !isSortChanged}
                 >
                     {selectedCount > 0
                         ? `ЗАСТОСУВАТИ (${selectedCount})`

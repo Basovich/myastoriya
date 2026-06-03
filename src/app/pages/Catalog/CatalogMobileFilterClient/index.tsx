@@ -5,13 +5,11 @@ import FilterModal from '@/app/pages/Catalog/CatalogModal';
 
 interface CatalogMobileFilterProps {
     sortBy: string;
-    categoryName?: string;
     children: React.ReactNode;
 }
 
 export default function CatalogMobileFilterClient({
     sortBy,
-    categoryName,
     children,
 }: CatalogMobileFilterProps) {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -28,7 +26,6 @@ export default function CatalogMobileFilterClient({
                 isOpen={isFilterOpen}
                 onClose={() => setIsFilterOpen(false)}
                 sortBy={sortBy}
-                category={categoryName}
             />
             {/* 
                 We need to trigger setIsFilterOpen from CatalogToolbarClient.

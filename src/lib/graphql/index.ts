@@ -32,6 +32,7 @@ export {
     getProductByIdApi,
     getProductCostVariantsApi,
     getPopularProductsApi,
+    getProductsFilterApi,
     getSpecialsByProductApi,
     addProductToAvailabilityTrackerApi,
     findProductIdBySlug,
@@ -56,6 +57,10 @@ export type {
     ProductCategory,
     ProductsFilter,
     ProductsResponse,
+    FilterOption,
+    FilterBlock,
+    ProductsFilterResponse,
+    FilterStateInput,
 } from './queries/products';
 
 // Re-export blog

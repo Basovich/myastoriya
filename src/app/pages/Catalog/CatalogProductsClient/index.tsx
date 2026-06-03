@@ -7,6 +7,7 @@ import ProductCardRow from "@/app/components/ui/ProductCardRow";
 import Button from "@/app/components/ui/Button/Button";
 import type { Product, ProductsResponse } from "@/lib/graphql";
 import { resolveProductImageUrl } from "@/lib/graphql";
+import type { FilterStateInput } from "@/lib/graphql";
 import { Locale } from "@/i18n/config";
 import s from "../CatalogContent/CatalogContent.module.scss";
 
@@ -31,6 +32,7 @@ interface CatalogProductsClientProps {
     view?: 'list' | 'grid';
     lang: Locale;
     sort?: string;
+    activeFilters?: FilterStateInput[];
 }
 
 export default function CatalogProductsClient({
@@ -39,6 +41,7 @@ export default function CatalogProductsClient({
     view = "list",
     lang,
     sort,
+    activeFilters,
 }: CatalogProductsClientProps) {
     const [products, setProducts] = useState<Product[]>(initialProducts.data);
     const [currentPage, setCurrentPage] = useState(initialProducts.current_page);
@@ -79,6 +82,7 @@ export default function CatalogProductsClient({
                     limit: 12,
                     page: nextPage,
                     sort,
+                    filter: activeFilters && activeFilters.length > 0 ? activeFilters : undefined,
                 }),
             });
 

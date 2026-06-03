@@ -4,19 +4,21 @@ import { useEffect, useState } from 'react';
 import { useTransition, animated, config } from '@react-spring/web';
 import s from './FilterModal.module.scss';
 import FilterSidebar from '@/app/pages/Catalog/CatalogSidebar';
+import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
 interface FilterModalProps {
     isOpen: boolean;
     onClose: () => void;
     sortBy?: string;
     onSortChange?: (value: string) => void;
-    category?: string;
     categoryId?: number;
     sortOptions?: string[];
     filterLabel?: string;
     clearLabel?: string;
+    filterBlocks?: FilterBlock[];
+    activeFilters?: FilterStateInput[];
 }
 
-export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, category, categoryId, sortOptions, filterLabel = "Фільтр", clearLabel = "Очистити" }: FilterModalProps) {
+export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, categoryId, sortOptions, filterLabel = "Фільтр", clearLabel = "Очистити", filterBlocks, activeFilters }: FilterModalProps) {
     const [clearTrigger, setClearTrigger] = useState(0);
     const [isModified, setIsModified] = useState(false);
 
@@ -91,9 +93,10 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, c
                         onClearAll={() => {}} 
                         onModifiedChange={setIsModified}
                         key={clearTrigger} 
-                        category={category}
                         categoryId={categoryId}
                         sortOptions={sortOptions}
+                        filterBlocks={filterBlocks}
+                        activeFilters={activeFilters}
                     />
                 </div>
             </animated.div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProductsApi } from "@/lib/graphql";
+import type { FilterStateInput } from "@/lib/graphql";
 
 export async function POST(req: NextRequest) {
     try {
@@ -9,11 +10,13 @@ export async function POST(req: NextRequest) {
         const limit = body.limit ?? 8;
         const page = body.page ?? 1;
         const sort = body.sort ?? undefined;
+        const filter: FilterStateInput[] | undefined =
+            Array.isArray(body.filter) && body.filter.length > 0 ? body.filter : undefined;
 
         const langHeader = req.headers.get('content-language');
         const lang = langHeader === 'ru_RU' ? 'ru' : 'ua';
 
-        const result = await getProductsApi({ categoryId, saleId, limit, page, sort }, lang);
+        const result = await getProductsApi({ categoryId, saleId, limit, page, sort, filter }, lang);
 
         return NextResponse.json(result);
     } catch (err) {

@@ -8,11 +8,11 @@ import CatalogSidebar from '@/app/pages/Catalog/CatalogSidebar';
 import ProductCard from '../../../components/ui/ProductCard/ProductCard';
 import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
 import clsx from 'clsx';
-import CategorySwitcher from "@/app/components/ui/CategorySwitcher/CategorySwitcher";
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import type { Product, ProductsResponse } from '@/lib/graphql';
 import { resolveProductImageUrl } from '@/lib/graphql';
+import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
 import type { BreadcrumbItem } from '@/utils/category-url';
 
 
@@ -66,9 +66,12 @@ interface CatalogContentProps {
     view?: 'list' | 'grid';
     sortBy?: string;
     hideSidebar?: boolean;
-    hideCategorySwitcher?: boolean;
     /** 12 найпопулярніших товарів на сайті (без прив'язки до категорії). */
     popularProducts?: Product[];
+    /** Динамічні блоки фільтрів з API productsFilter. */
+    filterBlocks?: FilterBlock[];
+    /** Активні фільтри, десеріалізовані з URL. */
+    activeFilters?: FilterStateInput[];
 }
 
 export default async function CatalogContent({
@@ -82,8 +85,9 @@ export default async function CatalogContent({
     view = 'list',
     sortBy,
     hideSidebar = false,
-    hideCategorySwitcher = false,
     popularProducts,
+    filterBlocks,
+    activeFilters,
 }: CatalogContentProps) {
     const sortLabel = lang === 'ua' ? 'Сортувати:' : 'Сортировать:';
     const filterLabel = lang === 'ua' ? 'Фільтр' : 'Фильтр';
@@ -191,22 +195,24 @@ export default async function CatalogContent({
                         sortBy={currentSort} 
                         view={view} 
                         sortOptions={sortOptions}
-                        categoryName={categoryName}
                         categoryId={categoryId}
                         hideFilter={hideSidebar}
                         sortLabel={sortLabel}
                         filterLabel={filterLabel}
                         clearLabel={clearLabel}
+                        filterBlocks={filterBlocks}
+                        activeFilters={activeFilters}
                     />
 
                     <div className={s.contentLayout}>
                         {!hideSidebar && (
                             <aside className={s.sidebar}>
-                                {categoryName && !hideCategorySwitcher && <CategorySwitcher categoryId={categoryId} lang={lang} />}
                                 <CatalogSidebar
                                     sortBy={currentSort}
                                     sortOptions={sortOptions}
                                     categoryId={categoryId}
+                                    filterBlocks={filterBlocks}
+                                    activeFilters={activeFilters}
                                 />
                             </aside>
                         )}
@@ -217,6 +223,7 @@ export default async function CatalogContent({
                             view={view}
                             lang={lang}
                             sort={currentSort}
+                            activeFilters={activeFilters}
                         />
                     </div>
                 </div>

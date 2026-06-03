@@ -6,6 +6,7 @@ import { getCatalogTreeApi, getProductsApi, getPopularProductsApi } from '@/lib/
 import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
+import { parseFilterParams } from '@/utils/filter-params';
 
 interface SubcategoryPageProps {
     params: Promise<{ lang: string; category: string; subcategory: string }>;
@@ -32,9 +33,14 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
     const view = (resolvedSearchParams.view as 'list' | 'grid') || 'list';
     const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
 
+    // Парсимо активні фільтри з URL
+    const activeFilters = parseFilterParams(resolvedSearchParams as Record<string, string | string[] | undefined>);
+
+    const categoryId = parseInt(matchedCat.id);
+
     const [productsResponse, popularProducts] = await Promise.all([
         getProductsApi(
-            { categoryId: parseInt(matchedCat.id), limit: 12 * page, page: 1, sort },
+            { categoryId, limit: 12 * page, page: 1, sort, filter: activeFilters },
             lang,
         ),
         getPopularProductsApi(undefined, 12, lang),
@@ -61,13 +67,14 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
                 lang={lang as Locale}
                 dict={dict}
                 initialProducts={productsResponse}
-                categoryId={parseInt(matchedCat.id)}
+                categoryId={categoryId}
                 categoryName={matchedCat.name}
                 breadcrumbItems={breadcrumbItems}
                 subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                 view={view}
                 sortBy={resolvedSearchParams.sort as string || undefined}
                 popularProducts={popularProducts}
+                activeFilters={activeFilters}
             />
         </main>
     );

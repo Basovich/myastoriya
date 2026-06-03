@@ -8,31 +8,34 @@ import SortSelect from "@/app/components/ui/SortSelect/SortSelect";
 import ViewToggle from "@/app/components/ui/ViewToggle/ViewToggle";
 import type { ViewType } from "@/app/components/ui/ViewToggle/ViewToggle";
 import FilterModal from "@/app/pages/Catalog/CatalogModal";
+import type { FilterBlock, FilterStateInput } from "@/lib/graphql";
 
 interface CatalogToolbarProps {
     sortBy: string;
     view: ViewType;
     sortOptions: string[];
-    categoryName?: string;
     categoryId?: number;
     className?: string;
     hideFilter?: boolean;
     sortLabel?: string;
     filterLabel?: string;
     clearLabel?: string;
+    filterBlocks?: FilterBlock[];
+    activeFilters?: FilterStateInput[];
 }
 
 export default function CatalogToolbarClient({
     sortBy,
     view,
     sortOptions,
-    categoryName,
     categoryId,
     className,
     hideFilter = false,
     sortLabel = "Сортувати:",
     filterLabel = "Фільтр",
     clearLabel = "Очистити",
+    filterBlocks,
+    activeFilters,
 }: CatalogToolbarProps) {
     const router = useRouter();
     const pathname = usePathname();
@@ -95,11 +98,12 @@ export default function CatalogToolbarClient({
                 onClose={() => setIsFilterOpen(false)}
                 sortBy={sortBy}
                 onSortChange={(val) => updateParams("sort", val)}
-                category={categoryName}
                 categoryId={categoryId}
                 sortOptions={sortOptions}
                 filterLabel={filterLabel}
                 clearLabel={clearLabel}
+                filterBlocks={filterBlocks}
+                activeFilters={activeFilters}
             />
         </>
     );
