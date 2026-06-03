@@ -115,10 +115,25 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }>) {
   const { lang } = await params;
-  const [catalogTree, socialLinks] = await Promise.all([
-    getCatalogTreeApi(lang),
-    getSocialLinksApi()
-  ]);
+  let catalogTree: any[] = [];
+  let socialLinks: any[] = [];
+
+  try {
+    const [tree, links] = await Promise.all([
+      getCatalogTreeApi(lang).catch((err) => {
+        console.error("Failed to fetch catalog tree:", err);
+        return [];
+      }),
+      getSocialLinksApi().catch((err) => {
+        console.error("Failed to fetch social links:", err);
+        return [];
+      }),
+    ]);
+    catalogTree = tree;
+    socialLinks = links;
+  } catch (err) {
+    console.error("Error loading layout data:", err);
+  }
 
   return (
     <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>

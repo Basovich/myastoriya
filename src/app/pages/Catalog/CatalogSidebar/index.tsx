@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
 import s from './FilterSidebar.module.scss';
 import FilterGroup from '@/app/components/ui/FilterGroup/FilterGroup';
@@ -61,6 +61,8 @@ export default function CatalogSidebar({
     const searchParams = useSearchParams();
 
     const lang = routeParams?.lang === 'ru' ? 'ru' : 'ua';
+    const sidebarRef = useRef<HTMLDivElement>(null);
+    const [floatingButtonPos, setFloatingButtonPos] = useState<{ top: number; left: number } | null>(null);
     const optionsToUse = sortOptions || SORT_OPTIONS;
     const defaultSortOption = optionsToUse[0] || 'За популярністю';
 
@@ -92,6 +94,7 @@ export default function CatalogSidebar({
     // Синхронізуємо з props при скиданні через key={clearTrigger}
     useEffect(() => {
         setPendingFilters(activeFilters ?? []);
+        setFloatingButtonPos(null);
     }, [activeFilters]);
 
     // --- Helpers ---
@@ -110,6 +113,22 @@ export default function CatalogSidebar({
             return setFilterValue(prev, { key: blockKey, values: newValues });
         });
     }, []);
+
+    const handleOptionClick = useCallback((e: React.MouseEvent<HTMLButtonElement>, blockKey: string, optionKey: string) => {
+        toggleListOption(blockKey, optionKey);
+
+        if (typeof window !== 'undefined' && window.innerWidth >= 1280 && sidebarRef.current) {
+            const sidebarRect = sidebarRef.current.getBoundingClientRect();
+            const clickedRect = e.currentTarget.getBoundingClientRect();
+
+            // Вертикально — по центру клікнутого елемента відносно сайдбару
+            const top = clickedRect.top - sidebarRect.top + (clickedRect.height / 2);
+            // Горизонтально — завжди праворуч від сайдбару (ширина сайдбару + відступ)
+            const left = sidebarRect.width + 16;
+
+            setFloatingButtonPos({ top, left });
+        }
+    }, [toggleListOption]);
 
     const setPriceRange = useCallback((blockKey: string, min: number, max: number, blockMin: number, blockMax: number) => {
         // Якщо значення = межам блоку — видаляємо фільтр (скидаємо)
@@ -140,6 +159,7 @@ export default function CatalogSidebar({
         if (!isPendingChanged && !isSortChanged) return;
         const params = buildFilterParams(pendingFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        setFloatingButtonPos(null);
         onApply?.();
         onClose?.();
     };
@@ -148,6 +168,7 @@ export default function CatalogSidebar({
         setPendingFilters([]);
         const params = clearFilterParams(new URLSearchParams(searchParams.toString()));
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        setFloatingButtonPos(null);
         onClearAll?.();
         onClose?.();
     };
@@ -155,7 +176,7 @@ export default function CatalogSidebar({
     const selectedCount = countActiveFilterValues(pendingFilters);
 
     return (
-        <div className={s.sidebar}>
+        <div className={s.sidebar} ref={sidebarRef}>
             <div className={s.filtersWrapper}>
                 {/* Мобільний блок: Сортування */}
                 <div className={s.onlyMobile}>
@@ -232,7 +253,7 @@ export default function CatalogSidebar({
                                             <FilterPill
                                                 key={option.key}
                                                 active={isActive}
-                                                onClick={isDisabled ? undefined : () => toggleListOption(blockKey, option.key!)}
+                                                onClick={isDisabled ? undefined : (e) => handleOptionClick(e, blockKey, option.key!)}
                                                 className={isDisabled ? s.disabledOption : undefined}
                                             >
                                                 {option.label ?? option.key}
@@ -244,7 +265,7 @@ export default function CatalogSidebar({
                                         <FilterCheckbox
                                             key={option.key}
                                             active={isActive}
-                                            onClick={isDisabled ? undefined : () => toggleListOption(blockKey, option.key!)}
+                                            onClick={isDisabled ? undefined : (e) => handleOptionClick(e, blockKey, option.key!)}
                                             className={isDisabled ? s.disabledOption : undefined}
                                         >
                                             {option.label ?? option.key}
@@ -268,6 +289,22 @@ export default function CatalogSidebar({
                         ? `ЗАСТОСУВАТИ (${selectedCount})`
                         : 'ЗАСТОСУВАТИ ФІЛЬТР'}
                 </Button>
+
+                {isPendingChanged && floatingButtonPos && (
+                    <button
+                        type="button"
+                        className={s.floatingApply}
+                        style={{
+                            top: `${floatingButtonPos.top}px`,
+                            left: `${floatingButtonPos.left}px`,
+                        }}
+                        onClick={handleApply}
+                    >
+                        {selectedCount > 0
+                            ? `ЗАСТОСУВАТИ (${selectedCount})`
+                            : 'ЗАСТОСУВАТИ'}
+                    </button>
+                )}
             </div>
         </div>
     );

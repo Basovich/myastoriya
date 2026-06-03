@@ -7,7 +7,7 @@ import clsx from 'clsx';
 interface FilterPillProps {
     children: React.ReactNode;
     active?: boolean;
-    onClick?: () => void;
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     className?: string;
 }
 
