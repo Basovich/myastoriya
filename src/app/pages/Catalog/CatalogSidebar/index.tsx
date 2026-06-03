@@ -187,6 +187,7 @@ export default function CatalogSidebar({
                         if (isRangeBlock(block)) {
                             const blockMin = block.min ?? 0;
                             const blockMax = block.max ?? 10000;
+                            if (blockMin === blockMax) return null;
                             const currentFilter = getFilterForBlock(pendingFilters, blockKey);
                             const from = currentFilter?.minValue ?? blockMin;
                             const to = currentFilter?.maxValue ?? blockMax;
@@ -210,7 +211,7 @@ export default function CatalogSidebar({
 
                         // --- List/Buttons block → FilterPill або FilterCheckbox ---
                         const options = block.values ?? [];
-                        if (options.length === 0) return null;
+                        if (options.length <= 1) return null;
                         if (!block.label) return null;
 
                         const currentFilter = getFilterForBlock(pendingFilters, blockKey);
