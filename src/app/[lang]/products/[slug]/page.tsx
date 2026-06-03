@@ -9,6 +9,7 @@ import {
     findProductIdBySlug,
     getCatalogTreeApi,
     getDeliveryBlocksApi,
+    getProductsApi,
 } from "@/lib/graphql";
 import { notFound } from "next/navigation";
 import { buildCategoryIndex, buildCategoryBreadcrumbs } from "@/utils/category-url";
@@ -40,10 +41,13 @@ export default async function ProductPage({ params }: Props) {
     // Cost variants are loaded client-side in ProductClient to avoid unauthorized SSR errors
     const costVariants: any[] = [];
 
-    // Load related (specials) + popular products in parallel
-    const [specialsProducts, popularProducts] = await Promise.all([
+    // Load related (specials), global popular products, and category-specific popular products in parallel
+    const [specialsProducts, popularProducts, categoryProductsResponse] = await Promise.all([
         getSpecialsByProductApi(numericId, 8, lang),
-        getPopularProductsApi(numericId, 12, lang),
+        getPopularProductsApi(undefined, 12, lang),
+        product.categoryId
+            ? getProductsApi({ categoryId: Number(product.categoryId), sort: "rating", limit: 13 }, lang)
+            : Promise.resolve({ data: [] }),
     ]);
 
     const categoryIndex = buildCategoryIndex(catalogTree);
@@ -57,6 +61,7 @@ export default async function ProductPage({ params }: Props) {
                 publications={blogsResponse.data}
                 relatedProducts={specialsProducts}
                 popularProducts={popularProducts}
+                categoryProducts={categoryProductsResponse.data || []}
                 lang={lang as Locale}
                 dict={dict}
                 breadcrumbs={breadcrumbs}

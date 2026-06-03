@@ -92,6 +92,7 @@ interface ProductClientProps {
     publications: BlogPost[];
     relatedProducts: Product[];
     popularProducts: Product[];
+    categoryProducts?: Product[];
     lang: Locale;
     dict: Dictionary;
     /** Pre-built breadcrumbs from server component (uses real category tree). */
@@ -109,6 +110,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
     publications,
     relatedProducts,
     popularProducts,
+    categoryProducts = [],
     lang,
     dict,
     breadcrumbs: breadcrumbsProp,
@@ -234,8 +236,9 @@ const ProductClient: React.FC<ProductClientProps> = ({
     ];
 
     // Map product list to RelatedProducts format
-    function mapProductsToRelated(products: Product[]) {
-        return products.slice(0, 8).map(p => ({
+    function mapProductsToRelated(products: Product[], limit?: number) {
+        const sliced = limit ? products.slice(0, limit) : products;
+        return sliced.map(p => ({
             id: p.id,
             title: p.name,
             price: p.cost,
@@ -246,8 +249,18 @@ const ProductClient: React.FC<ProductClientProps> = ({
         }));
     }
 
-    const mappedRelated = mapProductsToRelated(relatedProducts);
-    const mappedPopular = mapProductsToRelated(popularProducts);
+    const mappedRelated = mapProductsToRelated(relatedProducts, 8);
+    const mappedPopular = mapProductsToRelated(popularProducts, 12);
+
+    // Get current category name from breadcrumbs
+    const categoryName = breadcrumbsProp && breadcrumbsProp.length > 1
+        ? breadcrumbsProp[breadcrumbsProp.length - 1].label
+        : '';
+
+    const filteredCategoryProducts = categoryProducts
+        ? categoryProducts.filter(p => String(p.id) !== String(product.id))
+        : [];
+    const mappedCategoryProducts = mapProductsToRelated(filteredCategoryProducts, 12);
 
     // Resolve gift product image if present
     const giftImageUrl = product.gift?.images?.[0]?.url?.grid2x
@@ -424,6 +437,14 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         title="З цим товаром купують"
                         products={mappedRelated}
                         className={s.recommendations}
+                    />
+                )}
+                {mappedCategoryProducts.length > 0 && (
+                    <RelatedProducts
+                        title={lang === 'ru' ? `Популярные товары в категории: ${categoryName}` : `Популярні товари в категорії: ${categoryName}`}
+                        products={mappedCategoryProducts}
+                        className={s.recommendations}
+                        alwaysSlider={true}
                     />
                 )}
                 {mappedPopular.length > 0 && (

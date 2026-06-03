@@ -1362,6 +1362,16 @@ button.mobileBannerLink {
     }
 }
 
+.alwaysSlider {
+    display: block;
+    width: 100%;
+}
+
+.navArrowsAlways {
+    display: flex;
+    gap: 8px;
+}
+
 div.relatedSwiper {
     overflow: visible;
     
@@ -1374,7 +1384,7 @@ div.relatedSwiper {
     height: auto !important;
     display: flex;
     opacity: 1;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out !important;
 
     &:not(:global(.swiper-slide-visible)) {
         opacity: 0;

@@ -29,9 +29,16 @@ interface RelatedProductsProps {
     products: RelatedProduct[];
     className?: string;
     isSliderOnMobile?: boolean;
+    alwaysSlider?: boolean;
 }
  
-const RelatedProducts: React.FC<RelatedProductsProps> = ({ title, products, className, isSliderOnMobile = false }) => {
+const RelatedProducts: React.FC<RelatedProductsProps> = ({
+    title,
+    products,
+    className,
+    isSliderOnMobile = false,
+    alwaysSlider = false,
+}) => {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
@@ -39,24 +46,16 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ title, products, clas
         <section className={clsx(s.relatedSection, className)}>
             <div className={s.relatedHeaderRow}>
                 <SectionHeader title={title} classNameWrapper={s.relatedHeader} />
-                {isSliderOnMobile && (
-                    <div className={s.navArrowsMobile}>
+                {(isSliderOnMobile || alwaysSlider) && (
+                    <div className={alwaysSlider ? s.navArrowsAlways : s.navArrowsMobile}>
                         <SliderArrow direction="left" ref={setPrevEl} />
                         <SliderArrow direction="right" ref={setNextEl} />
                     </div>
                 )}
             </div>
             
-            <div className={isSliderOnMobile ? s.desktopGrid : ''}>
-                <div className={s.relatedGrid}>
-                    {products.map((product) => (
-                        <ProductCard key={product.id} {...product} lang="ua" />
-                    ))}
-                </div>
-            </div>
-            
-            {isSliderOnMobile && (
-                <div className={s.mobileSlider}>
+            {alwaysSlider ? (
+                <div className={s.alwaysSlider}>
                     <Swiper
                         modules={[Grid, Navigation]}
                         navigation={{ prevEl, nextEl }}
@@ -69,8 +68,14 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ title, products, clas
                             768: {
                                 slidesPerView: 3,
                                 slidesPerGroup: 1,
-                                grid: { rows: 1 },
+                                grid: { rows: 2, fill: 'row' },
                                 spaceBetween: 16
+                            },
+                            1280: {
+                                slidesPerView: 4,
+                                slidesPerGroup: 1,
+                                grid: { rows: 1 },
+                                spaceBetween: 22
                             }
                         }}
                         className={s.relatedSwiper}
@@ -82,6 +87,45 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ title, products, clas
                         ))}
                     </Swiper>
                 </div>
+            ) : (
+                <>
+                    <div className={isSliderOnMobile ? s.desktopGrid : ''}>
+                        <div className={s.relatedGrid}>
+                            {products.map((product) => (
+                                <ProductCard key={product.id} {...product} lang="ua" />
+                            ))}
+                        </div>
+                    </div>
+                    
+                    {isSliderOnMobile && (
+                        <div className={s.mobileSlider}>
+                            <Swiper
+                                modules={[Grid, Navigation]}
+                                navigation={{ prevEl, nextEl }}
+                                spaceBetween={12}
+                                slidesPerView={2}
+                                slidesPerGroup={1}
+                                watchSlidesProgress={true}
+                                grid={{ rows: 2, fill: 'row' }}
+                                breakpoints={{
+                                    768: {
+                                        slidesPerView: 3,
+                                        slidesPerGroup: 1,
+                                        grid: { rows: 1 },
+                                        spaceBetween: 16
+                                    }
+                                }}
+                                className={s.relatedSwiper}
+                            >
+                                {products.map((product) => (
+                                    <SwiperSlide key={product.id} className={s.slide}>
+                                        <ProductCard {...product} lang="ua" />
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
+                        </div>
+                    )}
+                </>
             )}
         </section>
     );
