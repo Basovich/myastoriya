@@ -221,7 +221,7 @@ export default function CatalogSidebar({
                         const usePill = block.type === 'buttons';
 
                         return (
-                            <FilterGroup key={blockKey} title={block.label.toUpperCase()} initialOpen={idx < 2}>
+                            <FilterGroup key={blockKey} title={block.label.toUpperCase()} initialOpen={true}>
                                 {options.map(option => {
                                     if (!option.key) return null;
                                     const isActive = selectedValues.includes(option.key);
