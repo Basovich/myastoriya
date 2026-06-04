@@ -83,7 +83,15 @@ nav.breadcrumbsCategory {
 
 .categoriesSection {
     background: #fff;
-    padding: 0;
+    padding-top: 12px;
+
+    @media (min-width: 768px) {
+        padding: 36px;
+    }
+
+    @media (min-width: 1280px) {
+        padding: 20px 0 0;
+    }
 }
 
 .mainSection {
@@ -349,6 +357,7 @@ div.sortWrap {
 
 .sliderSection {
     padding-top: 40px;
+    overflow: hidden;
 
     @media (min-width: 1280px) {
         padding-top: 70px;
@@ -367,7 +376,7 @@ div.sortWrap {
 }
 
 .slide {
-    height: auto;
+    height: auto !important;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;

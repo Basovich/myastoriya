@@ -5,6 +5,7 @@ import { useTransition, animated, config } from '@react-spring/web';
 import s from './FilterModal.module.scss';
 import FilterSidebar from '@/app/pages/Catalog/CatalogSidebar';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
+
 interface FilterModalProps {
     isOpen: boolean;
     onClose: () => void;

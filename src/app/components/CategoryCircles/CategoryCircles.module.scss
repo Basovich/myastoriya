@@ -1,5 +1,6 @@
 .wrapper {
     margin-bottom: 20px;
+    position: relative;
 
     @media (min-width: 768px) {
         margin-bottom: 30px;
@@ -21,7 +22,10 @@
 
     @media (min-width: 768px) {
         width: calc(100% - 80px);
-        margin-bottom: 20px;
+        justify-content: flex-end;
+        position: absolute;
+        top: -60px;
+        right: 0;
     }
 
     @media (min-width: 1280px) {
@@ -68,19 +72,17 @@
     }
 }
 
-.swiperContainer {
+div.swiperContainer {
     width: 100%;
     padding-left: 16px;
     padding-right: 16px;
 
     @media (min-width: 768px) {
-        padding-left: 40px;
-        padding-right: 40px;
+        padding-left: 0;
+        padding-right: 0;
     }
 
     @media (min-width: 1280px) {
-        padding-left: 0;
-        padding-right: 0;
         margin-left: auto;
         margin-right: auto;
         max-width: 1200px;
@@ -99,6 +101,10 @@
 .slide {
     display: flex;
     justify-content: center;
+
+    .swiper-slide {
+        height: auto !important;
+    }
 }
 
 .item {

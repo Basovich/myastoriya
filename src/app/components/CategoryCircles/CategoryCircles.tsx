@@ -71,10 +71,10 @@ export default function CategoryCircles({
                 breakpoints={{
                     0: { slidesPerView: 3.5, spaceBetween: 10 },
                     430: { slidesPerView: 4.5, spaceBetween: 10 },
-                    768: { slidesPerView: 7, spaceBetween: 16 },
-                    1024: { slidesPerView: 9, spaceBetween: 16 },
-                    1280: { slidesPerView: 10, spaceBetween: 16 },
-                    1440: { slidesPerView: 12, spaceBetween: 16 },
+                    768: { slidesPerView: 7, spaceBetween: 0 },
+                    1024: { slidesPerView: 9, spaceBetween: 0 },
+                    1280: { slidesPerView: 10, spaceBetween: 0 },
+                    1440: { slidesPerView: 12, spaceBetween: 0 },
                 }}
             >
                 {categories.map((item, index) => (

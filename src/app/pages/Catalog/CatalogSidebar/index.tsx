@@ -115,6 +115,23 @@ export default function CatalogSidebar({
     );
     const [isLoadingFilters, setIsLoadingFilters] = useState(!filterBlocks || filterBlocks.length === 0);
 
+    const renderedBlocks = dynamicBlocks.filter(block => {
+        if (!block.key || block.key === 'categories') return false;
+        if (isRangeBlock(block)) {
+            const blockMin = block.min ?? 0;
+            const blockMax = block.max ?? 10000;
+            if (blockMin === blockMax) return false;
+            return true;
+        } else {
+            const options = block.values ?? [];
+            if (options.length <= 1) return false;
+            if (!block.label) return false;
+            return true;
+        }
+    });
+
+    const isOnlyPriceRange = renderedBlocks.length === 1 && isRangeBlock(renderedBlocks[0]);
+
     useEffect(() => {
         if (!categoryId) {
             setIsLoadingFilters(false);
@@ -190,18 +207,38 @@ export default function CatalogSidebar({
     const handlePriceOk = useCallback((blockKey: string, blockMin: number, blockMax: number) => {
         const draft = pendingPrice[blockKey];
         if (!draft) return;
+        
+        let newFilters: FilterStateInput[];
         if (draft.from === blockMin && draft.to === blockMax) {
-            setPendingFilters(prev => removeFilter(prev, blockKey));
+            newFilters = removeFilter(pendingFilters, blockKey);
         } else {
-            setPendingFilters(prev => setFilterValue(prev, { key: blockKey, minValue: draft.from, maxValue: draft.to }));
+            newFilters = setFilterValue(pendingFilters, { key: blockKey, minValue: draft.from, maxValue: draft.to });
         }
-    }, [pendingPrice]);
+        setPendingFilters(newFilters);
+
+        if (isOnlyPriceRange) {
+            const params = buildFilterParams(newFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
+            router.push(`${pathname}?${params.toString()}`, { scroll: false });
+            setFloatingButtonPos(null);
+            onApply?.();
+            onClose?.();
+        }
+    }, [pendingPrice, pendingFilters, isOnlyPriceRange, searchParams, dynamicBlocks, router, pathname, onApply, onClose]);
 
 
     const clearPriceRange = useCallback((blockKey: string) => {
-        setPendingFilters(prev => removeFilter(prev, blockKey));
+        const newFilters = removeFilter(pendingFilters, blockKey);
+        setPendingFilters(newFilters);
         setPendingPrice(prev => { const next = { ...prev }; delete next[blockKey]; return next; });
-    }, []);
+
+        if (isOnlyPriceRange) {
+            const params = buildFilterParams(newFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
+            router.push(`${pathname}?${params.toString()}`, { scroll: false });
+            setFloatingButtonPos(null);
+            onClearAll?.();
+            onClose?.();
+        }
+    }, [pendingFilters, isOnlyPriceRange, searchParams, dynamicBlocks, router, pathname, onClearAll, onClose]);
 
     // --- isModified ---
 
@@ -339,19 +376,21 @@ export default function CatalogSidebar({
                 ) : null}
 
 
-                <Button
-                    variant="red"
-                    type="button"
-                    className={s.applyBtn}
-                    onClick={handleApply}
-                    disabled={!isPendingChanged && !isSortChanged}
-                >
-                    {selectedCount > 0
-                        ? `${texts.apply} (${selectedCount})`
-                        : texts.applyFilter}
-                </Button>
+                {!isOnlyPriceRange && (
+                    <Button
+                        variant="red"
+                        type="button"
+                        className={s.applyBtn}
+                        onClick={handleApply}
+                        disabled={!isPendingChanged && !isSortChanged}
+                    >
+                        {selectedCount > 0
+                            ? `${texts.apply} (${selectedCount})`
+                            : texts.applyFilter}
+                    </Button>
+                )}
 
-                {isPendingChanged && floatingButtonPos && (
+                {!isOnlyPriceRange && isPendingChanged && floatingButtonPos && (
                     <button
                         type="button"
                         className={s.floatingApply}
