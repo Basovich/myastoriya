@@ -1,4 +1,3 @@
-import { getDictionary } from "@/i18n/get-dictionary";
 import ActionDetail from "../../../components/ActionDetail/ActionDetail";
 import { getSalesApi, getProductsApi } from "@/lib/graphql";
 import { notFound } from "next/navigation";
@@ -10,7 +9,6 @@ export default async function ActionDetailPage({
     params: Promise<{ lang: "ua" | "ru"; slug: string }>;
 }) {
     const { lang, slug } = await params;
-    const dict = await getDictionary(lang);
 
     // Fetch full list of sales to find by slug or numeric id.
     // sale(id) query crashes on the backend (500), so we use the list endpoint.
@@ -33,7 +31,6 @@ export default async function ActionDetailPage({
     return (
         <main>
             <ActionDetail
-                dict={dict}
                 lang={lang}
                 id={slug}
                 sale={sale}

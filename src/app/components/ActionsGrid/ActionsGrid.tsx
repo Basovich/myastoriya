@@ -22,27 +22,78 @@ interface ActionItem {
     discount?: string | null;
 }
 
+const LOCALIZED_TEXTS = {
+    ua: {
+        promotions: {
+            title: "АКЦІЇ",
+            breadcrumbs: {
+                home: "Головна",
+                promotions: "Акції"
+            },
+            tabs: {
+                promotions: "АКЦІЇ",
+                complexDiscounts: "КОМПЛЕКСНІ ЗНИЖКИ"
+            },
+            showBtn: "ПОКАЗАТИ ЩЕ",
+            loading: "Завантаження...",
+            dateLabel: "Акція діє до:"
+        },
+        "complex-discounts": {
+            title: "КОМПЛЕКСНІ ЗНИЖКИ",
+            breadcrumbs: {
+                home: "Головна",
+                complexDiscounts: "Комплексні знижки"
+            },
+            tabs: {
+                promotions: "АКЦІЇ",
+                complexDiscounts: "КОМПЛЕКСНІ ЗНИЖКИ"
+            },
+            showBtn: "ПОКАЗАТИ ЩЕ",
+            loading: "Завантаження...",
+            dateLabel: "Комплексна знижка діє:"
+        }
+    },
+    ru: {
+        promotions: {
+            title: "АКЦИИ",
+            breadcrumbs: {
+                home: "Главная",
+                promotions: "Акции"
+            },
+            tabs: {
+                promotions: "АКЦИИ",
+                complexDiscounts: "КОМПЛЕКСНЫЕ СКИДКИ"
+            },
+            showBtn: "ПОКАЗАТЬ ЕЩЕ",
+            loading: "Загрузка...",
+            dateLabel: "Акция действует до:"
+        },
+        "complex-discounts": {
+            title: "КОМПЛЕКСНЫЕ СКИДКИ",
+            breadcrumbs: {
+                home: "Главная",
+                complexDiscounts: "Комплексные скидки"
+            },
+            tabs: {
+                promotions: "АКЦИИ",
+                complexDiscounts: "КОМПЛЕКСНЫЕ СКИДКИ"
+            },
+            showBtn: "ПОКАЗАТЬ ЕЩЕ",
+            loading: "Загрузка...",
+            dateLabel: "Комплексная скидка действует:"
+        }
+    }
+};
+
 interface ActionsGridProps {
-    dict: {
-        title: string;
-        breadcrumbs: {
-            home: string;
-            promotions?: string;
-            complexDiscounts?: string;
-        };
-        tabs: {
-            promotions: string;
-            complexDiscounts: string;
-        };
-        showBtn: string;
-    };
     initialItems: ActionItem[];
     lang: string;
     pageType: 'promotions' | 'complex-discounts';
     initialHasMore?: boolean;
 }
 
-export default function ActionsGrid({ dict, initialItems, lang, pageType, initialHasMore }: ActionsGridProps) {
+export default function ActionsGrid({ initialItems, lang, pageType, initialHasMore }: ActionsGridProps) {
+    const texts = LOCALIZED_TEXTS[lang === 'ru' ? 'ru' : 'ua'][pageType];
     const [items, setItems] = useState<ActionItem[]>(initialItems);
     const [hasMore, setHasMore] = useState(initialHasMore ?? true);
     const [loading, setLoading] = useState(false);
@@ -135,21 +186,22 @@ export default function ActionsGrid({ dict, initialItems, lang, pageType, initia
         }
     };
 
+    const currentLoc = LOCALIZED_TEXTS[lang === 'ru' ? 'ru' : 'ua'];
     const breadcrumbItems = [
-        { label: dict.breadcrumbs.home, href: '/' },
-        { label: pageType === 'promotions' ? dict.breadcrumbs.promotions! : dict.breadcrumbs.complexDiscounts! }
+        { label: currentLoc[pageType].breadcrumbs.home, href: '/' },
+        { label: pageType === 'promotions' ? currentLoc.promotions.breadcrumbs.promotions : currentLoc['complex-discounts'].breadcrumbs.complexDiscounts }
     ];
 
     const tabItems = [
         {
             id: 'promotions',
-            label: dict.tabs.promotions,
+            label: texts.tabs.promotions,
             href: '/actions',
             active: pageType === 'promotions'
         },
         {
             id: 'complex-discounts',
-            label: dict.tabs.complexDiscounts,
+            label: texts.tabs.complexDiscounts,
             href: '/complex-discounts',
             active: pageType === 'complex-discounts'
         }
@@ -158,7 +210,7 @@ export default function ActionsGrid({ dict, initialItems, lang, pageType, initia
     return (
         <section className={s.section}>
             <HeroBanner
-                title={dict.title}
+                title={texts.title}
                 image={`/images/promotions/${pageType}-banner.png`}
             />
 
@@ -196,7 +248,7 @@ export default function ActionsGrid({ dict, initialItems, lang, pageType, initia
                             <div className={s.cardBody}>
                                 <div className={s.date}>
                                     <span className={s.dateLabel}>
-                                        {pageType === 'promotions' ? 'Акція діє до:' : 'Комплексна знижка діє:'}
+                                        {texts.dateLabel}
                                     </span>
                                     {' '}
                                     <span className={s.dateValue}>
@@ -214,7 +266,7 @@ export default function ActionsGrid({ dict, initialItems, lang, pageType, initia
             {hasMore && (
                 <div className={s.loadMoreWrapper}>
                     <Button variant="outline-black" onClick={loadMore} className={s.loadMoreBtn} disabled={loading}>
-                        <span className={s.loadMoreBtnText}>{loading ? "Завантаження..." : dict.showBtn}</span>
+                        <span className={s.loadMoreBtnText}>{loading ? texts.loading : texts.showBtn}</span>
                         {!loading && (
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="15" viewBox="0 0 18 15" fill="none">
                             <path d="M9.98467 1.00019L16.3131 7.32861L9.98467 13.657" stroke="black" strokeWidth="2" strokeLinecap="round" />

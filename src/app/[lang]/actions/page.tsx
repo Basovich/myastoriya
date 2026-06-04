@@ -1,4 +1,3 @@
-import { getDictionary } from "@/i18n/get-dictionary";
 import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSalesApi } from "@/lib/graphql/queries/pages/home/sales";
 
@@ -9,7 +8,6 @@ export default async function ActionsPage({
     params: Promise<{ lang: "ua" | "ru" }>;
 }) {
     const { lang } = await params;
-    const dict = await getDictionary(lang);
     const salesResponse = await getSalesApi(12, 1, lang);
 
     const initialItems = salesResponse.data.map(sale => ({
@@ -23,7 +21,6 @@ export default async function ActionsPage({
     return (
         <main>
             <ActionsGrid
-                dict={dict.home.actionsPage}
                 initialItems={initialItems}
                 lang={lang}
                 pageType="promotions"

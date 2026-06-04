@@ -11,8 +11,66 @@ import { type Sale, type Product, resolveProductImageUrl } from '@/lib/graphql';
 
 const PAGE_SIZE = 12;
 
+const LOCALIZED_TEXTS = {
+    ua: {
+        promotions: {
+            breadcrumbs: {
+                home: "Головна",
+                promotions: "Акції"
+            },
+            countdown: {
+                label: "До кінця акції залишилось:",
+                days: "Днів",
+                hours: "Годин",
+                minutes: "Хвилин",
+                seconds: "Секунд"
+            }
+        },
+        "complex-discounts": {
+            breadcrumbs: {
+                home: "Головна",
+                complexDiscounts: "Комплексні знижки"
+            },
+            countdown: {
+                label: "До кінця акції залишилось:",
+                days: "Днів",
+                hours: "Годин",
+                minutes: "Хвилин",
+                seconds: "Секунд"
+            }
+        }
+    },
+    ru: {
+        promotions: {
+            breadcrumbs: {
+                home: "Главная",
+                promotions: "Акции"
+            },
+            countdown: {
+                label: "До окончания акции осталось:",
+                days: "Дней",
+                hours: "Часов",
+                minutes: "Минут",
+                seconds: "Секунд"
+            }
+        },
+        "complex-discounts": {
+            breadcrumbs: {
+                home: "Главная",
+                complexDiscounts: "Комплексные скидки"
+            },
+            countdown: {
+                label: "До окончания акции осталось:",
+                days: "Дней",
+                hours: "Часов",
+                minutes: "Минут",
+                seconds: "Секунд"
+            }
+        }
+    }
+};
+
 interface ActionDetailProps {
-    dict: Dictionary;
     lang: string;
     id: string;
     pageType?: 'promotions' | 'complex-discounts';
@@ -22,7 +80,6 @@ interface ActionDetailProps {
 }
 
 export default function ActionDetail({
-    dict,
     lang,
     id,
     pageType = 'promotions',
@@ -44,16 +101,19 @@ export default function ActionDetail({
         }
     }
 
+    const currentLoc = LOCALIZED_TEXTS[lang === 'ru' ? 'ru' : 'ua'];
     const breadcrumbItems = [
-        { label: dict.home.actionsPage.breadcrumbs.home, href: '/' },
+        { label: currentLoc[pageType].breadcrumbs.home, href: '/' },
         {
             label: pageType === 'promotions'
-                ? dict.home.actionsPage.breadcrumbs.promotions
-                : dict.home.complexDiscountsPage.breadcrumbs.complexDiscounts,
+                ? currentLoc.promotions.breadcrumbs.promotions
+                : currentLoc['complex-discounts'].breadcrumbs.complexDiscounts,
             href: pageType === 'promotions' ? '/actions' : '/complex-discounts',
         },
         { label: title },
     ];
+
+    const countdown = currentLoc[pageType].countdown;
 
     const [products, setProducts] = useState<Product[]>(initialProducts);
     const [hasMore, setHasMore] = useState(initialHasMore);
@@ -149,11 +209,11 @@ export default function ActionDetail({
                     <div className={s.timerAnchor}>
                         <CountdownTimer
                             targetDate={endDate}
-                            label="До кінця акції залишилось:"
-                            labelDays="Днів"
-                            labelHours="Годин"
-                            labelMinutes="Хвилин"
-                            labelSeconds="Секунди"
+                            label={countdown.label}
+                            labelDays={countdown.days}
+                            labelHours={countdown.hours}
+                            labelMinutes={countdown.minutes}
+                            labelSeconds={countdown.seconds}
                         />
                     </div>
                 )}

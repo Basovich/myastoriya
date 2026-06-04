@@ -10,17 +10,50 @@ import ProductCard from '../ui/ProductCard/ProductCard';
 import CartModal from '../CartModal/CartModal';
 import { useAppDispatch } from '@/store/hooks';
 import { addToCart } from '@/store/slices/cartSlice';
-import { type Dictionary } from '@/i18n/types';
 
 import { type Special, resolveProductImageUrl } from '@/lib/graphql';
 
+const LOCALIZED_TEXTS = {
+    ua: {
+        breadcrumbs: {
+            home: "Головна",
+            complexDiscounts: "Комплексні знижки"
+        },
+        countdown: {
+            label: "До кінця акції залишилось:",
+            days: "Днів",
+            hours: "Годин",
+            minutes: "Хвилин",
+            seconds: "Секунди"
+        },
+        buyTogetherDiscount: "При купівлі разом ви отримуєте знижку",
+        discount: "Знижка",
+        addToCart: "ДОДАТИ ДО КОШИКА"
+    },
+    ru: {
+        breadcrumbs: {
+            home: "Главная",
+            complexDiscounts: "Комплексные скидки"
+        },
+        countdown: {
+            label: "До окончания акции осталось:",
+            days: "Дней",
+            hours: "Часов",
+            minutes: "Минут",
+            seconds: "Секунд"
+        },
+        buyTogetherDiscount: "При покупке вместе вы получаете скидку",
+        discount: "Скидка",
+        addToCart: "ДОБАВИТЬ В КОРЗИНУ"
+    }
+};
+
 interface ComplexDiscountDetailProps {
-    dict: Dictionary;
     lang: string;
     initialData: Special;
 }
 
-export default function ComplexDiscountDetail({ dict, lang, initialData }: ComplexDiscountDetailProps) {
+export default function ComplexDiscountDetail({ lang, initialData }: ComplexDiscountDetailProps) {
     const item = initialData;
     
     const title = item?.title ?? '';
@@ -28,9 +61,11 @@ export default function ComplexDiscountDetail({ dict, lang, initialData }: Compl
     const discountPercent = item?.amount ? `-${item.amount}%` : '0%';
     const description = item?.description ?? '';
 
+    const texts = LOCALIZED_TEXTS[lang === 'ru' ? 'ru' : 'ua'];
+
     const breadcrumbItems = [
-        { label: dict.home.actionsPage.breadcrumbs.home, href: '/' },
-        { label: dict.home.complexDiscountsPage.breadcrumbs.complexDiscounts, href: '/complex-discounts' },
+        { label: texts.breadcrumbs.home, href: '/' },
+        { label: texts.breadcrumbs.complexDiscounts, href: '/complex-discounts' },
         { label: title },
     ];
 
@@ -77,11 +112,11 @@ export default function ComplexDiscountDetail({ dict, lang, initialData }: Compl
                     <div className={s.timerAnchor}>
                         <CountdownTimer
                             targetDate={endDate}
-                            label="До кінця акції залишилось:"
-                            labelDays="Днів"
-                            labelHours="Годин"
-                            labelMinutes="Хвилин"
-                            labelSeconds="Секунди"
+                            label={texts.countdown.label}
+                            labelDays={texts.countdown.days}
+                            labelHours={texts.countdown.hours}
+                            labelMinutes={texts.countdown.minutes}
+                            labelSeconds={texts.countdown.seconds}
                         />
                     </div>
                 </div>
@@ -112,7 +147,7 @@ export default function ComplexDiscountDetail({ dict, lang, initialData }: Compl
                                             unit={product.unit || "кг"}
                                             badge={null}
                                             image={productImage}
-                                        lang="ua" />
+                                            lang={lang} />
                                 </div>
                                 {idx < bundleProducts.length - 1 && (
                                     <span className={s.plus}>+</span>
@@ -124,10 +159,10 @@ export default function ComplexDiscountDetail({ dict, lang, initialData }: Compl
 
                     {/* Discount summary */}
                     <div className={s.discountBlock}>
-                        <span className={s.discountLabel}>При купівлі разом ви отримуєте знижку</span>
+                        <span className={s.discountLabel}>{texts.buyTogetherDiscount}</span>
                         <div className={s.discountValues}>
                             <div className={s.discountItem}>
-                                <span className={s.discountTitle}>Знижка</span>
+                                <span className={s.discountTitle}>{texts.discount}</span>
                                 <span className={s.discountPercent}>{discountPercent}</span>
                             </div>
                             <div className={s.discountItem}>
@@ -144,7 +179,7 @@ export default function ComplexDiscountDetail({ dict, lang, initialData }: Compl
                             className={s.ctaButton}
                             onClick={handleAddToCart}
                         >
-                            ДОДАТИ ДО КОШИКА
+                            {texts.addToCart}
                         </Button>
                     </div>
                 </div>

@@ -1,4 +1,3 @@
-import { getDictionary } from "@/i18n/get-dictionary";
 import ComplexDiscountDetail from "../../../components/ComplexDiscountDetail/ComplexDiscountDetail";
 import { findSpecialIdBySlug, getSpecialApi } from "@/lib/graphql";
 import { notFound } from "next/navigation";
@@ -9,7 +8,6 @@ export default async function ComboDetail({
     params: Promise<{ lang: "ua" | "ru"; slug: string }>;
 }) {
     const { lang, slug } = await params;
-    const dict = await getDictionary(lang);
 
     // Try to resolve slug to ID
     let finalId = slug;
@@ -28,7 +26,7 @@ export default async function ComboDetail({
 
     return (
         <main>
-            <ComplexDiscountDetail dict={dict} lang={lang} initialData={special} />
+            <ComplexDiscountDetail lang={lang} initialData={special} />
         </main>
     );
 }

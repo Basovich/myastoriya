@@ -1,4 +1,3 @@
-import { getDictionary } from "@/i18n/get-dictionary";
 import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSpecialsApi } from "@/lib/graphql";
 
@@ -9,7 +8,6 @@ export default async function ComplexDiscountsPage({
     params: Promise<{ lang: "ua" | "ru" }>;
 }) {
     const { lang } = await params;
-    const dict = await getDictionary(lang);
     const specialsResponse = await getSpecialsApi(12, 1, lang);
 
     const initialItems = specialsResponse.data.map(special => {
@@ -30,7 +28,6 @@ export default async function ComplexDiscountsPage({
     return (
         <main>
             <ActionsGrid
-                dict={dict.home.complexDiscountsPage}
                 initialItems={initialItems}
                 lang={lang}
                 pageType="complex-discounts"
