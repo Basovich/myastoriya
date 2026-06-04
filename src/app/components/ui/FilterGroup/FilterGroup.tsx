@@ -43,12 +43,12 @@ export default function FilterGroup({
                     <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             </button>
+            <div className={s.divider} />
             <div className={clsx(s.groupOptionsWrap, isOpen && s.groupOptionsWrapOpen)}>
                 <div className={s.groupOptions}>
                     {children}
                 </div>
             </div>
-            <div className={s.divider} />
         </div>
     );
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { Range } from 'react-range';
 import s from './PriceRange.module.scss';
 
 interface PriceRangeProps {
@@ -28,24 +29,67 @@ export default function PriceRange({
     showClear,
     onOk,
 }: PriceRangeProps) {
+    const [fromInput, setFromInput] = useState(String(from));
+    const [toInput, setToInput] = useState(String(to));
+
+    useEffect(() => {
+        setFromInput(String(from));
+    }, [from]);
+
+    useEffect(() => {
+        setToInput(String(to));
+    }, [to]);
+
     const fromPercent = useMemo(() => ((from - min) / (max - min)) * 100, [from, min, max]);
     const toPercent = useMemo(() => ((to - min) / (max - min)) * 100, [to, min, max]);
 
-    const handleFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = Math.min(Number(e.target.value), to - (step || 1));
+
+    const handleFromTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFromInput(e.target.value);
+    };
+
+    const handleToTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setToInput(e.target.value);
+    };
+
+    const commitFromValue = () => {
+        let val = Number(fromInput);
+        if (isNaN(val) || val < min) val = min;
+        if (val > to) val = to;
+        setFromInput(String(val));
         onChange(val, to);
     };
 
-    const handleToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = Math.max(Number(e.target.value), from + (step || 1));
+    const commitToValue = () => {
+        let val = Number(toInput);
+        if (isNaN(val) || val > max) val = max;
+        if (val < from) val = from;
+        setToInput(String(val));
         onChange(from, val);
+    };
+
+    const handleOkClick = () => {
+        let finalFrom = Number(fromInput);
+        if (isNaN(finalFrom) || finalFrom < min) finalFrom = min;
+        if (finalFrom > to) finalFrom = to;
+
+        let finalTo = Number(toInput);
+        if (isNaN(finalTo) || finalTo > max) finalTo = max;
+        if (finalTo < finalFrom) finalTo = finalFrom;
+
+        setFromInput(String(finalFrom));
+        setToInput(String(finalTo));
+        onChange(finalFrom, finalTo);
+        onOk?.();
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            onOk?.();
+            handleOkClick();
         }
     };
+
+    const isFromNearRightHalf = from > (max - min) / 2;
 
     return (
         <div className={s.priceSection}>
@@ -66,10 +110,11 @@ export default function PriceRange({
                     <input
                         type="number"
                         className={s.priceInput}
-                        value={from}
+                        value={fromInput}
                         min={min}
-                        max={to - step}
-                        onChange={handleFromChange}
+                        max={to}
+                        onChange={handleFromTextChange}
+                        onBlur={commitFromValue}
                         onKeyDown={handleKeyDown}
                     />
                 </div>
@@ -78,44 +123,74 @@ export default function PriceRange({
                     <input
                         type="number"
                         className={s.priceInput}
-                        value={to}
-                        min={from + step}
+                        value={toInput}
+                        min={from}
                         max={max}
-                        onChange={handleToChange}
+                        onChange={handleToTextChange}
+                        onBlur={commitToValue}
                         onKeyDown={handleKeyDown}
                     />
                 </div>
-                <button type="button" className={s.okBtn} onClick={onOk}>OK</button>
+                <button type="button" className={s.okBtn} onClick={handleOkClick}>OK</button>
             </div>
 
             <div className={s.sliderWrap}>
-                <div className={s.sliderTrack}>
-                    <div
-                        className={s.sliderFill}
-                        style={{
-                            left: `${fromPercent}%`,
-                            width: `${toPercent - fromPercent}%`,
-                        }}
-                    />
-                    <input
-                        type="range"
-                        min={min}
-                        max={max}
-                        step={step}
-                        value={from}
-                        className={s.rangeInput}
-                        onChange={handleFromChange}
-                    />
-                    <input
-                        type="range"
-                        min={min}
-                        max={max}
-                        step={step}
-                        value={to}
-                        className={s.rangeInput}
-                        onChange={handleToChange}
-                    />
-                </div>
+                <Range
+                    step={step}
+                    min={min}
+                    max={max}
+                    values={[from, to]}
+                    onChange={(values) => {
+                        // Clamp each handle independently against the other's CURRENT value
+                        // to prevent any crossing or nudging.
+                        const newFrom = Math.min(values[0], to);
+                        const newTo = Math.max(values[1], from);
+                        onChange(newFrom, newTo);
+                    }}
+                    renderTrack={({ props, children }) => {
+                        const { key, ...restProps } = props as typeof props & { key: React.Key };
+                        return (
+                            <div
+                                key={key}
+                                {...restProps}
+                                className={s.sliderTrack}
+                                style={{
+                                    ...restProps.style,
+                                }}
+                            >
+                                <div
+                                    className={s.sliderFill}
+                                    style={{
+                                        left: `${fromPercent}%`,
+                                        width: `${toPercent - fromPercent}%`,
+                                    }}
+                                />
+                                {children}
+                                <div
+                                    className={`${s.customThumb} ${isFromNearRightHalf ? s.highZ : ''}`}
+                                    style={{ left: `${fromPercent}%` }}
+                                />
+                                <div
+                                    className={`${s.customThumb} ${!isFromNearRightHalf ? s.highZ : ''}`}
+                                    style={{ left: `${toPercent}%` }}
+                                />
+                            </div>
+                        );
+                    }}
+                    renderThumb={({ props }) => {
+                        const { key, ...restProps } = props as typeof props & { key: React.Key };
+                        return (
+                            <div
+                                key={key}
+                                {...restProps}
+                                className={s.transparentThumb}
+                                style={{
+                                    ...restProps.style,
+                                }}
+                            />
+                        );
+                    }}
+                />
             </div>
         </div>
     );

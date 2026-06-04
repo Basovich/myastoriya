@@ -61,49 +61,36 @@
     pointer-events: none;
 }
 
-.rangeInput {
+.transparentThumb {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    cursor: pointer;
+    outline: none;
+    z-index: 5;
+}
+
+
+.customThumb {
     position: absolute;
     top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    width: 100%;
-    height: 6px;
-    appearance: none;
-    -webkit-appearance: none;
-    background: transparent;
-    cursor: pointer;
-    pointer-events: none;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    pointer-events: none; // Let mouse events pass through to native range inputs
+    z-index: 4;
+}
 
-    &::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #fff;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-        pointer-events: all;
-        cursor: pointer;
-        transition: transform 0.15s;
-    }
-
-    &::-moz-range-thumb {
-        appearance: none;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #fff;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-        pointer-events: all;
-        cursor: pointer;
-    }
-
-    &:focus-visible::-webkit-slider-thumb {
-        outline: 2px solid #E3051B;
-        outline-offset: 2px;
-    }
+.highZ {
+    z-index: 6;
 }
 
 .priceInputs {
