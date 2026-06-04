@@ -63,6 +63,22 @@ const LOCALIZED_SIDEBAR_TEXTS = {
     }
 };
 
+function shouldExcludeBlock(block: FilterBlock): boolean {
+    const key = (block.key ?? '').toLowerCase();
+    const label = (block.label ?? '').toLowerCase();
+
+    // Check for caloric value / energy
+    if (key.includes('kalor') || label.includes('калорі') || label.includes('калори')) return true;
+    // Check for carbohydrates
+    if (key.includes('vuhl') || key.includes('uglev') || label.includes('вуглевод') || label.includes('углевод')) return true;
+    // Check for proteins
+    if (key.includes('bilk') || key.includes('belk') || label.includes('білк') || label.includes('белк')) return true;
+    // Check for fats
+    if (key.includes('zhy') || key.includes('zhi') || label.includes('жир')) return true;
+
+    return false;
+}
+
 export default function CatalogSidebar({
     onApply,
     onClose,
@@ -94,7 +110,9 @@ export default function CatalogSidebar({
     const [pendingPrice, setPendingPrice] = useState<Record<string, { from: number; to: number }>>({});
 
     // Динамічні блоки фільтрів, отримані через /api/catalog/products-filter (з forwarded cookies)
-    const [dynamicBlocks, setDynamicBlocks] = useState<FilterBlock[]>(filterBlocks ?? []);
+    const [dynamicBlocks, setDynamicBlocks] = useState<FilterBlock[]>(
+        (filterBlocks ?? []).filter(block => !shouldExcludeBlock(block))
+    );
     const [isLoadingFilters, setIsLoadingFilters] = useState(!filterBlocks || filterBlocks.length === 0);
 
     useEffect(() => {
@@ -108,7 +126,7 @@ export default function CatalogSidebar({
             .then(r => r.json())
             .then(data => {
                 if (data.blocks && Array.isArray(data.blocks)) {
-                    setDynamicBlocks(data.blocks);
+                    setDynamicBlocks(data.blocks.filter((block: FilterBlock) => !shouldExcludeBlock(block)));
                 }
             })
             .catch(() => { /* залишаємо dynamicBlocks порожніми */ })
