@@ -34,14 +34,34 @@ interface CatalogSidebarProps {
     activeFilters?: FilterStateInput[];
 }
 
-const SORT_OPTIONS = [
-    'За популярністю',
-    'За зниженням ціни',
-    'За зростанням ціни',
-    'За рейтингом',
-    'За обговорюваністю',
-    'За датою',
-];
+const LOCALIZED_SIDEBAR_TEXTS = {
+    ua: {
+        applyFilter: 'ЗАСТОСУВАТИ ФІЛЬТР',
+        apply: 'ЗАСТОСУВАТИ',
+        defaultSortOption: 'За популярністю',
+        sortOptions: [
+            'За популярністю',
+            'За зниженням ціни',
+            'За зростанням ціни',
+            'За рейтингом',
+            'За обговорюваністю',
+            'За датою',
+        ]
+    },
+    ru: {
+        applyFilter: 'ПРИМЕНИТЬ ФИЛЬТР',
+        apply: 'ПРИМЕНИТЬ',
+        defaultSortOption: 'По популярности',
+        sortOptions: [
+            'По популярности',
+            'По снижению цены',
+            'По возрастанию цены',
+            'По рейтингу',
+            'По обсуждаемости',
+            'По дате',
+        ]
+    }
+};
 
 export default function CatalogSidebar({
     onApply,
@@ -61,10 +81,11 @@ export default function CatalogSidebar({
     const searchParams = useSearchParams();
 
     const lang = routeParams?.lang === 'ru' ? 'ru' : 'ua';
+    const texts = LOCALIZED_SIDEBAR_TEXTS[lang];
     const sidebarRef = useRef<HTMLDivElement>(null);
     const [floatingButtonPos, setFloatingButtonPos] = useState<{ top: number; left: number } | null>(null);
-    const optionsToUse = sortOptions || SORT_OPTIONS;
-    const defaultSortOption = optionsToUse[0] || 'За популярністю';
+    const optionsToUse = sortOptions || texts.sortOptions;
+    const defaultSortOption = optionsToUse[0] || texts.defaultSortOption;
 
     // Локальний стан фільтрів (pending до натискання «Застосувати»)
     const [pendingFilters, setPendingFilters] = useState<FilterStateInput[]>(activeFilters ?? []);
@@ -308,8 +329,8 @@ export default function CatalogSidebar({
                     disabled={!isPendingChanged && !isSortChanged}
                 >
                     {selectedCount > 0
-                        ? `ЗАСТОСУВАТИ (${selectedCount})`
-                        : 'ЗАСТОСУВАТИ ФІЛЬТР'}
+                        ? `${texts.apply} (${selectedCount})`
+                        : texts.applyFilter}
                 </Button>
 
                 {isPendingChanged && floatingButtonPos && (
@@ -323,8 +344,8 @@ export default function CatalogSidebar({
                         onClick={handleApply}
                     >
                         {selectedCount > 0
-                            ? `ЗАСТОСУВАТИ (${selectedCount})`
-                            : 'ЗАСТОСУВАТИ'}
+                            ? `${texts.apply} (${selectedCount})`
+                            : texts.apply}
                     </button>
                 )}
             </div>
