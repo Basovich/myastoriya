@@ -101,13 +101,13 @@ export default function SearchBar() {
                     <input
                         type="text"
                         className={s.searchInput}
-                        placeholder="Я шукаю..."
+                        placeholder={lang === "ru" ? "Я ищу..." : "Я шукаю..."}
                         value={query}
                         onFocus={handleInputFocus}
                         onChange={handleInputChange}
                         onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
-                    <button className={s.searchBtn} onClick={handleSearch}>ПОШУК</button>
+                    <button className={s.searchBtn} onClick={handleSearch}>{lang === "ru" ? "ПОИСК" : "ПОШУК"}</button>
                 </div>
 
                 {isActive && query.trim() !== "" && (
@@ -126,12 +126,12 @@ export default function SearchBar() {
                                     </div>
                                 ))}
                                 <button className={s.showAll} onClick={handleSearch}>
-                                    Показати всі результати
+                                    {lang === "ru" ? "Показать все результаты" : "Показати всі результати"}
                                 </button>
                             </div>
                         ) : (
                             <div className={s.noResults}>
-                                Товарів не знайдено
+                                {lang === "ru" ? "Товаров не найдено" : "Товарів не знайдено"}
                             </div>
                         )}
                     </div>

@@ -41,7 +41,7 @@ function Actions() {
         <>
             <div className={s.actions}>
                 {/* Cart */}
-                <button className={s.actionBtn} aria-label="Кошик" onClick={() => setIsCartModalOpen(true)}>
+                <button className={s.actionBtn} aria-label={lang === 'ru' ? 'Корзина' : 'Кошик'} onClick={() => setIsCartModalOpen(true)}>
                     <Image src="/icons/shopping-bag.svg" alt="Cart" width={20} height={20} />
                     {hydrated && totalCartItems > 0 && (
                         <span className={s.badge}>{totalCartItems}</span>
@@ -51,7 +51,7 @@ function Actions() {
                 {/* Heart (Favorites) */}
                 <button
                     className={s.actionBtn}
-                    aria-label="Обране"
+                    aria-label={lang === 'ru' ? 'Избранное' : 'Обране'}
                     onClick={handleFavoritesClick}
                 >
                     <Image src="/icons/icon-heart.svg" alt="Favorites" width={20} height={20} />

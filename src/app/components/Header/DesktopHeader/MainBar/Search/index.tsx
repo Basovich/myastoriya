@@ -238,8 +238,8 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                 <div className={s.iconWrapper}>
                     <Image src="/icons/icon-search.svg" alt="Search" width="20" height="20" />
                 </div>
-                <div className={s.placeholderText}>Я шукаю...</div>
-                <button className={s.headerSearchBtn}>пошук</button>
+                <div className={s.placeholderText}>{lang === 'ru' ? 'Я ищу...' : 'Я шукаю...'}</div>
+                <button className={s.headerSearchBtn}>{lang === 'ru' ? 'поиск' : 'пошук'}</button>
             </div>
 
             {isActive && (
@@ -255,7 +255,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                 <div className={s.inputWrapper}>
                                     <input
                                         type="text"
-                                        placeholder="Я шукаю..."
+                                        placeholder={lang === 'ru' ? 'Я ищу...' : 'Я шукаю...'}
                                         className={s.overlayInput}
                                         value={query}
                                         autoFocus
@@ -285,7 +285,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                 ) : (
                                     <div className={s.contentBody}>
                                         <div className={s.colCategories}>
-                                            <h3 className={s.colTitle}>Категорії</h3>
+                                            <h3 className={s.colTitle}>{lang === 'ru' ? 'Категории' : 'Категорії'}</h3>
                                             <ul className={s.categoryList}>
                                                 {searchCategories.length > 0 ? (
                                                     searchCategories.map(cat => (
@@ -298,7 +298,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                         />
                                                     ))
                                                 ) : query.length >= 3 && !isLoading ? (
-                                                    <li className={s.noResultsInline}>Нічого не знайдено</li>
+                                                    <li className={s.noResultsInline}>{lang === 'ru' ? 'Ничего не найдено' : 'Нічого не знайдено'}</li>
                                                 ) : (
                                                     popularQueries.map((q, idx) => (
                                                         <li key={idx} onClick={() => setQuery(q)}>
@@ -311,7 +311,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
 
                                         <div className={s.colDishes}>
                                             <div className={s.colTitleWrapper}>
-                                                <h3 className={s.colTitle}>Страви</h3>
+                                                <h3 className={s.colTitle}>{lang === 'ru' ? 'Блюда' : 'Страви'}</h3>
                                                 <div className={s.titleIcon}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><g opacity="0.5"><path d="M8.12988 2.7124C11.1214 2.71258 13.5459 5.13784 13.5459 8.12939C13.5458 9.47077 13.0547 10.7039 12.2383 11.6538L12.4717 11.8794H13.1299L17.2881 16.0454L16.0459 17.2876L11.8799 13.1294V12.4712L11.6543 12.2378C10.7044 13.0542 9.47126 13.5453 8.12988 13.5454C5.13833 13.5454 2.71307 11.1209 2.71289 8.12939C2.71289 5.13773 5.13822 2.7124 8.12988 2.7124ZM8.12988 4.37939C6.05488 4.37939 4.37988 6.05439 4.37988 8.12939C4.38006 10.2042 6.05499 11.8794 8.12988 11.8794C10.2046 11.8792 11.8797 10.2041 11.8799 8.12939C11.8799 6.0545 10.2047 4.37957 8.12988 4.37939Z" fill="black" /></g></svg>
                                                 </div>
@@ -336,19 +336,19 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                             );
                                                         })
                                                     ) : !isLoading ? (
-                                                        <div className={s.emptyPrompt}>Товарів не знайдено</div>
+                                                        <div className={s.emptyPrompt}>{lang === 'ru' ? 'Товаров не найдено' : 'Товарів не знайдено'}</div>
                                                     ) : (
-                                                        <div className={s.emptyPrompt}>Пошук...</div>
+                                                        <div className={s.emptyPrompt}>{lang === 'ru' ? 'Поиск...' : 'Пошук...'}</div>
                                                     )}
                                                 </div>
                                             </div>
                                             <button className={s.showAllResults} onClick={handleSearch}>
-                                                Показати всі результати
+                                                {lang === 'ru' ? 'Показать все результаты' : 'Показати всі результати'}
                                             </button>
                                         </div>
 
                                         <div className={s.colSuggestions}>
-                                            <h3 className={s.colTitle}>Кращі пропозиції за пошуком</h3>
+                                            <h3 className={s.colTitle}>{lang === 'ru' ? 'Лучшие предложения по поиску' : 'Кращі пропозиції за пошуком'}</h3>
                                             <div className={s.suggestionsContainer}>
                                                 {featuredProposals.length > 0 ? (
                                                     <>
@@ -373,7 +373,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                     {featuredProposals.map((product) => {
                                                                         const mainImage = resolveProductImageUrl(product);
                                                                         const weight = product.specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || product.unit;
-                                                                        const badgeText = product.oldCost ? 'акція' : (product.is_new ? 'new' : null);
+                                                                        const badgeText = product.oldCost ? (lang === 'ru' ? 'акция' : 'акція') : (product.is_new ? 'new' : null);
 
                                                                         return (
                                                                             <div key={product.id} className={s.featuredCardSlide}>
@@ -421,7 +421,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                             variant={featuredProposals[0].is_new ? "new" : "sale"} 
                                                                             className={s.featuredBadge}
                                                                         >
-                                                                            {featuredProposals[0].oldCost ? 'акція' : 'new'}
+                                                                            {featuredProposals[0].oldCost ? (lang === 'ru' ? 'акция' : 'акція') : 'new'}
                                                                         </Badge>
                                                                     )}
                                                                     <div className={s.featuredWeightOverlay}>
@@ -454,7 +454,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                         )}
                                                     </>
                                                 ) : (
-                                                    <div className={s.emptyPrompt}>Немає пропозицій</div>
+                                                    <div className={s.emptyPrompt}>{lang === 'ru' ? 'Нет предложений' : 'Немає пропозицій'}</div>
                                                 )}
                                             </div>
                                         </div>

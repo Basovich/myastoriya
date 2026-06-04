@@ -21,7 +21,15 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose, lang, categories }: MobileMenuProps) {
-    const navItems = [...siteData.navigation];
+    const getMobileNavItems = (targetLang: Locale) => [
+        { label: targetLang === "ru" ? "Заведения" : "Заклади", href: "/our-stores" },
+        { label: targetLang === "ru" ? "Акции" : "Акції", href: "/actions" },
+        { label: targetLang === "ru" ? "Блог" : "Блог", href: "/blog" },
+        { label: targetLang === "ru" ? "Доставка и Оплата" : "Доставка та Оплата", href: "/delivery" },
+        { label: targetLang === "ru" ? "Франшиза" : "Франшиза", href: "https://f.myastoriya.ua/" },
+        { label: targetLang === "ru" ? "Контакти" : "Контакти", href: "/contacts" }
+    ];
+    const navItems = getMobileNavItems(lang);
     // Menu Transition (Slide In/Out)
     const menuTransition = useTransition(isOpen, {
         from: { transform: "translateX(-100%)" },
@@ -71,7 +79,7 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
             {/* Header */}
             <div className={s.menuHeader}>
                 <div className={s.topRow}>
-                    <button onClick={onClose} className={s.closeBtn} aria-label="Закрити">
+                    <button onClick={onClose} className={s.closeBtn} aria-label={lang === "ru" ? "Закрыть" : "Закрити"}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18" />
                             <line x1="6" y1="6" x2="18" y2="18" />
@@ -101,7 +109,7 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
                 <div className={s.catalogHeader} onClick={(e) => {
                     toggleCatalog();
                 }}>
-                    Каталог продукції
+                    {lang === "ru" ? "Каталог продукции" : "Каталог продукції"}
                     <div className={s.iconWrapper} style={{ transform: isCatalogOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
                         <svg
                             width="16"

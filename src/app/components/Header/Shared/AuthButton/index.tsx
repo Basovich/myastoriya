@@ -36,14 +36,14 @@ function AuthButton() {
             <button
                 className={clsx(s.authBtn, isReallyLoggedIn && s.loggedIn)}
                 onClick={handleAuthClick}
-                aria-label={isReallyLoggedIn ? 'Профіль' : 'Вхід'}
+                aria-label={isReallyLoggedIn ? (lang === 'ru' ? 'Профиль' : 'Профіль') : (lang === 'ru' ? 'Вход' : 'Вхід')}
             >
                 {isReallyLoggedIn ? (
                     <Image src="/icons/icon-profile.svg" alt="Profile" width={20} height={20} className={s.icon} />
                 ) : (
                     <>
                         <span className={s.label}>
-                            Вхід
+                            {lang === 'ru' ? 'Вход' : 'Вхід'}
                         </span>
                         <Image src="/icons/icon-profile.svg" alt="Profile" width={20} height={20} className={s.icon} />
                     </>

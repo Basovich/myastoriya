@@ -15,7 +15,7 @@ export default function Logo({ lang, className, theme = 'white' }: LogoProps) {
         <AppLink href="/" className={clsx(s.logo, className)}>
             <Image
                 src={theme === 'black' ? "/images/logo-black.svg" : "/images/logo-white.svg"}
-                alt="М'ясторія"
+                alt={lang === 'ru' ? "Мястория" : "М'ясторія"}
                 width={114}
                 height={33}
                 className={s.logoImg}

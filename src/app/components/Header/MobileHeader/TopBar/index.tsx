@@ -12,7 +12,7 @@ interface TopBarProps {
 export default function TopBar({ lang, onMenuClick }: TopBarProps) {
     return (
         <div className={s.topBar}>
-            <ToggleMenu onClick={onMenuClick} />
+            <ToggleMenu onClick={onMenuClick} lang={lang} />
             <Logo lang={lang} className={s.logo} />
             <Actions />
         </div>

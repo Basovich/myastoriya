@@ -13,13 +13,13 @@ interface TopBarProps {
     lang: Locale;
 }
 
-const TOP_NAV_ITEMS = [
-    { label: "Заклади", href: "/our-stores" },
-    { label: "Акції", href: "/actions" },
-    { label: "Блог", href: "/blog" },
-    { label: "Доставка та Оплата", href: "/delivery" },
-    { label: "Франшиза", href: "https://f.myastoriya.ua/" },
-    { label: "Контакти", href: "/contacts" },
+const getTopNavItems = (lang: Locale) => [
+    { label: lang === "ru" ? "Заведения" : "Заклади", href: "/our-stores" },
+    { label: lang === "ru" ? "Акции" : "Акції", href: "/actions" },
+    { label: lang === "ru" ? "Блог" : "Блог", href: "/blog" },
+    { label: lang === "ru" ? "Доставка и Оплата" : "Доставка та Оплата", href: "/delivery" },
+    { label: lang === "ru" ? "Франшиза" : "Франшиза", href: "https://f.myastoriya.ua/" },
+    { label: lang === "ru" ? "Контакты" : "Контакти", href: "/contacts" },
 ];
 
 import { useIsHydrated } from "@/hooks/useIsHydrated";
@@ -28,7 +28,7 @@ export default function TopBar({ lang }: TopBarProps) {
     const { isAuthenticated, isGuest, user } = useAppSelector((state) => state.auth);
     const hydrated = useIsHydrated();
     const isReallyLoggedIn = hydrated && isAuthenticated && !isGuest;
-    const navItems = [...TOP_NAV_ITEMS];
+    const navItems = getTopNavItems(lang);
 
     return (
         <nav className={s.secondaryNav}>

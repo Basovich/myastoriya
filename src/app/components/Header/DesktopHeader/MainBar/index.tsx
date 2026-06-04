@@ -14,13 +14,13 @@ import Image from "next/image";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import { siteData } from "@/config/site";
 
-export const TOP_NAV_ITEMS = [
-    { label: "Заклади", href: "/restaurants" },
-    { label: "Акції", href: "/actions" },
-    { label: "Доставка та Оплата", href: "/delivery" },
-    { label: "Блог", href: "/blog" },
-    { label: "Франшиза", href: "https://f.myastoriya.ua/" },
-    { label: "Контакти", href: "/contacts" },
+const getScrolledNavItems = (lang: Locale) => [
+    { label: lang === "ru" ? "Заведения" : "Заклади", href: "/restaurants" },
+    { label: lang === "ru" ? "Акции" : "Акції", href: "/actions" },
+    { label: lang === "ru" ? "Доставка и Оплата" : "Доставка та Оплата", href: "/delivery" },
+    { label: lang === "ru" ? "Блог" : "Блог", href: "/blog" },
+    { label: lang === "ru" ? "Франшиза" : "Франшиза", href: "https://f.myastoriya.ua/" },
+    { label: lang === "ru" ? "Контакты" : "Контакти", href: "/contacts" },
 ];
 
 import { ProductCategory } from "@/lib/graphql/queries/products";
@@ -67,7 +67,7 @@ export default function MainBar({
                 <div className={clsx(s.scrolledMenu, isMenuOpen && s.scrolledMenuOpen)}>
                     <div className={s.scrolledMenuInner}>
                         <div className={s.scrolledMenuLinks}>
-                            {TOP_NAV_ITEMS.map((item, i) => (
+                            {getScrolledNavItems(lang).map((item, i) => (
                                 <AppLink
                                     key={i}
                                     href={item.href}
@@ -109,7 +109,7 @@ export default function MainBar({
                         ) : (
                             <Image src="/icons/icon-category.svg" alt="Categories" width={18} height={18} />
                         )}
-                        <span className={s.catalogBtnInner}>Каталог продукції</span>
+                        <span className={s.catalogBtnInner}>{lang === "ru" ? "Каталог продукции" : "Каталог продукції"}</span>
                     </button>
 
                     <div className={s.searchWrapper}>
@@ -129,7 +129,7 @@ export default function MainBar({
                         <button
                             className={clsx(s.burgerBtn, isMenuOpen && s.active)}
                             onClick={onMenuToggle}
-                            aria-label="Меню"
+                            aria-label={lang === "ru" ? "Меню" : "Меню"}
                             aria-expanded={isMenuOpen}
                         >
                             <span className={s.burgerIcon}>
