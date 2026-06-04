@@ -130,7 +130,7 @@ export default function Actions({ dict, lang, sales }: ActionsProps) {
                                     </div>
                                     <div className={s.cardBody}>
                                         <span className={s.date}>
-                                            Акція діє до: {' '}
+                                            {lang === 'ru' ? 'Акция действует до:' : 'Акція діє до:'}{' '}
                                             <strong>{item.date}</strong>
                                         </span>
                                         <h4 className={s.cardTitle}>{item.title}</h4>
