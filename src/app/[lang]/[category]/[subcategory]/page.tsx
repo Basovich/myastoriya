@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
@@ -21,13 +21,54 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
     const catalogTree = await getCatalogTreeApi(lang);
     const categoryIndex = buildCategoryIndex(catalogTree);
 
-    // Find level-1 parent by slug
-    const parentCat = catalogTree.find(c => c.slug === categorySlug);
-    if (!parentCat) notFound();
+    // Find level-1 parent by slug in the current locale tree
+    let parentCat = catalogTree.find(c => c.slug === categorySlug);
+
+    // Cross-locale fallback for parent slug (bidirectional: UA↔RU)
+    if (!parentCat) {
+        const otherLocales = ['ua', 'ru'].filter(l => l !== lang);
+        for (const otherLang of otherLocales) {
+            const otherTree = await getCatalogTreeApi(otherLang);
+            const otherParent = otherTree.find(c => c.slug === categorySlug);
+            if (otherParent) {
+                const localizedParent = catalogTree.find(c => c.id === otherParent.id);
+                if (localizedParent) {
+                    // Also translate the subcategory slug
+                    const otherSub = (otherParent.children ?? []).find(c => c.slug === subcategorySlug);
+                    const localizedSub = otherSub
+                        ? (localizedParent.children ?? []).find(c => c.id === otherSub.id)
+                        : null;
+                    const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+                    redirect(`${langPrefix}/${localizedParent.slug}/${localizedSub?.slug ?? subcategorySlug}`);
+                }
+                break;
+            }
+        }
+        notFound();
+    }
 
     // Find level-2 child by slug
-    const matchedCat = (parentCat.children ?? []).find(c => c.slug === subcategorySlug);
-    if (!matchedCat) notFound();
+    let matchedCat = (parentCat.children ?? []).find(c => c.slug === subcategorySlug);
+
+    // Cross-locale fallback for subcategory slug (bidirectional: UA↔RU)
+    if (!matchedCat) {
+        const otherLocales = ['ua', 'ru'].filter(l => l !== lang);
+        for (const otherLang of otherLocales) {
+            const otherTree = await getCatalogTreeApi(otherLang);
+            const otherParent = otherTree.find(c => c.id === parentCat.id);
+            const otherSub = (otherParent?.children ?? []).find(c => c.slug === subcategorySlug);
+            if (otherSub) {
+                const localizedSub = (parentCat.children ?? []).find(c => c.id === otherSub.id);
+                if (localizedSub) {
+                    const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+                    redirect(`${langPrefix}/${parentCat.slug}/${localizedSub.slug}`);
+                }
+                break;
+            }
+        }
+        notFound();
+    }
+
 
     const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page as string) : 1;
     const view = (resolvedSearchParams.view as 'list' | 'grid') || 'list';

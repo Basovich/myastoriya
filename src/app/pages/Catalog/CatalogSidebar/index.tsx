@@ -69,6 +69,9 @@ export default function CatalogSidebar({
     // Локальний стан фільтрів (pending до натискання «Застосувати»)
     const [pendingFilters, setPendingFilters] = useState<FilterStateInput[]>(activeFilters ?? []);
 
+    // Локальний стан «чернетки» ціни — не впливає на isPendingChanged
+    const [pendingPrice, setPendingPrice] = useState<Record<string, { from: number; to: number }>>({});
+
     // Динамічні блоки фільтрів, отримані через /api/catalog/products-filter (з forwarded cookies)
     const [dynamicBlocks, setDynamicBlocks] = useState<FilterBlock[]>(filterBlocks ?? []);
     const [isLoadingFilters, setIsLoadingFilters] = useState(!filterBlocks || filterBlocks.length === 0);
@@ -140,8 +143,6 @@ export default function CatalogSidebar({
         }
     }, []);
 
-    // Локальний стан «чернетки» ціни — не впливає на isPendingChanged
-    const [pendingPrice, setPendingPrice] = useState<Record<string, { from: number; to: number }>>({});
 
     const handlePriceChange = useCallback((blockKey: string, from: number, to: number) => {
         setPendingPrice(prev => ({ ...prev, [blockKey]: { from, to } }));

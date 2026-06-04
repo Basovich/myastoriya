@@ -46,17 +46,22 @@ export function middleware(request: NextRequest) {
     }
 
     // 5. Internal rewrite to [lang] structure
-    // Check if the URL already has a locale
     const pathnameHasLocale = locales.some(
         (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
     );
 
     if (!pathnameHasLocale) {
-        // Rewrite to default locale /ua/path
+        // No locale prefix → rewrite to default locale /ua/path
         return NextResponse.rewrite(
             new URL(`/ua${pathname}${search}`, request.url)
         );
     }
+
+    // Has a non-default locale (e.g. /ru/...) → explicit rewrite so Next.js
+    // resolves it through the [lang] dynamic segment, not a literal folder.
+    return NextResponse.rewrite(
+        new URL(`${pathname}${search}`, request.url)
+    );
 }
 
 export const config = {

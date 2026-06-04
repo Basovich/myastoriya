@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
@@ -21,9 +21,28 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     const catalogTree = await getCatalogTreeApi(lang);
     const categoryIndex = buildCategoryIndex(catalogTree);
 
-    // Find level-1 category by slug
-    const matchedCat = catalogTree.find(c => c.slug === categorySlug);
-    if (!matchedCat) notFound();
+    // Find level-1 category by slug in the current locale tree
+    let matchedCat = catalogTree.find(c => c.slug === categorySlug);
+
+    // Cross-locale fallback: slug may come from a different locale (e.g. after language switch).
+    // Search the slug in all other locale trees, find the category id, then redirect to the
+    // correct slug for the current locale.
+    if (!matchedCat) {
+        const otherLocales = ['ua', 'ru'].filter(l => l !== lang);
+        for (const otherLang of otherLocales) {
+            const otherTree = await getCatalogTreeApi(otherLang);
+            const otherCat = otherTree.find(c => c.slug === categorySlug);
+            if (otherCat) {
+                const localizedCat = catalogTree.find(c => c.id === otherCat.id);
+                if (localizedCat) {
+                    const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+                    redirect(`${langPrefix}/${localizedCat.slug}`);
+                }
+                break;
+            }
+        }
+        notFound();
+    }
 
     const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page as string) : 1;
     const view = (resolvedSearchParams.view as 'list' | 'grid') || 'grid';
