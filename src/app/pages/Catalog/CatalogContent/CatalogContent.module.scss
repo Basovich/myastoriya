@@ -48,6 +48,10 @@ section.heroBanner {
 
     &.heroBannerCategory {
         margin-bottom: 0;
+
+        &.noBannerCategory {
+            background-color: #000;
+        }
     }
 }
 

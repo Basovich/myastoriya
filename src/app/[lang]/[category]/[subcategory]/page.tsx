@@ -116,6 +116,7 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
                 popularProducts={popularProducts}
                 activeFilters={activeFilters}
                 recommendedProducts={categoryDetails?.recommendedProducts}
+                bannerUrl={categoryDetails?.banner?.size1x}
             />
         </main>
     );

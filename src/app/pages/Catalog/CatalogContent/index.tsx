@@ -74,6 +74,8 @@ interface CatalogContentProps {
     activeFilters?: FilterStateInput[];
     /** Товари для блоку «Вас може зацікавити» (якщо додані через адмінку). */
     recommendedProducts?: Product[];
+    /** URL банера категорії з API. */
+    bannerUrl?: string | null;
 }
 
 export default async function CatalogContent({
@@ -91,6 +93,7 @@ export default async function CatalogContent({
     filterBlocks,
     activeFilters,
     recommendedProducts,
+    bannerUrl,
 }: CatalogContentProps) {
     const sortLabel = lang === 'ua' ? 'Сортувати:' : 'Сортировать:';
     const filterLabel = lang === 'ua' ? 'Фільтр' : 'Фильтр';
@@ -171,7 +174,12 @@ export default async function CatalogContent({
                 <HeroBanner
                     prefix=""
                     title={pageTitle}
-                    className={clsx(s.heroBanner, categoryName && s.heroBannerCategory)}
+                    className={clsx(
+                        s.heroBanner,
+                        categoryName && s.heroBannerCategory,
+                        !bannerUrl && s.noBannerCategory
+                    )}
+                    image={bannerUrl || null}
                 />
                 <Breadcrumbs items={breadcrumbItems} className={clsx(s.breadcrumbs, categoryName && s.breadcrumbsCategory)} />
                 {subcategoryItems && subcategoryItems.length > 0 && (

@@ -7,7 +7,7 @@ interface HeroBannerProps {
     title?: string;
     subtitle?: string;
     prefix?: string;
-    image?: string;
+    image?: string | null;
     className?: string;
     children?: React.ReactNode;
 }
@@ -22,14 +22,16 @@ export default function HeroBanner({
 }: HeroBannerProps) {
     return (
         <section className={clsx(s.bannerWrapper, className)}>
-            <Image
-                src={image}
-                alt={title || "Banner"}
-                fill
-                priority
-                style={{ objectFit: 'cover' }}
-                className={s.bannerImg}
-            />
+            {image && (
+                <Image
+                    src={image}
+                    alt={title || "Banner"}
+                    fill
+                    priority
+                    style={{ objectFit: 'cover' }}
+                    className={s.bannerImg}
+                />
+            )}
             <div className={s.bannerContent}>
                 {title && (
                     <h1 className={s.bannerTitle}>

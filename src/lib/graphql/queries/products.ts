@@ -32,6 +32,9 @@ export interface ProductCategory {
     } | null;
     children?: ProductCategory[];
     recommendedProducts?: Product[];
+    banner?: {
+        size1x?: string | null;
+    } | null;
 }
 
 export interface ProductImageUrl {
@@ -980,6 +983,9 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
             parentId
             name
             slug
+            banner {
+                size1x
+            }
             recommendedProducts {
                 id
                 slug

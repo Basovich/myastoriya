@@ -91,6 +91,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 popularProducts={popularProducts}
                 activeFilters={activeFilters}
                 recommendedProducts={categoryDetails?.recommendedProducts}
+                bannerUrl={categoryDetails?.banner?.size1x}
             />
         </main>
     );

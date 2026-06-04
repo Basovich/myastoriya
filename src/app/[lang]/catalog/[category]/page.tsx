@@ -84,6 +84,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
                 view={view}
                 sortBy={resolvedSearchParams.sort as string || undefined}
                 recommendedProducts={categoryDetails?.recommendedProducts}
+                bannerUrl={categoryDetails?.banner?.size1x}
             />
         </main>
     );
