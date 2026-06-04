@@ -94,6 +94,7 @@ export default function CatalogSidebar({
     // Синхронізуємо з props при скиданні через key={clearTrigger}
     useEffect(() => {
         setPendingFilters(activeFilters ?? []);
+        setPendingPrice({});
         setFloatingButtonPos(null);
     }, [activeFilters]);
 
@@ -139,8 +140,27 @@ export default function CatalogSidebar({
         }
     }, []);
 
+    // Локальний стан «чернетки» ціни — не впливає на isPendingChanged
+    const [pendingPrice, setPendingPrice] = useState<Record<string, { from: number; to: number }>>({});
+
+    const handlePriceChange = useCallback((blockKey: string, from: number, to: number) => {
+        setPendingPrice(prev => ({ ...prev, [blockKey]: { from, to } }));
+    }, []);
+
+    const handlePriceOk = useCallback((blockKey: string, blockMin: number, blockMax: number) => {
+        const draft = pendingPrice[blockKey];
+        if (!draft) return;
+        if (draft.from === blockMin && draft.to === blockMax) {
+            setPendingFilters(prev => removeFilter(prev, blockKey));
+        } else {
+            setPendingFilters(prev => setFilterValue(prev, { key: blockKey, minValue: draft.from, maxValue: draft.to }));
+        }
+    }, [pendingPrice]);
+
+
     const clearPriceRange = useCallback((blockKey: string) => {
         setPendingFilters(prev => removeFilter(prev, blockKey));
+        setPendingPrice(prev => { const next = { ...prev }; delete next[blockKey]; return next; });
     }, []);
 
     // --- isModified ---
@@ -219,14 +239,14 @@ export default function CatalogSidebar({
                                     key={blockKey}
                                     min={blockMin}
                                     max={blockMax}
-                                    from={from}
-                                    to={to}
+                                    from={pendingPrice[blockKey]?.from ?? from}
+                                    to={pendingPrice[blockKey]?.to ?? to}
                                     step={10}
-                                    onChange={(f, t) => setPriceRange(blockKey, f, t, blockMin, blockMax)}
+                                    onChange={(f, t) => handlePriceChange(blockKey, f, t)}
                                     label={block.label ? block.label.toUpperCase() : undefined}
                                     onClear={() => clearPriceRange(blockKey)}
                                     showClear={showClear}
-                                    onOk={handleApply}
+                                    onOk={() => handlePriceOk(blockKey, blockMin, blockMax)}
                                 />
                             );
                         }
