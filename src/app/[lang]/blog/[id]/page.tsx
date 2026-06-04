@@ -14,7 +14,7 @@ export default async function BlogDetail({
     const { lang, id } = await params;
     const dict = await getDictionary(lang);
 
-    const post = await getBlogBySlugApi(id);
+    const post = await getBlogBySlugApi(id, lang);
 
     if (!post) {
         return (

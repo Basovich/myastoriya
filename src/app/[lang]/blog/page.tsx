@@ -12,8 +12,8 @@ export default async function BlogPage({
     const dict = await getDictionary(lang);
 
     const [blogsResult, blogTypes] = await Promise.all([
-        getBlogsApi({ page: 1 }),
-        getBlogTypesApi(),
+        getBlogsApi({ page: 1 }, lang),
+        getBlogTypesApi(lang),
     ]);
 
     return (

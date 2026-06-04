@@ -294,12 +294,12 @@ export async function getBlogBySlugApi(slug: string, lang?: string): Promise<Blo
     return data.blog;
 }
 
-export async function getBlogTypesApi(): Promise<BlogType[]> {
+export async function getBlogTypesApi(lang?: string): Promise<BlogType[]> {
     try {
         const data = await gqlRequest<{ blogTypes: BlogType[] }>(
             BLOG_TYPES_QUERY,
             {},
-            { next: { revalidate: 60 } },
+            { next: { revalidate: 60 }, lang },
         );
         return data.blogTypes;
     } catch (error) {

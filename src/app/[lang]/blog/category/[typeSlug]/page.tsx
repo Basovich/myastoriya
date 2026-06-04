@@ -16,8 +16,8 @@ export default async function BlogTypePage({
     const dict = await getDictionary(lang);
 
     const [blogsResult, blogTypes] = await Promise.all([
-        getBlogsApi({ page: 1, typeSlug }),
-        getBlogTypesApi(),
+        getBlogsApi({ page: 1, typeSlug }, lang),
+        getBlogTypesApi(lang),
     ]);
 
     // If the type doesn't exist in our list, show 404

@@ -4,8 +4,6 @@ import s from "./StoreMap.module.scss";
 import { type Store } from "../StoreCard/StoreCard";
 import StoreCard from "../StoreCard/StoreCard";
 import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from "@/lib/constants";
-import { useParams } from 'next/navigation';
-import { Locale } from '@/i18n/config';
 
 // Dark map style
 
@@ -35,16 +33,23 @@ interface StoreMapProps {
     };
 }
 
-export default function StoreMap({ stores, dict }: StoreMapProps) {
-    const params = useParams();
-    const lang = (params?.lang as Locale) || 'ua';
+// Google Maps loader options must be a stable module-level constant.
+// useJsApiLoader is a singleton — calling it with different options (e.g. a
+// different `language` after a locale switch) throws a runtime error.
+// We read the locale from the URL once at module initialisation time.
+const initialLang = typeof window !== 'undefined'
+    ? (window.location.pathname.startsWith('/ru') ? 'ru' : 'uk')
+    : 'uk';
 
-    const { isLoaded } = useJsApiLoader({
-        id: "google-map-script",
-        googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries: GOOGLE_MAPS_LIBRARIES,
-        language: typeof window !== 'undefined' ? (lang === 'ua' ? 'uk' : 'ru') : 'uk'
-    });
+const MAPS_LOADER_OPTIONS = {
+    id: 'google-map-script',
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: GOOGLE_MAPS_LIBRARIES,
+    language: initialLang,
+} as const;
+
+export default function StoreMap({ stores, dict }: StoreMapProps) {
+    const { isLoaded } = useJsApiLoader(MAPS_LOADER_OPTIONS);
 
     const [map, setMap] = useState<google.maps.Map | null>(null);
     const [selectedStore, setSelectedStore] = useState<Store | null>(null);
