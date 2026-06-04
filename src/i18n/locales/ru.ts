@@ -338,7 +338,7 @@ export const ru =
         },
         "publications": {
             "sectionTitle": "ПУБЛИКАЦИИ",
-            "showAllButton": "ВСЕ ПУБЛИКАЦИИ →",
+            "showAllButton": "ВСЕ ПУБЛИКАЦИИ",
             "items": [
                 {
                     "id": 1,
