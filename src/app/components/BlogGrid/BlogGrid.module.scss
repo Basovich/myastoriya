@@ -302,6 +302,16 @@
         width: 16px;
         height: 14px;
     }
+
+    @media (any-hover: hover) {
+        &:hover {
+            svg path,
+            svg line {
+                fill: none !important;
+                stroke: #fff !important;
+            }
+        }
+    }
 }
 
 .loadMoreBtnText {

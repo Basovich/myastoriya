@@ -234,5 +234,15 @@
             width: 16px;
             height: 16px;
         }
+
+        @media (any-hover: hover) {
+            &:hover {
+                svg path,
+                svg line {
+                    fill: none !important;
+                    stroke: #fff !important;
+                }
+            }
+        }
     }
 }

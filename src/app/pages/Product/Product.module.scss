@@ -1400,6 +1400,16 @@ section.publications {
     display: flex;
     justify-content: center;
     margin-top: 32px;
+
+    @media (any-hover: hover) {
+        button:hover {
+            svg path,
+            svg line {
+                fill: none !important;
+                stroke: #fff !important;
+            }
+        }
+    }
 }
 
 .showMoreText {
