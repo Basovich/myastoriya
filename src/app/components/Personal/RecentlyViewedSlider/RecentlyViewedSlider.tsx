@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Grid } from 'swiper/modules';
 import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
@@ -27,6 +28,8 @@ interface RecentlyViewedSliderProps {
 }
 
 export default function RecentlyViewedSlider({ title, products }: RecentlyViewedSliderProps) {
+    const params = useParams();
+    const lang = params?.lang as string || 'ua';
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
@@ -68,7 +71,7 @@ export default function RecentlyViewedSlider({ title, products }: RecentlyViewed
             >
                 {products.map((product) => (
                     <SwiperSlide key={product.id} className={s.slide}>
-                        <ProductCard {...product} lang="ua" />
+                        <ProductCard {...product} lang={lang} />
                     </SwiperSlide>
                 ))}
             </Swiper>

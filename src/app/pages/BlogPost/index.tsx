@@ -176,7 +176,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                             unit={product.unit ?? ""}
                                             badge={product.is_new ? "NEW" : null}
                                             image={resolveProductImageUrl(product as unknown as Product)}
-                                            lang="ua" 
+                                            lang={lang} 
                                         />
                                     </SwiperSlide>
                                 ))}

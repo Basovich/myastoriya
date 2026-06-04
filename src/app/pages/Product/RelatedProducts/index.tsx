@@ -1,6 +1,7 @@
 'use client';
  
 import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import s from '../Product.module.scss';
 import clsx from 'clsx';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
@@ -39,6 +40,8 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
     isSliderOnMobile = false,
     alwaysSlider = false,
 }) => {
+    const params = useParams();
+    const lang = params?.lang as string || 'ua';
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
@@ -82,7 +85,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
                     >
                         {products.map((product) => (
                             <SwiperSlide key={product.id} className={s.slide}>
-                                <ProductCard {...product} lang="ua" />
+                                <ProductCard {...product} lang={lang} />
                             </SwiperSlide>
                         ))}
                     </Swiper>
@@ -92,7 +95,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
                     <div className={isSliderOnMobile ? s.desktopGrid : ''}>
                         <div className={s.relatedGrid}>
                             {products.map((product) => (
-                                <ProductCard key={product.id} {...product} lang="ua" />
+                                <ProductCard key={product.id} {...product} lang={lang} />
                             ))}
                         </div>
                     </div>
@@ -119,7 +122,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
                             >
                                 {products.map((product) => (
                                     <SwiperSlide key={product.id} className={s.slide}>
-                                        <ProductCard {...product} lang="ua" />
+                                        <ProductCard {...product} lang={lang} />
                                     </SwiperSlide>
                                 ))}
                             </Swiper>
