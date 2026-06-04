@@ -114,39 +114,41 @@
 }
 
 .floatingApply {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
     position: absolute;
     z-index: 200;
     transform: translateY(-50%);
-    background: #E3051B;
-    color: #FFFFFF;
+    background: #E6000F;
     padding: 10px 16px;
     border-radius: 10px;
-    font-size: 13px;
+    color: #FFF;
+    font-size: 10px;
+    font-style: normal;
     font-weight: 700;
+    line-height: normal;
     text-transform: uppercase;
     white-space: nowrap;
     box-shadow: 0 4px 20px rgba(227, 5, 27, 0.35);
     border: none;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.2s, box-shadow 0.2s;
+    transition:  box-shadow 0.2s;
 
     &::before {
         content: '';
         position: absolute;
-        left: -8px;
+        left: -7px;
         top: 50%;
         transform: translateY(-50%);
-        border-top: 8px solid transparent;
-        border-bottom: 8px solid transparent;
-        border-right: 8px solid #E3051B;
+        border-top: 7px solid transparent;
+        border-bottom: 7px solid transparent;
+        border-right: 7px solid #E6000F;
     }
 
     @media (any-hover: hover) {
         &:hover {
-            opacity: 0.9;
             box-shadow: 0 6px 24px rgba(227, 5, 27, 0.5);
         }
     }
