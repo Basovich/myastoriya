@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
-import { getCatalogTreeApi, getProductsApi } from '@/lib/graphql';
+import { getCatalogTreeApi, getProductsApi, getCategoryByIdApi } from '@/lib/graphql';
 import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 
@@ -37,10 +37,14 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
     const view = (resolvedSearchParams.view as 'list' | 'grid') || 'list';
     const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
 
-    const productsResponse = await getProductsApi(
-        { categoryId: parseInt(matchedCat.id), limit: 12 * page, page: 1, sort },
-        lang,
-    );
+    const categoryId = parseInt(matchedCat.id);
+    const [productsResponse, categoryDetails] = await Promise.all([
+        getProductsApi(
+            { categoryId, limit: 12 * page, page: 1, sort },
+            lang,
+        ),
+        getCategoryByIdApi(categoryId, lang),
+    ]);
     productsResponse.current_page = page;
 
     // Build breadcrumbs: Головна > [GrandParent] > [Parent] > CurrentCategory
@@ -79,6 +83,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
                 subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                 view={view}
                 sortBy={resolvedSearchParams.sort as string || undefined}
+                recommendedProducts={categoryDetails?.recommendedProducts}
             />
         </main>
     );

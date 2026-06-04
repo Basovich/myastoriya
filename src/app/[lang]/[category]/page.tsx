@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
-import { getCatalogTreeApi, getProductsApi, getPopularProductsApi } from '@/lib/graphql';
+import { getCatalogTreeApi, getProductsApi, getPopularProductsApi, getCategoryByIdApi } from '@/lib/graphql';
 import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
@@ -53,12 +53,13 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
     const categoryId = parseInt(matchedCat.id);
 
-    const [productsResponse, popularProducts] = await Promise.all([
+    const [productsResponse, popularProducts, categoryDetails] = await Promise.all([
         getProductsApi(
             { categoryId, limit: 12 * page, page: 1, sort, filter: activeFilters },
             lang,
         ),
         getPopularProductsApi(undefined, 12, lang),
+        getCategoryByIdApi(categoryId, lang),
     ]);
     productsResponse.current_page = page;
 
@@ -89,6 +90,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 sortBy={resolvedSearchParams.sort as string || undefined}
                 popularProducts={popularProducts}
                 activeFilters={activeFilters}
+                recommendedProducts={categoryDetails?.recommendedProducts}
             />
         </main>
     );

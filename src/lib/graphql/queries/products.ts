@@ -31,6 +31,7 @@ export interface ProductCategory {
         big3x: string | null;
     } | null;
     children?: ProductCategory[];
+    recommendedProducts?: Product[];
 }
 
 export interface ProductImageUrl {
@@ -979,6 +980,40 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
             parentId
             name
             slug
+            recommendedProducts {
+                id
+                slug
+                categoryId
+                name
+                cost
+                oldCost
+                unit
+                multiplier
+                is_new
+                available
+                specifications {
+                    name
+                    values
+                }
+                image {
+                    url {
+                        grid2x
+                        grid1x
+                        main2x
+                        main1x
+                        big
+                    }
+                }
+                images {
+                    url {
+                        grid2x
+                        grid1x
+                        main2x
+                        main1x
+                        big
+                    }
+                }
+            }
         }
     }
 `;

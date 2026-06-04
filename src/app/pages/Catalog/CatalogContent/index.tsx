@@ -72,6 +72,8 @@ interface CatalogContentProps {
     filterBlocks?: FilterBlock[];
     /** Активні фільтри, десеріалізовані з URL. */
     activeFilters?: FilterStateInput[];
+    /** Товари для блоку «Вас може зацікавити» (якщо додані через адмінку). */
+    recommendedProducts?: Product[];
 }
 
 export default async function CatalogContent({
@@ -88,6 +90,7 @@ export default async function CatalogContent({
     popularProducts,
     filterBlocks,
     activeFilters,
+    recommendedProducts,
 }: CatalogContentProps) {
     const sortLabel = lang === 'ua' ? 'Сортувати:' : 'Сортировать:';
     const filterLabel = lang === 'ua' ? 'Фільтр' : 'Фильтр';
@@ -112,11 +115,7 @@ export default async function CatalogContent({
           ];
 
     const currentSort = sortBy || sortOptions[0];
-
     const products = initialProducts.data;
-    const activePage = initialProducts.current_page;
-    const hasMorePages = initialProducts.has_more_pages;
-
     const breadcrumbItems = breadcrumbItemsProp ?? [
         { label: 'Головна', href: '/' },
         ...(categoryName ? [{ label: categoryName }] : []),
@@ -125,22 +124,24 @@ export default async function CatalogContent({
     const pageTitle = categoryName ? categoryName.toUpperCase() : '';
 
     // Prepare related slider data
-    const relatedProducts = products.slice(0, 8).map(product => ({
-        id: product.id,
-        element: (
-            <ProductCard
-                id={product.id}
-                slug={product.slug}
-                title={product.name}
-                weight={getWeight(product)}
-                price={product.cost}
-                unit={product.unit}
-                badge={getBadge(product)}
-                image={resolveProductImageUrl(product)}
-                lang={lang}
-            />
-        )
-    }));
+    const relatedProducts = recommendedProducts && recommendedProducts.length > 0
+        ? recommendedProducts.map(product => ({
+            id: product.id,
+            element: (
+                <ProductCard
+                    id={product.id}
+                    slug={product.slug}
+                    title={product.name}
+                    weight={getWeight(product)}
+                    price={product.cost}
+                    unit={product.unit}
+                    badge={getBadge(product)}
+                    image={resolveProductImageUrl(product)}
+                    lang={lang}
+                />
+            )
+        }))
+        : [];
 
     const popularProductsList = popularProducts ?? products.slice(0, 12);
     const orderedProducts = popularProductsList.map(product => ({
@@ -229,7 +230,9 @@ export default async function CatalogContent({
                 </div>
             </div>
 
-            <CatalogRelatedSlidersClient title="ВАС МОЖЕ ЗАЦІКАВИТИ" products={relatedProducts} />
+            {relatedProducts.length > 0 && (
+                <CatalogRelatedSlidersClient title="ВАС МОЖЕ ЗАЦІКАВИТИ" products={relatedProducts} />
+            )}
             <CatalogRelatedSlidersClient title="ЧАСТО ЗАМОВЛЯЮТЬ" products={orderedProducts} />
 
             <div className={s.faqSection}>
