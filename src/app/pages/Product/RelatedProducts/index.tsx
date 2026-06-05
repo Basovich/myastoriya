@@ -16,6 +16,7 @@ import 'swiper/css/navigation';
  
 interface RelatedProduct {
     id: number | string;
+    slug?: string;
     title: string;
     weight: string;
     price: number;

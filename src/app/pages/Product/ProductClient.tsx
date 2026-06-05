@@ -244,6 +244,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
         const sliced = limit ? products.slice(0, limit) : products;
         return sliced.map(p => ({
             id: p.id,
+            slug: p.slug,
             title: p.name,
             price: p.cost,
             weight: getProductWeight(p),

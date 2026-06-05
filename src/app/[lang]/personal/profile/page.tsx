@@ -189,6 +189,7 @@ export default function ProfilePage() {
                 const products = await getProductsByIdsApi(idsToFetch, lang);
                 const mappedProducts = (products || []).map((p: ApiProduct) => ({
                     id: p.id,
+                    slug: p.slug,
                     title: p.name,
                     price: p.cost,
                     unit: p.unit,

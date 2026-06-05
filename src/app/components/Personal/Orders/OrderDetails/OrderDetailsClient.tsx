@@ -198,6 +198,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                             <ProductCard 
                                 key={product.id}
                                 id={product.id}
+                                slug={product.id}
                                 title={product.title}
                                 weight={product.weight}
                                 price={product.price}

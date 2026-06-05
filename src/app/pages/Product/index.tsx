@@ -127,6 +127,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }>; publ
 
     const relatedProducts = list.slice(0, 4).map(item => ({
         id: item.id,
+        slug: (item as any).slug || String(item.id),
         title: item.title,
         price: item.price,
         weight: item.weight || "350г",
@@ -142,6 +143,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }>; publ
         if (item) {
             popularProducts.push({
                 id: `${item.id}-${i}`, // Unique ID for key
+                slug: (item as any).slug || String(item.id),
                 title: item.title,
                 price: item.price,
                 weight: item.weight || "330г",

@@ -14,6 +14,7 @@ import 'swiper/css/grid';
 
 export interface RecentlyViewedProduct {
     id: number | string;
+    slug?: string;
     title: string;
     weight: string;
     price: number;

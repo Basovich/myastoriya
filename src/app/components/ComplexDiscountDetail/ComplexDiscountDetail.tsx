@@ -154,6 +154,7 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                                     <div className={s.productCardWrapper}>
                                         <ProductCard
                                             id={product.id}
+                                            slug={product.slug}
                                             title={product.name}
                                             weight={getWeight(product)}
                                             price={product.cost || 0}
