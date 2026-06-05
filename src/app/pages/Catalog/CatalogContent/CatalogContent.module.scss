@@ -254,9 +254,16 @@ div.sortWrap {
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
     }
+
+    &.noResultsList {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .noResults {
+    width: 100%;
     text-align: center;
     padding: 60px 20px;
     font-size: 16px;

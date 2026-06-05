@@ -55,7 +55,7 @@ export default function CategorySwitcher({
             });
     }, [categoryId, lang]);
 
-    if (isLoading || (!parent && siblings.length === 0)) {
+    if (isLoading || (!parent && siblings.length === 0) || parent?.id === '768') {
         return null; // Or skeleton loader if preferred
     }
 

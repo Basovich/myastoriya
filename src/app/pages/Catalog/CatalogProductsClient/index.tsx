@@ -122,7 +122,7 @@ export default function CatalogProductsClient({
 
     return (
         <div className={s.results}>
-            <div className={clsx(s.productList, view === "grid" && s.productListGrid)}>
+            <div className={clsx(s.productList, view === "grid" && s.productListGrid, products.length === 0 && s.noResultsList)}>
                 {products.length > 0 ? (
                     products.map((product) =>
                         view === "grid" ? (

@@ -8,6 +8,7 @@ import FilterCheckbox from '@/app/components/ui/FilterCheckbox/FilterCheckbox';
 import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
 import Button from "@/app/components/ui/Button/Button";
+import CategorySwitcher from '@/app/components/ui/CategorySwitcher/CategorySwitcher';
 import clsx from 'clsx';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
 import {
@@ -274,7 +275,16 @@ export default function CatalogSidebar({
 
     return (
         <div className={s.sidebar} ref={sidebarRef}>
+            {categoryId && (
+                <CategorySwitcher
+                    categoryId={categoryId}
+                    lang={lang}
+                    isSidebar={false}
+                />
+            )}
+
             <div className={s.filtersWrapper}>
+
                 {/* Мобільний блок: Сортування */}
                 <div className={s.onlyMobile}>
                     <FilterGroup title={sortBy || defaultSortOption} initialOpen={true}>
