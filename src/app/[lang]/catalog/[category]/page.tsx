@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
-import { getCatalogTreeApi, getProductsApi, getCategoryByIdApi } from '@/lib/graphql';
+import { getCatalogTreeApi, getProductsApi, getCategoryByIdApi, getFaqQuestionsApi } from '@/lib/graphql';
 import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 
@@ -47,6 +47,13 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
     ]);
     productsResponse.current_page = page;
 
+    // Завантажуємо FAQ для першої групи (якщо є)
+    let faq = null;
+    if (categoryDetails?.faqGroups && categoryDetails.faqGroups.length > 0) {
+        const firstGroupId = parseInt(categoryDetails.faqGroups[0].id);
+        faq = await getFaqQuestionsApi(firstGroupId, lang);
+    }
+
     // Build breadcrumbs: Головна > [GrandParent] > [Parent] > CurrentCategory
     const breadcrumbItems: { label: string; href?: string }[] = [
         { label: 'Головна', href: '/' },
@@ -85,6 +92,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
                 sortBy={resolvedSearchParams.sort as string || undefined}
                 recommendedProducts={categoryDetails?.recommendedProducts}
                 bannerUrl={categoryDetails?.banner?.size1x}
+                faq={faq}
             />
         </main>
     );

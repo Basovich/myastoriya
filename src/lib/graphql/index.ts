@@ -46,6 +46,7 @@ export {
     getProductsByIdsApi,
     getSearchPopularQueriesApi,
     getSearchCategoriesApi,
+    getFaqQuestionsApi,
 } from './queries/products';
 export type {
     Product,
@@ -61,6 +62,8 @@ export type {
     FilterBlock,
     ProductsFilterResponse,
     FilterStateInput,
+    FaqQuestion,
+    FaqGroup,
 } from './queries/products';
 
 // Re-export blog

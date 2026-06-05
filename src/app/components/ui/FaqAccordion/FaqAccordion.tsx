@@ -53,9 +53,10 @@ function FaqItemComponent({ item }: { item: FaqItem }) {
                 className={s.faqAnswerWrap}
                 style={{ height: 0, overflow: 'hidden' }}
             >
-                <div className={s.faqAnswerInner}>
-                    {item.answer}
-                </div>
+                <div 
+                    className={s.faqAnswerInner}
+                    dangerouslySetInnerHTML={{ __html: item.answer }}
+                />
             </div>
         </div>
     );

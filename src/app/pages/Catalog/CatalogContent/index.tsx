@@ -10,7 +10,7 @@ import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
 import clsx from 'clsx';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
-import type { Product, ProductsResponse } from '@/lib/graphql';
+import type { Product, ProductsResponse, FaqQuestion } from '@/lib/graphql';
 import { resolveProductImageUrl } from '@/lib/graphql';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
 import type { BreadcrumbItem } from '@/utils/category-url';
@@ -22,20 +22,7 @@ import CatalogProductsClient from '../CatalogProductsClient';
 import CatalogRelatedSlidersClient from '../CatalogRelatedSlidersClient';
 
 
-const FAQ_DATA = [
-    {
-        question: 'Доставка преміальних стейків Україною?',
-        answer: 'Для того, щоб посмакувати стейки щойно з гриля від наших шефів, немає кращого місця ніж фірмові магазини-ресторани «М\'ясторія» у Києві. Проте ви можете замовити відбірні стейки та свіжу мармурову яловичину в будь-яку точку України та приготувати улюблені страви вдома. Адже ми доставляємо сиру продукцію в охолодженому вигляді всією країною!'
-    },
-    {
-        question: 'Новинки у лінійці «Томлене м\'ясо» від «М\'ясторія»?',
-        answer: 'В нашій новій лінійці представлені унікальні рецепти томленого м\'яса, які готуються за низьких температур протягом багатьох годин. Це дозволяє зберегти максимум смаку та користі.'
-    },
-    {
-        question: 'Як правильно готувати мармурову яловичину?',
-        answer: 'Рекомендуємо смажити м\'ясо на добре розігрітій сковороді або грилі, попередньо давши йому "відпочити" при кімнатній температурі.'
-    }
-];
+
 
 
 function getBadge(product: Product): string | null {
@@ -76,6 +63,8 @@ interface CatalogContentProps {
     recommendedProducts?: Product[];
     /** URL банера категорії з API. */
     bannerUrl?: string | null;
+    /** FAQ дані з API. */
+    faq?: FaqQuestion[] | null;
 }
 
 export default async function CatalogContent({
@@ -94,6 +83,7 @@ export default async function CatalogContent({
     activeFilters,
     recommendedProducts,
     bannerUrl,
+    faq,
 }: CatalogContentProps) {
     const sortLabel = lang === 'ua' ? 'Сортувати:' : 'Сортировать:';
     const filterLabel = lang === 'ua' ? 'Фільтр' : 'Фильтр';
@@ -243,11 +233,13 @@ export default async function CatalogContent({
             )}
             <CatalogRelatedSlidersClient title="ЧАСТО ЗАМОВЛЯЮТЬ" products={orderedProducts} />
 
-            <div className={s.faqSection}>
-                <div className={s.relatedInner}>
-                    <FaqAccordion items={FAQ_DATA} />
+            {faq && faq.length > 0 && (
+                <div className={s.faqSection}>
+                    <div className={s.relatedInner}>
+                        <FaqAccordion items={faq} />
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

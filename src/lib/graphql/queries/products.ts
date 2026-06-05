@@ -9,6 +9,17 @@ export interface ProductImage {
     alt?: string;
 }
 
+export interface FaqQuestion {
+    id: string;
+    question: string;
+    answer: string;
+}
+
+export interface FaqGroup {
+    id: string;
+    name: string;
+}
+
 export interface ProductCategory {
     id: string;
     parentId?: number | null;
@@ -35,6 +46,7 @@ export interface ProductCategory {
     banner?: {
         size1x?: string | null;
     } | null;
+    faqGroups?: FaqGroup[] | null;
 }
 
 export interface ProductImageUrl {
@@ -986,6 +998,10 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
             banner {
                 size1x
             }
+            faqGroups {
+                id
+                name
+            }
             recommendedProducts {
                 id
                 slug
@@ -1032,5 +1048,29 @@ export async function getCategoryByIdApi(id: number, lang?: string): Promise<Pro
     );
     return data.category;
 }
+
+const FAQ_QUESTIONS_QUERY = /* GraphQL */ `
+    query GetFaqQuestions($groupId: Int!, $limit: Int, $page: Int) {
+        faqQuestions(groupId: $groupId, limit: $limit, page: $page) {
+            data {
+                id
+                question
+                answer
+            }
+        }
+    }
+`;
+
+export async function getFaqQuestionsApi(groupId: number, lang?: string): Promise<FaqQuestion[]> {
+    const data = await gqlRequest<{
+        faqQuestions: { data: FaqQuestion[] };
+    }>(
+        FAQ_QUESTIONS_QUERY,
+        { groupId },
+        { next: { revalidate: 3600 }, lang }
+    );
+    return data.faqQuestions?.data ?? [];
+}
+
 
 

@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
-import { getCatalogTreeApi, getProductsApi, getPopularProductsApi, getCategoryByIdApi } from '@/lib/graphql';
+import { getCatalogTreeApi, getProductsApi, getPopularProductsApi, getCategoryByIdApi, getFaqQuestionsApi } from '@/lib/graphql';
 import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
@@ -87,6 +87,13 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
     ]);
     productsResponse.current_page = page;
 
+    // Завантажуємо FAQ для першої групи (якщо є)
+    let faq = null;
+    if (categoryDetails?.faqGroups && categoryDetails.faqGroups.length > 0) {
+        const firstGroupId = parseInt(categoryDetails.faqGroups[0].id);
+        faq = await getFaqQuestionsApi(firstGroupId, lang);
+    }
+
     // Breadcrumbs: Головна > ParentName > SubcategoryName
     const breadcrumbItems = [
         { label: 'Головна', href: '/' },
@@ -117,6 +124,7 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
                 activeFilters={activeFilters}
                 recommendedProducts={categoryDetails?.recommendedProducts}
                 bannerUrl={categoryDetails?.banner?.size1x}
+                faq={faq}
             />
         </main>
     );

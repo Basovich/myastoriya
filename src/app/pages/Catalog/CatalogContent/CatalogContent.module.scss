@@ -344,10 +344,8 @@ div.sortWrap {
 .sectionHeaderRow {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0px;
-    // Inherit alignment from relatedInner or re-apply calc if not in relatedInner
-    // But currently they are in relatedInner.
+    align-items: center;
+    margin-bottom: 0;
 }
 
 .navArrows {
@@ -360,11 +358,11 @@ div.sortWrap {
 }
 
 .sliderSection {
-    padding-top: 40px;
+    margin: 40px 0;
     overflow: hidden;
 
     @media (min-width: 1280px) {
-        padding-top: 70px;
+        margin: 70px 0;
     }
 }
 
@@ -406,13 +404,11 @@ div.sortWrap {
     background: #E20B1C !important;
 }
 
-
-
 .faqSection {
     background: #fff;
-    padding: 40px 0;
+    margin: 40px 0;
 
     @media (min-width: 1280px) {
-        padding: 100px 0;
+        margin: 100px 0;
     }
 }
