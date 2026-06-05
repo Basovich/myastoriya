@@ -16,6 +16,7 @@ import {
     getProductsApi, 
     getSearchCategoriesApi, 
     getSearchPopularQueriesApi, 
+    getCatalogTreeApi,
     resolveProductImageUrl, 
     Product, 
     ProductCategory 
@@ -162,28 +163,77 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                 setHasMore(prodRes.has_more_pages);
                 setPage(1);
 
+                // Extract category IDs from found products to include their categories in results
+                const productCategoryIds = new Set(
+                    prodRes.data
+                        .map(p => p.categoryId ? String(p.categoryId) : "")
+                        .filter(Boolean)
+                );
+
                 // Local tree filtering for categories to show hierarchy
-                if (categories) {
-                    const findMatches = (list: ProductCategory[], forceInclude: boolean = false): ProductCategory[] => {
-                        const matches: ProductCategory[] = [];
-                        for (const cat of list) {
-                            const nameMatch = cat.name.toLowerCase().includes(query.toLowerCase());
-                            const shouldInclude = forceInclude || nameMatch;
+                const queryWords = query.toLowerCase().split(/[\s'.,!?()«»"]+/).filter(w => w.length >= 3);
+                const productWords = prodRes.data.map(p => p.name.toLowerCase()).join(" ").split(/[\s'.,!?()«»"]+/).filter(w => w.length >= 3);
+                const contextWords = Array.from(new Set([...queryWords, ...productWords]));
+
+                const isWordMatch = (w1: string, w2: string) => {
+                    const minLen = Math.min(w1.length, w2.length);
+                    if (minLen < 3) return false;
+                    const matchLen = minLen >= 5 ? 4 : 3;
+                    return w1.slice(0, matchLen) === w2.slice(0, matchLen);
+                };
+
+                const filterTree = (list: ProductCategory[], parentName?: string): ProductCategory[] => {
+                    const matches: ProductCategory[] = [];
+                    for (const cat of list) {
+                        const productMatch = productCategoryIds.has(String(cat.id));
+                        
+                        let nameMatch = false;
+                        if (parentName) {
+                            const parentWords = parentName.toLowerCase().split(/[\s'.,!?()«»"]+/).filter(w => w.length >= 3);
+                            const catWords = cat.name.toLowerCase().split(/[\s'.,!?()«»"]+/).filter(w => w.length >= 3);
+                            const specificWords = catWords.filter(catW => 
+                                !parentWords.some(parentW => isWordMatch(catW, parentW))
+                            );
                             
-                            const childMatches = cat.children ? findMatches(cat.children, shouldInclude) : [];
-                            
-                            if (shouldInclude || childMatches.length > 0) {
-                                matches.push({
-                                    ...cat,
-                                    children: childMatches
-                                });
+                            if (specificWords.length > 0) {
+                                nameMatch = specificWords.some(specW => 
+                                    contextWords.some(ctxW => isWordMatch(specW, ctxW))
+                                );
+                            } else {
+                                nameMatch = true;
                             }
+                        } else {
+                            const catWords = cat.name.toLowerCase().split(/[\s'.,!?()«»"]+/).filter(w => w.length >= 3);
+                            nameMatch = catWords.some(catW => 
+                                contextWords.some(ctxW => isWordMatch(catW, ctxW))
+                            );
                         }
-                        return matches;
-                    };
-                    setSearchCategories(findMatches(categories));
+                        
+                        const isMatched = productMatch || nameMatch;
+                        const childMatches = cat.children ? filterTree(cat.children, cat.name) : [];
+                        
+                        if (isMatched || childMatches.length > 0) {
+                            matches.push({
+                                ...cat,
+                                children: childMatches
+                            });
+                        }
+                    }
+                    return matches;
+                };
+
+                if (categories) {
+                    setSearchCategories(filterTree(categories));
                 } else {
-                    const catRes = await getSearchCategoriesApi(query, lang);
+                    let catRes = await getSearchCategoriesApi(query, lang);
+                    if (catRes.length === 0 && productCategoryIds.size > 0) {
+                        try {
+                            const tree = await getCatalogTreeApi(lang);
+                            catRes = filterTree(tree);
+                        } catch (e) {
+                            console.error("Failed to fetch/filter catalog tree by product categories:", e);
+                        }
+                    }
                     setSearchCategories(catRes);
                 }
 
