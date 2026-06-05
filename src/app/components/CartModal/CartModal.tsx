@@ -93,7 +93,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                     </h2>
                 </div>
 
-                <div className={s.body}>
+                <div className={clsx(s.body, populatedItems.length === 0 && s.bodyEmpty)}>
                     {populatedItems.length === 0 ? (
                         <div className={s.emptyState}>
                             Ваш кошик порожній.
