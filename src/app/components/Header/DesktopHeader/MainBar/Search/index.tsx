@@ -64,6 +64,9 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
     const [searchCategories, setSearchCategories] = useState<ProductCategory[]>([]);
     const [popularQueries, setPopularQueries] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
@@ -103,6 +106,32 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
             setShowOverlay(false);
             setResults([]);
             setSearchCategories([]);
+            setPage(1);
+            setHasMore(false);
+        }
+    };
+
+    const handleLoadMore = async () => {
+        if (isLoadingMore || !hasMore) return;
+        setIsLoadingMore(true);
+        try {
+            const nextPage = page + 1;
+            const prodRes = await getProductsApi({ search: query, limit: 12, page: nextPage }, lang);
+            setResults(prev => [...prev, ...prodRes.data]);
+            setHasMore(prodRes.has_more_pages);
+            setPage(nextPage);
+        } catch (error) {
+            console.error("Load more search results error:", error);
+        } finally {
+            setIsLoadingMore(false);
+        }
+    };
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.currentTarget;
+        const reachedBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
+        if (reachedBottom) {
+            handleLoadMore();
         }
     };
     
@@ -128,8 +157,10 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
         const timer = setTimeout(async () => {
             setIsLoading(true);
             try {
-                const prodRes = await getProductsApi({ search: query, limit: 6 }, lang);
+                const prodRes = await getProductsApi({ search: query, limit: 12, page: 1 }, lang);
                 setResults(prodRes.data);
+                setHasMore(prodRes.has_more_pages);
+                setPage(1);
 
                 // Local tree filtering for categories to show hierarchy
                 if (categories) {
@@ -317,27 +348,30 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                 </div>
                                             </div>
                                             <div className={s.dishListContainer}>
-                                                <div className={s.dishList}>
+                                                <div className={s.dishList} onScroll={handleScroll}>
                                                     {results.length > 0 ? (
-                                                        results.map((product) => {
-                                                            const mainImage = resolveProductImageUrl(product);
-                                                            const weight = product.specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || product.unit;
-                                                            const displayWeight = weight === "1"
-                                                                ? (lang === 'ru' ? "1 единица" : "1 одиниця")
-                                                                : weight;
-                                                            
-                                                            return (
-                                                                <div key={product.id} className={s.dishItem} onClick={() => router.push(getLocalizedHref(`/products/${product.slug || product.id}`, lang as Locale))}>
-                                                                    <div className={s.dishThumb}>
-                                                                        <Image src={mainImage || "/images/no-image.png"} alt={product.name} fill />
+                                                        <>
+                                                            {results.map((product) => {
+                                                                const mainImage = resolveProductImageUrl(product);
+                                                                const weight = product.specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || product.unit;
+                                                                const displayWeight = (weight === "1" || weight?.toLowerCase() === "шт")
+                                                                    ? (lang === 'ru' ? "1 шт" : "1 шт")
+                                                                    : weight;
+                                                                
+                                                                return (
+                                                                    <div key={product.id} className={s.dishItem} onClick={() => router.push(getLocalizedHref(`/products/${product.slug || product.id}`, lang as Locale))}>
+                                                                        <div className={s.dishThumb}>
+                                                                            <Image src={mainImage || "/images/no-image.png"} alt={product.name} fill />
+                                                                        </div>
+                                                                        <div className={s.dishInfo}>
+                                                                            <div className={s.dishName}>{product.name}</div>
+                                                                            <div className={s.dishWeight}>{displayWeight}</div>
+                                                                        </div>
                                                                     </div>
-                                                                    <div className={s.dishInfo}>
-                                                                        <div className={s.dishName}>{product.name}</div>
-                                                                        <div className={s.dishWeight}>{displayWeight}</div>
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })
+                                                                );
+                                                            })}
+                                                            {isLoadingMore && <div className={s.loader}></div>}
+                                                        </>
                                                     ) : !isLoading ? (
                                                         <div className={s.emptyPrompt}>{lang === 'ru' ? 'Товаров не найдено' : 'Товарів не знайдено'}</div>
                                                     ) : (
@@ -376,8 +410,8 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                     {featuredProposals.map((product) => {
                                                                         const mainImage = resolveProductImageUrl(product);
                                                                         const weight = product.specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || product.unit;
-                                                                        const displayWeight = weight === "1"
-                                                                            ? (lang === 'ru' ? "1 единица" : "1 одиниця")
+                                                                        const displayWeight = (weight === "1" || weight?.toLowerCase() === "шт")
+                                                                            ? (lang === 'ru' ? "1 шт" : "1 шт")
                                                                             : weight;
                                                                         const displayUnit = product.unit.toLowerCase() === "шт"
                                                                             ? "За 1 шт"
