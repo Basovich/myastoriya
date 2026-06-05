@@ -56,18 +56,33 @@ export async function GET(req: NextRequest) {
             cache: 'no-store',
         });
 
+        const cacheHeaders = {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+        };
+
         if (!res.ok) {
-            return NextResponse.json({ blocks: [], productsCount: 0 });
+            return NextResponse.json({ blocks: [], productsCount: 0 }, { headers: cacheHeaders });
         }
 
         const json = await res.json();
 
         if (json.errors?.length || !json.data?.productsFilter) {
-            return NextResponse.json({ blocks: [], productsCount: 0 });
+            return NextResponse.json({ blocks: [], productsCount: 0 }, { headers: cacheHeaders });
         }
 
-        return NextResponse.json(json.data.productsFilter);
+        return NextResponse.json(json.data.productsFilter, { headers: cacheHeaders });
     } catch {
-        return NextResponse.json({ blocks: [], productsCount: 0 });
+        return NextResponse.json(
+            { blocks: [], productsCount: 0 },
+            {
+                headers: {
+                    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0',
+                },
+            }
+        );
     }
 }
