@@ -319,25 +319,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         </svg>
                         <span>{availabilityLabel}</span>
                     </div>
-
                     <h1 className={s.title}>{product.name}</h1>
-
-                    {/* Rating */}
-                    {product.rating != null && product.rating > 0 && (
-                        <div className={s.ratingRow}>
-                            {[...Array(5)].map((_, i) => (
-                                <svg
-                                    key={i}
-                                    className={clsx(s.star, i < Math.round(product.rating!) && s.filled)}
-                                    width="16" height="16" viewBox="0 0 32 32" fill="none"
-                                >
-                                    <path d="M16 2.66667L20.12 11.0267L29.3333 12.36L22.6667 18.8533L24.24 28.0267L16 23.6933L7.76 28.0267L9.33333 18.8533L2.66667 12.36L11.88 11.0267L16 2.66667Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            ))}
-                            <span className={s.ratingValue}>{product.rating.toFixed(1)}</span>
-                        </div>
-                    )}
-
                     <div className={s.priceSection}>
                         <div className={s.priceWrapper}>
                             <span className={clsx(s.price, activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost && s.newPrice)}>
@@ -367,12 +349,6 @@ const ProductClient: React.FC<ProductClientProps> = ({
                                         )}
                                     </>
                                 )}
-                            </div>
-                        )}
-                        {hydrated && isAuthenticated && !isGuest && user?.bonuses != null && (
-                            <div className={s.bonusesSubtitle}>
-                                {lang === 'ru' ? 'Доступно бонусов:' : 'Доступно бонусів:'}{' '}
-                                <span className={s.bonusesValue}>{user.bonuses}</span>
                             </div>
                         )}
                     </div>

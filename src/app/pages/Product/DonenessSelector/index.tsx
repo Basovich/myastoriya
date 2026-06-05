@@ -83,11 +83,8 @@ const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange, op
                 <span className={s.label}>
                     {currentLang === 'ru' ? 'Степень прожарки:' : 'Рівень прожарки:'}
                 </span>
-                <span className={s.currentValue}>{selectedItem?.label}</span>
-                {selectedItem?.cost != null && (
-                    <span className={s.currentCost}>{selectedItem.cost} ₴</span>
-                )}
                 <div className={s.infoWrapper}>
+                    <span className={s.currentValue}>{selectedItem?.label}</span>
                     <button
                         ref={btnRef}
                         className={s.infoBtn}

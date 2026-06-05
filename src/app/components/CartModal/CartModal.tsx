@@ -15,6 +15,9 @@ import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Button from "@/app/components/ui/Button/Button";
+import { useIsHydrated } from '@/hooks/useIsHydrated';
+import { getAccessToken } from '@/app/actions/authActions';
+import { getOrdersApi } from '@/lib/graphql/queries/orders';
 
 interface CartModalProps {
     isOpen: boolean;
@@ -26,11 +29,52 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     const { disableScroll, enableScroll } = useScrollLock();
     const dispatch = useAppDispatch();
     const cartItems = useAppSelector(state => state.cart.items);
+    const { user, isGuest, isInitialized } = useAppSelector(state => state.auth);
+    const hydrated = useIsHydrated();
 
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
+    const [showCashback, setShowCashback] = useState(false);
 
     const { populatedItems, loading } = useCartProducts();
+
+    useEffect(() => {
+        if (!hydrated || !isInitialized || !user || isGuest) {
+            setShowCashback(false);
+            return;
+        }
+
+        const checkOrders = async () => {
+            try {
+                const token = await getAccessToken();
+                if (!token) return;
+                const ordersData = await getOrdersApi(token, { limit: 50 });
+                if (ordersData && ordersData.data) {
+                    const hasPaidAndCompleted = ordersData.data.some(order => {
+                        const currentStatusName = order.status?.name || '';
+                        const historyNames = (order.statusHistory || []).map(h => h?.name || '');
+                        const allStatusNames = [currentStatusName, ...historyNames].map(n => n.toLowerCase());
+
+                        const isCompleted = allStatusNames.some(n =>
+                            n.includes('завершено') || n.includes('виконано') || n.includes('completed') || n.includes('выполнено')
+                        );
+                        const isPaid = allStatusNames.some(n =>
+                            n.includes('оплачено') || n.includes('оплачен') || n.includes('paid')
+                        );
+
+                        return isCompleted && isPaid;
+                    });
+                    setShowCashback(hasPaidAndCompleted);
+                }
+            } catch (error) {
+                console.error('Failed to fetch orders for cashback check', error);
+                setShowCashback(false);
+            }
+        };
+
+        void checkOrders();
+    }, [hydrated, isInitialized, user, isGuest]);
+
 
     // Calculate total
     const totalSum = useMemo(() => {
@@ -173,15 +217,17 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                     <div className={s.modalFooter}>
                         <div className={s.footerContent}>
                             <div className={s.summaryStats}>
-                                <div className={s.statRow}>
-                                    <div className={s.statLabel}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none">
-                                            <path d="M9.8505 7.4305H7.359C7.21313 7.4305 7.07324 7.48845 6.97009 7.59159C6.86695 7.69474 6.809 7.83463 6.809 7.9805C6.809 8.12637 6.86695 8.26626 6.97009 8.36941C7.07324 8.47255 7.21313 8.5305 7.359 8.5305H8.679C8.07232 9.1645 7.28992 9.60262 6.43234 9.78857C5.57476 9.97451 4.68116 9.89978 3.86638 9.57399C3.05159 9.24819 2.35283 8.68621 1.85987 7.96024C1.36692 7.23428 1.1023 6.37751 1.1 5.5C1.1 5.35413 1.04205 5.21424 0.938909 5.11109C0.835764 5.00795 0.695869 4.95 0.55 4.95C0.404131 4.95 0.264236 5.00795 0.161091 5.11109C0.0579462 5.21424 0 5.35413 0 5.5C0.00290766 6.57404 0.320222 7.62372 0.912782 8.51952C1.50534 9.41531 2.34722 10.118 3.33451 10.5409C4.3218 10.9637 5.4113 11.0883 6.46856 10.8992C7.52582 10.71 8.50456 10.2154 9.284 9.4765V10.45C9.284 10.5959 9.34195 10.7358 9.44509 10.8389C9.54824 10.9421 9.68813 11 9.834 11C9.97987 11 10.1198 10.9421 10.2229 10.8389C10.3261 10.7358 10.384 10.5959 10.384 10.45V7.975C10.3826 7.8329 10.3263 7.69684 10.2269 7.59533C10.1274 7.49383 9.99254 7.43476 9.8505 7.4305ZM5.5 0C4.09001 0.00402171 2.73542 0.549403 1.716 1.5235V0.55C1.716 0.404131 1.65805 0.264236 1.55491 0.161091C1.45176 0.0579462 1.31187 0 1.166 0C1.02013 0 0.880236 0.0579462 0.777091 0.161091C0.673946 0.264236 0.616 0.404131 0.616 0.55V3.025C0.616 3.17087 0.673946 3.31076 0.777091 3.41391C0.880236 3.51705 1.02013 3.575 1.166 3.575H3.641C3.78687 3.575 3.92676 3.51705 4.02991 3.41391C4.13305 3.31076 4.191 3.17087 4.191 3.025C4.191 2.87913 4.13305 2.73924 4.02991 2.63609C3.92676 2.53295 3.78687 2.475 3.641 2.475H2.321C2.92736 1.84133 3.70925 1.40332 4.56632 1.21721C5.42339 1.03109 6.31652 1.10536 7.13108 1.43047C7.94564 1.75559 8.64446 2.31672 9.13783 3.04183C9.6312 3.76695 9.89661 4.62296 9.9 5.5C9.9 5.64587 9.95795 5.78576 10.0611 5.88891C10.1642 5.99205 10.3041 6.05 10.45 6.05C10.5959 6.05 10.7358 5.99205 10.8389 5.88891C10.9421 5.78576 11 5.64587 11 5.5C11 4.77773 10.8577 4.06253 10.5813 3.39524C10.3049 2.72795 9.89981 2.12163 9.38909 1.61091C8.87837 1.10019 8.27205 0.695063 7.60476 0.418663C6.93747 0.142262 6.22227 0 5.5 0Z" fill="black"/>
-                                        </svg>
-                                        <span>Кешбек балами:</span>
+                                {showCashback && (
+                                    <div className={s.statRow}>
+                                        <div className={s.statLabel}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none">
+                                                <path d="M9.8505 7.4305H7.359C7.21313 7.4305 7.07324 7.48845 6.97009 7.59159C6.86695 7.69474 6.809 7.83463 6.809 7.9805C6.809 8.12637 6.86695 8.26626 6.97009 8.36941C7.07324 8.47255 7.21313 8.5305 7.359 8.5305H8.679C8.07232 9.1645 7.28992 9.60262 6.43234 9.78857C5.57476 9.97451 4.68116 9.89978 3.86638 9.57399C3.05159 9.24819 2.35283 8.68621 1.85987 7.96024C1.36692 7.23428 1.1023 6.37751 1.1 5.5C1.1 5.35413 1.04205 5.21424 0.938909 5.11109C0.835764 5.00795 0.695869 4.95 0.55 4.95C0.404131 4.95 0.264236 5.00795 0.161091 5.11109C0.0579462 5.21424 0 5.35413 0 5.5C0.00290766 6.57404 0.320222 7.62372 0.912782 8.51952C1.50534 9.41531 2.34722 10.118 3.33451 10.5409C4.3218 10.9637 5.4113 11.0883 6.46856 10.8992C7.52582 10.71 8.50456 10.2154 9.284 9.4765V10.45C9.284 10.5959 9.34195 10.7358 9.44509 10.8389C9.54824 10.9421 9.68813 11 9.834 11C9.97987 11 10.1198 10.9421 10.2229 10.8389C10.3261 10.7358 10.384 10.5959 10.384 10.45V7.975C10.3826 7.8329 10.3263 7.69684 10.2269 7.59533C10.1274 7.49383 9.99254 7.43476 9.8505 7.4305ZM5.5 0C4.09001 0.00402171 2.73542 0.549403 1.716 1.5235V0.55C1.716 0.404131 1.65805 0.264236 1.55491 0.161091C1.45176 0.0579462 1.31187 0 1.166 0C1.02013 0 0.880236 0.0579462 0.777091 0.161091C0.673946 0.264236 0.616 0.404131 0.616 0.55V3.025C0.616 3.17087 0.673946 3.31076 0.777091 3.41391C0.880236 3.51705 1.02013 3.575 1.166 3.575H3.641C3.78687 3.575 3.92676 3.51705 4.02991 3.41391C4.13305 3.31076 4.191 3.17087 4.191 3.025C4.191 2.87913 4.13305 2.73924 4.02991 2.63609C3.92676 2.53295 3.78687 2.475 3.641 2.475H2.321C2.92736 1.84133 3.70925 1.40332 4.56632 1.21721C5.42339 1.03109 6.31652 1.10536 7.13108 1.43047C7.94564 1.75559 8.64446 2.31672 9.13783 3.04183C9.6312 3.76695 9.89661 4.62296 9.9 5.5C9.9 5.64587 9.95795 5.78576 10.0611 5.88891C10.1642 5.99205 10.3041 6.05 10.45 6.05C10.5959 6.05 10.7358 5.99205 10.8389 5.88891C10.9421 5.78576 11 5.64587 11 5.5C11 4.77773 10.8577 4.06253 10.5813 3.39524C10.3049 2.72795 9.89981 2.12163 9.38909 1.61091C8.87837 1.10019 8.27205 0.695063 7.60476 0.418663C6.93747 0.142262 6.22227 0 5.5 0Z" fill="black"/>
+                                            </svg>
+                                            <span>Кешбек балами:</span>
+                                        </div>
+                                        <span className={s.statValBlack}>{Math.round(totalSum * 0.03)} Б</span>
                                     </div>
-                                    <span className={s.statValBlack}>180 Б</span>
-                                </div>
+                                )}
                                 <div className={s.statRow}>
                                     <div className={s.statLabel}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none">

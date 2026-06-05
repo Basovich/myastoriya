@@ -142,3 +142,6 @@ export type { Contact, ContactCategory, ContactSchedule, ContactsCategoriesRespo
 export { getCareerApi } from './queries/pages/career';
 export type { Career } from './queries/pages/career';
 
+// Re-export orders
+export { getOrdersApi } from './queries/orders';
+export type { Order, OrderStatus, OrderSimplePagination } from './queries/orders';
