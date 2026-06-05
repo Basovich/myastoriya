@@ -295,7 +295,11 @@ export default function CatalogSidebar({
 
                 {/* Динамічні блоки фільтрів з API */}
                 {isLoadingFilters ? (
-                    <div className={s.filtersLoading} />
+                    <div className={s.loaderContainer}>
+                        <svg className={s.spinner} viewBox="0 0 50 50">
+                            <circle className={s.path} cx="25" cy="25" r="20" fill="none" strokeWidth="4.5"></circle>
+                        </svg>
+                    </div>
                 ) : dynamicBlocks.length > 0 ? (
                     dynamicBlocks.map((block, idx) => {
                         if (!block.key || block.key === 'categories') return null;
