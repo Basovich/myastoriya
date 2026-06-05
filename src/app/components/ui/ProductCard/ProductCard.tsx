@@ -69,7 +69,7 @@ export default function ProductCard({
                     </Badge>
                 )}
                 <WishButton productId={String(id)} className={s.favorite} />
-                <span className={s.weight}>{displayWeight}</span>
+                {displayWeight && <span className={s.weight}>{displayWeight}</span>}
 
             </div>
             <div className={s.info}>

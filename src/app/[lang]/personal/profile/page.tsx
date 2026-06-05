@@ -21,6 +21,19 @@ import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalConte
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import s from './Profile.module.scss';
 
+function getWeight(product: ApiProduct): string {
+    const weightSpec = product.specifications?.find(sp =>
+        sp.name.toLowerCase().includes('вага') ||
+        sp.name.toLowerCase().includes('важ') ||
+        sp.name.toLowerCase().includes('вес') ||
+        sp.name.toLowerCase().includes("об'єм")
+    );
+    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
+    const multiplier = product.multiplier ? String(product.multiplier) : '';
+    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
+    return multiplier;
+}
+
 const profileDict = {
   ua: {
     title: "Особистий кабінет клієнта",
@@ -181,10 +194,7 @@ export default function ProfilePage() {
                     unit: p.unit,
                     image: resolveProductImageUrl(p),
                     badge: p.is_new ? "NEW" : null,
-                    weight: p.specifications?.find((s) => 
-                        s.name.toLowerCase().includes('важ') || 
-                        s.name.toLowerCase().includes('вес')
-                    )?.values[0] || p.multiplier?.toString() || ""
+                    weight: getWeight(p)
                 }));
                 setViewedProducts(mappedProducts);
             } catch (err) {

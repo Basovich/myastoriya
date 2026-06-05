@@ -47,10 +47,14 @@ function getProductBadge(product: Product): string | null {
 function getProductWeight(product: Product): string {
     const weightSpec = product.specifications?.find(sp =>
         sp.name.toLowerCase().includes('вага') ||
+        sp.name.toLowerCase().includes('важ') ||
+        sp.name.toLowerCase().includes('вес') ||
         sp.name.toLowerCase().includes("об'єм")
     );
     if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
-    return product.multiplier ? `${product.multiplier}` : '';
+    const multiplier = product.multiplier ? String(product.multiplier) : '';
+    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
+    return multiplier;
 }
 
 function formatPrice(price: number): string {

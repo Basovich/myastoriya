@@ -48,6 +48,19 @@ const LOCALIZED_TEXTS = {
     }
 };
 
+function getWeight(product: any): string {
+    const weightSpec = product.specifications?.find((sp: any) =>
+        sp.name.toLowerCase().includes('вага') ||
+        sp.name.toLowerCase().includes('важ') ||
+        sp.name.toLowerCase().includes('вес') ||
+        sp.name.toLowerCase().includes("об'єм")
+    );
+    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
+    const multiplier = product.multiplier ? String(product.multiplier) : '';
+    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
+    return multiplier;
+}
+
 interface ComplexDiscountDetailProps {
     lang: string;
     initialData: Special;
@@ -142,7 +155,7 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                                         <ProductCard
                                             id={product.id}
                                             title={product.name}
-                                            weight={""}
+                                            weight={getWeight(product)}
                                             price={product.cost || 0}
                                             unit={product.unit || "кг"}
                                             badge={null}

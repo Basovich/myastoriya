@@ -13,6 +13,11 @@ export interface SpecialProduct {
     cost: number;
     oldCost: number | null;
     unit: string | null;
+    multiplier?: number | null;
+    specifications?: {
+        name: string;
+        values: string[];
+    }[] | null;
     available: boolean;
     image?: {
         url: {
@@ -95,6 +100,11 @@ const SPECIALS_QUERY = /* GraphQL */ `
                     cost
                     oldCost
                     unit
+                    multiplier
+                    specifications {
+                        name
+                        values
+                    }
                     available
                     image {
                         url {
@@ -146,6 +156,11 @@ export const SPECIAL_BY_ID_QUERY = /* GraphQL */ `
                 cost
                 oldCost
                 unit
+                multiplier
+                specifications {
+                    name
+                    values
+                }
                 available
                 image {
                     url {

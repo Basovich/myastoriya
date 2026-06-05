@@ -23,6 +23,19 @@ import {
 
 // Removed MOCKs
 
+function getWeight(product: ApiProduct): string {
+    const weightSpec = product.specifications?.find(sp =>
+        sp.name.toLowerCase().includes('вага') ||
+        sp.name.toLowerCase().includes('важ') ||
+        sp.name.toLowerCase().includes('вес') ||
+        sp.name.toLowerCase().includes("об'єм")
+    );
+    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
+    const multiplier = product.multiplier ? String(product.multiplier) : '';
+    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
+    return multiplier;
+}
+
 export default function SearchContent() {
     const searchParams = useSearchParams();
     const { lang } = useParams();
@@ -122,8 +135,7 @@ export default function SearchContent() {
                              <div className={s.loading}>Завантаження...</div>
                         ) : products.length > 0 ? (
                             products.map((product) => {
-                                const weightSpec = product.specifications?.find(sp => sp.name.toLowerCase().includes('вага'));
-                                const weight = weightSpec?.values[0] || product.unit;
+                                const weight = getWeight(product);
 
                                 return (
                                     <ProductCard

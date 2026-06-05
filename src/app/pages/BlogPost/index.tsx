@@ -17,6 +17,19 @@ import { type BlogPost, type Product, resolveProductImageUrl, resolveBlogImageUr
 import { likeBlogApi } from "@/lib/graphql/queries/blog";
 import clsx from "clsx";
 
+function getWeight(product: any): string {
+    const weightSpec = product.specifications?.find((sp: any) =>
+        sp.name.toLowerCase().includes('вага') ||
+        sp.name.toLowerCase().includes('важ') ||
+        sp.name.toLowerCase().includes('вес') ||
+        sp.name.toLowerCase().includes("об'єм")
+    );
+    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
+    const multiplier = product.multiplier ? String(product.multiplier) : '';
+    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
+    return multiplier;
+}
+
 interface BlogPostPageProps {
     dict: Dictionary;
     post: BlogPost;
@@ -171,7 +184,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                             id={product.id}
                                             slug={product.slug}
                                             title={product.name}
-                                            weight={product.unit ?? ""}
+                                            weight={getWeight(product)}
                                             price={product.cost}
                                             unit={product.unit ?? ""}
                                             badge={product.is_new ? "NEW" : null}
@@ -202,7 +215,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                     id={product.id}
                                     slug={product.slug}
                                     title={product.name}
-                                    weight={product.unit ?? ""}
+                                    weight={getWeight(product)}
                                     price={product.cost}
                                     unit={product.unit ?? ""}
                                     badge={product.is_new ? "NEW" : null}

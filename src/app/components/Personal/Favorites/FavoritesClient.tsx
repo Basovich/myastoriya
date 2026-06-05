@@ -16,6 +16,19 @@ import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter } from 'next/navigation';
 import s from './Favorites.module.scss';
 
+function getWeight(product: Product): string {
+    const weightSpec = product.specifications?.find(sp =>
+        sp.name.toLowerCase().includes('вага') ||
+        sp.name.toLowerCase().includes('важ') ||
+        sp.name.toLowerCase().includes('вес') ||
+        sp.name.toLowerCase().includes("об'єм")
+    );
+    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
+    const multiplier = product.multiplier ? String(product.multiplier) : '';
+    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
+    return multiplier;
+}
+
 const favDict = {
     ua: {
         title: "СПИСОК БАЖАНЬ",
@@ -136,7 +149,7 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                                     title={product.name}
                                     price={product.cost}
                                     unit={product.unit}
-                                    weight={product.multiplier ? String(product.multiplier) : "1"}
+                                    weight={getWeight(product)}
                                     image={resolveProductImageUrl(product)}
                                     badge={badgeStr}
                                     lang={lang} 
