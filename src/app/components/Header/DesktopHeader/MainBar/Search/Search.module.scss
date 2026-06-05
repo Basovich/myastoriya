@@ -472,11 +472,14 @@
 }
 
 .featuredCard {
+    display: flex;
+    flex-direction: column;
     background: #ffffff;
     border: 1px solid #EBEBEB;
     border-radius: 20px;
     overflow: hidden;
     position: relative;
+    height: 100%;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
@@ -526,10 +529,14 @@
 }
 
 .featuredInfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
     padding: 24px;
 }
 
 .featuredName {
+    flex: 1 1;
     font-size: 18px;
     font-weight: 700;
     color: #000;

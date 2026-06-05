@@ -180,10 +180,6 @@ nav.breadcrumbsWrapper {
     flex: 1;
     min-width: 140px;
     max-width: 260px;
-    
-    @media (min-width: 1280px) {
-      max-width: initial;
-    }
 }
 
 .plus {

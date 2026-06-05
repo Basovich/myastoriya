@@ -322,6 +322,9 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                         results.map((product) => {
                                                             const mainImage = resolveProductImageUrl(product);
                                                             const weight = product.specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || product.unit;
+                                                            const displayWeight = weight === "1"
+                                                                ? (lang === 'ru' ? "1 единица" : "1 одиниця")
+                                                                : weight;
                                                             
                                                             return (
                                                                 <div key={product.id} className={s.dishItem} onClick={() => router.push(`/${lang}/product/${product.slug || product.id}`)}>
@@ -330,7 +333,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                     </div>
                                                                     <div className={s.dishInfo}>
                                                                         <div className={s.dishName}>{product.name}</div>
-                                                                        <div className={s.dishWeight}>{weight}</div>
+                                                                        <div className={s.dishWeight}>{displayWeight}</div>
                                                                     </div>
                                                                 </div>
                                                             );
@@ -373,6 +376,12 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                     {featuredProposals.map((product) => {
                                                                         const mainImage = resolveProductImageUrl(product);
                                                                         const weight = product.specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || product.unit;
+                                                                        const displayWeight = weight === "1"
+                                                                            ? (lang === 'ru' ? "1 единица" : "1 одиниця")
+                                                                            : weight;
+                                                                        const displayUnit = product.unit.toLowerCase() === "шт"
+                                                                            ? "За 1 шт"
+                                                                            : `За ${product.unit}`;
                                                                         const badgeText = product.oldCost ? (lang === 'ru' ? 'акция' : 'акція') : (product.is_new ? 'new' : null);
 
                                                                         return (
@@ -387,7 +396,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                                         />
                                                                                         {badgeText && <Badge variant={badgeText === "new" ? "new" : "sale"} className={s.featuredBadge}>{badgeText}</Badge>}
                                                                                         <div className={s.featuredWeightOverlay}>
-                                                                                            {weight}
+                                                                                            {displayWeight}
                                                                                         </div>
                                                                                         <WishButton productId={String(product.id)} className={s.wishBtn} />
                                                                                     </div>
@@ -396,7 +405,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                                         <div className={s.featuredFooter}>
                                                                                             <div className={s.featuredPriceBlock}>
                                                                                                 <div className={s.featuredPriceValue}>{product.cost} ₴</div>
-                                                                                                <div className={s.featuredPriceUnit}>{product.unit}</div>
+                                                                                                <div className={s.featuredPriceUnit}>{displayUnit}</div>
                                                                                             </div>
                                                                                             <AddToCartButton productId={String(product.id)} className={s.addToCartBtn} />
                                                                                         </div>
@@ -425,7 +434,12 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                         </Badge>
                                                                     )}
                                                                     <div className={s.featuredWeightOverlay}>
-                                                                        {featuredProposals[0].specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || featuredProposals[0].unit}
+                                                                        {(() => {
+                                                                            const fallbackWeight = featuredProposals[0].specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || featuredProposals[0].unit;
+                                                                            return fallbackWeight === "1"
+                                                                                ? (lang === 'ru' ? "1 единица" : "1 одиниця")
+                                                                                : fallbackWeight;
+                                                                        })()}
                                                                     </div>
                                                                     <WishButton productId={String(featuredProposals[0].id)} className={s.wishBtn} />
                                                                 </div>
@@ -434,7 +448,14 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                     <div className={s.featuredFooter}>
                                                                         <div className={s.featuredPriceBlock}>
                                                                             <div className={s.featuredPriceValue}>{featuredProposals[0].cost} ₴</div>
-                                                                            <div className={s.featuredPriceUnit}>{featuredProposals[0].unit}</div>
+                                                                            <div className={s.featuredPriceUnit}>
+                                                                                {(() => {
+                                                                                    const unit = featuredProposals[0].unit;
+                                                                                    return unit.toLowerCase() === "шт"
+                                                                                        ? "За 1 шт"
+                                                                                        : `За ${unit}`;
+                                                                                })()}
+                                                                            </div>
                                                                         </div>
                                                                         <AddToCartButton productId={String(featuredProposals[0].id)} className={s.addToCartBtn} />
                                                                     </div>
