@@ -24,7 +24,7 @@ import Image from 'next/image';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import type { BlogPost, Product, ProductCostVariant, OrderingInfoBlock } from '@/lib/graphql';
-import { resolveProductImageUrl, getProductCostVariantsApi } from '@/lib/graphql';
+import { resolveProductImageUrl, getProductCostVariantsApi, getPopularProductsApi } from '@/lib/graphql';
 import type { BreadcrumbItem } from '@/utils/category-url';
 
 
@@ -154,6 +154,33 @@ const ProductClient: React.FC<ProductClientProps> = ({
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isVideoReviewModalOpen, setIsVideoReviewModalOpen] = useState(false);
 
+    const [popularList, setPopularList] = useState<Product[]>(popularProducts ?? []);
+    const [popularLimit, setPopularLimit] = useState(12);
+    const [isLoadingMorePopular, setIsLoadingMorePopular] = useState(false);
+    const [hasMorePopular, setHasMorePopular] = useState((popularProducts ?? []).length >= 12);
+
+    const handleLoadMorePopular = async () => {
+        if (isLoadingMorePopular || !hasMorePopular) return;
+        setIsLoadingMorePopular(true);
+        const nextLimit = popularLimit + 12;
+        try {
+            const res = await getPopularProductsApi(undefined, nextLimit, lang);
+            if (res.length <= popularList.length) {
+                setHasMorePopular(false);
+            } else {
+                setPopularList(res);
+                setPopularLimit(nextLimit);
+                if (res.length < nextLimit) {
+                    setHasMorePopular(false);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load more popular products:', error);
+        } finally {
+            setIsLoadingMorePopular(false);
+        }
+    };
+
     // Optional products/modifications (currently empty as they are not supported by the API yet)
     const productModifications: { id: string; name: string; price: number }[] = [];
     /* Commented out hardcoded options:
@@ -255,7 +282,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
     }
 
     const mappedRelated = mapProductsToRelated(relatedProducts, 8);
-    const mappedPopular = mapProductsToRelated(popularProducts, 12);
+    const mappedPopular = mapProductsToRelated(popularList);
 
     // Get current category name from breadcrumbs
     const categoryName = breadcrumbsProp && breadcrumbsProp.length > 1
@@ -461,15 +488,27 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         isSliderOnMobile={true}
                     />
                 )}
-                <div className={s.showMoreWrapper}>
-                    <Button variant="outline-black">
-                        <span className={s.showMoreText}>ПОКАЗАТИ ЩЕ</span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    </Button>
-                </div>
+                {hasMorePopular && (
+                    <div className={s.showMoreWrapper}>
+                        <Button 
+                            variant="outline-black" 
+                            onClick={handleLoadMorePopular}
+                            disabled={isLoadingMorePopular}
+                        >
+                            <span className={s.showMoreText}>
+                                {isLoadingMorePopular 
+                                    ? (lang === 'ru' ? 'ЗАГРУЗКА...' : 'ЗАВАНТАЖЕННЯ...') 
+                                    : (lang === 'ru' ? 'ПОКАЗАТЬ ЕЩЕ' : 'ПОКАЗАТИ ЩЕ')}
+                            </span>
+                            {!isLoadingMorePopular && (
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path d="M12 5L19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            )}
+                        </Button>
+                    </div>
+                )}
             </div>
 
             <Publications dict={dict.home.publications} posts={publications} lang={lang} className={s.publications} />
