@@ -5,6 +5,8 @@ import { useRouter, useParams } from "next/navigation";
 import clsx from "clsx";
 import s from "./SearchBar.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { Locale } from "@/i18n/config";
+import { getLocalizedHref } from "@/utils/i18n-helpers";
 
 import { 
     getProductsApi, 
@@ -23,7 +25,7 @@ export default function SearchBar() {
     const router = useRouter();
     const params = useParams();
     const { disableScroll, enableScroll } = useScrollLock();
-    const lang = params?.lang || "uk";
+    const lang = (params?.lang as Locale) || "ua";
     const containerRef = useRef<HTMLDivElement>(null);
 
     const handleSearch = (e?: React.SyntheticEvent) => {
@@ -34,7 +36,7 @@ export default function SearchBar() {
             return;
         }
 
-        router.push(`/${lang}/search?q=${encodeURIComponent(query)}`);
+        router.push(getLocalizedHref(`/search?q=${encodeURIComponent(query)}`, lang));
         setIsActive(false);
     };
 
@@ -115,7 +117,7 @@ export default function SearchBar() {
                         {results.length > 0 ? (
                             <div className={s.resultsList}>
                                 {results.map((product) => (
-                                    <div key={product.id} className={s.resultItem} onClick={() => router.push(`/${lang}/product/${product.slug || product.id}`)}>
+                                    <div key={product.id} className={s.resultItem} onClick={() => router.push(getLocalizedHref(`/products/${product.slug || product.id}`, lang))}>
                                         <div className={s.resultImage}>
                                             <img src={resolveProductImageUrl(product) || "/images/no-image.png"} alt={product.name} />
                                         </div>

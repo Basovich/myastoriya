@@ -327,7 +327,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                 : weight;
                                                             
                                                             return (
-                                                                <div key={product.id} className={s.dishItem} onClick={() => router.push(`/${lang}/product/${product.slug || product.id}`)}>
+                                                                <div key={product.id} className={s.dishItem} onClick={() => router.push(getLocalizedHref(`/products/${product.slug || product.id}`, lang as Locale))}>
                                                                     <div className={s.dishThumb}>
                                                                         <Image src={mainImage || "/images/no-image.png"} alt={product.name} fill />
                                                                     </div>
