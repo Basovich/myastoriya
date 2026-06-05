@@ -30,7 +30,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 
-    const { populatedItems } = useCartProducts();
+    const { populatedItems, loading } = useCartProducts();
 
     // Calculate total
     const totalSum = useMemo(() => {
@@ -93,8 +93,14 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                     </h2>
                 </div>
 
-                <div className={clsx(s.body, populatedItems.length === 0 && s.bodyEmpty)}>
-                    {populatedItems.length === 0 ? (
+                <div className={clsx(s.body, (populatedItems.length === 0 || loading) && s.bodyEmpty)}>
+                    {loading ? (
+                        <div className={s.loaderContainer}>
+                            <svg className={s.spinner} viewBox="0 0 50 50">
+                                <circle className={s.path} cx="25" cy="25" r="20" fill="none" strokeWidth="5"></circle>
+                            </svg>
+                        </div>
+                    ) : populatedItems.length === 0 ? (
                         <div className={s.emptyState}>
                             Ваш кошик порожній.
                         </div>
@@ -163,7 +169,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                     )}
                 </div>
 
-                {populatedItems.length > 0 && (
+                {!loading && populatedItems.length > 0 && (
                     <div className={s.modalFooter}>
                         <div className={s.footerContent}>
                             <div className={s.summaryStats}>
