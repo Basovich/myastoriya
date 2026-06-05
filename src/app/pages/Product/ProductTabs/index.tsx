@@ -107,7 +107,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
     const tabs: TabItem[] = [
         { id: 'description', label: 'Опис', icon: '/images/product/tab-description.svg' },
         ...(generalSpecs.length > 0 ? [{ id: 'characteristics', label: 'Характеристики', icon: '/images/product/tab-characteristics.svg' } as TabItem] : []),
-        ...(hasNutritionOrAllergens ? [{ id: 'allergens', label: 'АЛЕРГЕНИ / КАЛОРІЙНІСТЬ', icon: '/images/product/tab-characteristics.svg' } as TabItem] : []),
+        ...(hasNutritionOrAllergens ? [{ id: 'allergens', label: 'АЛЕРГЕНИ / КАЛОРІЙНІСТЬ', icon: '/images/product/tab-characteristics.webp' } as TabItem] : []),
         { id: 'delivery', label: 'Доставка', icon: '/images/product/tab-delivery.svg' },
     ];
 
