@@ -34,7 +34,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
     const { node: matchedCat, parent, grandParent } = entryFallback;
 
     const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page as string) : 1;
-    const view = (resolvedSearchParams.view as 'list' | 'grid') || 'list';
+    const view = (resolvedSearchParams.view as 'list' | 'grid') || 'grid';
     const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
 
     const categoryId = parseInt(matchedCat.id);

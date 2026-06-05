@@ -69,7 +69,7 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
 
 
     const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page as string) : 1;
-    const view = (resolvedSearchParams.view as 'list' | 'grid') || 'list';
+    const view = (resolvedSearchParams.view as 'list' | 'grid') || 'grid';
     const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
 
     // Парсимо активні фільтри з URL
