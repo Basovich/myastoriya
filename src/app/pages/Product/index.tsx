@@ -201,6 +201,7 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }>; publ
                         <DonenessSelector 
                             value={selectedDoneness} 
                             onChange={setSelectedDoneness} 
+                            lang={locale}
                         />
 
                         <ProductModifications

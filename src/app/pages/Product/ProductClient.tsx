@@ -400,6 +400,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                             value={selectedCostVariantId}
                             onChange={setSelectedCostVariantId}
                             options={variants}
+                            lang={lang}
                         />
                     )}
 
