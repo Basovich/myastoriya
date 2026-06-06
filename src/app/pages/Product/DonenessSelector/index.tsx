@@ -40,9 +40,10 @@ interface DonenessSelectorProps {
     /** Реальні варіанти з API. Якщо передано — використовуються замість статичних. */
     options?: ProductCostVariant[];
     lang?: 'ua' | 'ru';
+    noBorder?: boolean;
 }
 
-const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange, options, lang = 'ua' }) => {
+const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange, options, lang = 'ua', noBorder }) => {
     const [showTooltip, setShowTooltip] = React.useState(false);
     const tooltipRef = React.useRef<HTMLDivElement>(null);
     const btnRef = React.useRef<HTMLButtonElement>(null);
@@ -78,7 +79,7 @@ const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange, op
     const currentLang = lang === 'ru' ? 'ru' : 'ua';
 
     return (
-        <div className={s.selectorWrapper}>
+        <div className={`${s.selectorWrapper} ${noBorder ? s.noBorder : ''}`}>
             <div className={s.labelRow}>
                 <span className={s.label}>
                     {currentLang === 'ru' ? 'Степень прожарки:' : 'Рівень прожарки:'}

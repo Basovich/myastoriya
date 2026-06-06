@@ -14,6 +14,7 @@ import QuantitySelector from '@/app/components/ui/QuantitySelector/QuantitySelec
 import Publications from '@/app/components/Publications';
 import AuthModal from '@/app/components/AuthModal';
 import VideoReviewModal from '@/app/components/VideoReviewModal';
+import CartModal from '@/app/components/CartModal/CartModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { RootState } from '@/store';
 import { recordProductViewAsync } from '@/store/slices/viewedProductsSlice';
@@ -153,6 +154,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
     const [selectedSouces, setSelectedSouces] = useState<string[]>([]);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isVideoReviewModalOpen, setIsVideoReviewModalOpen] = useState(false);
+    const [isCartModalOpen, setIsCartModalOpen] = useState(false);
 
     const [popularList, setPopularList] = useState<Product[]>(popularProducts ?? []);
     const [popularLimit, setPopularLimit] = useState(12);
@@ -216,6 +218,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                 costVariantId: selectedCostVariantId ? Number(selectedCostVariantId) : undefined,
             })
         );
+        setIsCartModalOpen(true);
     };
 
     // Build display data from real product — читаємо з images[], бо image завжди null
@@ -299,6 +302,11 @@ const ProductClient: React.FC<ProductClientProps> = ({
         ? getProductImageUrl(product.gift.images[0].url.grid2x)
         : null;
 
+    const hasOptionsUnderCart = 
+        (product.hasCostVariants && variants.length > 1) || 
+        (productModifications && productModifications.length > 0) || 
+        (productSouces && productSouces.length > 0);
+
     return (
         <main className={s.productPage}>
             <Breadcrumbs items={breadcrumbs} className={s.breadcrumbsWrapper} />
@@ -353,7 +361,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         )}
                     </div>
 
-                    <div className={s.actionsBlock}>
+                    <div className={clsx(s.actionsBlock, !hasOptionsUnderCart && s.noBorder)}>
                         {inStock ? (
                             <>
                                 <Button variant="primary" className={s.mainBuyBtn} onClick={handleAddToCart}>Додати у кошик</Button>
@@ -404,6 +412,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                             onChange={setSelectedCostVariantId}
                             options={variants}
                             lang={lang}
+                            noBorder={productModifications.length === 0 && productSouces.length === 0}
                         />
                     )}
 
@@ -413,7 +422,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                             items={productModifications}
                             selectedItems={selectedMods}
                             onToggle={toggleMod}
-                            className={s.productModifications}
+                            className={clsx(s.productModifications, productSouces.length === 0 && s.noBorder)}
                         />
                     )}
                     {productSouces && productSouces.length > 0 && (
@@ -491,6 +500,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
 
             <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
             <VideoReviewModal isOpen={isVideoReviewModalOpen} onClose={() => setIsVideoReviewModalOpen(false)} />
+            <CartModal isOpen={isCartModalOpen} onClose={() => setIsCartModalOpen(false)} />
         </main>
     );
 };

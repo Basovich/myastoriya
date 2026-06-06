@@ -3,6 +3,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import Modal from 'react-modal';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { getLocalizedHref } from '@/utils/i18n-helpers';
+import { Locale } from '@/i18n/config';
 import s from './CartModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -26,6 +30,8 @@ interface CartModalProps {
 }
 
 export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: CartModalProps) {
+    const params = useParams();
+    const lang = (params?.lang as string) || 'ua';
     const { disableScroll, enableScroll } = useScrollLock();
     const dispatch = useAppDispatch();
     const cartItems = useAppSelector(state => state.cart.items);
@@ -153,18 +159,24 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                             {populatedItems.map((item) => (
                                 <div key={item.id} className={s.cartItem}>
                                     <div className={s.itemImage}>
-                                        <Image
-                                            src={item.product.image}
-                                            alt={item.product.title}
-                                            width={80}
-                                            height={80}
-                                            className={s.image}
-                                        />
+                                        <Link href={getLocalizedHref(`/products/${item.product.slug || item.id}`, lang as Locale)} target="_blank">
+                                            <Image
+                                                src={item.product.image}
+                                                alt={item.product.title}
+                                                width={80}
+                                                height={80}
+                                                className={s.image}
+                                            />
+                                        </Link>
                                     </div>
                                     <div className={s.itemDetails}>
                                         <div className={s.itemTop}>
                                             <div className={s.itemInfo}>
-                                                <h3 className={s.itemTitle}>{item.product.title}</h3>
+                                                <h3 className={s.itemTitle}>
+                                                    <Link href={getLocalizedHref(`/products/${item.product.slug || item.id}`, lang as Locale)} target="_blank">
+                                                        {item.product.title}
+                                                    </Link>
+                                                </h3>
                                                 <span className={s.itemWeight}>{item.product.weight}</span>
                                             </div>
                                         </div>

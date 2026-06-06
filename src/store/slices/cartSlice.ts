@@ -69,17 +69,28 @@ export const addToCartAsync = createAsyncThunk(
     'cart/add',
     async (
         payload: { id: string; quantity: number; costVariantId?: number },
-        { rejectWithValue }
+        { getState, rejectWithValue }
     ) => {
         try {
-            const response = await addProductToCartApi({
-                productId: Number(payload.id),
-                quantity: payload.quantity,
-                costVariantId: payload.costVariantId,
-            });
+            const state = getState() as RootState;
+            const existingItem = state.cart.items.find(item => item.id === payload.id);
+
+            let response;
+            if (existingItem && existingItem.rowId) {
+                response = await editCartItemQuantityApi({
+                    rowId: existingItem.rowId,
+                    quantity: existingItem.quantity,
+                });
+            } else {
+                response = await addProductToCartApi({
+                    productId: Number(payload.id),
+                    quantity: payload.quantity,
+                    costVariantId: payload.costVariantId,
+                });
+            }
             return mapCartItems(response);
         } catch (error: any) {
-            console.error('[Cart] Failed to add product to backend cart:', error);
+            console.error('[Cart] Failed to add or update product in backend cart:', error);
             return rejectWithValue('Failed to add product to cart');
         }
     }

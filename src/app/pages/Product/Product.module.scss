@@ -234,6 +234,11 @@ nav.breadcrumbsWrapper {
     padding-top: 24px;
     padding-bottom: 30px;
     border-bottom: 1px solid #E0E0E0;
+
+    &.noBorder {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
 }
 
 button.mainBuyBtn {
@@ -617,6 +622,12 @@ div.quantitySelector {
     padding-bottom: 24px;
     border-bottom: 1px solid #E0E0E0;
     margin-bottom: 24px;
+
+    &.noBorder {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
 }
 
 .modSectionTitle {
