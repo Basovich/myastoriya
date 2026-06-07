@@ -89,6 +89,13 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
         }, 0);
     }, [populatedItems]);
 
+    const originalTotalSum = useMemo(() => {
+        return populatedItems.reduce((acc, item) => {
+            const origPrice = (item.product as any).originalPrice || item.product.price;
+            return acc + (origPrice * item.quantity);
+        }, 0);
+    }, [populatedItems]);
+
     useEffect(() => {
         if (isOpen) {
             disableScroll();
@@ -249,7 +256,14 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                         </svg>
                                         <span>Загальна сума:</span>
                                     </div>
-                                    <span className={s.statValRed}>{totalSum} ₴</span>
+                                    <div className={s.totalPriceWrapper}>
+                                        <span className={clsx(s.statValRed, originalTotalSum > totalSum && s.hasDiscount)}>
+                                            {totalSum.toLocaleString('uk-UA')} ₴
+                                        </span>
+                                        {originalTotalSum > totalSum && (
+                                            <span className={s.statValCrossed}>{originalTotalSum.toLocaleString('uk-UA')} ₴</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <div className={s.actionButtons}>

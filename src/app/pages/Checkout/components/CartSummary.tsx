@@ -62,11 +62,22 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
         return populatedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
     }, [populatedItems]);
 
+    const originalTotalSum = useMemo(() => {
+        return populatedItems.reduce((acc, item) => {
+            const origPrice = (item.product as any).originalPrice || item.product.price;
+            return acc + (origPrice * item.quantity);
+        }, 0);
+    }, [populatedItems]);
+
     if (!hydrated) return null;
 
     const delivery = deliveryPrice;
     const discountAmount = Math.round(totalSum * (discountPercent / 100));
     const cashback = Math.round((totalSum - discountAmount) * 0.03);
+
+    const hasAnyDiscount = (originalTotalSum > totalSum) || (discountPercent > 0);
+    const finalPrice = totalSum + delivery - discountAmount;
+    const originalPrice = originalTotalSum + delivery;
 
     return (
         <div className={s.cartSummary}>
@@ -159,11 +170,11 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                             </span>
                             <div className={s.priceBlock}>
                                 <span className={s.cartStatVal}>
-                                    {totalSum + delivery - discountAmount} ₴
+                                    {finalPrice} ₴
                                 </span>
-                                {discountAmount > 0 && (
+                                {hasAnyDiscount && (
                                     <span className={s.oldPrice}>
-                                        {totalSum + delivery} ₴
+                                        {originalPrice} ₴
                                     </span>
                                 )}
                             </div>

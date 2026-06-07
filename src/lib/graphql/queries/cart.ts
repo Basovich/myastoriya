@@ -6,6 +6,7 @@ export interface CartItemGql {
     quantity: number;
     categoryId?: string;
     cost: number;
+    purchaseCost?: number;
     unit: string;
     multiplier: number;
     costVariantId?: number | null;
@@ -28,6 +29,7 @@ const CART_FIELDS = `
         quantity
         categoryId
         cost
+        purchaseCost
         unit
         multiplier
         costVariantId

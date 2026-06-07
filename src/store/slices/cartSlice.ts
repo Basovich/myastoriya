@@ -14,6 +14,7 @@ export interface CartItem {
     rowId?: string; // Unique key returned by backend
     quantity: number;
     cost?: number;
+    purchaseCost?: number;
     costVariantId?: number | null;
     costVariantName?: string | null;
 }
@@ -39,6 +40,7 @@ const mapCartItems = (cart: CartGql): CartItem[] => {
         rowId: item.rowId,
         quantity: item.quantity,
         cost: item.cost,
+        purchaseCost: item.purchaseCost,
         costVariantId: item.costVariantId,
         costVariantName: item.costVariantName,
     }));
@@ -280,6 +282,7 @@ const cartSlice = createSlice({
             })
             // addToCartAsync
             .addCase(addToCartAsync.pending, (state, action) => {
+                state.loading = true;
                 const { id, quantity, costVariantId } = action.meta.arg;
                 const existingItem = state.items.find(
                     item => item.id === id && item.costVariantId === (costVariantId ?? null)
@@ -296,15 +299,20 @@ const cartSlice = createSlice({
             })
             .addCase(addToCartAsync.fulfilled, (state, action) => {
                 // null payload = local-only add (auth not ready), state already set by pending
-                if (action.payload === null) return;
+                if (action.payload === null) {
+                    state.loading = false;
+                    return;
+                }
                 if (!state.deletingIds) {
                     state.deletingIds = [];
                 }
                 state.items = mergeCartItems(state.items, action.payload).filter(
                     item => !state.deletingIds.includes(item.rowId || item.id)
                 );
+                state.loading = false;
             })
             .addCase(addToCartAsync.rejected, (state, action) => {
+                state.loading = false;
                 if (action.meta.arg) {
                     const { id, quantity, costVariantId } = action.meta.arg;
                     const existingItem = state.items.find(
@@ -322,6 +330,7 @@ const cartSlice = createSlice({
             })
             // updateQuantityAsync
             .addCase(updateQuantityAsync.pending, (state, action) => {
+                state.loading = true;
                 const { id, rowId, quantity } = action.meta.arg;
                 const item = state.items.find(i => rowId ? i.rowId === rowId : i.id === id);
                 if (item) {
@@ -335,9 +344,14 @@ const cartSlice = createSlice({
                 state.items = mergeCartItems(state.items, action.payload).filter(
                     item => !state.deletingIds.includes(item.rowId || item.id)
                 );
+                state.loading = false;
+            })
+            .addCase(updateQuantityAsync.rejected, (state) => {
+                state.loading = false;
             })
             // removeFromCartAsync
             .addCase(removeFromCartAsync.pending, (state, action) => {
+                state.loading = true;
                 const { id, rowId } = action.meta.arg;
                 if (!state.deletingIds) {
                     state.deletingIds = [];
@@ -358,8 +372,10 @@ const cartSlice = createSlice({
                 state.items = mergeCartItems(state.items, action.payload).filter(
                     item => !state.deletingIds.includes(item.rowId || item.id)
                 );
+                state.loading = false;
             })
             .addCase(removeFromCartAsync.rejected, (state, action) => {
+                state.loading = false;
                 if (action.meta.arg) {
                     const { id, rowId } = action.meta.arg;
                     if (!state.deletingIds) {

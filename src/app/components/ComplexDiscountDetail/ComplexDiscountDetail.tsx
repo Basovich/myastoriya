@@ -8,8 +8,8 @@ import CountdownTimer from '../ui/CountdownTimer/CountdownTimer';
 import Button from '../ui/Button/Button';
 import ProductCard from '../ui/ProductCard/ProductCard';
 import CartModal from '../CartModal/CartModal';
-import { useAppDispatch } from '@/store/hooks';
-import { addToCart } from '@/store/slices/cartSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { addToCartAsync, fetchCartAsync } from '@/store/slices/cartSlice';
 
 import { type Special, resolveProductImageUrl } from '@/lib/graphql';
 
@@ -28,7 +28,8 @@ const LOCALIZED_TEXTS = {
         },
         buyTogetherDiscount: "При купівлі разом ви отримуєте знижку",
         discount: "Знижка",
-        addToCart: "ДОДАТИ ДО КОШИКА"
+        addToCart: "ДОДАТИ ДО КОШИКА",
+        addingToCart: "ДОДАВАННЯ..."
     },
     ru: {
         breadcrumbs: {
@@ -44,7 +45,8 @@ const LOCALIZED_TEXTS = {
         },
         buyTogetherDiscount: "При покупке вместе вы получаете скидку",
         discount: "Скидка",
-        addToCart: "ДОБАВИТЬ В КОРЗИНУ"
+        addToCart: "ДОБАВИТЬ В КОРЗИНУ",
+        addingToCart: "ДОБАВЛЕНИЕ..."
     }
 };
 
@@ -86,22 +88,43 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
     const bundleProducts = item?.products ?? [];
 
     // Calculate total bundle price and discounted price
-    const totalPrice = bundleProducts.reduce((sum, p) => sum + (p.cost || 0), 0);
+    const totalPrice = bundleProducts.reduce((sum, p) => sum + ((p.purchaseOldCost ?? p.purchaseCost ?? p.cost) || 0), 0);
     const discountFactor = 1 - (Math.abs(parseInt(discountPercent)) / 100);
     const discountedPrice = item?.cost || Math.round(totalPrice * discountFactor);
 
     const dispatch = useAppDispatch();
+    const cartItems = useAppSelector(state => state.cart.items);
     const [isCartOpen, setIsCartOpen] = useState(false);
 
     const handleAddToCart = () => {
-        bundleProducts.forEach((product) => {
-            dispatch(addToCart({ id: String(product.id), quantity: 1 }));
-        });
+        // Find which products from the bundle are not in the cart yet
+        const existingIds = new Set(cartItems.map(item => String(item.id)));
+        const productsToAdd = bundleProducts.filter(p => !existingIds.has(String(p.id)));
+
+        if (productsToAdd.length === 0) {
+            setIsCartOpen(true);
+            return;
+        }
+
         setIsCartOpen(true);
+
+        // Sync and add only the missing products using the async thunk sequentially
+        (async () => {
+            try {
+                for (const product of productsToAdd) {
+                    await dispatch(addToCartAsync({
+                        id: String(product.id),
+                        quantity: 1,
+                    })).unwrap();
+                }
+            } catch (error) {
+                console.error('[ComplexDiscountDetail] Failed to add bundle items:', error);
+            }
+        })();
     };
 
-    const heroImage = item?.banner?.size3x || item?.banner?.size2x || item?.banner?.size1x || 
-                    item?.image?.size3x || item?.image?.size2x || item?.image?.size1x ||
+    const heroImage = item?.banner?.original || item?.banner?.size3x || item?.banner?.size2x || item?.banner?.size1x || 
+                    item?.image?.original || item?.image?.size3x || item?.image?.size2x || item?.image?.size1x ||
                     "/images/promotions/promo-hero-bg2.png";
     
     const displayHeroImage = heroImage.startsWith('/') && !heroImage.startsWith('/images') ? `https://dev-api.myastoriya.com.ua${heroImage}` : heroImage;
@@ -157,7 +180,7 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                                             slug={product.slug}
                                             title={product.name}
                                             weight={getWeight(product)}
-                                            price={product.cost || 0}
+                                            price={product.purchaseOldCost ?? product.purchaseCost ?? product.cost ?? 0}
                                             unit={product.unit || "кг"}
                                             badge={null}
                                             image={productImage}

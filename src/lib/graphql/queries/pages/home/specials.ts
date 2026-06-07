@@ -4,6 +4,7 @@ export interface SpecialImage {
     size1x: string | null;
     size2x: string | null;
     size3x: string | null;
+    original?: string | null;
 }
 
 export interface SpecialProduct {
@@ -12,6 +13,8 @@ export interface SpecialProduct {
     slug: string;
     cost: number;
     oldCost: number | null;
+    purchaseCost?: number | null;
+    purchaseOldCost?: number | null;
     unit: string | null;
     multiplier?: number | null;
     specifications?: {
@@ -88,11 +91,13 @@ const SPECIALS_QUERY = /* GraphQL */ `
                     size1x
                     size2x
                     size3x
+                    original
                 }
                 banner {
                     size1x
                     size2x
                     size3x
+                    original
                 }
                 products {
                     id
@@ -100,6 +105,8 @@ const SPECIALS_QUERY = /* GraphQL */ `
                     slug
                     cost
                     oldCost
+                    purchaseCost
+                    purchaseOldCost
                     unit
                     multiplier
                     specifications {
@@ -145,11 +152,13 @@ export const SPECIAL_BY_ID_QUERY = /* GraphQL */ `
                 size1x
                 size2x
                 size3x
+                original
             }
             banner {
                 size1x
                 size2x
                 size3x
+                original
             }
             products {
                 id
@@ -157,6 +166,8 @@ export const SPECIAL_BY_ID_QUERY = /* GraphQL */ `
                 slug
                 cost
                 oldCost
+                purchaseCost
+                purchaseOldCost
                 unit
                 multiplier
                 specifications {
