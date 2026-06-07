@@ -43,5 +43,5 @@ export const FALLBACK_PRODUCT: MockProduct = {
     title: "Медальйони з яловичини",
     weight: "200г",
     price: 350,
-    image: "/images/cat-branded.png"
+    image: "/images/product-placeholder.svg"
 };

@@ -80,10 +80,10 @@ const Product: React.FC<{ params: Promise<{ lang: string; slug?: string }>; publ
         badge: matchedItem?.badge || "Steak Days щовівторка!",
         description: "По классической американской технологии Стриплойн USA создается из самого ценного мяса передней части говяжьей полутуши. Мясо с тонким краем, срезается в поясничной части от 13 ребра до костреца. Причем животные откармливаются только на лучших кормах, с продуманным рационом, получая качественный уход на протяжении всего периода. Уже это становится залогом великолепного вкуса! Обратите внимание, при откорме не используются гормоны роста, ГМО или антибиотики.",
         images: [
-            matchedItem ? matchedItem.image : "/images/product/product-main.png",
-            matchedItem ? matchedItem.image : "/images/product/product-main.png",
-            matchedItem ? matchedItem.image : "/images/product/product-main.png",
-            matchedItem ? matchedItem.image : "/images/product/product-main.png",
+            matchedItem ? matchedItem.image : "/images/product-placeholder.svg",
+            matchedItem ? matchedItem.image : "/images/product-placeholder.svg",
+            matchedItem ? matchedItem.image : "/images/product-placeholder.svg",
+            matchedItem ? matchedItem.image : "/images/product-placeholder.svg",
         ],
         characteristics: {
             "Вага": "350г",

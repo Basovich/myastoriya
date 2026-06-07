@@ -254,7 +254,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
           }).filter(Boolean)
         : resolvedMain
             ? [resolvedMain]
-            : ['/images/product/product-main.png'];
+            : ['/images/product-placeholder.svg'];
 
     const characteristics: Record<string, string> = {};
     product.specifications?.forEach(spec => {

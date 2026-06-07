@@ -155,7 +155,7 @@ export function useCartProducts() {
                         weight: weight,
                         price: initialPrice,
                         originalPrice: originalPrice,
-                        image: resolveProductImageUrl(dbProduct) || "/images/cat-branded.png",
+                        image: resolveProductImageUrl(dbProduct) || "/images/product-placeholder.svg",
                         slug: dbProduct.slug || dbProduct.id,
                         costVariantName: item.costVariantName
                     }
