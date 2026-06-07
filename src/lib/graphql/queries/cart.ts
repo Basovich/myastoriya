@@ -8,6 +8,8 @@ export interface CartItemGql {
     cost: number;
     unit: string;
     multiplier: number;
+    costVariantId?: number | null;
+    costVariantName?: string | null;
 }
 
 export interface CartGql {
@@ -28,6 +30,8 @@ const CART_FIELDS = `
         cost
         unit
         multiplier
+        costVariantId
+        costVariantName
     }
     hasRawFoods
     total

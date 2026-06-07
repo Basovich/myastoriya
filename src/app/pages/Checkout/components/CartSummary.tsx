@@ -98,7 +98,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                     <p className={s.emptyCart}>Кошик порожній</p>
                 ) : (
                     populatedItems.map(item => (
-                        <div key={item.id} className={s.cartItem}>
+                        <div key={item.rowId || item.id} className={s.cartItem}>
                             <div className={s.cartItemImg}>
                                 <Image
                                     src={item.product.image}
@@ -110,7 +110,10 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                             </div>
                             <div className={s.cartItemInfo}>
                                 <p className={s.cartItemTitle}>{item.product.title}</p>
-                                <p className={s.cartItemWeight}>{item.product.weight}</p>
+                                <p className={s.cartItemWeight}>
+                                    {item.product.weight}
+                                    {item.product.costVariantName && ` • ${item.product.costVariantName}`}
+                                </p>
                             </div>
                             <div className={s.cartItemRight}>
                                 <span className={s.cartItemPrice}>{item.product.price * item.quantity} ₴</span>

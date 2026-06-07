@@ -96,14 +96,13 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
         }
     }, [isOpen, disableScroll, enableScroll]);
 
-    const handleUpdateQuantity = (id: string, newQuantity: number) => {
+    const handleUpdateQuantity = (id: string, rowId: string | undefined, newQuantity: number) => {
         if (newQuantity < 1) return;
-        void dispatch(updateQuantityAsync({ id, quantity: newQuantity }));
+        void dispatch(updateQuantityAsync({ id, rowId, quantity: newQuantity }));
     };
 
-    const handleRemove = (id: string) => {
-        const item = cartItems.find(i => i.id === id);
-        void dispatch(removeFromCartAsync({ id, rowId: item?.rowId }));
+    const handleRemove = (id: string, rowId: string | undefined) => {
+        void dispatch(removeFromCartAsync({ id, rowId }));
     };
 
     const handleAddToCart = (id: string) => {
@@ -157,7 +156,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                     ) : (
                         <div className={s.cartItems}>
                             {populatedItems.map((item) => (
-                                <div key={item.id} className={s.cartItem}>
+                                <div key={item.rowId || item.id} className={s.cartItem}>
                                     <div className={s.itemImage}>
                                         <Link href={getLocalizedHref(`/products/${item.product.slug || item.id}`, lang as Locale)} target="_blank">
                                             <Image
@@ -177,14 +176,17 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                                         {item.product.title}
                                                     </Link>
                                                 </h3>
-                                                <span className={s.itemWeight}>{item.product.weight}</span>
+                                                <span className={s.itemWeight}>
+                                                    {item.product.weight}
+                                                    {item.product.costVariantName && ` • ${item.product.costVariantName}`}
+                                                </span>
                                             </div>
                                         </div>
                                         <div className={s.itemBottom}>
                                             <div className={s.quantitySelector}>
                                                 <button
                                                     className={s.qtyBtn}
-                                                    onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                                    onClick={() => handleUpdateQuantity(item.id, item.rowId, item.quantity - 1)}
                                                     disabled={item.quantity <= 1}
                                                 >
                                                     -
@@ -197,7 +199,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                                 />
                                                 <button
                                                     className={s.qtyBtn}
-                                                    onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                                                    onClick={() => handleUpdateQuantity(item.id, item.rowId, item.quantity + 1)}
                                                 >
                                                     +
                                                 </button>
@@ -209,7 +211,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                                 </div>
                                                 <button
                                                     className={s.removeItemBtn}
-                                                    onClick={() => handleRemove(item.id)}
+                                                    onClick={() => handleRemove(item.id, item.rowId)}
                                                     aria-label="Видалити товар"
                                                 >
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">

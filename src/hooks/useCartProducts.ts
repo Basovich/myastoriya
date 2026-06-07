@@ -19,6 +19,7 @@ export interface PopulatedCartItem {
         price: number;
         image: string;
         slug?: string;
+        costVariantName?: string | null;
     };
 }
 
@@ -94,9 +95,10 @@ export function useCartProducts() {
                         id: dbProduct.id,
                         title: dbProduct.name,
                         weight: weight,
-                        price: dbProduct.cost,
+                        price: item.cost ?? dbProduct.cost,
                         image: resolveProductImageUrl(dbProduct) || "/images/cat-branded.png",
-                        slug: dbProduct.slug || dbProduct.id
+                        slug: dbProduct.slug || dbProduct.id,
+                        costVariantName: item.costVariantName
                     }
                 };
             }
@@ -109,7 +111,8 @@ export function useCartProducts() {
                 quantity: item.quantity,
                 product: {
                     ...mockProduct,
-                    slug: mockProduct.id
+                    slug: mockProduct.id,
+                    costVariantName: item.costVariantName || null
                 }
             };
         });

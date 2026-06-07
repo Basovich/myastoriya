@@ -13,6 +13,9 @@ export interface CartItem {
     id: string; // Product ID
     rowId?: string; // Unique key returned by backend
     quantity: number;
+    cost?: number;
+    costVariantId?: number | null;
+    costVariantName?: string | null;
 }
 
 interface CartState {
@@ -35,17 +38,22 @@ const mapCartItems = (cart: CartGql): CartItem[] => {
         id: String(item.productId),
         rowId: item.rowId,
         quantity: item.quantity,
+        cost: item.cost,
+        costVariantId: item.costVariantId,
+        costVariantName: item.costVariantName,
     }));
 };
 
 // Helper to merge optimistic items with backend state
 const mergeCartItems = (currentItems: CartItem[], backendItems: CartItem[]): CartItem[] => {
-    const backendMap = new Map(backendItems.map(item => [item.id, item]));
+    const getMapKey = (item: CartItem) => `${item.id}_${item.costVariantId ?? ''}`;
+    const backendMap = new Map(backendItems.map(item => [getMapKey(item), item]));
     const optimisticItems = currentItems.filter(item => !item.rowId);
     const merged = [...backendItems];
 
     for (const optItem of optimisticItems) {
-        if (!backendMap.has(optItem.id)) {
+        const key = getMapKey(optItem);
+        if (!backendMap.has(key)) {
             merged.push(optItem);
         }
     }
@@ -75,7 +83,9 @@ export const addToCartAsync = createAsyncThunk(
     ) => {
         try {
             const state = getState() as RootState;
-            const existingItem = state.cart.items.find(item => item.id === payload.id);
+            const existingItem = state.cart.items.find(
+                item => item.id === payload.id && item.costVariantId === (payload.costVariantId ?? null)
+            );
 
             let response;
             if (existingItem && existingItem.rowId) {
@@ -102,12 +112,14 @@ export const addToCartAsync = createAsyncThunk(
 export const updateQuantityAsync = createAsyncThunk(
     'cart/updateQuantity',
     async (
-        payload: { id: string; quantity: number },
+        payload: { id: string; rowId?: string; quantity: number },
         { getState, dispatch, rejectWithValue }
     ) => {
         try {
             const state = getState() as RootState;
-            const item = state.cart.items.find(i => i.id === payload.id);
+            const item = state.cart.items.find(
+                i => payload.rowId ? i.rowId === payload.rowId : i.id === payload.id
+            );
 
             if (item?.rowId) {
                 const response = await editCartItemQuantityApi({
@@ -166,7 +178,7 @@ export const syncCartOnAuthAsync = createAsyncThunk(
 
             // Deduplicate items before syncing
             const uniqueItems = Array.from(
-                new Map(localItems.map(item => [item.id, item])).values()
+                new Map(localItems.map(item => [`${item.id}_${item.costVariantId ?? ''}`, item])).values()
             );
 
             if (uniqueItems.length > 0) {
@@ -178,6 +190,7 @@ export const syncCartOnAuthAsync = createAsyncThunk(
                         await addProductToCartApi({
                             productId: Number(item.id),
                             quantity: item.quantity,
+                            costVariantId: item.costVariantId || undefined,
                         });
                         // Small delay to prevent rate limits
                         await new Promise(resolve => setTimeout(resolve, 300));
@@ -203,22 +216,31 @@ const cartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        addToCart: (state, action: PayloadAction<{ id: string; quantity: number }>) => {
-            const existingItem = state.items.find(item => item.id === action.payload.id);
+        addToCart: (state, action: PayloadAction<{ id: string; quantity: number; costVariantId?: number }>) => {
+            const existingItem = state.items.find(
+                item => item.id === action.payload.id && item.costVariantId === (action.payload.costVariantId ?? null)
+            );
             if (existingItem) {
                 existingItem.quantity += action.payload.quantity;
             } else {
                 state.items.push({
                     id: action.payload.id,
                     quantity: action.payload.quantity,
+                    costVariantId: action.payload.costVariantId ?? null,
                 });
             }
         },
-        removeFromCart: (state, action: PayloadAction<string>) => {
-            state.items = state.items.filter(item => item.id !== action.payload);
+        removeFromCart: (state, action: PayloadAction<{ id: string; rowId?: string } | string>) => {
+            const targetId = typeof action.payload === 'string' ? action.payload : action.payload.id;
+            const targetRowId = typeof action.payload === 'string' ? undefined : action.payload.rowId;
+            state.items = state.items.filter(
+                item => targetRowId ? item.rowId !== targetRowId : item.id !== targetId
+            );
         },
-        updateQuantity: (state, action: PayloadAction<{ id: string; quantity: number }>) => {
-            const item = state.items.find(item => item.id === action.payload.id);
+        updateQuantity: (state, action: PayloadAction<{ id: string; rowId?: string; quantity: number }>) => {
+            const item = state.items.find(
+                item => action.payload.rowId ? item.rowId === action.payload.rowId : item.id === action.payload.id
+            );
             if (item) {
                 item.quantity = action.payload.quantity;
             }
@@ -238,7 +260,7 @@ const cartSlice = createSlice({
                     state.deletingIds = [];
                 }
                 state.items = action.payload.filter(
-                    item => !state.deletingIds.includes(item.id)
+                    item => !state.deletingIds.includes(item.rowId || item.id)
                 );
                 state.isInitialized = true;
                 state.loading = false;
@@ -248,14 +270,17 @@ const cartSlice = createSlice({
             })
             // addToCartAsync
             .addCase(addToCartAsync.pending, (state, action) => {
-                const { id, quantity } = action.meta.arg;
-                const existingItem = state.items.find(item => item.id === id);
+                const { id, quantity, costVariantId } = action.meta.arg;
+                const existingItem = state.items.find(
+                    item => item.id === id && item.costVariantId === (costVariantId ?? null)
+                );
                 if (existingItem) {
                     existingItem.quantity += quantity;
                 } else {
                     state.items.push({
                         id,
                         quantity,
+                        costVariantId: costVariantId ?? null,
                     });
                 }
             })
@@ -264,25 +289,29 @@ const cartSlice = createSlice({
                     state.deletingIds = [];
                 }
                 state.items = mergeCartItems(state.items, action.payload).filter(
-                    item => !state.deletingIds.includes(item.id)
+                    item => !state.deletingIds.includes(item.rowId || item.id)
                 );
             })
             .addCase(addToCartAsync.rejected, (state, action) => {
                 if (action.meta.arg) {
-                    const { id, quantity } = action.meta.arg;
-                    const existingItem = state.items.find(item => item.id === id);
+                    const { id, quantity, costVariantId } = action.meta.arg;
+                    const existingItem = state.items.find(
+                        item => item.id === id && item.costVariantId === (costVariantId ?? null)
+                    );
                     if (existingItem) {
                         existingItem.quantity -= quantity;
                         if (existingItem.quantity <= 0) {
-                            state.items = state.items.filter(item => item.id !== id);
+                            state.items = state.items.filter(
+                                item => !(item.id === id && item.costVariantId === (costVariantId ?? null))
+                            );
                         }
                     }
                 }
             })
             // updateQuantityAsync
             .addCase(updateQuantityAsync.pending, (state, action) => {
-                const { id, quantity } = action.meta.arg;
-                const item = state.items.find(item => item.id === id);
+                const { id, rowId, quantity } = action.meta.arg;
+                const item = state.items.find(i => rowId ? i.rowId === rowId : i.id === id);
                 if (item) {
                     item.quantity = quantity;
                 }
@@ -292,37 +321,40 @@ const cartSlice = createSlice({
                     state.deletingIds = [];
                 }
                 state.items = mergeCartItems(state.items, action.payload).filter(
-                    item => !state.deletingIds.includes(item.id)
+                    item => !state.deletingIds.includes(item.rowId || item.id)
                 );
             })
             // removeFromCartAsync
             .addCase(removeFromCartAsync.pending, (state, action) => {
-                const { id } = action.meta.arg;
+                const { id, rowId } = action.meta.arg;
                 if (!state.deletingIds) {
                     state.deletingIds = [];
                 }
-                if (!state.deletingIds.includes(id)) {
-                    state.deletingIds.push(id);
+                const key = rowId || id;
+                if (!state.deletingIds.includes(key)) {
+                    state.deletingIds.push(key);
                 }
-                state.items = state.items.filter(item => item.id !== id);
+                state.items = state.items.filter(item => rowId ? item.rowId !== rowId : item.id !== id);
             })
             .addCase(removeFromCartAsync.fulfilled, (state, action) => {
-                const { id } = action.meta.arg;
+                const { id, rowId } = action.meta.arg;
                 if (!state.deletingIds) {
                     state.deletingIds = [];
                 }
-                state.deletingIds = state.deletingIds.filter(dId => dId !== id);
+                const key = rowId || id;
+                state.deletingIds = state.deletingIds.filter(dId => dId !== key);
                 state.items = mergeCartItems(state.items, action.payload).filter(
-                    item => !state.deletingIds.includes(item.id)
+                    item => !state.deletingIds.includes(item.rowId || item.id)
                 );
             })
             .addCase(removeFromCartAsync.rejected, (state, action) => {
                 if (action.meta.arg) {
-                    const { id } = action.meta.arg;
+                    const { id, rowId } = action.meta.arg;
                     if (!state.deletingIds) {
                         state.deletingIds = [];
                     }
-                    state.deletingIds = state.deletingIds.filter(dId => dId !== id);
+                    const key = rowId || id;
+                    state.deletingIds = state.deletingIds.filter(dId => dId !== key);
                 }
             });
     }
