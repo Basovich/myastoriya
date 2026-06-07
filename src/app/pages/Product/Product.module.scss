@@ -1245,27 +1245,27 @@ button.leaveReviewBtn {
 
 button.showMoreBtn,
 button.leaveReviewBtn {
-    @media (min-width: 1280px) {
+    @media (min-width: 768px) {
         padding-top: 12px;
         min-width: 164px;
         width: fit-content;
     }
 }
 
-.mobileRewardsBanner {
-    margin: 32px auto 0;
-    width: calc(100% - 48px);
-
-    @media (min-width: 1024px) {
-        display: none;
-    }
-}
-
-button.mobileBannerLink {
-    width: 100%;
-    height: 44px;
-    font-size: 10px;
-}
+//.mobileRewardsBanner {
+//    margin: 32px auto 0;
+//    width: calc(100% - 48px);
+//
+//    @media (min-width: 1024px) {
+//        display: none;
+//    }
+//}
+//
+//button.mobileBannerLink {
+//    width: 100%;
+//    height: 44px;
+//    font-size: 10px;
+//}
 
 /* Related products section */
 .relatedProductsGrid {

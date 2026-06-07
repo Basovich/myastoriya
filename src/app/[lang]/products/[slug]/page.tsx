@@ -10,6 +10,8 @@ import {
     getCatalogTreeApi,
     getDeliveryBlocksApi,
     getProductsApi,
+    getBoughtTogetherProductsApi,
+    Product,
 } from "@/lib/graphql";
 import { notFound } from "next/navigation";
 import { buildCategoryIndex, buildCategoryBreadcrumbs } from "@/utils/category-url";
@@ -41,14 +43,44 @@ export default async function ProductPage({ params }: Props) {
     // Cost variants are loaded client-side in ProductClient to avoid unauthorized SSR errors
     const costVariants: any[] = [];
 
-    // Load related (specials), global popular products, and category-specific popular products in parallel
-    const [specialsProducts, popularProducts, categoryProductsResponse] = await Promise.all([
+    // Load related (specials), bought together, global popular products, and category-specific popular products in parallel
+    const [specialsProducts, boughtTogetherProducts, popularProducts, categoryProductsResponse] = await Promise.all([
         getSpecialsByProductApi(numericId, 8, lang),
+        product.categoryId
+            ? getBoughtTogetherProductsApi(Number(product.categoryId), numericId, 10, lang)
+            : Promise.resolve([]),
         getPopularProductsApi(undefined, 12, lang),
         product.categoryId
             ? getProductsApi({ categoryId: Number(product.categoryId), sort: "rating", limit: 13 }, lang)
             : Promise.resolve({ data: [] }),
     ]);
+
+    // Extract products from bundles if they exist (for "З цим товаром купують")
+    const bundleProducts: Product[] = [];
+    if (product.bundles) {
+        for (const bundle of product.bundles) {
+            if (bundle.items) {
+                for (const item of bundle.items) {
+                    if (item.product && String(item.product.id) !== String(product.id)) {
+                        if (!bundleProducts.some(p => String(p.id) === String(item.product.id))) {
+                            bundleProducts.push(item.product);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Determine what to show in "З цим товаром купують":
+    // 1. boughtTogetherProducts (products from the dedicated API block)
+    // 2. bundleProducts (products bundled together)
+    // 3. specialsProducts (fallback specials)
+    let finalRelatedProducts = specialsProducts;
+    if (boughtTogetherProducts.length > 0) {
+        finalRelatedProducts = boughtTogetherProducts;
+    } else if (bundleProducts.length > 0) {
+        finalRelatedProducts = bundleProducts;
+    }
 
     const categoryIndex = buildCategoryIndex(catalogTree);
     const breadcrumbs = buildCategoryBreadcrumbs(product.categoryId, categoryIndex);
@@ -59,7 +91,7 @@ export default async function ProductPage({ params }: Props) {
                 product={product}
                 costVariants={costVariants}
                 publications={blogsResponse.data}
-                relatedProducts={specialsProducts}
+                relatedProducts={finalRelatedProducts}
                 popularProducts={popularProducts}
                 categoryProducts={categoryProductsResponse.data || []}
                 lang={lang as Locale}

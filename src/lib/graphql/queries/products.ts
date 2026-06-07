@@ -92,6 +92,18 @@ export interface ProductCostVariant {
     } | null;
 }
 
+export interface ProductBundleItem {
+    id: string;
+    product: Product;
+}
+
+export interface ProductBundle {
+    id: string;
+    discountType?: string | null;
+    discountAmount?: number | null;
+    items?: ProductBundleItem[] | null;
+}
+
 export interface Product {
     id: string;
     slug?: string;
@@ -130,6 +142,8 @@ export interface Product {
         name: string;
         values: string[];
     }[];
+    /** Набори товарів — джерело блоку «З цим товаром купують» */
+    bundles?: ProductBundle[] | null;
 }
 
 /**
@@ -332,6 +346,36 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                     }
                 }
             }
+            bundles {
+                id
+                discountType
+                discountAmount
+                items {
+                    id
+                    product {
+                        id
+                        slug
+                        name
+                        cost
+                        oldCost
+                        unit
+                        multiplier
+                        is_new
+                        available
+                        hasCostVariants
+                        specifications {
+                            name
+                            values
+                        }
+                        images {
+                            url {
+                                grid2x
+                                grid1x
+                            }
+                        }
+                    }
+                }
+            }
             specifications {
                 name
                 values
@@ -434,6 +478,34 @@ const SPECIALS_BY_PRODUCT_QUERY = /* GraphQL */ `
                             grid1x
                         }
                     }
+                }
+            }
+        }
+    }
+`;
+
+const BOUGHT_TOGETHER_PRODUCTS_QUERY = /* GraphQL */ `
+    query BoughtTogetherProducts($categoryId: Int!, $productId: Int!, $limit: Int) {
+        boughtTogetherProducts(categoryId: $categoryId, productId: $productId, limit: $limit) {
+            id
+            slug
+            categoryId
+            name
+            cost
+            oldCost
+            unit
+            multiplier
+            is_new
+            available
+            hasCostVariants
+            specifications {
+                name
+                values
+            }
+            images {
+                url {
+                    grid2x
+                    grid1x
                 }
             }
         }
@@ -689,6 +761,20 @@ export async function getSpecialsByProductApi(
         }
     }
     return result;
+}
+
+export async function getBoughtTogetherProductsApi(
+    categoryId: number,
+    productId: number,
+    limit: number = 8,
+    lang?: string,
+): Promise<Product[]> {
+    const data = await gqlRequest<{ boughtTogetherProducts: Product[] }>(
+        BOUGHT_TOGETHER_PRODUCTS_QUERY,
+        { categoryId, productId, limit },
+        { next: { revalidate: 3600 }, lang },
+    );
+    return data.boughtTogetherProducts ?? [];
 }
 
 export async function addProductToAvailabilityTrackerApi(

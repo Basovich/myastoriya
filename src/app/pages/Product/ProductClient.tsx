@@ -473,6 +473,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         title="З цим товаром купують"
                         products={mappedRelated}
                         className={s.recommendations}
+                        alwaysSlider={true}
                     />
                 )}
                 {mappedCategoryProducts.length > 0 && (

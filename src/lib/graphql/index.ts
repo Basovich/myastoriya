@@ -34,6 +34,7 @@ export {
     getPopularProductsApi,
     getProductsFilterApi,
     getSpecialsByProductApi,
+    getBoughtTogetherProductsApi,
     addProductToAvailabilityTrackerApi,
     findProductIdBySlug,
     getCategoriesApi,

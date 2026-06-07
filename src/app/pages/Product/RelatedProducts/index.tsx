@@ -46,13 +46,21 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
     const lang = params?.lang as string || 'ua';
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
+    const [showArrows, setShowArrows] = useState(false);
+
+    const handleSwiperUpdate = (swiper: any) => {
+        setShowArrows(!swiper.isLocked);
+    };
 
     return (
         <section className={clsx(s.relatedSection, className)}>
             <div className={s.relatedHeaderRow}>
                 <SectionHeader title={title} classNameWrapper={s.relatedHeader} />
                 {(isSliderOnMobile || alwaysSlider) && (
-                    <div className={alwaysSlider ? s.navArrowsAlways : s.navArrowsMobile}>
+                    <div 
+                        className={alwaysSlider ? s.navArrowsAlways : s.navArrowsMobile}
+                        style={{ display: showArrows ? 'flex' : 'none' }}
+                    >
                         <SliderArrow direction="left" ref={setPrevEl} />
                         <SliderArrow direction="right" ref={setNextEl} />
                     </div>
@@ -69,6 +77,10 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
                         slidesPerGroup={1}
                         watchSlidesProgress={true}
                         grid={{ rows: 2, fill: 'row' }}
+                        onInit={handleSwiperUpdate}
+                        onUpdate={handleSwiperUpdate}
+                        onResize={handleSwiperUpdate}
+                        onBreakpoint={handleSwiperUpdate}
                         breakpoints={{
                             768: {
                                 slidesPerView: 3,
@@ -112,6 +124,10 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
                                 slidesPerGroup={1}
                                 watchSlidesProgress={true}
                                 grid={{ rows: 2, fill: 'row' }}
+                                onInit={handleSwiperUpdate}
+                                onUpdate={handleSwiperUpdate}
+                                onResize={handleSwiperUpdate}
+                                onBreakpoint={handleSwiperUpdate}
                                 breakpoints={{
                                     768: {
                                         slidesPerView: 3,

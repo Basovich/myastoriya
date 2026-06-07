@@ -288,15 +288,15 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                 </div>
             </div>
 
-            <div className={styles.mobileRewardsBanner}>
-                <Button
-                    variant="black"
-                    className={styles.mobileBannerLink}
-                    onClick={() => setIsReviewModalOpen(true)}
-                >
-                    ЗАЛИШИТИ ВІДГУК
-                </Button>
-            </div>
+            {/*<div className={styles.mobileRewardsBanner}>*/}
+            {/*    <Button*/}
+            {/*        variant="black"*/}
+            {/*        className={styles.mobileBannerLink}*/}
+            {/*        onClick={() => setIsReviewModalOpen(true)}*/}
+            {/*    >*/}
+            {/*        ЗАЛИШИТИ ВІДГУК*/}
+            {/*    </Button>*/}
+            {/*</div>*/}
 
             <ReviewModal
                 isOpen={isReviewModalOpen}
