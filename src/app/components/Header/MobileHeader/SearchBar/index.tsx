@@ -119,7 +119,7 @@ export default function SearchBar() {
                                 {results.map((product) => (
                                     <div key={product.id} className={s.resultItem} onClick={() => router.push(getLocalizedHref(`/products/${product.slug || product.id}`, lang))}>
                                         <div className={s.resultImage}>
-                                            <img src={resolveProductImageUrl(product) || "/images/no-image.png"} alt={product.name} />
+                                            <img src={resolveProductImageUrl(product) || "/images/product-placeholder.svg"} alt={product.name} />
                                         </div>
                                         <div className={s.resultInfo}>
                                             <div className={s.resultName}>{product.name}</div>

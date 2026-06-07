@@ -145,7 +145,7 @@ export default function SearchContent() {
                 }
                 items.push({
                     name: cat.name,
-                    image: resolveCategoryImageUrl(cat) || "/images/no-image.png",
+                    image: resolveCategoryImageUrl(cat) || "/images/product-placeholder.svg",
                     href: getLocalizedHref(href, (lang as Locale) || "ua")
                 });
                 if (cat.children && cat.children.length > 0) {

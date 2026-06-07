@@ -411,7 +411,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                 return (
                                                                     <div key={product.id} className={s.dishItem} onClick={() => router.push(getLocalizedHref(`/products/${product.slug || product.id}`, lang as Locale))}>
                                                                         <div className={s.dishThumb}>
-                                                                            <Image src={mainImage || "/images/no-image.png"} alt={product.name} fill />
+                                                                            <Image src={mainImage || "/images/product-placeholder.svg"} alt={product.name} fill />
                                                                         </div>
                                                                         <div className={s.dishInfo}>
                                                                             <div className={s.dishName}>{product.name}</div>
@@ -473,7 +473,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                                 <div className={s.featuredCard}>
                                                                                     <div className={s.featuredImage}>
                                                                                         <Image
-                                                                                            src={mainImage || "/images/no-image.png"}
+                                                                                            src={mainImage || "/images/product-placeholder.svg"}
                                                                                             alt={product.name}
                                                                                             fill
                                                                                             draggable={false}
@@ -504,7 +504,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                             <div className={s.featuredCard}>
                                                                 <div className={s.featuredImage}>
                                                                     <Image
-                                                                        src={resolveProductImageUrl(featuredProposals[0]) || "/images/no-image.png"}
+                                                                        src={resolveProductImageUrl(featuredProposals[0]) || "/images/product-placeholder.svg"}
                                                                         alt={featuredProposals[0].name}
                                                                         fill
                                                                         draggable={false}
