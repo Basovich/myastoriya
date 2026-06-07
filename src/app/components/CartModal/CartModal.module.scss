@@ -114,8 +114,7 @@
     }
 
     @media (min-width: 1024px) {
-        //max-height: initial;
-        padding: 34px 46px 58px;
+        padding: 24px 46px;
     }
 }
 
@@ -127,7 +126,7 @@
     flex-shrink: 0;
 
     @media (min-width: 1024px) {
-        padding-bottom: 24px;
+        padding-bottom: 14px;
     }
 }
 
@@ -274,7 +273,7 @@
     @media (min-width: 1024px) {
         gap: 24px;
         align-items: center;
-        padding: 15px 0 17px;
+        padding: 14px 0;
     }
 }
 
@@ -540,7 +539,7 @@
     flex-direction: column;
 
     @media (min-width: 1024px) {
-        padding-top: 24px;
+        padding-top: 14px;
     }
 }
 
@@ -705,8 +704,8 @@ button.btnApply {
     background: #fff;
 
     @media (min-width: 1024px) {
-        margin-top: 20px;
-        padding-top: 20px;
+        margin-top: 14px;
+        padding-top: 14px;
         border-top: 1px solid rgba(0, 0, 0, 0.1);
     }
 }
@@ -716,6 +715,10 @@ button.btnApply {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 16px;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 12px;
+    }
 }
 
 .suggestedTitle {

@@ -842,6 +842,31 @@ export async function getProductsByIdsApi(ids: number[], lang?: string): Promise
     return data.productsByIds;
 }
 
+/**
+ * Helper to determine the score/rank of a roast degree (higher means more cooked).
+ */
+export function getRoastDegreeScore(name: string): number {
+    const lower = name.toLowerCase();
+    if (lower.includes('well done') || lower.includes('well_done') || lower.includes('повн')) return 5;
+    if (lower.includes('medium well') || lower.includes('medium_well') || lower.includes('майже')) return 4;
+    if (lower.includes('medium rare') || lower.includes('medium_rare') || lower.includes('середньо-слабке')) return 2;
+    if (lower.includes('medium') || lower.includes('середнє')) return 3;
+    if (lower.includes('rare') || lower.includes('слабке')) return 1;
+    return 0;
+}
+
+/**
+ * Returns the default variant (one with isDefault: true, or the one with the highest roast degree).
+ */
+export function getDefaultCostVariant(variants: ProductCostVariant[]): ProductCostVariant | undefined {
+    if (!variants || variants.length === 0) return undefined;
+    const defaultVar = variants.find(v => v.isDefault);
+    if (defaultVar) return defaultVar;
+
+    // Fallback: choose the one with the highest roast degree score
+    return [...variants].sort((a, b) => getRoastDegreeScore(b.name || '') - getRoastDegreeScore(a.name || ''))[0];
+}
+
 
 const SEARCH_POPULAR_QUERIES_QUERY = /* GraphQL */ `
     query SearchPopularQueries($search: String, $limit: Int) {

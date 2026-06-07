@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCartAsync } from "@/store/slices/cartSlice";
 import CartModal from "@/app/components/CartModal/CartModal";
 import { useParams } from "next/navigation";
-import { getProductCostVariantsApi } from "@/lib/graphql/queries/products";
+import { getProductCostVariantsApi, getDefaultCostVariant } from "@/lib/graphql/queries/products";
 
 interface AddToCartButtonProps {
     productId: string | number;
@@ -51,7 +51,7 @@ export default function AddToCartButton({
             try {
                 setIsLoading(true);
                 const variants = await getProductCostVariantsApi(productId, currentLang);
-                const defaultVariant = variants.find((v) => v.isDefault) || variants[0];
+                const defaultVariant = getDefaultCostVariant(variants);
                 if (defaultVariant) {
                     await dispatch(
                         addToCartAsync({

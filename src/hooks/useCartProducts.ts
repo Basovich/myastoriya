@@ -24,9 +24,11 @@ export interface PopulatedCartItem {
 
 export function useCartProducts() {
     const cartItems = useAppSelector(state => state.cart.items);
+    const { isInitialized } = useAppSelector(state => state.auth);
     const [cacheVersion, setCacheVersion] = useState(0);
 
     useEffect(() => {
+        if (!isInitialized) return;
         if (cartItems.length === 0) return;
 
         const missingIds = cartItems
@@ -67,7 +69,7 @@ export function useCartProducts() {
         return () => {
             isMounted = false;
         };
-    }, [cartItems]);
+    }, [cartItems, isInitialized]);
 
     const populatedItems = useMemo(() => {
         // Reference cacheVersion to re-evaluate when cache updates
@@ -115,6 +117,6 @@ export function useCartProducts() {
 
     return {
         populatedItems,
-        loading: cartItems.some(item => globalProductCache[item.id] === undefined)
+        loading: !isInitialized || cartItems.some(item => globalProductCache[item.id] === undefined)
     };
 }

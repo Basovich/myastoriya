@@ -25,7 +25,7 @@ import Image from 'next/image';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import type { BlogPost, Product, ProductCostVariant, OrderingInfoBlock } from '@/lib/graphql';
-import { resolveProductImageUrl, getProductCostVariantsApi, getPopularProductsApi } from '@/lib/graphql';
+import { resolveProductImageUrl, getProductCostVariantsApi, getPopularProductsApi, getDefaultCostVariant } from '@/lib/graphql';
 import type { BreadcrumbItem } from '@/utils/category-url';
 
 
@@ -122,7 +122,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
     deliveryBlocks,
 }) => {
     const dispatch = useAppDispatch();
-    const { isAuthenticated, isGuest, user } = useAppSelector((state: RootState) => state.auth);
+    const { isAuthenticated, isGuest, user, isInitialized } = useAppSelector((state: RootState) => state.auth);
     const hydrated = useIsHydrated();
 
     // Record product view on mount
@@ -134,21 +134,27 @@ const ProductClient: React.FC<ProductClientProps> = ({
 
     const [quantity, setQuantity] = useState(1);
     const [variants, setVariants] = useState<ProductCostVariant[]>(costVariants ?? []);
-    const [selectedCostVariantId, setSelectedCostVariantId] = useState<string>('');
+    const [selectedCostVariantId, setSelectedCostVariantId] = useState<string>(() => {
+        if (costVariants && costVariants.length > 0) {
+            const def = getDefaultCostVariant(costVariants);
+            return def ? def.id : '';
+        }
+        return '';
+    });
 
     React.useEffect(() => {
-        if (product.hasCostVariants) {
+        if (product.hasCostVariants && isInitialized) {
             getProductCostVariantsApi(product.id, lang)
                 .then(res => {
                     setVariants(res);
-                    const defaultId = res.find(v => v.isDefault)?.id ?? res[0]?.id ?? '';
-                    setSelectedCostVariantId(defaultId);
+                    const def = getDefaultCostVariant(res);
+                    setSelectedCostVariantId(def ? def.id : '');
                 })
                 .catch(err => {
                     console.error('[ProductClient] Failed to load cost variants:', err);
                 });
         }
-    }, [product.id, product.hasCostVariants, lang]);
+    }, [product.id, product.hasCostVariants, lang, isInitialized]);
 
     const [selectedMods, setSelectedMods] = useState<string[]>([]);
     const [selectedSouces, setSelectedSouces] = useState<string[]>([]);

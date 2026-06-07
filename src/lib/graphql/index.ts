@@ -47,6 +47,8 @@ export {
     getSearchPopularQueriesApi,
     getSearchCategoriesApi,
     getFaqQuestionsApi,
+    getDefaultCostVariant,
+    getRoastDegreeScore,
 } from './queries/products';
 export type {
     Product,
