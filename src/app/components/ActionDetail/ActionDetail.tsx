@@ -180,12 +180,10 @@ export default function ActionDetail({
         return () => observer.disconnect();
     }, [hasMore, loading, page, sale.id, lang]);
 
-    // Use ONLY the banner field for the hero — `image` is the card thumbnail, wrong aspect ratio.
-    // If no banner → show placeholder (black bg + red logo).
-    const bannerImage =
-        sale.banner?.size2x ||
-        sale.banner?.size1x ||
-        null;
+    const bannerDesktop = sale.bannerWeb?.desktop;
+    const bannerLaptop = sale.bannerWeb?.laptop;
+    const bannerTablet = sale.bannerWeb?.tablet;
+    const bannerDefault = sale.banner?.size2x || sale.banner?.size1x || null;
 
     // Rich HTML description from the backend
     const descriptionHtml = sale.text || sale.description || '';
@@ -197,14 +195,27 @@ export default function ActionDetail({
             {/* Hero banner */}
             <div className={s.heroWrapper}>
                 <div className={s.heroImageWrapper}>
-                    {bannerImage ? (
-                        <Image
-                            src={bannerImage}
-                            alt={title}
-                            fill
-                            className={s.heroImage}
-                            priority
-                        />
+                    {bannerDefault || bannerDesktop || bannerLaptop || bannerTablet ? (
+                        sale.bannerWeb ? (
+                            <picture className={s.heroPicture}>
+                                {sale.bannerWeb.desktop && <source media="(min-width: 1280px)" srcSet={sale.bannerWeb.desktop} />}
+                                {sale.bannerWeb.laptop && <source media="(min-width: 1024px)" srcSet={sale.bannerWeb.laptop} />}
+                                {sale.bannerWeb.tablet && <source media="(min-width: 768px)" srcSet={sale.bannerWeb.tablet} />}
+                                <img
+                                    src={bannerDefault || sale.bannerWeb.desktop || sale.bannerWeb.laptop || sale.bannerWeb.tablet || undefined}
+                                    alt={title}
+                                    className={s.heroImage}
+                                />
+                            </picture>
+                        ) : (
+                            <Image
+                                src={bannerDefault!}
+                                alt={title}
+                                fill
+                                className={s.heroImage}
+                                priority
+                            />
+                        )
                     ) : (
                         <div className={s.placeholder}>
                             <Image

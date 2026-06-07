@@ -17,6 +17,11 @@ interface ActionItem {
     slug?: string | null;
     title: string;
     image: string;
+    imageWeb?: {
+        desktop?: string | null;
+        laptop?: string | null;
+        tablet?: string | null;
+    } | null;
     date?: string;
     dateRange?: string;
     discount?: string | null;
@@ -168,6 +173,7 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
                     title: sale.name,
                     slug: sale.slug || sale.id,
                     image: sale.image?.size2x || sale.image?.size1x || "",
+                    imageWeb: sale.imageWeb,
                     date: sale.expiresAt || "",
                     discount: null
                 }));
@@ -222,17 +228,33 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
                 {items.map((item, idx) => {
                     const identifier = item.slug || item.id;
                     const path = pageType === 'promotions' ? 'actions' : pageType;
+                    const hasImageWeb = !!item.imageWeb && (!!item.imageWeb.desktop || !!item.imageWeb.laptop || !!item.imageWeb.tablet);
+                    const hasImage = !!item.image || hasImageWeb;
+
                     return (
                         <AppLink key={`${item.id}-${idx}`} href={`/${path}/${identifier}`} className={s.cardLink}>
                         <div className={s.card}>
                             <div className={s.cardImage}>
-                                {item.image ? (
-                                    <Image src={item.image}
-                                           alt={item.title}
-                                           className={s.cardImg}
-                                           width={320}
-                                           height={200}
-                                    />
+                                {hasImage ? (
+                                    hasImageWeb ? (
+                                        <picture className={s.cardImgPicture}>
+                                            {item.imageWeb?.desktop && <source media="(min-width: 1280px)" srcSet={item.imageWeb.desktop} />}
+                                            {item.imageWeb?.laptop && <source media="(min-width: 1024px)" srcSet={item.imageWeb.laptop} />}
+                                            {item.imageWeb?.tablet && <source media="(min-width: 768px)" srcSet={item.imageWeb.tablet} />}
+                                            <img
+                                                src={item.image || item.imageWeb?.desktop || item.imageWeb?.laptop || item.imageWeb?.tablet || undefined}
+                                                alt={item.title}
+                                                className={s.cardImg}
+                                            />
+                                        </picture>
+                                    ) : (
+                                        <Image src={item.image}
+                                               alt={item.title}
+                                               className={s.cardImg}
+                                               width={320}
+                                               height={200}
+                                        />
+                                    )
                                 ) : (
                                     <div className={s.placeholder}>
                                         <Image

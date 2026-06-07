@@ -144,7 +144,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
     onAuthRequired,
     onVideoReviewRequired,
 }) => {
-    const [activeTab, setActiveTab] = useState<'text' | 'video'>('text');
+    // const [activeTab, setActiveTab] = useState<'text' | 'video'>('text');
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [reviews, setReviews] = useState<ProductReview[]>([]);
     const [totalCount, setTotalCount] = useState(0);
@@ -178,13 +178,13 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
         void loadReviews(nextPage, true);
     };
 
-    const handleVideoReviewClick = () => {
-        if (!isAuthenticated) {
-            onAuthRequired?.();
-        } else {
-            onVideoReviewRequired?.();
-        }
-    };
+    // const handleVideoReviewClick = () => {
+    //     if (!isAuthenticated) {
+    //         onAuthRequired?.();
+    //     } else {
+    //         onVideoReviewRequired?.();
+    //     }
+    // };
 
     return (
         <div className={styles.reviewsSection} id="reviews">

@@ -16,12 +16,20 @@ export interface SaleBannerImages {
     size3x?: string | null;
 }
 
+export interface WebImageVariants {
+    desktop?: string | null;
+    laptop?: string | null;
+    tablet?: string | null;
+}
+
 export interface Sale {
     id: string;
     name: string;
     slug?: string | null;
     image?: SaleImages | null;
     banner?: SaleBannerImages | null;
+    imageWeb?: WebImageVariants | null;
+    bannerWeb?: WebImageVariants | null;
     expiresAt?: string | null;
     publishedAt?: string | null;
     title?: string | null;
@@ -67,6 +75,16 @@ export const SALES_QUERY = /* GraphQL */ `
                     size2x
                     size3x
                 }
+                imageWeb {
+                    desktop
+                    laptop
+                    tablet
+                }
+                bannerWeb {
+                    desktop
+                    laptop
+                    tablet
+                }
             }
         }
     }
@@ -105,6 +123,16 @@ export const SALE_BY_ID_QUERY = /* GraphQL */ `
                 size1x
                 size2x
                 size3x
+            }
+            imageWeb {
+                desktop
+                laptop
+                tablet
+            }
+            bannerWeb {
+                desktop
+                laptop
+                tablet
             }
         }
     }

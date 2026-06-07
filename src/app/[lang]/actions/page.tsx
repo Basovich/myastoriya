@@ -15,6 +15,7 @@ export default async function ActionsPage({
         slug: sale.slug,
         title: sale.name,
         image: sale.image?.size2x || sale.image?.size1x || "",
+        imageWeb: sale.imageWeb,
         date: sale.expiresAt ? new Date(sale.expiresAt).toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uk-UA') : ""
     }));
 
