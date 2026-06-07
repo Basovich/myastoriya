@@ -83,6 +83,14 @@ export const addToCartAsync = createAsyncThunk(
     ) => {
         try {
             const state = getState() as RootState;
+
+            // Auth hasn't completed yet — no access_token cookie exists.
+            // The item is already stored optimistically by the pending reducer.
+            // syncCartOnAuthAsync will push it to the backend once auth is ready.
+            if (!state.auth.isInitialized) {
+                return null;
+            }
+
             const existingItem = state.cart.items.find(
                 item => item.id === payload.id && item.costVariantId === (payload.costVariantId ?? null)
             );
@@ -101,7 +109,7 @@ export const addToCartAsync = createAsyncThunk(
                 });
             }
             return mapCartItems(response);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('[Cart] Failed to add or update product in backend cart:', error);
             Sentry.captureException(error, { extra: { payload } });
             return rejectWithValue('Failed to add product to cart');
@@ -259,7 +267,9 @@ const cartSlice = createSlice({
                 if (!state.deletingIds) {
                     state.deletingIds = [];
                 }
-                state.items = action.payload.filter(
+                // Merge backend state with local optimistic items (no rowId yet)
+                // so items added before auth was ready are not wiped.
+                state.items = mergeCartItems(state.items, action.payload).filter(
                     item => !state.deletingIds.includes(item.rowId || item.id)
                 );
                 state.isInitialized = true;
@@ -285,6 +295,8 @@ const cartSlice = createSlice({
                 }
             })
             .addCase(addToCartAsync.fulfilled, (state, action) => {
+                // null payload = local-only add (auth not ready), state already set by pending
+                if (action.payload === null) return;
                 if (!state.deletingIds) {
                     state.deletingIds = [];
                 }

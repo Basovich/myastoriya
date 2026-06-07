@@ -158,6 +158,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
 
     const [selectedMods, setSelectedMods] = useState<string[]>([]);
     const [selectedSouces, setSelectedSouces] = useState<string[]>([]);
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isVideoReviewModalOpen, setIsVideoReviewModalOpen] = useState(false);
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -216,14 +217,22 @@ const ProductClient: React.FC<ProductClientProps> = ({
         setSelectedSouces(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
     };
 
-    const handleAddToCart = () => {
-        void dispatch(
-            addToCartAsync({
-                id: String(product.id),
-                quantity,
-                costVariantId: selectedCostVariantId ? Number(selectedCostVariantId) : undefined,
-            })
-        );
+    const handleAddToCart = async () => {
+        if (isAddingToCart) return;
+        setIsAddingToCart(true);
+        try {
+            await dispatch(
+                addToCartAsync({
+                    id: String(product.id),
+                    quantity,
+                    costVariantId: selectedCostVariantId ? Number(selectedCostVariantId) : undefined,
+                })
+            ).unwrap();
+        } catch (err) {
+            console.error('[ProductClient] Failed to add to cart:', err);
+        } finally {
+            setIsAddingToCart(false);
+        }
         setIsCartModalOpen(true);
     };
 
@@ -371,7 +380,9 @@ const ProductClient: React.FC<ProductClientProps> = ({
                     <div className={clsx(s.actionsBlock, !hasOptionsUnderCart && s.noBorder)}>
                         {inStock ? (
                             <>
-                                <Button variant="primary" className={s.mainBuyBtn} onClick={handleAddToCart}>Додати у кошик</Button>
+                                <Button variant="primary" className={s.mainBuyBtn} onClick={handleAddToCart} disabled={isAddingToCart}>
+                                    {isAddingToCart ? 'Додавання...' : 'Додати у кошик'}
+                                </Button>
                                 <QuantitySelector value={quantity} onChange={setQuantity} className={s.quantitySelector} />
                             </>
                         ) : (

@@ -41,35 +41,27 @@ export function useCartProducts() {
         // Mark as pending
         missingIds.forEach(id => pendingRequests.add(id));
 
-        let isMounted = true;
         getProductsByIdsApi(missingIds)
             .then(fetchedProducts => {
-                // Remove from pending
                 missingIds.forEach(id => pendingRequests.delete(id));
-
-                if (!isMounted) return;
 
                 const fetchedMap = new Map((fetchedProducts || []).map(p => [String(p.id), p]));
 
-                // For every missing ID, store the fetched product or null if not returned
+                // Always update the module-level cache, even if the effect re-ran.
+                // pendingRequests already prevents duplicate in-flight calls.
                 missingIds.forEach(id => {
                     const idStr = String(id);
-                    const prod = fetchedMap.get(idStr);
-                    globalProductCache[idStr] = prod || null;
+                    globalProductCache[idStr] = fetchedMap.get(idStr) || null;
                 });
 
-                // Trigger re-render to compute populated items with new cache values
+                // Trigger re-render to reflect the newly populated cache.
+                // React 19: calling setState after unmount is a safe no-op.
                 setCacheVersion(prev => prev + 1);
             })
             .catch(err => {
-                // Remove from pending so we can retry on next explicit dependency change if needed
                 missingIds.forEach(id => pendingRequests.delete(id));
                 console.error('[useCartProducts] Failed to fetch product details:', err);
             });
-
-        return () => {
-            isMounted = false;
-        };
     }, [cartItems, isInitialized]);
 
     const populatedItems = useMemo(() => {
