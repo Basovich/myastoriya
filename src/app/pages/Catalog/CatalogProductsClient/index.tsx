@@ -137,6 +137,7 @@ export default function CatalogProductsClient({
                                 badge={getBadge(product)}
                                 image={resolveProductImageUrl(product)}
                                 lang={lang}
+                                hasCostVariants={product.hasCostVariants}
                             />
                         ) : (
                             <ProductCardRow
@@ -151,6 +152,7 @@ export default function CatalogProductsClient({
                                 badge={getBadge(product)}
                                 image={resolveProductImageUrl(product)}
                                 lang={lang}
+                                hasCostVariants={product.hasCostVariants}
                             />
                         )
                     )

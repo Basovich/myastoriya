@@ -8,49 +8,120 @@ import s from "./AddToCartButton.module.scss";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCartAsync } from "@/store/slices/cartSlice";
 import CartModal from "@/app/components/CartModal/CartModal";
+import { useParams } from "next/navigation";
+import { getProductCostVariantsApi } from "@/lib/graphql/queries/products";
 
 interface AddToCartButtonProps {
     productId: string | number;
     className?: string;
     variant?: "icon" | "full";
     text?: string;
+    hasCostVariants?: boolean;
 }
 
 export default function AddToCartButton({ 
     productId, 
     className, 
     variant = "icon",
-    text = "В КОШИК"
+    text = "В КОШИК",
+    hasCostVariants = false
 }: AddToCartButtonProps) {
     const dispatch = useAppDispatch();
+    const { lang } = useParams();
+    const currentLang = typeof lang === 'string' ? lang : 'ua';
+    
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const hydrated = useIsHydrated();
 
     const isInCart = useAppSelector((state) =>
         state.cart.items.some((item) => item.id === String(productId))
     );
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!isInCart) {
-            void dispatch(addToCartAsync({ id: String(productId), quantity: 1 }));
+        if (isInCart) {
+            setIsModalOpen(true);
+            return;
         }
 
-        setIsModalOpen(true);
+        if (hasCostVariants) {
+            try {
+                setIsLoading(true);
+                const variants = await getProductCostVariantsApi(productId, currentLang);
+                const defaultVariant = variants.find((v) => v.isDefault) || variants[0];
+                if (defaultVariant) {
+                    await dispatch(
+                        addToCartAsync({
+                            id: String(productId),
+                            quantity: 1,
+                            costVariantId: Number(defaultVariant.id),
+                        })
+                    ).unwrap();
+                    setIsModalOpen(true);
+                } else {
+                    await dispatch(
+                        addToCartAsync({
+                            id: String(productId),
+                            quantity: 1,
+                        })
+                    ).unwrap();
+                    setIsModalOpen(true);
+                }
+            } catch (err) {
+                console.error("[AddToCartButton] Failed to fetch variants and add to cart:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        } else {
+            try {
+                setIsLoading(true);
+                await dispatch(
+                    addToCartAsync({
+                        id: String(productId),
+                        quantity: 1,
+                    })
+                ).unwrap();
+                setIsModalOpen(true);
+            } catch (err) {
+                console.error("[AddToCartButton] Failed to add to cart:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        }
     };
 
     return (
         <>
             <button
                 type="button"
-                className={clsx(s.btn, s[variant], hydrated && isInCart && s.active, className)}
+                className={clsx(
+                    s.btn,
+                    s[variant],
+                    hydrated && isInCart && s.active,
+                    isLoading && s.loading,
+                    className
+                )}
                 onClick={handleClick}
-                aria-label={hydrated && isInCart ? "Товар у кошику" : (variant === 'full' ? text : "Додати до кошика")}
+                disabled={isLoading}
+                aria-label={
+                    isLoading
+                        ? "Завантаження..."
+                        : hydrated && isInCart
+                        ? "Товар у кошику"
+                        : variant === "full"
+                        ? text
+                        : "Додати до кошика"
+                }
                 aria-pressed={hydrated && isInCart}
             >
-                {variant === "icon" ? (
+                {isLoading ? (
+                    <svg className={s.spinner} viewBox="0 0 50 50" fill="none" stroke="currentColor">
+                        <circle cx="25" cy="25" r="20" strokeWidth="5" strokeDasharray="80 150" strokeLinecap="round" />
+                    </svg>
+                ) : variant === "icon" ? (
                     <Image 
                         src={hydrated && isInCart ? "/icons/icon-check.svg" : "/icons/icon-plus.svg"} 
                         width={12} 

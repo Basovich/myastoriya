@@ -16,6 +16,7 @@ interface ProductCardProps {
     badge?: string | null;
     image: string;
     lang: string;
+    hasCostVariants?: boolean;
 }
 
 export default function ProductCard({
@@ -28,6 +29,7 @@ export default function ProductCard({
     badge,
     image,
     lang,
+    hasCostVariants = false,
 }: ProductCardProps) {
     const isRu = lang === 'ru';
     const productUrl = slug ? `/products/${slug}` : `/products/${id}`;
@@ -82,7 +84,7 @@ export default function ProductCard({
                         <span className={s.unit}>{displayUnit}</span>
 
                     </div>
-                    <AddToCartButton productId={String(id)} />
+                    <AddToCartButton productId={String(id)} hasCostVariants={hasCostVariants} />
                 </div>
             </div>
         </div>

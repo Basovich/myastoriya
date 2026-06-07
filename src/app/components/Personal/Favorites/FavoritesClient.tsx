@@ -153,6 +153,7 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                                     image={resolveProductImageUrl(product)}
                                     badge={badgeStr}
                                     lang={lang} 
+                                    hasCostVariants={product.hasCostVariants}
                                 />
                             );
                         })}

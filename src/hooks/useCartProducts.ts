@@ -4,7 +4,9 @@ import { getProductsByIdsApi, resolveProductImageUrl, type Product } from '@/lib
 import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from '@/app/components/CartModal/products_mock';
 
 // Module-level cache to share fetched products across CartModal, CartSummary, etc.
-const globalProductCache: Record<string, Product> = {};
+// Use Product | null so we can cache failed/missing lookups as null and avoid refetching.
+const globalProductCache: Record<string, Product | null> = {};
+const pendingRequests = new Set<number>();
 
 export interface PopulatedCartItem {
     id: string;
@@ -29,21 +31,36 @@ export function useCartProducts() {
 
         const missingIds = cartItems
             .map(item => Number(item.id))
-            .filter(id => !isNaN(id) && !globalProductCache[String(id)]);
+            .filter(id => !isNaN(id) && globalProductCache[String(id)] === undefined && !pendingRequests.has(id));
 
         if (missingIds.length === 0) return;
+
+        // Mark as pending
+        missingIds.forEach(id => pendingRequests.add(id));
 
         let isMounted = true;
         getProductsByIdsApi(missingIds)
             .then(fetchedProducts => {
+                // Remove from pending
+                missingIds.forEach(id => pendingRequests.delete(id));
+
                 if (!isMounted) return;
-                fetchedProducts.forEach(prod => {
-                    globalProductCache[prod.id] = prod;
+
+                const fetchedMap = new Map((fetchedProducts || []).map(p => [String(p.id), p]));
+
+                // For every missing ID, store the fetched product or null if not returned
+                missingIds.forEach(id => {
+                    const idStr = String(id);
+                    const prod = fetchedMap.get(idStr);
+                    globalProductCache[idStr] = prod || null;
                 });
+
                 // Trigger re-render to compute populated items with new cache values
                 setCacheVersion(prev => prev + 1);
             })
             .catch(err => {
+                // Remove from pending so we can retry on next explicit dependency change if needed
+                missingIds.forEach(id => pendingRequests.delete(id));
                 console.error('[useCartProducts] Failed to fetch product details:', err);
             });
 
@@ -98,6 +115,6 @@ export function useCartProducts() {
 
     return {
         populatedItems,
-        loading: cartItems.some(item => !globalProductCache[item.id])
+        loading: cartItems.some(item => globalProductCache[item.id] === undefined)
     };
 }

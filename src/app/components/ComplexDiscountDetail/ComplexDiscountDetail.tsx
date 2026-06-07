@@ -161,7 +161,9 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                                             unit={product.unit || "кг"}
                                             badge={null}
                                             image={productImage}
-                                            lang={lang} />
+                                            lang={lang}
+                                            hasCostVariants={product.hasCostVariants}
+                                        />
                                 </div>
                                 {idx < bundleProducts.length - 1 && (
                                     <span className={s.plus}>+</span>

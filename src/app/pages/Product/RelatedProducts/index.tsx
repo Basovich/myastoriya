@@ -24,6 +24,7 @@ interface RelatedProduct {
     badge?: string | null;
     image: string;
     description?: string;
+    hasCostVariants?: boolean;
 }
  
 interface RelatedProductsProps {

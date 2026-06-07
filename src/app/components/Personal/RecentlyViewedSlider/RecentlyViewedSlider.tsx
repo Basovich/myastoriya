@@ -21,6 +21,7 @@ export interface RecentlyViewedProduct {
     unit: string;
     badge?: string | null;
     image: string;
+    hasCostVariants?: boolean;
 }
 
 interface RecentlyViewedSliderProps {

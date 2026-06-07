@@ -131,6 +131,7 @@ export default async function CatalogContent({
                     badge={getBadge(product)}
                     image={resolveProductImageUrl(product)}
                     lang={lang}
+                    hasCostVariants={product.hasCostVariants}
                 />
             )
         }))
@@ -150,6 +151,7 @@ export default async function CatalogContent({
                 badge={getBadge(product)}
                 image={resolveProductImageUrl(product)}
                 lang={lang}
+                hasCostVariants={product.hasCostVariants}
             />
         )
     }));

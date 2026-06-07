@@ -491,7 +491,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                                                 <div className={s.featuredPriceValue}>{product.cost} ₴</div>
                                                                                                 <div className={s.featuredPriceUnit}>{displayUnit}</div>
                                                                                             </div>
-                                                                                            <AddToCartButton productId={String(product.id)} className={s.addToCartBtn} />
+                                                                                            <AddToCartButton productId={String(product.id)} className={s.addToCartBtn} hasCostVariants={product.hasCostVariants} />
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -541,7 +541,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                                 })()}
                                                                             </div>
                                                                         </div>
-                                                                        <AddToCartButton productId={String(featuredProposals[0].id)} className={s.addToCartBtn} />
+                                                                        <AddToCartButton productId={String(featuredProposals[0].id)} className={s.addToCartBtn} hasCostVariants={featuredProposals[0].hasCostVariants} />
                                                                     </div>
                                                                 </div>
                                                             </div>

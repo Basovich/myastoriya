@@ -195,6 +195,7 @@ export default function Products({ dict, categories, initialProducts, initialHas
                             badge={getBadge(product)}
                             image={resolveProductImageUrl(product)}
                             lang={locale} 
+                            hasCostVariants={product.hasCostVariants}
                         />
                     ))}
                 </div>

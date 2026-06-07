@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import * as Sentry from '@sentry/nextjs';
 import {
     getCartApi,
     addProductToCartApi,
@@ -60,6 +61,7 @@ export const fetchCartAsync = createAsyncThunk(
             return mapCartItems(response);
         } catch (error: any) {
             console.error('[Cart] Failed to fetch cart from backend:', error);
+            Sentry.captureException(error);
             return rejectWithValue('Failed to fetch cart');
         }
     }
@@ -91,6 +93,7 @@ export const addToCartAsync = createAsyncThunk(
             return mapCartItems(response);
         } catch (error: any) {
             console.error('[Cart] Failed to add or update product in backend cart:', error);
+            Sentry.captureException(error, { extra: { payload } });
             return rejectWithValue('Failed to add product to cart');
         }
     }

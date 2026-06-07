@@ -19,6 +19,7 @@ interface ProductCardRowProps {
     image: string;
     description?: string;
     lang: string;
+    hasCostVariants?: boolean;
 }
 
 export default function ProductCardRow({
@@ -33,6 +34,7 @@ export default function ProductCardRow({
     image,
     description,
     lang,
+    hasCostVariants = false,
 }: ProductCardRowProps) {
     const isRu = lang === 'ru';
     
@@ -104,7 +106,7 @@ export default function ProductCardRow({
                         <span className={s.unit}>{displayUnit}</span>
 
                     </div>
-                    <AddToCartButton productId={String(id)} variant="full" className={s.buyBtn} />
+                    <AddToCartButton productId={String(id)} variant="full" className={s.buyBtn} hasCostVariants={hasCostVariants} />
                 </div>
             </div>
         </div>

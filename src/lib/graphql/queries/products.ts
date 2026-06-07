@@ -257,6 +257,7 @@ const PRODUCTS_QUERY = /* GraphQL */ `
                 multiplier
                 is_new
                 available
+                hasCostVariants
                 specifications {
                     name
                     values
@@ -392,6 +393,7 @@ const POPULAR_PRODUCTS_QUERY = /* GraphQL */ `
                 multiplier
                 is_new
                 available
+                hasCostVariants
                 specifications {
                     name
                     values
@@ -465,6 +467,7 @@ const VIEWED_PRODUCTS_QUERY = /* GraphQL */ `
                 unit
                 multiplier
                 is_new
+                hasCostVariants
                 images {
                     url {
                         grid2x
@@ -496,6 +499,7 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
             multiplier
             is_new
             available
+            hasCostVariants
             specifications {
                 name
                 values

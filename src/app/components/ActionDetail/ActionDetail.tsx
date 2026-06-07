@@ -259,6 +259,7 @@ export default function ActionDetail({
                                 badge={product.is_new ? 'NEW' : null}
                                 image={resolveProductImageUrl(product)}
                                 lang={lang}
+                                hasCostVariants={product.hasCostVariants}
                             />
                         ))}
                     </div>

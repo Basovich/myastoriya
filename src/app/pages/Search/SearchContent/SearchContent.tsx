@@ -205,6 +205,7 @@ export default function SearchContent() {
                                         badge={product.is_new ? "NEW" : (product.oldCost && product.oldCost > product.cost ? "АКЦІЯ" : null)}
                                         image={resolveProductImageUrl(product)}
                                         lang={String(lang)} 
+                                        hasCostVariants={product.hasCostVariants}
                                     />
                                 );
                             })

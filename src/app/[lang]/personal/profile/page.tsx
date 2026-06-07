@@ -195,7 +195,8 @@ export default function ProfilePage() {
                     unit: p.unit,
                     image: resolveProductImageUrl(p),
                     badge: p.is_new ? "NEW" : null,
-                    weight: getWeight(p)
+                    weight: getWeight(p),
+                    hasCostVariants: p.hasCostVariants
                 }));
                 setViewedProducts(mappedProducts);
             } catch (err) {

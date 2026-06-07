@@ -190,6 +190,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                             badge={product.is_new ? "NEW" : null}
                                             image={resolveProductImageUrl(product as unknown as Product)}
                                             lang={lang} 
+                                            hasCostVariants={product.hasCostVariants}
                                         />
                                     </SwiperSlide>
                                 ))}
@@ -221,6 +222,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                     badge={product.is_new ? "NEW" : null}
                                     image={resolveProductImageUrl(product as unknown as Product)}
                                     lang={lang} 
+                                    hasCostVariants={product.hasCostVariants}
                                 />
                             ))}
                         </div>

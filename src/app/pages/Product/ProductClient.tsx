@@ -281,6 +281,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
             unit: p.unit || 'шт',
             image: resolveProductImageUrl(p),
             badge: getProductBadge(p),
+            hasCostVariants: p.hasCostVariants,
         }));
     }
 
