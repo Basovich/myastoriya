@@ -71,8 +71,16 @@ const authPersistConfig = {
     transforms: [authExpireTransform],
 };
 
+// Cart gets its own persist config so transient state (loading, deletingIds)
+// is never written to localStorage — prevents eternal spinner on next load.
+const cartPersistConfig = {
+    key: 'cart',
+    storage,
+    blacklist: ['loading', 'deletingIds'],
+};
+
 const rootReducer = combineReducers({
-    cart: cartReducer,
+    cart: persistReducer(cartPersistConfig, cartReducer),
     wishlist: wishlistReducer,
     auth: persistReducer(authPersistConfig, authReducer),
     locality: persistReducer(localityPersistConfig, localityReducer),
@@ -82,7 +90,8 @@ const rootReducer = combineReducers({
 const persistConfig = {
     key: 'myastoriya-root',
     storage,
-    whitelist: ['cart', 'wishlist', 'viewedProducts'], // auth and locality are nested
+    // cart and auth/locality are nested — each has its own persistReducer
+    whitelist: ['wishlist', 'viewedProducts'],
     transforms: [generalExpireTransform]
 };
 

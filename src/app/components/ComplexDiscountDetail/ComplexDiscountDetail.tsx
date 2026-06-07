@@ -9,7 +9,7 @@ import Button from '../ui/Button/Button';
 import ProductCard from '../ui/ProductCard/ProductCard';
 import CartModal from '../CartModal/CartModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { addToCartAsync, fetchCartAsync } from '@/store/slices/cartSlice';
+import { addToCartAsync } from '@/store/slices/cartSlice';
 
 import { type Special, resolveProductImageUrl } from '@/lib/graphql';
 
@@ -95,6 +95,7 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
     const dispatch = useAppDispatch();
     const cartItems = useAppSelector(state => state.cart.items);
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
 
     const handleAddToCart = () => {
         // Find which products from the bundle are not in the cart yet
@@ -106,9 +107,11 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
             return;
         }
 
-        setIsCartOpen(true);
+        setIsAdding(true);
 
-        // Sync and add only the missing products using the async thunk sequentially
+        // Add missing products sequentially, THEN open the cart.
+        // This ensures the cart opens only after all items are in Redux state,
+        // avoiding the partial-item display issue.
         (async () => {
             try {
                 for (const product of productsToAdd) {
@@ -119,6 +122,9 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                 }
             } catch (error) {
                 console.error('[ComplexDiscountDetail] Failed to add bundle items:', error);
+            } finally {
+                setIsAdding(false);
+                setIsCartOpen(true);
             }
         })();
     };
@@ -217,8 +223,13 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                             variant="black"
                             className={s.ctaButton}
                             onClick={handleAddToCart}
+                            disabled={isAdding}
                         >
-                            {texts.addToCart}
+                            {isAdding ? (
+                                <svg className={s.btnSpinner} viewBox="0 0 50 50" width="18" height="18">
+                                    <circle cx="25" cy="25" r="20" fill="none" strokeWidth="5" />
+                                </svg>
+                            ) : texts.addToCart}
                         </Button>
                     </div>
                 </div>

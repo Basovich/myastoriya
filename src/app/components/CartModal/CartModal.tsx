@@ -10,7 +10,7 @@ import { Locale } from '@/i18n/config';
 import s from './CartModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { addToCartAsync, updateQuantityAsync, removeFromCartAsync } from '@/store/slices/cartSlice';
+import { addToCartAsync, updateQuantityAsync, removeFromCartAsync, fetchCartAsync } from '@/store/slices/cartSlice';
 import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from './products_mock';
 import { useCartProducts } from '@/hooks/useCartProducts';
 import clsx from 'clsx';
@@ -99,9 +99,12 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     useEffect(() => {
         if (isOpen) {
             disableScroll();
+            if (isInitialized) {
+                void dispatch(fetchCartAsync());
+            }
             return () => enableScroll();
         }
-    }, [isOpen, disableScroll, enableScroll]);
+    }, [isOpen, disableScroll, enableScroll, isInitialized, dispatch]);
 
     const handleUpdateQuantity = (id: string, rowId: string | undefined, newQuantity: number) => {
         if (newQuantity < 1) return;
@@ -123,6 +126,8 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     }, [cartItems]);
 
     const itemsToDisplay = suggestedProducts.length > 0 ? suggestedProducts : Object.values(MOCK_PRODUCTS);
+
+    if (!hydrated) return null;
 
     return (
         <Modal

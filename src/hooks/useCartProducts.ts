@@ -12,6 +12,11 @@ const pendingRequests = new Set<number>();
 let globalSpecialsCache: any[] | null = null;
 let pendingSpecialsRequest: Promise<any> | null = null;
 
+const listeners = new Set<() => void>();
+function emitCacheUpdate() {
+    listeners.forEach(l => l());
+}
+
 export interface PopulatedCartItem {
     id: string;
     rowId?: string;
@@ -31,30 +36,59 @@ export function useCartProducts() {
     const cartItems = useAppSelector(state => state.cart.items);
     const { isInitialized } = useAppSelector(state => state.auth);
     const [cacheVersion, setCacheVersion] = useState(0);
+
+    useEffect(() => {
+        const listener = () => {
+            setCacheVersion(prev => prev + 1);
+        };
+        listeners.add(listener);
+        return () => {
+            listeners.delete(listener);
+        };
+    }, []);
+
     useEffect(() => {
         if (!isInitialized) return;
         if (globalSpecialsCache === null && !pendingSpecialsRequest) {
             pendingSpecialsRequest = getSpecialsApi(100, 1)
                 .then(resp => {
-                    globalSpecialsCache = resp?.data || [];
-                    setCacheVersion(prev => prev + 1);
+                    const data = resp?.data || [];
+                    globalSpecialsCache = data;
+                    emitCacheUpdate();
                 })
                 .catch(err => {
                     console.error('[useCartProducts] Failed to fetch specials:', err);
                     globalSpecialsCache = [];
+                    emitCacheUpdate();
                 });
         }
     }, [isInitialized]);
 
     useEffect(() => {
         if (!isInitialized) return;
-        if (cartItems.length === 0) return;
+        if (cartItems.length === 0) {
+            return;
+        }
+
+        // Immediately mark non-numeric IDs as null in the cache so they don't block loading
+        let cacheChanged = false;
+        cartItems.forEach(item => {
+            if (isNaN(Number(item.id)) && globalProductCache[item.id] === undefined) {
+                globalProductCache[item.id] = null;
+                cacheChanged = true;
+            }
+        });
+        if (cacheChanged) {
+            emitCacheUpdate();
+        }
 
         const missingIds = cartItems
             .map(item => Number(item.id))
             .filter(id => !isNaN(id) && globalProductCache[String(id)] === undefined && !pendingRequests.has(id));
 
-        if (missingIds.length === 0) return;
+        if (missingIds.length === 0) {
+            return;
+        }
 
         // Mark as pending
         missingIds.forEach(id => pendingRequests.add(id));
@@ -69,16 +103,24 @@ export function useCartProducts() {
                 // pendingRequests already prevents duplicate in-flight calls.
                 missingIds.forEach(id => {
                     const idStr = String(id);
-                    globalProductCache[idStr] = fetchedMap.get(idStr) || null;
+                    const found = fetchedMap.get(idStr);
+                    if (!found) {
+                        console.warn(`[useCartProducts] Product ID ${idStr} not found in API response.`);
+                    }
+                    globalProductCache[idStr] = found || null;
                 });
 
                 // Trigger re-render to reflect the newly populated cache.
-                // React 19: calling setState after unmount is a safe no-op.
-                setCacheVersion(prev => prev + 1);
+                emitCacheUpdate();
             })
             .catch(err => {
-                missingIds.forEach(id => pendingRequests.delete(id));
                 console.error('[useCartProducts] Failed to fetch product details:', err);
+                missingIds.forEach(id => {
+                    pendingRequests.delete(id);
+                    // Prevent infinite refetch loop on API failure by setting to null
+                    globalProductCache[String(id)] = null;
+                });
+                emitCacheUpdate();
             });
     }, [cartItems, isInitialized]);
 
@@ -198,9 +240,24 @@ export function useCartProducts() {
     }, [cartItems, cacheVersion]);
 
     const cartLoading = useAppSelector(state => state.cart.loading);
+    void cartLoading; // used only to invalidate memoization during active operations
+
+    const someItemUndefined = cartItems.some(item => {
+        return globalProductCache[item.id] === undefined;
+    });
+
 
     return {
         populatedItems,
-        loading: !isInitialized || cartLoading || cartItems.some(item => globalProductCache[item.id] === undefined)
+        // Show spinner until:
+        // 1. Auth is ready (isInitialized)
+        // 2. Specials are loaded — prevents the 562→478 price flicker on bundle items
+        // 3. All cart item product details are in cache
+        // We intentionally do NOT include cartLoading here — add/remove/update
+        // operations are reflected optimistically in state.items (via pending reducer),
+        // and cartLoading is now blacklisted from localStorage to avoid eternal spinners.
+        loading: !isInitialized
+            || globalSpecialsCache === null
+            || someItemUndefined
     };
 }
