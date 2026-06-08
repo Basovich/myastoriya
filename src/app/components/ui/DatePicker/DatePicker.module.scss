@@ -135,7 +135,7 @@
     padding: 14px 16px;
     font-size: 16px;
     color: #333;
-    background-color: transparent;
+    background-color: #fff;
     outline: none;
     font-family: inherit;
     transition: border-color 0.2s ease;
@@ -296,4 +296,33 @@
         opacity: 0.3;
         cursor: not-allowed;
     }
+}
+
+.selectContent {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.leftIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.selectValue {
+    font-size: 16px;
+    color: #000;
+}
+
+.placeholder {
+    color: #888;
+}
+
+.arrow, .arrowRight {
+    transition: transform 0.2s ease;
+    color: #000;
+    flex-shrink: 0;
 }

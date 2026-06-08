@@ -24,28 +24,80 @@ interface DatePickerProps {
     touched?: boolean;
     required?: boolean;
     hideIcon?: boolean;
+    hideLabel?: boolean;
+    leftIcon?: React.ReactNode;
+    arrowVariant?: 'down' | 'right';
+    lang?: 'ua' | 'ru';
 }
 
-const CustomInput = forwardRef<HTMLButtonElement, { id?: string; value?: string; onClick?: () => void; label: string; error?: boolean; hasValue?: boolean; required?: boolean; onBlur?: () => void; hideIcon?: boolean }>(
-    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon }, ref) => (
-        <button id={id} className={clsx(s.customInput, error && s.inputError)} onClick={onClick} ref={ref} type="button" onBlur={onBlur}>
-            <div className={s.inputContent}>
-                <span className={clsx(s.floatingLabel, (hasValue || !!value) && s.floating)}>
-                    {label}
-                    {required && <span className={s.asterisk}>*</span>}
-                </span>
-                <span className={s.inputValue}>{value}</span>
-            </div>
-            {!hideIcon && (
-                <svg className={s.calendarIcon} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15.8333 3.33334H4.16667C3.24619 3.33334 2.5 4.07954 2.5 5.00001V16.6667C2.5 17.5872 3.24619 18.3333 4.16667 18.3333H15.8333C16.7538 18.3333 17.5 17.5872 17.5 16.6667V5.00001C17.5 4.07954 16.7538 3.33334 15.8333 3.33334Z" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M13.3333 1.66666V5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M6.66666 1.66666V5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M2.5 8.33334H17.5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-            )}
-        </button>
-    )
+const CustomInput = forwardRef<
+    HTMLButtonElement, 
+    { 
+        id?: string; 
+        value?: string; 
+        onClick?: () => void; 
+        label: string; 
+        error?: boolean; 
+        hasValue?: boolean; 
+        required?: boolean; 
+        onBlur?: () => void; 
+        hideIcon?: boolean;
+        hideLabel?: boolean;
+        leftIcon?: React.ReactNode;
+        arrowVariant?: 'down' | 'right';
+        selectedDate?: Date | null;
+        lang?: 'ua' | 'ru';
+    }
+>(
+    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, lang = 'ua' }, ref) => {
+        let displayValue = value;
+        if (selectedDate) {
+            if (isToday(selectedDate)) {
+                displayValue = lang === 'ua' ? 'Сьогодні' : 'Сегодня';
+            } else if (isTomorrow(selectedDate)) {
+                displayValue = lang === 'ua' ? 'Завтра' : 'Завтра';
+            }
+        }
+        
+        return (
+            <button id={id} className={clsx(s.customInput, error && s.inputError)} onClick={onClick} ref={ref} type="button" onBlur={onBlur}>
+                {hideLabel ? (
+                    <div className={s.selectContent}>
+                        {leftIcon && <div className={s.leftIcon}>{leftIcon}</div>}
+                        <span className={clsx(s.selectValue, !displayValue && s.placeholder)}>
+                            {displayValue || label}
+                        </span>
+                    </div>
+                ) : (
+                    <div className={s.inputContent}>
+                        <span className={clsx(s.floatingLabel, (hasValue || !!displayValue) && s.floating)}>
+                            {label}
+                            {required && <span className={s.asterisk}>*</span>}
+                        </span>
+                        <span className={s.inputValue}>{displayValue}</span>
+                    </div>
+                )}
+                {hideLabel ? (
+                    arrowVariant === 'down' ? (
+                        <svg className={s.arrow} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    ) : (
+                        <svg className={s.arrowRight} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    )
+                ) : !hideIcon ? (
+                    <svg className={s.calendarIcon} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.8333 3.33334H4.16667C3.24619 3.33334 2.5 4.07954 2.5 5.00001V16.6667C2.5 17.5872 3.24619 18.3333 4.16667 18.3333H15.8333C16.7538 18.3333 17.5 17.5872 17.5 16.6667V5.00001C17.5 4.07954 16.7538 3.33334 15.8333 3.33334Z" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M13.3333 1.66666V5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M6.66666 1.66666V5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M2.5 8.33334H17.5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                ) : null}
+            </button>
+        );
+    }
 );
 
 CustomInput.displayName = 'CustomInput';
@@ -69,7 +121,11 @@ export default function DatePicker({
     error,
     touched,
     required,
-    hideIcon
+    hideIcon,
+    hideLabel,
+    leftIcon,
+    arrowVariant,
+    lang
 }: DatePickerProps) {
     const isValidDate = selected instanceof Date && !isNaN(selected.getTime());
     const safeSelected = isValidDate ? selected : null;
@@ -152,6 +208,11 @@ export default function DatePicker({
                         required={required}
                         onBlur={onBlur}
                         hideIcon={hideIcon}
+                        hideLabel={hideLabel}
+                        leftIcon={leftIcon}
+                        arrowVariant={arrowVariant}
+                        selectedDate={safeSelected}
+                        lang={lang}
                     />
                 }
                 calendarStartDay={1}
