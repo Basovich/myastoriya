@@ -37,4 +37,9 @@
     height: 8px;
     border-radius: 50%;
     background-color: var(--color-accent);
+
+    @media (min-width: 1280px) {
+        width: 14px;
+        height: 14px;
+    }
 }

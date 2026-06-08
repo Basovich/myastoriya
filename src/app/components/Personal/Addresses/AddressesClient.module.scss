@@ -8,22 +8,26 @@
     }
 }
 
-.pageHeaderWrapper {
-    // Shared header styles
-}
-
-.contentBlock {
+div.contentBlock {
     padding: 20px;
+    gap: 16px;
     
     @media (min-width: 1024px) {
         padding: 32px;
+        gap: 0;
     }
 }
 
 .subtitle {
-    font-size: 14px;
-    font-weight: 700;
     color: #000;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+
+    @media (min-width: 1024px) {
+        margin-bottom: 20px;
+    }
 }
 
 .grid {
@@ -91,15 +95,24 @@
     border: none;
     padding: 4px;
     cursor: pointer;
-    color: #999;
+    margin-top: -8px;
     transition: color 0.2s;
 
     @media (any-hover: hover) {
         &:hover {
-            color: #E6000F;
             svg path {
-                stroke: #E6000F;
+                fill: rgba(0, 0, 0, 1);
             }
+        }
+    }
+
+    svg {
+        width: 12px;
+        height: 14px;
+
+        path {
+            fill: rgba(0, 0, 0, 0.5);
+            transition: fill 0.2s;
         }
     }
 }
@@ -110,7 +123,7 @@
 }
 
 .addressText {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     color: #000;
     line-height: 1.4;
@@ -133,6 +146,13 @@
     font-weight: 700;
     text-transform: uppercase;
     width: 100%;
+    transition: border-color 0.2s;
+
+    @media (any-hover: hover) {
+      &:hover {
+          border-color: #000;
+      }
+    }
 }
 
 .setPrimaryBtn {
