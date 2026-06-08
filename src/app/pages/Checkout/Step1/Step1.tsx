@@ -318,6 +318,15 @@ export default function Step1() {
                 }));
             }
 
+            const checkoutUserData = {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                phone: formData.phone,
+                email: formData.email || null,
+                anotherRecipient: formData.anotherRecipient,
+            };
+            localStorage.setItem('checkout_user_data', JSON.stringify(checkoutUserData));
+
             // Navigate to step 2
             const url = new URL(window.location.href);
             url.searchParams.set('step', '2');

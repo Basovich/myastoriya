@@ -364,3 +364,134 @@ textarea.commentTextarea {
         margin-top: 1px;
     }
 }
+
+.changeSection {
+    margin-top: 12px;
+    padding-left: 32px;
+}
+
+.changeInput {
+    width: 100%;
+    max-width: 240px;
+    height: 44px;
+    border-radius: 8px;
+    border: 1px solid #E2E2E2;
+    padding: 0 16px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+        border-color: #FD2427;
+    }
+}
+
+.loadingPayments,
+.noPayments {
+    font-size: 14px;
+    color: #828282;
+    padding: 8px 0;
+}
+
+.submitError {
+    color: #E3051B;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 20px;
+    text-align: center;
+    background: #FFECEE;
+    border: 1px solid #FFC4C8;
+    padding: 10px 16px;
+    border-radius: 8px;
+}
+
+.successContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 16px;
+    width: 100%;
+}
+
+.successCard {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 14px 18px 0 rgba(0, 0, 0, 0.05);
+    padding: 40px 24px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    @media (min-width: 768px) {
+        padding: 56px 48px;
+    }
+}
+
+.successIcon {
+    margin-bottom: 24px;
+    
+    svg {
+        display: block;
+    }
+}
+
+.successTitle {
+    color: #060606;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 130%;
+    margin-bottom: 12px;
+}
+
+.successMessage {
+    color: #4F4F4F;
+    font-size: 15px;
+    line-height: 150%;
+    margin-bottom: 24px;
+}
+
+.orderInfoBlock {
+    background: #F8F8F8;
+    border-radius: 10px;
+    padding: 16px 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+
+    span {
+        opacity: 0.85;
+    }
+
+    strong {
+        font-weight: 700;
+        color: #000;
+        font-size: 15px;
+    }
+}
+
+.successSubtext {
+    color: #828282;
+    font-size: 13px;
+    line-height: 145%;
+    margin-bottom: 32px;
+}
+
+.homeBtn {
+    width: 100%;
+    max-width: 240px;
+    height: 48px;
+    text-transform: uppercase;
+}

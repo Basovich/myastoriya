@@ -61,3 +61,136 @@ export async function getOrdersApi(
     );
     return data.orders;
 }
+
+// ── Payments & Order Creation ────────────────────────────────────────────────
+
+export interface Payment {
+    id: string;
+    name?: string | null;
+    driver?: string | null;
+    showChangeField?: boolean | null;
+}
+
+export interface CheckoutUserData {
+    localityId: number;
+    name: string;
+    surname: string;
+    phone: string;
+    email?: string | null;
+    anotherRecipient?: boolean | null;
+    recipientFullName?: string | null;
+    recipientPhone?: string | null;
+}
+
+export interface CheckoutDeliveryData {
+    deliveryId: number;
+    userAddressId?: number | null;
+    desiredDeliveryDate?: string | null;
+    desiredDeliveryTime?: string | null;
+    userPickupPointId?: number | null;
+}
+
+export interface CheckoutPaymentData {
+    paymentId: number;
+    userCardId?: number | null;
+    change?: number | null;
+    browserInfo?: {
+        screenWidth: number;
+        screenHeight: number;
+    } | null;
+}
+
+export interface CreateOrderResponse {
+    action: string;
+    actionToken?: string | null;
+    url?: string | null;
+    orderId: string;
+    driver?: string | null;
+    currencyCode?: string | null;
+    total: number;
+}
+
+const PAYMENTS_QUERY = /* GraphQL */ `
+    query GetPayments($localityId: Int, $os: String) {
+        payments(localityId: $localityId, os: $os) {
+            id
+            name
+            driver
+            showChangeField
+        }
+    }
+`;
+
+const CREATE_ORDER_MUTATION = /* GraphQL */ `
+    mutation CreateOrder(
+        $userData: CheckoutUserData!,
+        $deliveryData: CheckoutDeliveryData!,
+        $paymentData: CheckoutPaymentData!,
+        $useBonuses: Boolean,
+        $comment: String,
+        $personsCount: Int,
+        $communicationMethod: String,
+        $dontCallBack: Boolean,
+        $registerMe: Boolean,
+        $password: String
+    ) {
+        createOrder(
+            userData: $userData,
+            deliveryData: $deliveryData,
+            paymentData: $paymentData,
+            useBonuses: $useBonuses,
+            comment: $comment,
+            personsCount: $personsCount,
+            communicationMethod: $communicationMethod,
+            dontCallBack: $dontCallBack,
+            registerMe: $registerMe,
+            password: $password
+        ) {
+            action
+            actionToken
+            url
+            orderId
+            driver
+            currencyCode
+            total
+        }
+    }
+`;
+
+export async function getPaymentsApi(
+    localityId?: number,
+    os?: string,
+    token?: string,
+    lang?: string,
+): Promise<Payment[]> {
+    const data = await gqlRequest<{ payments: Payment[] }>(
+        PAYMENTS_QUERY,
+        { localityId, os },
+        { token, lang },
+    );
+    return data.payments;
+}
+
+export async function createOrderApi(
+    variables: {
+        userData: CheckoutUserData;
+        deliveryData: CheckoutDeliveryData;
+        paymentData: CheckoutPaymentData;
+        useBonuses?: boolean;
+        comment?: string;
+        personsCount?: number;
+        communicationMethod?: string;
+        dontCallBack?: boolean;
+        registerMe?: boolean;
+        password?: string;
+    },
+    token: string,
+    lang?: string,
+): Promise<CreateOrderResponse> {
+    const data = await gqlRequest<{ createOrder: CreateOrderResponse }>(
+        CREATE_ORDER_MUTATION,
+        variables,
+        { token, lang },
+    );
+    return data.createOrder;
+}
