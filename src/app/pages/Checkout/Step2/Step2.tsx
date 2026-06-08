@@ -72,9 +72,11 @@ export default function Step2() {
     
     const citySelectRef = useRef<HTMLDivElement>(null);
     const npSelectRef = useRef<HTMLDivElement>(null);
+    const shopSelectRef = useRef<HTMLDivElement>(null);
 
     // Local states for custom city selector
     const [isOpenCitySelect, setIsOpenCitySelect] = useState(false);
+    const [isOpenShopSelect, setIsOpenShopSelect] = useState(false);
     const [citySearchQuery, setCitySearchQuery] = useState('');
     const [citySearchResults, setCitySearchResults] = useState<Locality[]>([]);
     const [citySearchPage, setCitySearchPage] = useState(1);
@@ -210,6 +212,9 @@ export default function Step2() {
             }
             if (npSelectRef.current && !npSelectRef.current.contains(event.target as Node)) {
                 setIsOpenNPDropdown(false);
+            }
+            if (shopSelectRef.current && !shopSelectRef.current.contains(event.target as Node)) {
+                setIsOpenShopSelect(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -747,6 +752,9 @@ export default function Step2() {
 
                             if (method.disabled) return null;
 
+                            const selectedShop = shops.find(shop => shop.id.toString() === selectedShopId);
+                            const selectedShopName = selectedShop?.name || selectedShop?.siteName || (lang === 'ua' ? "Оберіть магазин" : "Выберите магазин");
+
                             return (
                                 <div key={method.id} className={s.methodContainer}>
                                     <label className={s.methodItem}>
@@ -792,13 +800,52 @@ export default function Step2() {
                                     {(hydrated && isSelected && isMethodShop) && (
                                         <div className={s.nestedSelectRow}>
                                             <h4 className={s.nestedSelectTitle}>Оберіть магазин М'ясторія:</h4>
-                                            <CustomSelect 
-                                                options={shopOptions}
-                                                value={selectedShopId}
-                                                onChange={setSelectedShopId}
-                                                placeholder="Оберіть магазин"
-                                                className={s.nestedSelect}
-                                            />
+                                            <div className={s.citySelectContainer} ref={shopSelectRef}>
+                                                <button
+                                                    type="button"
+                                                    className={clsx(s.citySelectBtn, isOpenShopSelect && s.isOpen)}
+                                                    onClick={() => setIsOpenShopSelect(!isOpenShopSelect)}
+                                                >
+                                                    <span>{selectedShopName}</span>
+                                                    <svg
+                                                        className={clsx(s.arrow, isOpenShopSelect && s.arrowOpen)}
+                                                        width="20"
+                                                        height="20"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="2.5"
+                                                    >
+                                                        <polyline points="6 9 12 15 18 9" />
+                                                    </svg>
+                                                </button>
+
+                                                {isOpenShopSelect && (
+                                                    <div className={s.cityDropdown}>
+                                                        <div className={s.cityList}>
+                                                            {shops.map((shop) => {
+                                                                const isShopSelected = selectedShopId === shop.id.toString();
+                                                                const shopName = shop.name || shop.siteName || `Магазин №${shop.id}`;
+                                                                return (
+                                                                    <div
+                                                                        key={shop.id}
+                                                                        className={clsx(
+                                                                            s.cityItem,
+                                                                            isShopSelected && s.cityItemSelected
+                                                                        )}
+                                                                        onClick={() => {
+                                                                            setSelectedShopId(shop.id.toString());
+                                                                            setIsOpenShopSelect(false);
+                                                                        }}
+                                                                    >
+                                                                        {shopName}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     )}
 
