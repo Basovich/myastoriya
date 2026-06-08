@@ -53,6 +53,34 @@ export default function Step3({ lang }: Step3Props) {
     // UI state
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
     const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
+
+    const [deliveryPrice, setDeliveryPrice] = useState<number | undefined>(undefined);
+    const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number } | null>(null);
+
+    React.useEffect(() => {
+        const savedParams = localStorage.getItem('checkout_delivery_params');
+        if (savedParams) {
+            try {
+                const parsed = JSON.parse(savedParams);
+                if (typeof parsed.deliveryPrice === 'number') {
+                    setDeliveryPrice(parsed.deliveryPrice);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        const savedPromo = localStorage.getItem('applied_promo');
+        if (savedPromo) {
+            try {
+                const parsed = JSON.parse(savedPromo);
+                if (parsed && parsed.code && typeof parsed.discount === 'number') {
+                    setAppliedPromo(parsed);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    }, []);
     
     const handleBack = () => {
         const url = new URL(window.location.href);
@@ -180,13 +208,13 @@ export default function Step3({ lang }: Step3Props) {
             <div className={s.sidebar}>
                 <CartSummary 
                     onEditCart={() => setIsCartModalOpen(true)} 
-                    discountPercent={0}
-                    deliveryPrice={120} // Mocked value for Step 3
+                    discountPercent={appliedPromo?.discount || 0}
+                    deliveryPrice={deliveryPrice}
                 />
                 {hydrated && (
                     <PromoBlock 
-                        onApply={() => {}} 
-                        isApplied={false}
+                        onApply={(code, discount) => setAppliedPromo({ code, discount })} 
+                        isApplied={!!appliedPromo}
                     />
                 )}
                 

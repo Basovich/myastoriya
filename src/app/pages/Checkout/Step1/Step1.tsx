@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import s from './Step1.module.scss';
 import InputField from '@/app/components/ui/InputField/index';
+import { GraphQLError } from '@/lib/graphql/client';
 import Button from '@/app/components/ui/Button/Button';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
@@ -59,12 +60,13 @@ export default function Step1() {
     const hydrated = useIsHydrated();
     const params = useParams();
     const locale = params?.lang as string;
-    const { user, isAuthenticated } = useAppSelector(state => state.auth);
+    const { user, isAuthenticated, isGuest } = useAppSelector(state => state.auth);
     const dispatch = useAppDispatch();
     const [smsToken, setSmsToken] = useState('');
     const [smsSending, setSmsSending] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
+    const [submitAttempted, setSubmitAttempted] = useState(false);
     const [formData, setFormData] = useState<FormData>({
         firstName: '',
         lastName: '',
@@ -146,17 +148,21 @@ export default function Step1() {
                     email: '',
                 }));
                 setPhoneVerified(false);
-            } else if (user) {
-                // Restoring user data
+            } else {
+                // Restoring user data if user is present, otherwise just updating the checkbox state
                 setFormData(prev => ({
                     ...prev,
                     [field]: false,
-                    firstName: user.name?.split(' ')[0] || '',
-                    lastName: user.name?.split(' ').slice(1).join(' ') || '',
-                    phone: (user.phone || '').replace(/\D/g, ''),
-                    email: user.email || '',
+                    ...(user ? {
+                        firstName: user.name?.split(' ')[0] || '',
+                        lastName: user.name?.split(' ').slice(1).join(' ') || '',
+                        phone: (user.phone || '').replace(/\D/g, ''),
+                        email: user.email || '',
+                    } : {})
                 }));
-                if (user.phone) setPhoneVerified(true);
+                if (user && user.phone) {
+                    setPhoneVerified(true);
+                }
             }
         } else {
             setFormData(prev => ({ ...prev, [field]: value }));
@@ -176,6 +182,7 @@ export default function Step1() {
         setCodeSent(false);
         setCountdown(0);
         setSmsError('');
+        setSubmitAttempted(false);
         if (timerRef.current) clearInterval(timerRef.current);
     };
 
@@ -188,13 +195,15 @@ export default function Step1() {
         setTouched(prev => ({ ...prev, [field]: true }));
     };
 
-    const validate = (): FormErrors => {
+    const validate = (forceVerifyCheck = false): FormErrors => {
         const errors: FormErrors = {};
         if (!formData.firstName.trim()) errors.firstName = "Обов'язкове поле";
         if (!formData.lastName.trim()) errors.lastName = "Обов'язкове поле";
         if (!formData.phone.trim()) {
             errors.phone = "Обов'язкове поле";
-        } else if (!phoneVerified) {
+        } else if (formData.phone.length < 12) {
+            errors.phone = "Некоректний номер телефону";
+        } else if ((submitAttempted || forceVerifyCheck) && !phoneVerified) {
             errors.phone = "Підтвердіть номер телефону через SMS";
         }
         if (!formData.agreed) errors.agreed = 'Потрібна згода';
@@ -204,7 +213,7 @@ export default function Step1() {
     const errors = validate();
 
     const handleSendSms = async () => {
-        if (!formData.phone.trim()) {
+        if (!formData.phone.trim() || formData.phone.length < 12) {
             setTouched(prev => ({ ...prev, phone: true }));
             return;
         }
@@ -270,6 +279,7 @@ export default function Step1() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setSubmitAttempted(true);
         const allTouched: Touched = {
             firstName: true,
             lastName: true,
@@ -279,7 +289,9 @@ export default function Step1() {
             agreed: true,
         };
         setTouched(allTouched);
-        if (Object.keys(errors).length > 0) return;
+        
+        const freshErrors = validate(true);
+        if (Object.keys(freshErrors).length > 0) return;
 
         setIsSubmitting(true);
         setSubmitError('');
@@ -313,7 +325,30 @@ export default function Step1() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
             console.error('Error updating checkout user data:', err);
-            const msg = err instanceof Error ? err.message : 'Помилка оновлення даних користувача';
+            let msg = 'Помилка оновлення даних користувача';
+            if (err instanceof GraphQLError && err.errors.length > 0) {
+                const firstError = err.errors[0];
+                const errorCode = firstError.extensions?.error_code;
+                if (errorCode === 141 || errorCode === 25) {
+                    msg = locale === 'ru'
+                        ? 'Этот номер телефона уже зарегистрирован. Пожалуйста, войдите в свой аккаунт или воспользуйтесь другим номером.'
+                        : 'Цей номер телефону вже зареєстрований. Будь ласка, увійдіть у свій акаунт або скористайтеся іншим номером.';
+                } else if (err.message === 'Internal server error') {
+                    msg = locale === 'ru'
+                        ? 'Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.'
+                        : 'Внутрішня помилка сервера. Будь ласка, спробуйте пізніше.';
+                } else {
+                    msg = err.message;
+                }
+            } else if (err instanceof Error) {
+                if (err.message === 'Internal server error') {
+                    msg = locale === 'ru'
+                        ? 'Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.'
+                        : 'Внутрішня помилка сервера. Будь ласка, спробуйте пізніше.';
+                } else {
+                    msg = err.message;
+                }
+            }
             setSubmitError(msg);
         } finally {
             setIsSubmitting(false);
@@ -439,7 +474,7 @@ export default function Step1() {
                                             ? 'Перевірка...'
                                             : smsRequested
                                                 ? 'Підтвердити код'
-                                                : 'Відправити код'
+                                                : 'Отримати код'
                                     }
                                 </button>
                             </div>
@@ -473,7 +508,7 @@ export default function Step1() {
                             )}
                         </div>
 
-                        {hydrated && isAuthenticated && (
+                        {hydrated && isAuthenticated && !isGuest && user && (
                             <Checkbox
                                 id="checkout-another-recipient"
                                 checked={formData.anotherRecipient}
@@ -504,7 +539,6 @@ export default function Step1() {
                 <CartSummary 
                     onEditCart={() => setIsCartModalOpen(true)} 
                     discountPercent={appliedPromo?.discount || 0}
-                    deliveryPrice={125}
                 />
                 {hydrated && (
                     <PromoBlock 

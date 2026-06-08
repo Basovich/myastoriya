@@ -408,6 +408,7 @@ export default function Step2() {
                 desiredDeliveryDate: deliveryDate ? formatDate(deliveryDate) : null,
                 desiredDeliveryTime: deliveryTime || null,
                 userPickupPointId: finalPickupPointId,
+                deliveryPrice: deliveryPrice,
             };
             localStorage.setItem('checkout_delivery_params', JSON.stringify(checkoutDeliveryParams));
             
