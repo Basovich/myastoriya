@@ -11,7 +11,6 @@ import s from './CartModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCartAsync, updateQuantityAsync, removeFromCartAsync, fetchCartAsync } from '@/store/slices/cartSlice';
-import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from './products_mock';
 import { useCartProducts } from '@/hooks/useCartProducts';
 import clsx from 'clsx';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -34,15 +33,24 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     const lang = (params?.lang as string) || 'ua';
     const { disableScroll, enableScroll } = useScrollLock();
     const dispatch = useAppDispatch();
-    const cartItems = useAppSelector(state => state.cart.items);
     const { user, isGuest, isInitialized } = useAppSelector(state => state.auth);
     const hydrated = useIsHydrated();
 
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
     const [showCashback, setShowCashback] = useState(false);
+    const [isMobile, setIsMobile] = useState(true);
 
-    const { populatedItems, loading } = useCartProducts();
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const { populatedItems, suggestedProducts, loading } = useCartProducts();
 
     useEffect(() => {
         if (!hydrated || !isInitialized || !user || isGuest) {
@@ -118,14 +126,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     const handleAddToCart = (id: string) => {
         void dispatch(addToCartAsync({ id, quantity: 1 }));
     };
-
-    // Catalog MOCK_PRODUCTS to show as suggestions (those not already in cart)
-    const suggestedProducts = useMemo(() => {
-        const inCartIds = new Set(cartItems.map(item => item.id));
-        return Object.values(MOCK_PRODUCTS).filter(p => !inCartIds.has(p.id));
-    }, [cartItems]);
-
-    const itemsToDisplay = suggestedProducts.length > 0 ? suggestedProducts : Object.values(MOCK_PRODUCTS);
+    const isSliderActive = isMobile ? suggestedProducts.length > 2 : suggestedProducts.length > 3;
 
     if (!hydrated) return null;
 
@@ -289,61 +290,68 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                             </div>
                         </div>
 
-                        <div className={s.suggestedBlock}>
-                            <div className={s.suggestedHeader}>
-                                <h3 className={s.suggestedTitle}>Разом дешевше</h3>
-                            </div>
-                            <div className={s.suggestedCarousel}>
-                                <button className={clsx(s.navArrow, s.navPrev)} ref={setPrevEl}>
-                                    <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M5.10934 0.499962L0.706955 4.90234L5.10934 9.30473" stroke="black" strokeLinecap="round"/>
-                                        <line x1="0.5" y1="-0.5" x2="10.6304" y2="-0.5" transform="matrix(1 -8.74228e-08 -8.74228e-08 -1 0.925781 4.09766)" stroke="black" strokeLinecap="round"/>
-                                    </svg>
-                                </button>
-                                <Swiper
-                                    modules={[Navigation]}
-                                    navigation={{ prevEl, nextEl }}
-                                    slidesPerView={1.6}
-                                    spaceBetween={12}
-                                    loop={true}
-                                    breakpoints={{
-                                        768: {
-                                            slidesPerView: 3,
-                                            spaceBetween: 16
-                                        }
-                                    }}
-                                    className={s.swiper}
-                                >
-                                    {itemsToDisplay.map((product) => (
-                                        <SwiperSlide key={product.id} className={s.swiperSlide}>
-                                            <div className={s.suggestedItem}>
-                                                <div className={s.suggestedImgWrapper}>
-                                                    <Image src={product.image} alt={product.title} width={100} height={70} className={s.sugImg} />
-                                                </div>
-                                                <div className={s.sugInfo}>
-                                                    <div className={s.sugPriceRow}>
-                                                        <span className={s.sugPriceRed}>{product.price} ₴</span>
-                                                        <span className={s.sugPriceCrossed}>{Math.round(product.price * 1.2)} ₴</span>
+                        {suggestedProducts.length > 0 && (
+                            <div className={s.suggestedBlock}>
+                                <div className={s.suggestedHeader}>
+                                    <h3 className={s.suggestedTitle}>Разом дешевше</h3>
+                                </div>
+                                <div className={s.suggestedCarousel}>
+                                    <button className={clsx(s.navArrow, s.navPrev)} ref={setPrevEl}>
+                                        <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M5.10934 0.499962L0.706955 4.90234L5.10934 9.30473" stroke="black" strokeLinecap="round"/>
+                                            <line x1="0.5" y1="-0.5" x2="10.6304" y2="-0.5" transform="matrix(1 -8.74228e-08 -8.74228e-08 -1 0.925781 4.09766)" stroke="black" strokeLinecap="round"/>
+                                        </svg>
+                                    </button>
+                                    <Swiper
+                                        modules={[Navigation]}
+                                        navigation={{ prevEl, nextEl }}
+                                        slidesPerView={isSliderActive ? (isMobile ? 2 : 3) : 'auto'}
+                                        spaceBetween={0}
+                                        loop={isSliderActive}
+                                        breakpoints={isSliderActive ? {
+                                            768: {
+                                                slidesPerView: Math.min(3, suggestedProducts.length),
+                                                spaceBetween: 0
+                                            }
+                                        } : undefined}
+                                        className={s.swiper}
+                                    >
+                                        {suggestedProducts.map((product) => (
+                                            <SwiperSlide key={product.id} className={clsx(s.swiperSlide, !isSliderActive && s.slideFit)}>
+                                                <div className={s.suggestedItem}>
+                                                    <Link 
+                                                        href={getLocalizedHref(`/products/${product.slug || product.id}`, lang as Locale)} 
+                                                        target="_blank"
+                                                        title={product.title}
+                                                        className={s.suggestedImgWrapper}
+                                                    >
+                                                        <Image src={product.image} alt={product.title} width={100} height={70} className={s.sugImg} />
+                                                    </Link>
+                                                    <div className={s.sugInfo}>
+                                                        <div className={s.sugPriceRow}>
+                                                            <span className={s.sugPriceRed}>{product.price} ₴</span>
+                                                            <span className={s.sugPriceCrossed}>{product.originalPrice} ₴</span>
+                                                        </div>
+                                                        <button className={s.sugAddBtn} onClick={() => handleAddToCart(product.id)}>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                                                                <circle cx="11" cy="11" r="11" fill="black"/>
+                                                                <path d="M11.5615 9.97559H14.666V11.1045H11.5615V14.208H10.4336V11.1045H7.33203V9.97559H10.4336V6.875H11.5615V9.97559Z" fill="white"/>
+                                                            </svg>
+                                                        </button>
                                                     </div>
-                                                    <button className={s.sugAddBtn} onClick={() => handleAddToCart(product.id)}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
-                                                            <circle cx="11" cy="11" r="11" fill="black"/>
-                                                            <path d="M11.5615 9.97559H14.666V11.1045H11.5615V14.208H10.4336V11.1045H7.33203V9.97559H10.4336V6.875H11.5615V9.97559Z" fill="white"/>
-                                                        </svg>
-                                                    </button>
                                                 </div>
-                                            </div>
-                                        </SwiperSlide>
-                                    ))}
-                                </Swiper>
-                                <button className={clsx(s.navArrow, s.navNext)} ref={setNextEl}>
-                                    <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M6.94926 0.499962L11.3516 4.90234L6.94926 9.30473" stroke="black" strokeLinecap="round"/>
-                                        <line x1="10.6328" y1="4.59766" x2="0.502379" y2="4.59766" stroke="black" strokeLinecap="round"/>
-                                    </svg>
-                                </button>
+                                            </SwiperSlide>
+                                        ))}
+                                    </Swiper>
+                                    <button className={clsx(s.navArrow, s.navNext)} ref={setNextEl}>
+                                        <svg width="13" height="10" viewBox="0 0 13 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M6.94926 0.499962L11.3516 4.90234L6.94926 9.30473" stroke="black" strokeLinecap="round"/>
+                                            <line x1="10.6328" y1="4.59766" x2="0.502379" y2="4.59766" stroke="black" strokeLinecap="round"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 )}
             </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAppSelector } from '@/store/hooks';
-import { getProductsByIdsApi, resolveProductImageUrl, type Product } from '@/lib/graphql/queries/products';
+import { useParams } from 'next/navigation';
+import { getProductsByIdsApi, resolveProductImageUrl, type Product, getCategoryByIdApi, type ProductCategory } from '@/lib/graphql/queries/products';
 import { getSpecialsApi } from '@/lib/graphql/queries/pages/home/specials';
 import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from '@/app/components/CartModal/products_mock';
 
@@ -11,6 +12,9 @@ const pendingRequests = new Set<number>();
 
 let globalSpecialsCache: any[] | null = null;
 let pendingSpecialsRequest: Promise<any> | null = null;
+
+const globalCategoryCache: Record<number, ProductCategory | null> = {};
+const pendingCategoryRequests = new Set<number>();
 
 const listeners = new Set<() => void>();
 function emitCacheUpdate() {
@@ -26,9 +30,11 @@ export interface PopulatedCartItem {
         title: string;
         weight: string;
         price: number;
+        originalPrice: number;
         image: string;
         slug?: string;
         costVariantName?: string | null;
+        categoryId?: number;
     };
 }
 
@@ -36,6 +42,8 @@ export function useCartProducts() {
     const cartItems = useAppSelector(state => state.cart.items);
     const { isInitialized } = useAppSelector(state => state.auth);
     const [cacheVersion, setCacheVersion] = useState(0);
+    const params = useParams();
+    const lang = (params?.lang as string) || 'ua';
 
     useEffect(() => {
         const listener = () => {
@@ -124,6 +132,40 @@ export function useCartProducts() {
             });
     }, [cartItems, isInitialized]);
 
+    useEffect(() => {
+        if (!isInitialized) return;
+        if (cartItems.length === 0) return;
+
+        const categoryIds = cartItems
+            .map(item => {
+                const dbProduct = globalProductCache[item.id];
+                return dbProduct?.categoryId ? Number(dbProduct.categoryId) : 0;
+            })
+            .filter((id): id is number => id > 0 && globalCategoryCache[id] === undefined && !pendingCategoryRequests.has(id));
+
+        if (categoryIds.length === 0) return;
+
+        categoryIds.forEach(id => pendingCategoryRequests.add(id));
+
+        Promise.allSettled(categoryIds.map(id => getCategoryByIdApi(id, lang)))
+            .then(results => {
+                categoryIds.forEach(id => pendingCategoryRequests.delete(id));
+                results.forEach((res, index) => {
+                    const catId = categoryIds[index];
+                    if (res.status === 'fulfilled') {
+                        globalCategoryCache[catId] = res.value;
+                    } else {
+                        globalCategoryCache[catId] = null;
+                    }
+                });
+                emitCacheUpdate();
+            })
+            .catch(err => {
+                console.error('[useCartProducts] Failed to fetch category bundles:', err);
+                categoryIds.forEach(id => pendingCategoryRequests.delete(id));
+            });
+    }, [cartItems, isInitialized, cacheVersion, lang]);
+
     const populatedItems = useMemo(() => {
         // Reference cacheVersion to re-evaluate when cache updates
         void cacheVersion;
@@ -135,9 +177,15 @@ export function useCartProducts() {
                     s.name.toLowerCase().includes("вага") || 
                     s.name.toLowerCase().includes("об'єм")
                 );
-                const weight = weightSpec && weightSpec.values.length > 0
-                    ? weightSpec.values[0]
-                    : (dbProduct.multiplier ? `${dbProduct.multiplier} ${dbProduct.unit}` : dbProduct.unit);
+                const rawWeight = weightSpec && weightSpec.values.length > 0 ? weightSpec.values[0] : '';
+                let weight = rawWeight;
+                if (rawWeight) {
+                    if (/^\d+([.,]\d+)?$/.test(rawWeight.trim()) && dbProduct.unit) {
+                        weight = `${rawWeight} ${dbProduct.unit}`;
+                    }
+                } else {
+                    weight = dbProduct.multiplier ? `${dbProduct.multiplier} ${dbProduct.unit}` : dbProduct.unit;
+                }
 
                 // Use purchaseCost from the cart API as the base price (true retail price, e.g. 127 ₴).
                 // dbProduct.cost (98 ₴) is the catalog promotional price which is already discounted.
@@ -157,7 +205,8 @@ export function useCartProducts() {
                         originalPrice: originalPrice,
                         image: resolveProductImageUrl(dbProduct) || "/images/product-placeholder.svg",
                         slug: dbProduct.slug || dbProduct.id,
-                        costVariantName: item.costVariantName
+                        costVariantName: item.costVariantName,
+                        categoryId: dbProduct.categoryId ? Number(dbProduct.categoryId) : undefined
                     }
                 };
             }
@@ -177,13 +226,10 @@ export function useCartProducts() {
             };
         });
 
-        if (globalSpecialsCache && globalSpecialsCache.length > 0) {
-            // Build a map of pid → absolute discounted bundle price.
-            // We check freshly whether ALL items of a bundle are present in the cart.
-            // If they are, the bundle price overrides the catalog price.
-            // If not (e.g. one item removed), no override happens and catalog price is kept.
-            const absolutePriceMap = new Map<string, number>();
+        const absolutePriceMap = new Map<string, number>();
 
+        // --- 1. SPECIALS DISCOUNTS ---
+        if (globalSpecialsCache && globalSpecialsCache.length > 0) {
             for (const special of globalSpecialsCache) {
                 const specialProducts = special.products || [];
                 if (specialProducts.length < 2) continue;
@@ -222,19 +268,74 @@ export function useCartProducts() {
                         discPrice = Math.round(origPrice * factor);
                         sumDiscounted += discPrice;
                     }
-                    // Absolute bundle price overrides the catalog price only when bundle is complete
                     absolutePriceMap.set(pid, discPrice);
                 });
             }
-
-            // Apply absolute bundle prices to items in a complete bundle
-            baseItems.forEach(item => {
-                const bundlePrice = absolutePriceMap.get(item.id);
-                if (bundlePrice !== undefined && bundlePrice > 0) {
-                    item.product.price = bundlePrice;
-                }
-            });
         }
+
+        // --- 2. CATEGORY BUNDLE DISCOUNTS ---
+        for (const catIdStr of Object.keys(globalCategoryCache)) {
+            const category = globalCategoryCache[Number(catIdStr)];
+            if (!category) continue;
+
+            const bundles = category.bundles || [];
+            for (const bundle of bundles) {
+                const discountAmount = bundle.discountAmount || 0;
+                const discountType = bundle.discountType || 'percent';
+                const bundleItems = bundle.items || [];
+                if (bundleItems.length < 2) continue;
+
+                // Check if every bundle item is currently in the cart
+                const freshQty = new Map<string, number>();
+                baseItems.forEach(item => {
+                    freshQty.set(item.id, (freshQty.get(item.id) || 0) + item.quantity);
+                });
+
+                let times = Infinity;
+                for (const bItem of bundleItems) {
+                    const product = bItem.product;
+                    if (!product) { times = 0; break; }
+                    const qty = freshQty.get(String(product.id)) || 0;
+                    if (qty === 0) { times = 0; break; }
+                    times = Math.min(times, qty);
+                }
+                // If the bundle is not fully present in the cart, skip — no discount
+                if (times <= 0 || times === Infinity) continue;
+
+                // Apply the discount to each item of the bundle in the absolutePriceMap
+                for (const bItem of bundleItems) {
+                    const product = bItem.product;
+                    if (!product) continue;
+
+                    const pid = String(product.id);
+                    // Find the corresponding cart item to get its actual price in the cart
+                    const cartItem = baseItems.find(item => item.id === pid);
+                    if (!cartItem) continue;
+
+                    const origPrice = cartItem.product.originalPrice || cartItem.product.price || 0;
+                    let discountedPrice = origPrice;
+
+                    if (discountType === 'percent') {
+                        discountedPrice = Math.round(origPrice * (1 - discountAmount / 100));
+                    } else if (discountType === 'amount') {
+                        discountedPrice = Math.max(0, origPrice - discountAmount);
+                    }
+
+                    const existingPrice = absolutePriceMap.get(pid);
+                    if (existingPrice === undefined || discountedPrice < existingPrice) {
+                        absolutePriceMap.set(pid, discountedPrice);
+                    }
+                }
+            }
+        }
+
+        // Apply absolute bundle prices to items in a complete bundle
+        baseItems.forEach(item => {
+            const bundlePrice = absolutePriceMap.get(item.id);
+            if (bundlePrice !== undefined && bundlePrice > 0) {
+                item.product.price = bundlePrice;
+            }
+        });
 
         return baseItems;
     }, [cartItems, cacheVersion]);
@@ -246,18 +347,79 @@ export function useCartProducts() {
         return globalProductCache[item.id] === undefined;
     });
 
+    const someCategoryUndefined = cartItems.some(item => {
+        const dbProduct = globalProductCache[item.id];
+        if (!dbProduct || !dbProduct.categoryId) return false;
+        const catId = Number(dbProduct.categoryId);
+        return catId > 0 && globalCategoryCache[catId] === undefined;
+    });
+
+    const hookLoading = !isInitialized
+        || globalSpecialsCache === null
+        || someItemUndefined
+        || someCategoryUndefined;
+
+    const suggestedProducts = useMemo(() => {
+        if (hookLoading) return [];
+
+        const uniqueBundleProducts = new Map<string, {
+            id: string;
+            title: string;
+            price: number;
+            originalPrice: number;
+            image: string;
+            slug?: string;
+        }>();
+
+        const inCartIds = new Set(cartItems.map(item => String(item.id)));
+
+        for (const catIdStr of Object.keys(globalCategoryCache)) {
+            const category = globalCategoryCache[Number(catIdStr)];
+            if (!category) continue;
+
+            const bundles = category.bundles || [];
+            for (const bundle of bundles) {
+                const discountAmount = bundle.discountAmount || 0;
+                const discountType = bundle.discountType || 'percent';
+                const bundleItems = bundle.items || [];
+
+                for (const bItem of bundleItems) {
+                    const product = bItem.product;
+                    if (!product) continue;
+
+                    const pid = String(product.id);
+                    // Skip products already in the cart
+                    if (inCartIds.has(pid)) continue;
+
+                    const origCost = product.cost || 0;
+                    let discountedPrice = origCost;
+
+                    if (discountType === 'percent') {
+                        discountedPrice = Math.round(origCost * (1 - discountAmount / 100));
+                    } else if (discountType === 'amount') {
+                        discountedPrice = Math.max(0, origCost - discountAmount);
+                    }
+
+                    const imageSrc = resolveProductImageUrl(product as any) || "/images/product-placeholder.svg";
+
+                    uniqueBundleProducts.set(pid, {
+                        id: pid,
+                        title: product.name,
+                        price: discountedPrice,
+                        originalPrice: origCost,
+                        image: imageSrc,
+                        slug: product.slug || undefined
+                    });
+                }
+            }
+        }
+
+        return Array.from(uniqueBundleProducts.values());
+    }, [cartItems, cacheVersion, hookLoading]);
 
     return {
         populatedItems,
-        // Show spinner until:
-        // 1. Auth is ready (isInitialized)
-        // 2. Specials are loaded — prevents the 562→478 price flicker on bundle items
-        // 3. All cart item product details are in cache
-        // We intentionally do NOT include cartLoading here — add/remove/update
-        // operations are reflected optimistically in state.items (via pending reducer),
-        // and cartLoading is now blacklisted from localStorage to avoid eternal spinners.
-        loading: !isInitialized
-            || globalSpecialsCache === null
-            || someItemUndefined
+        suggestedProducts,
+        loading: hookLoading
     };
 }

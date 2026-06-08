@@ -47,6 +47,7 @@ export interface ProductCategory {
         size1x?: string | null;
     } | null;
     faqGroups?: FaqGroup[] | null;
+    bundles?: ProductBundle[] | null;
 }
 
 export interface ProductImageUrl {
@@ -1116,6 +1117,30 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
             faqGroups {
                 id
                 name
+            }
+            bundles {
+                id
+                discountType
+                discountAmount
+                items {
+                    id
+                    product {
+                        id
+                        slug
+                        name
+                        cost
+                        oldCost
+                        unit
+                        multiplier
+                        available
+                        images {
+                            url {
+                                grid2x
+                                grid1x
+                            }
+                        }
+                    }
+                }
             }
             recommendedProducts {
                 id
