@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import s from './Step2.module.scss';
 import StepIndicator from '../components/StepIndicator';
@@ -19,7 +19,6 @@ import AddAddressModal from '@/app/components/AddAddressModal/AddAddressModal';
 import Image from 'next/image';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { getAccessToken } from '@/app/actions/authActions';
-import { setSelectedCity } from '@/store/slices/localitySlice';
 import { 
     getLocalitiesApi, 
     selectLocalityApi, 
@@ -56,6 +55,8 @@ function formatDate(date: Date): string {
     return `${dd}.${mm}.${yyyy}`;
 }
 
+const PAGE_SIZE = 50;
+
 export default function Step2() {
     const hydrated = useIsHydrated();
     const dispatch = useAppDispatch();
@@ -63,10 +64,29 @@ export default function Step2() {
     const lang = (params?.lang as 'ua' | 'ru') || 'ua';
     
     const { isAuthenticated } = useAppSelector(state => state.auth);
-    const selectedCity = useAppSelector(state => state.locality.selectedCity);
+    const headerCity = useAppSelector(state => state.locality.selectedCity);
+    const [checkoutCity, setCheckoutCity] = useState<Locality | null>(null);
+    const [isCityManuallyChanged, setIsCityManuallyChanged] = useState(false);
     
-    // API lists
-    const [citiesList, setCitiesList] = useState<Locality[]>([]);
+    const citySelectRef = useRef<HTMLDivElement>(null);
+    const npSelectRef = useRef<HTMLDivElement>(null);
+
+    // Local states for custom city selector
+    const [isOpenCitySelect, setIsOpenCitySelect] = useState(false);
+    const [citySearchQuery, setCitySearchQuery] = useState('');
+    const [citySearchResults, setCitySearchResults] = useState<Locality[]>([]);
+    const [citySearchPage, setCitySearchPage] = useState(1);
+    const [hasMoreSearchCities, setHasMoreSearchCities] = useState(true);
+    const [isSearchingCities, setIsSearchingCities] = useState(false);
+    
+    const [allCitiesList, setAllCitiesList] = useState<Locality[]>([]);
+    const [allCitiesPage, setAllCitiesPage] = useState(1);
+    const [hasMoreAllCities, setHasMoreAllCities] = useState(true);
+    const [isLoadingCitiesList, setIsLoadingCitiesList] = useState(false);
+    const [isLoadingMoreCities, setIsLoadingMoreCities] = useState(false);
+
+    // Local states for Nova Poshta selection dropdown
+    const [isOpenNPDropdown, setIsOpenNPDropdown] = useState(false);
     const [deliveries, setDeliveries] = useState<Delivery[]>([]);
     const [dbAddresses, setDbAddresses] = useState<any[]>([]);
     const [guestAddresses, setGuestAddresses] = useState<Address[]>([]);
@@ -110,24 +130,123 @@ export default function Step2() {
                 if (parsed.npSearchQuery) setNpSearchQuery(parsed.npSearchQuery);
                 if (parsed.deliveryDate) setDeliveryDate(new Date(parsed.deliveryDate));
                 if (parsed.deliveryTime) setDeliveryTime(parsed.deliveryTime);
+                if (parsed.selectedCity) {
+                    setCheckoutCity(parsed.selectedCity);
+                    setIsCityManuallyChanged(true);
+                }
             } catch (e) {
                 console.error('Failed to parse checkout delivery data', e);
             }
         }
     }, []);
 
-    // 2. Load cities list on mount
+    // 1b. Initialize local city state with headerCity if not manually changed or restored
     useEffect(() => {
-        const fetchCities = async () => {
+        if (headerCity && !isCityManuallyChanged && !checkoutCity) {
+            setCheckoutCity(headerCity);
+        }
+    }, [headerCity, isCityManuallyChanged, checkoutCity]);
+
+    // 2. Load initial cities list on first open
+    useEffect(() => {
+        if (!isOpenCitySelect || allCitiesList.length > 0 || isLoadingCitiesList) return;
+
+        const fetchInitialCities = async () => {
+            setIsLoadingCitiesList(true);
             try {
-                const res = await getLocalitiesApi(undefined, 100, 1, lang);
-                setCitiesList(res.data);
-            } catch (e) {
-                console.error('Failed to fetch cities list', e);
+                const res = await getLocalitiesApi(undefined, PAGE_SIZE, 1, lang);
+                let list = [...res.data];
+                if (checkoutCity && !list.some(c => c.id === checkoutCity.id)) {
+                    list.unshift(checkoutCity);
+                }
+                setAllCitiesList(list);
+                setHasMoreAllCities(res.has_more_pages);
+                setAllCitiesPage(1);
+            } catch (error) {
+                console.error('Failed to fetch initial cities:', error);
+            } finally {
+                setIsLoadingCitiesList(false);
             }
         };
-        fetchCities();
-    }, [lang]);
+        fetchInitialCities();
+    }, [isOpenCitySelect, allCitiesList.length, isLoadingCitiesList, checkoutCity, lang]);
+
+    // 2b. Debounced search for cities
+    useEffect(() => {
+        if (citySearchQuery.length >= 2) {
+            const searchCities = async () => {
+                setIsSearchingCities(true);
+                try {
+                    const res = await getLocalitiesApi(citySearchQuery, PAGE_SIZE, 1, lang);
+                    setCitySearchResults(res.data);
+                    setHasMoreSearchCities(res.has_more_pages);
+                    setCitySearchPage(1);
+                } catch (error) {
+                    console.error('City search failed:', error);
+                } finally {
+                    setIsSearchingCities(false);
+                }
+            };
+            const timer = setTimeout(searchCities, 300);
+            return () => clearTimeout(timer);
+        } else {
+            setCitySearchResults([]);
+        }
+    }, [citySearchQuery, lang]);
+
+    // 2c. Close dropdown on click outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (citySelectRef.current && !citySelectRef.current.contains(event.target as Node)) {
+                setIsOpenCitySelect(false);
+            }
+            if (npSelectRef.current && !npSelectRef.current.contains(event.target as Node)) {
+                setIsOpenNPDropdown(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleLoadMoreCities = async () => {
+        if (isLoadingMoreCities) return;
+
+        if (citySearchQuery.length >= 2 && hasMoreSearchCities) {
+            setIsLoadingMoreCities(true);
+            try {
+                const nextPage = citySearchPage + 1;
+                const res = await getLocalitiesApi(citySearchQuery, PAGE_SIZE, nextPage, lang);
+                setCitySearchResults(prev => [...prev, ...res.data]);
+                setHasMoreSearchCities(res.has_more_pages);
+                setCitySearchPage(nextPage);
+            } catch (error) {
+                console.error('Load more search cities error:', error);
+            } finally {
+                setIsLoadingMoreCities(false);
+            }
+        } else if (citySearchQuery.length < 2 && hasMoreAllCities) {
+            setIsLoadingMoreCities(true);
+            try {
+                const nextPage = allCitiesPage + 1;
+                const res = await getLocalitiesApi(undefined, PAGE_SIZE, nextPage, lang);
+                setAllCitiesList(prev => [...prev, ...res.data]);
+                setHasMoreAllCities(res.has_more_pages);
+                setAllCitiesPage(nextPage);
+            } catch (error) {
+                console.error('Load more cities error:', error);
+            } finally {
+                setIsLoadingMoreCities(false);
+            }
+        }
+    };
+
+    const handleCityScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.currentTarget;
+        const reachedBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
+        if (reachedBottom) {
+            handleLoadMoreCities();
+        }
+    };
 
     // 3. Load user addresses if authenticated
     useEffect(() => {
@@ -171,10 +290,22 @@ export default function Step2() {
 
     // 6. Fetch deliveries when city changes
     useEffect(() => {
-        if (!selectedCity) return;
+        if (!checkoutCity) {
+            setDeliveries([]);
+            setDeliveryMethod('');
+            return;
+        }
+
+        // Reset deliveries and deliveryMethod immediately when city changes to avoid outdated API requests
+        setDeliveries([]);
+        setDeliveryMethod('');
+        setSelectedNPRef('');
+        setNpSearchQuery('');
+        setIsOpenNPDropdown(false);
+
         const fetchDeliveries = async () => {
             try {
-                const res = await getDeliveriesApi(undefined, selectedCity.id, lang);
+                const res = await getDeliveriesApi(undefined, checkoutCity.id, lang);
                 setDeliveries(res);
                 
                 // Determine what delivery method to select
@@ -187,7 +318,7 @@ export default function Step2() {
                         try {
                             const parsed = JSON.parse(saved);
                             if (parsed.deliveryMethod && res.some(d => d.id === parsed.deliveryMethod)) {
-                                restored = parsed.deliveryMethod;
+                                  restored = parsed.deliveryMethod;
                             }
                         } catch (e) {}
                     }
@@ -206,18 +337,18 @@ export default function Step2() {
             }
         };
         fetchDeliveries();
-    }, [selectedCity, lang, restoredData]);
+    }, [checkoutCity, lang, restoredData]);
 
     // 7. Debounced search for Nova Poshta warehouses
     useEffect(() => {
-        if (!selectedCity) {
+        if (!checkoutCity) {
             setNpResults([]);
             return;
         }
         const fetchNP = async () => {
             setIsSearchingNP(true);
             try {
-                const res = await getWarehousesApi(selectedCity.id, npSearchQuery, 50, 1, lang);
+                const res = await getWarehousesApi(checkoutCity.id, npSearchQuery, 50, 1, lang);
                 setNpResults(res.data);
             } catch (e) {
                 console.error('Failed to fetch Nova Poshta warehouses', e);
@@ -227,11 +358,23 @@ export default function Step2() {
         };
         const timer = setTimeout(fetchNP, 300);
         return () => clearTimeout(timer);
-    }, [npSearchQuery, selectedCity, lang]);
+    }, [npSearchQuery, checkoutCity, lang]);
 
     // 8. Fetch dynamic delivery times
     useEffect(() => {
-        if (!deliveryMethod || !deliveryDate) return;
+        if (!deliveryMethod || !deliveryDate) {
+            setDeliveryTimes([]);
+            setDeliveryTime('');
+            return;
+        }
+
+        const activeDelivery = deliveries.find(d => d.id === deliveryMethod);
+        if (!activeDelivery || activeDelivery.disabled || !activeDelivery.showDeliveryTime) {
+            setDeliveryTimes([]);
+            setDeliveryTime('');
+            return;
+        }
+
         const fetchTimes = async () => {
             setIsLoadingTimes(true);
             try {
@@ -255,7 +398,7 @@ export default function Step2() {
             }
         };
         fetchTimes();
-    }, [deliveryMethod, deliveryDate, lang]);
+    }, [deliveryMethod, deliveryDate, lang, deliveries]);
 
     // 9. Load saved promo
     useEffect(() => {
@@ -303,17 +446,6 @@ export default function Step2() {
     const elapsedForFree = activeDelivery?.elapsedForFree || 0;
     const deliveryPrice = activeDelivery?.deliveryCost || 0;
 
-    const cityOptions = React.useMemo(() => {
-        const list = [...citiesList];
-        if (selectedCity && !list.some(c => c.id === selectedCity.id)) {
-            list.unshift(selectedCity);
-        }
-        return list.map(c => ({
-            value: c.id.toString(),
-            label: c.name
-        }));
-    }, [citiesList, selectedCity]);
-
     const shopOptions = React.useMemo(() => {
         return shops.map(shop => ({
             value: shop.id.toString(),
@@ -328,16 +460,25 @@ export default function Step2() {
         }));
     }, [deliveryTimes]);
 
-    const handleCityChange = async (cityIdStr: string) => {
-        const cityId = parseInt(cityIdStr, 10);
-        const cityObj = citiesList.find(c => c.id === cityId) || (selectedCity?.id === cityId ? selectedCity : null);
-        if (cityObj) {
-            dispatch(setSelectedCity(cityObj));
-            try {
-                await selectLocalityApi(cityId, lang);
-            } catch (e) {
-                console.error('Failed to select locality on backend', e);
-            }
+    const handleSelectCheckoutCity = async (city: Locality) => {
+        setCheckoutCity(city);
+        setIsCityManuallyChanged(true);
+        setIsOpenCitySelect(false);
+        setCitySearchQuery('');
+        
+        try {
+            const saved = localStorage.getItem('checkout_delivery_data');
+            const parsed = saved ? JSON.parse(saved) : {};
+            parsed.selectedCity = city;
+            localStorage.setItem('checkout_delivery_data', JSON.stringify(parsed));
+        } catch (e) {
+            console.error('Failed to save selected city to localStorage', e);
+        }
+
+        try {
+            await selectLocalityApi(city.id, lang);
+        } catch (e) {
+            console.error('Failed to select locality on backend', e);
         }
     };
 
@@ -398,6 +539,7 @@ export default function Step2() {
                 npSearchQuery,
                 deliveryDate: deliveryDate ? deliveryDate.toISOString() : null,
                 deliveryTime,
+                selectedCity: checkoutCity,
             };
             localStorage.setItem('checkout_delivery_data', JSON.stringify(rawData));
             
@@ -438,7 +580,7 @@ export default function Step2() {
             const token = await getAccessToken();
             if (token) {
                 const created = await createUserAddressApi({
-                    city: newAddr.city || selectedCity?.name || 'Київ',
+                    city: newAddr.city || checkoutCity?.name || 'Київ',
                     street: newAddr.street,
                     house: newAddr.house || '',
                     apartment: newAddr.apartment ? parseInt(newAddr.apartment, 10) : undefined,
@@ -470,8 +612,6 @@ export default function Step2() {
         }
     };
 
-    const currentCityId = selectedCity?.id?.toString() || '';
-
     return (
         <div className={s.layout}>
             {/* ── Left: Delivery Form ── */}
@@ -481,12 +621,93 @@ export default function Step2() {
                 <div className={s.formSection}>
                     <h2 className={s.sectionTitle}>Ваше місто ?</h2>
                     {hydrated && (
-                        <CustomSelect 
-                            options={cityOptions}
-                            value={currentCityId}
-                            onChange={handleCityChange}
-                            className={s.citySelect}
-                        />
+                        <div className={s.citySelectContainer} ref={citySelectRef}>
+                            <button
+                                type="button"
+                                className={clsx(s.citySelectBtn, isOpenCitySelect && s.isOpen)}
+                                onClick={() => setIsOpenCitySelect(!isOpenCitySelect)}
+                            >
+                                <span>{checkoutCity?.name || (lang === 'ua' ? 'Оберіть місто' : 'Выберите город')}</span>
+                                <svg
+                                    className={clsx(s.arrow, isOpenCitySelect && s.arrowOpen)}
+                                    width="20"
+                                    height="20"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                >
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </button>
+
+                            {isOpenCitySelect && (
+                                <div className={s.cityDropdown}>
+                                    <div className={s.searchWrapper}>
+                                        <div className={s.searchIcon}>
+                                            <Image src="/icons/icon-search.svg" alt="Search" width={16} height={16} />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            className={s.searchInput}
+                                            placeholder={lang === 'ua' ? 'Введіть назву' : 'Введите название'}
+                                            value={citySearchQuery}
+                                            onChange={(e) => setCitySearchQuery(e.target.value)}
+                                            autoFocus
+                                        />
+                                    </div>
+                                    <div className={s.cityList} onScroll={handleCityScroll}>
+                                        {citySearchQuery.length < 2 ? (
+                                            isLoadingCitiesList ? (
+                                                <div className={s.loader}></div>
+                                            ) : allCitiesList.length > 0 ? (
+                                                <>
+                                                    {allCitiesList.map((city) => (
+                                                        <div
+                                                            key={city.id}
+                                                            className={clsx(
+                                                                s.cityItem,
+                                                                Number(checkoutCity?.id) === Number(city.id) && s.cityItemSelected
+                                                            )}
+                                                            onClick={() => handleSelectCheckoutCity(city)}
+                                                        >
+                                                            {city.name}
+                                                        </div>
+                                                    ))}
+                                                    {isLoadingMoreCities && <div className={s.loader}></div>}
+                                                </>
+                                            ) : (
+                                                <div className={s.notFound}>
+                                                    {lang === 'ua' ? 'Місто не знайдено' : 'Город не найден'}
+                                                </div>
+                                            )
+                                        ) : isSearchingCities ? (
+                                            <div className={s.loader}></div>
+                                        ) : citySearchResults.length > 0 ? (
+                                            <>
+                                                {citySearchResults.map((city) => (
+                                                    <div
+                                                        key={city.id}
+                                                        className={clsx(
+                                                            s.cityItem,
+                                                            Number(checkoutCity?.id) === Number(city.id) && s.cityItemSelected
+                                                        )}
+                                                        onClick={() => handleSelectCheckoutCity(city)}
+                                                    >
+                                                        {city.name}
+                                                    </div>
+                                                ))}
+                                                {isLoadingMoreCities && <div className={s.loader}></div>}
+                                            </>
+                                        ) : (
+                                            <div className={s.notFound}>
+                                                {lang === 'ua' ? 'Місто не знайдено' : 'Город не найден'}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
 
@@ -558,44 +779,56 @@ export default function Step2() {
                                     )}
 
                                     {(hydrated && isSelected && isMethodNP) && (
-                                        <div className={s.nestedSelectRow}>
+                                        <div className={s.nestedSelectRow} ref={npSelectRef} onFocusCapture={() => setIsOpenNPDropdown(true)}>
                                             <h4 className={s.nestedSelectTitle}>Введіть номер або адресу відділення Нової Пошти:</h4>
                                             <Search 
                                                 value={npSearchQuery}
-                                                onChange={setNpSearchQuery}
+                                                onChange={(val) => {
+                                                    setNpSearchQuery(val);
+                                                    setSelectedNPRef('');
+                                                    setIsOpenNPDropdown(true);
+                                                }}
                                                 placeholder="Пошук відділення (наприклад: 125 або Хрещатик)"
                                                 showButton={false}
                                                 className={s.nestedSearch}
                                             />
-                                            {isSearchingNP ? (
-                                                <div className={s.npLoader}>Пошук відділень...</div>
-                                            ) : (
-                                                <div className={s.npResultsList}>
-                                                    {npResults.map(wh => {
-                                                        const isWhSelected = selectedNPRef === wh.ref;
-                                                        return (
-                                                            <div 
-                                                                key={wh.ref} 
-                                                                className={clsx(s.npResultItem, isWhSelected && s.npResultItemActive)}
-                                                                onClick={() => setSelectedNPRef(wh.ref)}
-                                                            >
-                                                                <div className={s.npName}>{wh.name}</div>
-                                                                {wh.schedule && wh.schedule.length > 0 && (
-                                                                    <div className={s.npSchedule}>
-                                                                        {wh.schedule.map((sch, idx) => (
-                                                                            <span key={idx} className={s.npScheduleItem}>
-                                                                                {sch.days}: {sch.workTime}
-                                                                            </span>
-                                                                        ))}
+                                            {isOpenNPDropdown && (
+                                                <>
+                                                    {isSearchingNP ? (
+                                                        <div className={s.npLoader}>Пошук відділень...</div>
+                                                    ) : (
+                                                        <div className={s.npResultsList}>
+                                                            {npResults.map(wh => {
+                                                                const isWhSelected = selectedNPRef === wh.ref;
+                                                                return (
+                                                                    <div 
+                                                                        key={wh.ref} 
+                                                                        className={clsx(s.npResultItem, isWhSelected && s.npResultItemActive)}
+                                                                        onClick={() => {
+                                                                            setSelectedNPRef(wh.ref);
+                                                                            setNpSearchQuery(wh.name);
+                                                                            setIsOpenNPDropdown(false);
+                                                                        }}
+                                                                    >
+                                                                        <div className={s.npName}>{wh.name}</div>
+                                                                        {wh.schedule && wh.schedule.length > 0 && (
+                                                                            <div className={s.npSchedule}>
+                                                                                {wh.schedule.map((sch, idx) => (
+                                                                                    <span key={idx} className={s.npScheduleItem}>
+                                                                                        {sch.days}: {sch.workTime}
+                                                                                    </span>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
                                                                     </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                    {!isSearchingNP && npResults.length === 0 && (
-                                                        <div className={s.npNoResults}>Нічого не знайдено</div>
+                                                                );
+                                                            })}
+                                                            {!isSearchingNP && npResults.length === 0 && (
+                                                                <div className={s.npNoResults}>Нічого не знайдено</div>
+                                                            )}
+                                                        </div>
                                                     )}
-                                                </div>
+                                                </>
                                             )}
                                         </div>
                                     )}
