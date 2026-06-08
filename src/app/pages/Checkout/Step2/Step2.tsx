@@ -64,6 +64,8 @@ export default function Step2() {
     const lang = (params?.lang as 'ua' | 'ru') || 'ua';
     
     const { isAuthenticated } = useAppSelector(state => state.auth);
+    const cartItems = useAppSelector(state => state.cart.items);
+    const cartLoading = useAppSelector(state => state.cart.loading);
     const headerCity = useAppSelector(state => state.locality.selectedCity);
     const [checkoutCity, setCheckoutCity] = useState<Locality | null>(null);
     const [isCityManuallyChanged, setIsCityManuallyChanged] = useState(false);
@@ -91,7 +93,7 @@ export default function Step2() {
     const [dbAddresses, setDbAddresses] = useState<any[]>([]);
     const [guestAddresses, setGuestAddresses] = useState<Address[]>([]);
     const [shops, setShops] = useState<Shop[]>([]);
-    
+
     // Selected fields
     const [deliveryMethod, setDeliveryMethod] = useState('');
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -100,6 +102,12 @@ export default function Step2() {
     const [npResults, setNpResults] = useState<Warehouse[]>([]);
     const [selectedNPRef, setSelectedNPRef] = useState<string>('');
     const [isSearchingNP, setIsSearchingNP] = useState(false);
+
+    const prevCityIdRef = useRef<number | null>(null);
+    const deliveryMethodRef = useRef(deliveryMethod);
+    useEffect(() => {
+        deliveryMethodRef.current = deliveryMethod;
+    }, [deliveryMethod]);
     
     const [deliveryDate, setDeliveryDate] = useState<Date | null>(new Date());
     const [deliveryTimes, setDeliveryTimes] = useState<string[]>([]);
@@ -288,20 +296,33 @@ export default function Step2() {
         }
     }, [shops, selectedShopId]);
 
-    // 6. Fetch deliveries when city changes
+    // 6. Fetch deliveries when city or cart changes
     useEffect(() => {
         if (!checkoutCity) {
             setDeliveries([]);
             setDeliveryMethod('');
+            setSelectedNPRef('');
+            setNpSearchQuery('');
+            setIsOpenNPDropdown(false);
+            prevCityIdRef.current = null;
             return;
         }
 
-        // Reset deliveries and deliveryMethod immediately when city changes to avoid outdated API requests
-        setDeliveries([]);
-        setDeliveryMethod('');
-        setSelectedNPRef('');
-        setNpSearchQuery('');
-        setIsOpenNPDropdown(false);
+        if (cartLoading) {
+            return;
+        }
+
+        const isCityChanged = prevCityIdRef.current !== checkoutCity.id;
+        prevCityIdRef.current = checkoutCity.id;
+
+        if (isCityChanged) {
+            // Reset deliveries and deliveryMethod immediately when city changes to avoid outdated API requests
+            setDeliveries([]);
+            setDeliveryMethod('');
+            setSelectedNPRef('');
+            setNpSearchQuery('');
+            setIsOpenNPDropdown(false);
+        }
 
         const fetchDeliveries = async () => {
             try {
@@ -327,9 +348,12 @@ export default function Step2() {
                 if (restored) {
                     setDeliveryMethod(restored);
                 } else {
-                    const firstEnabled = res.find(d => !d.disabled);
-                    if (firstEnabled) {
-                        setDeliveryMethod(firstEnabled.id);
+                    const currentSelectedExists = res.some(d => d.id === deliveryMethodRef.current && !d.disabled);
+                    if (!currentSelectedExists) {
+                        const firstEnabled = res.find(d => !d.disabled);
+                        if (firstEnabled) {
+                            setDeliveryMethod(firstEnabled.id);
+                        }
                     }
                 }
             } catch (e) {
@@ -337,7 +361,7 @@ export default function Step2() {
             }
         };
         fetchDeliveries();
-    }, [checkoutCity, lang, restoredData]);
+    }, [checkoutCity, lang, restoredData, cartItems, cartLoading]);
 
     // 7. Debounced search for Nova Poshta warehouses
     useEffect(() => {
