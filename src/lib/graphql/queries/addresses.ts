@@ -104,3 +104,46 @@ export const markUserAddressAsDefaultApi = async (id: string, token: string): Pr
     const res = await gqlRequest<{ markUserAddressAsDefault: boolean }>(mutation, { id: parseInt(id, 10) }, { token });
     return res.markUserAddressAsDefault;
 };
+
+export interface Street {
+    id: number;
+    name: string;
+}
+
+export interface StreetsResponse {
+    streets: {
+        data: Street[];
+        per_page: number;
+        current_page: number;
+        has_more_pages: boolean;
+    };
+}
+
+export const getStreetsApi = async (
+    localityId: number,
+    name?: string,
+    limit: number = 50,
+    page: number = 1,
+    lang?: string
+): Promise<StreetsResponse['streets']> => {
+    const query = `
+        query GetStreets($localityId: Int!, $name: String, $limit: Int, $page: Int) {
+            streets(localityId: $localityId, name: $name, limit: $limit, page: $page) {
+                data {
+                    id
+                    name
+                }
+                per_page
+                current_page
+                has_more_pages
+            }
+        }
+    `;
+    const res = await gqlRequest<StreetsResponse>(
+        query,
+        { localityId, name, limit, page },
+        { lang }
+    );
+    return res.streets;
+};
+

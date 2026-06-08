@@ -599,6 +599,7 @@ export default function Step2() {
         id: string;
         title: string;
         street: string;
+        streetId?: number | string;
         city?: string;
         house?: string;
         apartment?: string;
@@ -611,6 +612,7 @@ export default function Step2() {
                 const created = await createUserAddressApi({
                     city: newAddr.city || checkoutCity?.name || 'Київ',
                     street: newAddr.street,
+                    streetId: newAddr.streetId ? parseInt(newAddr.streetId as any, 10) : undefined,
                     house: newAddr.house || '',
                     apartment: newAddr.apartment ? parseInt(newAddr.apartment, 10) : undefined,
                     entrance: newAddr.entrance ? parseInt(newAddr.entrance, 10) : undefined,

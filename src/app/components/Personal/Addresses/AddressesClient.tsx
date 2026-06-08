@@ -14,6 +14,7 @@ import {
 } from '@/lib/graphql/queries/addresses';
 import { getAccessToken } from '@/app/actions/authActions';
 import AddAddressModal from '@/app/components/AddAddressModal/AddAddressModal';
+import DeleteAddressModal from './DeleteAddressModal';
 import s from './AddressesClient.module.scss';
 import clsx from 'clsx';
 import * as Sentry from "@sentry/nextjs";
@@ -48,6 +49,7 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
     const [addresses, setAddresses] = useState<UserAddress[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [addressToDelete, setAddressToDelete] = useState<string | null>(null);
     
     const pDict = personalDict[lang];
     const dict = localDict[lang];
@@ -76,20 +78,26 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
         // Handled by layout or parent
     };
 
-    const handleDelete = async (id: string) => {
-        if (!window.confirm(dict.deleteConfirm)) return;
+    const handleDelete = (id: string) => {
+        setAddressToDelete(id);
+    };
+
+    const confirmDeleteAddress = async () => {
+        if (!addressToDelete) return;
         
         try {
             const token = await getAccessToken();
             if (token) {
-                const success = await deleteUserAddressApi(id, token);
+                const success = await deleteUserAddressApi(addressToDelete, token);
                 if (success) {
-                    setAddresses(prev => prev.filter(a => a.id !== id));
+                    setAddresses(prev => prev.filter(a => a.id !== addressToDelete));
                 }
             }
         } catch (error) {
             console.error('Failed to delete address:', error);
             alert('Помилка при видаленні адреси');
+        } finally {
+            setAddressToDelete(null);
         }
     };
 
@@ -118,6 +126,7 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
                 const newAddress = await createUserAddressApi({
                     city: data.city || 'Київ',
                     street: data.street,
+                    streetId: data.streetId ? parseInt(data.streetId, 10) : undefined,
                     house: data.house || '',
                     apartment: data.apartment ? parseInt(data.apartment, 10) : undefined,
                     entrance: data.entrance ? parseInt(data.entrance, 10) : undefined,
@@ -205,6 +214,13 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onAdd={handleAddAddress}
+            />
+
+            <DeleteAddressModal
+                isOpen={addressToDelete !== null}
+                onClose={() => setAddressToDelete(null)}
+                onConfirm={confirmDeleteAddress}
+                lang={lang}
             />
         </div>
     );

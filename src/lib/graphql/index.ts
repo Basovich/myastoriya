@@ -141,8 +141,8 @@ export {
 export type { Delivery, UserPickupPoint, Warehouse, WarehousePagination, Schedule } from './queries/deliveries';
 
 // Re-export addresses
-export { getUserAddressesApi, createUserAddressApi } from './queries/addresses';
-export type { UserAddress } from './queries/addresses';
+export { getUserAddressesApi, createUserAddressApi, getStreetsApi } from './queries/addresses';
+export type { UserAddress, Street } from './queries/addresses';
 
 // Re-export shops
 export { getShopsApi, getContactsShopsApi, SHOPS_QUERY } from './queries/shops';

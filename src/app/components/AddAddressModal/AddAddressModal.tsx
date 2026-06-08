@@ -5,6 +5,8 @@ import Modal from 'react-modal';
 import { GoogleMap, useJsApiLoader, Marker, Autocomplete } from '@react-google-maps/api';
 import s from './AddAddressModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
+import SearchableSelect from '@/app/components/ui/SearchableSelect';
+import { getLocalitiesApi, getStreetsApi } from '@/lib/graphql';
 import InputField from '@/app/components/ui/InputField';
 import Button from '@/app/components/ui/Button/Button';
 import Search from '@/app/components/ui/Search/Search';
@@ -21,6 +23,7 @@ interface AddAddressModalProps {
         id: string; 
         title: string; 
         street: string;
+        streetId?: number;
         city?: string;
         house?: string;
         apartment?: string;
@@ -55,8 +58,10 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
     const { disableScroll, enableScroll } = useScrollLock();
 
     // Form state
-    const [city, setCity] = useState('Київ');
+    const [city, setCity] = useState('');
+    const [cityId, setCityId] = useState<number | undefined>(undefined);
     const [street, setStreet] = useState('');
+    const [streetId, setStreetId] = useState<number | undefined>(undefined);
     const [house, setHouse] = useState('');
     const [apartment, setApartment] = useState('');
     const [entrance, setEntrance] = useState('');
@@ -67,6 +72,11 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
     const [mapSearch, setMapSearch] = useState('');
     const [map, setMap] = useState<google.maps.Map | null>(null);
     const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+    const [parsedAddress, setParsedAddress] = useState<{
+        city: string;
+        street: string;
+        house: string;
+    } | null>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -79,14 +89,17 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
         onClose();
         setTimeout(() => {
             setView('form');
-            setCity('Київ');
+            setCity('');
+            setCityId(undefined);
             setStreet('');
+            setStreetId(undefined);
             setHouse('');
             setApartment('');
             setEntrance('');
             setFloor('');
             setMapMarker(null);
             setMapSearch('');
+            setParsedAddress(null);
         }, 300);
     };
 
@@ -99,6 +112,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
             id: Math.random().toString(36).substr(2, 9),
             title: `Моя адреса №${Math.floor(Math.random() * 10) + 2}`,
             street: street,
+            streetId: streetId,
             city,
             house,
             apartment,
@@ -109,14 +123,169 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
         handleClose();
     };
 
+    const updateFormFromGeocode = useCallback(async (gCity: string, gStreet: string, gHouse: string) => {
+        setStreet(gStreet);
+        setHouse(gHouse);
+        
+        if (gCity) {
+            try {
+                const res = await getLocalitiesApi(gCity, 5, 1, lang);
+                if (res.data && res.data.length > 0) {
+                    const matched = res.data.find(c => 
+                        c.name.toLowerCase().includes(gCity.toLowerCase()) || 
+                        gCity.toLowerCase().includes(c.name.toLowerCase())
+                    ) || res.data[0];
+                    
+                    setCity(matched.name);
+                    setCityId(matched.id);
+
+                    if (gStreet) {
+                        const streetsRes = await getStreetsApi(matched.id, gStreet, 5, 1, lang);
+                        if (streetsRes.data && streetsRes.data.length > 0) {
+                            const matchedStreet = streetsRes.data.find(s => 
+                                s.name.toLowerCase().includes(gStreet.toLowerCase()) || 
+                                gStreet.toLowerCase().includes(s.name.toLowerCase())
+                            ) || streetsRes.data[0];
+                            setStreetId(matchedStreet.id);
+                        } else {
+                            setStreetId(undefined);
+                        }
+                    } else {
+                        setStreetId(undefined);
+                    }
+                } else {
+                    setCity(gCity);
+                    setCityId(undefined);
+                    setStreetId(undefined);
+                }
+            } catch (e) {
+                console.error('Failed to map geocoded city:', e);
+                setCity(gCity);
+                setCityId(undefined);
+                setStreetId(undefined);
+            }
+        } else {
+            setCityId(undefined);
+            setStreetId(undefined);
+        }
+    }, [lang]);
+
+    const handleCitySearch = useCallback(async (query: string) => {
+        try {
+            const res = await getLocalitiesApi(query, 50, 1, lang);
+            return res.data.map(item => ({ id: item.id, name: item.name }));
+        } catch (e) {
+            console.error('Error fetching cities:', e);
+            return [];
+        }
+    }, [lang]);
+
+    const handleStreetSearch = useCallback(async (query: string) => {
+        if (!cityId) return [];
+        try {
+            const res = await getStreetsApi(cityId, query, 50, 1, lang);
+            return res.data.map(item => ({ id: item.id, name: item.name }));
+        } catch (e) {
+            console.error('Error fetching streets:', e);
+            return [];
+        }
+    }, [cityId, lang]);
+
+    const handleCitySelect = useCallback((option: { id: number | string; name: string } | null) => {
+        if (option) {
+            setCity(option.name);
+            setCityId(option.id as number);
+        } else {
+            setCity('');
+            setCityId(undefined);
+        }
+        // Always reset street and subsequent fields on city change
+        setStreet('');
+        setStreetId(undefined);
+        setHouse('');
+        setApartment('');
+        setEntrance('');
+        setFloor('');
+    }, []);
+
+    const handleStreetSelect = useCallback((option: { id: number | string; name: string } | null) => {
+        if (option) {
+            setStreet(option.name);
+            setStreetId(option.id as number);
+        } else {
+            setStreet('');
+            setStreetId(undefined);
+            // Reset subsequent fields on street clear
+            setHouse('');
+            setApartment('');
+            setEntrance('');
+            setFloor('');
+        }
+    }, []);
+
+    const geocodePosition = useCallback((pos: { lat: number; lng: number }) => {
+        if (typeof window === 'undefined' || !window.google) return;
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ location: pos }, (results, status) => {
+            if (status === 'OK' && results && results[0]) {
+                const result = results[0];
+                const components = result.address_components || [];
+                let parsedStreet = '';
+                let parsedHouse = '';
+                let parsedCity = 'Київ';
+
+                for (const component of components) {
+                    const types = component.types;
+                    if (types.includes('route')) {
+                        parsedStreet = component.long_name;
+                    } else if (types.includes('street_number')) {
+                        parsedHouse = component.long_name;
+                    } else if (types.includes('locality')) {
+                        parsedCity = component.long_name;
+                    }
+                }
+
+                setParsedAddress({
+                    city: parsedCity,
+                    street: parsedStreet,
+                    house: parsedHouse
+                });
+                
+                setMapSearch(cleanAddressText(result.formatted_address || ''));
+                updateFormFromGeocode(parsedCity, parsedStreet, parsedHouse);
+            }
+        });
+    }, [updateFormFromGeocode]);
+
     const handleMapConfirm = () => {
         if (!mapMarker) return;
+
+        let streetVal = parsedAddress?.street || '';
+        let houseVal = parsedAddress?.house || '';
+        let cityVal = parsedAddress?.city || 'Київ';
+
+        if (!streetVal && mapSearch) {
+            const parts = mapSearch.split(',');
+            if (parts.length > 0) {
+                streetVal = parts[0].trim();
+            }
+            if (parts.length > 1) {
+                houseVal = parts[1].trim();
+            }
+        }
+
+        if (!streetVal) {
+            streetVal = mapSearch || `Координати: ${mapMarker.lat.toFixed(4)}, ${mapMarker.lng.toFixed(4)}`;
+        }
+
         onAdd({
             id: Math.random().toString(36).substr(2, 9),
             title: 'Вибрана на карті',
-            street: mapSearch || `Координати: ${mapMarker.lat.toFixed(4)}, ${mapMarker.lng.toFixed(4)}`,
-            city: 'Київ', // Default for map for now
-        });
+            street: streetVal,
+            streetId: streetId,
+            city: cityVal,
+            house: houseVal,
+        } as any);
         handleClose();
     };
 
@@ -128,9 +297,11 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
         if (e.latLng) {
             const lat = e.latLng.lat();
             const lng = e.latLng.lng();
-            setMapMarker({ lat, lng });
+            const pos = { lat, lng };
+            setMapMarker(pos);
+            geocodePosition(pos);
         }
-    }, []);
+    }, [geocodePosition]);
 
     const onAutocompleteLoad = (autocomplete: google.maps.places.Autocomplete) => {
         autocompleteRef.current = autocomplete;
@@ -150,7 +321,32 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                     map.panTo(newPos);
                     map.setZoom(16);
                 }
+
+                // Parse address components
+                const components = place.address_components || [];
+                let parsedStreet = '';
+                let parsedHouse = '';
+                let parsedCity = 'Київ';
+
+                for (const component of components) {
+                    const types = component.types;
+                    if (types.includes('route')) {
+                        parsedStreet = component.long_name;
+                    } else if (types.includes('street_number')) {
+                        parsedHouse = component.long_name;
+                    } else if (types.includes('locality')) {
+                        parsedCity = component.long_name;
+                    }
+                }
+
+                setParsedAddress({
+                    city: parsedCity,
+                    street: parsedStreet,
+                    house: parsedHouse
+                });
+
                 setMapSearch(cleanAddressText(place.formatted_address || ''));
+                updateFormFromGeocode(parsedCity, parsedStreet, parsedHouse);
             }
         }
     };
@@ -184,22 +380,25 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                         <h2 className={s.title}>Додати адресу</h2>
                         <form className={s.form} onSubmit={handleFormSubmit}>
                             <div className={s.formRow}>
-                                <InputField 
+                                <SearchableSelect
                                     id="city"
                                     label="Місто"
                                     value={city}
-                                    onChange={(e) => setCity(e.target.value)}
+                                    onSearch={handleCitySearch}
+                                    onSelect={handleCitySelect}
                                     required
                                     className={s.cityField}
                                 />
                             </div>
                             <div className={s.formRow}>
-                                <InputField 
+                                <SearchableSelect
                                     id="street"
                                     label="Вулиця"
                                     value={street}
-                                    onChange={(e) => setStreet(e.target.value)}
+                                    onSearch={handleStreetSearch}
+                                    onSelect={handleStreetSelect}
                                     required
+                                    disabled={!cityId}
                                     className={s.streetField}
                                 />
                                 <button 
@@ -223,27 +422,31 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                                     value={house}
                                     onChange={(e) => setHouse(e.target.value)}
                                     required
+                                    disabled={!street}
                                 />
                                 <InputField 
                                     id="apartment"
                                     label="Квартира"
                                     value={apartment}
                                     onChange={(e) => setApartment(e.target.value)}
+                                    disabled={!street}
                                 />
                                 <InputField 
                                     id="entrance"
                                     label="Під’їзд"
                                     value={entrance}
                                     onChange={(e) => setEntrance(e.target.value)}
+                                    disabled={!street}
                                 />
                                 <InputField 
                                     id="floor"
                                     label="Поверх"
                                     value={floor}
                                     onChange={(e) => setFloor(e.target.value)}
+                                    disabled={!street}
                                 />
                             </div>
-                            <Button variant="red" type="submit" className={s.submitBtn}>
+                            <Button variant="red" type="submit" className={s.submitBtn} disabled={!street || !house}>
                                 ДОДАТИ АДРЕСУ
                             </Button>
                         </form>
