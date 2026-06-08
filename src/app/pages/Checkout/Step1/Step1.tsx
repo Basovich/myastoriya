@@ -5,7 +5,10 @@ import Image from 'next/image';
 import s from './Step1.module.scss';
 import InputField from '@/app/components/ui/InputField/index';
 import Button from '@/app/components/ui/Button/Button';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { setUser } from '@/store/slices/authSlice';
+import { getAccessToken } from '@/app/actions/authActions';
+import { sendSmsApi, smsVerifyApi, updateCheckoutUserDataApi } from '@/lib/graphql/queries/auth';
 import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from '@/app/components/CartModal/products_mock';
 import { useMemo } from 'react';
 import clsx from 'clsx';
@@ -57,6 +60,11 @@ export default function Step1() {
     const params = useParams();
     const locale = params?.lang as string;
     const { user, isAuthenticated } = useAppSelector(state => state.auth);
+    const dispatch = useAppDispatch();
+    const [smsToken, setSmsToken] = useState('');
+    const [smsSending, setSmsSending] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
     const [formData, setFormData] = useState<FormData>({
         firstName: '',
         lastName: '',
@@ -184,7 +192,11 @@ export default function Step1() {
         const errors: FormErrors = {};
         if (!formData.firstName.trim()) errors.firstName = "Обов'язкове поле";
         if (!formData.lastName.trim()) errors.lastName = "Обов'язкове поле";
-        if (!formData.phone.trim()) errors.phone = "Обов'язкове поле";
+        if (!formData.phone.trim()) {
+            errors.phone = "Обов'язкове поле";
+        } else if (!phoneVerified) {
+            errors.phone = "Підтвердіть номер телефону через SMS";
+        }
         if (!formData.agreed) errors.agreed = 'Потрібна згода';
         return errors;
     };
@@ -198,20 +210,13 @@ export default function Step1() {
         }
         
         setSmsError('');
+        setSmsSending(true);
         try {
-            const res = await fetch('/api/send-sms', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
-                },
-                body: JSON.stringify({ phone: formData.phone }),
-            });
-            const data = await res.json();
+            const result = await sendSmsApi(formData.phone, locale);
+            setSmsToken(result.token);
             
-            if (!res.ok) {
-                setSmsError(data.error || 'Помилка відправки SMS');
-                return;
+            if (result.code) {
+                console.info('[SMS DEV] Code:', result.code);
             }
             
             setSmsRequested(true);
@@ -230,8 +235,11 @@ export default function Step1() {
                     return prev - 1;
                 });
             }, 1000);
-        } catch {
-            setSmsError('Помилка мережі. Спробуйте ще раз.');
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Помилка відправки SMS';
+            setSmsError(msg);
+        } finally {
+            setSmsSending(false);
         }
     };
 
@@ -245,34 +253,22 @@ export default function Step1() {
         setSmsError('');
         
         try {
-            const res = await fetch('/api/verify-sms', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
-                },
-                body: JSON.stringify({ phone: formData.phone, code: formData.smsCode.trim() }),
-            });
-            const data = await res.json();
-            
-            if (data.valid) {
-                setPhoneVerified(true);
-                setSmsRequested(false);
-                setCodeSent(false);
-                setCountdown(0);
-                if (timerRef.current) clearInterval(timerRef.current);
-            } else {
-                setSmsError(data.error || 'Невірний код. Спробуйте ще раз.');
-                handleChange('smsCode', '');
-            }
-        } catch {
-            setSmsError('Помилка мережі. Спробуйте ще раз.');
+            await smsVerifyApi(smsToken, formData.smsCode.trim(), locale);
+            setPhoneVerified(true);
+            setSmsRequested(false);
+            setCodeSent(false);
+            setCountdown(0);
+            if (timerRef.current) clearInterval(timerRef.current);
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Невірний код. Спробуйте ще раз.';
+            setSmsError(msg);
+            handleChange('smsCode', '');
         } finally {
             setSmsVerifying(false);
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const allTouched: Touched = {
             firstName: true,
@@ -284,11 +280,44 @@ export default function Step1() {
         };
         setTouched(allTouched);
         if (Object.keys(errors).length > 0) return;
-        // Navigate to step 2
-        const url = new URL(window.location.href);
-        url.searchParams.set('step', '2');
-        window.history.pushState({}, '', url.toString());
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        setIsSubmitting(true);
+        setSubmitError('');
+        try {
+            const token = await getAccessToken();
+            await updateCheckoutUserDataApi(
+                {
+                    name: formData.firstName,
+                    surname: formData.lastName,
+                    phone: formData.phone,
+                    email: formData.email || undefined,
+                },
+                token || '',
+                locale
+            );
+
+            if (isAuthenticated) {
+                dispatch(setUser({
+                    ...user,
+                    name: formData.firstName,
+                    surname: formData.lastName,
+                    phone: formData.phone,
+                    email: formData.email || undefined,
+                }));
+            }
+
+            // Navigate to step 2
+            const url = new URL(window.location.href);
+            url.searchParams.set('step', '2');
+            window.history.pushState({}, '', url.toString());
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (err) {
+            console.error('Error updating checkout user data:', err);
+            const msg = err instanceof Error ? err.message : 'Помилка оновлення даних користувача';
+            setSubmitError(msg);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -402,13 +431,15 @@ export default function Step1() {
                                     id="send-sms-code-btn"
                                     className={s.sendCodeBtn}
                                     onClick={smsRequested ? handleVerifySms : handleSendSms}
-                                    disabled={(countdown > 0 && !smsRequested) || smsVerifying}
+                                    disabled={(countdown > 0 && !smsRequested) || smsVerifying || smsSending}
                                 >
-                                    {smsVerifying
-                                        ? 'Перевірка...'
-                                        : smsRequested
-                                            ? 'Підтвердити код'
-                                            : 'Відправити код'
+                                    {smsSending
+                                        ? 'Надсилання...'
+                                        : smsVerifying
+                                            ? 'Перевірка...'
+                                            : smsRequested
+                                                ? 'Підтвердити код'
+                                                : 'Відправити код'
                                     }
                                 </button>
                             </div>
@@ -453,13 +484,17 @@ export default function Step1() {
                         )}
                     </div>
 
+                    {submitError && (
+                        <div className={s.fieldError} style={{ marginBottom: '16px' }}>{submitError}</div>
+                    )}
                     <Button
                         type="submit"
                         variant="red"
                         id="checkout-next-btn"
                         className={s.submitBtn}
+                        disabled={isSubmitting}
                     >
-                        ДАЛІ
+                        {isSubmitting ? 'ЗАЧЕКАЙТЕ...' : 'ДАЛІ'}
                     </Button>
                 </form>
             </div>
