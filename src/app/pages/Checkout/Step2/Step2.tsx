@@ -9,116 +9,255 @@ import PromoBlock from '../components/PromoBlock/Index';
 import CustomSelect from '@/app/components/ui/CustomSelect/CustomSelect';
 import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
 import Button from '@/app/components/ui/Button/Button';
-import { useAppSelector } from '@/store/hooks';
+import Search from '@/app/components/ui/Search/Search';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import CartModal from '@/app/components/CartModal/CartModal';
 import AuthModal from '@/app/components/AuthModal';
-import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import AddressRow from '../components/AddressRow/AddressRow';
 import AddAddressModal from '@/app/components/AddAddressModal/AddAddressModal';
-import { addAddress } from '@/store/slices/authSlice';
-import { useDispatch } from 'react-redux';
 import Image from 'next/image';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
+import { getAccessToken } from '@/app/actions/authActions';
+import { setSelectedCity } from '@/store/slices/localitySlice';
+import { 
+    getLocalitiesApi, 
+    selectLocalityApi, 
+    getDeliveriesApi, 
+    getDeliveryTimesApi, 
+    getWarehousesApi, 
+    addUserPickupPointApi, 
+    getUserAddressesApi, 
+    createUserAddressApi, 
+    getShopsApi,
+    Locality,
+    Delivery,
+    Warehouse,
+    Shop
+} from '@/lib/graphql';
 
-// ── Mock Data ────────────────────────────────────────────────────────────────
-
-const MOCK_CITIES = [
-    { value: 'kyiv', label: 'Київ' },
-    { value: 'kyiv-region', label: 'Київська область' },
-    { value: 'lviv', label: 'Львів' },
-    { value: 'odesa', label: 'Одеса' },
-];
-
-const KYIV_DELIVERY = [
-    { id: 'courier-kyiv', label: 'Кур’єром по Києву', price: 125 },
-    { id: 'courier-region', label: 'Кур’єром в Київській області', price: 80 },
-    { id: 'pickup', label: 'Самовивіз з закладу М’ясторія', price: 0, free: true },
-];
-
-const OTHER_DELIVERY = [
-    { id: 'courier-nova-poshta', label: 'Курьєром Нової Пошти', price: 125, isNP: true },
-    { id: 'branch-nova-poshta', label: 'У відділення Нової Пошти', price: 225, isNP: true },
-];
-
-const MOCK_DATES = [
-    { value: 'today', label: 'Сьогодні' },
-    { value: 'tomorrow', label: 'Завтра' },
-];
-
-const SHOP_OPEN = 10;
-const SHOP_CLOSE = 22;
-
-function isTodayDate(date: Date | null) {
-    if (!date) return false;
-    const today = new Date();
-    return date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear();
+interface Address {
+    id: string;
+    title: string;
+    street: string;
 }
 
-// ── Main Step2 Component ──────────────────────────────────────────────────────
+function formatDeliveryTimesDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd} 00:00:00.000000`;
+}
+
+function formatDate(date: Date): string {
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}.${mm}.${yyyy}`;
+}
 
 export default function Step2() {
     const hydrated = useIsHydrated();
-    const dispatch = useDispatch();
-    const { isAuthenticated, user } = useAppSelector(state => state.auth);
-    const [guestAddresses, setGuestAddresses] = useState<{ id: string; title: string; street: string }[]>([]);
+    const dispatch = useAppDispatch();
+    const params = useParams();
+    const lang = (params?.lang as 'ua' | 'ru') || 'ua';
     
-    const addresses = [...(user?.addresses || []), ...guestAddresses];
-
-    const [city, setCity] = useState(MOCK_CITIES[0].value);
+    const { isAuthenticated } = useAppSelector(state => state.auth);
+    const selectedCity = useAppSelector(state => state.locality.selectedCity);
     
-    const deliveryMethods = city === 'kyiv' ? KYIV_DELIVERY : OTHER_DELIVERY;
-
-    const [deliveryMethod, setDeliveryMethod] = useState(deliveryMethods[0].id);
-    const [selectedAddressId, setSelectedAddressId] = useState<string | null>(addresses.length > 0 ? addresses[0].id : null);
+    // API lists
+    const [citiesList, setCitiesList] = useState<Locality[]>([]);
+    const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+    const [dbAddresses, setDbAddresses] = useState<any[]>([]);
+    const [guestAddresses, setGuestAddresses] = useState<Address[]>([]);
+    const [shops, setShops] = useState<Shop[]>([]);
+    
+    // Selected fields
+    const [deliveryMethod, setDeliveryMethod] = useState('');
+    const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+    const [selectedShopId, setSelectedShopId] = useState<string>('');
+    const [npSearchQuery, setNpSearchQuery] = useState('');
+    const [npResults, setNpResults] = useState<Warehouse[]>([]);
+    const [selectedNPRef, setSelectedNPRef] = useState<string>('');
+    const [isSearchingNP, setIsSearchingNP] = useState(false);
+    
     const [deliveryDate, setDeliveryDate] = useState<Date | null>(new Date());
-    
-    // Generate dynamic time slots
-    const availableTimeSlots = React.useMemo(() => {
-        const slots = [];
-        const isToday = isTodayDate(deliveryDate);
-        const currentHour = new Date().getHours();
-        
-        // Start from SHOP_OPEN or current hour + 1 for Today
-        const startHour = isToday ? Math.max(SHOP_OPEN, currentHour + 1) : SHOP_OPEN;
-        
-        for (let h = startHour; h < SHOP_CLOSE; h++) {
-            const nextH = h + 1;
-            const timeStr = `${h.toString().padStart(2, '0')}:00-${nextH.toString().padStart(2, '0')}:00`;
-            const label = `${h.toString().padStart(2, '0')}:00 - ${nextH.toString().padStart(2, '0')}:00`;
-            slots.push({ value: timeStr, label });
-        }
-        return slots;
-    }, [deliveryDate]);
-
+    const [deliveryTimes, setDeliveryTimes] = useState<string[]>([]);
     const [deliveryTime, setDeliveryTime] = useState('');
-
-    // Ensure deliveryTime is valid when available slots change
-    useEffect(() => {
-        if (availableTimeSlots.length > 0) {
-            const isValid = availableTimeSlots.some(s => s.value === deliveryTime);
-            if (!isValid) {
-                setDeliveryTime(availableTimeSlots[0].value);
-            }
-        } else {
-            setDeliveryTime('');
-        }
-    }, [availableTimeSlots, deliveryTime]);
-
-    // Reset delivery method when city changes
-    useEffect(() => {
-        setDeliveryMethod(city === 'kyiv' ? KYIV_DELIVERY[0].id : OTHER_DELIVERY[0].id);
-    }, [city]);
+    const [isLoadingTimes, setIsLoadingTimes] = useState(false);
     
-    // UI state
+    // UI states
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
-    
-    // Promo functionality (reused from Step 1)
+    const [validationError, setValidationError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number } | null>(null);
+    
+    const [restoredData, setRestoredData] = useState<any>(null);
 
+    // 1. Restore saved states from localStorage on mount
+    useEffect(() => {
+        const saved = localStorage.getItem('checkout_delivery_data');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                setRestoredData(parsed);
+                if (parsed.deliveryMethod) setDeliveryMethod(parsed.deliveryMethod);
+                if (parsed.selectedAddressId) setSelectedAddressId(parsed.selectedAddressId);
+                if (parsed.selectedShopId) setSelectedShopId(parsed.selectedShopId);
+                if (parsed.selectedNPRef) setSelectedNPRef(parsed.selectedNPRef);
+                if (parsed.npSearchQuery) setNpSearchQuery(parsed.npSearchQuery);
+                if (parsed.deliveryDate) setDeliveryDate(new Date(parsed.deliveryDate));
+                if (parsed.deliveryTime) setDeliveryTime(parsed.deliveryTime);
+            } catch (e) {
+                console.error('Failed to parse checkout delivery data', e);
+            }
+        }
+    }, []);
+
+    // 2. Load cities list on mount
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const res = await getLocalitiesApi(undefined, 100, 1, lang);
+                setCitiesList(res.data);
+            } catch (e) {
+                console.error('Failed to fetch cities list', e);
+            }
+        };
+        fetchCities();
+    }, [lang]);
+
+    // 3. Load user addresses if authenticated
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setDbAddresses([]);
+            return;
+        }
+        const fetchAddresses = async () => {
+            try {
+                const token = await getAccessToken();
+                if (token) {
+                    const res = await getUserAddressesApi(token);
+                    setDbAddresses(res);
+                }
+            } catch (e) {
+                console.error('Failed to fetch user addresses', e);
+            }
+        };
+        fetchAddresses();
+    }, [isAuthenticated]);
+
+    // 4. Load shops list on mount
+    useEffect(() => {
+        const fetchShops = async () => {
+            try {
+                const res = await getShopsApi({ limit: 100, onlyCompanyStores: true }, lang);
+                setShops(res.shops.data);
+            } catch (e) {
+                console.error('Failed to fetch shops', e);
+            }
+        };
+        fetchShops();
+    }, [lang]);
+
+    // 5. Initialize selected shop
+    useEffect(() => {
+        if (shops.length > 0 && !selectedShopId) {
+            setSelectedShopId(shops[0].id.toString());
+        }
+    }, [shops, selectedShopId]);
+
+    // 6. Fetch deliveries when city changes
+    useEffect(() => {
+        if (!selectedCity) return;
+        const fetchDeliveries = async () => {
+            try {
+                const res = await getDeliveriesApi(undefined, selectedCity.id, lang);
+                setDeliveries(res);
+                
+                // Determine what delivery method to select
+                let restored = '';
+                if (restoredData && res.some(d => d.id === restoredData.deliveryMethod)) {
+                    restored = restoredData.deliveryMethod;
+                } else {
+                    const saved = localStorage.getItem('checkout_delivery_data');
+                    if (saved) {
+                        try {
+                            const parsed = JSON.parse(saved);
+                            if (parsed.deliveryMethod && res.some(d => d.id === parsed.deliveryMethod)) {
+                                restored = parsed.deliveryMethod;
+                            }
+                        } catch (e) {}
+                    }
+                }
+                
+                if (restored) {
+                    setDeliveryMethod(restored);
+                } else {
+                    const firstEnabled = res.find(d => !d.disabled);
+                    if (firstEnabled) {
+                        setDeliveryMethod(firstEnabled.id);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to fetch deliveries for locality', e);
+            }
+        };
+        fetchDeliveries();
+    }, [selectedCity, lang, restoredData]);
+
+    // 7. Debounced search for Nova Poshta warehouses
+    useEffect(() => {
+        if (!selectedCity) {
+            setNpResults([]);
+            return;
+        }
+        const fetchNP = async () => {
+            setIsSearchingNP(true);
+            try {
+                const res = await getWarehousesApi(selectedCity.id, npSearchQuery, 50, 1, lang);
+                setNpResults(res.data);
+            } catch (e) {
+                console.error('Failed to fetch Nova Poshta warehouses', e);
+            } finally {
+                setIsSearchingNP(false);
+            }
+        };
+        const timer = setTimeout(fetchNP, 300);
+        return () => clearTimeout(timer);
+    }, [npSearchQuery, selectedCity, lang]);
+
+    // 8. Fetch dynamic delivery times
+    useEffect(() => {
+        if (!deliveryMethod || !deliveryDate) return;
+        const fetchTimes = async () => {
+            setIsLoadingTimes(true);
+            try {
+                const formattedDate = formatDeliveryTimesDate(deliveryDate);
+                const times = await getDeliveryTimesApi(parseInt(deliveryMethod, 10), formattedDate, lang);
+                setDeliveryTimes(times);
+                
+                if (times.length > 0) {
+                    if (!times.includes(deliveryTime)) {
+                        setDeliveryTime(times[0]);
+                    }
+                } else {
+                    setDeliveryTime('');
+                }
+            } catch (e) {
+                console.error('Failed to fetch delivery times', e);
+                setDeliveryTimes([]);
+                setDeliveryTime('');
+            } finally {
+                setIsLoadingTimes(false);
+            }
+        };
+        fetchTimes();
+    }, [deliveryMethod, deliveryDate, lang]);
+
+    // 9. Load saved promo
     useEffect(() => {
         const saved = localStorage.getItem('applied_promo');
         if (saved) {
@@ -133,14 +272,74 @@ export default function Step2() {
         }
     }, [isAuthenticated]);
 
+    // Address list mapping
+    const formattedDbAddresses = React.useMemo(() => {
+        return dbAddresses.map(addr => ({
+            id: addr.id.toString(),
+            title: addr.isDefault ? 'Основна адреса' : 'Адреса',
+            street: `вул. ${addr.street || ''}, буд. ${addr.house || ''}` + (addr.apartment ? `, кв. ${addr.apartment}` : '')
+        }));
+    }, [dbAddresses]);
+
+    const addresses = React.useMemo(() => {
+        return [...formattedDbAddresses, ...guestAddresses];
+    }, [formattedDbAddresses, guestAddresses]);
+
+    // Set default selected address
     useEffect(() => {
         if (addresses.length > 0 && !selectedAddressId) {
             setSelectedAddressId(addresses[0].id);
         }
     }, [addresses, selectedAddressId]);
 
-    const router = useRouter();
-    const cartItems = useAppSelector(state => state.cart.items);
+    const activeDelivery = React.useMemo(() => {
+        return deliveries.find(d => d.id === deliveryMethod);
+    }, [deliveries, deliveryMethod]);
+
+    const isCourier = activeDelivery?.driver === 'courier';
+    const isNP = activeDelivery?.driver === 'nova-poshta-postal';
+    const isShop = activeDelivery?.driver === 'shop';
+    const showDeliveryTimeBlock = activeDelivery ? activeDelivery.showDeliveryTime : true;
+    const elapsedForFree = activeDelivery?.elapsedForFree || 0;
+    const deliveryPrice = activeDelivery?.deliveryCost || 0;
+
+    const cityOptions = React.useMemo(() => {
+        const list = [...citiesList];
+        if (selectedCity && !list.some(c => c.id === selectedCity.id)) {
+            list.unshift(selectedCity);
+        }
+        return list.map(c => ({
+            value: c.id.toString(),
+            label: c.name
+        }));
+    }, [citiesList, selectedCity]);
+
+    const shopOptions = React.useMemo(() => {
+        return shops.map(shop => ({
+            value: shop.id.toString(),
+            label: shop.name || shop.siteName || `Магазин №${shop.id}`
+        }));
+    }, [shops]);
+
+    const timeOptions = React.useMemo(() => {
+        return deliveryTimes.map(t => ({
+            value: t,
+            label: t
+        }));
+    }, [deliveryTimes]);
+
+    const handleCityChange = async (cityIdStr: string) => {
+        const cityId = parseInt(cityIdStr, 10);
+        const cityObj = citiesList.find(c => c.id === cityId) || (selectedCity?.id === cityId ? selectedCity : null);
+        if (cityObj) {
+            dispatch(setSelectedCity(cityObj));
+            try {
+                await selectLocalityApi(cityId, lang);
+            } catch (e) {
+                console.error('Failed to select locality on backend', e);
+            }
+        }
+    };
 
     const handleBack = () => {
         const url = new URL(window.location.href);
@@ -149,23 +348,128 @@ export default function Step2() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleNext = () => {
-        const url = new URL(window.location.href);
-        url.searchParams.set('step', '3');
-        window.history.pushState({}, '', url.toString());
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleAddAddress = (address: { id: string; title: string; street: string }) => {
-        if (isAuthenticated) {
-            dispatch(addAddress(address));
-        } else {
-            setGuestAddresses(prev => [...prev, address]);
+    const handleNext = async () => {
+        setValidationError('');
+        
+        if (!activeDelivery) {
+            setValidationError('Будь ласка, оберіть спосіб доставки');
+            return;
         }
-        setSelectedAddressId(address.id);
+        
+        if (isCourier && !selectedAddressId) {
+            setValidationError('Будь ласка, додайте або оберіть адресу доставки');
+            return;
+        }
+        
+        if (isShop && !selectedShopId) {
+            setValidationError('Будь ласка, оберіть магазин для самовивозу');
+            return;
+        }
+        
+        if (isNP && !selectedNPRef) {
+            setValidationError('Будь ласка, оберіть відділення Нової Пошти');
+            return;
+        }
+        
+        if (showDeliveryTimeBlock && !deliveryTime) {
+            setValidationError('Будь ласка, оберіть бажаний час доставки');
+            return;
+        }
+        
+        setIsSubmitting(true);
+        
+        try {
+            let finalPickupPointId: number | null = null;
+            if (isShop || isNP) {
+                const token = await getAccessToken();
+                const type = isShop ? 'brand_store' : 'nova_poshta';
+                const key = isShop ? selectedShopId : selectedNPRef;
+                
+                const pickupPoint = await addUserPickupPointApi(type, key, token || '', lang);
+                finalPickupPointId = parseInt(pickupPoint.id, 10);
+            }
+            
+            // Save state to localStorage for back navigation / reload restoration
+            const rawData = {
+                deliveryMethod,
+                selectedAddressId,
+                selectedShopId,
+                selectedNPRef,
+                npSearchQuery,
+                deliveryDate: deliveryDate ? deliveryDate.toISOString() : null,
+                deliveryTime,
+            };
+            localStorage.setItem('checkout_delivery_data', JSON.stringify(rawData));
+            
+            // Save step 3 parameters
+            const checkoutDeliveryParams = {
+                deliveryId: parseInt(deliveryMethod, 10),
+                userAddressId: isCourier ? (selectedAddressId ? parseInt(selectedAddressId, 10) : null) : null,
+                desiredDeliveryDate: deliveryDate ? formatDate(deliveryDate) : null,
+                desiredDeliveryTime: deliveryTime || null,
+                userPickupPointId: finalPickupPointId,
+            };
+            localStorage.setItem('checkout_delivery_params', JSON.stringify(checkoutDeliveryParams));
+            
+            const url = new URL(window.location.href);
+            url.searchParams.set('step', '3');
+            window.history.pushState({}, '', url.toString());
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (e) {
+            console.error('Failed to proceed to step 3:', e);
+            setValidationError('Сталася помилка при збереженні вибору доставки. Спробуйте ще раз.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const freeDeliveryMissing = 1200;
+    const handleAddAddress = async (newAddr: {
+        id: string;
+        title: string;
+        street: string;
+        city?: string;
+        house?: string;
+        apartment?: string;
+        entrance?: string;
+        floor?: string;
+    }) => {
+        try {
+            const token = await getAccessToken();
+            if (token) {
+                const created = await createUserAddressApi({
+                    city: newAddr.city || selectedCity?.name || 'Київ',
+                    street: newAddr.street,
+                    house: newAddr.house || '',
+                    apartment: newAddr.apartment ? parseInt(newAddr.apartment, 10) : undefined,
+                    entrance: newAddr.entrance ? parseInt(newAddr.entrance, 10) : undefined,
+                    floor: newAddr.floor ? parseInt(newAddr.floor, 10) : undefined,
+                    isDefault: true,
+                }, token);
+                
+                setDbAddresses(prev => [created, ...prev]);
+                setSelectedAddressId(created.id.toString());
+            } else {
+                const tempAddr: Address = {
+                    id: newAddr.id || Math.random().toString(),
+                    title: newAddr.title || 'Тимчасова адреса',
+                    street: `вул. ${newAddr.street}, буд. ${newAddr.house || ''}` + (newAddr.apartment ? `, кв. ${newAddr.apartment}` : ''),
+                };
+                setGuestAddresses(prev => [...prev, tempAddr]);
+                setSelectedAddressId(tempAddr.id);
+            }
+        } catch (e) {
+            console.error('Failed to create address:', e);
+            const tempAddr: Address = {
+                id: newAddr.id || Math.random().toString(),
+                title: newAddr.title || 'Тимчасова адреса',
+                street: `вул. ${newAddr.street}, буд. ${newAddr.house || ''}` + (newAddr.apartment ? `, кв. ${newAddr.apartment}` : ''),
+            };
+            setGuestAddresses(prev => [...prev, tempAddr]);
+            setSelectedAddressId(tempAddr.id);
+        }
+    };
+
+    const currentCityId = selectedCity?.id?.toString() || '';
 
     return (
         <div className={s.layout}>
@@ -175,20 +479,27 @@ export default function Step2() {
 
                 <div className={s.formSection}>
                     <h2 className={s.sectionTitle}>Ваше місто ?</h2>
-                    <CustomSelect 
-                        options={MOCK_CITIES}
-                        value={city}
-                        onChange={setCity}
-                        className={s.citySelect}
-                    />
+                    {hydrated && (
+                        <CustomSelect 
+                            options={cityOptions}
+                            value={currentCityId}
+                            onChange={handleCityChange}
+                            className={s.citySelect}
+                        />
+                    )}
                 </div>
 
                 <div className={s.formSection}>
                     <h2 className={s.sectionTitle}>Оберіть спосіб доставки чи самовивозу</h2>
                     <div className={s.deliveryMethods}>
-                        {deliveryMethods.map(method => {
-                            const isCourier = ['courier-kyiv', 'courier-region', 'courier-nova-poshta'].includes(method.id);
+                        {deliveries.map(method => {
                             const isSelected = deliveryMethod === method.id;
+                            const isMethodCourier = method.driver === 'courier';
+                            const isMethodShop = method.driver === 'shop';
+                            const isMethodNP = method.driver === 'nova-poshta-postal';
+                            const showNpIcon = isMethodNP || method.name?.toLowerCase().includes('нова пошта') || method.type?.toLowerCase().includes('nova');
+
+                            if (method.disabled) return null;
 
                             return (
                                 <div key={method.id} className={s.methodContainer}>
@@ -203,11 +514,11 @@ export default function Step2() {
                                         />
                                         <span className={s.radioCircle} />
                                         <span className={s.methodLabel}>
-                                            {method.label} 
+                                            {method.name} 
                                             <span className={s.methodPrice}>
-                                                ({method.price === 0 ? 'Безкоштовно' : `${method.price} ₴`})
+                                                ({method.deliveryCost === 0 ? 'Безкоштовно' : `${method.deliveryCost} ₴`})
                                             </span>
-                                            {('isNP' in method && method.isNP) && (
+                                            {showNpIcon && (
                                                 <div className={s.npIconContainer}>
                                                     <Image
                                                         src="/icons/novaposhta_rounded.svg"
@@ -221,7 +532,7 @@ export default function Step2() {
                                         </span>
                                     </label>
                                     
-                                    {(hydrated && isSelected && isCourier) && (
+                                    {(hydrated && isSelected && isMethodCourier) && (
                                         <div className={s.nestedAddressRow}>
                                             <AddressRow 
                                                 addresses={addresses}
@@ -231,21 +542,79 @@ export default function Step2() {
                                             />
                                         </div>
                                     )}
+
+                                    {(hydrated && isSelected && isMethodShop) && (
+                                        <div className={s.nestedSelectRow}>
+                                            <h4 className={s.nestedSelectTitle}>Оберіть магазин М'ясторія:</h4>
+                                            <CustomSelect 
+                                                options={shopOptions}
+                                                value={selectedShopId}
+                                                onChange={setSelectedShopId}
+                                                placeholder="Оберіть магазин"
+                                                className={s.nestedSelect}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {(hydrated && isSelected && isMethodNP) && (
+                                        <div className={s.nestedSelectRow}>
+                                            <h4 className={s.nestedSelectTitle}>Введіть номер або адресу відділення Нової Пошти:</h4>
+                                            <Search 
+                                                value={npSearchQuery}
+                                                onChange={setNpSearchQuery}
+                                                placeholder="Пошук відділення (наприклад: 125 або Хрещатик)"
+                                                showButton={false}
+                                                className={s.nestedSearch}
+                                            />
+                                            {isSearchingNP ? (
+                                                <div className={s.npLoader}>Пошук відділень...</div>
+                                            ) : (
+                                                <div className={s.npResultsList}>
+                                                    {npResults.map(wh => {
+                                                        const isWhSelected = selectedNPRef === wh.ref;
+                                                        return (
+                                                            <div 
+                                                                key={wh.ref} 
+                                                                className={clsx(s.npResultItem, isWhSelected && s.npResultItemActive)}
+                                                                onClick={() => setSelectedNPRef(wh.ref)}
+                                                            >
+                                                                <div className={s.npName}>{wh.name}</div>
+                                                                {wh.schedule && wh.schedule.length > 0 && (
+                                                                    <div className={s.npSchedule}>
+                                                                        {wh.schedule.map((sch, idx) => (
+                                                                            <span key={idx} className={s.npScheduleItem}>
+                                                                                {sch.days}: {sch.workTime}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                    {!isSearchingNP && npResults.length === 0 && (
+                                                        <div className={s.npNoResults}>Нічого не знайдено</div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
                     </div>
                 </div>
 
-                <div className={s.freeDeliveryBlock}>
-                    <div className={s.freeDeliveryText}>
-                        Для безкоштовної доставки не вистачає <span>{freeDeliveryMissing} ₴</span>
+                {hydrated && elapsedForFree > 0 && (
+                    <div className={s.freeDeliveryBlock}>
+                        <div className={s.freeDeliveryText}>
+                            Для безкоштовної доставки не вистачає <span>{elapsedForFree} ₴</span>
+                        </div>
                     </div>
-                </div>
+                )}
 
-                <div className={s.formSection}>
-                    <h2 className={s.sectionTitle}>Оберіть бажаний час доставки чи самовивозу</h2>
-                    {hydrated && (
+                {hydrated && showDeliveryTimeBlock && (
+                    <div className={s.formSection}>
+                        <h2 className={s.sectionTitle}>Оберіть бажаний час доставки чи самовивозу</h2>
                         <div className={s.timeSelectors}>
                             <DatePicker 
                                 selected={deliveryDate}
@@ -253,7 +622,7 @@ export default function Step2() {
                                 className={s.timeSelect}
                             />
                             <CustomSelect 
-                                options={availableTimeSlots}
+                                options={timeOptions}
                                 value={deliveryTime}
                                 onChange={setDeliveryTime}
                                 className={s.timeSelect}
@@ -266,21 +635,27 @@ export default function Step2() {
                                 }
                             />
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
+
+                {validationError && (
+                    <div className={s.errorText}>{validationError}</div>
+                )}
 
                 <div className={s.actions}>
                     <Button 
                         variant="red" 
                         onClick={handleNext}
                         className={s.nextBtn}
+                        disabled={isSubmitting}
                     >
-                        ДАЛІ
+                        {isSubmitting ? 'ЗБЕРЕЖЕННЯ...' : 'ДАЛІ'}
                     </Button>
                     <button 
                         type="button" 
                         onClick={handleBack} 
                         className={s.backBtn}
+                        disabled={isSubmitting}
                     >
                         ПОВЕРНУТИСЯ НАЗАД
                     </button>
@@ -292,7 +667,7 @@ export default function Step2() {
                 <CartSummary 
                     onEditCart={() => setIsCartModalOpen(true)} 
                     discountPercent={appliedPromo?.discount || 0}
-                    deliveryPrice={deliveryMethods.find(m => m.id === deliveryMethod)?.price || 0}
+                    deliveryPrice={deliveryPrice}
                 />
                 {hydrated && (
                     <PromoBlock 

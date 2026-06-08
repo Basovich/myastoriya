@@ -248,3 +248,102 @@
         margin-top: 1px;
     }
 }
+
+.nestedSelectRow {
+    margin-top: 12px;
+    padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nestedSelectTitle {
+    color: #4a4a4a;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 120%;
+    margin-bottom: 4px;
+}
+
+.nestedSelect {
+    width: 100%;
+}
+
+.nestedSearch {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.npLoader {
+    font-size: 13px;
+    color: #888;
+    padding: 12px 0;
+}
+
+.npResultsList {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.npResultItem {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f2f2f2;
+    transition: background-color 0.2s;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            background-color: #f9f9f9;
+        }
+    }
+}
+
+.npResultItemActive {
+    background-color: #fff5f5;
+    border-left: 4px solid #E3051B;
+}
+
+.npName {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+}
+
+.npSchedule {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.npScheduleItem {
+    background: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.npNoResults {
+    padding: 16px;
+    font-size: 13px;
+    color: #999;
+    text-align: center;
+}
+
+.errorText {
+    color: #E3051B;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 12px;
+}

@@ -129,6 +129,21 @@ export {
 } from './queries/localities';
 export type { Locality } from './queries/localities';
 
+// Re-export deliveries
+export {
+    getDeliveriesApi,
+    getDeliveryTimesApi,
+    getWarehousesApi,
+    addUserPickupPointApi,
+    deleteUserPickupPointApi,
+    getUserPickupPointsApi,
+} from './queries/deliveries';
+export type { Delivery, UserPickupPoint, Warehouse, WarehousePagination, Schedule } from './queries/deliveries';
+
+// Re-export addresses
+export { getUserAddressesApi, createUserAddressApi } from './queries/addresses';
+export type { UserAddress } from './queries/addresses';
+
 // Re-export shops
 export { getShopsApi, getContactsShopsApi, SHOPS_QUERY } from './queries/shops';
 export type { Shop, ShopSchedule, ShopsResponse } from './queries/shops';
