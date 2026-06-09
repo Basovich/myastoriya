@@ -514,7 +514,7 @@ export default function Step2() {
         return deliveries.find(d => d.id === deliveryMethod);
     }, [deliveries, deliveryMethod]);
 
-    const isCourier = activeDelivery?.driver === 'courier';
+    const isCourier = activeDelivery?.type === 'courier';
     const isNP = activeDelivery?.driver === 'nova-poshta-postal';
     const isShop = activeDelivery?.driver === 'shop';
     const showDeliveryTimeBlock = activeDelivery ? activeDelivery.showDeliveryTime : true;
@@ -803,7 +803,7 @@ export default function Step2() {
                     <div className={s.deliveryMethods}>
                         {deliveries.map(method => {
                             const isSelected = deliveryMethod === method.id;
-                            const isMethodCourier = method.driver === 'courier';
+                            const isMethodCourier = method.type === 'courier';
                             const isMethodShop = method.driver === 'shop';
                             const isMethodNP = method.driver === 'nova-poshta-postal';
                             const showNpIcon = isMethodNP || method.name?.toLowerCase().includes('нова пошта') || method.type?.toLowerCase().includes('nova');
