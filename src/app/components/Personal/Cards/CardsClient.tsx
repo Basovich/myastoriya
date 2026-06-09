@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import clsx from 'clsx';
 import s from './CardsClient.module.scss';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
@@ -22,13 +21,11 @@ const localDict = {
     ua: {
         subtitle: "Ваші банківські картки",
         addCard: "Додати картку",
-        noCards: "Немає збережених карток",
         loading: "Завантаження карток...",
     },
     ru: {
         subtitle: "Ваши банковские карты",
         addCard: "Добавить карту",
-        noCards: "Нет сохраненных карт",
         loading: "Загрузка карт...",
     }
 };
@@ -172,9 +169,6 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
                             lang={lang}
                         />
                     </div>
-                )}
-                {!isLoading && cards.length === 0 && (
-                    <div className={s.noCards}>{dict.noCards}</div>
                 )}
             </PersonalContentBlock>
         </div>
