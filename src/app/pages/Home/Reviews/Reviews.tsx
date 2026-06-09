@@ -111,7 +111,7 @@ export default function Reviews({ dict, reviews }: ReviewsProps) {
                                                     <button className={s.readMoreBtn} onClick={() => toggleExpand(review.id)}>
                                                         {isExpanded ? dict.collapseText : dict.readMoreText}
                                                         <svg style={{ transform: isExpanded ? 'rotate(180deg)' : 'none' }} xmlns="http://www.w3.org/2000/svg" width="14" height="8" viewBox="0 0 14 8" fill="none">
-                                                            <path d="M0.799805 0.799805L6.7998 6.7998L12.7998 0.799805" stroke="#E3051B" strokeWidth="1.6" strokeLinecap="round" />
+                                                            <path d="M0.799805 0.799805L6.7998 6.7998L12.7998 0.799805" strokeWidth="1.6" strokeLinecap="round" />
                                                         </svg>
                                                     </button>
                                                 )}

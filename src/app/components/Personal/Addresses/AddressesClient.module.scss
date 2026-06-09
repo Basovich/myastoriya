@@ -80,7 +80,7 @@ div.contentBlock {
 .cardHeader {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 12px;
 }
 
@@ -91,11 +91,13 @@ div.contentBlock {
 }
 
 .deleteBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
     padding: 4px;
     cursor: pointer;
-    margin-top: -8px;
     transition: color 0.2s;
 
     @media (any-hover: hover) {
@@ -139,7 +141,7 @@ div.contentBlock {
     justify-content: center;
     gap: 8px;
     height: 32px;
-    border: 1px solid #E2E2E2;
+    border: 1px solid #000;
     border-radius: 8px;
     color: #000;
     font-size: 10px;

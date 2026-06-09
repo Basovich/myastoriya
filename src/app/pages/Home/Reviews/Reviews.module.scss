@@ -246,9 +246,25 @@ div.reviewsSlider {
     font-weight: 700;
     line-height: 120%;
     margin-top: 14px;
+    transition: color 0.2s;
+
+    @media (any-hover: hover) {
+      &:hover {
+          color: #000;
+
+          svg path {
+              stroke: #000;
+          }
+      }
+    }
 
     svg {
         margin-bottom: 2px;
+
+        path {
+            stroke: #E3051B;
+            transition: stroke 0.2s;
+        }
     }
 }
 
