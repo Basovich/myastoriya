@@ -1,0 +1,139 @@
+.pickupRow {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-top: 8px;
+    padding-left: 2px;
+    padding-bottom: 12px;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    @media (min-width: 1024px) {
+        flex-wrap: wrap;
+        overflow: visible;
+    }
+}
+
+.pickupCard {
+    width: 208px;
+    height: 118px;
+    min-width: 208px;
+    background: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.11);
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.15);
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.pickupCardActive {
+    outline: 1.5px solid #E3051B;
+    box-shadow: 0 4px 12px rgba(227, 5, 27, 0.15);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.cardTitle {
+    font-size: 11px;
+    color: #4F4F4F;
+    opacity: 0.6;
+}
+
+.storeLogo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cardBody {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+}
+
+.cardAddress {
+    font-size: 13px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.4;
+}
+
+.cardSchedule {
+    font-size: 10px;
+    color: #4F4F4F;
+    opacity: 0.8;
+}
+
+.addPickupCard {
+    width: 208px;
+    height: 118px;
+    min-width: 208px;
+    background: #fff;
+    border: none;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.11);
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+
+    span {
+        font-size: 12px;
+        font-weight: 700;
+        color: #000;
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            background: #FAFAFA;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.15);
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #E3051B;
+        outline-offset: 2px;
+    }
+}
+
+.plusCircle {
+    width: 56px;
+    height: 56px;
+    border-radius: 56px;
+    background: #F6F6F6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.20);
+}

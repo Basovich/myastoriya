@@ -16,6 +16,8 @@ import AuthModal from '@/app/components/AuthModal';
 import { useParams } from 'next/navigation';
 import AddressRow from '../components/AddressRow/AddressRow';
 import AddAddressModal from '@/app/components/AddAddressModal/AddAddressModal';
+import PickupPointRow from '../components/PickupPointRow/PickupPointRow';
+import AddPickupModal from '@/app/components/Personal/Pickup/AddPickupModal';
 import Image from 'next/image';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { getAccessToken } from '@/app/actions/authActions';
@@ -26,13 +28,15 @@ import {
     getDeliveryTimesApi, 
     getWarehousesApi, 
     addUserPickupPointApi, 
+    getUserPickupPointsApi,
     getUserAddressesApi, 
     createUserAddressApi, 
     getShopsApi,
     Locality,
     Delivery,
     Warehouse,
-    Shop
+    Shop,
+    UserPickupPoint
 } from '@/lib/graphql';
 
 interface Address {
@@ -96,11 +100,14 @@ export default function Step2() {
     const [dbAddresses, setDbAddresses] = useState<any[]>([]);
     const [guestAddresses, setGuestAddresses] = useState<Address[]>([]);
     const [shops, setShops] = useState<Shop[]>([]);
+    const [userPickupPoints, setUserPickupPoints] = useState<UserPickupPoint[]>([]);
+    const [guestPickupPoints, setGuestPickupPoints] = useState<UserPickupPoint[]>([]);
 
     // Selected fields
     const [deliveryMethod, setDeliveryMethod] = useState('');
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [selectedShopId, setSelectedShopId] = useState<string>('');
+    const [isAddPickupModalOpen, setIsAddPickupModalOpen] = useState(false);
     const [npSearchQuery, setNpSearchQuery] = useState('');
     const [npResults, setNpResults] = useState<Warehouse[]>([]);
     const [selectedNPRef, setSelectedNPRef] = useState<string>('');
@@ -295,12 +302,25 @@ export default function Step2() {
         fetchShops();
     }, [lang]);
 
-    // 5. Initialize selected shop
+    // 5. Load user pickup points if authenticated
     useEffect(() => {
-        if (shops.length > 0 && !selectedShopId) {
-            setSelectedShopId(shops[0].id.toString());
+        if (!isAuthenticated) {
+            setUserPickupPoints([]);
+            return;
         }
-    }, [shops, selectedShopId]);
+        const fetchPoints = async () => {
+            try {
+                const token = await getAccessToken();
+                if (token) {
+                    const data = await getUserPickupPointsApi('brand_store', token, lang);
+                    setUserPickupPoints(data);
+                }
+            } catch (e) {
+                console.error('Failed to fetch user pickup points', e);
+            }
+        };
+        fetchPoints();
+    }, [isAuthenticated, lang]);
 
     // 6. Fetch deliveries when city or cart changes
     useEffect(() => {
@@ -510,6 +530,52 @@ export default function Step2() {
         }
     }, [addresses, selectedAddressId]);
 
+    const pickupPoints = React.useMemo(() => {
+        return [...userPickupPoints, ...guestPickupPoints];
+    }, [userPickupPoints, guestPickupPoints]);
+
+    // Set default selected shop
+    useEffect(() => {
+        if (pickupPoints.length > 0) {
+            const exists = pickupPoints.some(point => {
+                const matchedShop = shops.find(s => s.name === point.name || s.siteName === point.name);
+                return matchedShop && matchedShop.id.toString() === selectedShopId;
+            });
+            if (!exists) {
+                const defaultPoint = pickupPoints.find(p => p.isDefault) || pickupPoints[0];
+                const matchedShop = shops.find(s => s.name === defaultPoint.name || s.siteName === defaultPoint.name);
+                if (matchedShop) {
+                    setSelectedShopId(matchedShop.id.toString());
+                }
+            }
+        }
+    }, [pickupPoints, shops, selectedShopId]);
+
+    // Restore selected shop from restoredData / localStorage as virtual guest point if not in user points
+    useEffect(() => {
+        if (restoredData?.selectedShopId && shops.length > 0) {
+            const shopId = restoredData.selectedShopId;
+            const matchedShop = shops.find(s => s.id.toString() === shopId.toString());
+            if (matchedShop) {
+                const matchedInPoints = pickupPoints.some(p => p.name === matchedShop.name || p.name === matchedShop.siteName);
+                if (!matchedInPoints) {
+                    const tempPoint: UserPickupPoint = {
+                        id: `restored-${matchedShop.id}`,
+                        isDefault: false,
+                        type: 'brand_store',
+                        name: matchedShop.name || matchedShop.siteName || '',
+                        schedule: matchedShop.schedule || []
+                    };
+                    setGuestPickupPoints(prev => {
+                        if (prev.some(p => p.id === tempPoint.id)) return prev;
+                        return [...prev, tempPoint];
+                    });
+                }
+                setSelectedShopId(shopId.toString());
+            }
+        }
+    }, [restoredData, shops, pickupPoints]);
+
     const activeDelivery = React.useMemo(() => {
         return deliveries.find(d => d.id === deliveryMethod);
     }, [deliveries, deliveryMethod]);
@@ -699,6 +765,43 @@ export default function Step2() {
         }
     };
 
+    const handleAddPickupPoint = async (store: {
+        id: string;
+        name: string;
+        address: string;
+        hours: string;
+        lat: number;
+        lng: number;
+    }) => {
+        try {
+            const token = await getAccessToken();
+            if (token && isAuthenticated) {
+                const newPoint = await addUserPickupPointApi('brand_store', store.id, token, lang);
+                setUserPickupPoints(prev => {
+                    if (prev.some(p => p.id === newPoint.id)) return prev;
+                    return [...prev, newPoint];
+                });
+            } else {
+                const tempPoint: UserPickupPoint = {
+                    id: `guest-${store.id}`,
+                    isDefault: false,
+                    type: 'brand_store',
+                    name: store.name,
+                    schedule: [{ days: 'Пн-Нд', workTime: store.hours }]
+                };
+                setGuestPickupPoints(prev => {
+                    if (prev.some(p => p.id === tempPoint.id)) return prev;
+                    return [...prev, tempPoint];
+                });
+            }
+            setSelectedShopId(store.id);
+            setIsAddPickupModalOpen(false);
+        } catch (e) {
+            console.error('Failed to add pickup point:', e);
+        }
+    };
+
+
     return (
         <div className={s.layout}>
             {/* ── Left: Delivery Form ── */}
@@ -856,56 +959,18 @@ export default function Step2() {
                                     )}
 
                                     {(hydrated && isSelected && isMethodShop) && (
-                                        <div className={s.nestedSelectRow}>
-                                            <h4 className={s.nestedSelectTitle}>Оберіть магазин М'ясторія:</h4>
-                                            <div className={s.citySelectContainer} ref={shopSelectRef}>
-                                                <button
-                                                    type="button"
-                                                    className={clsx(s.citySelectBtn, isOpenShopSelect && s.isOpen)}
-                                                    onClick={() => setIsOpenShopSelect(!isOpenShopSelect)}
-                                                >
-                                                    <span>{selectedShopName}</span>
-                                                    <svg
-                                                        className={clsx(s.arrow, isOpenShopSelect && s.arrowOpen)}
-                                                        width="20"
-                                                        height="20"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        strokeWidth="2.5"
-                                                    >
-                                                        <polyline points="6 9 12 15 18 9" />
-                                                    </svg>
-                                                </button>
-
-                                                {isOpenShopSelect && (
-                                                    <div className={s.cityDropdown}>
-                                                        <div className={s.cityList}>
-                                                            {shops.map((shop) => {
-                                                                const isShopSelected = selectedShopId === shop.id.toString();
-                                                                const shopName = shop.name || shop.siteName || `Магазин №${shop.id}`;
-                                                                return (
-                                                                    <div
-                                                                        key={shop.id}
-                                                                        className={clsx(
-                                                                            s.cityItem,
-                                                                            isShopSelected && s.cityItemSelected
-                                                                        )}
-                                                                        onClick={() => {
-                                                                            setSelectedShopId(shop.id.toString());
-                                                                            setIsOpenShopSelect(false);
-                                                                        }}
-                                                                    >
-                                                                        {shopName}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
+                                        <div className={s.nestedAddressRow}>
+                                            <PickupPointRow
+                                                points={pickupPoints}
+                                                shops={shops}
+                                                selectedShopId={selectedShopId}
+                                                onSelect={setSelectedShopId}
+                                                onAddClick={() => setIsAddPickupModalOpen(true)}
+                                                lang={lang}
+                                            />
                                         </div>
                                     )}
+
 
                                     {(hydrated && isSelected && isMethodNP) && (
                                         <div className={s.nestedSelectRow} ref={npSelectRef} onFocusCapture={() => setIsOpenNPDropdown(true)}>
@@ -1069,6 +1134,13 @@ export default function Step2() {
                 onClose={() => setIsAddAddressModalOpen(false)} 
                 onAdd={handleAddAddress}
             />
+            <AddPickupModal 
+                isOpen={isAddPickupModalOpen}
+                onClose={() => setIsAddPickupModalOpen(false)}
+                onAdd={handleAddPickupPoint}
+                lang={lang}
+            />
         </div>
     );
 }
+
