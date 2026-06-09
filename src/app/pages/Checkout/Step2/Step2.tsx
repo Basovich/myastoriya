@@ -446,12 +446,26 @@ export default function Step2() {
 
     // Address list mapping
     const formattedDbAddresses = React.useMemo(() => {
-        return dbAddresses.map(addr => ({
-            id: addr.id.toString(),
-            title: addr.isDefault ? 'Основна адреса' : 'Адреса',
-            street: `вул. ${addr.street || ''}, буд. ${addr.house || ''}` + (addr.apartment ? `, кв. ${addr.apartment}` : '')
-        }));
-    }, [dbAddresses]);
+        return dbAddresses.map(addr => {
+            const title = lang === 'ua' 
+                ? (addr.isDefault ? 'Основна адреса' : 'Адреса') 
+                : (addr.isDefault ? 'Основной адрес' : 'Адрес');
+            
+            const streetPrefix = lang === 'ua' ? 'вул. ' : 'ул. ';
+            const housePrefix = lang === 'ua' ? ', буд. ' : ', дом ';
+            const aptPrefix = lang === 'ua' ? ', кв. ' : ', кв. ';
+            
+            const streetVal = addr.street || '';
+            const houseVal = addr.house ? `${housePrefix}${addr.house}` : '';
+            const aptVal = addr.apartment ? `${aptPrefix}${addr.apartment}` : '';
+            
+            return {
+                id: addr.id.toString(),
+                title,
+                street: `${streetPrefix}${streetVal}${houseVal}${aptVal}`
+            };
+        });
+    }, [dbAddresses, lang]);
 
     const addresses = React.useMemo(() => {
         return [...formattedDbAddresses, ...guestAddresses];
@@ -623,20 +637,28 @@ export default function Step2() {
                 setDbAddresses(prev => [created, ...prev]);
                 setSelectedAddressId(created.id.toString());
             } else {
+                const streetPrefix = lang === 'ua' ? 'вул. ' : 'ул. ';
+                const housePrefix = lang === 'ua' ? ', буд. ' : ', дом ';
+                const aptPrefix = lang === 'ua' ? ', кв. ' : ', кв. ';
+                
                 const tempAddr: Address = {
                     id: newAddr.id || Math.random().toString(),
-                    title: newAddr.title || 'Тимчасова адреса',
-                    street: `вул. ${newAddr.street}, буд. ${newAddr.house || ''}` + (newAddr.apartment ? `, кв. ${newAddr.apartment}` : ''),
+                    title: newAddr.title || (lang === 'ua' ? 'Тимчасова адреса' : 'Временный адрес'),
+                    street: `${streetPrefix}${newAddr.street}${newAddr.house ? `${housePrefix}${newAddr.house}` : ''}${newAddr.apartment ? `${aptPrefix}${newAddr.apartment}` : ''}`,
                 };
                 setGuestAddresses(prev => [...prev, tempAddr]);
                 setSelectedAddressId(tempAddr.id);
             }
         } catch (e) {
             console.error('Failed to create address:', e);
+            const streetPrefix = lang === 'ua' ? 'вул. ' : 'ул. ';
+            const housePrefix = lang === 'ua' ? ', буд. ' : ', дом ';
+            const aptPrefix = lang === 'ua' ? ', кв. ' : ', кв. ';
+            
             const tempAddr: Address = {
                 id: newAddr.id || Math.random().toString(),
-                title: newAddr.title || 'Тимчасова адреса',
-                street: `вул. ${newAddr.street}, буд. ${newAddr.house || ''}` + (newAddr.apartment ? `, кв. ${newAddr.apartment}` : ''),
+                title: newAddr.title || (lang === 'ua' ? 'Тимчасова адреса' : 'Временный адрес'),
+                street: `${streetPrefix}${newAddr.street}${newAddr.house ? `${housePrefix}${newAddr.house}` : ''}${newAddr.apartment ? `${aptPrefix}${newAddr.apartment}` : ''}`,
             };
             setGuestAddresses(prev => [...prev, tempAddr]);
             setSelectedAddressId(tempAddr.id);
