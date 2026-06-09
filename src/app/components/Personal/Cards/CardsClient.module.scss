@@ -2,21 +2,25 @@
     width: 100%;
 }
 
-.contentBlock {
-    padding: 24px 16px;
+div.contentBlock {
+    padding: 20px;
+    gap: 16px;
 
-    @media (min-width: 768px) {
-        padding: 40px;
+    @media (min-width: 1024px) {
+        padding: 32px;
+        gap: 0;
     }
 }
 
 .subtitle {
-    font-size: 14px;
-    font-weight: 700;
     color: #000;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
 
-    @media (min-width: 1280px) {
-        font-size: 16px;
+    @media (min-width: 1024px) {
+        margin-bottom: 20px;
     }
 }
 

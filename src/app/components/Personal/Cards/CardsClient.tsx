@@ -8,6 +8,7 @@ import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
 import { AuthUser } from '@/store/slices/authSlice';
 import BankCardItem, { type BankCard } from './BankCardItem';
 import AddBankCardBtn from './AddBankCardBtn';
+import DeleteCardModal from './DeleteCardModal';
 import { 
     getUserBankCardsApi, 
     deleteUserBankCardApi, 
@@ -39,6 +40,8 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
     const [cards, setCards] = useState<BankCard[]>([]);
     const [selectedCardId, setSelectedCardId] = useState<string>('');
     const [isLoading, setIsLoading] = useState(true);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [cardToDeleteId, setCardToDeleteId] = useState<string | null>(null);
     
     const pDict = personalDict[lang];
     const dict = localDict[lang];
@@ -82,21 +85,28 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
         return () => window.removeEventListener('focus', handleFocus);
     }, [fetchCards]);
 
-    const handleDelete = async (id: string) => {
-        if (window.confirm(lang === 'ua' ? 'Ви впевнені?' : 'Вы уверены?')) {
-            try {
-                const token = await getAccessToken();
-                if (!token) return;
-                const success = await deleteUserBankCardApi(id, token, lang);
-                if (success) {
-                    setCards(prev => prev.filter(c => c.id !== id));
-                    if (selectedCardId === id) {
-                        setSelectedCardId('');
-                    }
+    const handleDeleteClick = (id: string) => {
+        setCardToDeleteId(id);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!cardToDeleteId) return;
+        try {
+            const token = await getAccessToken();
+            if (!token) return;
+            const success = await deleteUserBankCardApi(cardToDeleteId, token, lang);
+            if (success) {
+                setCards(prev => prev.filter(c => c.id !== cardToDeleteId));
+                if (selectedCardId === cardToDeleteId) {
+                    setSelectedCardId('');
                 }
-            } catch (e) {
-                console.error('Failed to delete card:', e);
             }
+        } catch (e) {
+            console.error('Failed to delete card:', e);
+        } finally {
+            setIsDeleteModalOpen(false);
+            setCardToDeleteId(null);
         }
     };
 
@@ -158,7 +168,7 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
                                 card={card}
                                 isSelected={selectedCardId === card.id}
                                 onSelect={handleSelect}
-                                onDelete={handleDelete}
+                                onDelete={handleDeleteClick}
                                 lang={lang}
                                 showDelete
                             />
@@ -170,7 +180,14 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
                         />
                     </div>
                 )}
+                <DeleteCardModal 
+                    isOpen={isDeleteModalOpen}
+                    onClose={() => setIsDeleteModalOpen(false)}
+                    onConfirm={handleConfirmDelete}
+                    lang={lang}
+                />
             </PersonalContentBlock>
         </div>
     );
+
 }
