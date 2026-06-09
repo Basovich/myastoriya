@@ -46,8 +46,10 @@ function formatPhone(phone: string): string {
 // ── Mock Data ────────────────────────────────────────────────────────────────
 
 const CONTACT_METHODS = [
+    { value: 'phone', label: 'Телефон' },
+    { value: 'telegram', label: 'Telegram' },
+    { value: 'viber', label: 'Viber' },
     { value: 'no-call', label: 'Не передзвонювати' },
-    { value: 'call', label: 'Передзвонити для уточнення' },
 ];
 
 import { type Locale } from '@/i18n/config';
@@ -305,7 +307,7 @@ export default function Step3({ lang }: Step3Props) {
                     paymentData,
                     comment: comment || undefined,
                     personsCount: personsCount,
-                    communicationMethod: contactMethod === 'no-call' ? 'no-call' : 'call',
+                    communicationMethod: contactMethod,
                     dontCallBack: contactMethod === 'no-call',
                     useBonuses: false,
                 },
@@ -442,7 +444,9 @@ export default function Step3({ lang }: Step3Props) {
                         <CustomSelect 
                             options={lang === 'ru' ? CONTACT_METHODS.map(m => ({
                                 value: m.value,
-                                label: m.value === 'no-call' ? 'Не перезванивать' : 'Перезвонить для уточнения'
+                                label: m.value === 'phone' ? 'Телефон' : 
+                                       m.value === 'telegram' ? 'Telegram' :
+                                       m.value === 'viber' ? 'Viber' : 'Не перезванивать'
                             })) : CONTACT_METHODS}
                             value={contactMethod}
                             onChange={setContactMethod}
