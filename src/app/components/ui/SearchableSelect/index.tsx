@@ -16,7 +16,7 @@ interface SearchableSelectProps {
     placeholder?: string;
     required?: boolean;
     disabled?: boolean;
-    onSearch: (query: string) => Promise<Option[]>;
+    onSearch: (query: string, page: number) => Promise<{ data: Option[]; hasMore: boolean }>;
     onSelect: (option: Option | null) => void;
     className?: string;
 }
@@ -38,6 +38,11 @@ export default function SearchableSelect({
     const [isLoading, setIsLoading] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
 
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+
     const wrapperRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -53,8 +58,10 @@ export default function SearchableSelect({
         const fetchOptions = async () => {
             setIsLoading(true);
             try {
-                const results = await onSearch(searchQuery);
-                setOptions(results);
+                const result = await onSearch(searchQuery, 1);
+                setOptions(result.data);
+                setHasMore(result.hasMore);
+                setPage(1);
             } catch (error) {
                 console.error('Failed to search options:', error);
             } finally {
@@ -112,6 +119,30 @@ export default function SearchableSelect({
         }
     };
 
+    const handleLoadMore = async () => {
+        if (isLoadingMore || !hasMore) return;
+        setIsLoadingMore(true);
+        try {
+            const nextPage = page + 1;
+            const result = await onSearch(searchQuery, nextPage);
+            setOptions(prev => [...prev, ...result.data]);
+            setHasMore(result.hasMore);
+            setPage(nextPage);
+        } catch (error) {
+            console.error('Failed to load more options:', error);
+        } finally {
+            setIsLoadingMore(false);
+        }
+    };
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.currentTarget;
+        const reachedBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
+        if (reachedBottom) {
+            handleLoadMore();
+        }
+    };
+
     const hasValue = searchQuery !== '' || value !== '';
 
     return (
@@ -163,7 +194,7 @@ export default function SearchableSelect({
 
             {/* Dropdown Options List */}
             {isOpen && !disabled && (
-                <div className={s.dropdown}>
+                <div className={s.dropdown} onScroll={handleScroll}>
                     {isLoading ? (
                         <div className={s.loading}>
                             <div className={s.spinner}></div>
@@ -179,6 +210,11 @@ export default function SearchableSelect({
                                     {option.name}
                                 </li>
                             ))}
+                            {isLoadingMore && (
+                                <li className={s.loadingMore}>
+                                    <div className={s.spinner}></div>
+                                </li>
+                            )}
                         </ul>
                     ) : (
                         <div className={s.noOptions}>Не знайдено</div>

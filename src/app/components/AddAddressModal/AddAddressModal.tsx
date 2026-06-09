@@ -170,26 +170,33 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
         }
     }, [lang]);
 
-    const handleCitySearch = useCallback(async (query: string) => {
+    const handleCitySearch = useCallback(async (query: string, page: number) => {
         try {
-            const res = await getLocalitiesApi(query, 50, 1, lang);
-            return res.data.map(item => ({ id: item.id, name: item.name }));
+            const res = await getLocalitiesApi(query, 50, page, lang);
+            return {
+                data: res.data.map(item => ({ id: item.id, name: item.name })),
+                hasMore: res.has_more_pages
+            };
         } catch (e) {
             console.error('Error fetching cities:', e);
-            return [];
+            return { data: [], hasMore: false };
         }
     }, [lang]);
 
-    const handleStreetSearch = useCallback(async (query: string) => {
-        if (!cityId) return [];
+    const handleStreetSearch = useCallback(async (query: string, page: number) => {
+        if (!cityId) return { data: [], hasMore: false };
         try {
-            const res = await getStreetsApi(cityId, query, 50, 1, lang);
-            return res.data.map(item => ({ id: item.id, name: item.name }));
+            const res = await getStreetsApi(cityId, query, 50, page, lang);
+            return {
+                data: res.data.map(item => ({ id: item.id, name: item.name })),
+                hasMore: res.has_more_pages
+            };
         } catch (e) {
             console.error('Error fetching streets:', e);
-            return [];
+            return { data: [], hasMore: false };
         }
     }, [cityId, lang]);
+
 
     const handleCitySelect = useCallback((option: { id: number | string; name: string } | null) => {
         if (option) {
