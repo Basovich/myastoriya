@@ -137,6 +137,7 @@ export {
     addUserPickupPointApi,
     deleteUserPickupPointApi,
     getUserPickupPointsApi,
+    markUserPickupPointAsDefaultApi,
 } from './queries/deliveries';
 export type { Delivery, UserPickupPoint, Warehouse, WarehousePagination, Schedule } from './queries/deliveries';
 

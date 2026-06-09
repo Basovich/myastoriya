@@ -105,6 +105,12 @@ const DELETE_USER_PICKUP_POINT_MUTATION = /* GraphQL */ `
     }
 `;
 
+const MARK_USER_PICKUP_POINT_AS_DEFAULT_MUTATION = /* GraphQL */ `
+    mutation MarkUserPickupPointAsDefault($id: Int!) {
+        markUserPickupPointAsDefault(id: $id)
+    }
+`;
+
 const USER_PICKUP_POINTS_QUERY = /* GraphQL */ `
     query GetUserPickupPoints($type: String) {
         userPickupPoints(type: $type) {
@@ -186,6 +192,19 @@ export async function deleteUserPickupPointApi(
         { token, lang }
     );
     return data.deleteUserPickupPoint;
+}
+
+export async function markUserPickupPointAsDefaultApi(
+    id: number,
+    token: string,
+    lang?: string
+): Promise<boolean> {
+    const data = await gqlRequest<{ markUserPickupPointAsDefault: boolean }>(
+        MARK_USER_PICKUP_POINT_AS_DEFAULT_MUTATION,
+        { id },
+        { token, lang }
+    );
+    return data.markUserPickupPointAsDefault;
 }
 
 export async function getUserPickupPointsApi(

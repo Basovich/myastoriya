@@ -10,6 +10,7 @@ import useScrollLock from '@/hooks/useScrollLock';
 import Search from '@/app/components/ui/Search/Search';
 import Button from '@/app/components/ui/Button/Button';
 import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
+import { getShopsApi } from '@/lib/graphql';
 
 interface Store {
     id: string;
@@ -26,41 +27,6 @@ interface AddPickupModalProps {
     onAdd: (store: Store) => void;
     lang: 'ua' | 'ru';
 }
-
-const MOCK_STORES: Store[] = [
-    {
-        id: '101',
-        name: 'М\'ЯСТОРІЯ НА ПОЗНЯКАХ',
-        address: 'М\'ясторія | Київ, просп. Володимира Івасюка, 8',
-        hours: 'Пн.-Нд.: 10:00-22:00',
-        lat: 50.4950,
-        lng: 30.6010
-    },
-    {
-        id: '102',
-        name: 'М\'ЯСТОРІЯ НА ОБОЛОНІ',
-        address: 'М\'ясторія | Київ, просп. Героїв Сталінграда, 12г',
-        hours: 'Пн.-Нд.: 10:00-22:00',
-        lat: 50.5050,
-        lng: 30.5110
-    },
-    {
-        id: '103',
-        name: 'М\'ЯСТОРІЯ В ЦЕНТРІ',
-        address: 'М\'ясторія | Київ, вул. Хрещатик, 15',
-        hours: 'Пн.-Нд.: 10:00-22:00',
-        lat: 50.4501,
-        lng: 30.5234
-    },
-    {
-        id: '104',
-        name: 'М\'ЯСТОРІЯ НА ПЕЧЕРСЬКУ',
-        address: 'М\'ясторія | Київ, вул. Коновальця, 36в',
-        hours: 'Пн.-Нд.: 10:00-22:00',
-        lat: 50.4250,
-        lng: 30.5350
-    }
-];
 
 const containerStyle = {
     width: '100%',
@@ -105,6 +71,8 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang }: AddPick
         language: typeof window !== 'undefined' ? (lang === 'ua' ? 'uk' : 'ru') : 'uk'
     });
 
+    const [stores, setStores] = useState<Store[]>([]);
+    const [isLoadingStores, setIsLoadingStores] = useState(false);
     const [view, setView] = useState<'list' | 'map'>('list');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedStore, setSelectedStore] = useState<Store | null>(null);
@@ -112,11 +80,37 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang }: AddPick
     const [map, setMap] = useState<google.maps.Map | null>(null);
 
     useEffect(() => {
+        const fetchShops = async () => {
+            setIsLoadingStores(true);
+            try {
+                const res = await getShopsApi({ limit: 100, onlyCompanyStores: true }, lang);
+                const mappedStores: Store[] = res.shops.data.map(shop => {
+                    const hours = shop.schedule && shop.schedule.length > 0 
+                        ? shop.schedule.map(s => `${s.days}: ${s.workTime}`).join(', ') 
+                        : '';
+                    return {
+                        id: shop.id.toString(),
+                        name: shop.name || shop.siteName || '',
+                        address: shop.siteAddress || '',
+                        hours: hours,
+                        lat: shop.lat || defaultCenter.lat,
+                        lng: shop.lng || defaultCenter.lng,
+                    };
+                });
+                setStores(mappedStores);
+            } catch (error) {
+                console.error('Failed to fetch real shops:', error);
+            } finally {
+                setIsLoadingStores(false);
+            }
+        };
+
         if (isOpen) {
+            fetchShops();
             disableScroll();
             return () => enableScroll();
         }
-    }, [isOpen, disableScroll, enableScroll]);
+    }, [isOpen, lang, disableScroll, enableScroll]);
 
     const handleClose = () => {
         onClose();
@@ -134,7 +128,7 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang }: AddPick
         }
     };
 
-    const filteredStores = MOCK_STORES.filter(store => 
+    const filteredStores = stores.filter(store => 
         store.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
         store.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -207,7 +201,9 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang }: AddPick
                 </div>
 
                 <div className={s.modalContent}>
-                    {view === 'list' ? (
+                    {isLoadingStores ? (
+                        <div className={s.loading}>{t.loading}</div>
+                    ) : view === 'list' ? (
                         <div className={s.listView}>
                             <div className={s.storeList}>
                                 {filteredStores.map(store => (
@@ -261,13 +257,13 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang }: AddPick
                                             zoomControl: true,
                                         }}
                                     >
-                                        {MOCK_STORES.map(store => (
+                                        {filteredStores.map(store => (
                                             <Marker 
                                                 key={store.id}
                                                 position={{lat: store.lat, lng: store.lng}}
                                                 onClick={() => handleMarkerClick(store)}
                                                 icon={{
-                                                    url: selectedStore?.id === store.id ? '/icons/logo-red.svg' : '/icons/logo-red.svg', // In real project might use different icon for active
+                                                    url: '/icons/logo-red.svg',
                                                     scaledSize: new window.google.maps.Size(32, 32)
                                                 }}
                                             />
