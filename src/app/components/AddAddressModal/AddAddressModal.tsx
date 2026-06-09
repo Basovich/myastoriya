@@ -58,8 +58,8 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
     const { disableScroll, enableScroll } = useScrollLock();
 
     // Form state
-    const [city, setCity] = useState('');
-    const [cityId, setCityId] = useState<number | undefined>(undefined);
+    const [city, setCity] = useState('м. Київ');
+    const [cityId, setCityId] = useState<number | undefined>(2581);
     const [street, setStreet] = useState('');
     const [streetId, setStreetId] = useState<number | undefined>(undefined);
     const [house, setHouse] = useState('');
@@ -89,8 +89,8 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
         onClose();
         setTimeout(() => {
             setView('form');
-            setCity('');
-            setCityId(undefined);
+            setCity('м. Київ');
+            setCityId(2581);
             setStreet('');
             setStreetId(undefined);
             setHouse('');
@@ -184,9 +184,9 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
     }, [lang]);
 
     const handleStreetSearch = useCallback(async (query: string, page: number) => {
-        if (!cityId) return { data: [], hasMore: false };
+        const targetCityId = cityId || 2581;
         try {
-            const res = await getStreetsApi(cityId, query, 50, page, lang);
+            const res = await getStreetsApi(targetCityId, query, 50, page, lang);
             return {
                 data: res.data.map(item => ({ id: item.id, name: item.name })),
                 hasMore: res.has_more_pages
@@ -269,7 +269,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
 
         let streetVal = parsedAddress?.street || '';
         let houseVal = parsedAddress?.house || '';
-        let cityVal = parsedAddress?.city || 'Київ';
+        const cityVal = parsedAddress?.city || 'Київ';
 
         if (!streetVal && mapSearch) {
             const parts = mapSearch.split(',');
@@ -376,8 +376,8 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
             closeTimeoutMS={200}
         >
             <button className={s.closeBtn} onClick={handleClose} aria-label="Закрити">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M11.7625 9.99893L19.6326 2.14129C19.8678 1.90606 20 1.58701 20 1.25434C20 0.921668 19.8678 0.602622 19.6326 0.367388C19.3974 0.132153 19.0783 0 18.7457 0C18.413 0 18.0939 0.132153 17.8587 0.367388L10.0011 8.23752L2.14342 0.367388C1.90819 0.132153 1.58914 2.95361e-07 1.25647 2.97839e-07C0.9238 3.00318e-07 0.604754 0.132153 0.369519 0.367388C0.134285 0.602622 0.00213223 0.921668 0.00213223 1.25434C0.00213223 1.58701 0.134285 1.90606 0.369519 2.14129L8.23966 9.99893L0.369519 17.8566C0.252431 17.9727 0.159496 18.1109 0.0960746 18.2631C0.0326529 18.4153 0 18.5786 0 18.7435C0 18.9084 0.0326529 19.0717 0.0960746 19.224C0.159496 19.3762 0.252431 19.5143 0.369519 19.6305C0.485651 19.7476 0.623817 19.8405 0.776047 19.9039C0.928277 19.9673 1.09156 20 1.25647 20C1.42138 20 1.58467 19.9673 1.7369 19.9039C1.88913 19.8405 2.02729 19.7476 2.14342 19.6305L10.0011 11.7603L17.8587 19.6305C17.9748 19.7476 18.113 19.8405 18.2652 19.9039C18.4175 19.9673 18.5807 20 18.7457 20C18.9106 20 19.0739 19.9673 19.2261 19.9039C19.3783 19.8405 19.5165 19.7476 19.6326 19.6305C19.7497 19.5143 19.8426 19.3762 19.9061 19.224C19.9695 19.0717 20.0021 18.9084 20.0021 18.7435C20.0021 18.5786 19.9695 18.4153 19.9061 18.2631C19.8426 18.1109 19.7497 17.9727 19.6326 17.8566L11.7625 9.99893Z" fill="white"/>
                 </svg>
             </button>
 
@@ -388,24 +388,12 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                         <form className={s.form} onSubmit={handleFormSubmit}>
                             <div className={s.formRow}>
                                 <SearchableSelect
-                                    id="city"
-                                    label="Місто"
-                                    value={city}
-                                    onSearch={handleCitySearch}
-                                    onSelect={handleCitySelect}
-                                    required
-                                    className={s.cityField}
-                                />
-                            </div>
-                            <div className={s.formRow}>
-                                <SearchableSelect
                                     id="street"
                                     label="Вулиця"
                                     value={street}
                                     onSearch={handleStreetSearch}
                                     onSelect={handleStreetSelect}
                                     required
-                                    disabled={!cityId}
                                     className={s.streetField}
                                 />
                                 <button 
@@ -413,13 +401,10 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                                     className={s.mapToggleBtn}
                                     onClick={() => setView('map')}
                                 >
-                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                                        <path d="M9 16.5C12.3137 16.5 15 13.8137 15 10.5C15 7.18629 12.3137 4.5 9 4.5C5.68629 4.5 3 7.18629 3 10.5C3 13.8137 5.68629 16.5 9 16.5Z" stroke="black" strokeWidth="1.2" />
-                                        <path d="M9 12.75V10.5" stroke="black" strokeWidth="1.2" strokeLinecap="round" />
-                                        <path d="M9 8.25V7.5" stroke="black" strokeWidth="1.2" strokeLinecap="round" />
-                                        <rect x="7.5" y="1.5" width="3" height="3" rx="0.5" stroke="black" strokeWidth="1.2" />
+                                    <span>Знайти на карті</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="14" viewBox="0 0 11 14" fill="none">
+                                        <path d="M5.5 6.15314C5.77195 6.15314 6.03779 6.07096 6.26391 5.91699C6.49003 5.76302 6.66626 5.54418 6.77033 5.28814C6.8744 5.0321 6.90163 4.75036 6.84858 4.47855C6.79553 4.20674 6.66457 3.95706 6.47227 3.7611C6.27997 3.56513 6.03497 3.43168 5.76825 3.37761C5.50153 3.32354 5.22506 3.35129 4.97381 3.45735C4.72256 3.5634 4.50782 3.743 4.35673 3.97343C4.20564 4.20386 4.125 4.47478 4.125 4.75191C4.125 5.12354 4.26987 5.47995 4.52773 5.74273C4.78559 6.00551 5.13533 6.15314 5.5 6.15314ZM5.01188 10.9944C5.07579 11.06 5.15183 11.1122 5.2356 11.1477C5.31938 11.1833 5.40924 11.2016 5.5 11.2016C5.59076 11.2016 5.68062 11.1833 5.7644 11.1477C5.84817 11.1122 5.92421 11.06 5.98812 10.9944L8.8 8.12186C9.45309 7.45666 9.89793 6.60902 10.0782 5.68615C10.2586 4.76328 10.1663 3.80665 9.81302 2.93725C9.45977 2.06785 8.86145 1.32473 8.09373 0.801899C7.326 0.279065 6.42337 0 5.5 0C4.57663 0 3.674 0.279065 2.90628 0.801899C2.13855 1.32473 1.54023 2.06785 1.18698 2.93725C0.833734 3.80665 0.741432 4.76328 0.92175 5.68615C1.10207 6.60902 1.54691 7.45666 2.2 8.12186L5.01188 10.9944ZM2.22062 4.42963C2.2676 3.93011 2.42345 3.44758 2.6768 3.01728C2.93015 2.58697 3.2746 2.21976 3.685 1.94246C4.22414 1.58171 4.85503 1.3895 5.5 1.3895C6.14497 1.3895 6.77586 1.58171 7.315 1.94246C7.72266 2.21881 8.06516 2.5838 8.31788 3.01116C8.57059 3.43852 8.72723 3.91764 8.77653 4.41407C8.82584 4.91049 8.76658 5.41188 8.60303 5.88218C8.43947 6.35248 8.17568 6.78 7.83063 7.134L5.5 9.50907L3.16937 7.134C2.82392 6.78343 2.55951 6.35879 2.39539 5.89097C2.23127 5.42315 2.17157 4.92393 2.22062 4.42963ZM10.3125 12.5988H0.6875C0.505164 12.5988 0.330295 12.6726 0.201364 12.804C0.072433 12.9354 0 13.1136 0 13.2994C0 13.4852 0.072433 13.6634 0.201364 13.7948C0.330295 13.9262 0.505164 14 0.6875 14H10.3125C10.4948 14 10.6697 13.9262 10.7986 13.7948C10.9276 13.6634 11 13.4852 11 13.2994C11 13.1136 10.9276 12.9354 10.7986 12.804C10.6697 12.6726 10.4948 12.5988 10.3125 12.5988Z" fill="black"/>
                                     </svg>
-                                    Знайти на карті
                                 </button>
                             </div>
                             <div className={s.gridFields}>
@@ -453,8 +438,13 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                                     disabled={!street}
                                 />
                             </div>
-                            <Button variant="red" type="submit" className={s.submitBtn} disabled={!street || !house}>
-                                ДОДАТИ АДРЕСУ
+                            <Button 
+                                variant="red" 
+                                type="submit" 
+                                className={s.submitBtn} 
+                                disabled={!street || !house}
+                            >
+                                {lang === 'ua' ? 'ДОДАТИ АДРЕСУ' : 'ДОБАВИТЬ АДРЕС'}
                             </Button>
                         </form>
                     </div>
