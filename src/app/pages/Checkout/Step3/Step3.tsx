@@ -11,11 +11,10 @@ import QuantitySelector from '@/app/components/ui/QuantitySelector/QuantitySelec
 import CustomSelect from '@/app/components/ui/CustomSelect';
 import Button from '@/app/components/ui/Button/Button';
 import CartModal from '@/app/components/CartModal/CartModal';
-import AddCardModal from '@/app/components/Personal/Cards/AddCardModal';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
-import BankCardItem from '@/app/components/Personal/Cards/BankCardItem';
+import BankCardItem, { type BankCard } from '@/app/components/Personal/Cards/BankCardItem';
 import AddBankCardBtn from '@/app/components/Personal/Cards/AddBankCardBtn';
 
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
@@ -30,6 +29,12 @@ import {
     CheckoutPaymentData 
 } from '@/lib/graphql/queries/orders';
 import { GraphQLError } from '@/lib/graphql/client';
+import { 
+    getUserBankCardsApi, 
+    requestTokenizeCardApi, 
+    type UserBankCard 
+} from '@/lib/graphql';
+
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -43,10 +48,6 @@ function formatPhone(phone: string): string {
 const CONTACT_METHODS = [
     { value: 'no-call', label: 'Не передзвонювати' },
     { value: 'call', label: 'Передзвонити для уточнення' },
-];
-
-const SAVED_CARDS = [
-    { id: 'card-1', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
 ];
 
 import { type Locale } from '@/i18n/config';
@@ -66,7 +67,10 @@ export default function Step3({ lang }: Step3Props) {
     const [isLoadingPayments, setIsLoadingPayments] = useState(true);
     const [paymentMethod, setPaymentMethod] = useState('');
     const [changeAmount, setChangeAmount] = useState('');
-    const [selectedCardId, setSelectedCardId] = useState('card-1');
+    const [selectedCardId, setSelectedCardId] = useState('');
+    const [userCards, setUserCards] = useState<BankCard[]>([]);
+    const [isLoadingCards, setIsLoadingCards] = useState(false);
+
     
     // Submit / Success State
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,7 +80,6 @@ export default function Step3({ lang }: Step3Props) {
 
     // UI state
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-    const [isAddCardModalOpen, setIsAddCardModalOpen] = useState(false);
 
     const [deliveryPrice, setDeliveryPrice] = useState<number | undefined>(undefined);
     const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number } | null>(null);
@@ -135,13 +138,81 @@ export default function Step3({ lang }: Step3Props) {
         };
         fetchPayments();
     }, [lang]);
-    
     const handleBack = () => {
         const url = new URL(window.location.href);
         url.searchParams.set('step', '2');
         window.history.pushState({}, '', url.toString());
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+
+    // Fetch saved bank cards for authenticated user
+    useEffect(() => {
+        const fetchCards = async () => {
+            if (!isAuthenticated) return;
+            setIsLoadingCards(true);
+            try {
+                const token = await getAccessToken();
+                if (!token) return;
+                const res = await getUserBankCardsApi(token, lang);
+                const mapped = res.map((c: UserBankCard): BankCard => ({
+                    id: c.id,
+                    number: c.number,
+                    expiry: c.formattedExpire || c.expire,
+                    type: (c.icon?.toLowerCase() === 'mastercard' ? 'mastercard' : 'visa') as 'visa' | 'mastercard',
+                    isDefault: c.isDefault,
+                }));
+                setUserCards(mapped);
+                const defaultCard = mapped.find(c => c.isDefault) || mapped[0];
+                if (defaultCard) {
+                    setSelectedCardId(defaultCard.id);
+                }
+            } catch (e) {
+                console.error('Failed to load user bank cards:', e);
+            } finally {
+                setIsLoadingCards(false);
+            }
+        };
+        fetchCards();
+    }, [isAuthenticated, lang]);
+
+    useEffect(() => {
+        const handleFocus = async () => {
+            if (!isAuthenticated) return;
+            try {
+                const token = await getAccessToken();
+                if (!token) return;
+                const res = await getUserBankCardsApi(token, lang);
+                const mapped = res.map((c: UserBankCard): BankCard => ({
+                    id: c.id,
+                    number: c.number,
+                    expiry: c.formattedExpire || c.expire,
+                    type: (c.icon?.toLowerCase() === 'mastercard' ? 'mastercard' : 'visa') as 'visa' | 'mastercard',
+                    isDefault: c.isDefault,
+                }));
+                setUserCards(mapped);
+            } catch (e) {
+                console.error('Failed to reload bank cards on focus:', e);
+            }
+        };
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
+    }, [isAuthenticated, lang]);
+
+    const handleAddCard = async () => {
+        try {
+            const token = await getAccessToken();
+            if (!token) return;
+            const url = await requestTokenizeCardApi(token, lang);
+            if (url) {
+                window.open(url, '_blank');
+            } else {
+                alert(lang === 'ua' ? 'Помилка отримання посилання для додавання картки' : 'Ошибка получения ссылки для добавления карты');
+            }
+        } catch (e) {
+            console.error('Failed to request tokenize card:', e);
+        }
+    };
+
 
     const handleSubmit = async () => {
         setSubmitError('');
@@ -217,7 +288,7 @@ export default function Step3({ lang }: Step3Props) {
 
             const paymentData: CheckoutPaymentData = {
                 paymentId: Number(paymentMethod),
-                userCardId: selectedPayment.driver === 'liqpay' || selectedPayment.driver === 'card' 
+                userCardId: selectedPayment.driver?.includes('liqpay') || selectedPayment.driver?.includes('card')
                     ? (selectedCardId ? Number(selectedCardId.replace('card-', '')) : null) 
                     : null,
                 change: selectedPayment.showChangeField && changeAmount ? Number(changeAmount) || null : null,
@@ -396,7 +467,7 @@ export default function Step3({ lang }: Step3Props) {
                         ) : (
                             payments.map(method => {
                                 const isSelected = paymentMethod === method.id;
-                                const isCardDriver = method.driver === 'liqpay' || method.driver === 'card';
+                                const isCardDriver = !!method.driver?.includes('liqpay') || !!method.driver?.includes('card');
                                 return (
                                     <div key={method.id} className={s.methodContainer}>
                                         <label className={s.methodItem}>
@@ -439,10 +510,10 @@ export default function Step3({ lang }: Step3Props) {
                                         {isSelected && isCardDriver && (
                                             <div className={s.cardsSection}>
                                                 <div className={s.cardsList}>
-                                                    {SAVED_CARDS.map(card => (
+                                                    {userCards.map(card => (
                                                         <BankCardItem 
                                                             key={card.id}
-                                                            card={card as any}
+                                                            card={card}
                                                             isSelected={selectedCardId === card.id}
                                                             onSelect={setSelectedCardId}
                                                             lang={lang as 'ua' | 'ru'}
@@ -450,13 +521,14 @@ export default function Step3({ lang }: Step3Props) {
                                                         />
                                                     ))}
                                                     <AddBankCardBtn 
-                                                        onClick={() => setIsAddCardModalOpen(true)}
+                                                        onClick={handleAddCard}
                                                         lang={lang as 'ua' | 'ru'}
                                                         className={s.checkoutAddCard}
                                                     />
                                                 </div>
                                             </div>
                                         )}
+
                                     </div>
                                 );
                             })
@@ -522,11 +594,7 @@ export default function Step3({ lang }: Step3Props) {
                 onClose={() => setIsCartModalOpen(false)} 
                 isCheckoutMode={true}
             />
-            <AddCardModal 
-                isOpen={isAddCardModalOpen} 
-                onClose={() => setIsAddCardModalOpen(false)}
-                lang={lang as 'ua' | 'ru'}
-            />
         </div>
     );
 }
+

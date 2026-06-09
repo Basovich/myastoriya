@@ -164,3 +164,13 @@ export type { Career } from './queries/pages/career';
 // Re-export orders
 export { getOrdersApi } from './queries/orders';
 export type { Order, OrderStatus, OrderSimplePagination } from './queries/orders';
+
+// Re-export bank cards
+export {
+    getUserBankCardsApi,
+    deleteUserBankCardApi,
+    markUserBankCardAsDefaultApi,
+    requestTokenizeCardApi,
+} from './queries/bankCards';
+export type { UserBankCard } from './queries/bankCards';
+

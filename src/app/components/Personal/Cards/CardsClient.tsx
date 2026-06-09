@@ -1,34 +1,35 @@
 'use client';
 
-import React, { useState } from 'react';
-import Image from 'next/image';
+import React, { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
 import s from './CardsClient.module.scss';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
 import { AuthUser } from '@/store/slices/authSlice';
-import AddCardModal from './AddCardModal';
 import BankCardItem, { type BankCard } from './BankCardItem';
 import AddBankCardBtn from './AddBankCardBtn';
-
-const MOCK_CARDS: BankCard[] = [
-    { id: '1', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-    { id: '2', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-    { id: '3', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-    { id: '4', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-    { id: '5', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-    { id: '6', number: '4265 **** **** 5874', expiry: '10 / 2023', type: 'visa' },
-];
+import { 
+    getUserBankCardsApi, 
+    deleteUserBankCardApi, 
+    markUserBankCardAsDefaultApi, 
+    requestTokenizeCardApi,
+    UserBankCard
+} from '@/lib/graphql';
+import { getAccessToken } from '@/app/actions/authActions';
 
 const localDict = {
     ua: {
         subtitle: "Ваші банківські картки",
         addCard: "Додати картку",
+        noCards: "Немає збережених карток",
+        loading: "Завантаження карток...",
     },
     ru: {
         subtitle: "Ваши банковские карты",
         addCard: "Добавить карту",
+        noCards: "Нет сохраненных карт",
+        loading: "Загрузка карт...",
     }
 };
 
@@ -38,21 +39,99 @@ interface CardsClientProps {
 }
 
 export default function CardsClient({ user, lang }: CardsClientProps) {
-    const [cards, setCards] = useState<BankCard[]>(MOCK_CARDS);
-    const [selectedCardId, setSelectedCardId] = useState<string>(MOCK_CARDS[0].id);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [cards, setCards] = useState<BankCard[]>([]);
+    const [selectedCardId, setSelectedCardId] = useState<string>('');
+    const [isLoading, setIsLoading] = useState(true);
     
     const pDict = personalDict[lang];
     const dict = localDict[lang];
 
-    const handleDelete = (id: string) => {
+    const fetchCards = useCallback(async () => {
+        try {
+            const token = await getAccessToken();
+            if (!token) {
+                setIsLoading(false);
+                return;
+            }
+            const res = await getUserBankCardsApi(token, lang);
+            const mapped = res.map((c: UserBankCard): BankCard => ({
+                id: c.id,
+                number: c.number,
+                expiry: c.formattedExpire || c.expire,
+                type: (c.icon?.toLowerCase() === 'mastercard' ? 'mastercard' : 'visa') as 'visa' | 'mastercard',
+                isDefault: c.isDefault,
+            }));
+            setCards(mapped);
+            const defaultCard = mapped.find(c => c.isDefault) || mapped[0];
+            if (defaultCard) {
+                setSelectedCardId(defaultCard.id);
+            }
+        } catch (e) {
+            console.error('Failed to load bank cards:', e);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [lang]);
+
+    useEffect(() => {
+        fetchCards();
+    }, [fetchCards]);
+
+    useEffect(() => {
+        const handleFocus = () => {
+            fetchCards();
+        };
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
+    }, [fetchCards]);
+
+    const handleDelete = async (id: string) => {
         if (window.confirm(lang === 'ua' ? 'Ви впевнені?' : 'Вы уверены?')) {
-            setCards(prev => prev.filter(c => c.id !== id));
+            try {
+                const token = await getAccessToken();
+                if (!token) return;
+                const success = await deleteUserBankCardApi(id, token, lang);
+                if (success) {
+                    setCards(prev => prev.filter(c => c.id !== id));
+                    if (selectedCardId === id) {
+                        setSelectedCardId('');
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to delete card:', e);
+            }
         }
     };
 
-    const handleSelect = (id: string) => {
+    const handleSelect = async (id: string) => {
         setSelectedCardId(id);
+        try {
+            const token = await getAccessToken();
+            if (!token) return;
+            const numericId = parseInt(id, 10);
+            if (!isNaN(numericId)) {
+                await markUserBankCardAsDefaultApi(numericId, token, lang);
+                // Refresh to update isDefault
+                fetchCards();
+            }
+        } catch (e) {
+            console.error('Failed to mark card as default:', e);
+        }
+    };
+
+    const handleAddCard = async () => {
+        try {
+            const token = await getAccessToken();
+            if (!token) return;
+            const url = await requestTokenizeCardApi(token, lang);
+            if (url) {
+                window.open(url, '_blank');
+            } else {
+                alert(lang === 'ua' ? 'Помилка отримання посилання для додавання картки' : 'Ошибка получения ссылки для добавления карты');
+            }
+        } catch (e) {
+            console.error('Failed to request tokenize card:', e);
+        }
     };
 
     const handleLogout = () => {
@@ -72,31 +151,32 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
 
                 <h2 className={s.subtitle}>{dict.subtitle}</h2>
 
-                <div className={s.grid}>
-                    {cards.map((card) => (
-                        <BankCardItem 
-                            key={card.id}
-                            card={card}
-                            isSelected={selectedCardId === card.id}
-                            onSelect={handleSelect}
-                            onDelete={handleDelete}
+                {isLoading ? (
+                    <div className={s.loading}>{dict.loading}</div>
+                ) : (
+                    <div className={s.grid}>
+                        {cards.map((card) => (
+                            <BankCardItem 
+                                key={card.id}
+                                card={card}
+                                isSelected={selectedCardId === card.id}
+                                onSelect={handleSelect}
+                                onDelete={handleDelete}
+                                lang={lang}
+                                showDelete
+                            />
+                        ))}
+
+                        <AddBankCardBtn 
+                            onClick={handleAddCard}
                             lang={lang}
-                            showDelete
                         />
-                    ))}
-
-                    <AddBankCardBtn 
-                        onClick={() => setIsModalOpen(true)}
-                        lang={lang}
-                    />
-                </div>
+                    </div>
+                )}
+                {!isLoading && cards.length === 0 && (
+                    <div className={s.noCards}>{dict.noCards}</div>
+                )}
             </PersonalContentBlock>
-
-            <AddCardModal 
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                lang={lang}
-            />
         </div>
     );
 }

@@ -159,3 +159,13 @@
     box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.20);
     transition: all 0.2s;
 }
+
+.loading,
+.noCards {
+    font-size: 14px;
+    color: #999;
+    padding: 24px 0;
+    text-align: center;
+    width: 100%;
+}
+
