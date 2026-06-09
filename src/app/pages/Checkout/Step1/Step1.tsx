@@ -8,6 +8,7 @@ import { GraphQLError } from '@/lib/graphql/client';
 import Button from '@/app/components/ui/Button/Button';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
+import { fetchCartAsync } from '@/store/slices/cartSlice';
 import { getAccessToken } from '@/app/actions/authActions';
 import { sendSmsApi, smsVerifyApi, updateCheckoutUserDataApi } from '@/lib/graphql/queries/auth';
 import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from '@/app/components/CartModal/products_mock';
@@ -82,30 +83,19 @@ export default function Step1() {
     const [countdown, setCountdown] = useState(0);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    // Promo functionality
-    const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number } | null>(null);
-
-    useEffect(() => {
-        const saved = localStorage.getItem('applied_promo');
-        if (saved) {
-            try {
-                const val = JSON.parse(saved);
-                if (val && val.code && typeof val.discount === 'number') {
-                    setAppliedPromo(val);
-                }
-            } catch (e) {
-                console.error('Error parsing saved promo', e);
-            }
+    // Promo functionality from Redux
+    const promoCode = useAppSelector(state => state.cart.promoCode);
+    const appliedPromo = useMemo(() => {
+        if (promoCode && promoCode.isApplied && promoCode.code) {
+            const discountStr = promoCode.discount || '0';
+            const discountVal = parseFloat(discountStr.replace(/[^\d.]/g, '')) || 0;
+            return {
+                code: promoCode.code,
+                discount: discountVal
+            };
         }
-    }, []);
-
-    useEffect(() => {
-        if (appliedPromo) {
-            localStorage.setItem('applied_promo', JSON.stringify(appliedPromo));
-        } else {
-            localStorage.removeItem('applied_promo');
-        }
-    }, [appliedPromo]);
+        return null;
+    }, [promoCode]);
     
     // Cart modal functionality
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -551,7 +541,9 @@ export default function Step1() {
                 />
                 {hydrated && (
                     <PromoBlock 
-                        onApply={(code, discount) => setAppliedPromo({ code, discount })} 
+                        onApply={() => {
+                            void dispatch(fetchCartAsync());
+                        }} 
                         isApplied={!!appliedPromo}
                     />
                 )}

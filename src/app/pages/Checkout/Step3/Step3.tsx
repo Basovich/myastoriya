@@ -18,7 +18,7 @@ import BankCardItem, { type BankCard } from '@/app/components/Personal/Cards/Ban
 import AddBankCardBtn from '@/app/components/Personal/Cards/AddBankCardBtn';
 
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { clearCart } from '@/store/slices/cartSlice';
+import { clearCart, fetchCartAsync } from '@/store/slices/cartSlice';
 import { getAccessToken } from '@/app/actions/authActions';
 import { 
     getPaymentsApi, 
@@ -84,7 +84,19 @@ export default function Step3({ lang }: Step3Props) {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
 
     const [deliveryPrice, setDeliveryPrice] = useState<number | undefined>(undefined);
-    const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number } | null>(null);
+    // Promo functionality from Redux
+    const promoCode = useAppSelector(state => state.cart.promoCode);
+    const appliedPromo = React.useMemo(() => {
+        if (promoCode && promoCode.isApplied && promoCode.code) {
+            const discountStr = promoCode.discount || '0';
+            const discountVal = parseFloat(discountStr.replace(/[^\d.]/g, '')) || 0;
+            return {
+                code: promoCode.code,
+                discount: discountVal
+            };
+        }
+        return null;
+    }, [promoCode]);
 
     const dispatch = useAppDispatch();
     const { user, isAuthenticated } = useAppSelector(state => state.auth);
@@ -103,17 +115,7 @@ export default function Step3({ lang }: Step3Props) {
             }
         }
         
-        const savedPromo = localStorage.getItem('applied_promo');
-        if (savedPromo) {
-            try {
-                const parsed = JSON.parse(savedPromo);
-                if (parsed && parsed.code && typeof parsed.discount === 'number') {
-                    setAppliedPromo(parsed);
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }
+        // Stale localStorage logic removed - promo code is synced via Redux/API
 
         const fetchPayments = async () => {
             setIsLoadingPayments(true);
@@ -575,7 +577,9 @@ export default function Step3({ lang }: Step3Props) {
                 />
                 {hydrated && (
                     <PromoBlock 
-                        onApply={(code, discount) => setAppliedPromo({ code, discount })} 
+                        onApply={() => {
+                            void dispatch(fetchCartAsync());
+                        }} 
                         isApplied={!!appliedPromo}
                     />
                 )}

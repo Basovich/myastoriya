@@ -5,7 +5,8 @@ import {
     addProductToCartApi,
     editCartItemQuantityApi,
     removeCartItemApi,
-    CartGql
+    CartGql,
+    CartPromoCodeGql
 } from '@/lib/graphql/queries/cart';
 import { RootState } from '../index';
 
@@ -19,11 +20,18 @@ export interface CartItem {
     costVariantName?: string | null;
 }
 
+export interface CartPromoCode {
+    isApplied: boolean;
+    code?: string | null;
+    discount?: string | null;
+}
+
 interface CartState {
     items: CartItem[];
     deletingIds: string[];
     isInitialized: boolean;
     loading: boolean;
+    promoCode: CartPromoCode | null;
 }
 
 const initialState: CartState = {
@@ -31,6 +39,7 @@ const initialState: CartState = {
     deletingIds: [],
     isInitialized: false,
     loading: false,
+    promoCode: null,
 };
 
 // Helper to map CartGql to local CartItem[]
@@ -65,9 +74,10 @@ const mergeCartItems = (currentItems: CartItem[], backendItems: CartItem[]): Car
 // Async Thunks
 export const fetchCartAsync = createAsyncThunk(
     'cart/fetch',
-    async (_, { rejectWithValue }) => {
+    async (_, { dispatch, rejectWithValue }) => {
         try {
             const response = await getCartApi();
+            dispatch(setPromoCode(response.promoCode || null));
             return mapCartItems(response);
         } catch (error: any) {
             console.error('[Cart] Failed to fetch cart from backend:', error);
@@ -81,7 +91,7 @@ export const addToCartAsync = createAsyncThunk(
     'cart/add',
     async (
         payload: { id: string; quantity: number; costVariantId?: number },
-        { getState, rejectWithValue }
+        { getState, dispatch, rejectWithValue }
     ) => {
         try {
             const state = getState() as RootState;
@@ -110,6 +120,7 @@ export const addToCartAsync = createAsyncThunk(
                     costVariantId: payload.costVariantId,
                 });
             }
+            dispatch(setPromoCode(response.promoCode || null));
             return mapCartItems(response);
         } catch (error: unknown) {
             console.error('[Cart] Failed to add or update product in backend cart:', error);
@@ -136,6 +147,7 @@ export const updateQuantityAsync = createAsyncThunk(
                     rowId: item.rowId,
                     quantity: payload.quantity,
                 });
+                dispatch(setPromoCode(response.promoCode || null));
                 return mapCartItems(response);
             } else {
                 return rejectWithValue('No rowId found');
@@ -161,6 +173,7 @@ export const removeFromCartAsync = createAsyncThunk(
                 const response = await removeCartItemApi({
                     rowId,
                 });
+                dispatch(setPromoCode(response.promoCode || null));
                 return mapCartItems(response);
             } else {
                 return rejectWithValue('No rowId found');
@@ -257,6 +270,9 @@ const cartSlice = createSlice({
         },
         clearCart: (state) => {
             state.items = [];
+        },
+        setPromoCode: (state, action: PayloadAction<CartPromoCode | null>) => {
+            state.promoCode = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -388,5 +404,5 @@ const cartSlice = createSlice({
     }
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQuantity, clearCart, setPromoCode } = cartSlice.actions;
 export default cartSlice.reducer;

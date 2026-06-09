@@ -19,6 +19,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
     const hydrated = useIsHydrated();
     const { populatedItems } = useCartProducts();
     const { user, isGuest, isInitialized } = useAppSelector(state => state.auth);
+    const promoCode = useAppSelector(state => state.cart.promoCode);
     const [showCashback, setShowCashback] = useState(false);
 
     useEffect(() => {
@@ -69,13 +70,24 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
         }, 0);
     }, [populatedItems]);
 
+    const discountAmount = useMemo(() => {
+        if (promoCode && promoCode.isApplied && promoCode.discount) {
+            const discountStr = promoCode.discount;
+            const value = parseFloat(discountStr.replace(/[^\d.]/g, '')) || 0;
+            if (discountStr.includes('%')) {
+                return Math.round(totalSum * (value / 100));
+            }
+            return value;
+        }
+        return Math.round(totalSum * (discountPercent / 100));
+    }, [promoCode, discountPercent, totalSum]);
+
     if (!hydrated) return null;
 
     const delivery = deliveryPrice !== undefined ? deliveryPrice : 0;
-    const discountAmount = Math.round(totalSum * (discountPercent / 100));
     const cashback = Math.round((totalSum - discountAmount) * 0.03);
 
-    const hasAnyDiscount = (originalTotalSum > totalSum) || (discountPercent > 0);
+    const hasAnyDiscount = (originalTotalSum > totalSum) || (discountAmount > 0);
     const finalPrice = totalSum + delivery - discountAmount;
     const originalPrice = originalTotalSum + delivery;
 

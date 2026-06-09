@@ -11,6 +11,7 @@ import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
 import Button from '@/app/components/ui/Button/Button';
 import Search from '@/app/components/ui/Search/Search';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { fetchCartAsync } from '@/store/slices/cartSlice';
 import CartModal from '@/app/components/CartModal/CartModal';
 import AuthModal from '@/app/components/AuthModal';
 import { useParams } from 'next/navigation';
@@ -130,7 +131,19 @@ export default function Step2() {
     const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
     const [validationError, setValidationError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number } | null>(null);
+    // Promo functionality from Redux
+    const promoCode = useAppSelector(state => state.cart.promoCode);
+    const appliedPromo = React.useMemo(() => {
+        if (promoCode && promoCode.isApplied && promoCode.code) {
+            const discountStr = promoCode.discount || '0';
+            const discountVal = parseFloat(discountStr.replace(/[^\d.]/g, '')) || 0;
+            return {
+                code: promoCode.code,
+                discount: discountVal
+            };
+        }
+        return null;
+    }, [promoCode]);
     
     const [restoredData, setRestoredData] = useState<any>(null);
 
@@ -450,20 +463,7 @@ export default function Step2() {
         fetchTimes();
     }, [deliveryMethod, deliveryDate, lang, deliveries]);
 
-    // 9. Load saved promo
-    useEffect(() => {
-        const saved = localStorage.getItem('applied_promo');
-        if (saved) {
-            try {
-                const val = JSON.parse(saved);
-                if (val && val.code && typeof val.discount === 'number') {
-                    setAppliedPromo(val);
-                }
-            } catch (e) {
-                console.error('Error parsing saved promo', e);
-            }
-        }
-    }, [isAuthenticated]);
+    // Stale localStorage logic removed - promo code is synced via Redux/API
 
     // Address list mapping
     const formattedDbAddresses = React.useMemo(() => {
@@ -1107,7 +1107,9 @@ export default function Step2() {
                 />
                 {hydrated && (
                     <PromoBlock 
-                        onApply={(code, discount) => setAppliedPromo({ code, discount })} 
+                        onApply={() => {
+                            void dispatch(fetchCartAsync());
+                        }} 
                         isApplied={!!appliedPromo}
                     />
                 )}
