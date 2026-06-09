@@ -333,19 +333,18 @@ export default function Step2() {
         const fetchDeliveries = async () => {
             try {
                 const res = await getDeliveriesApi(undefined, checkoutCity.id, lang);
-                const filtered = res.filter(d => !(d.name || '').toLowerCase().includes('500'));
-                setDeliveries(filtered);
+                setDeliveries(res);
                 
                 // Determine what delivery method to select
                 let restored = '';
-                if (restoredData && filtered.some(d => d.id === restoredData.deliveryMethod)) {
+                if (restoredData && res.some(d => d.id === restoredData.deliveryMethod)) {
                     restored = restoredData.deliveryMethod;
                 } else {
                     const saved = localStorage.getItem('checkout_delivery_data');
                     if (saved) {
                         try {
                             const parsed = JSON.parse(saved);
-                            if (parsed.deliveryMethod && filtered.some(d => d.id === parsed.deliveryMethod)) {
+                            if (parsed.deliveryMethod && res.some(d => d.id === parsed.deliveryMethod)) {
                                   restored = parsed.deliveryMethod;
                             }
                         } catch (e) {}
@@ -355,9 +354,9 @@ export default function Step2() {
                 if (restored) {
                     setDeliveryMethod(restored);
                 } else {
-                    const currentSelectedExists = filtered.some(d => d.id === deliveryMethodRef.current && !d.disabled);
+                    const currentSelectedExists = res.some(d => d.id === deliveryMethodRef.current && !d.disabled);
                     if (!currentSelectedExists) {
-                        const firstEnabled = filtered.find(d => !d.disabled);
+                        const firstEnabled = res.find(d => !d.disabled);
                         if (firstEnabled) {
                             setDeliveryMethod(firstEnabled.id);
                         }

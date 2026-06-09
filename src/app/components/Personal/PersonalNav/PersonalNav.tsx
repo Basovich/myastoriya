@@ -41,20 +41,9 @@ const PersonalNav: React.FC<PersonalNavProps> = ({ dict, onLogout, user, isMobil
     const hydrated = useIsHydrated();
 
     const burgerIcon = (
-        <div className={s.listIcon}>
-            <div className={s.line}>
-                <span className={s.dot} />
-                <span className={s.longLine} />
-            </div>
-            <div className={s.line}>
-                <span className={s.dot} />
-                <span className={s.longLine} />
-            </div>
-            <div className={s.line}>
-                <span className={s.dot} />
-                <span className={s.longLine} />
-            </div>
-        </div>
+        <svg className={s.listIcon} xmlns="http://www.w3.org/2000/svg" width="21" height="14" viewBox="0 0 21 14" fill="none">
+            <path fillRule="evenodd" clipRule="evenodd" d="M1.5 3C2.32843 3 3 2.32843 3 1.5C3 0.671573 2.32843 0 1.5 0C0.671573 0 0 0.671573 0 1.5C0 2.32843 0.671573 3 1.5 3ZM5.25 0.8C4.83579 0.8 4.5 1.13579 4.5 1.55C4.5 1.96421 4.83579 2.3 5.25 2.3H20.25C20.6642 2.3 21 1.96421 21 1.55C21 1.13579 20.6642 0.8 20.25 0.8H5.25ZM3 7C3 7.82843 2.32843 8.5 1.5 8.5C0.671573 8.5 0 7.82843 0 7C0 6.17157 0.671573 5.5 1.5 5.5C2.32843 5.5 3 6.17157 3 7ZM5.25 6.3C4.83579 6.3 4.5 6.63579 4.5 7.05C4.5 7.46421 4.83579 7.8 5.25 7.8H20.25C20.6642 7.8 21 7.46421 21 7.05C21 6.63579 20.6642 6.3 20.25 6.3H5.25ZM4.5 12.55C4.5 12.1358 4.83579 11.8 5.25 11.8H20.25C20.6642 11.8 21 12.1358 21 12.55C21 12.9642 20.6642 13.3 20.25 13.3H5.25C4.83579 13.3 4.5 12.9642 4.5 12.55ZM1.5 14C2.32843 14 3 13.3284 3 12.5C3 11.6716 2.32843 11 1.5 11C0.671573 11 0 11.6716 0 12.5C0 13.3284 0.671573 14 1.5 14Z" fill="white"/>
+        </svg>
     );
 
     React.useEffect(() => {
