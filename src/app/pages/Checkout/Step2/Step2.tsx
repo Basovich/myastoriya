@@ -39,6 +39,7 @@ interface Address {
     id: string;
     title: string;
     street: string;
+    city?: string;
 }
 
 function formatDeliveryTimesDate(date: Date): string {
@@ -446,7 +447,19 @@ export default function Step2() {
 
     // Address list mapping
     const formattedDbAddresses = React.useMemo(() => {
-        return dbAddresses.map(addr => {
+        if (!checkoutCity) return [];
+
+        const filtered = dbAddresses.filter(addr => {
+            const addrCity = addr.city || '';
+            const selectedCity = checkoutCity.name || '';
+            
+            const c1 = addrCity.toLowerCase().replace(/^(м\.|смт\.|с\.|город\.|село\.)\s*/, '').trim();
+            const c2 = selectedCity.toLowerCase().replace(/^(м\.|смт\.|с\.|город\.|село\.)\s*/, '').trim();
+            
+            return c1 === c2 || c1.includes(c2) || c2.includes(c1);
+        });
+
+        return filtered.map(addr => {
             const title = lang === 'ua' 
                 ? (addr.isDefault ? 'Основна адреса' : 'Адреса') 
                 : (addr.isDefault ? 'Основной адрес' : 'Адрес');
@@ -462,19 +475,38 @@ export default function Step2() {
             return {
                 id: addr.id.toString(),
                 title,
-                street: `${streetPrefix}${streetVal}${houseVal}${aptVal}`
+                street: `${streetPrefix}${streetVal}${houseVal}${aptVal}`,
+                city: addr.city
             };
         });
-    }, [dbAddresses, lang]);
+    }, [dbAddresses, lang, checkoutCity]);
+
+    const filteredGuestAddresses = React.useMemo(() => {
+        if (!checkoutCity) return [];
+        return guestAddresses.filter(addr => {
+            const addrCity = addr.city || '';
+            const selectedCity = checkoutCity.name || '';
+            
+            const c1 = addrCity.toLowerCase().replace(/^(м\.|смт\.|с\.|город\.|село\.)\s*/, '').trim();
+            const c2 = selectedCity.toLowerCase().replace(/^(м\.|смт\.|с\.|город\.|село\.)\s*/, '').trim();
+            
+            return !addrCity || c1 === c2 || c1.includes(c2) || c2.includes(c1);
+        });
+    }, [guestAddresses, checkoutCity]);
 
     const addresses = React.useMemo(() => {
-        return [...formattedDbAddresses, ...guestAddresses];
-    }, [formattedDbAddresses, guestAddresses]);
+        return [...formattedDbAddresses, ...filteredGuestAddresses];
+    }, [formattedDbAddresses, filteredGuestAddresses]);
 
     // Set default selected address
     useEffect(() => {
-        if (addresses.length > 0 && !selectedAddressId) {
-            setSelectedAddressId(addresses[0].id);
+        if (addresses.length > 0) {
+            const exists = addresses.some(addr => addr.id === selectedAddressId);
+            if (!exists) {
+                setSelectedAddressId(addresses[0].id);
+            }
+        } else {
+            setSelectedAddressId('');
         }
     }, [addresses, selectedAddressId]);
 
@@ -645,6 +677,7 @@ export default function Step2() {
                     id: newAddr.id || Math.random().toString(),
                     title: newAddr.title || (lang === 'ua' ? 'Тимчасова адреса' : 'Временный адрес'),
                     street: `${streetPrefix}${newAddr.street}${newAddr.house ? `${housePrefix}${newAddr.house}` : ''}${newAddr.apartment ? `${aptPrefix}${newAddr.apartment}` : ''}`,
+                    city: newAddr.city || checkoutCity?.name || 'Київ',
                 };
                 setGuestAddresses(prev => [...prev, tempAddr]);
                 setSelectedAddressId(tempAddr.id);
@@ -659,6 +692,7 @@ export default function Step2() {
                 id: newAddr.id || Math.random().toString(),
                 title: newAddr.title || (lang === 'ua' ? 'Тимчасова адреса' : 'Временный адрес'),
                 street: `${streetPrefix}${newAddr.street}${newAddr.house ? `${housePrefix}${newAddr.house}` : ''}${newAddr.apartment ? `${aptPrefix}${newAddr.apartment}` : ''}`,
+                city: newAddr.city || checkoutCity?.name || 'Київ',
             };
             setGuestAddresses(prev => [...prev, tempAddr]);
             setSelectedAddressId(tempAddr.id);
