@@ -474,12 +474,12 @@
     gap: 0;
 
     @media (min-width: 1024px) {
-        max-height: 252px;
+        max-height: 300px;
         overflow-y: auto;
         overflow-x: hidden;
         scrollbar-width: thin;
         scrollbar-color: #E3051B #E2E2E2;
-        padding-right: 6px;
+        padding-right: 12px;
 
         &::-webkit-scrollbar {
             width: 4px;
