@@ -90,7 +90,7 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang }: AddPick
                         : '';
                     return {
                         id: shop.id.toString(),
-                        name: shop.name || shop.siteName || '',
+                        name: shop.siteName || shop.name || '',
                         address: shop.siteAddress || '',
                         hours: hours,
                         lat: shop.lat || defaultCenter.lat,
