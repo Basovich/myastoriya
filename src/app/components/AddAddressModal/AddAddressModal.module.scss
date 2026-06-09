@@ -7,10 +7,11 @@
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
     z-index: 1000;
-    padding: 16px;
+    padding: 40px 16px;
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
 
@@ -35,6 +36,7 @@
     outline: none;
     padding: 20px;
     z-index: 1000;
+    margin: auto;
 }
 
 .modal {
