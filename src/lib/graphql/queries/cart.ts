@@ -13,12 +13,19 @@ export interface CartItemGql {
     costVariantName?: string | null;
 }
 
+export interface CartPromoCodeGql {
+    isApplied: boolean;
+    code?: string | null;
+    discount?: string | null;
+}
+
 export interface CartGql {
     hasUnavailableProducts: boolean;
     items: CartItemGql[];
     hasRawFoods: boolean;
     total: number;
     cashback: number;
+    promoCode?: CartPromoCodeGql | null;
 }
 
 const CART_FIELDS = `
@@ -38,6 +45,11 @@ const CART_FIELDS = `
     hasRawFoods
     total
     cashback
+    promoCode {
+        isApplied
+        code
+        discount
+    }
 `;
 
 export const ADD_PRODUCT_TO_CART_MUTATION = /* GraphQL */ `
@@ -212,4 +224,79 @@ export async function getCartApi(
         { token, lang, cache: 'no-store' }
     );
     return data.cart;
+}
+
+export const APPLY_PROMO_CODE_MUTATION = /* GraphQL */ `
+    mutation ApplyPromoCode(
+        $code: String!
+        $paymentId: Int
+        $deliveryId: Int
+        $localityId: Int
+        $useBonuses: Boolean
+    ) {
+        applyPromoCode(
+            code: $code
+            paymentId: $paymentId
+            deliveryId: $deliveryId
+            localityId: $localityId
+            useBonuses: $useBonuses
+        ) {
+            ${CART_FIELDS}
+        }
+    }
+`;
+
+export const CANCEL_PROMO_CODE_MUTATION = /* GraphQL */ `
+    mutation CancelCartPromoCode(
+        $paymentId: Int
+        $deliveryId: Int
+        $localityId: Int
+        $useBonuses: Boolean
+    ) {
+        cancelCartPromoCode(
+            paymentId: $paymentId
+            deliveryId: $deliveryId
+            localityId: $localityId
+            useBonuses: $useBonuses
+        ) {
+            ${CART_FIELDS}
+        }
+    }
+`;
+
+export async function applyPromoCodeApi(
+    params: {
+        code: string;
+        paymentId?: number;
+        deliveryId?: number;
+        localityId?: number;
+        useBonuses?: boolean;
+    },
+    token?: string,
+    lang?: string
+): Promise<CartGql> {
+    const data = await gqlRequest<{ applyPromoCode: CartGql }>(
+        APPLY_PROMO_CODE_MUTATION,
+        params,
+        { token, lang, cache: 'no-store' }
+    );
+    return data.applyPromoCode;
+}
+
+export async function cancelCartPromoCodeApi(
+    params: {
+        paymentId?: number;
+        deliveryId?: number;
+        localityId?: number;
+        useBonuses?: boolean;
+    } = {},
+    token?: string,
+    lang?: string
+): Promise<CartGql> {
+    const data = await gqlRequest<{ cancelCartPromoCode: CartGql }>(
+        CANCEL_PROMO_CODE_MUTATION,
+        params,
+        { token, lang, cache: 'no-store' }
+    );
+    return data.cancelCartPromoCode;
 }

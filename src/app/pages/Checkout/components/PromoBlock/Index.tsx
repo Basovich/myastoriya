@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useParams } from 'next/navigation';
 import s from './PromoBlock.module.scss';
 import clsx from 'clsx';
+import { applyPromoCodeApi } from '@/lib/graphql/queries/cart';
 
 interface PromoBlockProps {
     onApply: (code: string, discount: number) => void;
@@ -10,6 +12,8 @@ interface PromoBlockProps {
 }
 
 export default function PromoBlock({ onApply, isApplied }: PromoBlockProps) {
+    const params = useParams();
+    const locale = params?.lang as string;
     const [isEditing, setIsEditing] = useState(false);
     const [code, setCode] = useState('');
     const [error, setError] = useState('');
@@ -26,21 +30,20 @@ export default function PromoBlock({ onApply, isApplied }: PromoBlockProps) {
 
         setIsLoading(true);
         try {
-            const res = await fetch('/api/promo/verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: code.trim() }),
-            });
-            const data = await res.json();
+            const lang = locale === 'ru' ? 'ru' : 'ua';
+            const cart = await applyPromoCodeApi({ code: code.trim() }, undefined, lang);
 
-            if (res.ok && data.valid) {
+            if (cart.promoCode?.isApplied) {
                 setIsEditing(false);
-                onApply(code.trim(), data.discount);
+                const discountStr = cart.promoCode.discount || '0';
+                const discountVal = parseFloat(discountStr.replace(/[^\d.]/g, '')) || 0;
+                onApply(code.trim(), discountVal);
             } else {
-                setError(data.error || 'Невірний код');
+                setError(lang === 'ru' ? 'Не удалось применить промокод' : 'Не вдалося застосувати промокод');
             }
         } catch (err) {
-            setError('Помилка звязку з сервером');
+            const msg = err instanceof Error ? err.message : 'Помилка зв\'язку з сервером';
+            setError(msg);
         } finally {
             setIsLoading(false);
         }
