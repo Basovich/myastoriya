@@ -374,3 +374,24 @@
         min-width: 200px;
     }
 }
+
+.loadingWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 100px 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #8c8c8c;
+}
+
+.searchingState,
+.noResultsState {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #8c8c8c;
+}

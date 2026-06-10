@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { Locale } from '@/i18n/config';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
@@ -14,6 +14,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
 import ShoppingListCard from './ShoppingListCard/ShoppingListCard';
+import { 
+    getShoppingListsApi, 
+    deleteShoppingListApi, 
+    addShoppingListToCartApi,
+    ShoppingList 
+} from '@/lib/graphql/queries/pages/shoppingList';
+import { fetchCartAsync } from '@/store/slices/cartSlice';
 import s from './ShoppingListClient.module.scss';
 
 const shoppingListDict = {
@@ -27,37 +34,6 @@ const shoppingListDict = {
     }
 };
 
-const mockShoppingLists = [
-    {
-        id: "1",
-        name: "НАЗВА СПИСКУ ПОКУПОК",
-        date: "12.08.2025",
-        products: ["/images/product-ribeye.jpg", "/images/product-meatballs.jpg", "/images/product-sausages.jpg", "/images/product-shashlik.jpg", "/images/product-ribeye.jpg", "/images/product-meatballs.jpg", "/images/product-sausages.jpg", "/images/product-shashlik.jpg", "/images/product-ribeye.jpg", "/images/product-meatballs.jpg", "/images/product-sausages.jpg"],
-        totalSum: 12050
-    },
-    {
-        id: "2",
-        name: "НАЗВА СПИСКУ ПОКУПОК",
-        date: "12.08.2025",
-        products: ["/images/product-ribeye.jpg", "/images/product-meatballs.jpg", "/images/product-sausages.jpg", "/images/product-shashlik.jpg"],
-        totalSum: 12050
-    },
-    {
-        id: "3",
-        name: "НАЗВА СПИСКУ ПОКУПОК",
-        date: "12.08.2025",
-        products: ["/images/product-ribeye.jpg", "/images/product-meatballs.jpg", "/images/product-sausages.jpg"],
-        totalSum: 12050
-    },
-    {
-        id: "4",
-        name: "НАЗВА СПИСКУ ПОКУПОК",
-        date: "12.08.2025",
-        products: ["/images/product-shashlik.jpg"],
-        totalSum: 12050
-    }
-];
-
 interface ShoppingListClientProps {
     lang: Locale;
 }
@@ -70,6 +46,30 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
     const router = useRouter();
     const { user } = useAppSelector((state) => state.auth);
 
+    const [lists, setLists] = useState<ShoppingList[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const loadLists = async () => {
+        try {
+            setIsLoading(true);
+            const token = await getAccessToken();
+            if (token) {
+                const res = await getShoppingListsApi(100, 1, token, lang);
+                setLists(res.data || []);
+            }
+        } catch (error) {
+            console.error('Failed to load shopping lists:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (hydrated) {
+            loadLists();
+        }
+    }, [hydrated]);
+
     const handleLogout = async () => {
         try {
             const token = await getAccessToken();
@@ -80,6 +80,38 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
             await clearAuthCookies();
             dispatch(logout());
             router.replace('/');
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm(lang === 'ua' ? 'Ви впевнені, що хочете видалити цей список покупок?' : 'Вы уверены, что хотите удалить этот список покупок?')) {
+            return;
+        }
+        try {
+            const token = await getAccessToken();
+            if (token) {
+                const success = await deleteShoppingListApi(id, token, lang);
+                if (success) {
+                    setLists((prev) => prev.filter((item) => item.id !== id));
+                }
+            }
+        } catch (error) {
+            console.error('Failed to delete shopping list:', error);
+        }
+    };
+
+    const handleAddToCart = async (id: string) => {
+        try {
+            const token = await getAccessToken();
+            if (token) {
+                const success = await addShoppingListToCartApi(id, token, lang);
+                if (success) {
+                    dispatch(fetchCartAsync());
+                    alert(lang === 'ua' ? 'Товари успішно додано до кошика!' : 'Товары успешно добавлены в корзину!');
+                }
+            }
+        } catch (error) {
+            console.error('Failed to add shopping list to cart:', error);
         }
     };
 
@@ -104,20 +136,26 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                     </Button>
                 </Link>
 
-                <div className={s.listsGrid}>
-                    {mockShoppingLists.map((item) => (
-                        <ShoppingListCard
-                            key={item.id}
-                            name={item.name}
-                            date={item.date}
-                            products={item.products}
-                            totalSum={item.totalSum}
-                            onEdit={() => console.log('Edit list', item.id)}
-                            onAddToCart={() => console.log('Add list to cart', item.id)}
-                            onDelete={() => console.log('Delete list', item.id)}
-                        />
-                    ))}
-                </div>
+                {isLoading ? (
+                    <div className={s.loading}>
+                        {lang === 'ua' ? 'Завантаження...' : 'Загрузка...'}
+                    </div>
+                ) : (
+                    <div className={s.listsGrid}>
+                        {lists.map((item) => (
+                            <ShoppingListCard
+                                key={item.id}
+                                name={item.name || ''}
+                                date="—"
+                                products={item.products || []}
+                                totalSum={item.total || 0}
+                                onEdit={() => router.push(`/${lang}/personal/shopping-list/create?id=${item.id}`)}
+                                onAddToCart={() => handleAddToCart(item.id)}
+                                onDelete={() => handleDelete(item.id)}
+                            />
+                        ))}
+                    </div>
+                )}
             </PersonalContentBlock>
         </div>
     );

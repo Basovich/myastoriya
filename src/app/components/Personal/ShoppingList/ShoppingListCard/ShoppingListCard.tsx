@@ -3,12 +3,13 @@
 import React from 'react';
 import Image from 'next/image';
 import Button from '@/app/components/ui/Button/Button';
+import { ShoppingListProduct } from '@/lib/graphql/queries/pages/shoppingList';
 import s from './ShoppingListCard.module.scss';
 
 interface ShoppingListCardProps {
     name: string;
     date: string;
-    products: string[];
+    products: ShoppingListProduct[];
     totalSum: number;
     onEdit: () => void;
     onAddToCart: () => void;
@@ -48,11 +49,19 @@ export default function ShoppingListCard({
 
             <div className={s.productsRow}>
                 <div className={s.productsList}>
-                    {products.slice(0, 10).map((img, i) => (
-                        <div key={i} className={s.productThumb}>
-                            <Image src={img} alt="Product" width={56} height={42} />
-                        </div>
-                    ))}
+                    {products.slice(0, 10).map((prod, i) => {
+                        const imgUrl = prod.image
+                            ? (prod.image.grid2x || prod.image.main2x || prod.image.grid1x || prod.image.main1x || prod.image.big || '')
+                            : '';
+                        const resolvedImg = imgUrl.startsWith('/')
+                            ? `https://dev-api.myastoriya.com.ua${imgUrl}`
+                            : imgUrl || '/images/no-image.jpg';
+                        return (
+                            <div key={prod.id || i} className={s.productThumb}>
+                                <Image src={resolvedImg} alt={prod.name || "Product"} width={56} height={42} />
+                            </div>
+                        );
+                    })}
                     {products.length > 10 && (
                         <div className={s.moreThumb}>
                             <span>{products.length - 10}</span>
