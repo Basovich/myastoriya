@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { refreshTokenApi } from '@/lib/graphql/queries/auth';
+import { refreshTokenApi, authAsGuestApi } from '@/lib/graphql/queries/auth';
 
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
@@ -69,4 +69,14 @@ export async function tryRefreshTokenAction(): Promise<string | null> {
         cookieStore.delete(REFRESH_TOKEN_KEY);
         return null;
     }
+}
+
+/**
+ * Initializes a new guest session using deviceId and sets auth cookies.
+ * Returns the new guest access token.
+ */
+export async function initializeGuestSessionAction(deviceId: string): Promise<string> {
+    const result = await authAsGuestApi(deviceId);
+    await setAuthCookies(result.accessToken, result.refreshToken);
+    return result.accessToken;
 }

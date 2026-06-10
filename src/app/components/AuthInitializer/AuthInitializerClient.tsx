@@ -69,6 +69,9 @@ function AuthInitializerClient() {
         if (initialised.current) return;
         initialised.current = true;
 
+        // Ensure device ID is generated immediately on startup
+        getOrCreateDeviceId();
+
         void initAuth(dispatch).finally(() => {
             // Once auth is initialized (either as user or guest), fetch the wishlist payload
             void dispatch(fetchWishlistPayloadAsync());

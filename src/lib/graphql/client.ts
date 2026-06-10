@@ -36,6 +36,8 @@ interface RequestOptions {
     cache?: RequestCache;
     /** Internal retry counter */
     _retryCount?: number;
+    /** Internal retry flag for token refresh */
+    _isRetry?: boolean;
 }
 
 const MAX_RETRIES = 5;
@@ -160,6 +162,49 @@ export async function gqlRequest<T>(
 
         if (json.errors?.length) {
             const error = json.errors[0];
+            
+            // JWT Interceptor for Unauthorized (401) errors on the client side
+            const isUnauthorized = error.message === 'Unauthorized' || error.extensions?.category === 'authentication';
+            if (!isServer && isUnauthorized && !options?._isRetry) {
+                try {
+                    const { tryRefreshTokenAction, initializeGuestSessionAction } = await import('@/app/actions/authActions');
+                    let freshToken = await tryRefreshTokenAction();
+                    
+                    if (!freshToken) {
+                        const deviceId = localStorage.getItem('mya_device_id');
+                        if (deviceId) {
+                            freshToken = await initializeGuestSessionAction(deviceId);
+                        }
+                    }
+                    
+                    if (freshToken) {
+                        // Dynamically import store and actions to update UI state
+                        const { store } = await import('@/store');
+                        const { loginAsGuest, setUser } = await import('@/store/slices/authSlice');
+                        const { getMeApi } = await import('@/lib/graphql/queries/auth');
+                        
+                        try {
+                            const user = await getMeApi(freshToken);
+                            if (user && (user.phone || user.email)) {
+                                store.dispatch(setUser(user));
+                            } else {
+                                store.dispatch(loginAsGuest());
+                            }
+                        } catch {
+                            store.dispatch(loginAsGuest());
+                        }
+                        
+                        // Retry original request with the fresh token
+                        return gqlRequest(query, variables, {
+                            ...options,
+                            token: freshToken,
+                            _isRetry: true,
+                        });
+                    }
+                } catch (refreshErr) {
+                    console.error('[GQL Interceptor] Automatic token refresh failed:', refreshErr);
+                }
+            }
             
             if (isServer) {
                 // If it's the known backend crash, don't log the full trace to keep build logs clean
