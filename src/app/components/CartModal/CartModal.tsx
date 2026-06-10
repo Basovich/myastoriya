@@ -81,7 +81,11 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                     setShowCashback(hasPaidAndCompleted);
                 }
             } catch (error) {
-                console.error('Failed to fetch orders for cashback check', error);
+                if (error instanceof Error && error.message === 'Unauthorized') {
+                    console.warn('Failed to fetch orders for cashback check: User is unauthorized (guest or session expired)');
+                } else {
+                    console.error('Failed to fetch orders for cashback check:', error);
+                }
                 setShowCashback(false);
             }
         };
