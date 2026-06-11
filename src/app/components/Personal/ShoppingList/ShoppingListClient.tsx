@@ -21,6 +21,7 @@ import {
     ShoppingList 
 } from '@/lib/graphql/queries/pages/shoppingList';
 import { fetchCartAsync } from '@/store/slices/cartSlice';
+import Spinner from '@/app/components/ui/Spinner/Spinner';
 import s from './ShoppingListClient.module.scss';
 
 const shoppingListDict = {
@@ -137,9 +138,7 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                 </Link>
 
                 {isLoading ? (
-                    <div className={s.loading}>
-                        {lang === 'ua' ? 'Завантаження...' : 'Загрузка...'}
-                    </div>
+                    <Spinner />
                 ) : (
                     <div className={s.listsGrid}>
                         {lists.map((item) => (

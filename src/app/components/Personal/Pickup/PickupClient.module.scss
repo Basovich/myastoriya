@@ -242,13 +242,4 @@ div.contentBlock {
     transition: all 0.2s;
 }
 
-.loading {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 180px;
-    font-size: 14px;
-    color: #666;
-    font-weight: 500;
-}
+

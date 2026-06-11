@@ -14,6 +14,7 @@ import { logout } from '@/store/slices/authSlice';
 import { logoutApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter } from 'next/navigation';
+import Spinner from '@/app/components/ui/Spinner/Spinner';
 import s from './Favorites.module.scss';
 
 function getWeight(product: Product): string {
@@ -125,9 +126,7 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
             />
             <div className={s.favoritesContainer}>
                 {!isInitialized || isLoading ? (
-                    <div className={s.emptyState}>
-                        <p>{dict.loading}</p>
-                    </div>
+                    <Spinner />
                 ) : products.length === 0 ? (
                     <div className={s.emptyState}>
                         <p>{dict.empty}</p>

@@ -9,6 +9,7 @@ import { AuthUser } from '@/store/slices/authSlice';
 import BankCardItem, { type BankCard } from './BankCardItem';
 import AddBankCardBtn from './AddBankCardBtn';
 import DeleteCardModal from './DeleteCardModal';
+import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { 
     getUserBankCardsApi, 
     deleteUserBankCardApi, 
@@ -159,7 +160,7 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
                 <h2 className={s.subtitle}>{dict.subtitle}</h2>
 
                 {isLoading ? (
-                    <div className={s.loading}>{dict.loading}</div>
+                    <Spinner />
                 ) : (
                     <div className={s.grid}>
                         {cards.map((card) => (
