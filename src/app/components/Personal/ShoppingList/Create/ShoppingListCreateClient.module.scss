@@ -49,28 +49,32 @@
         gap: 24px;
         align-items: center;
     }
+
+    @media (min-width: 1280px) {
+        gap: 32px;
+    }
 }
 
 .searchField {
     flex: 1;
     max-width: 100%;
 
-    @media (min-width: 1024px) {
-        max-width: 480px;
+    @media (min-width: 1280px) {
+        min-width: 369px;
+        height: 46px;
     }
 }
 
 .categorySelect {
     height: 44px;
-    border: 1px solid #F0F0F0;
     border-radius: 8px;
-    padding: 0 16px;
     font-size: 14px;
     background: #fff;
     outline: none;
+    max-width: 100%;
 
     @media (min-width: 1024px) {
-        width: 300px;
+        flex: 1;
     }
 }
 

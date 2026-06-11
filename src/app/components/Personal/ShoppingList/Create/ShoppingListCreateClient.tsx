@@ -33,6 +33,7 @@ import {
 } from '@/lib/graphql/queries/pages/shoppingList';
 import { fetchCartAsync } from '@/store/slices/cartSlice';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
+import CustomSelect from '@/app/components/ui/CustomSelect';
 import s from './ShoppingListCreateClient.module.scss';
 
 const createDict = {
@@ -97,6 +98,14 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const [isSaving, setIsSaving] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
+
+    const categoryOptions = React.useMemo(() => [
+        { label: dict.categoryPlaceholder, value: "" },
+        ...categories.map(cat => ({
+            label: cat.name,
+            value: String(cat.id)
+        }))
+    ], [categories, dict.categoryPlaceholder]);
 
     useEffect(() => {
         if (!hydrated) return;
@@ -166,8 +175,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
         void performSearch(searchQuery, selectedCategory);
     };
 
-    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const catId = e.target.value;
+    const handleCategoryChange = (catId: string) => {
         setSelectedCategory(catId);
         void performSearch(searchQuery, catId);
     };
@@ -304,6 +312,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const totalSum = addedItems.reduce((acc, item) => acc + item.price, 0);
     const titleText = editId ? dict.editTitle : dict.title;
 
+
     return (
         <div className={s.createPage}>
             <PersonalContentBlock className={s.contentBlock}>
@@ -335,17 +344,13 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                             onSubmit={handleSearchSubmit}
                             disabled={isSaving}
                         />
-                        <select 
-                            className={s.categorySelect}
+                        <CustomSelect 
+                            options={categoryOptions}
                             value={selectedCategory}
                             onChange={handleCategoryChange}
-                            disabled={isSaving}
-                        >
-                            <option value="">{dict.categoryPlaceholder}</option>
-                            {categories.map(cat => (
-                                <option key={cat.id} value={cat.id}>{cat.name}</option>
-                            ))}
-                        </select>
+                            placeholder={dict.categoryPlaceholder}
+                            className={s.categorySelect}
+                        />
                     </div>
                 </div>
 

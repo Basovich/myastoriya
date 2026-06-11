@@ -1,10 +1,12 @@
 .selectWrapper {
     position: relative;
     width: 100%;
+    min-width: 0;
 }
 
 .selectBtn {
     width: 100%;
+    min-width: 0;
     border: 1px solid #c4c4c4;
     border-radius: 8px;
     padding: 10px 16px;
@@ -48,6 +50,14 @@
     align-items: center;
     gap: 12px;
     flex: 1;
+    min-width: 0;
+}
+
+.selectValue {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .leftIcon {

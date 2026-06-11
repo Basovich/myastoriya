@@ -191,7 +191,6 @@ button.logoutBtn {
     display: flex;
     flex-direction: column;
     gap: 24px;
-    overflow: hidden;
 
     @media (min-width: 1024px) {
         padding: 32px;
