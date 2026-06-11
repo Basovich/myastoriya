@@ -176,3 +176,27 @@ button.swiper-button-lock {
   font-weight: 700;
   color: var(--color-text-primary);
 }
+
+/* ===== Custom Scrollbar for the Entire Page ===== */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent) #f5f5f5;
+}
+
+html::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 4px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-hover);
+}

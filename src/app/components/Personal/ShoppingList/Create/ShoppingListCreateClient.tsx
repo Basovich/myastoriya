@@ -99,7 +99,9 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const [isSaving, setIsSaving] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(false);
+    const [isFetchingNext, setIsFetchingNext] = useState(false);
     const categoryOptions = React.useMemo(() => 
         categories.map(cat => ({
             label: cat.name,
@@ -168,18 +170,54 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
 
     const performSearch = async (query: string, catId: string) => {
         setHasSearched(true);
+        setCurrentPage(1);
         try {
             setIsSearching(true);
             const res = await getProductsApi({
                 search: query || undefined,
                 categoryId: catId ? Number(catId) : undefined,
-                limit: 20
+                limit: 20,
+                page: 1
             }, lang);
             setSearchResults(res.data || []);
+            setHasMore(res.has_more_pages);
         } catch (error) {
             console.error('Failed to search products:', error);
         } finally {
             setIsSearching(false);
+        }
+    };
+
+    const loadNextPage = async () => {
+        try {
+            setIsFetchingNext(true);
+            const nextPage = currentPage + 1;
+            const res = await getProductsApi({
+                search: searchQuery || undefined,
+                categoryId: selectedCategory ? Number(selectedCategory) : undefined,
+                limit: 20,
+                page: nextPage
+            }, lang);
+            
+            if (res.data && res.data.length > 0) {
+                setSearchResults(prev => [...prev, ...res.data]);
+                setCurrentPage(nextPage);
+                setHasMore(res.has_more_pages);
+            } else {
+                setHasMore(false);
+            }
+        } catch (error) {
+            console.error('Failed to load next page:', error);
+        } finally {
+            setIsFetchingNext(false);
+        }
+    };
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.currentTarget;
+        const isNearBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 150;
+        if (isNearBottom && hasMore && !isFetchingNext) {
+            void loadNextPage();
         }
     };
 
@@ -381,7 +419,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                 {lang === 'ua' ? 'Нічого не знайдено' : 'Ничего не найдено'}
                             </div>
                         ) : (
-                            <div className={s.resultsGrid}>
+                            <div className={s.resultsGrid} onScroll={handleScroll}>
                                 {searchResults.map(prod => {
                                     const price = prod.cost || 0;
                                     const imgUrl = resolveProductImageUrl(prod) || '/images/no-image.jpg';
@@ -401,6 +439,11 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                         />
                                     );
                                 })}
+                                {isFetchingNext && (
+                                    <div className={s.nextPageLoader}>
+                                        <Spinner />
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

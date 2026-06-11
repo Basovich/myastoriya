@@ -90,19 +90,50 @@ div.contentBlock {
 /* Search Cards */
 .searchResults {
     padding: 16px;
-    border: 1px solid #F0F0F0;
     border-radius: 12px;
-    background: #fff;
-
-    @media (min-width: 1024px) {
-        padding: 24px;
-    }
+    background: #FFF;
+    box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.11);
 }
 
 .resultsGrid {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 4px;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent) #f5f5f5;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f5f5f5;
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--color-accent);
+        border-radius: 3px;
+        transition: background-color 0.2s;
+
+        @media (any-hover: hover) {
+            &:hover {
+                background: var(--color-accent-hover);
+            }
+        }
+    }
+}
+
+.nextPageLoader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 0;
+    width: 100%;
 }
 
 .searchCard {
