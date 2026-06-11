@@ -96,6 +96,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
+    const [hasSearched, setHasSearched] = useState(false);
 
     useEffect(() => {
         if (!hydrated) return;
@@ -105,9 +106,6 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                 setIsLoading(true);
                 const cats = await getCategoriesApi(lang);
                 setCategories(cats || []);
-
-                const initialSearch = await getProductsApi({ limit: 12 }, lang);
-                setSearchResults(initialSearch.data || []);
 
                 if (editId) {
                     const token = await getAccessToken();
@@ -148,6 +146,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     }, [hydrated, editId, lang]);
 
     const performSearch = async (query: string, catId: string) => {
+        setHasSearched(true);
         try {
             setIsSearching(true);
             const res = await getProductsApi({
@@ -353,8 +352,12 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                 <div className={s.mainGrid}>
                     <div className={s.searchResults}>
                         {isSearching ? (
-                            <div className={s.searchingState}>
-                                {lang === 'ua' ? 'Пошук товарів...' : 'Поиск товаров...'}
+                            <Spinner />
+                        ) : !hasSearched ? (
+                            <div className={s.noResultsState}>
+                                {lang === 'ua' 
+                                    ? 'Скористайтеся формою пошуку або оберіть категорію, щоб знайти товари' 
+                                    : 'Воспользуйтесь формой поиска или выберите категорию, чтобы найти товары'}
                             </div>
                         ) : searchResults.length === 0 ? (
                             <div className={s.noResultsState}>
