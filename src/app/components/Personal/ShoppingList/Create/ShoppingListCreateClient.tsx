@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Locale } from '@/i18n/config';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
@@ -102,6 +102,8 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
     const [isFetchingNext, setIsFetchingNext] = useState(false);
+    const [nameError, setNameError] = useState("");
+    const nameInputRef = useRef<HTMLInputElement>(null);
     const categoryOptions = React.useMemo(() => 
         categories.map(cat => ({
             label: cat.name,
@@ -251,7 +253,9 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
 
     const handleSaveList = async () => {
         if (!listName.trim()) {
-            alert(lang === 'ua' ? 'Будь ласка, введіть назву списку' : 'Пожалуйста, введите название списка');
+            setNameError(lang === 'ua' ? 'Будь ласка, введіть назву списку' : 'Пожалуйста, введите название списка');
+            nameInputRef.current?.focus();
+            nameInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
         if (addedItems.length === 0) {
@@ -308,7 +312,9 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
             let activeId = editId;
             if (!activeId) {
                 if (!listName.trim()) {
-                    alert(lang === 'ua' ? 'Будь ласка, введіть назву списку' : 'Пожалуйста, введите название списка');
+                    setNameError(lang === 'ua' ? 'Будь ласка, введіть назву списку' : 'Пожалуйста, введите название списка');
+                    nameInputRef.current?.focus();
+                    nameInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
                 }
                 if (addedItems.length === 0) {
@@ -375,14 +381,23 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                 />
 
                 <div className={s.formHeader}>
-                    <input 
-                        type="text" 
-                        className={s.nameInput} 
-                        placeholder={dict.namePlaceholder}
-                        value={listName}
-                        onChange={(e) => setListName(e.target.value)}
-                        disabled={isSaving}
-                    />
+                    <div className={s.nameInputContainer}>
+                        <input 
+                            ref={nameInputRef}
+                            type="text" 
+                            className={`${s.nameInput} ${nameError ? s.errorInput : ''}`} 
+                            placeholder={dict.namePlaceholder}
+                            value={listName}
+                            onChange={(e) => {
+                                setListName(e.target.value);
+                                if (nameError) setNameError("");
+                            }}
+                            disabled={isSaving}
+                        />
+                        {nameError && (
+                            <span className={s.errorMessage}>{nameError}</span>
+                        )}
+                    </div>
 
                     <div className={s.searchRow}>
                         <Search 

@@ -37,6 +37,27 @@ div.contentBlock {
     }
 }
 
+.nameInputContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.errorInput {
+    border-color: #E30613 !important;
+
+    &::placeholder {
+        color: #E30613;
+    }
+}
+
+.errorMessage {
+    color: #E30613;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
 .searchRow {
     display: flex;
     flex-direction: column;
