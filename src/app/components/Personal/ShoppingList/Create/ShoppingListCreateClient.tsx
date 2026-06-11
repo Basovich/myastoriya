@@ -19,6 +19,7 @@ import {
     Product, 
     ProductCategory, 
     getCategoriesApi, 
+    getCatalogTreeApi,
     getProductsApi, 
     resolveProductImageUrl 
 } from '@/lib/graphql/queries/products';
@@ -99,13 +100,12 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const [isSearching, setIsSearching] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
 
-    const categoryOptions = React.useMemo(() => [
-        { label: dict.categoryPlaceholder, value: "" },
-        ...categories.map(cat => ({
+    const categoryOptions = React.useMemo(() => 
+        categories.map(cat => ({
             label: cat.name,
             value: String(cat.id)
         }))
-    ], [categories, dict.categoryPlaceholder]);
+    , [categories]);
 
     useEffect(() => {
         if (!hydrated) return;
@@ -113,8 +113,20 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
         const init = async () => {
             try {
                 setIsLoading(true);
-                const cats = await getCategoriesApi(lang);
-                setCategories(cats || []);
+                const tree = await getCatalogTreeApi(lang, 768);
+                const flattened: ProductCategory[] = [];
+                const recurse = (items: ProductCategory[]) => {
+                    for (const item of items) {
+                        flattened.push(item);
+                        if (item.children && item.children.length > 0) {
+                            recurse(item.children);
+                        }
+                    }
+                };
+                if (tree) {
+                    recurse(tree);
+                }
+                setCategories(flattened);
 
                 if (editId) {
                     const token = await getAccessToken();
