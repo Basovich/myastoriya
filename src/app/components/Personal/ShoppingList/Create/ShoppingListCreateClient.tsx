@@ -15,13 +15,16 @@ import Button from '@/app/components/ui/Button/Button';
 import Search from '@/app/components/ui/Search/Search';
 import SearchProductCard from './SearchProductCard';
 import AddedProductItem from './AddedProductItem';
+import ShoppingListNotificationModal from './ShoppingListNotificationModal';
 import { 
     Product, 
     ProductCategory,
     getCatalogTreeApi,
     getProductsApi, 
     resolveProductImageUrl,
-    getProductsByIdsApi
+    getProductsByIdsApi,
+    getProductCostVariantsApi,
+    getDefaultCostVariant
 } from '@/lib/graphql/queries/products';
 import { 
     getShoppingListByIdApi, 
@@ -52,6 +55,14 @@ const createDict = {
         saving: "ЗБЕРЕЖЕННЯ...",
         searchRequiredError: "Будь ласка, введіть пошуковий запит",
         searchMinLengthError: "Пошуковий запит має містити щонайменше 2 символи",
+        successTitle: "УСПІХ",
+        errorTitle: "ПОМИЛКА",
+        validationTitle: "УВАГА",
+        successSaveMessage: "Список покупок успішно збережено!",
+        errorSaveMessage: "Помилка при збереженні списку покупок",
+        validationAddProductsMessage: "Будь ласка, додайте товари до списку",
+        cartSuccessTitle: "УСПІХ",
+        cartSuccessMessage: "Товари успішно додано до кошика!"
     },
     ru: {
         title: "СОЗДАНИЕ СПИСКА ПОКУПОК",
@@ -67,6 +78,14 @@ const createDict = {
         saving: "СОХРАНЕНИЕ...",
         searchRequiredError: "Пожалуйста, введите поисковый запрос",
         searchMinLengthError: "Поисковый запрос должен содержать не менее 2 символов",
+        successTitle: "УСПЕХ",
+        errorTitle: "ОШИБКА",
+        validationTitle: "ВНИМАНИЕ",
+        successSaveMessage: "Список покупок успешно сохранен!",
+        errorSaveMessage: "Ошибка при сохранении списка покупок",
+        validationAddProductsMessage: "Пожалуйста, добавьте товары в список",
+        cartSuccessTitle: "УСПЕХ",
+        cartSuccessMessage: "Товары успешно добавлены в корзину!"
     }
 };
 
@@ -111,6 +130,15 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const [nameError, setNameError] = useState("");
     const [searchError, setSearchError] = useState("");
     const nameInputRef = useRef<HTMLInputElement>(null);
+
+    const [addingProductIds, setAddingProductIds] = useState<Set<number>>(new Set());
+    const [notification, setNotification] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        buttonText?: string;
+        onClose?: () => void;
+    } | null>(null);
     const categoryOptions = React.useMemo(() => 
         categories.map(cat => ({
             label: cat.name,
@@ -283,7 +311,14 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
         void performSearch(searchQuery, catId);
     };
 
-    const handleAddProductToList = (prod: Product) => {
+    const handleAddProductToList = async (prod: Product) => {
+        const prodId = Number(prod.id);
+        setAddingProductIds((prev) => {
+            const next = new Set(prev);
+            next.add(prodId);
+            return next;
+        });
+
         const tempId = `new_${Date.now()}_${Math.random()}`;
         const imgUrl = resolveProductImageUrl(prod);
         
@@ -297,17 +332,36 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
             ? weightSpec.values.join(' / ')
             : (prod.multiplier ? `${prod.multiplier} ${prod.unit || ''}` : '');
 
+        let costVariantId: string | null = null;
+        if (prod.hasCostVariants) {
+            try {
+                const variants = await getProductCostVariantsApi(prod.id, lang);
+                const defaultVariant = getDefaultCostVariant(variants);
+                if (defaultVariant) {
+                    costVariantId = defaultVariant.id;
+                }
+            } catch (e) {
+                console.error("Failed to fetch product cost variants: ", e);
+            }
+        }
+
         const newItem: ClientAddedItem = {
             id: tempId,
-            productId: Number(prod.id),
+            productId: prodId,
             name: prod.name,
             price: prod.cost || 0,
             unit: prod.unit || 'шт',
             image: imgUrl,
-            costVariantId: null,
+            costVariantId: costVariantId ? Number(costVariantId) : null,
             weight: weightVal
         };
+
         setAddedItems((prev) => [...prev, newItem]);
+        setAddingProductIds((prev) => {
+            const next = new Set(prev);
+            next.delete(prodId);
+            return next;
+        });
     };
 
     const handleRemoveItem = (id: string) => {
@@ -322,7 +376,11 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
             return;
         }
         if (addedItems.length === 0) {
-            alert(lang === 'ua' ? 'Будь ласка, додайте товари до списку' : 'Пожалуйста, добавьте товары в список');
+            setNotification({
+                isOpen: true,
+                title: dict.validationTitle,
+                message: dict.validationAddProductsMessage
+            });
             return;
         }
 
@@ -357,11 +415,21 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                 }
             }
 
-            alert(lang === 'ua' ? 'Список покупок успішно збережено!' : 'Список покупок успешно сохранен!');
-            router.push(`/${lang}/personal/shopping-list`);
+            setNotification({
+                isOpen: true,
+                title: dict.successTitle,
+                message: dict.successSaveMessage,
+                onClose: () => {
+                    router.push(`/${lang}/personal/shopping-list`);
+                }
+            });
         } catch (error) {
             console.error('Failed to save shopping list:', error);
-            alert(lang === 'ua' ? 'Помилка при збереженні списку покупок' : 'Ошибка при сохранении списка покупок');
+            setNotification({
+                isOpen: true,
+                title: dict.errorTitle,
+                message: dict.errorSaveMessage
+            });
         } finally {
             setIsSaving(false);
         }
@@ -381,7 +449,11 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                     return;
                 }
                 if (addedItems.length === 0) {
-                    alert(lang === 'ua' ? 'Будь ласка, додайте товари до списку' : 'Пожалуйста, добавьте товары в список');
+                    setNotification({
+                        isOpen: true,
+                        title: dict.validationTitle,
+                        message: dict.validationAddProductsMessage
+                    });
                     return;
                 }
                 setIsSaving(true);
@@ -395,8 +467,14 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
             const success = await addShoppingListToCartApi(activeId, token, lang);
             if (success) {
                 dispatch(fetchCartAsync());
-                alert(lang === 'ua' ? 'Товари успішно додано до кошика!' : 'Товары успешно добавлены в корзину!');
-                router.push(`/${lang}/personal/shopping-list`);
+                setNotification({
+                    isOpen: true,
+                    title: dict.cartSuccessTitle,
+                    message: dict.cartSuccessMessage,
+                    onClose: () => {
+                        router.push(`/${lang}/personal/shopping-list`);
+                    }
+                });
             }
         } catch (error) {
             console.error('Failed to add list to cart:', error);
@@ -515,6 +593,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                     const weightVal = weightSpec?.values?.[0] || '';
 
                                     const isAdded = addedItems.some(item => item.productId === Number(prod.id));
+                                    const isCurrentlyAdding = addingProductIds.has(Number(prod.id));
 
                                     return (
                                         <SearchProductCard 
@@ -525,7 +604,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                             image={imgUrl}
                                             onAdd={() => handleAddProductToList(prod)}
                                             lang={lang}
-                                            isAdded={isAdded}
+                                            isAdded={isAdded || isCurrentlyAdding}
                                         />
                                     );
                                 })}
@@ -567,7 +646,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                             <div className={s.listFooter}>
                                 <div className={s.sumBlock}>
                                     <span className={s.sumLabel}>{dict.sumLabel}</span>
-                                    <span className={s.sumValue}>{totalSum.toLocaleString()} ₴</span>
+                                    <span className={s.sumValue}>{totalSum.toLocaleString()} <span>₴</span></span>
                                 </div>
                                 <div className={s.footerActions}>
                                     <Button 
@@ -592,6 +671,19 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                     )}
                 </div>
             </PersonalContentBlock>
+            {notification && (
+                <ShoppingListNotificationModal
+                    isOpen={notification.isOpen}
+                    onClose={() => {
+                        const cb = notification.onClose;
+                        setNotification(null);
+                        if (cb) cb();
+                    }}
+                    title={notification.title}
+                    message={notification.message}
+                    lang={lang}
+                />
+            )}
         </div>
     );
 }
