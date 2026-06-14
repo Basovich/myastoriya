@@ -9,9 +9,11 @@ import s from './ShoppingListCreateClient.module.scss';
 const cardDict = {
     ua: {
         addToList: "ДОДАТИ ДО СПИСКУ",
+        addedToList: "ТОВАР ДОДАНО В СПИСОК",
     },
     ru: {
         addToList: "ДОБАВИТЬ В СПИСОК",
+        addedToList: "ТОВАР ДОБАВЛЕН В СПИСОК",
     }
 };
 
@@ -22,9 +24,10 @@ interface SearchProductCardProps {
     image: string;
     onAdd: () => void;
     lang: Locale;
+    isAdded?: boolean;
 }
 
-export default function SearchProductCard({ name, price, weight, image, onAdd, lang }: SearchProductCardProps) {
+export default function SearchProductCard({ name, price, weight, image, onAdd, lang, isAdded = false }: SearchProductCardProps) {
     const dict = cardDict[lang] || cardDict.ua;
 
     return (
@@ -36,8 +39,13 @@ export default function SearchProductCard({ name, price, weight, image, onAdd, l
                     <div className={s.searchCardPrice}>{price.toLocaleString()} <span>₴</span></div>
                 </div>
             </div>
-            <Button variant="outline-black" className={s.addBtn} onClick={onAdd}>
-                {dict.addToList}
+            <Button 
+                variant={isAdded ? "black" : "outline-black"} 
+                className={`${s.addBtn} ${isAdded ? s.added : ''}`} 
+                onClick={onAdd}
+                disabled={isAdded}
+            >
+                {isAdded ? dict.addedToList : dict.addToList}
             </Button>
         </div>
     );

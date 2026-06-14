@@ -123,7 +123,6 @@ div.contentBlock {
 
 /* Search Cards */
 .searchResults {
-
     @media (min-width: 768px) {
         padding: 18px 8px 18px 16px;
         border-radius: 12px;
@@ -136,7 +135,9 @@ div.contentBlock {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding-right: 4px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 8px;
     scrollbar-width: thin;
     scrollbar-color: var(--color-accent) #f5f5f5;
 
@@ -159,12 +160,6 @@ div.contentBlock {
                 background: var(--color-accent-hover);
             }
         }
-    }
-
-    @media (min-width: 768px) {
-        max-height: 400px;
-        overflow-y: auto;
-        padding-right: 8px;
     }
 }
 
@@ -277,6 +272,12 @@ button.addBtn {
         width: fit-content;
         min-width: 178px;
     }
+
+    &.added {
+        color: #fff;
+        background-color: #000;
+        cursor: not-allowed;
+    }
 }
 
 /* Active List */
@@ -308,8 +309,16 @@ button.addBtn {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
-    color: #1C1B1B;
+
+    span {
+        color: #060606;
+        font-feature-settings: 'liga' off, 'clig' off;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 120%;
+        padding-top: 3px;
+    }
 }
 
 .itemsList {
