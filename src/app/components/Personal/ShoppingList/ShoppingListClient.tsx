@@ -49,6 +49,7 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
 
     const [lists, setLists] = useState<ShoppingList[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const todayDate = new Date().toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uk-UA');
 
     const loadLists = async () => {
         try {
@@ -145,7 +146,7 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                             <ShoppingListCard
                                 key={item.id}
                                 name={item.name || ''}
-                                date="—"
+                                date={todayDate}
                                 products={item.products || []}
                                 totalSum={item.total || 0}
                                 onEdit={() => router.push(`/${lang}/personal/shopping-list/create?id=${item.id}`)}

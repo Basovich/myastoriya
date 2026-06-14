@@ -263,7 +263,7 @@ div.contentBlock {
     }
 }
 
-.addBtn {
+button.addBtn {
     height: 36px;
     font-weight: 700;
     width: 100%;
@@ -293,9 +293,11 @@ div.contentBlock {
 }
 
 .listTitle {
-    font-size: 16px;
+    color: #000;
+    font-size: 14px;
+    font-style: normal;
     font-weight: 700;
-    margin: 0;
+    line-height: normal;
 
     @media (min-width: 1024px) {
         font-size: 18px;

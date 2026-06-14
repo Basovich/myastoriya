@@ -3,7 +3,17 @@
 import React from 'react';
 import Image from 'next/image';
 import Button from '@/app/components/ui/Button/Button';
+import { Locale } from '@/i18n/config';
 import s from './ShoppingListCreateClient.module.scss';
+
+const cardDict = {
+    ua: {
+        addToList: "ДОДАТИ ДО СПИСКУ",
+    },
+    ru: {
+        addToList: "ДОБАВИТЬ В СПИСОК",
+    }
+};
 
 interface SearchProductCardProps {
     name: string;
@@ -11,9 +21,12 @@ interface SearchProductCardProps {
     weight?: string;
     image: string;
     onAdd: () => void;
+    lang: Locale;
 }
 
-export default function SearchProductCard({ name, price, weight, image, onAdd }: SearchProductCardProps) {
+export default function SearchProductCard({ name, price, weight, image, onAdd, lang }: SearchProductCardProps) {
+    const dict = cardDict[lang] || cardDict.ua;
+
     return (
         <div className={s.searchCard}>
             <div className={s.searchCardContent}>
@@ -24,7 +37,7 @@ export default function SearchProductCard({ name, price, weight, image, onAdd }:
                 </div>
             </div>
             <Button variant="outline-black" className={s.addBtn} onClick={onAdd}>
-                ДОДАТИ ДО СПИСКУ
+                {dict.addToList}
             </Button>
         </div>
     );
