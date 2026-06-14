@@ -25,15 +25,16 @@ export default function AddedProductItem({
         <div className={s.addedItem}>
             <div className={s.addedItemLeft}>
                 <div className={s.addedItemImg}>
-                    <Image src={image} alt={name} width={64} height={48} />
+                    <Image src={image} alt={name} width={88} height={88} />
                 </div>
                 <div className={s.addedItemInfo}>
                     <h4 className={s.addedItemName}>{name}</h4>
-                    <div className={s.addedItemWeight}>{weight} / {unitPrice}</div>
+                    {weight && <div className={s.addedItemWeight}>{weight}</div>}
+                    <div className={s.addedItemPriceBlock}>
+                        <span className={s.addedItemPrice}>{price.toLocaleString()} ₴</span>
+                        {unitPrice && <span className={s.addedItemUnitPrice}>{unitPrice}</span>}
+                    </div>
                 </div>
-            </div>
-            <div className={s.addedItemRight}>
-                <div className={s.addedItemPrice}>{price.toLocaleString()} ₴</div>
             </div>
             <button className={s.removeBtn} onClick={onRemove} aria-label="Видалити">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

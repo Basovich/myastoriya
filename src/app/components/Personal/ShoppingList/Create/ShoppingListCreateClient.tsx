@@ -20,7 +20,8 @@ import {
     ProductCategory,
     getCatalogTreeApi,
     getProductsApi, 
-    resolveProductImageUrl 
+    resolveProductImageUrl,
+    getProductsByIdsApi
 } from '@/lib/graphql/queries/products';
 import { 
     getShoppingListByIdApi, 
@@ -77,6 +78,7 @@ interface ClientAddedItem {
     unit: string;
     image: string;
     costVariantId?: number | null;
+    weight: string;
 }
 
 export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
@@ -145,6 +147,20 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                             setListName(list.name || "");
                             const prods = list.products || [];
                             setOriginalProducts(prods);
+
+                            let detailsMap: Record<number, Product> = {};
+                            if (prods.length > 0) {
+                                try {
+                                    const details = await getProductsByIdsApi(prods.map(p => p.productId), lang);
+                                    detailsMap = details.reduce((acc, curr) => {
+                                        acc[Number(curr.id)] = curr;
+                                        return acc;
+                                    }, {} as Record<number, Product>);
+                                } catch (e) {
+                                    console.error("Failed to fetch product details for weight mapping:", e);
+                                }
+                            }
+
                             setAddedItems(prods.map(p => {
                                 const imgUrl = p.image
                                     ? (p.image.grid2x || p.image.main2x || p.image.grid1x || p.image.main1x || p.image.big || '')
@@ -152,6 +168,21 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                 const resolvedImg = imgUrl.startsWith('/')
                                     ? `https://dev-api.myastoriya.com.ua${imgUrl}`
                                     : imgUrl || '/images/no-image.jpg';
+
+                                const detailedProd = detailsMap[p.productId];
+                                let weightVal = '';
+                                if (detailedProd) {
+                                    const weightSpec = detailedProd.specifications?.find(sp =>
+                                        sp.name.toLowerCase().includes('вага') ||
+                                        sp.name.toLowerCase().includes('важ') ||
+                                        sp.name.toLowerCase().includes('вес') ||
+                                        sp.name.toLowerCase().includes("об'єм")
+                                    );
+                                    weightVal = weightSpec && weightSpec.values.length > 0
+                                        ? weightSpec.values.join(' / ')
+                                        : (detailedProd.multiplier ? `${detailedProd.multiplier} ${detailedProd.unit || ''}` : '');
+                                }
+
                                 return {
                                     id: p.id,
                                     productId: p.productId,
@@ -159,7 +190,8 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                     price: p.cost || 0,
                                     unit: p.unit || "шт",
                                     image: resolvedImg,
-                                    costVariantId: p.costVariantId
+                                    costVariantId: p.costVariantId,
+                                    weight: weightVal
                                 };
                             }));
                         }
@@ -250,6 +282,17 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const handleAddProductToList = (prod: Product) => {
         const tempId = `new_${Date.now()}_${Math.random()}`;
         const imgUrl = resolveProductImageUrl(prod) || '/images/no-image.jpg';
+        
+        const weightSpec = prod.specifications?.find(sp =>
+            sp.name.toLowerCase().includes('вага') ||
+            sp.name.toLowerCase().includes('важ') ||
+            sp.name.toLowerCase().includes('вес') ||
+            sp.name.toLowerCase().includes("об'єм")
+        );
+        const weightVal = weightSpec && weightSpec.values.length > 0
+            ? weightSpec.values.join(' / ')
+            : (prod.multiplier ? `${prod.multiplier} ${prod.unit || ''}` : '');
+
         const newItem: ClientAddedItem = {
             id: tempId,
             productId: Number(prod.id),
@@ -257,7 +300,8 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
             price: prod.cost || 0,
             unit: prod.unit || 'шт',
             image: imgUrl,
-            costVariantId: null
+            costVariantId: null,
+            weight: weightVal
         };
         setAddedItems((prev) => [...prev, newItem]);
     };
@@ -509,7 +553,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                         name={item.name}
                                         price={item.price}
                                         unitPrice={`${item.price} грн / ${item.unit}`}
-                                        weight=""
+                                        weight={item.weight}
                                         image={item.image}
                                         onRemove={() => handleRemoveItem(item.id)}
                                     />
@@ -517,6 +561,10 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                             </div>
 
                             <div className={s.listFooter}>
+                                <div className={s.sumBlock}>
+                                    <span className={s.sumLabel}>{dict.sumLabel}</span>
+                                    <span className={s.sumValue}>{totalSum.toLocaleString()} ₴</span>
+                                </div>
                                 <div className={s.footerActions}>
                                     <Button 
                                         variant="outline-black" 
@@ -534,10 +582,6 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                     >
                                         {isSaving ? dict.saving : dict.saveBtn}
                                     </Button>
-                                </div>
-                                <div className={s.sumBlock}>
-                                    <span className={s.sumLabel}>{dict.sumLabel}</span>
-                                    <span className={s.sumValue}>{totalSum.toLocaleString()} ₴</span>
                                 </div>
                             </div>
                         </div>
