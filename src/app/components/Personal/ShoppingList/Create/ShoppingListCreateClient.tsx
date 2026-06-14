@@ -50,6 +50,8 @@ const createDict = {
         addToCartBtn: "ДОДАТИ СПИСОК У КОШИК",
         saveBtn: "ЗБЕРЕГТИ СПИСОК",
         saving: "ЗБЕРЕЖЕННЯ...",
+        searchRequiredError: "Будь ласка, введіть пошуковий запит",
+        searchMinLengthError: "Пошуковий запит має містити щонайменше 2 символи",
     },
     ru: {
         title: "СОЗДАНИЕ СПИСКА ПОКУПОК",
@@ -63,6 +65,8 @@ const createDict = {
         addToCartBtn: "ДОБАВИТЬ СПИСОК В КОРЗИНУ",
         saveBtn: "СОХРАНИТЬ СПИСОК",
         saving: "СОХРАНЕНИЕ...",
+        searchRequiredError: "Пожалуйста, введите поисковый запрос",
+        searchMinLengthError: "Поисковый запрос должен содержать не менее 2 символов",
     }
 };
 
@@ -103,6 +107,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const [hasMore, setHasMore] = useState(false);
     const [isFetchingNext, setIsFetchingNext] = useState(false);
     const [nameError, setNameError] = useState("");
+    const [searchError, setSearchError] = useState("");
     const nameInputRef = useRef<HTMLInputElement>(null);
     const categoryOptions = React.useMemo(() => 
         categories.map(cat => ({
@@ -224,7 +229,17 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     };
 
     const handleSearchSubmit = () => {
-        void performSearch(searchQuery, selectedCategory);
+        const query = searchQuery.trim();
+        if (!query) {
+            setSearchError(dict.searchRequiredError);
+            return;
+        }
+        if (query.length < 2) {
+            setSearchError(dict.searchMinLengthError);
+            return;
+        }
+        setSearchError("");
+        void performSearch(query, selectedCategory);
     };
 
     const handleCategoryChange = (catId: string) => {
@@ -400,15 +415,23 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                     </div>
 
                     <div className={s.searchRow}>
-                        <Search 
-                            value={searchQuery}
-                            onChange={setSearchQuery}
-                            placeholder={dict.searchPlaceholder}
-                            buttonText={dict.searchBtn}
-                            className={s.searchField}
-                            onSubmit={handleSearchSubmit}
-                            disabled={isSaving}
-                        />
+                        <div className={s.searchFieldContainer}>
+                            <Search 
+                                value={searchQuery}
+                                onChange={(val) => {
+                                    setSearchQuery(val);
+                                    if (searchError) setSearchError("");
+                                }}
+                                placeholder={dict.searchPlaceholder}
+                                buttonText={dict.searchBtn}
+                                className={`${s.searchField} ${searchError ? s.errorInput : ''}`}
+                                onSubmit={handleSearchSubmit}
+                                disabled={isSaving}
+                            />
+                            {searchError && (
+                                <span className={s.errorMessage}>{searchError}</span>
+                            )}
+                        </div>
                         <CustomSelect 
                             options={categoryOptions}
                             value={selectedCategory}

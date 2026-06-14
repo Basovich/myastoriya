@@ -162,6 +162,11 @@ div.contentBlock {
     justify-content: center;
     box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.20);
     transition: all 0.2s;
+
+    @media (min-width: 1280px) {
+        width: 56px;
+        height: 56px;
+    }
 }
 
 .noCards {

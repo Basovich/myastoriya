@@ -46,6 +46,7 @@ div.contentBlock {
 .errorInput {
     border-color: #E30613 !important;
 
+    input::placeholder,
     &::placeholder {
         color: #E30613;
     }
@@ -58,6 +59,13 @@ div.contentBlock {
     display: block;
 }
 
+.searchFieldContainer {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+}
+
 .searchRow {
     display: flex;
     flex-direction: column;
@@ -66,7 +74,7 @@ div.contentBlock {
     @media (min-width: 1024px) {
         flex-direction: row;
         gap: 24px;
-        align-items: center;
+        align-items: flex-start;
     }
 
     @media (min-width: 1280px) {
