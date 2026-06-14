@@ -55,7 +55,7 @@ export default function ShoppingListCard({
                             : '';
                         const resolvedImg = imgUrl.startsWith('/')
                             ? `https://dev-api.myastoriya.com.ua${imgUrl}`
-                            : imgUrl || '/images/no-image.jpg';
+                            : imgUrl || '/images/product-placeholder.svg';
                         return (
                             <div key={prod.id || i} className={s.productThumb}>
                                 <Image src={resolvedImg} alt={prod.name || "Product"} width={56} height={42} />

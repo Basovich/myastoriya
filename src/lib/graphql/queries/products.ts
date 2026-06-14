@@ -161,7 +161,8 @@ export function resolveProductImageUrl(product: Product): string {
         entry?.url?.big ||
         null;
 
-    if (!url) return '';
+    if (!url) return '/images/product-placeholder.svg';
+    if (url.startsWith('/images/')) return url;
     if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
     return url;
 }

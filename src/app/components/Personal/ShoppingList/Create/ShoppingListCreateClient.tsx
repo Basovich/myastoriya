@@ -162,14 +162,18 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                             }
 
                             setAddedItems(prods.map(p => {
-                                const imgUrl = p.image
-                                    ? (p.image.grid2x || p.image.main2x || p.image.grid1x || p.image.main1x || p.image.big || '')
-                                    : '';
-                                const resolvedImg = imgUrl.startsWith('/')
-                                    ? `https://dev-api.myastoriya.com.ua${imgUrl}`
-                                    : imgUrl || '/images/no-image.jpg';
-
                                 const detailedProd = detailsMap[p.productId];
+                                let resolvedImg = '';
+                                if (detailedProd) {
+                                    resolvedImg = resolveProductImageUrl(detailedProd);
+                                } else {
+                                    const imgUrl = p.image
+                                        ? (p.image.grid2x || p.image.main2x || p.image.grid1x || p.image.main1x || p.image.big || '')
+                                        : '';
+                                    resolvedImg = imgUrl.startsWith('/')
+                                        ? `https://dev-api.myastoriya.com.ua${imgUrl}`
+                                        : imgUrl || '/images/product-placeholder.svg';
+                                }
                                 let weightVal = '';
                                 if (detailedProd) {
                                     const weightSpec = detailedProd.specifications?.find(sp =>
@@ -281,7 +285,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
 
     const handleAddProductToList = (prod: Product) => {
         const tempId = `new_${Date.now()}_${Math.random()}`;
-        const imgUrl = resolveProductImageUrl(prod) || '/images/no-image.jpg';
+        const imgUrl = resolveProductImageUrl(prod);
         
         const weightSpec = prod.specifications?.find(sp =>
             sp.name.toLowerCase().includes('вага') ||
@@ -504,7 +508,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                             <div className={s.resultsGrid} onScroll={handleScroll}>
                                 {searchResults.map(prod => {
                                     const price = prod.cost || 0;
-                                    const imgUrl = resolveProductImageUrl(prod) || '/images/no-image.jpg';
+                                    const imgUrl = resolveProductImageUrl(prod);
                                     const weightSpec = prod.specifications?.find(
                                         s => s.name.toLowerCase().includes('вага') || s.name.toLowerCase().includes('вес')
                                     );
