@@ -116,6 +116,7 @@
     letter-spacing: 0.05em;
     transition: all 0.2s ease;
     cursor: pointer;
+    text-decoration: none;
 
     @media (any-hover: hover) {
         &:hover {

@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import s from './BonusCard.module.scss';
+import AppLink from '@/app/components/ui/AppLink/AppLink';
 
 interface BonusCardProps {
     balance: number;
@@ -46,9 +47,9 @@ export default function BonusCard({ balance, percent, dict }: BonusCardProps) {
 
             <div className={s.bottomRow}>
                 <div className={s.rate}>{dict.exchangeRate}</div>
-                <button type="button" className={s.howToUse}>
+                <AppLink href="/loyalty-program-rules" className={s.howToUse}>
                     {dict.howToUse}
-                </button>
+                </AppLink>
             </div>
         </div>
     );
