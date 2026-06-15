@@ -27,7 +27,9 @@ const reviewsDict = {
         tabOrders: "Відгуки по замовленню",
         tabProducts: "Відгуки про товари",
         noOrders: "У вас поки немає замовлень.",
+        noOrdersFilter: "У вас немає замовлень у вибрані дати.",
         noProducts: "У вас поки немає придбаних товарів.",
+        noProductsFilter: "У вас немає придбаних товарів у вибрані дати.",
         leaveReview: "ЗАЛИШИТИ ВІДГУК",
         editReview: "ЗМІНИТИ ВІДГУК",
         details: "ДЕТАЛІ ЗАМОВЛЕННЯ",
@@ -40,7 +42,9 @@ const reviewsDict = {
         tabOrders: "Отзывы по заказу",
         tabProducts: "Отзывы о товарах",
         noOrders: "У вас пока нет заказов.",
+        noOrdersFilter: "У вас нет заказов в выбранные даты.",
         noProducts: "У вас пока нет купленных товаров.",
+        noProductsFilter: "У вас нет купленных товаров в выбранные даты.",
         leaveReview: "ОСТАВИТЬ ОТЗЫВ",
         editReview: "ИЗМЕНИТЬ ОТЗЫВ",
         details: "ДЕТАЛИ ЗАКАЗА",
@@ -271,7 +275,9 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                     <Spinner />
                 ) : activeTab === 'orders' ? (
                     filteredOrders.length === 0 ? (
-                        <div className={s.emptyBlock}>{dict.noOrders}</div>
+                        <div className={s.emptyBlock}>
+                            {orders.length === 0 ? dict.noOrders : dict.noOrdersFilter}
+                        </div>
                     ) : (
                         <div className={s.reviewsList}>
                             {filteredOrders.map((order) => {
@@ -323,7 +329,9 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                         </div>
                     )
                 ) : filteredProducts.length === 0 ? (
-                    <div className={s.emptyBlock}>{dict.noProducts}</div>
+                    <div className={s.emptyBlock}>
+                        {productsList.length === 0 ? dict.noProducts : dict.noProductsFilter}
+                    </div>
                 ) : (
                     <div className={s.reviewsList}>
                         {filteredProducts.map((prod) => {
