@@ -20,6 +20,7 @@ import {
     addShoppingListToCartApi,
     ShoppingList 
 } from '@/lib/graphql/queries/pages/shoppingList';
+import { getProductsByIdsApi, resolveProductImageUrl } from '@/lib/graphql/queries/products';
 import { fetchCartAsync } from '@/store/slices/cartSlice';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import s from './ShoppingListClient.module.scss';
@@ -28,10 +29,12 @@ const shoppingListDict = {
     ua: {
         title: "СПИСОК ПОКУПОК",
         createBtn: "СТВОРИТИ НОВИЙ СПИСОК",
+        sumLabel: "Сума списку",
     },
     ru: {
         title: "СПИСОК ПОКУПОК",
         createBtn: "СОЗДАТЬ НОВЫЙ СПИСОК",
+        sumLabel: "Сумма списка",
     }
 };
 
@@ -57,7 +60,41 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
             const token = await getAccessToken();
             if (token) {
                 const res = await getShoppingListsApi(100, 1, token, lang);
-                setLists(res.data || []);
+                const fetchedLists = res.data || [];
+
+                const allProductIds = Array.from(new Set(
+                    fetchedLists.flatMap(list => (list.products || []).map(p => p.productId))
+                ));
+
+                let detailsMap: Record<number, string> = {};
+                if (allProductIds.length > 0) {
+                    try {
+                        const details = await getProductsByIdsApi(allProductIds, lang);
+                        details.forEach(prod => {
+                            detailsMap[Number(prod.id)] = resolveProductImageUrl(prod);
+                        });
+                    } catch (e) {
+                        console.error("Failed to fetch product details for images:", e);
+                    }
+                }
+
+                const updatedLists = fetchedLists.map(list => ({
+                    ...list,
+                    products: (list.products || []).map(p => {
+                        const resolvedImgUrl = detailsMap[p.productId];
+                        if (resolvedImgUrl) {
+                            return {
+                                ...p,
+                                image: {
+                                    grid2x: resolvedImgUrl
+                                }
+                            };
+                        }
+                        return p;
+                    })
+                }));
+
+                setLists(updatedLists);
             }
         } catch (error) {
             console.error('Failed to load shopping lists:', error);
@@ -86,7 +123,7 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm(lang === 'ua' ? 'Ви впевнені, що хочете видалити цей список покупок?' : 'Вы уверены, что хотите удалить этот список покупок?')) {
+        if (!confirm(lang === 'ua' ? 'Ви впевнені, що хочете видалити цей список покупок?' : 'Вы уверены, що хотите удалить этот список покупок?')) {
             return;
         }
         try {
@@ -132,11 +169,13 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                     navDict={pDict.navigation}
                 />
 
-                <Link href={`/${lang}/personal/shopping-list/create`} className={s.createLink}>
-                    <Button variant="black" className={s.createBtn}>
-                        {dict.createBtn}
-                    </Button>
-                </Link>
+                <Button 
+                    variant="black" 
+                    className={s.createBtn} 
+                    href={`/${lang}/personal/shopping-list/create`}
+                >
+                    {dict.createBtn}
+                </Button>
 
                 {isLoading ? (
                     <Spinner />
@@ -149,6 +188,7 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                                 date={todayDate}
                                 products={item.products || []}
                                 totalSum={item.total || 0}
+                                sumLabel={dict.sumLabel}
                                 onEdit={() => router.push(`/${lang}/personal/shopping-list/create?id=${item.id}`)}
                                 onAddToCart={() => handleAddToCart(item.id)}
                                 onDelete={() => handleDelete(item.id)}
@@ -160,3 +200,4 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
         </div>
     );
 }
+

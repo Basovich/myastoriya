@@ -13,7 +13,8 @@ div.shoppingBlock {
     }
 }
 
-.createLink {
+a.createLink {
+    font-size: 10px;
     width: 100%;
 
     @media (min-width: 1024px) {
@@ -21,18 +22,16 @@ div.shoppingBlock {
     }
 }
 
-.createBtn {
+a.createBtn {
     width: 100%;
-    height: 48px;
-    font-size: 14px;
+    height: 32px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     margin-bottom: 8px;
 
     @media (min-width: 1024px) {
         width: max-content;
-        height: 38px;
-        font-size: 12px;
         padding: 0 24px;
         margin-bottom: 0;
     }
