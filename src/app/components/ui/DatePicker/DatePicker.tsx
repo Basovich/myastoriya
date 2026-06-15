@@ -59,9 +59,10 @@ const CustomInput = forwardRef<
         onClear?: (e: React.MouseEvent) => void;
         prefixLabel?: string;
         isOpen?: boolean;
+        onToggle?: () => void;
     }
 >(
-    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, startDate, endDate, selectsRange, lang = 'ua', onClear, prefixLabel, isOpen }, ref) => {
+    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, startDate, endDate, selectsRange, lang = 'ua', onClear, prefixLabel, isOpen, onToggle }, ref) => {
         let displayValue = value;
         if (selectsRange) {
             if (startDate) {
@@ -84,7 +85,17 @@ const CustomInput = forwardRef<
         }
         
         return (
-            <button id={id} className={clsx(s.customInput, error && s.inputError)} onClick={onClick} ref={ref} type="button" onBlur={onBlur}>
+            <button
+                id={id}
+                className={clsx(s.customInput, error && s.inputError)}
+                onClick={(e) => {
+                    if (onToggle) onToggle();
+                    if (onClick) onClick();
+                }}
+                ref={ref}
+                type="button"
+                onBlur={onBlur}
+            >
                 {hideLabel ? (
                     <div className={s.selectContent}>
                         {leftIcon && <div className={s.leftIcon}>{leftIcon}</div>}
@@ -102,7 +113,7 @@ const CustomInput = forwardRef<
                         <span className={s.inputValue}>{displayValue}</span>
                     </div>
                 )}
-                <div className={s.inputActions} onClick={(e) => e.stopPropagation()}>
+                <div className={s.inputActions}>
                     {hideLabel ? (
                         arrowVariant === 'down' ? (
                             <svg className={clsx(s.arrow, isOpen && s.arrowOpen)} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -166,6 +177,31 @@ export default function DatePicker({
     const DatePickerComponent = ReactDatePicker as any;
 
     const [isOpen, setIsOpen] = useState(false);
+    const [shouldRender, setShouldRender] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
+
+    const openCalendar = () => {
+        setIsClosing(false);
+        setShouldRender(true);
+        setIsOpen(true);
+    };
+
+    const closeCalendar = () => {
+        setIsClosing(true);
+        setIsOpen(false);
+        setTimeout(() => {
+            setShouldRender(false);
+            setIsClosing(false);
+        }, 200);
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+        const target = event.target as HTMLElement;
+        if (target && (target.closest(`.${s.customInput}`) || (id && target.closest(`#${id}`)))) {
+            return;
+        }
+        closeCalendar();
+    };
 
     const datePickerDict = {
         ua: {
@@ -194,18 +230,24 @@ export default function DatePicker({
                                 if (onChangeRange) {
                                     onChangeRange(val);
                                 }
+                                const [start, end] = val || [null, null];
+                                if (start && end) {
+                                    closeCalendar();
+                                }
                             } else {
                                 if (onChange) {
                                     onChange(val);
                                 }
+                                closeCalendar();
                             }
                         }}
                         locale="uk"
                         dateFormat="dd.MM.yyyy"
                         minDate={minDate}
                         maxDate={maxDate}
-                        onCalendarOpen={() => setIsOpen(true)}
-                        onCalendarClose={() => setIsOpen(false)}
+                        open={shouldRender}
+                        calendarClassName={isClosing ? s.calendarClosing : undefined}
+                        onClickOutside={handleClickOutside}
                         renderCustomHeader={({
                             date,
                             changeYear,
@@ -285,6 +327,7 @@ export default function DatePicker({
                                 onClear={onClear}
                                 prefixLabel={prefixLabel}
                                 isOpen={isOpen}
+                                onToggle={shouldRender ? closeCalendar : openCalendar}
                             />
                         }
                         calendarStartDay={1}
