@@ -154,11 +154,14 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                 setIsLoading(true);
                 const tree = await getCatalogTreeApi(lang, 768);
                 const flattened: ProductCategory[] = [];
-                const recurse = (items: ProductCategory[]) => {
+                const recurse = (items: ProductCategory[], depth = 0) => {
                     for (const item of items) {
-                        flattened.push(item);
+                        flattened.push({
+                            ...item,
+                            name: depth > 0 ? '\u00A0\u00A0\u00A0\u00A0'.repeat(depth) + item.name : item.name
+                        });
                         if (item.children && item.children.length > 0) {
-                            recurse(item.children);
+                            recurse(item.children, depth + 1);
                         }
                     }
                 };
