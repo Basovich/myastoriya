@@ -12,8 +12,13 @@ registerLocale('uk', uk);
 
 interface DatePickerProps {
     id?: string;
-    selected: Date | null;
-    onChange: (date: Date | null) => void;
+    selected?: Date | null;
+    onChange?: (date: Date | null) => void;
+    startDate?: Date | null;
+    endDate?: Date | null;
+    selectsRange?: boolean;
+    onChangeRange?: (dates: [Date | null, Date | null]) => void;
+    onClear?: (e: React.MouseEvent) => void;
     onBlur?: () => void;
     placeholder?: string;
     className?: string;
@@ -46,12 +51,28 @@ const CustomInput = forwardRef<
         leftIcon?: React.ReactNode;
         arrowVariant?: 'down' | 'right';
         selectedDate?: Date | null;
+        startDate?: Date | null;
+        endDate?: Date | null;
+        selectsRange?: boolean;
         lang?: 'ua' | 'ru';
+        onClear?: (e: React.MouseEvent) => void;
     }
 >(
-    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, lang = 'ua' }, ref) => {
+    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, startDate, endDate, selectsRange, lang = 'ua', onClear }, ref) => {
         let displayValue = value;
-        if (selectedDate) {
+        if (selectsRange) {
+            if (startDate) {
+                const startStr = format(startDate, 'dd.MM.yyyy');
+                if (endDate) {
+                    const endStr = format(endDate, 'dd.MM.yyyy');
+                    displayValue = `${startStr} - ${endStr}`;
+                } else {
+                    displayValue = startStr;
+                }
+            } else {
+                displayValue = '';
+            }
+        } else if (selectedDate) {
             if (isToday(selectedDate)) {
                 displayValue = lang === 'ua' ? 'Сьогодні' : 'Сегодня';
             } else if (isTomorrow(selectedDate)) {
@@ -77,24 +98,33 @@ const CustomInput = forwardRef<
                         <span className={s.inputValue}>{displayValue}</span>
                     </div>
                 )}
-                {hideLabel ? (
-                    arrowVariant === 'down' ? (
-                        <svg className={s.arrow} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <div className={s.inputActions} onClick={(e) => e.stopPropagation()}>
+                    {onClear && hasValue && (
+                        <span className={s.clearBtn} onClick={onClear} role="button" aria-label="Очистити">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                        </span>
+                    )}
+                    {hideLabel ? (
+                        arrowVariant === 'down' ? (
+                            <svg className={s.arrow} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        ) : (
+                            <svg className={s.arrowRight} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        )
+                    ) : !hideIcon ? (
+                        <svg className={s.calendarIcon} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15.8333 3.33334H4.16667C3.24619 3.33334 2.5 4.07954 2.5 5.00001V16.6667C2.5 17.5872 3.24619 18.3333 4.16667 18.3333H15.8333C16.7538 18.3333 17.5 17.5872 17.5 16.6667V5.00001C17.5 4.07954 16.7538 3.33334 15.8333 3.33334Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M13.3333 1.66666V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M6.66666 1.66666V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M2.5 8.33334H17.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                    ) : (
-                        <svg className={s.arrowRight} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    )
-                ) : !hideIcon ? (
-                    <svg className={s.calendarIcon} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M15.8333 3.33334H4.16667C3.24619 3.33334 2.5 4.07954 2.5 5.00001V16.6667C2.5 17.5872 3.24619 18.3333 4.16667 18.3333H15.8333C16.7538 18.3333 17.5 17.5872 17.5 16.6667V5.00001C17.5 4.07954 16.7538 3.33334 15.8333 3.33334Z" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M13.3333 1.66666V5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M6.66666 1.66666V5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M2.5 8.33334H17.5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                ) : null}
+                    ) : null}
+                </div>
             </button>
         );
     }
@@ -112,6 +142,11 @@ export default function DatePicker({
     id,
     selected,
     onChange,
+    startDate,
+    endDate,
+    selectsRange,
+    onChangeRange,
+    onClear,
     onBlur,
     placeholder = 'Оберіть дату',
     className,
@@ -130,12 +165,26 @@ export default function DatePicker({
     const isValidDate = selected instanceof Date && !isNaN(selected.getTime());
     const safeSelected = isValidDate ? selected : null;
     const isErr = touched && !!error;
+    const DatePickerComponent = ReactDatePicker as any;
 
     return (
         <div className={clsx(s.datePickerWrapper, className)}>
-            <ReactDatePicker
-                selected={safeSelected}
-                onChange={onChange}
+            <DatePickerComponent
+                selectsRange={selectsRange}
+                startDate={startDate || undefined}
+                endDate={endDate || undefined}
+                selected={selectsRange ? null : safeSelected}
+                onChange={(val: any) => {
+                    if (selectsRange) {
+                        if (onChangeRange) {
+                            onChangeRange(val);
+                        }
+                    } else {
+                        if (onChange) {
+                            onChange(val);
+                        }
+                    }
+                }}
                 locale="uk"
                 dateFormat="dd.MM.yyyy"
                 minDate={minDate}
@@ -148,7 +197,7 @@ export default function DatePicker({
                     increaseMonth,
                     prevMonthButtonDisabled,
                     nextMonthButtonDisabled,
-                }) => (
+                }: any) => (
                     <div className={s.customHeaderContainer} onClick={(e) => e.stopPropagation()}>
                         <button
                             type="button"
@@ -204,7 +253,7 @@ export default function DatePicker({
                         id={id}
                         label={label || placeholder} 
                         error={isErr} 
-                        hasValue={!!selected}
+                        hasValue={selectsRange ? !!startDate : !!selected}
                         required={required}
                         onBlur={onBlur}
                         hideIcon={hideIcon}
@@ -212,7 +261,11 @@ export default function DatePicker({
                         leftIcon={leftIcon}
                         arrowVariant={arrowVariant}
                         selectedDate={safeSelected}
+                        startDate={startDate}
+                        endDate={endDate}
+                        selectsRange={selectsRange}
                         lang={lang}
+                        onClear={onClear}
                     />
                 }
                 calendarStartDay={1}

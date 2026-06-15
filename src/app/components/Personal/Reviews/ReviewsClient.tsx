@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, forwardRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { Locale } from '@/i18n/config';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
@@ -11,25 +11,18 @@ import { logout } from '@/store/slices/authSlice';
 import { logoutApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter } from 'next/navigation';
-import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
 import ReviewCard from './ReviewCard/ReviewCard';
 import ProductReviewCard from './ProductReviewCard/ProductReviewCard';
 import PersonalReviewModal from './PersonalReviewModal/PersonalReviewModal';
 import { getOrdersApi, getOrderReviewsApi, getProductReviewsApi, Order, OrderReview, ProductReview } from '@/lib/graphql';
-import ReactDatePicker, { registerLocale } from 'react-datepicker';
-import { uk } from 'date-fns/locale';
-import { format, startOfDay, endOfDay } from 'date-fns';
+import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
+import { startOfDay, endOfDay } from 'date-fns';
 import clsx from 'clsx';
 import s from './ReviewsClient.module.scss';
-import "react-datepicker/dist/react-datepicker.css";
-
-registerLocale('uk', uk);
 
 const reviewsDict = {
     ua: {
         title: "МОЇ ВІДГУКИ",
-        sortLabel: "Сортування:",
-        sortOptions: ["По даті", "За оцінкою"],
         tabOrders: "Відгуки по замовленню",
         tabProducts: "Відгуки про товари",
         noOrders: "У вас поки немає замовлень.",
@@ -43,8 +36,6 @@ const reviewsDict = {
     },
     ru: {
         title: "МОИ ОТЗЫВЫ",
-        sortLabel: "Сортировка:",
-        sortOptions: ["По дате", "По оценке"],
         tabOrders: "Отзывы по заказу",
         tabProducts: "Отзывы о товарах",
         noOrders: "У вас пока нет заказов.",
@@ -89,51 +80,6 @@ const getPurchasedProducts = (ordersList: Order[]): PurchasedProduct[] => {
     return Array.from(productsMap.values());
 };
 
-const CustomRangeInput = forwardRef<
-    HTMLButtonElement,
-    {
-        value?: string;
-        onClick?: () => void;
-        startDate: Date | null;
-        endDate: Date | null;
-        placeholder: string;
-        onClear: (e: React.MouseEvent) => void;
-    }
->(({ onClick, startDate, endDate, placeholder, onClear }, ref) => {
-    let displayText = placeholder;
-    if (startDate) {
-        const startStr = format(startDate, 'dd.MM.yyyy');
-        if (endDate) {
-            const endStr = format(endDate, 'dd.MM.yyyy');
-            displayText = `${startStr} - ${endStr}`;
-        } else {
-            displayText = startStr;
-        }
-    }
-
-    return (
-        <button className={s.calendarInputBtn} onClick={onClick} ref={ref} type="button">
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={s.calendarIcon}>
-                <path d="M15.8333 3.33334H4.16667C3.24619 3.33334 2.5 4.07954 2.5 5.00001V16.6667C2.5 17.5872 3.24619 18.3333 4.16667 18.3333H15.8333C16.7538 18.3333 17.5 17.5872 17.5 16.6667V5.00001C17.5 4.07954 16.7538 3.33334 15.8333 3.33334Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M13.3333 1.66666V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M6.66666 1.66666V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M2.5 8.33334H17.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className={clsx(s.calendarValue, !startDate && s.placeholder)}>
-                {displayText}
-            </span>
-            {startDate && (
-                <span className={s.clearBtn} onClick={onClear} role="button" aria-label="Очистити">
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                </span>
-            )}
-        </button>
-    );
-});
-CustomRangeInput.displayName = 'CustomRangeInput';
-
 export default function ReviewsClient({ lang }: { lang: Locale }) {
     const hydrated = useIsHydrated();
     const dict = reviewsDict[lang] || reviewsDict.ua;
@@ -143,7 +89,6 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
     const { user } = useAppSelector((state) => state.auth);
 
     const [activeTab, setActiveTab] = useState<'orders' | 'products'>('orders');
-    const [sortValue, setSortValue] = useState(dict.sortOptions[0]);
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
 
@@ -267,35 +212,15 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
 
     const productsList = getPurchasedProducts(orders);
 
-    // Filter and Sort Orders
+    // Filter and Sort Orders by date (newest first)
     const filteredOrders = orders
         .filter((order) => isDateInRange(new Date(order.createdAt), startDate, endDate))
-        .sort((a, b) => {
-            if (sortValue === dict.sortOptions[1]) {
-                // By rating
-                const ratingA = orderReviews[a.id]?.averageRating || 0;
-                const ratingB = orderReviews[b.id]?.averageRating || 0;
-                return ratingB - ratingA;
-            } else {
-                // By date
-                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-            }
-        });
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    // Filter and Sort Products
+    // Filter and Sort Products by date (newest first)
     const filteredProducts = productsList
         .filter((prod) => isDateInRange(prod.date, startDate, endDate))
-        .sort((a, b) => {
-            if (sortValue === dict.sortOptions[1]) {
-                // By rating
-                const ratingA = productReviews[a.id]?.rating || 0;
-                const ratingB = productReviews[b.id]?.rating || 0;
-                return ratingB - ratingA;
-            } else {
-                // By date
-                return b.date.getTime() - a.date.getTime();
-            }
-        });
+        .sort((a, b) => b.date.getTime() - a.date.getTime());
 
     return (
         <div className={s.reviewsPage}>
@@ -324,32 +249,18 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                 </div>
 
                 <div className={s.controlsRow}>
-                    <SortSelect
-                        value={sortValue}
-                        options={dict.sortOptions}
-                        onChange={setSortValue}
-                        label={dict.sortLabel}
-                        className={s.sortSelect}
+                    <DatePicker
+                        id="reviews-date-range"
+                        label={dict.filterDatePlaceholder}
+                        selectsRange={true}
+                        startDate={startDate}
+                        endDate={endDate}
+                        onChangeRange={handleDateChange}
+                        onClear={handleClearDate}
+                        maxDate={new Date()}
+                        className={s.reviewsDatePicker}
+                        lang={lang}
                     />
-
-                    <div className={s.calendarFilterWrapper}>
-                        <ReactDatePicker
-                            selectsRange={true}
-                            startDate={startDate}
-                            endDate={endDate}
-                            onChange={handleDateChange}
-                            locale="uk"
-                            dateFormat="dd.MM.yyyy"
-                            customInput={
-                                <CustomRangeInput
-                                    startDate={startDate}
-                                    endDate={endDate}
-                                    placeholder={dict.filterDatePlaceholder}
-                                    onClear={handleClearDate}
-                                />
-                            }
-                        />
-                    </div>
                 </div>
 
                 {loading ? (
