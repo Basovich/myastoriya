@@ -16,6 +16,7 @@ import ProductReviewCard from './ProductReviewCard/ProductReviewCard';
 import PersonalReviewModal from './PersonalReviewModal/PersonalReviewModal';
 import { getOrdersApi, getOrderReviewsApi, getProductReviewsApi, Order, OrderReview, ProductReview } from '@/lib/graphql';
 import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
+import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { startOfDay, endOfDay } from 'date-fns';
 import clsx from 'clsx';
 import s from './ReviewsClient.module.scss';
@@ -31,8 +32,7 @@ const reviewsDict = {
         editReview: "ЗМІНИТИ ВІДГУК",
         details: "ДЕТАЛІ ЗАМОВЛЕННЯ",
         filterDatePlaceholder: "Оберіть дату/діапазон",
-        clearFilter: "Очистити",
-        loading: "Завантаження відгуків..."
+        clearFilter: "Очистити"
     },
     ru: {
         title: "МОИ ОТЗЫВЫ",
@@ -44,8 +44,7 @@ const reviewsDict = {
         editReview: "ИЗМЕНИТЬ ОТЗЫВ",
         details: "ДЕТАЛИ ЗАКАЗА",
         filterDatePlaceholder: "Выберите дату/диапазон",
-        clearFilter: "Очистить",
-        loading: "Загрузка отзывов..."
+        clearFilter: "Очистить"
     }
 };
 
@@ -264,7 +263,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                 </div>
 
                 {loading ? (
-                    <div className={s.loadingBlock}>{dict.loading}</div>
+                    <Spinner />
                 ) : activeTab === 'orders' ? (
                     filteredOrders.length === 0 ? (
                         <div className={s.emptyBlock}>{dict.noOrders}</div>
