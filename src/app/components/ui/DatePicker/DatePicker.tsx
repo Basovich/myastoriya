@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import { uk } from 'date-fns/locale';
 import { format, isToday, isTomorrow } from 'date-fns';
@@ -58,9 +58,10 @@ const CustomInput = forwardRef<
         lang?: 'ua' | 'ru';
         onClear?: (e: React.MouseEvent) => void;
         prefixLabel?: string;
+        isOpen?: boolean;
     }
 >(
-    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, startDate, endDate, selectsRange, lang = 'ua', onClear, prefixLabel }, ref) => {
+    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, startDate, endDate, selectsRange, lang = 'ua', onClear, prefixLabel, isOpen }, ref) => {
         let displayValue = value;
         if (selectsRange) {
             if (startDate) {
@@ -102,16 +103,9 @@ const CustomInput = forwardRef<
                     </div>
                 )}
                 <div className={s.inputActions} onClick={(e) => e.stopPropagation()}>
-                    {onClear && hasValue && (
-                        <span className={s.clearBtn} onClick={onClear} role="button" aria-label="Очистити">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </span>
-                    )}
                     {hideLabel ? (
                         arrowVariant === 'down' ? (
-                            <svg className={s.arrow} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg className={clsx(s.arrow, isOpen && s.arrowOpen)} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                         ) : (
@@ -171,111 +165,153 @@ export default function DatePicker({
     const isErr = touched && !!error;
     const DatePickerComponent = ReactDatePicker as any;
 
+    const [isOpen, setIsOpen] = useState(false);
+
+    const datePickerDict = {
+        ua: {
+            clear: "Очистити",
+            chooseDate: "Оберіть дату",
+        },
+        ru: {
+            clear: "Очистить",
+            chooseDate: "Выберите дату",
+        }
+    };
+    const t = datePickerDict[lang || 'ua'] || datePickerDict.ua;
+    const hasValue = selectsRange ? !!startDate : !!selected;
+
     return (
         <div className={clsx(s.datePickerWrapper, className)}>
-            <DatePickerComponent
-                selectsRange={selectsRange}
-                startDate={startDate || undefined}
-                endDate={endDate || undefined}
-                selected={selectsRange ? null : safeSelected}
-                onChange={(val: any) => {
-                    if (selectsRange) {
-                        if (onChangeRange) {
-                            onChangeRange(val);
-                        }
-                    } else {
-                        if (onChange) {
-                            onChange(val);
-                        }
-                    }
-                }}
-                locale="uk"
-                dateFormat="dd.MM.yyyy"
-                minDate={minDate}
-                maxDate={maxDate}
-                renderCustomHeader={({
-                    date,
-                    changeYear,
-                    changeMonth,
-                    decreaseMonth,
-                    increaseMonth,
-                    prevMonthButtonDisabled,
-                    nextMonthButtonDisabled,
-                }: any) => (
-                    <div className={s.customHeaderContainer} onClick={(e) => e.stopPropagation()}>
-                        <button
-                            type="button"
-                            className={s.navBtn}
-                            onClick={decreaseMonth}
-                            disabled={prevMonthButtonDisabled}
-                        >
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </button>
-                        
-                        <div className={s.headerSelects}>
-                            <select
-                                className={s.customSelect}
-                                value={date.getMonth()}
-                                onChange={({ target: { value } }) => changeMonth(Number(value))}
-                            >
-                                {MONTHS.map((month, index) => (
-                                    <option key={month} value={index}>
-                                        {month}
-                                    </option>
-                                ))}
-                            </select>
-
-                            <select
-                                className={s.customSelect}
-                                value={date.getFullYear()}
-                                onChange={({ target: { value } }) => changeYear(Number(value))}
-                            >
-                                {YEARS.map((year) => (
-                                    <option key={year} value={year}>
-                                        {year}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <button
-                            type="button"
-                            className={s.navBtn}
-                            onClick={increaseMonth}
-                            disabled={nextMonthButtonDisabled}
-                        >
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </button>
-                    </div>
-                )}
-                customInput={
-                    <CustomInput 
-                        id={id}
-                        label={label || placeholder} 
-                        error={isErr} 
-                        hasValue={selectsRange ? !!startDate : !!selected}
-                        required={required}
-                        onBlur={onBlur}
-                        hideIcon={hideIcon}
-                        hideLabel={hideLabel}
-                        leftIcon={leftIcon}
-                        arrowVariant={arrowVariant}
-                        selectedDate={safeSelected}
-                        startDate={startDate}
-                        endDate={endDate}
+            <div className={s.pickerRow}>
+                <div className={s.pickerContainer}>
+                    <DatePickerComponent
                         selectsRange={selectsRange}
-                        lang={lang}
-                        onClear={onClear}
-                        prefixLabel={prefixLabel}
+                        startDate={startDate || undefined}
+                        endDate={endDate || undefined}
+                        selected={selectsRange ? null : safeSelected}
+                        onChange={(val: any) => {
+                            if (selectsRange) {
+                                if (onChangeRange) {
+                                    onChangeRange(val);
+                                }
+                            } else {
+                                if (onChange) {
+                                    onChange(val);
+                                }
+                            }
+                        }}
+                        locale="uk"
+                        dateFormat="dd.MM.yyyy"
+                        minDate={minDate}
+                        maxDate={maxDate}
+                        onCalendarOpen={() => setIsOpen(true)}
+                        onCalendarClose={() => setIsOpen(false)}
+                        renderCustomHeader={({
+                            date,
+                            changeYear,
+                            changeMonth,
+                            decreaseMonth,
+                            increaseMonth,
+                            prevMonthButtonDisabled,
+                            nextMonthButtonDisabled,
+                        }: any) => (
+                            <div className={s.customHeaderContainer} onClick={(e) => e.stopPropagation()}>
+                                <button
+                                    type="button"
+                                    className={s.navBtn}
+                                    onClick={decreaseMonth}
+                                    disabled={prevMonthButtonDisabled}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </button>
+                                
+                                <div className={s.headerSelects}>
+                                    <select
+                                        className={s.customSelect}
+                                        value={date.getMonth()}
+                                        onChange={({ target: { value } }) => changeMonth(Number(value))}
+                                    >
+                                        {MONTHS.map((month, index) => (
+                                            <option key={month} value={index}>
+                                                {month}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <select
+                                        className={s.customSelect}
+                                        value={date.getFullYear()}
+                                        onChange={({ target: { value } }) => changeYear(Number(value))}
+                                    >
+                                        {YEARS.map((year) => (
+                                            <option key={year} value={year}>
+                                                {year}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className={s.navBtn}
+                                    onClick={increaseMonth}
+                                    disabled={nextMonthButtonDisabled}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                        <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        )}
+                        customInput={
+                            <CustomInput 
+                                id={id}
+                                label={label || placeholder} 
+                                error={isErr} 
+                                hasValue={hasValue}
+                                required={required}
+                                onBlur={onBlur}
+                                hideIcon={hideIcon}
+                                hideLabel={hideLabel}
+                                leftIcon={leftIcon}
+                                arrowVariant={arrowVariant}
+                                selectedDate={safeSelected}
+                                startDate={startDate}
+                                endDate={endDate}
+                                selectsRange={selectsRange}
+                                lang={lang}
+                                onClear={onClear}
+                                prefixLabel={prefixLabel}
+                                isOpen={isOpen}
+                            />
+                        }
+                        calendarStartDay={1}
+                        peekNextMonth
                     />
-                }
-                calendarStartDay={1}
-                peekNextMonth
-            />
+                </div>
+                {onClear && hasValue && (
+                    <span 
+                        role="button"
+                        tabIndex={0}
+                        className={s.clearTextBtn} 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onClear(e as any);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                onClear(e as any);
+                            }
+                        }}
+                    >
+                        {t.clear}
+                    </span>
+                )}
+            </div>
             {isErr && (
                 <span className={s.errorText} role="alert">
                     {error}
