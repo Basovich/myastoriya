@@ -23,6 +23,8 @@ import {
 import { getProductsByIdsApi, resolveProductImageUrl } from '@/lib/graphql/queries/products';
 import { fetchCartAsync } from '@/store/slices/cartSlice';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
+import CartModal from '@/app/components/CartModal/CartModal';
+import DeleteShoppingListModal from './DeleteShoppingListModal/DeleteShoppingListModal';
 import s from './ShoppingListClient.module.scss';
 
 const shoppingListDict = {
@@ -52,6 +54,8 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
 
     const [lists, setLists] = useState<ShoppingList[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+    const [listToDelete, setListToDelete] = useState<string | null>(null);
     const todayDate = new Date().toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uk-UA');
 
     const loadLists = async () => {
@@ -122,20 +126,24 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm(lang === 'ua' ? 'Ви впевнені, що хочете видалити цей список покупок?' : 'Вы уверены, що хотите удалить этот список покупок?')) {
-            return;
-        }
+    const handleDeleteClick = (id: string) => {
+        setListToDelete(id);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!listToDelete) return;
         try {
             const token = await getAccessToken();
             if (token) {
-                const success = await deleteShoppingListApi(id, token, lang);
+                const success = await deleteShoppingListApi(listToDelete, token, lang);
                 if (success) {
-                    setLists((prev) => prev.filter((item) => item.id !== id));
+                    setLists((prev) => prev.filter((item) => item.id !== listToDelete));
                 }
             }
         } catch (error) {
             console.error('Failed to delete shopping list:', error);
+        } finally {
+            setListToDelete(null);
         }
     };
 
@@ -146,7 +154,7 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                 const success = await addShoppingListToCartApi(id, token, lang);
                 if (success) {
                     dispatch(fetchCartAsync());
-                    alert(lang === 'ua' ? 'Товари успішно додано до кошика!' : 'Товары успешно добавлены в корзину!');
+                    setIsCartModalOpen(true);
                 }
             }
         } catch (error) {
@@ -191,12 +199,19 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                                 sumLabel={dict.sumLabel}
                                 onEdit={() => router.push(`/${lang}/personal/shopping-list/create?id=${item.id}`)}
                                 onAddToCart={() => handleAddToCart(item.id)}
-                                onDelete={() => handleDelete(item.id)}
+                                onDelete={() => handleDeleteClick(item.id)}
                             />
                         ))}
                     </div>
                 )}
             </PersonalContentBlock>
+            <CartModal isOpen={isCartModalOpen} onClose={() => setIsCartModalOpen(false)} />
+            <DeleteShoppingListModal
+                isOpen={listToDelete !== null}
+                onClose={() => setListToDelete(null)}
+                onConfirm={handleConfirmDelete}
+                lang={lang}
+            />
         </div>
     );
 }
