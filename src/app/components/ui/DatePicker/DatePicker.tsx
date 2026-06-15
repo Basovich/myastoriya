@@ -33,6 +33,7 @@ interface DatePickerProps {
     leftIcon?: React.ReactNode;
     arrowVariant?: 'down' | 'right';
     lang?: 'ua' | 'ru';
+    prefixLabel?: string;
 }
 
 const CustomInput = forwardRef<
@@ -56,9 +57,10 @@ const CustomInput = forwardRef<
         selectsRange?: boolean;
         lang?: 'ua' | 'ru';
         onClear?: (e: React.MouseEvent) => void;
+        prefixLabel?: string;
     }
 >(
-    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, startDate, endDate, selectsRange, lang = 'ua', onClear }, ref) => {
+    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, startDate, endDate, selectsRange, lang = 'ua', onClear, prefixLabel }, ref) => {
         let displayValue = value;
         if (selectsRange) {
             if (startDate) {
@@ -86,7 +88,8 @@ const CustomInput = forwardRef<
                     <div className={s.selectContent}>
                         {leftIcon && <div className={s.leftIcon}>{leftIcon}</div>}
                         <span className={clsx(s.selectValue, !displayValue && s.placeholder)}>
-                            {displayValue || label}
+                            {prefixLabel && <span className={s.prefixLabel}>{prefixLabel}</span>}
+                            <span className={s.valueText}>{displayValue || label}</span>
                         </span>
                     </div>
                 ) : (
@@ -160,7 +163,8 @@ export default function DatePicker({
     hideLabel,
     leftIcon,
     arrowVariant,
-    lang
+    lang,
+    prefixLabel
 }: DatePickerProps) {
     const isValidDate = selected instanceof Date && !isNaN(selected.getTime());
     const safeSelected = isValidDate ? selected : null;
@@ -266,6 +270,7 @@ export default function DatePicker({
                         selectsRange={selectsRange}
                         lang={lang}
                         onClear={onClear}
+                        prefixLabel={prefixLabel}
                     />
                 }
                 calendarStartDay={1}

@@ -31,7 +31,8 @@ const reviewsDict = {
         leaveReview: "ЗАЛИШИТИ ВІДГУК",
         editReview: "ЗМІНИТИ ВІДГУК",
         details: "ДЕТАЛІ ЗАМОВЛЕННЯ",
-        filterDatePlaceholder: "Оберіть дату/діапазон",
+        sortLabel: "По даті",
+        sortPrefix: "Сортування: ",
         clearFilter: "Очистити"
     },
     ru: {
@@ -43,7 +44,8 @@ const reviewsDict = {
         leaveReview: "ОСТАВИТЬ ОТЗЫВ",
         editReview: "ИЗМЕНИТЬ ОТЗЫВ",
         details: "ДЕТАЛИ ЗАКАЗА",
-        filterDatePlaceholder: "Выберите дату/диапазон",
+        sortLabel: "По дате",
+        sortPrefix: "Сортировка: ",
         clearFilter: "Очистить"
     }
 };
@@ -250,7 +252,10 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                 <div className={s.controlsRow}>
                     <DatePicker
                         id="reviews-date-range"
-                        label={dict.filterDatePlaceholder}
+                        label={dict.sortLabel}
+                        prefixLabel={dict.sortPrefix}
+                        hideLabel={true}
+                        hideIcon={true}
                         selectsRange={true}
                         startDate={startDate}
                         endDate={endDate}

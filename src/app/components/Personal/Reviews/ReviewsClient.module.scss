@@ -91,7 +91,39 @@
     width: 100%;
 
     @media (min-width: 768px) {
-        width: 320px;
+        width: auto;
+    }
+
+    :global {
+        .react-datepicker-wrapper {
+            @media (min-width: 768px) {
+                width: auto;
+            }
+        }
+    }
+
+    button {
+        background-color: #F5F5F5;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        height: 40px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        @media (min-width: 768px) {
+            width: auto;
+            justify-content: flex-start;
+            gap: 12px;
+        }
+
+        @media (any-hover: hover) {
+            &:hover {
+                background-color: #ECECEC;
+            }
+        }
     }
 }
 
