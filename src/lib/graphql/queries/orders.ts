@@ -7,6 +7,17 @@ export interface OrderStatus {
     icon?: string | null;
 }
 
+export interface OrderItem {
+    id: string;
+    name: string;
+    quantity: number;
+    cost: number;
+    totalCost: number;
+    image?: {
+        list1x?: string | null;
+    } | null;
+}
+
 export interface Order {
     id: string;
     orderNo: string;
@@ -14,6 +25,8 @@ export interface Order {
     total: number;
     status?: OrderStatus | null;
     statusHistory?: (OrderStatus | null)[] | null;
+    items?: OrderItem[] | null;
+    reviewId?: number | null;
 }
 
 export interface OrderSimplePagination {
@@ -40,6 +53,17 @@ const ORDERS_QUERY = /* GraphQL */ `
                     id
                     createdAt
                     name
+                }
+                reviewId
+                items {
+                    id
+                    name
+                    quantity
+                    cost
+                    totalCost
+                    image {
+                        list1x
+                    }
                 }
             }
             per_page

@@ -8,16 +8,21 @@ import clsx from 'clsx';
 import useScrollLock from '@/hooks/useScrollLock';
 import Button from "@/app/components/ui/Button/Button";
 import TextareaField from '@/app/components/ui/TextareaField';
+import { getAccessToken } from '@/app/actions/authActions';
+import { addOrderReviewApi, addProductReviewApi } from '@/lib/graphql';
 import s from './PersonalReviewModal.module.scss';
 
 interface PersonalReviewModalProps {
     isOpen: boolean;
     onClose: () => void;
-    orderNumber: string;
+    orderNumber?: string;
+    productId?: number;
+    productName?: string;
     initialData?: {
         review: string;
-        ratings: Record<string, number>;
+        ratings?: Record<string, number> | number;
     };
+    onSuccess?: () => void;
 }
 
 const RATING_CATEGORIES = [
@@ -30,13 +35,18 @@ const RATING_CATEGORIES = [
 type RatingCategoryId = (typeof RATING_CATEGORIES)[number]['id'];
 type RatingsType = Record<RatingCategoryId, number>;
 
-const reviewSchema = Yup.object({
+const orderReviewSchema = Yup.object({
     review: Yup.string().trim().required("Відгук є обов'язковим"),
     ratings: Yup.object(
         Object.fromEntries(
             RATING_CATEGORIES.map(({ id }) => [id, Yup.number().min(1).max(5)])
         )
     ),
+});
+
+const productReviewSchema = Yup.object({
+    review: Yup.string().trim().required("Відгук є обов'язковим"),
+    rating: Yup.number().min(1).max(5).required("Оцінка є обов'язковою"),
 });
 
 const defaultRatings: RatingsType = {
@@ -50,10 +60,14 @@ export default function PersonalReviewModal({
     isOpen, 
     onClose, 
     orderNumber,
-    initialData 
+    productId,
+    productName,
+    initialData,
+    onSuccess
 }: PersonalReviewModalProps) {
     const { disableScroll, enableScroll } = useScrollLock();
     const [submitted, setSubmitted] = useState(false);
+    const isProduct = !!productId;
 
     useEffect(() => {
         if (isOpen) {
@@ -67,17 +81,43 @@ export default function PersonalReviewModal({
     const formik = useFormik({
         initialValues: {
             review: initialData?.review || '',
-            ratings: (initialData?.ratings as RatingsType) || { ...defaultRatings },
+            ratings: !isProduct ? ((initialData?.ratings as RatingsType) || { ...defaultRatings }) : { ...defaultRatings },
+            rating: isProduct ? (typeof initialData?.ratings === 'number' ? initialData.ratings : 5) : 5,
         },
         enableReinitialize: true,
-        validationSchema: reviewSchema,
+        validationSchema: isProduct ? productReviewSchema : orderReviewSchema,
         onSubmit: async (values, { setStatus }) => {
             try {
-                // Mock API call
-                await new Promise((resolve) => setTimeout(resolve, 800));
-                console.log('Order review submitted:', values);
+                const token = await getAccessToken();
+                if (!token) {
+                    setStatus('Необхідно авторизуватися.');
+                    return;
+                }
+
+                if (isProduct) {
+                    await addProductReviewApi(token, {
+                        productId: productId as number,
+                        rating: values.rating,
+                        text: values.review,
+                    });
+                } else {
+                    const ratingsArray = [
+                        { id: "2", rating: values.ratings.service },
+                        { id: "1", rating: values.ratings.personnel },
+                        { id: "4", rating: values.ratings.delivery },
+                        { id: "5", rating: values.ratings.product },
+                    ];
+                    await addOrderReviewApi(token, {
+                        orderId: parseInt(orderNumber as string),
+                        ratings: ratingsArray,
+                        text: values.review,
+                    });
+                }
+                
                 setSubmitted(true);
-            } catch {
+                if (onSuccess) onSuccess();
+            } catch (error) {
+                console.error("Error submitting review:", error);
                 setStatus('Не вдалося надіслати відгук. Спробуйте ще раз.');
             }
         },
@@ -93,6 +133,10 @@ export default function PersonalReviewModal({
 
     const setRating = (categoryId: RatingCategoryId, value: number) => {
         formik.setFieldValue(`ratings.${categoryId}`, value);
+    };
+
+    const setProductRatingValue = (value: number) => {
+        formik.setFieldValue('rating', value);
     };
 
     return (
@@ -128,28 +172,50 @@ export default function PersonalReviewModal({
                 ) : (
                     <>
                         <h2 className={s.title}>
-                            ЗАЛИШТЕ СВІЙ ВІДГУК ПО ЗАМОВЛЕННЮ <br />
-                            <span className={s.orderNum}>№{orderNumber}</span>
+                            {isProduct ? (
+                                <>
+                                    ЗАЛИШТЕ СВІЙ ВІДГУК ПРО ТОВАР <br />
+                                    <span className={s.orderNum}>{productName}</span>
+                                </>
+                            ) : (
+                                <>
+                                    ЗАЛИШТЕ СВІЙ ВІДГУК ПО ЗАМОВЛЕННЮ <br />
+                                    <span className={s.orderNum}>№{orderNumber}</span>
+                                </>
+                            )}
                         </h2>
 
                         <form className={s.form} onSubmit={formik.handleSubmit} noValidate>
-                            <div className={s.ratingsBlock}>
-                                {RATING_CATEGORIES.map(({ id, label }) => (
-                                    <div key={id} className={s.ratingRow}>
-                                        <span className={s.ratingLabel}>{label}</span>
+                            {isProduct ? (
+                                <div className={s.ratingsBlock}>
+                                    <div className={s.ratingRow}>
+                                        <span className={s.ratingLabel}>Оцінка товару</span>
                                         <RatingStars 
-                                            currentRating={formik.values.ratings[id]} 
-                                            onSetRating={(val) => setRating(id, val)}
-                                            label={label}
+                                            currentRating={formik.values.rating} 
+                                            onSetRating={setProductRatingValue}
+                                            label="Оцінка товару"
                                         />
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ) : (
+                                <div className={s.ratingsBlock}>
+                                    {RATING_CATEGORIES.map(({ id, label }) => (
+                                        <div key={id} className={s.ratingRow}>
+                                            <span className={s.ratingLabel}>{label}</span>
+                                            <RatingStars 
+                                                currentRating={formik.values.ratings[id]} 
+                                                onSetRating={(val) => setRating(id, val)}
+                                                label={label}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
                             <TextareaField
                                 id="review-text"
                                 name="review"
-                                label="Напишіть своє враження про М'ясторію"
+                                label={isProduct ? "Напишіть своє враження про товар" : "Напишіть своє враження про М'ясторію"}
                                 value={formik.values.review}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
@@ -157,6 +223,12 @@ export default function PersonalReviewModal({
                                 touched={formik.touched.review}
                                 rows={4}
                             />
+
+                            {formik.status && (
+                                <div className={s.errorBox} style={{ color: '#e3051b', marginBottom: '16px', fontSize: '14px' }}>
+                                    {formik.status}
+                                </div>
+                            )}
 
                             <Button 
                                 type="submit"

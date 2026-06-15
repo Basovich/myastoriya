@@ -174,3 +174,19 @@ export {
 } from './queries/bankCards';
 export type { UserBankCard } from './queries/bankCards';
 
+// Re-export reviews API
+export {
+    getOrderReviewsApi,
+    getProductReviewsApi,
+    addOrderReviewApi,
+    addProductReviewApi,
+} from './queries/reviews';
+export type {
+    OrderReview,
+    OrderReviewRating,
+    OrderReviewSimplePagination,
+    ProductReview,
+    ProductReviewSimplePagination,
+} from './queries/reviews';
+
+

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, forwardRef, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { Locale } from '@/i18n/config';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
@@ -13,69 +13,128 @@ import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter } from 'next/navigation';
 import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
 import ReviewCard from './ReviewCard/ReviewCard';
+import ProductReviewCard from './ProductReviewCard/ProductReviewCard';
 import PersonalReviewModal from './PersonalReviewModal/PersonalReviewModal';
+import { getOrdersApi, getOrderReviewsApi, getProductReviewsApi, Order, OrderReview, ProductReview } from '@/lib/graphql';
+import ReactDatePicker, { registerLocale } from 'react-datepicker';
+import { uk } from 'date-fns/locale';
+import { format, startOfDay, endOfDay } from 'date-fns';
+import clsx from 'clsx';
 import s from './ReviewsClient.module.scss';
+import "react-datepicker/dist/react-datepicker.css";
+
+registerLocale('uk', uk);
 
 const reviewsDict = {
     ua: {
         title: "МОЇ ВІДГУКИ",
         sortLabel: "Сортування:",
         sortOptions: ["По даті", "За оцінкою"],
+        tabOrders: "Відгуки по замовленню",
+        tabProducts: "Відгуки про товари",
+        noOrders: "У вас поки немає замовлень.",
+        noProducts: "У вас поки немає придбаних товарів.",
+        leaveReview: "ЗАЛИШИТИ ВІДГУК",
+        editReview: "ЗМІНИТИ ВІДГУК",
+        details: "ДЕТАЛІ ЗАМОВЛЕННЯ",
+        filterDatePlaceholder: "Оберіть дату/діапазон",
+        clearFilter: "Очистити",
+        loading: "Завантаження відгуків..."
     },
     ru: {
         title: "МОИ ОТЗЫВЫ",
         sortLabel: "Сортировка:",
         sortOptions: ["По дате", "По оценке"],
+        tabOrders: "Отзывы по заказу",
+        tabProducts: "Отзывы о товарах",
+        noOrders: "У вас пока нет заказов.",
+        noProducts: "У вас пока нет купленных товаров.",
+        leaveReview: "ОСТАВИТЬ ОТЗЫВ",
+        editReview: "ИЗМЕНИТЬ ОТЗЫВ",
+        details: "ДЕТАЛИ ЗАКАЗА",
+        filterDatePlaceholder: "Выберите дату/диапазон",
+        clearFilter: "Очистить",
+        loading: "Загрузка отзывов..."
     }
 };
 
-const mockReviews = [
-    {
-        id: "2323423",
-        date: "12.06.2025",
-        time: "18:24",
-        products: ["/images/product-ribeye.jpg", "/images/product-meatballs.jpg", "/images/product-sausages.jpg", "/images/product-shashlik.jpg", "/images/product-ribeye.jpg", "/images/product-meatballs.jpg", "/images/product-sausages.jpg", "/images/product-shashlik.jpg", "/images/product-ribeye.jpg"],
-        hasReview: false,
-    },
-    {
-        id: "2323425",
-        date: "12.06.2025",
-        time: "18:24",
-        products: ["/images/product-ribeye.jpg", "/images/product-meatballs.jpg", "/images/product-sausages.jpg", "/images/product-shashlik.jpg"],
-        hasReview: true,
-        reviewText: "Замовляли м'ясо на ювілей, блюдо дуже сподобалось. М'ясо ніжне и сочне. Дуже смачно! Я думаю таке мясо должен попробовать каждый в домашних условиях.",
-        rating: 3,
-        ratings: { service: 3, personnel: 4, delivery: 2, product: 5 }
-    },
-    {
-        id: "2323428",
-        date: "12.06.2025",
-        time: "18:24",
-        products: ["/images/product-ribeye.jpg", "/images/product-meatballs.jpg", "/images/product-sausages.jpg"],
-        hasReview: false,
-    },
-    {
-        id: "2323430",
-        date: "12.06.2025",
-        time: "18:24",
-        products: ["/images/product-shashlik.jpg"],
-        hasReview: false,
-    },
-    {
-        id: "2323435",
-        date: "12.06.2025",
-        time: "18:24",
-        products: ["/images/product-ribeye.jpg", "/images/product-meatballs.jpg"],
-        hasReview: false,
-        isDetailsOnly: true
-    }
-];
-
-interface ReviewsClientProps {
-    lang: Locale;
+interface PurchasedProduct {
+    id: string;
+    name: string;
+    image?: string | null;
+    date: Date;
 }
 
-export default function ReviewsClient({ lang }: ReviewsClientProps) {
+const getPurchasedProducts = (ordersList: Order[]): PurchasedProduct[] => {
+    const productsMap = new Map<string, PurchasedProduct>();
+    const sortedOrders = [...ordersList].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    for (const order of sortedOrders) {
+        if (!order.items) continue;
+        const orderDate = new Date(order.createdAt);
+        for (const item of order.items) {
+            if (!item.id) continue;
+            if (!productsMap.has(item.id)) {
+                productsMap.set(item.id, {
+                    id: item.id,
+                    name: item.name,
+                    image: item.image?.list1x,
+                    date: orderDate,
+                });
+            }
+        }
+    }
+    return Array.from(productsMap.values());
+};
+
+const CustomRangeInput = forwardRef<
+    HTMLButtonElement,
+    {
+        value?: string;
+        onClick?: () => void;
+        startDate: Date | null;
+        endDate: Date | null;
+        placeholder: string;
+        onClear: (e: React.MouseEvent) => void;
+    }
+>(({ onClick, startDate, endDate, placeholder, onClear }, ref) => {
+    let displayText = placeholder;
+    if (startDate) {
+        const startStr = format(startDate, 'dd.MM.yyyy');
+        if (endDate) {
+            const endStr = format(endDate, 'dd.MM.yyyy');
+            displayText = `${startStr} - ${endStr}`;
+        } else {
+            displayText = startStr;
+        }
+    }
+
+    return (
+        <button className={s.calendarInputBtn} onClick={onClick} ref={ref} type="button">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className={s.calendarIcon}>
+                <path d="M15.8333 3.33334H4.16667C3.24619 3.33334 2.5 4.07954 2.5 5.00001V16.6667C2.5 17.5872 3.24619 18.3333 4.16667 18.3333H15.8333C16.7538 18.3333 17.5 17.5872 17.5 16.6667V5.00001C17.5 4.07954 16.7538 3.33334 15.8333 3.33334Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M13.3333 1.66666V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6.66666 1.66666V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M2.5 8.33334H17.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className={clsx(s.calendarValue, !startDate && s.placeholder)}>
+                {displayText}
+            </span>
+            {startDate && (
+                <span className={s.clearBtn} onClick={onClear} role="button" aria-label="Очистити">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.5 3.5L3.5 10.5M3.5 3.5L10.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                </span>
+            )}
+        </button>
+    );
+});
+CustomRangeInput.displayName = 'CustomRangeInput';
+
+export default function ReviewsClient({ lang }: { lang: Locale }) {
     const hydrated = useIsHydrated();
     const dict = reviewsDict[lang] || reviewsDict.ua;
     const pDict = personalDict[lang] || personalDict.ua;
@@ -83,9 +142,71 @@ export default function ReviewsClient({ lang }: ReviewsClientProps) {
     const router = useRouter();
     const { user } = useAppSelector((state) => state.auth);
 
+    const [activeTab, setActiveTab] = useState<'orders' | 'products'>('orders');
     const [sortValue, setSortValue] = useState(dict.sortOptions[0]);
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [orderReviews, setOrderReviews] = useState<Record<string, OrderReview>>({});
+    const [productReviews, setProductReviews] = useState<Record<string, ProductReview>>({});
+    const [loading, setLoading] = useState(false);
+
+    // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState<{id: string, ratings?: any, review?: string} | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<{ id: string; ratings?: Record<string, number>; review?: string } | null>(null);
+    const [selectedProduct, setSelectedProduct] = useState<{ id: number; name: string; rating?: number; review?: string } | null>(null);
+
+    const loadData = useCallback(async () => {
+        setLoading(true);
+        try {
+            const token = await getAccessToken();
+            if (!token) return;
+
+            // 1. Fetch Orders
+            const ordersData = await getOrdersApi(token, { limit: 100 });
+            setOrders(ordersData.data);
+
+            // 2. Fetch Order Reviews
+            const orderReviewsData = await getOrderReviewsApi(token, { limit: 100 });
+            const oRevMap: Record<string, OrderReview> = {};
+            orderReviewsData.data.forEach((r) => {
+                oRevMap[r.orderId.toString()] = r;
+            });
+            setOrderReviews(oRevMap);
+
+            // 3. Extract unique purchased products
+            const productsList = getPurchasedProducts(ordersData.data);
+            const pRevMap: Record<string, ProductReview> = {};
+            
+            // Fetch product reviews sequentially to not overwhelm dev-api
+            for (const prod of productsList) {
+                try {
+                    const pRevData = await getProductReviewsApi(token, {
+                        productId: parseInt(prod.id),
+                        userId: user?.id ? parseInt(user.id) : undefined,
+                        limit: 1,
+                    });
+                    if (pRevData.data && pRevData.data.length > 0) {
+                        pRevMap[prod.id] = pRevData.data[0];
+                    }
+                } catch (error) {
+                    console.error(`Failed to fetch reviews for product ${prod.id}:`, error);
+                }
+            }
+            setProductReviews(pRevMap);
+        } catch (error) {
+            console.error('Error fetching reviews details:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [user?.id]);
+
+    useEffect(() => {
+        if (hydrated && user) {
+            loadData();
+        }
+    }, [hydrated, user, loadData]);
 
     const handleLogout = async () => {
         try {
@@ -100,25 +221,107 @@ export default function ReviewsClient({ lang }: ReviewsClientProps) {
         }
     };
 
-    const openReviewModal = (id: string, initialData?: any) => {
+    const isDateInRange = (dateToCheck: Date, start: Date | null, end: Date | null) => {
+        if (!start) return true;
+        const checkTime = startOfDay(dateToCheck).getTime();
+        const startTime = startOfDay(start).getTime();
+        if (!end) {
+            return checkTime === startTime;
+        }
+        const endTime = endOfDay(end).getTime();
+        return checkTime >= startTime && checkTime <= endTime;
+    };
+
+    const handleDateChange = (dates: [Date | null, Date | null]) => {
+        const [start, end] = dates;
+        setStartDate(start);
+        setEndDate(end);
+    };
+
+    const handleClearDate = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setStartDate(null);
+        setEndDate(null);
+    };
+
+    const openOrderReviewModal = (id: string, initialData?: { review?: string; ratings?: Record<string, number> }) => {
         setSelectedOrder({ id, ...initialData });
+        setSelectedProduct(null);
         setIsModalOpen(true);
+    };
+
+    const openProductReviewModal = (id: number, name: string, initialData?: { review?: string; ratings?: number }) => {
+        setSelectedProduct({ id, name, ...initialData });
+        setSelectedOrder(null);
+        setIsModalOpen(true);
+    };
+
+    const handleReviewSuccess = () => {
+        setIsModalOpen(false);
+        loadData();
     };
 
     if (!hydrated) {
         return null;
     }
 
+    const productsList = getPurchasedProducts(orders);
+
+    // Filter and Sort Orders
+    const filteredOrders = orders
+        .filter((order) => isDateInRange(new Date(order.createdAt), startDate, endDate))
+        .sort((a, b) => {
+            if (sortValue === dict.sortOptions[1]) {
+                // By rating
+                const ratingA = orderReviews[a.id]?.averageRating || 0;
+                const ratingB = orderReviews[b.id]?.averageRating || 0;
+                return ratingB - ratingA;
+            } else {
+                // By date
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            }
+        });
+
+    // Filter and Sort Products
+    const filteredProducts = productsList
+        .filter((prod) => isDateInRange(prod.date, startDate, endDate))
+        .sort((a, b) => {
+            if (sortValue === dict.sortOptions[1]) {
+                // By rating
+                const ratingA = productReviews[a.id]?.rating || 0;
+                const ratingB = productReviews[b.id]?.rating || 0;
+                return ratingB - ratingA;
+            } else {
+                // By date
+                return b.date.getTime() - a.date.getTime();
+            }
+        });
+
     return (
         <div className={s.reviewsPage}>
             <PersonalContentBlock className={s.reviewsBlock}>
-                <PersonalPageHeader 
+                <PersonalPageHeader
                     title={dict.title}
                     logoutLabel={pDict.navigation.logout}
                     onLogout={handleLogout}
                     user={user}
                     navDict={pDict.navigation}
                 />
+
+                <div className={s.tabsRow}>
+                    <button
+                        className={clsx(s.tabBtn, activeTab === 'orders' && s.active)}
+                        onClick={() => setActiveTab('orders')}
+                    >
+                        {dict.tabOrders}
+                    </button>
+                    <button
+                        className={clsx(s.tabBtn, activeTab === 'products' && s.active)}
+                        onClick={() => setActiveTab('products')}
+                    >
+                        {dict.tabProducts}
+                    </button>
+                </div>
 
                 <div className={s.controlsRow}>
                     <SortSelect
@@ -128,34 +331,131 @@ export default function ReviewsClient({ lang }: ReviewsClientProps) {
                         label={dict.sortLabel}
                         className={s.sortSelect}
                     />
+
+                    <div className={s.calendarFilterWrapper}>
+                        <ReactDatePicker
+                            selectsRange={true}
+                            startDate={startDate}
+                            endDate={endDate}
+                            onChange={handleDateChange}
+                            locale="uk"
+                            dateFormat="dd.MM.yyyy"
+                            customInput={
+                                <CustomRangeInput
+                                    startDate={startDate}
+                                    endDate={endDate}
+                                    placeholder={dict.filterDatePlaceholder}
+                                    onClear={handleClearDate}
+                                />
+                            }
+                        />
+                    </div>
                 </div>
 
-                <div className={s.reviewsList}>
-                    {mockReviews.map((item) => (
-                        <ReviewCard
-                            key={item.id}
-                            orderNumber={item.id}
-                            date={item.date}
-                            time={item.time}
-                            products={item.products}
-                            hasReview={item.hasReview}
-                            reviewText={item.reviewText}
-                            rating={item.rating}
-                            onLeaveReview={() => openReviewModal(item.id)}
-                            onEditReview={() => openReviewModal(item.id, { review: item.reviewText, ratings: item.ratings })}
-                            onDetails={() => router.push(`/${lang}/personal/orders/${item.id}`)}
-                            isDetailsOnly={item.isDetailsOnly}
-                        />
-                    ))}
-                </div>
+                {loading ? (
+                    <div className={s.loadingBlock}>{dict.loading}</div>
+                ) : activeTab === 'orders' ? (
+                    filteredOrders.length === 0 ? (
+                        <div className={s.emptyBlock}>{dict.noOrders}</div>
+                    ) : (
+                        <div className={s.reviewsList}>
+                            {filteredOrders.map((order) => {
+                                const rev = orderReviews[order.id];
+                                const hasReview = !!rev;
+                                const productsImages =
+                                    order.items?.map((item) => item.image?.list1x || '/images/product-placeholder.svg') || [];
+                                
+                                const orderDate = new Date(order.createdAt);
+                                const dateStr = orderDate.toLocaleDateString('uk-UA', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                });
+                                const timeStr = orderDate.toLocaleTimeString('uk-UA', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                });
+
+                                return (
+                                    <ReviewCard
+                                        key={order.id}
+                                        orderNumber={order.orderNo || order.id}
+                                        date={dateStr}
+                                        time={timeStr}
+                                        products={productsImages}
+                                        hasReview={hasReview}
+                                        reviewText={rev?.text}
+                                        rating={rev?.averageRating}
+                                        onLeaveReview={() => openOrderReviewModal(order.id)}
+                                        onEditReview={() => {
+                                            const catsMap: Record<string, number> = {};
+                                            rev?.ratings?.forEach((item) => {
+                                                if (item.id === '1') catsMap.personnel = item.rating;
+                                                if (item.id === '2') catsMap.service = item.rating;
+                                                if (item.id === '4') catsMap.delivery = item.rating;
+                                                if (item.id === '5') catsMap.product = item.rating;
+                                            });
+                                            openOrderReviewModal(order.id, {
+                                                review: rev?.text,
+                                                ratings: catsMap,
+                                            });
+                                        }}
+                                        onDetails={() => router.push(`/${lang}/personal/orders/${order.id}`)}
+                                        isDetailsOnly={false}
+                                    />
+                                );
+                            })}
+                        </div>
+                    )
+                ) : filteredProducts.length === 0 ? (
+                    <div className={s.emptyBlock}>{dict.noProducts}</div>
+                ) : (
+                    <div className={s.reviewsList}>
+                        {filteredProducts.map((prod) => {
+                            const rev = productReviews[prod.id];
+                            const hasReview = !!rev;
+
+                            return (
+                                <ProductReviewCard
+                                    key={prod.id}
+                                    productName={prod.name}
+                                    productImage={prod.image}
+                                    hasReview={hasReview}
+                                    reviewText={rev?.text}
+                                    rating={rev?.rating}
+                                    onLeaveReview={() => openProductReviewModal(parseInt(prod.id), prod.name)}
+                                    onEditReview={() =>
+                                        openProductReviewModal(parseInt(prod.id), prod.name, {
+                                            review: rev?.text,
+                                            ratings: rev?.rating,
+                                        })
+                                    }
+                                />
+                            );
+                        })}
+                    </div>
+                )}
             </PersonalContentBlock>
 
-            {selectedOrder && (
-                <PersonalReviewModal 
+            {isModalOpen && (
+                <PersonalReviewModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
-                    orderNumber={selectedOrder.id}
-                    initialData={selectedOrder.review ? { review: selectedOrder.review, ratings: selectedOrder.ratings } : undefined}
+                    orderNumber={selectedOrder?.id}
+                    productId={selectedProduct?.id}
+                    productName={selectedProduct?.name}
+                    initialData={
+                        selectedOrder
+                            ? selectedOrder.review
+                                ? { review: selectedOrder.review, ratings: selectedOrder.ratings }
+                                : undefined
+                            : selectedProduct
+                            ? selectedProduct.review
+                                ? { review: selectedProduct.review, ratings: selectedProduct.rating }
+                                : undefined
+                            : undefined
+                    }
+                    onSuccess={handleReviewSuccess}
                 />
             )}
         </div>

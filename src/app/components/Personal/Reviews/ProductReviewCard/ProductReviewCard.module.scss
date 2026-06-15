@@ -1,0 +1,146 @@
+.card {
+    background: #fff;
+    border: 1px solid #F0F0F0;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.02);
+
+    @media (min-width: 1024px) {
+        padding: 24px;
+        gap: 20px;
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 1024px) {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.productInfo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.productImg {
+    width: 72px;
+    height: 54px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #F5F5F5;
+    flex-shrink: 0;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.productMeta {
+    flex: 1;
+}
+
+.productName {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1C1B1B;
+    margin: 0;
+    line-height: 1.3;
+
+    @media (min-width: 1024px) {
+        font-size: 16px;
+    }
+}
+
+.desktopAction {
+    display: none;
+    @media (min-width: 1024px) {
+        display: block;
+        min-width: 200px;
+    }
+}
+
+.mobileAction {
+    display: block;
+    @media (min-width: 1024px) {
+        display: none;
+    }
+}
+
+.actionBtn {
+    width: 100%;
+    height: 44px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 0 20px;
+}
+
+.reviewBlock {
+    padding-top: 16px;
+    border-top: 1px solid #F0F0F0;
+}
+
+.reviewInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 640px) {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+.textGroup {
+    flex: 1;
+}
+
+.reviewLabel {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #1C1B1B;
+}
+
+.reviewText {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #666;
+    margin: 0;
+}
+
+.ratingGroup {
+    @media (min-width: 640px) {
+        text-align: right;
+    }
+}
+
+.stars {
+    display: flex;
+    gap: 4px;
+    @media (min-width: 640px) {
+        justify-content: flex-end;
+    }
+}
+
+.star {
+    color: #fff;
+    fill: #fff;
+}
+
+.starFilled {
+    color: #E30613;
+    fill: #E30613;
+}
