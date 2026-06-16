@@ -79,6 +79,14 @@
     overflow: hidden;
     background: #F5F5F5;
     flex-shrink: 0;
+    display: block;
+    transition: opacity 0.2s ease;
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.85;
+        }
+    }
 
     img {
         width: 100%;

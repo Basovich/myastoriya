@@ -3,10 +3,14 @@
 import React from 'react';
 import clsx from 'clsx';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import Button from '@/app/components/ui/Button/Button';
+import AppLink from '@/app/components/ui/AppLink/AppLink';
 import s from './ProductReviewCard.module.scss';
 
 interface ProductReviewCardProps {
+    productId: string | number;
+    productSlug?: string;
     productName: string;
     productImage?: string | null;
     hasReview: boolean;
@@ -17,6 +21,8 @@ interface ProductReviewCardProps {
 }
 
 export default function ProductReviewCard({
+    productId,
+    productSlug,
     productName,
     productImage,
     hasReview,
@@ -25,18 +31,39 @@ export default function ProductReviewCard({
     onLeaveReview,
     onEditReview,
 }: ProductReviewCardProps) {
+    const params = useParams();
+    const lang = params.lang || 'ua';
+    
+    const isDeleted = productName.startsWith('cms-orders::') || productName.toLowerCase().includes('deleted');
+    const deletedTitle = lang === 'ru' ? 'Товар удален' : 'Товар видалено';
+    const displayName = isDeleted ? deletedTitle : productName;
+
     const fallbackImage = '/images/product-placeholder.svg';
     const displayImage = productImage || fallbackImage;
+    const productUrl = productSlug ? `/products/${productSlug}` : `/products/${productId}`;
 
     return (
         <div className={s.card}>
             <div className={s.content}>
                 <div className={s.productInfo}>
                     <div className={s.productImg}>
-                        <Image src={displayImage} alt={productName} width={80} height={60} style={{ objectFit: 'cover' }} />
+                        {isDeleted ? (
+                            <div title={displayName} style={{ cursor: 'default', width: '100%', height: '100%' }}>
+                                <Image src={displayImage} alt={displayName} width={80} height={60} style={{ objectFit: 'cover' }} />
+                            </div>
+                        ) : (
+                            <AppLink
+                                href={productUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title={displayName}
+                            >
+                                <Image src={displayImage} alt={displayName} width={80} height={60} style={{ objectFit: 'cover' }} />
+                            </AppLink>
+                        )}
                     </div>
                     <div className={s.productMeta}>
-                        <h3 className={s.productName}>{productName}</h3>
+                        <h3 className={s.productName}>{displayName}</h3>
                     </div>
                 </div>
 

@@ -58,7 +58,14 @@ interface PurchasedProduct {
     id: string;
     name: string;
     image?: string | null;
+    slug?: string;
     date: Date;
+}
+
+interface ProductDetails {
+    image: string;
+    slug?: string;
+    name: string;
 }
 
 const resolveOrderItemImageUrl = (
@@ -68,11 +75,11 @@ const resolveOrderItemImageUrl = (
         grid1x?: string | null;
         main1x?: string | null;
     } | null,
-    productImagesMap?: Record<number, string>
+    productDetailsMap?: Record<number, ProductDetails>
 ): string => {
     const productId = Number(itemId);
-    if (productId && productImagesMap?.[productId]) {
-        return productImagesMap[productId];
+    if (productId && productDetailsMap?.[productId]) {
+        return productDetailsMap[productId].image;
     }
     const url = image?.list1x || image?.grid1x || image?.main1x || null;
     if (!url) return '/images/product-placeholder.svg';
@@ -83,7 +90,7 @@ const resolveOrderItemImageUrl = (
 
 const getPurchasedProducts = (
     ordersList: Order[],
-    productImagesMap: Record<number, string>
+    productDetailsMap: Record<number, ProductDetails>
 ): PurchasedProduct[] => {
     const productsMap = new Map<string, PurchasedProduct>();
     const sortedOrders = [...ordersList].sort(
@@ -96,10 +103,12 @@ const getPurchasedProducts = (
         for (const item of order.items) {
             if (!item.id) continue;
             if (!productsMap.has(item.id)) {
+                const details = productDetailsMap[Number(item.id)];
                 productsMap.set(item.id, {
                     id: item.id,
                     name: item.name,
-                    image: resolveOrderItemImageUrl(item.id, item.image, productImagesMap),
+                    image: details?.image || resolveOrderItemImageUrl(item.id, item.image, productDetailsMap),
+                    slug: details?.slug,
                     date: orderDate,
                 });
             }
@@ -123,7 +132,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
     const [orders, setOrders] = useState<Order[]>([]);
     const [orderReviews, setOrderReviews] = useState<Record<string, OrderReview>>({});
     const [productReviews, setProductReviews] = useState<Record<string, ProductReview>>({});
-    const [productImagesMap, setProductImagesMap] = useState<Record<number, string>>({});
+    const [productDetailsMap, setProductDetailsMap] = useState<Record<number, ProductDetails>>({});
     const [loading, setLoading] = useState(false);
 
     // Modal state
@@ -149,18 +158,22 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                     .filter(id => !isNaN(id) && id > 0)
             ));
 
-            const imagesMap: Record<number, string> = {};
+            const detailsMap: Record<number, ProductDetails> = {};
             if (productIds.length > 0) {
                 try {
                     const details = await getProductsByIdsApi(productIds, lang);
                     details.forEach(prod => {
-                        imagesMap[Number(prod.id)] = resolveProductImageUrl(prod);
+                        detailsMap[Number(prod.id)] = {
+                            image: resolveProductImageUrl(prod),
+                            slug: prod.slug,
+                            name: prod.name,
+                        };
                     });
                 } catch (e) {
                     console.error("Failed to fetch product details for images:", e);
                 }
             }
-            setProductImagesMap(imagesMap);
+            setProductDetailsMap(detailsMap);
 
             // 3. Fetch Order Reviews
             const orderReviewsData = await getOrderReviewsApi(token, { limit: 100 });
@@ -170,8 +183,8 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
             });
             setOrderReviews(oRevMap);
 
-            // 4. Extract unique purchased products (passing the imagesMap)
-            const productsList = getPurchasedProducts(ordersData.data, imagesMap);
+            // 4. Extract unique purchased products (passing the detailsMap)
+            const productsList = getPurchasedProducts(ordersData.data, detailsMap);
             const pRevMap: Record<string, ProductReview> = {};
             
             // Fetch product reviews sequentially to not overwhelm dev-api
@@ -260,7 +273,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         return null;
     }
 
-    const productsList = getPurchasedProducts(orders, productImagesMap);
+    const productsList = getPurchasedProducts(orders, productDetailsMap);
 
     // Filter and Sort Orders by date (newest first)
     const filteredOrders = orders
@@ -328,8 +341,16 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                             {filteredOrders.map((order) => {
                                 const rev = orderReviews[order.id];
                                 const hasReview = !!rev;
-                                const productsImages =
-                                    order.items?.map((item) => resolveOrderItemImageUrl(item.id, item.image, productImagesMap)) || [];
+                                const reviewProducts =
+                                    order.items?.map((item) => {
+                                        const details = productDetailsMap[Number(item.id)];
+                                        return {
+                                            id: item.id,
+                                            name: item.name,
+                                            image: details?.image || resolveOrderItemImageUrl(item.id, item.image, productDetailsMap),
+                                            slug: details?.slug,
+                                        };
+                                    }) || [];
                                 
                                 const orderDate = new Date(order.createdAt);
                                 const dateStr = orderDate.toLocaleDateString('uk-UA', {
@@ -348,7 +369,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                                         orderNumber={order.orderNo || order.id}
                                         date={dateStr}
                                         time={timeStr}
-                                        products={productsImages}
+                                        products={reviewProducts}
                                         hasReview={hasReview}
                                         reviewText={rev?.text}
                                         rating={rev?.averageRating}
@@ -386,6 +407,8 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                             return (
                                 <ProductReviewCard
                                     key={prod.id}
+                                    productId={prod.id}
+                                    productSlug={prod.slug}
                                     productName={prod.name}
                                     productImage={prod.image}
                                     hasReview={hasReview}

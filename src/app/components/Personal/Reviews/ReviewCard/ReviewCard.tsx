@@ -3,14 +3,24 @@
 import React from 'react';
 import clsx from 'clsx';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import Button from '@/app/components/ui/Button/Button';
+import AppLink from '@/app/components/ui/AppLink/AppLink';
 import s from './ReviewCard.module.scss';
+
+export interface ReviewProduct {
+    id: string;
+    name: string;
+    image: string;
+    slug?: string;
+    isDeleted?: boolean;
+}
 
 interface ReviewCardProps {
     orderNumber: string;
     date: string;
     time: string;
-    products: string[];
+    products: ReviewProduct[];
     hasReview: boolean;
     reviewText?: string;
     rating?: number;
@@ -33,6 +43,9 @@ export default function ReviewCard({
     onDetails,
     isDetailsOnly
 }: ReviewCardProps) {
+    const params = useParams();
+    const lang = params.lang || 'ua';
+
     return (
         <div className={s.card}>
             <div className={s.header}>
@@ -56,11 +69,38 @@ export default function ReviewCard({
             <div className={s.content}>
                 <div className={s.productsRow}>
                     <div className={s.productsList}>
-                        {products.slice(0, 8).map((img, i) => (
-                            <div key={i} className={s.productThumb}>
-                                <Image src={img} alt="Product" width={56} height={42} />
-                            </div>
-                        ))}
+                        {products.slice(0, 8).map((prod, i) => {
+                            const isDeleted = prod.isDeleted || prod.name.startsWith('cms-orders::') || prod.name.toLowerCase().includes('deleted');
+                            const deletedTitle = lang === 'ru' ? 'Товар удален' : 'Товар видалено';
+                            const titleText = isDeleted ? deletedTitle : prod.name;
+                            const productUrl = prod.slug ? `/products/${prod.slug}` : `/products/${prod.id}`;
+
+                            if (isDeleted) {
+                                return (
+                                    <div
+                                        key={i}
+                                        className={s.productThumb}
+                                        title={titleText}
+                                        style={{ cursor: 'default' }}
+                                    >
+                                        <Image src={prod.image} alt={titleText} width={56} height={42} />
+                                    </div>
+                                );
+                            }
+
+                            return (
+                                <AppLink
+                                    key={i}
+                                    href={productUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title={titleText}
+                                    className={s.productThumb}
+                                >
+                                    <Image src={prod.image} alt={titleText} width={56} height={42} />
+                                </AppLink>
+                            );
+                        })}
                         {products.length > 8 && (
                             <div className={s.moreThumb}>
                                 <span>{products.length - 8}</span>
