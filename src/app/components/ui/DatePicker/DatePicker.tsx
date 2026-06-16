@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useState, useEffect, useRef } from 'react';
 import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import { uk } from 'date-fns/locale';
 import { format, isToday, isTomorrow } from 'date-fns';
@@ -146,6 +146,69 @@ const MONTHS = [
     'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'
 ];
 
+interface InlineSelectOption {
+    label: string;
+    value: number;
+}
+
+interface InlineSelectProps {
+    value: number;
+    options: InlineSelectOption[];
+    onChange: (value: number) => void;
+}
+
+function InlineSelect({ value, options, onChange }: InlineSelectProps) {
+    const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const selectedOption = options.find((opt) => opt.value === value);
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        }
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isOpen]);
+
+    return (
+        <div className={s.inlineSelectWrapper} ref={containerRef}>
+            <button
+                type="button"
+                className={clsx(s.inlineSelectBtn, isOpen && s.isOpen)}
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <span>{selectedOption ? selectedOption.label : ''}</span>
+                <svg className={clsx(s.inlineSelectArrow, isOpen && s.arrowOpen)} width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            </button>
+            {isOpen && (
+                <div className={s.inlineSelectDropdown}>
+                    <ul className={s.inlineSelectOptions}>
+                        {options.map((opt) => (
+                            <li
+                                key={opt.value}
+                                className={clsx(s.inlineSelectOption, opt.value === value && s.selected)}
+                                onClick={() => {
+                                    onChange(opt.value);
+                                    setIsOpen(false);
+                                }}
+                            >
+                                {opt.label}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </div>
+    );
+}
+
 export default function DatePicker({
     id,
     selected,
@@ -270,29 +333,23 @@ export default function DatePicker({
                                 </button>
                                 
                                 <div className={s.headerSelects}>
-                                    <select
-                                        className={s.customSelect}
+                                    <InlineSelect
                                         value={date.getMonth()}
-                                        onChange={({ target: { value } }) => changeMonth(Number(value))}
-                                    >
-                                        {MONTHS.map((month, index) => (
-                                            <option key={month} value={index}>
-                                                {month}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        options={MONTHS.map((month, index) => ({
+                                            label: month,
+                                            value: index,
+                                        }))}
+                                        onChange={(val) => changeMonth(val)}
+                                    />
 
-                                    <select
-                                        className={s.customSelect}
+                                    <InlineSelect
                                         value={date.getFullYear()}
-                                        onChange={({ target: { value } }) => changeYear(Number(value))}
-                                    >
-                                        {YEARS.map((year) => (
-                                            <option key={year} value={year}>
-                                                {year}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        options={YEARS.map((year) => ({
+                                            label: year.toString(),
+                                            value: year,
+                                        }))}
+                                        onChange={(val) => changeYear(val)}
+                                    />
                                 </div>
 
                                 <button
