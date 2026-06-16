@@ -277,7 +277,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
 
     // Filter and Sort Orders by date (newest first)
     const filteredOrders = orders
-        .filter((order) => isDateInRange(new Date(order.createdAt), startDate, endDate))
+        .filter((order) => order.status?.id === '2' && isDateInRange(new Date(order.createdAt), startDate, endDate))
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     // Filter and Sort Products by date (newest first)
