@@ -72,7 +72,7 @@ export default function ProductReviewCard({
                 <div className={s.desktopAction}>
                     {hasReview ? (
                         <Button onClick={onEditReview} variant="black" className={s.actionBtn}>
-                            ЗМІНИТИ ВІДГУК
+                            {lang === 'ru' ? 'ИЗМЕНИТЬ ОТЗЫВ' : 'ЗМІНИТИ ВІДГУК'}
                         </Button>
                     ) : (
                         <Button onClick={onLeaveReview} variant="red" className={s.actionBtn}>
@@ -111,7 +111,7 @@ export default function ProductReviewCard({
             <div className={s.mobileAction}>
                 {hasReview ? (
                     <Button onClick={onEditReview} variant="black" className={s.actionBtn}>
-                        ЗМІНИТИ ВІДГУК
+                        {lang === 'ru' ? 'ИЗМЕНИТЬ ОТЗЫВ' : 'ЗМІНИТИ ВІДГУК'}
                     </Button>
                 ) : (
                     <Button onClick={onLeaveReview} variant="red" className={s.actionBtn}>

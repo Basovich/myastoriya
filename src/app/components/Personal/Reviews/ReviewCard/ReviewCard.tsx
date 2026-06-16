@@ -115,7 +115,7 @@ export default function ReviewCard({
                             </Button>
                         ) : hasReview ? (
                             <Button onClick={onEditReview} variant="black" className={s.actionBtn}>
-                                ЗМІНИТИ ВІДГУК
+                                {lang === 'ru' ? 'ИЗМЕНИТЬ ОТЗЫВ' : 'ЗМІНИТИ ВІДГУК'}
                             </Button>
                         ) : (
                             <Button onClick={onLeaveReview} variant="red" className={s.actionBtn}>
@@ -153,7 +153,7 @@ export default function ReviewCard({
                         </Button>
                     ) : hasReview ? (
                         <Button onClick={onEditReview} variant="black" className={s.actionBtn}>
-                            ЗМІНИТИ ВІДГУК
+                            {lang === 'ru' ? 'ИЗМЕНИТЬ ОТЗЫВ' : 'ЗМІНИТИ ВІДГУК'}
                         </Button>
                     ) : (
                         <Button onClick={onLeaveReview} variant="red" className={s.actionBtn}>

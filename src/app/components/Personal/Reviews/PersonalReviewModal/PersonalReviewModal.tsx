@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import clsx from 'clsx';
+import { useParams } from 'next/navigation';
 import useScrollLock from '@/hooks/useScrollLock';
 import Button from "@/app/components/ui/Button/Button";
 import TextareaField from '@/app/components/ui/TextareaField';
@@ -65,9 +66,12 @@ export default function PersonalReviewModal({
     initialData,
     onSuccess
 }: PersonalReviewModalProps) {
+    const params = useParams();
+    const lang = params.lang || 'ua';
     const { disableScroll, enableScroll } = useScrollLock();
     const [submitted, setSubmitted] = useState(false);
     const isProduct = !!productId;
+    const isEditMode = !!initialData;
 
     useEffect(() => {
         if (isOpen) {
@@ -90,7 +94,7 @@ export default function PersonalReviewModal({
             try {
                 const token = await getAccessToken();
                 if (!token) {
-                    setStatus('Необхідно авторизуватися.');
+                    setStatus(lang === 'ru' ? 'Необходимо авторизоваться.' : 'Необхідно авторизуватися.');
                     return;
                 }
 
@@ -116,9 +120,9 @@ export default function PersonalReviewModal({
                 
                 setSubmitted(true);
                 if (onSuccess) onSuccess();
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Error submitting review:", error);
-                setStatus('Не вдалося надіслати відгук. Спробуйте ще раз.');
+                setStatus(error?.message || (lang === 'ru' ? 'Не удалось отправить отзыв. Попробуйте еще раз.' : 'Не вдалося надіслати відгук. Спробуйте ще раз.'));
             }
         },
     });
@@ -163,10 +167,18 @@ export default function PersonalReviewModal({
                                 <path d="M14 24.5L21 31.5L34 17" stroke="#e3051b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                         </div>
-                        <h2 className={s.successTitle}>Дякуємо за відгук!</h2>
-                        <p className={s.successText}>Ваш відгук успішно надіслано.</p>
+                        <h2 className={s.successTitle}>
+                            {isEditMode 
+                                ? (lang === 'ru' ? 'Отзыв обновлен!' : 'Відгук оновлено!')
+                                : (lang === 'ru' ? 'Спасибо за отзыв!' : 'Дякуємо за відгук!')}
+                        </h2>
+                        <p className={s.successText}>
+                            {isEditMode 
+                                ? (lang === 'ru' ? 'Ваш отзыв успешно сохранен.' : 'Ваш відгук успішно збережено.')
+                                : (lang === 'ru' ? 'Ваш отзыв успешно отправлен.' : 'Ваш відгук успішно надіслано.')}
+                        </p>
                         <Button type="button" className={s.submitBtn} onClick={handleClose} variant='red'>
-                            Закрити
+                            {lang === 'ru' ? 'Закрыть' : 'Закрити'}
                         </Button>
                     </div>
                 ) : (
@@ -174,12 +186,18 @@ export default function PersonalReviewModal({
                         <h2 className={s.title}>
                             {isProduct ? (
                                 <>
-                                    ЗАЛИШТЕ СВІЙ ВІДГУК ПРО ТОВАР <br />
+                                    {isEditMode
+                                        ? (lang === 'ru' ? 'РЕДАКТИРОВАНИЕ ОТЗЫВА О ТОВАРЕ' : 'РЕДАГУВАННЯ ВІДГУКУ ПРО ТОВАР')
+                                        : (lang === 'ru' ? 'ОСТАВЬТЕ СВОЙ ОТЗЫВ О ТОВАРЕ' : 'ЗАЛИШТЕ СВІЙ ВІДГУК ПРО ТОВАР')
+                                    } <br />
                                     <span className={s.orderNum}>{productName}</span>
                                 </>
                             ) : (
                                 <>
-                                    ЗАЛИШТЕ СВІЙ ВІДГУК ПО ЗАМОВЛЕННЮ <br />
+                                    {isEditMode
+                                        ? (lang === 'ru' ? 'РЕДАКТИРОВАНИЕ ОТЗЫВА ПО ЗАКАЗУ' : 'РЕДАГУВАННЯ ВІДГУКУ ПО ЗАМОВЛЕННЮ')
+                                        : (lang === 'ru' ? 'ОСТАВЬТЕ СВОЙ ОТЗЫВ ПО ЗАКАЗУ' : 'ЗАЛИШТЕ СВІЙ ВІДГУК ПО ЗАМОВЛЕННЮ')
+                                    } <br />
                                     <span className={s.orderNum}>№{orderNumber}</span>
                                 </>
                             )}
@@ -236,7 +254,9 @@ export default function PersonalReviewModal({
                                 disabled={formik.isSubmitting}
                                 variant='red'
                             >
-                                {formik.isSubmitting ? 'Надсилаємо...' : 'ВІДПРАВИТИ'}
+                                {formik.isSubmitting 
+                                    ? (lang === 'ru' ? 'Отправляем...' : 'Надсилаємо...') 
+                                    : (lang === 'ru' ? 'ОТПРАВИТЬ' : 'ВІДПРАВИТИ')}
                             </Button>
                         </form>
                     </>
@@ -250,9 +270,10 @@ interface RatingStarsProps {
     currentRating: number;
     onSetRating: (value: number) => void;
     label: string;
+    disabled?: boolean;
 }
 
-function RatingStars({ currentRating, onSetRating, label }: RatingStarsProps) {
+function RatingStars({ currentRating, onSetRating, label, disabled }: RatingStarsProps) {
     const [hoverRating, setHoverRating] = useState(0);
 
     return (
@@ -260,7 +281,7 @@ function RatingStars({ currentRating, onSetRating, label }: RatingStarsProps) {
             className={s.stars} 
             role="group" 
             aria-label={label}
-            onMouseLeave={() => setHoverRating(0)}
+            onMouseLeave={() => !disabled && setHoverRating(0)}
         >
             {Array.from({ length: 5 }, (_, i) => {
                 const starValue = i + 1;
@@ -271,8 +292,9 @@ function RatingStars({ currentRating, onSetRating, label }: RatingStarsProps) {
                         type="button"
                         aria-label={`${starValue} зірка`}
                         className={clsx(s.starBtn, isFilled && s.starBtnFilled)}
-                        onClick={() => onSetRating(starValue)}
-                        onMouseEnter={() => setHoverRating(starValue)}
+                        onClick={() => !disabled && onSetRating(starValue)}
+                        onMouseEnter={() => !disabled && setHoverRating(starValue)}
+                        style={disabled ? { cursor: 'default' } : undefined}
                     >
                         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M16 2.66667L20.12 11.0267L29.3333 12.36L22.6667 18.8533L24.24 28.0267L16 23.6933L7.76 28.0267L9.33333 18.8533L2.66667 12.36L11.88 11.0267L16 2.66667Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
