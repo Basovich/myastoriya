@@ -206,3 +206,10 @@ html::-webkit-scrollbar-thumb:hover {
   width: 0 !important;
   height: 0 !important;
 }
+
+@supports (-webkit-appearance: none) {
+  :not(html) {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+}

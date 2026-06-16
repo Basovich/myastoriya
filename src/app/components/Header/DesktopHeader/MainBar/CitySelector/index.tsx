@@ -46,6 +46,15 @@ const translations = {
     }
 } as const;
 
+const deduplicateLocality = (list: Locality[]): Locality[] => {
+    const seen = new Set<number | string>();
+    return list.filter(item => {
+        if (!item || seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
+    });
+};
+
 const PAGE_SIZE = 50;
 
 interface CitySelectorProps {
@@ -96,6 +105,8 @@ export default function CitySelector({
         // Reset UI states on mount to avoid persistence after reload
         dispatch(setManualSelectionOpen(false));
         dispatch(setPromptVisible(false));
+        // Clear any stale city list that may have been persisted before the blacklist fix
+        dispatch(setAllCities([]));
     }, [dispatch, hydrated]);
 
     // 2. Initial city detection logic (Centralized in Global UI instance)
@@ -153,7 +164,7 @@ export default function CitySelector({
             dispatch(setIsLoadingCities(true));
             try {
                 const res = await getLocalitiesApi(undefined, PAGE_SIZE, 1, lang);
-                dispatch(setAllCities(res.data));
+                dispatch(setAllCities(deduplicateLocality(res.data)));
                 setHasMoreAll(res.has_more_pages);
                 setAllCitiesPage(1);
             } catch (error) {
@@ -174,7 +185,7 @@ export default function CitySelector({
                 setIsSearching(true);
                 try {
                     const res = await getLocalitiesApi(searchQuery, PAGE_SIZE, 1, lang);
-                    setSearchResults(res.data);
+                    setSearchResults(deduplicateLocality(res.data));
                     setHasMoreSearch(res.has_more_pages);
                     setSearchPage(1);
                 } catch (error) {
@@ -212,7 +223,7 @@ export default function CitySelector({
             try {
                 const nextPage = searchPage + 1;
                 const res = await getLocalitiesApi(searchQuery, PAGE_SIZE, nextPage, lang);
-                setSearchResults(prev => [...prev, ...res.data]);
+                setSearchResults(prev => deduplicateLocality([...prev, ...res.data]));
                 setHasMoreSearch(res.has_more_pages);
                 setSearchPage(nextPage);
             } catch (error) {
@@ -225,7 +236,7 @@ export default function CitySelector({
             try {
                 const nextPage = allCitiesPage + 1;
                 const res = await getLocalitiesApi(undefined, PAGE_SIZE, nextPage, lang);
-                dispatch(setAllCities([...allCities, ...res.data]));
+                dispatch(setAllCities(deduplicateLocality([...allCities, ...res.data])));
                 setHasMoreAll(res.has_more_pages);
                 setAllCitiesPage(nextPage);
             } catch (error) {

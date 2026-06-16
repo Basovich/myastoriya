@@ -61,7 +61,7 @@ const generalExpireTransform = createTransform(
 const localityPersistConfig = {
     key: 'locality',
     storage,
-    blacklist: ['isManualSelectionOpen', 'isPromptVisible'],
+    blacklist: ['isManualSelectionOpen', 'isPromptVisible', 'allCities', 'isLoadingCities'],
 };
 
 const authPersistConfig = {
