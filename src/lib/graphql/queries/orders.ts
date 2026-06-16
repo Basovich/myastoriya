@@ -15,6 +15,8 @@ export interface OrderItem {
     totalCost: number;
     image?: {
         list1x?: string | null;
+        grid1x?: string | null;
+        main1x?: string | null;
     } | null;
 }
 
@@ -63,6 +65,8 @@ const ORDERS_QUERY = /* GraphQL */ `
                     totalCost
                     image {
                         list1x
+                        grid1x
+                        main1x
                     }
                 }
             }

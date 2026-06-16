@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation';
 import ReviewCard from './ReviewCard/ReviewCard';
 import ProductReviewCard from './ProductReviewCard/ProductReviewCard';
 import PersonalReviewModal from './PersonalReviewModal/PersonalReviewModal';
-import { getOrdersApi, getOrderReviewsApi, getProductReviewsApi, Order, OrderReview, ProductReview } from '@/lib/graphql';
+import { getOrdersApi, getOrderReviewsApi, getProductReviewsApi, Order, OrderReview, ProductReview, getProductsByIdsApi, resolveProductImageUrl } from '@/lib/graphql';
 import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { startOfDay, endOfDay } from 'date-fns';
@@ -61,7 +61,30 @@ interface PurchasedProduct {
     date: Date;
 }
 
-const getPurchasedProducts = (ordersList: Order[]): PurchasedProduct[] => {
+const resolveOrderItemImageUrl = (
+    itemId: string,
+    image?: {
+        list1x?: string | null;
+        grid1x?: string | null;
+        main1x?: string | null;
+    } | null,
+    productImagesMap?: Record<number, string>
+): string => {
+    const productId = Number(itemId);
+    if (productId && productImagesMap?.[productId]) {
+        return productImagesMap[productId];
+    }
+    const url = image?.list1x || image?.grid1x || image?.main1x || null;
+    if (!url) return '/images/product-placeholder.svg';
+    if (url.startsWith('/images/')) return url;
+    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
+    return url;
+};
+
+const getPurchasedProducts = (
+    ordersList: Order[],
+    productImagesMap: Record<number, string>
+): PurchasedProduct[] => {
     const productsMap = new Map<string, PurchasedProduct>();
     const sortedOrders = [...ordersList].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -76,7 +99,7 @@ const getPurchasedProducts = (ordersList: Order[]): PurchasedProduct[] => {
                 productsMap.set(item.id, {
                     id: item.id,
                     name: item.name,
-                    image: item.image?.list1x,
+                    image: resolveOrderItemImageUrl(item.id, item.image, productImagesMap),
                     date: orderDate,
                 });
             }
@@ -100,6 +123,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
     const [orders, setOrders] = useState<Order[]>([]);
     const [orderReviews, setOrderReviews] = useState<Record<string, OrderReview>>({});
     const [productReviews, setProductReviews] = useState<Record<string, ProductReview>>({});
+    const [productImagesMap, setProductImagesMap] = useState<Record<number, string>>({});
     const [loading, setLoading] = useState(false);
 
     // Modal state
@@ -117,7 +141,28 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
             const ordersData = await getOrdersApi(token, { limit: 100 });
             setOrders(ordersData.data);
 
-            // 2. Fetch Order Reviews
+            // 2. Fetch product details to get correct image URLs
+            const productIds = Array.from(new Set(
+                ordersData.data
+                    .flatMap(order => order.items || [])
+                    .map(item => Number(item.id))
+                    .filter(id => !isNaN(id) && id > 0)
+            ));
+
+            const imagesMap: Record<number, string> = {};
+            if (productIds.length > 0) {
+                try {
+                    const details = await getProductsByIdsApi(productIds, lang);
+                    details.forEach(prod => {
+                        imagesMap[Number(prod.id)] = resolveProductImageUrl(prod);
+                    });
+                } catch (e) {
+                    console.error("Failed to fetch product details for images:", e);
+                }
+            }
+            setProductImagesMap(imagesMap);
+
+            // 3. Fetch Order Reviews
             const orderReviewsData = await getOrderReviewsApi(token, { limit: 100 });
             const oRevMap: Record<string, OrderReview> = {};
             orderReviewsData.data.forEach((r) => {
@@ -125,8 +170,8 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
             });
             setOrderReviews(oRevMap);
 
-            // 3. Extract unique purchased products
-            const productsList = getPurchasedProducts(ordersData.data);
+            // 4. Extract unique purchased products (passing the imagesMap)
+            const productsList = getPurchasedProducts(ordersData.data, imagesMap);
             const pRevMap: Record<string, ProductReview> = {};
             
             // Fetch product reviews sequentially to not overwhelm dev-api
@@ -150,7 +195,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         } finally {
             setLoading(false);
         }
-    }, [user?.id]);
+    }, [user?.id, lang]);
 
     useEffect(() => {
         if (hydrated && user) {
@@ -215,7 +260,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         return null;
     }
 
-    const productsList = getPurchasedProducts(orders);
+    const productsList = getPurchasedProducts(orders, productImagesMap);
 
     // Filter and Sort Orders by date (newest first)
     const filteredOrders = orders
@@ -284,7 +329,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                                 const rev = orderReviews[order.id];
                                 const hasReview = !!rev;
                                 const productsImages =
-                                    order.items?.map((item) => item.image?.list1x || '/images/product-placeholder.svg') || [];
+                                    order.items?.map((item) => resolveOrderItemImageUrl(item.id, item.image, productImagesMap)) || [];
                                 
                                 const orderDate = new Date(order.createdAt);
                                 const dateStr = orderDate.toLocaleDateString('uk-UA', {
