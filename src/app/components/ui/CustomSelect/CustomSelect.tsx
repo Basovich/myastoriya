@@ -19,6 +19,7 @@ interface CustomSelectProps {
     className?: string;
     leftIcon?: React.ReactNode;
     arrowVariant?: 'down' | 'right';
+    variant?: 'default' | 'compact';
 }
 
 export default function CustomSelect({
@@ -31,6 +32,7 @@ export default function CustomSelect({
     className = '',
     leftIcon,
     arrowVariant = 'down',
+    variant = 'default',
 }: CustomSelectProps) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -54,10 +56,15 @@ export default function CustomSelect({
     };
 
     return (
-        <div className={clsx(s.selectWrapper, className)} ref={dropdownRef}>
+        <div className={clsx(s.selectWrapper, variant === 'compact' && s.compactWrapper, className)} ref={dropdownRef}>
             <button
                 type="button"
-                className={clsx(s.selectBtn, error && s.selectError, isOpen && s.isOpen)}
+                className={clsx(
+                    s.selectBtn, 
+                    error && s.selectError, 
+                    isOpen && s.isOpen,
+                    variant === 'compact' && s.compactBtn
+                )}
                 onClick={() => setIsOpen(!isOpen)}
                 aria-expanded={isOpen}
                 aria-haspopup="listbox"
@@ -80,12 +87,16 @@ export default function CustomSelect({
             </button>
             
             {isOpen && (
-                <div className={s.dropdown} role="listbox">
+                <div className={clsx(s.dropdown, variant === 'compact' && s.compactDropdown)} role="listbox">
                     <ul className={s.optionsList}>
                         {options.map((opt) => (
                             <li
                                 key={opt.value}
-                                className={clsx(s.optionItem, value === opt.value && s.optionSelected)}
+                                className={clsx(
+                                    s.optionItem, 
+                                    value === opt.value && s.optionSelected,
+                                    variant === 'compact' && s.compactOption
+                                )}
                                 onClick={() => handleSelect(opt.value)}
                                 role="option"
                                 aria-selected={value === opt.value}

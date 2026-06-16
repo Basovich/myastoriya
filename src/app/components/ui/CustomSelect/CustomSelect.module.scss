@@ -2,6 +2,11 @@
     position: relative;
     width: 100%;
     min-width: 0;
+
+    &.compactWrapper {
+        width: auto;
+        display: inline-block;
+    }
 }
 
 .selectBtn {
@@ -42,6 +47,25 @@
 
     &.selectError {
         border-color: #E6000F;
+    }
+
+    &.compactBtn {
+        border-color: #E5E5E5;
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #000;
+        gap: 6px;
+
+        .arrow {
+            width: 12px;
+            height: 12px;
+        }
+
+        .selectContent {
+            gap: 6px;
+        }
     }
 }
 
@@ -92,9 +116,29 @@
     padding: 12px 0;
     animation: fade-in-up 0.2s ease-out;
 
+    /* Reset inherited scrollbar properties to enable -webkit-scrollbar */
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+
     /* Custom scrollbar */
     &::-webkit-scrollbar {
         width: 4px;
+    }
+    &::-webkit-scrollbar-button,
+    &::-webkit-scrollbar-button:single-button,
+    &::-webkit-scrollbar-button:double-button,
+    &::-webkit-scrollbar-button:vertical,
+    &::-webkit-scrollbar-button:horizontal,
+    &::-webkit-scrollbar-button:decrement,
+    &::-webkit-scrollbar-button:increment,
+    &::-webkit-scrollbar-button:start,
+    &::-webkit-scrollbar-button:end {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        background: transparent !important;
+        color: transparent !important;
+        border: none !important;
     }
     &::-webkit-scrollbar-track {
         background: #F2F2F2;
@@ -103,12 +147,28 @@
         background: #FD2427;
         border-radius: 10px;
     }
+
+    &.compactDropdown {
+        border-radius: 8px;
+        max-height: 180px;
+        padding: 6px 0;
+        min-width: 100%;
+        width: auto;
+
+        &::-webkit-scrollbar {
+            width: 2px;
+        }
+    }
 }
 
 .optionsList {
     list-style: none;
     padding: 0 16px;
     margin: 0;
+
+    .compactDropdown & {
+        padding: 0 8px;
+    }
 }
 
 .optionItem {
@@ -135,6 +195,14 @@
         background-color: #fff5f5;
         color: #FD2427;
         font-weight: 600;
+    }
+
+    &.compactOption {
+        padding: 6px 8px;
+        font-size: 12px;
+        border-radius: 4px;
+        text-transform: capitalize;
+        white-space: nowrap;
     }
 }
 
