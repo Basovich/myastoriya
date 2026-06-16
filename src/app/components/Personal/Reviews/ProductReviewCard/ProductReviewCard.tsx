@@ -14,6 +14,7 @@ interface ProductReviewCardProps {
     productName: string;
     productImage?: string | null;
     hasReview: boolean;
+    published?: boolean;
     reviewText?: string;
     rating?: number;
     onLeaveReview: () => void;
@@ -26,6 +27,7 @@ export default function ProductReviewCard({
     productName,
     productImage,
     hasReview,
+    published,
     reviewText,
     rating = 0,
     onLeaveReview,
@@ -86,6 +88,11 @@ export default function ProductReviewCard({
                         <div className={s.textGroup}>
                             <h4 className={s.reviewLabel}>Ваш відгук</h4>
                             <p className={s.reviewText}>{reviewText}</p>
+                            {published === false && (
+                                <div className={s.unmoderatedNote}>
+                                    {lang === 'ru' ? '* Комментарий не модерирован' : '* Коментар не модерований'}
+                                </div>
+                            )}
                         </div>
                         <div className={s.ratingGroup}>
                             <h4 className={s.reviewLabel}>Ваша оцінка</h4>

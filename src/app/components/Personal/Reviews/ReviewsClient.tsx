@@ -184,25 +184,25 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
             setOrderReviews(oRevMap);
 
             // 4. Extract unique purchased products (passing the detailsMap)
-            const productsList = getPurchasedProducts(ordersData.data, detailsMap);
-            const pRevMap: Record<string, ProductReview> = {};
-            
-            // Fetch product reviews sequentially to not overwhelm dev-api
-            for (const prod of productsList) {
-                try {
-                    const pRevData = await getProductReviewsApi(token, {
-                        productId: parseInt(prod.id),
-                        userId: user?.id ? parseInt(user.id) : undefined,
-                        limit: 1,
-                    });
-                    if (pRevData.data && pRevData.data.length > 0) {
-                        pRevMap[prod.id] = pRevData.data[0];
-                    }
-                } catch (error) {
-                    console.error(`Failed to fetch reviews for product ${prod.id}:`, error);
-                }
-            }
-            setProductReviews(pRevMap);
+            // const productsList = getPurchasedProducts(ordersData.data, detailsMap);
+            // const pRevMap: Record<string, ProductReview> = {};
+            // 
+            // // Fetch product reviews sequentially to not overwhelm dev-api
+            // for (const prod of productsList) {
+            //     try {
+            //         const pRevData = await getProductReviewsApi(token, {
+            //             productId: parseInt(prod.id),
+            //             userId: user?.id ? parseInt(user.id) : undefined,
+            //             limit: 1,
+            //         });
+            //         if (pRevData.data && pRevData.data.length > 0) {
+            //             pRevMap[prod.id] = pRevData.data[0];
+            //         }
+            //     } catch (error) {
+            //         console.error(`Failed to fetch reviews for product ${prod.id}:`, error);
+            //     }
+            // }
+            // setProductReviews(pRevMap);
         } catch (error) {
             console.error('Error fetching reviews details:', error);
         } finally {
@@ -273,7 +273,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         return null;
     }
 
-    const productsList = getPurchasedProducts(orders, productDetailsMap);
+    // const productsList = getPurchasedProducts(orders, productDetailsMap);
 
     // Filter and Sort Orders by date (newest first)
     const filteredOrders = orders
@@ -281,9 +281,9 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     // Filter and Sort Products by date (newest first)
-    const filteredProducts = productsList
-        .filter((prod) => isDateInRange(prod.date, startDate, endDate))
-        .sort((a, b) => b.date.getTime() - a.date.getTime());
+    // const filteredProducts = productsList
+    //     .filter((prod) => isDateInRange(prod.date, startDate, endDate))
+    //     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
     return (
         <div className={s.reviewsPage}>
@@ -296,7 +296,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                     navDict={pDict.navigation}
                 />
 
-                <div className={s.tabsRow}>
+                {/* <div className={s.tabsRow}>
                     <button
                         className={clsx(s.tabBtn, activeTab === 'orders' && s.active)}
                         onClick={() => setActiveTab('orders')}
@@ -309,7 +309,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                     >
                         {dict.tabProducts}
                     </button>
-                </div>
+                </div> */}
 
                 <div className={s.controlsRow}>
                     <DatePicker
@@ -394,7 +394,8 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                             })}
                         </div>
                     )
-                ) : filteredProducts.length === 0 ? (
+                ) : null
+                /* : filteredProducts.length === 0 ? (
                     <div className={s.emptyBlock}>
                         {productsList.length === 0 ? dict.noProducts : dict.noProductsFilter}
                     </div>
@@ -412,6 +413,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                                     productName={prod.name}
                                     productImage={prod.image}
                                     hasReview={hasReview}
+                                    published={rev?.published}
                                     reviewText={rev?.text}
                                     rating={rev?.rating}
                                     onLeaveReview={() => openProductReviewModal(parseInt(prod.id), prod.name)}
@@ -425,7 +427,8 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                             );
                         })}
                     </div>
-                )}
+                )*/
+                }
             </PersonalContentBlock>
 
             {isModalOpen && (
