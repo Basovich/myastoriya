@@ -50,13 +50,21 @@
     }
 
     &.compactBtn {
-        border-color: #E5E5E5;
+        border: none;
         border-radius: 6px;
         padding: 4px 8px;
+        height: 40px;
         font-size: 13px;
         font-weight: 600;
         color: #000;
+        background-color: #F5F5F5;
         gap: 6px;
+
+        @media (any-hover: hover) {
+            &:hover {
+                background-color: #ECECEC;
+            }
+        }
 
         .arrow {
             width: 12px;
