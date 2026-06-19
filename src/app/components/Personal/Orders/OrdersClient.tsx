@@ -11,7 +11,8 @@ import { logout } from '@/store/slices/authSlice';
 import { logoutApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter } from 'next/navigation';
-import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
+import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
+import { startOfDay, endOfDay } from 'date-fns';
 import OrderCard from './OrderCard/OrderCard';
 import s from './OrdersClient.module.scss';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
@@ -31,8 +32,10 @@ import {
 const ordersDict = {
     ua: {
         title: "ІСТОРІЯ ЗАМОВЛЕНЬ",
-        sortLabel: "Сортування:",
-        sortOptions: ["По даті", "За сумою"],
+        sortLabel: "По даті",
+        sortPrefix: "Сортування: ",
+        noOrders: "У вас ще немає замовлень.",
+        noOrdersFilter: "У вас немає замовлень у вибрані дати.",
         card: {
             orderPrefix: "Замовлення",
             sourcePrefix: "Замовлення",
@@ -45,8 +48,10 @@ const ordersDict = {
     },
     ru: {
         title: "ИСТОРИЯ ЗАКАЗОВ",
-        sortLabel: "Сортировка:",
-        sortOptions: ["По дате", "По сумме"],
+        sortLabel: "По дате",
+        sortPrefix: "Сортировка: ",
+        noOrders: "У вас еще нет заказов.",
+        noOrdersFilter: "У вас нет заказов в выбранные даты.",
         card: {
             orderPrefix: "Заказ",
             sourcePrefix: "Заказ",
@@ -139,7 +144,31 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
     const router = useRouter();
     const { user } = useAppSelector((state) => state.auth);
 
-    const [sortValue, setSortValue] = useState(dict.sortOptions[0]);
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+
+    const isDateInRange = (dateToCheck: Date, start: Date | null, end: Date | null) => {
+        if (!start) return true;
+        const checkTime = startOfDay(dateToCheck).getTime();
+        const startTime = startOfDay(start).getTime();
+        if (!end) {
+            return checkTime === startTime;
+        }
+        const endTime = endOfDay(end).getTime();
+        return checkTime >= startTime && checkTime <= endTime;
+    };
+
+    const handleDateChange = (dates: [Date | null, Date | null]) => {
+        const [start, end] = dates;
+        setStartDate(start);
+        setEndDate(end);
+    };
+
+    const handleClearDate = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setStartDate(null);
+        setEndDate(null);
+    };
     const [orders, setOrders] = useState<Order[]>([]);
     const [orderReviews, setOrderReviews] = useState<Record<string, OrderReview>>({});
     const [productDetailsMap, setProductDetailsMap] = useState<Record<number, ProductDetails>>({});
@@ -255,12 +284,11 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
         return null;
     }
 
-    const sortedOrders = [...orders].sort((a, b) => {
-        if (sortValue === dict.sortOptions[0]) {
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        } else {
-            return b.total - a.total;
-        }
+    const filteredOrders = orders
+        .filter((order) => isDateInRange(new Date(order.createdAt), startDate, endDate));
+
+    const sortedOrders = [...filteredOrders].sort((a, b) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 
     return (
@@ -274,12 +302,20 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                     navDict={personalDict[lang].navigation}
                 />
                 <div className={s.controlsRow}>
-                    <SortSelect
-                        value={sortValue}
-                        options={dict.sortOptions}
-                        onChange={setSortValue}
+                    <DatePicker
+                        id="orders-date-range"
                         label={dict.sortLabel}
-                        className={s.sortSelect}
+                        prefixLabel={dict.sortPrefix}
+                        hideLabel={true}
+                        hideIcon={true}
+                        selectsRange={true}
+                        startDate={startDate}
+                        endDate={endDate}
+                        onChangeRange={handleDateChange}
+                        onClear={handleClearDate}
+                        maxDate={new Date()}
+                        className={s.ordersDatePicker}
+                        lang={lang}
                     />
                 </div>
 
@@ -289,7 +325,7 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                     </div>
                 ) : sortedOrders.length === 0 ? (
                     <div className={s.emptyState}>
-                        {lang === 'ru' ? 'У вас еще нет заказов.' : 'У вас ще немає замовлень.'}
+                        {orders.length === 0 ? dict.noOrders : dict.noOrdersFilter}
                     </div>
                 ) : (
                     <div className={s.ordersList}>

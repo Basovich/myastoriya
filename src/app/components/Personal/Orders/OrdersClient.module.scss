@@ -16,28 +16,42 @@
     justify-content: flex-start;
 }
 
-.sortSelect {
-    background-color: #F7F7F7 !important;
-    border-radius: 12px !important;
-    height: 44px !important;
-    padding: 0 16px !important;
-    width: max-content;
+.ordersDatePicker {
+    width: 100%;
 
-    > span {
-        display: inline-block !important;
-        font-size: 14px !important;
-        color: #666 !important;
+    @media (min-width: 768px) {
+        width: auto;
     }
 
-    > div {
-        > button {
-            background-color: transparent !important;
-            padding: 0 24px 0 6px !important;
-            font-size: 14px !important;
-            height: auto !important;
-            
-            span {
-                font-size: 14px !important;
+    :global {
+        .react-datepicker-wrapper {
+            @media (min-width: 768px) {
+                width: auto;
+            }
+        }
+    }
+
+    :global(.customInput) {
+        background-color: #F5F5F5;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        height: 40px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        @media (min-width: 768px) {
+            width: auto;
+            justify-content: flex-start;
+            gap: 12px;
+        }
+
+        @media (any-hover: hover) {
+            &:hover {
+                background-color: #ECECEC;
+                border-color: transparent;
             }
         }
     }
