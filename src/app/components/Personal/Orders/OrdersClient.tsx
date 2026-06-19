@@ -310,7 +310,14 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                             const review = orderReviews[order.id.toString()];
                             const hasReview = !!review;
 
-                            const canLeaveReview = order.status?.id === '2';
+                            const statusNameLower = (order.status?.name || '').toLowerCase();
+                            const canLeaveReview = order.status?.id === '2'
+                                || statusNameLower.includes('завершено')
+                                || statusNameLower.includes('виконано')
+                                || statusNameLower.includes('выполнено')
+                                || statusNameLower.includes('доставлено')
+                                || statusNameLower.includes('delivered')
+                                || statusNameLower.includes('completed');
 
                             return (
                                 <OrderCard
