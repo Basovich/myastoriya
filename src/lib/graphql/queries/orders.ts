@@ -13,6 +13,7 @@ export interface OrderItem {
     quantity: number;
     cost: number;
     totalCost: number;
+    totalOldCost?: number | null;
     image?: {
         list1x?: string | null;
         grid1x?: string | null;
@@ -63,6 +64,7 @@ const ORDERS_QUERY = /* GraphQL */ `
                     quantity
                     cost
                     totalCost
+                    totalOldCost
                     image {
                         list1x
                         grid1x
@@ -77,6 +79,12 @@ const ORDERS_QUERY = /* GraphQL */ `
     }
 `;
 
+const REPEAT_ORDER_MUTATION = /* GraphQL */ `
+    mutation RepeatOrder($orderId: ID!) {
+        repeatOrder(orderId: $orderId)
+    }
+`;
+
 export async function getOrdersApi(
     token: string,
     params?: { withoutCancelled?: boolean; limit?: number; page?: number },
@@ -88,6 +96,19 @@ export async function getOrdersApi(
         { token, lang },
     );
     return data.orders;
+}
+
+export async function repeatOrderApi(
+    orderId: string,
+    token: string,
+    lang?: string,
+): Promise<boolean> {
+    const data = await gqlRequest<{ repeatOrder: boolean }>(
+        REPEAT_ORDER_MUTATION,
+        { orderId },
+        { token, lang },
+    );
+    return data.repeatOrder;
 }
 
 // ── Payments & Order Creation ────────────────────────────────────────────────
