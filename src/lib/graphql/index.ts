@@ -189,4 +189,10 @@ export type {
     ProductReviewSimplePagination,
 } from './queries/reviews';
 
-
+// Re-export loyalty
+export {
+    getUserDiscountInfoApi,
+    getLoyaltyTermsApi,
+    getLoyaltyBarcodeApi,
+} from './queries/pages/loyalty';
+export type { UserDiscountInfo } from './queries/pages/loyalty';

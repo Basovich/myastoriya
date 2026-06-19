@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
@@ -14,6 +14,7 @@ import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import Button from '@/app/components/ui/Button/Button';
+import { getUserDiscountInfoApi, UserDiscountInfo } from '@/lib/graphql';
 import s from './LoyaltyClient.module.scss';
 
 const loyaltyDict = {
@@ -57,14 +58,42 @@ const loyaltyDict = {
     }
 };
 
-export default function LoyaltyClient({ lang }: { lang: Locale }) {
+interface LoyaltyClientProps {
+    lang: Locale;
+    initialDiscountInfo?: UserDiscountInfo | null;
+    initialTerms?: string | null;
+}
+
+export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms }: LoyaltyClientProps) {
     const hydrated = useIsHydrated();
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const { user } = useAppSelector((state) => state.auth);
+    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
     const dict = loyaltyDict[lang] || loyaltyDict.ua;
     const pDict = personalDict[lang] || personalDict.ua;
+    
+    const [discountInfo, setDiscountInfo] = useState<UserDiscountInfo | null>(initialDiscountInfo || null);
+    const [terms, setTerms] = useState<string>(initialTerms || dict.terms);
     const [isExpanded, setIsExpanded] = useState(false);
+
+    useEffect(() => {
+        if (!discountInfo && isAuthenticated) {
+            const fetchDiscountInfo = async () => {
+                try {
+                    const token = await getAccessToken();
+                    if (token) {
+                        const info = await getUserDiscountInfoApi(token, lang);
+                        if (info) {
+                            setDiscountInfo(info);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading loyalty data on client:', error);
+                }
+            };
+            fetchDiscountInfo();
+        }
+    }, [discountInfo, isAuthenticated, lang]);
 
     const handleLogout = async () => {
         try {
@@ -107,7 +136,7 @@ export default function LoyaltyClient({ lang }: { lang: Locale }) {
                                 </div>
                                 <div className={s.balanceBody}>
                                     <div className={s.balanceValue}>
-                                        <span className={s.amount}>1500</span>
+                                        <span className={s.amount}>{user?.bonuses ?? 0}</span>
                                         <span className={s.currency}>Б</span>
                                     </div>
                                     <div className={s.conversionTag}>1 Б = 1 ₴</div>
@@ -117,16 +146,29 @@ export default function LoyaltyClient({ lang }: { lang: Locale }) {
                             <div className={s.progressCard}>
                                 <div className={s.progressTextWrapper}>
                                     <p className={s.progressDesc}>
-                                        Для отримання більшого <strong>кешбеку</strong>,<br />
-                                        у розмірі <span className={s.whiteHighlight}>+4%</span> нарахувань балами,<br />
-                                        необхідно зробити замовлень<br />
-                                        на суму:
+                                        {lang === 'ru' ? (
+                                            <>
+                                                Для получения большего <strong>кэшбэка</strong>,<br />
+                                                в размере <span className={s.whiteHighlight}>+{discountInfo?.nextDiscount ?? 4}%</span> начислений баллами,<br />
+                                                необходимо совершить заказов<br />
+                                                на сумму:
+                                            </>
+                                        ) : (
+                                            <>
+                                                Для отримання більшого <strong>кешбеку</strong>,<br />
+                                                у розмірі <span className={s.whiteHighlight}>+{discountInfo?.nextDiscount ?? 4}%</span> нарахувань балами,<br />
+                                                необхідно зробити замовлень<br />
+                                                на суму:
+                                            </>
+                                        )}
                                     </p>
                                     <div className={s.targetAmount}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-                                            <path d="M9.9 12.6011H4.50001C4.26131 12.6011 4.03239 12.6959 3.86361 12.8646C3.69483 13.0334 3.60001 13.2622 3.60001 13.5009C3.60001 13.7395 3.69483 13.9684 3.86361 14.1372C4.03239 14.3059 4.26131 14.4007 4.50001 14.4007H9.9C10.1387 14.4007 10.3676 14.3059 10.5364 14.1372C10.7052 13.9684 10.8 13.7395 10.8 13.5009C10.8 13.2622 10.7052 13.0334 10.5364 12.8646C10.3676 12.6959 10.1387 12.6011 9.9 12.6011ZM6.3 7.20215H8.1C8.3387 7.20215 8.56762 7.10734 8.7364 6.93859C8.90518 6.76984 9 6.54097 9 6.30232C9 6.06368 8.90518 5.8348 8.7364 5.66605C8.56762 5.49731 8.3387 5.4025 8.1 5.4025H6.3C6.06131 5.4025 5.83239 5.49731 5.66361 5.66605C5.49483 5.8348 5.40001 6.06368 5.40001 6.30232C5.40001 6.54097 5.49483 6.76984 5.66361 6.93859C5.83239 7.10734 6.06131 7.20215 6.3 7.20215ZM17.1 9.00179H14.4V0.903398C14.4006 0.74484 14.3593 0.588931 14.2803 0.451459C14.2013 0.313986 14.0873 0.199831 13.95 0.120553C13.8132 0.0415774 13.658 0 13.5 0C13.342 0 13.1868 0.0415774 13.05 0.120553L10.35 1.66825L7.65 0.120553C7.51319 0.0415774 7.35799 0 7.2 0C7.04202 0 6.88682 0.0415774 6.75 0.120553L4.05001 1.66825L1.35001 0.120553C1.21319 0.0415774 1.05799 0 0.900007 0C0.742024 0 0.586824 0.0415774 0.450007 0.120553C0.312663 0.199831 0.19871 0.313986 0.119687 0.451459C0.0406645 0.588931 -0.000622516 0.74484 7.09459e-06 0.903398V15.3005C7.09459e-06 16.0165 0.284471 16.7031 0.790819 17.2093C1.29717 17.7156 1.98392 18 2.70001 18H15.3C16.0161 18 16.7028 17.7156 17.2092 17.2093C17.7155 16.7031 18 16.0165 18 15.3005V9.90161C18 9.66296 17.9052 9.43409 17.7364 9.26534C17.5676 9.09659 17.3387 9.00179 17.1 9.00179ZM2.70001 16.2004C2.46131 16.2004 2.23239 16.1056 2.06361 15.9368C1.89483 15.7681 1.80001 15.5392 1.80001 15.3005V2.46009L3.60001 3.48588C3.73891 3.55842 3.8933 3.5963 4.05001 3.5963C4.20672 3.5963 4.3611 3.55842 4.50001 3.48588L7.2 1.93819L9.9 3.48588C10.0389 3.55842 10.1933 3.5963 10.35 3.5963C10.5067 3.5963 10.6611 3.55842 10.8 3.48588L12.6 2.46009V15.3005C12.6024 15.6075 12.6572 15.9118 12.762 16.2004H2.70001ZM16.2 15.3005C16.2 15.5392 16.1052 15.7681 15.9364 15.9368C15.7676 16.1056 15.5387 16.2004 15.3 16.2004C15.0613 16.2004 14.8324 16.1056 14.6636 15.9368C14.4948 15.7681 14.4 15.5392 14.4 15.3005V10.8014H16.2V15.3005ZM9.9 9.00179H4.50001C4.26131 9.00179 4.03239 9.09659 3.86361 9.26534C3.69483 9.43409 3.60001 9.66296 3.60001 9.90161C3.60001 10.1403 3.69483 10.3691 3.86361 10.5379C4.03239 10.7066 4.26131 10.8014 4.50001 10.8014H9.9C10.1387 10.8014 10.3676 10.7066 10.5364 10.5379C10.7052 10.3691 10.8 10.1403 10.8 9.90161C10.8 9.66296 10.7052 9.43409 10.5364 9.26534C10.3676 9.09659 10.1387 9.00179 9.9 9.00179Z" fill="white"/>
+                                            <path d="M9.9 12.6011H4.50001C4.26131 12.6011 4.03239 12.6959 3.86361 12.8646C3.69483 13.0334 3.60001 13.2622 3.60001 13.5009C3.60001 13.7395 3.69483 13.9684 3.86361 14.1372C4.03239 14.3059 4.26131 14.4007 4.50001 14.4007H9.9C10.1387 14.4007 10.3676 14.3059 10.5364 14.1372C10.7052 13.9684 10.8 13.7395 10.8 13.5009C10.8 13.2622 10.7052 13.0334 10.5364 12.8646C10.3676 12.6011 10.1387 12.6011 9.9 12.6011ZM6.3 7.20215H8.1C8.3387 7.20215 8.56762 7.10734 8.7364 6.93859C8.90518 6.76984 9 6.54097 9 6.30232C9 6.06368 8.90518 5.8348 8.7364 5.66605C8.56762 5.49731 8.3387 5.4025 8.1 5.4025H6.3C6.06131 5.4025 5.83239 5.49731 5.66361 5.66605C5.49483 5.8348 5.40001 6.06368 5.40001 6.30232C5.40001 6.54097 5.49483 6.76984 5.66361 6.93859C5.83239 7.10734 6.06131 7.20215 6.3 7.20215ZM17.1 9.00179H14.4V0.903398C14.4006 0.74484 14.3593 0.588931 14.2803 0.451459C14.2013 0.313986 14.0873 0.199831 13.95 0.120553C13.8132 0.0415774 13.658 0 13.5 0C13.342 0 13.1868 0.0415774 13.05 0.120553L10.35 1.66825L7.65 0.120553C7.51319 0.0415774 7.35799 0 7.2 0C7.04202 0 6.88682 0.0415774 6.75 0.120553L4.05001 1.66825L1.35001 0.120553C1.21319 0.0415774 1.05799 0 0.900007 0C0.742024 0 0.586824 0.0415774 0.450007 0.120553C0.312663 0.199831 0.19871 0.313986 0.119687 0.451459C0.0406645 0.588931 -0.000622516 0.74484 7.09459e-06 0.903398V15.3005C7.09459e-06 16.0165 0.284471 16.7031 0.790819 17.2093C1.29717 17.7156 1.98392 18 2.70001 18H15.3C16.0161 18 16.7028 17.7156 17.2092 17.2093C17.7155 16.7031 18 16.0165 18 15.3005V9.90161C18 9.66296 17.9052 9.43409 17.7364 9.26534C17.5676 9.09659 17.3387 9.00179 17.1 9.00179ZM2.70001 16.2004C2.46131 16.2004 2.23239 16.1056 2.06361 15.9368C1.89483 15.7681 1.80001 15.5392 1.80001 15.3005V2.46009L3.60001 3.48588C3.73891 3.55842 3.8933 3.5963 4.05001 3.5963C4.20672 3.5963 4.3611 3.55842 4.50001 3.48588L7.2 1.93819L9.9 3.48588C10.0389 3.55842 10.1933 3.5963 10.35 3.5963C10.5067 3.5963 10.6611 3.55842 10.8 3.48588L12.6 2.46009V15.3005C12.6024 15.6075 12.6572 15.9118 12.762 16.2004H2.70001ZM16.2 15.3005C16.2 15.5392 16.1052 15.7681 15.9364 15.9368C15.7676 16.1056 15.5387 16.2004 15.3 16.2004C15.0613 16.2004 14.8324 16.1056 14.6636 15.9368C14.4948 15.7681 14.4 15.5392 14.4 15.3005V10.8014H16.2V15.3005ZM9.9 9.00179H4.50001C4.26131 9.00179 4.03239 9.09659 3.86361 9.26534C3.69483 9.43409 3.60001 9.66296 3.60001 9.90161C3.60001 10.1403 3.69483 10.3691 3.86361 10.5379C4.03239 10.7066 4.26131 10.8014 4.50001 10.8014H9.9C10.1387 10.8014 10.3676 10.7066 10.5364 10.5379C10.7052 10.3691 10.8 10.1403 10.8 9.90161C10.8 9.66296 10.7052 9.43409 10.5364 9.26534C10.3676 9.09659 10.1387 9.00179 9.9 9.00179Z" fill="white"/>
                                         </svg>
-                                        16 000 грн
+                                        {discountInfo?.leftUntilNextStep !== undefined && discountInfo?.leftUntilNextStep !== null
+                                            ? `${discountInfo.leftUntilNextStep.toLocaleString('uk-UA')} ${lang === 'ru' ? 'грн' : 'грн'}`
+                                            : (lang === 'ru' ? '16 000 грн' : '16 000 грн')}
                                     </div>
                                 </div>
                                 <div className={s.progressGraphics}>
@@ -188,9 +230,10 @@ export default function LoyaltyClient({ lang }: { lang: Locale }) {
             <PersonalContentBlock className={s.contentBlock}>
                 <div className={s.termsSection}>
                     <h2 className={s.sectionTitle}>{dict.termsTitle}</h2>
-                    <div className={`${s.termsText} ${isExpanded ? s.expanded : ''}`}>
-                        {dict.terms}
-                    </div>
+                    <div 
+                        className={`${s.termsText} ${isExpanded ? s.expanded : ''}`}
+                        dangerouslySetInnerHTML={{ __html: terms }}
+                    />
                     {!isExpanded && (
                         <Button 
                             variant="outline-black" 
