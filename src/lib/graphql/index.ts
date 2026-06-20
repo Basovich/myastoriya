@@ -196,3 +196,16 @@ export {
     getLoyaltyBarcodeApi,
 } from './queries/pages/loyalty';
 export type { UserDiscountInfo } from './queries/pages/loyalty';
+
+// Re-export restaurant menu
+export { getRestaurantMenuApi } from './queries/pages/restaurantMenu';
+export type {
+    RestaurantProduct,
+    RestaurantMenuCategory,
+    RestaurantMenuResponse,
+    DishSpecific,
+    ModifierGroup,
+    Modifier,
+} from './queries/pages/restaurantMenu';
+
+

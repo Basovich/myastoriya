@@ -7,12 +7,18 @@
     padding: 20px;
     height: 100%;
     box-shadow: 0 14px 20px 0 rgba(0, 0, 0, 0.10);
+    transition: opacity 0.3s ease, filter 0.3s ease;
 
     @media (min-width: 1024px) {
         flex-direction: row;
         gap: 32px;
         padding: 24px;
         align-items: center;
+    }
+
+    &.unavailable {
+        opacity: 0.6;
+        filter: grayscale(40%);
     }
 }
 
@@ -32,6 +38,34 @@
         width: 380px;
         height: 240px;
     }
+}
+
+.spicyBadge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.unavailableBadge {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    color: #FFF;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .productImg {
@@ -65,6 +99,7 @@
 .details {
     display: flex;
     align-items: baseline;
+    flex-wrap: wrap;
     gap: 12px;
     margin-top: 6px;
 
@@ -85,6 +120,17 @@
     }
 }
 
+.oldPrice {
+    color: rgba(#000, 0.4);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: line-through;
+
+    @media (min-width: 1280px) {
+        font-size: 18px;
+    }
+}
+
 .unit {
     color: rgba(#000, 0.3);
     font-size: 14px;
@@ -93,26 +139,30 @@
     line-height: normal;
 }
 
-.description {
-    color: rgba(#000, 0.8);
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 150%;
-    letter-spacing: 0.24px;
+.specifics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-top: 10px;
 
     @media (min-width: 1280px) {
-        font-size: 18px;
-        margin-top: 22px;
+        margin-top: 16px;
     }
 }
 
-.weight {
-    color: #000;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 112.5%;
-    margin-top: 16px;
+.specBadge {
+    background: #F5F5F7;
+    color: #777777;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    @media (min-width: 1280px) {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
 }
+
