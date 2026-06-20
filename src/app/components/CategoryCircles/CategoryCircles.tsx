@@ -77,9 +77,10 @@ export default function CategoryCircles({
                     1440: { slidesPerView: 12, spaceBetween: 0 },
                 }}
             >
-                {categories.map((item, index) => (
-                    <SwiperSlide key={index} className={s.slide}>
-                        <AppLink href={item.href} className={s.item}>
+                {categories.map((item, index) => {
+                    const isHashLink = item.href.startsWith('#');
+                    const content = (
+                        <>
                             <div className={s.circle}>
                                 {item.image && item.image !== "/icons/icon-category.svg" ? (
                                     <Image
@@ -101,9 +102,36 @@ export default function CategoryCircles({
                                 )}
                             </div>
                             <span className={s.name}>{item.name}</span>
-                        </AppLink>
-                    </SwiperSlide>
-                ))}
+                        </>
+                    );
+
+                    const handleHashClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+                        e.preventDefault();
+                        const targetId = item.href.substring(1);
+                        const element = document.getElementById(targetId);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    };
+
+                    return (
+                        <SwiperSlide key={index} className={s.slide}>
+                            {isHashLink ? (
+                                <a 
+                                    href={item.href} 
+                                    className={s.item} 
+                                    onClick={handleHashClick}
+                                >
+                                    {content}
+                                </a>
+                            ) : (
+                                <AppLink href={item.href} className={s.item}>
+                                    {content}
+                                </AppLink>
+                            )}
+                        </SwiperSlide>
+                    );
+                })}
             </Swiper>
         </div>
     );
