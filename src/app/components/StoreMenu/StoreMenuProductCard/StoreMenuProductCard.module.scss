@@ -139,15 +139,36 @@
     line-height: normal;
 }
 
+.description {
+    color: #555555;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    margin-top: 8px;
+
+    @media (min-width: 1280px) {
+        font-size: 14px;
+        margin-top: 14px;
+    }
+}
+
+.footerRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 12px;
+    gap: 16px;
+
+    @media (min-width: 1024px) {
+        margin-top: auto;
+        padding-top: 16px;
+    }
+}
+
 .specifics {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 10px;
-
-    @media (min-width: 1280px) {
-        margin-top: 16px;
-    }
 }
 
 .specBadge {
@@ -163,6 +184,17 @@
     @media (min-width: 1280px) {
         font-size: 12px;
         padding: 6px 12px;
+    }
+}
+
+.weightText {
+    color: #000000;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: normal;
+
+    @media (min-width: 1280px) {
+        font-size: 14px;
     }
 }
 

@@ -14,11 +14,24 @@ export const RESTAURANT_MENU_QUERY = `
         available
         portionSize
         isSpicy
+        text
+        specifications {
+          name
+          values
+        }
         dishSpecifics {
           key
           name
         }
         image {
+          url {
+            grid2x
+            main2x
+          }
+          alt
+          title
+        }
+        images {
           url {
             grid2x
             main2x
@@ -66,6 +79,11 @@ export interface ProductImage {
   title: string | null;
 }
 
+export interface ProductSpecification {
+  name: string;
+  values: string[];
+}
+
 export interface RestaurantProduct {
   id: string;
   name: string;
@@ -75,8 +93,11 @@ export interface RestaurantProduct {
   available: number;
   portionSize: string | null;
   isSpicy: boolean;
+  text: string | null;
+  specifications: ProductSpecification[] | null;
   dishSpecifics: DishSpecific[];
   image: ProductImage | null;
+  images: ProductImage[] | null;
   modifierGroups: ModifierGroup[];
 }
 
