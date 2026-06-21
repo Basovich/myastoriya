@@ -48,6 +48,12 @@ const defaultRatings: RatingsType = {
 export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
     const { disableScroll, enableScroll } = useScrollLock();
     const [submitted, setSubmitted] = useState(false);
+    const [hoveredRatings, setHoveredRatings] = useState<Record<RatingCategoryId, number>>({
+        dishQuality: 0,
+        serviceQuality: 0,
+        deliverySpeed: 0,
+        interactionEase: 0,
+    });
 
     useEffect(() => {
         if (isOpen) {
@@ -160,7 +166,7 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                                             <div className={s.stars} role="group" aria-label={label}>
                                                 {Array.from({ length: 5 }, (_, i) => {
                                                     const starValue = i + 1;
-                                                    const isFilled = starValue <= currentRating;
+                                                    const isFilled = starValue <= (hoveredRatings[id] || currentRating);
                                                     return (
                                                         <button
                                                             key={i}
@@ -168,6 +174,8 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                                                             aria-label={`${starValue} зірка`}
                                                             className={clsx(s.starBtn, isFilled && s.starBtnFilled)}
                                                             onClick={() => setRating(id, starValue)}
+                                                            onMouseEnter={() => setHoveredRatings(prev => ({ ...prev, [id]: starValue }))}
+                                                            onMouseLeave={() => setHoveredRatings(prev => ({ ...prev, [id]: 0 }))}
                                                         >
                                                             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                 <path d="M16 2.66667L20.12 11.0267L29.3333 12.36L22.6667 18.8533L24.24 28.0267L16 23.6933L7.76 28.0267L9.33333 18.8533L2.66667 12.36L11.88 11.0267L16 2.66667Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

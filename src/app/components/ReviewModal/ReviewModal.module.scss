@@ -168,14 +168,7 @@
     }
 
     @media (any-hover: hover) {
-
-        &:hover svg,
-        &:hover~.starBtn svg {
-            fill: transparent;
-        }
-
         &:hover svg {
-            fill: #e3051b;
             transform: scale(1.1);
         }
     }
