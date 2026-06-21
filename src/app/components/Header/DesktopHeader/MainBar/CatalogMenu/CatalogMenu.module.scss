@@ -4,7 +4,6 @@
     left: 0;
     width: 100%;
     height: calc(100vh - 80px);
-    /* 80px is minimum header height, visual overlay can overflow safely */
     background: rgba(0, 0, 0, 0.4);
     z-index: 1100;
     display: flex;
@@ -141,6 +140,7 @@
     object-fit: cover;
 }
 
+// ── subContent ── стає flex-контейнером для subColumns
 .subContent {
     position: relative;
     z-index: 2;
@@ -149,14 +149,15 @@
     color: #fff;
 }
 
-.currentTitle {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 24px;
-    text-transform: uppercase;
-    color: #fff;
+// ── subColumns ── горизонтальна обгортка L2 + L3
+.subColumns {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    height: 100%;
 }
 
+// ── L2 ──
 .subList {
     list-style: none;
     padding: 0;
@@ -164,12 +165,96 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-width: 200px;
+    transition: min-width 0.2s;
+
+    &.subListNarrow {
+        min-width: 180px;
+    }
+}
+
+.subItem {
+    position: relative;
+}
+
+.subItemActive {
+    .subTitleText {
+        font-weight: 700;
+    }
+
+    .subArrow {
+        opacity: 1;
+    }
 }
 
 .subLink {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 6px;
+    width: fit-content;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.2s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            .subTitleText {
+                font-weight: 700;
+            }
+        }
+    }
+}
+
+.subTitleText {
+    white-space: nowrap;
+}
+
+.subArrow {
+    font-size: 20px;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.5);
+    opacity: 0.5;
+    transition: opacity 0.2s, color 0.2s;
+    margin-left: 2px;
+}
+
+// ── L3 ──
+.thirdList {
+    list-style: none;
+    padding: 0 0 0 36px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeInL3 0.18s ease-out;
+}
+
+@keyframes fadeInL3 {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.thirdItem {
+    // базовий стиль
+}
+
+.thirdItemActive {
+    .thirdLink {
+        font-weight: 700;
+    }
+}
+
+.thirdLink {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     width: fit-content;
     color: #fff;
     text-decoration: none;
@@ -181,23 +266,6 @@
             font-weight: 700;
         }
     }
-}
-
-.subIconWrapper {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.subIcon {
-    opacity: 0.6;
-    transition: all 0.2s;
-}
-
-.subTitleText {
-    white-space: nowrap;
 }
 
 .closeBtn {
