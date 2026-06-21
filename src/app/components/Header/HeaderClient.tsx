@@ -25,12 +25,9 @@ export default function HeaderClient({ lang, initialCategories }: HeaderProps) {
 
     const [categories, setCategories] = useState<ProductCategory[]>(() => getRootCategories(initialCategories || []));
 
-    // Return null to hide header on restaurant menu pages
-    if (isMenuPage) {
-        return null;
-    }
-
+    // useEffect MUST be before any conditional return (Rules of Hooks)
     useEffect(() => {
+        if (isMenuPage) return;
         if (initialCategories && initialCategories.length > 0) return;
 
         fetch("/api/catalog/tree", {
@@ -45,7 +42,12 @@ export default function HeaderClient({ lang, initialCategories }: HeaderProps) {
                 }
             })
             .catch(err => console.error("Header: Failed to fetch categories:", err));
-    }, [lang, initialCategories]);
+    }, [lang, initialCategories, isMenuPage]);
+
+    // Return null to hide header on restaurant menu pages
+    if (isMenuPage) {
+        return null;
+    }
 
     return (
         <header className={s.header} id="header">
