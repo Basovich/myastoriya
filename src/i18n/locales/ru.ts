@@ -702,5 +702,8 @@ export const ru =
                 }
             }
         }
+    },
+    "catalog": {
+        "pageTitle": "Каталог"
     }
 }

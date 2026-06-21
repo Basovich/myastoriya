@@ -63,6 +63,8 @@ interface CatalogContentProps {
     recommendedProducts?: Product[];
     /** URL банера категорії з API. */
     bannerUrl?: string | null;
+    /** Мобільна версія банера (≤ 767px). */
+    mobileImage?: string | null;
     /** FAQ дані з API. */
     faq?: FaqQuestion[] | null;
 }
@@ -83,6 +85,7 @@ export default async function CatalogContent({
     activeFilters,
     recommendedProducts,
     bannerUrl,
+    mobileImage,
     faq,
 }: CatalogContentProps) {
     const sortLabel = lang === 'ua' ? 'Сортувати:' : 'Сортировать:';
@@ -172,6 +175,7 @@ export default async function CatalogContent({
                         !bannerUrl && s.noBannerCategory
                     )}
                     image={bannerUrl || null}
+                    mobileImage={mobileImage}
                 />
                 <Breadcrumbs items={breadcrumbItems} className={clsx(s.breadcrumbs, categoryName && s.breadcrumbsCategory)} />
                 {subcategoryItems && subcategoryItems.length > 0 && (
