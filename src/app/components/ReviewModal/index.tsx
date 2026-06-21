@@ -6,6 +6,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import clsx from 'clsx';
 import useScrollLock from '@/hooks/useScrollLock';
+import { useAppSelector } from '@/store/hooks';
 import s from './ReviewModal.module.scss';
 import Button from "@/app/components/ui/Button/Button";
 import InputField from '@/app/components/ui/InputField';
@@ -57,12 +58,15 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
         return () => enableScroll();
     }, [isOpen, disableScroll, enableScroll]);
 
+    const user = useAppSelector((state) => state.auth.user);
+
     const formik = useFormik({
         initialValues: {
-            name: '',
+            name: user?.name || '',
             review: '',
             ratings: { ...defaultRatings } as RatingsType,
         },
+        enableReinitialize: true,
         validationSchema: reviewSchema,
         onSubmit: async (values, { setStatus }) => {
             try {
@@ -130,19 +134,21 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
 
                         <form className={s.form} onSubmit={formik.handleSubmit} noValidate>
                             {/* Name field */}
-                            <InputField
-                                id="review-name"
-                                type="text"
-                                name="name"
-                                label="Ім'я"
-                                required
-                                value={formik.values.name}
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                onFocus={() => formik.setFieldTouched('name', false)}
-                                error={formik.errors.name}
-                                touched={formik.touched.name}
-                            />
+                            {!user && (
+                                <InputField
+                                    id="review-name"
+                                    type="text"
+                                    name="name"
+                                    label="Ім'я"
+                                    required
+                                    value={formik.values.name}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    onFocus={() => formik.setFieldTouched('name', false)}
+                                    error={formik.errors.name}
+                                    touched={formik.touched.name}
+                                />
+                            )}
 
                             {/* Rating categories */}
                             <div className={s.ratingsBlock}>

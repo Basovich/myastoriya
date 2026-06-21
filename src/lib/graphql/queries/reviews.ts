@@ -22,6 +22,7 @@ export interface OrderReviewSimplePagination {
 
 export interface ProductReview {
     id: string;
+    productId?: number | null;
     rating: number;
     text: string;
     created_at: string;
@@ -65,6 +66,7 @@ const PRODUCT_REVIEWS_QUERY = /* GraphQL */ `
         productReviews(productId: $productId, userId: $userId, limit: $limit, page: $page) {
             data {
                 id
+                productId
                 rating
                 text
                 created_at

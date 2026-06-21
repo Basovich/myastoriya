@@ -28,8 +28,8 @@ const reviewsDict = {
         tabProducts: "Відгуки про товари",
         noOrders: "У вас поки немає замовлень.",
         noOrdersFilter: "У вас немає замовлень у вибрані дати.",
-        noProducts: "У вас поки немає придбаних товарів.",
-        noProductsFilter: "У вас немає придбаних товарів у вибрані дати.",
+        noProducts: "У вас поки немає відгуків про товари.",
+        noProductsFilter: "У вас немає відгуків про товари у вибрані дати.",
         leaveReview: "ЗАЛИШИТИ ВІДГУК",
         editReview: "ЗМІНИТИ ВІДГУК",
         details: "ДЕТАЛІ ЗАМОВЛЕННЯ",
@@ -43,8 +43,8 @@ const reviewsDict = {
         tabProducts: "Отзывы о товарах",
         noOrders: "У вас пока нет заказов.",
         noOrdersFilter: "У вас нет заказов в выбранные даты.",
-        noProducts: "У вас пока нет купленных товаров.",
-        noProductsFilter: "У вас нет купленных товаров в выбранные даты.",
+        noProducts: "У вас пока нет отзывов о товарах.",
+        noProductsFilter: "У вас нет отзывов о товарах в выбранные даты.",
         leaveReview: "ОСТАВИТЬ ОТЗЫВ",
         editReview: "ИЗМЕНИТЬ ОТЗЫВ",
         details: "ДЕТАЛИ ЗАКАЗА",
@@ -183,26 +183,24 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
             });
             setOrderReviews(oRevMap);
 
-            // 4. Extract unique purchased products (passing the detailsMap)
-            // const productsList = getPurchasedProducts(ordersData.data, detailsMap);
-            // const pRevMap: Record<string, ProductReview> = {};
-            // 
-            // // Fetch product reviews sequentially to not overwhelm dev-api
-            // for (const prod of productsList) {
-            //     try {
-            //         const pRevData = await getProductReviewsApi(token, {
-            //             productId: parseInt(prod.id),
-            //             userId: user?.id ? parseInt(user.id) : undefined,
-            //             limit: 1,
-            //         });
-            //         if (pRevData.data && pRevData.data.length > 0) {
-            //             pRevMap[prod.id] = pRevData.data[0];
-            //         }
-            //     } catch (error) {
-            //         console.error(`Failed to fetch reviews for product ${prod.id}:`, error);
-            //     }
-            // }
-            // setProductReviews(pRevMap);
+            // 4. Fetch all user product reviews in ONE single request
+            const pRevMap: Record<string, ProductReview> = {};
+            if (user?.id) {
+                try {
+                    const pRevData = await getProductReviewsApi(token, {
+                        userId: parseInt(user.id),
+                        limit: 100,
+                    });
+                    pRevData.data.forEach((r) => {
+                        if (r.productId) {
+                            pRevMap[r.productId.toString()] = r;
+                        }
+                    });
+                } catch (error) {
+                    console.error("Failed to fetch product reviews:", error);
+                }
+            }
+            setProductReviews(pRevMap);
         } catch (error) {
             console.error('Error fetching reviews details:', error);
         } finally {
@@ -273,7 +271,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         return null;
     }
 
-    // const productsList = getPurchasedProducts(orders, productDetailsMap);
+    const productsList = getPurchasedProducts(orders, productDetailsMap);
 
     // Filter and Sort Orders by date (newest first)
     const filteredOrders = orders
@@ -281,9 +279,12 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     // Filter and Sort Products by date (newest first)
-    // const filteredProducts = productsList
-    //     .filter((prod) => isDateInRange(prod.date, startDate, endDate))
-    //     .sort((a, b) => b.date.getTime() - a.date.getTime());
+    const filteredProducts = productsList
+        .filter((prod) => {
+            const hasReview = !!productReviews[prod.id];
+            return hasReview && isDateInRange(prod.date, startDate, endDate);
+        })
+        .sort((a, b) => b.date.getTime() - a.date.getTime());
 
     return (
         <div className={s.reviewsPage}>
@@ -296,7 +297,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                     navDict={pDict.navigation}
                 />
 
-                {/* <div className={s.tabsRow}>
+                <div className={s.tabsRow}>
                     <button
                         className={clsx(s.tabBtn, activeTab === 'orders' && s.active)}
                         onClick={() => setActiveTab('orders')}
@@ -309,7 +310,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                     >
                         {dict.tabProducts}
                     </button>
-                </div> */}
+                </div>
 
                 <div className={s.controlsRow}>
                     <DatePicker
@@ -394,8 +395,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                             })}
                         </div>
                     )
-                ) : null
-                /* : filteredProducts.length === 0 ? (
+                ) : filteredProducts.length === 0 ? (
                     <div className={s.emptyBlock}>
                         {productsList.length === 0 ? dict.noProducts : dict.noProductsFilter}
                     </div>
@@ -427,8 +427,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                             );
                         })}
                     </div>
-                )*/
-                }
+                )}
             </PersonalContentBlock>
 
             {isModalOpen && (
