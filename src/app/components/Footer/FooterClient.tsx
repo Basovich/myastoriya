@@ -29,8 +29,8 @@ export default function FooterClient({ lang, initialSocialLinks }: FooterProps) 
 
     const allLinks = [...footer.siteLinks];
 
-    const siteLinks = allLinks.slice(0, 8);
-    const legalLinks = allLinks.slice(8);
+    const siteLinks = allLinks.slice(0, 6);
+    const legalLinks = allLinks.slice(6);
 
     const renderSocialIcons = () => (
         <div className={s.socialIcons}>

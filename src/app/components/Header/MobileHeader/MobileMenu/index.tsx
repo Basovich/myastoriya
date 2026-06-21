@@ -26,7 +26,6 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
         { label: targetLang === "ru" ? "Акции" : "Акції", href: "/actions" },
         { label: targetLang === "ru" ? "Блог" : "Блог", href: "/blog" },
         { label: targetLang === "ru" ? "Доставка и Оплата" : "Доставка та Оплата", href: "/delivery" },
-        { label: targetLang === "ru" ? "Франшиза" : "Франшиза", href: "https://f.myastoriya.ua/" },
         { label: targetLang === "ru" ? "Контакти" : "Контакти", href: "/contacts" }
     ];
     const navItems = getMobileNavItems(lang);

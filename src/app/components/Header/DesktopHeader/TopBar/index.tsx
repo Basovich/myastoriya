@@ -18,7 +18,6 @@ const getTopNavItems = (lang: Locale) => [
     { label: lang === "ru" ? "Акции" : "Акції", href: "/actions" },
     { label: lang === "ru" ? "Блог" : "Блог", href: "/blog" },
     { label: lang === "ru" ? "Доставка и Оплата" : "Доставка та Оплата", href: "/delivery" },
-    { label: lang === "ru" ? "Франшиза" : "Франшиза", href: "https://f.myastoriya.ua/" },
     { label: lang === "ru" ? "Контакты" : "Контакти", href: "/contacts" },
 ];
 

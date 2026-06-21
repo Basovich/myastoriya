@@ -37,10 +37,6 @@ export const siteData =
             "href": "/delivery"
         },
         {
-            "label": "Франшиза",
-            "href": "https://f.myastoriya.ua/"
-        },
-        {
             "label": "Контакти",
             "href": "/contacts"
         }
@@ -72,10 +68,6 @@ export const siteData =
             {
                 "label": "Доставка та Оплата",
                 "href": "/delivery"
-            },
-            {
-                "label": "Франшиза",
-                "href": "https://f.myastoriya.ua/"
             },
             {
                 "label": "Контакти",
