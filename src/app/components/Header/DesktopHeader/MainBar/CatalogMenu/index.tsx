@@ -6,33 +6,19 @@ import AppLink from "@/app/components/ui/AppLink/AppLink";
 import clsx from "clsx";
 import s from "./CatalogMenu.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
-
-interface Category {
-    id: string;
-    name: string;
-    slug: string;
-    menuIcon?: {
-        icon1x: string | null;
-        icon2x: string | null;
-        icon3x: string | null;
-    } | null;
-    image?: {
-        big1x: string | null;
-        big2x: string | null;
-    } | null;
-    children?: Category[];
-}
+import { getCategoryHref } from "@/utils/category-url";
+import { ProductCategory } from "@/lib/graphql/queries/products";
 
 interface CatalogMenuProps {
     isOpen: boolean;
     onClose: () => void;
-    categories: Category[];
+    categories: ProductCategory[];
 }
 
 export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenuProps) {
-    const [activeCategory, setActiveCategory] = useState<Category | null>(null);
-    const [hoveredSubCategory, setHoveredSubCategory] = useState<Category | null>(null);
-    const [hoveredThirdLevel, setHoveredThirdLevel] = useState<Category | null>(null);
+    const [activeCategory, setActiveCategory] = useState<ProductCategory | null>(null);
+    const [hoveredSubCategory, setHoveredSubCategory] = useState<ProductCategory | null>(null);
+    const [hoveredThirdLevel, setHoveredThirdLevel] = useState<ProductCategory | null>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
     // Data Cleanup: Some categories in the API are both roots and children.
@@ -90,7 +76,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                 }}
                             >
                                 <AppLink
-                                    href={`/${cat.slug}`}
+                                    href={getCategoryHref(cat)}
                                     className={s.categoryLink}
                                     onClick={onClose}
                                 >
@@ -214,7 +200,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                                     }}
                                                 >
                                                     <AppLink
-                                                        href={`/${activeCategory.slug}/${sub.slug}`}
+                                                        href={getCategoryHref(sub, activeCategory)}
                                                         className={s.subLink}
                                                         onClick={onClose}
                                                     >
@@ -235,7 +221,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                                     onMouseEnter={() => setHoveredThirdLevel(third)}
                                                 >
                                                     <AppLink
-                                                        href={`/${third.slug}`}
+                                                        href={getCategoryHref(third, hoveredSubCategory, activeCategory)}
                                                         className={s.thirdLink}
                                                         onClick={onClose}
                                                     >
