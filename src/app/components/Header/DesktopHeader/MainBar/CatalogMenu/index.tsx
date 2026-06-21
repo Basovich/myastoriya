@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import clsx from "clsx";
@@ -8,6 +8,9 @@ import s from "./CatalogMenu.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { getCategoryHref } from "@/utils/category-url";
 import { ProductCategory } from "@/lib/graphql/queries/products";
+import { useParams, usePathname } from "next/navigation";
+import { Locale } from "@/i18n/config";
+import { getLocalizedHref } from "@/utils/i18n-helpers";
 
 interface CatalogMenuProps {
     isOpen: boolean;
@@ -20,24 +23,30 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
     const [hoveredSubCategory, setHoveredSubCategory] = useState<ProductCategory | null>(null);
     const [hoveredThirdLevel, setHoveredThirdLevel] = useState<ProductCategory | null>(null);
     const { disableScroll, enableScroll } = useScrollLock();
+    
+    const params = useParams();
+    const pathname = usePathname();
+    const lang = (params.lang as Locale) || "ua";
 
-    // Data Cleanup: Some categories in the API are both roots and children.
-    // We filter out any root categories that already appear as children of another root.
-    const allChildIds = new Set(categories.flatMap(cat => (cat.children || []).map(child => child.id)));
-    const uniqueRootCategories = categories.filter(cat => !allChildIds.has(cat.id));
+    // Data Cleanup & Smart flattening memoized to prevent infinite updates in useEffect
+    const displayCategories = useMemo(() => {
+        const allChildIds = new Set(categories.flatMap(cat => (cat.children || []).map(child => child.id)));
+        const uniqueRootCategories = categories.filter(cat => !allChildIds.has(cat.id));
 
-    // Smart flattening: If we have very few roots (like Raw/Ready), take their children.
-    const isDeepRoot = uniqueRootCategories.length <= 3 && uniqueRootCategories.every(c => c.children && c.children.length > 0);
-    const displayCategories = isDeepRoot
-        ? uniqueRootCategories.flatMap(cat => cat.children || [])
-        : uniqueRootCategories;
+        const isDeepRoot = uniqueRootCategories.length <= 3 && uniqueRootCategories.every(c => c.children && c.children.length > 0);
+        return isDeepRoot
+            ? uniqueRootCategories.flatMap(cat => cat.children || [])
+            : uniqueRootCategories;
+    }, [categories]);
 
-    // Set initial active category when displayCategories are loaded
+    // Reset states when menu is closed so it starts fresh with only L1 categories next time
     useEffect(() => {
-        if (displayCategories.length > 0 && !activeCategory) {
-            setActiveCategory(displayCategories[0]);
+        if (!isOpen) {
+            setActiveCategory(null);
+            setHoveredSubCategory(null);
+            setHoveredThirdLevel(null);
         }
-    }, [displayCategories, activeCategory]);
+    }, [isOpen]);
 
     // Close on ESC
     useEffect(() => {
@@ -65,52 +74,57 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
             <div className={s.menuWrapper} onClick={(e) => e.stopPropagation()}>
                 <div className={s.sidebar}>
                     <ul className={s.categoryList}>
-                        {displayCategories.map((cat) => (
-                            <li
-                                key={cat.id}
-                                className={clsx(s.categoryItem, activeCategory?.id === cat.id && s.active)}
-                                onMouseEnter={() => {
-                                    setActiveCategory(cat);
-                                    setHoveredSubCategory(null);
-                                    setHoveredThirdLevel(null);
-                                }}
-                            >
-                                <AppLink
-                                    href={getCategoryHref(cat)}
-                                    className={s.categoryLink}
-                                    onClick={onClose}
+                        {displayCategories.map((cat) => {
+                            const canonicalHref = getCategoryHref(cat);
+                            const localizedHref = getLocalizedHref(canonicalHref, lang);
+                            const isCurrentL1 = pathname === localizedHref;
+                            return (
+                                <li
+                                    key={cat.id}
+                                    className={clsx(s.categoryItem, activeCategory?.id === cat.id && s.active)}
+                                    onMouseEnter={() => {
+                                        setActiveCategory(cat);
+                                        setHoveredSubCategory(null);
+                                        setHoveredThirdLevel(null);
+                                    }}
                                 >
-                                    <div className={s.iconWrapper}>
-                                        {cat.menuIcon?.icon1x ? (
-                                            <Image
-                                                src={cat.menuIcon.icon1x}
-                                                alt={cat.name}
-                                                width={16}
-                                                height={16}
-                                                className={s.icon}
-                                            />
-                                        ) : cat.image?.big1x ? (
-                                            <Image
-                                                src={cat.image.big1x}
-                                                alt={cat.name}
-                                                width={16}
-                                                height={16}
-                                                className={s.icon}
-                                            />
-                                        ) : (
-                                            <Image
-                                                src="/icons/icon-category.svg"
-                                                alt=""
-                                                width={16}
-                                                height={16}
-                                                className={s.icon}
-                                            />
-                                        )}
-                                    </div>
-                                    <span className={s.catTitle}>{cat.name}</span>
-                                </AppLink>
-                            </li>
-                        ))}
+                                    <AppLink
+                                        href={canonicalHref}
+                                        className={s.categoryLink}
+                                        onClick={onClose}
+                                    >
+                                        <div className={s.iconWrapper}>
+                                            {cat.menuIcon?.icon1x ? (
+                                                <Image
+                                                    src={cat.menuIcon.icon1x}
+                                                    alt={cat.name}
+                                                    width={16}
+                                                    height={16}
+                                                    className={s.icon}
+                                                />
+                                            ) : cat.image?.big1x ? (
+                                                <Image
+                                                    src={cat.image.big1x}
+                                                    alt={cat.name}
+                                                    width={16}
+                                                    height={16}
+                                                    className={s.icon}
+                                                />
+                                            ) : (
+                                                <Image
+                                                    src="/icons/icon-category.svg"
+                                                    alt=""
+                                                    width={16}
+                                                    height={16}
+                                                    className={s.icon}
+                                                />
+                                            )}
+                                        </div>
+                                        <span className={clsx(s.catTitle, isCurrentL1 && s.current)}>{cat.name}</span>
+                                    </AppLink>
+                                </li>
+                            );
+                        })}
                     </ul>
                 </div>
 
@@ -189,7 +203,9 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                     {/* ── Колонка L2 ── */}
                                     <ul className={clsx(s.subList, hasThirdLevel && s.subListNarrow)}>
                                         {activeCategory.children.map((sub) => {
-                                            const hasChildren = !!(sub.children && sub.children.length > 0);
+                                            const canonicalHref = getCategoryHref(sub, activeCategory);
+                                            const localizedHref = getLocalizedHref(canonicalHref, lang);
+                                            const isCurrentL2 = pathname === localizedHref;
                                             return (
                                                 <li
                                                     key={sub.id}
@@ -200,11 +216,11 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                                     }}
                                                 >
                                                     <AppLink
-                                                        href={getCategoryHref(sub, activeCategory)}
+                                                        href={canonicalHref}
                                                         className={s.subLink}
                                                         onClick={onClose}
                                                     >
-                                                        <span className={s.subTitleText}>{sub.name}</span>
+                                                        <span className={clsx(s.subTitleText, isCurrentL2 && s.current)}>{sub.name}</span>
                                                     </AppLink>
                                                 </li>
                                             );
@@ -214,21 +230,26 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                     {/* ── Колонка L3 ── */}
                                     {hasThirdLevel && (
                                         <ul className={s.thirdList}>
-                                            {hoveredSubCategory!.children!.map((third) => (
-                                                <li
-                                                    key={third.id}
-                                                    className={clsx(s.thirdItem, hoveredThirdLevel?.id === third.id && s.thirdItemActive)}
-                                                    onMouseEnter={() => setHoveredThirdLevel(third)}
-                                                >
-                                                    <AppLink
-                                                        href={getCategoryHref(third, hoveredSubCategory, activeCategory)}
-                                                        className={s.thirdLink}
-                                                        onClick={onClose}
+                                            {hoveredSubCategory!.children!.map((third) => {
+                                                const canonicalHref = getCategoryHref(third, hoveredSubCategory, activeCategory);
+                                                const localizedHref = getLocalizedHref(canonicalHref, lang);
+                                                const isCurrentL3 = pathname === localizedHref;
+                                                return (
+                                                    <li
+                                                        key={third.id}
+                                                        className={clsx(s.thirdItem, hoveredThirdLevel?.id === third.id && s.thirdItemActive)}
+                                                        onMouseEnter={() => setHoveredThirdLevel(third)}
                                                     >
-                                                        {third.name}
-                                                    </AppLink>
-                                                </li>
-                                            ))}
+                                                        <AppLink
+                                                            href={canonicalHref}
+                                                            className={clsx(s.thirdLink, isCurrentL3 && s.current)}
+                                                            onClick={onClose}
+                                                        >
+                                                            {third.name}
+                                                        </AppLink>
+                                                    </li>
+                                                );
+                                            })}
                                         </ul>
                                     )}
                                 </div>

@@ -90,6 +90,11 @@
     font-size: 14px;
     color: #000;
     white-space: nowrap;
+
+    &.current {
+        color: #e30613;
+        font-weight: 700;
+    }
 }
 
 .content {
@@ -208,6 +213,11 @@
 
 .subTitleText {
     white-space: nowrap;
+
+    &.current {
+        color: #e30613;
+        font-weight: 700;
+    }
 }
 
 .subArrow {
@@ -260,6 +270,11 @@
     text-decoration: none;
     font-size: 16px;
     transition: color 0.2s;
+
+    &.current {
+        color: #e30613;
+        font-weight: 700;
+    }
 
     @media (any-hover: hover) {
         &:hover {
