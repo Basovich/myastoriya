@@ -150,13 +150,42 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
             const ordersData = await getOrdersApi(token, { limit: 100 });
             setOrders(ordersData.data);
 
-            // 2. Fetch product details to get correct image URLs
-            const productIds = Array.from(new Set(
-                ordersData.data
-                    .flatMap(order => order.items || [])
-                    .map(item => Number(item.id))
-                    .filter(id => !isNaN(id) && id > 0)
-            ));
+            // 2. Fetch Order Reviews
+            const orderReviewsData = await getOrderReviewsApi(token, { limit: 100 });
+            const oRevMap: Record<string, OrderReview> = {};
+            orderReviewsData.data.forEach((r) => {
+                oRevMap[r.orderId.toString()] = r;
+            });
+            setOrderReviews(oRevMap);
+
+            // 3. Fetch all user product reviews in ONE single request
+            const pRevMap: Record<string, ProductReview> = {};
+            const reviewProductIds: number[] = [];
+            if (user?.id) {
+                try {
+                    const pRevData = await getProductReviewsApi(token, {
+                        userId: parseInt(user.id),
+                        limit: 100,
+                    });
+                    pRevData.data.forEach((r) => {
+                        if (r.productId) {
+                            pRevMap[r.productId.toString()] = r;
+                            reviewProductIds.push(r.productId);
+                        }
+                    });
+                } catch (error) {
+                    console.error("Failed to fetch product reviews:", error);
+                }
+            }
+            setProductReviews(pRevMap);
+
+            // 4. Fetch product details to get correct image URLs
+            const orderProductIds = ordersData.data
+                .flatMap(order => order.items || [])
+                .map(item => Number(item.id))
+                .filter(id => !isNaN(id) && id > 0);
+
+            const productIds = Array.from(new Set([...orderProductIds, ...reviewProductIds]));
 
             const detailsMap: Record<number, ProductDetails> = {};
             if (productIds.length > 0) {
@@ -174,33 +203,6 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                 }
             }
             setProductDetailsMap(detailsMap);
-
-            // 3. Fetch Order Reviews
-            const orderReviewsData = await getOrderReviewsApi(token, { limit: 100 });
-            const oRevMap: Record<string, OrderReview> = {};
-            orderReviewsData.data.forEach((r) => {
-                oRevMap[r.orderId.toString()] = r;
-            });
-            setOrderReviews(oRevMap);
-
-            // 4. Fetch all user product reviews in ONE single request
-            const pRevMap: Record<string, ProductReview> = {};
-            if (user?.id) {
-                try {
-                    const pRevData = await getProductReviewsApi(token, {
-                        userId: parseInt(user.id),
-                        limit: 100,
-                    });
-                    pRevData.data.forEach((r) => {
-                        if (r.productId) {
-                            pRevMap[r.productId.toString()] = r;
-                        }
-                    });
-                } catch (error) {
-                    console.error("Failed to fetch product reviews:", error);
-                }
-            }
-            setProductReviews(pRevMap);
         } catch (error) {
             console.error('Error fetching reviews details:', error);
         } finally {
@@ -271,20 +273,22 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         return null;
     }
 
-    const productsList = getPurchasedProducts(orders, productDetailsMap);
-
     // Filter and Sort Orders by date (newest first)
     const filteredOrders = orders
         .filter((order) => order.status?.id === '2' && isDateInRange(new Date(order.createdAt), startDate, endDate))
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     // Filter and Sort Products by date (newest first)
-    const filteredProducts = productsList
-        .filter((prod) => {
-            const hasReview = !!productReviews[prod.id];
-            return hasReview && isDateInRange(prod.date, startDate, endDate);
+    const filteredProducts = Object.values(productReviews)
+        .filter((rev) => {
+            if (!rev.created_at) return true;
+            const reviewDate = new Date(rev.created_at);
+            return isDateInRange(reviewDate, startDate, endDate);
         })
-        .sort((a, b) => b.date.getTime() - a.date.getTime());
+        .sort((a, b) => {
+            if (!a.created_at || !b.created_at) return 0;
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
 
     return (
         <div className={s.reviewsPage}>
@@ -397,32 +401,53 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                     )
                 ) : filteredProducts.length === 0 ? (
                     <div className={s.emptyBlock}>
-                        {productsList.length === 0 ? dict.noProducts : dict.noProductsFilter}
+                        {Object.keys(productReviews).length === 0 ? dict.noProducts : dict.noProductsFilter}
                     </div>
                 ) : (
                     <div className={s.reviewsList}>
-                        {filteredProducts.map((prod) => {
-                            const rev = productReviews[prod.id];
-                            const hasReview = !!rev;
+                        {filteredProducts.map((rev) => {
+                            const prodId = rev.productId;
+                            if (!prodId) return null;
+                            const details = productDetailsMap[prodId];
+                            const productName = details?.name || `Товар #${prodId}`;
+                            const productImage = details?.image || '/images/product-placeholder.svg';
+                            const productSlug = details?.slug;
+
+                            const reviewDate = rev.created_at ? new Date(rev.created_at) : null;
+                            const dateStr = reviewDate
+                                ? reviewDate.toLocaleDateString('uk-UA', {
+                                      day: '2-digit',
+                                      month: '2-digit',
+                                      year: 'numeric',
+                                  })
+                                : undefined;
+                            const timeStr = reviewDate
+                                ? reviewDate.toLocaleTimeString('uk-UA', {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                  })
+                                : undefined;
 
                             return (
                                 <ProductReviewCard
-                                    key={prod.id}
-                                    productId={prod.id}
-                                    productSlug={prod.slug}
-                                    productName={prod.name}
-                                    productImage={prod.image}
-                                    hasReview={hasReview}
-                                    published={rev?.published}
-                                    reviewText={rev?.text}
-                                    rating={rev?.rating}
-                                    onLeaveReview={() => openProductReviewModal(parseInt(prod.id), prod.name)}
+                                    key={rev.id}
+                                    productId={prodId}
+                                    productSlug={productSlug}
+                                    productName={productName}
+                                    productImage={productImage}
+                                    hasReview={true}
+                                    published={rev.published}
+                                    reviewText={rev.text}
+                                    rating={rev.rating}
+                                    onLeaveReview={() => openProductReviewModal(prodId, productName)}
                                     onEditReview={() =>
-                                        openProductReviewModal(parseInt(prod.id), prod.name, {
-                                            review: rev?.text,
-                                            ratings: rev?.rating,
+                                        openProductReviewModal(prodId, productName, {
+                                            review: rev.text,
+                                            ratings: rev.rating,
                                         })
                                     }
+                                    date={dateStr}
+                                    time={timeStr}
                                 />
                             );
                         })}

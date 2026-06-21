@@ -19,6 +19,8 @@ interface ProductReviewCardProps {
     rating?: number;
     onLeaveReview: () => void;
     onEditReview: () => void;
+    date?: string;
+    time?: string;
 }
 
 export default function ProductReviewCard({
@@ -32,6 +34,8 @@ export default function ProductReviewCard({
     rating = 0,
     onLeaveReview,
     onEditReview,
+    date,
+    time,
 }: ProductReviewCardProps) {
     const params = useParams();
     const lang = params.lang || 'ua';
@@ -46,6 +50,29 @@ export default function ProductReviewCard({
 
     return (
         <div className={s.card}>
+            {(date || time) && (
+                <div className={s.header}>
+                    <div />
+                    <div className={s.meta}>
+                        {date && (
+                            <div className={s.metaItem}>
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                    <path d="M12.25 1.75H11.375V0.875H10.5V1.75H3.5V0.875H2.625V1.75H1.75C1.26875 1.75 0.875 2.14375 0.875 2.625V12.25C0.875 12.7313 1.26875 13.125 1.75 13.125H12.25C12.7313 13.125 13.125 12.7313 13.125 12.25V2.625C13.125 2.14375 12.7313 1.75 12.25 1.75ZM12.25 12.25H1.75V4.375H12.25V12.25Z" fill="#1C1B1B"/>
+                                </svg>
+                                {date}
+                            </div>
+                        )}
+                        {time && (
+                            <div className={s.metaItem}>
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                    <path d="M7 0C3.13437 0 0 3.13437 0 7C0 10.8656 3.13437 14 7 14C10.8656 14 14 10.8656 14 7C14 3.13437 10.8656 0 7 0ZM7 12.6875C3.86563 12.6875 1.3125 10.1344 1.3125 7C1.3125 3.86563 3.86563 1.3125 7 1.3125C10.1344 1.3125 12.6875 3.86563 12.6875 7C12.6875 10.1344 10.1344 12.6875 7 12.6875ZM7.4375 3.5H6.125V7.4375L9.625 9.5375L10.2812 8.46562L7.4375 6.78125V3.5Z" fill="#1C1B1B"/>
+                                </svg>
+                                {time}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
             <div className={s.content}>
                 <div className={s.productInfo}>
                     <div className={s.productImg}>
@@ -65,7 +92,19 @@ export default function ProductReviewCard({
                         )}
                     </div>
                     <div className={s.productMeta}>
-                        <h3 className={s.productName}>{displayName}</h3>
+                        {isDeleted ? (
+                            <h3 className={s.productName}>{displayName}</h3>
+                        ) : (
+                            <AppLink
+                                href={productUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={s.productLink}
+                                title={displayName}
+                            >
+                                <h3 className={s.productName}>{displayName}</h3>
+                            </AppLink>
+                        )}
                     </div>
                 </div>
 
@@ -88,11 +127,7 @@ export default function ProductReviewCard({
                         <div className={s.textGroup}>
                             <h4 className={s.reviewLabel}>Ваш відгук</h4>
                             <p className={s.reviewText}>{reviewText}</p>
-                            {published === false && (
-                                <div className={s.unmoderatedNote}>
-                                    {lang === 'ru' ? '* Комментарий не модерирован' : '* Коментар не модерований'}
-                                </div>
-                            )}
+
                         </div>
                         <div className={s.ratingGroup}>
                             <h4 className={s.reviewLabel}>Ваша оцінка</h4>
