@@ -1,5 +1,11 @@
 import { gqlRequest } from '../client';
 
+export interface CartItemModifierGql {
+    id: number;
+    name?: string | null;
+    price?: number | null;
+}
+
 export interface CartItemGql {
     rowId: string;
     productId: number;
@@ -11,6 +17,7 @@ export interface CartItemGql {
     multiplier: number;
     costVariantId?: number | null;
     costVariantName?: string | null;
+    modifiers?: CartItemModifierGql[] | null;
 }
 
 export interface CartPromoCodeGql {
@@ -41,6 +48,11 @@ const CART_FIELDS = `
         multiplier
         costVariantId
         costVariantName
+        modifiers {
+            id
+            name
+            price
+        }
     }
     hasRawFoods
     total
@@ -57,6 +69,7 @@ export const ADD_PRODUCT_TO_CART_MUTATION = /* GraphQL */ `
         $productId: Int!
         $quantity: Int
         $costVariantId: Int
+        $modifierIds: [Int]
         $paymentId: Int
         $deliveryId: Int
         $localityId: Int
@@ -66,6 +79,7 @@ export const ADD_PRODUCT_TO_CART_MUTATION = /* GraphQL */ `
             productId: $productId
             quantity: $quantity
             costVariantId: $costVariantId
+            modifierIds: $modifierIds
             paymentId: $paymentId
             deliveryId: $deliveryId
             localityId: $localityId
@@ -144,6 +158,7 @@ export async function addProductToCartApi(
         productId: number;
         quantity?: number;
         costVariantId?: number;
+        modifierIds?: number[];
         paymentId?: number;
         deliveryId?: number;
         localityId?: number;

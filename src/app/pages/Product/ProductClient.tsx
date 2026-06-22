@@ -156,8 +156,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
         }
     }, [product.id, product.hasCostVariants, lang, isInitialized]);
 
-    const [selectedMods, setSelectedMods] = useState<string[]>([]);
-    const [selectedSouces, setSelectedSouces] = useState<string[]>([]);
+    const [selectedModifierIds, setSelectedModifierIds] = useState<string[]>([]);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isVideoReviewModalOpen, setIsVideoReviewModalOpen] = useState(false);
@@ -190,31 +189,8 @@ const ProductClient: React.FC<ProductClientProps> = ({
         }
     };
 
-    // Optional products/modifications (currently empty as they are not supported by the API yet)
-    const productModifications: { id: string; name: string; price: number }[] = [];
-    /* Commented out hardcoded options:
-    const productModifications = [
-        { id: 'm1', name: 'Додаткова картопля фрі', price: 125 },
-        { id: 'm2', name: 'Картопля по селянські', price: 125 },
-        { id: 'm3', name: 'Батат фрі', price: 95 },
-        { id: 'm4', name: 'Овочевий салат', price: 130 },
-    ];
-    */
-
-    const productSouces: { id: string; name: string; price: number }[] = [];
-    /* Commented out hardcoded sauces:
-    const productSouces = [
-        { id: 's1', name: 'Соус гострий Табаско', price: 35 },
-        { id: 's2', name: 'Ворчестер Німеччина 140 мл', price: 25 },
-        { id: 's3', name: 'Кіккоман соєвий соус 150 мл', price: 95 },
-    ];
-    */
-
-    const toggleMod = (id: string) => {
-        setSelectedMods(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
-    };
-    const toggleSouce = (id: string) => {
-        setSelectedSouces(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    const toggleModifier = (id: string) => {
+        setSelectedModifierIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
     };
 
     const handleAddToCart = async () => {
@@ -226,6 +202,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                     id: String(product.id),
                     quantity,
                     costVariantId: selectedCostVariantId ? Number(selectedCostVariantId) : undefined,
+                    modifierIds: selectedModifierIds.map(Number),
                 })
             ).unwrap();
         } catch (err) {
@@ -271,8 +248,10 @@ const ProductClient: React.FC<ProductClientProps> = ({
 
     const activeCost = selectedVariant?.cost ?? product.cost;
     const activeOldCost = selectedVariant?.oldCost ?? product.oldCost;
+
     const activePurchaseCost = selectedVariant?.purchaseCost ?? product.purchaseCost ?? activeCost;
-    const activePurchaseOldCost = selectedVariant?.purchaseOldCost ?? product.purchaseOldCost ?? activeOldCost;
+    const baseOldCost = selectedVariant?.purchaseOldCost ?? product.purchaseOldCost ?? activeOldCost;
+    const activePurchaseOldCost = baseOldCost;
     const activeUnit = product.unit;
 
     const hasDiscount = activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost;
@@ -320,8 +299,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
 
     const hasOptionsUnderCart = 
         (product.hasCostVariants && variants.length > 1) || 
-        (productModifications && productModifications.length > 0) || 
-        (productSouces && productSouces.length > 0);
+        (product.modifierGroups && product.modifierGroups.length > 0);
 
     return (
         <main className={s.productPage}>
@@ -430,27 +408,20 @@ const ProductClient: React.FC<ProductClientProps> = ({
                             onChange={setSelectedCostVariantId}
                             options={variants}
                             lang={lang}
-                            noBorder={productModifications.length === 0 && productSouces.length === 0}
+                            noBorder={!product.modifierGroups || product.modifierGroups.length === 0}
                         />
                     )}
 
-                    {productModifications && productModifications.length > 0 && (
+                    {product.modifierGroups?.map((group, index, arr) => (
                         <ProductModifications
-                            title="Додати до замовлення:"
-                            items={productModifications}
-                            selectedItems={selectedMods}
-                            onToggle={toggleMod}
-                            className={clsx(s.productModifications, productSouces.length === 0 && s.noBorder)}
+                            key={group.id}
+                            title={group.name}
+                            items={group.modifiers || []}
+                            selectedItems={selectedModifierIds}
+                            onToggle={toggleModifier}
+                            className={clsx(s.productModifications, index === arr.length - 1 && s.noBorder)}
                         />
-                    )}
-                    {productSouces && productSouces.length > 0 && (
-                        <ProductModifications
-                            title="Додати соус до замовлення:"
-                            items={productSouces}
-                            selectedItems={selectedSouces}
-                            onToggle={toggleSouce}
-                        />
-                    )}
+                    ))}
                 </section>
 
                 <ProductTabs

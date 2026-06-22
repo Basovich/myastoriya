@@ -105,6 +105,18 @@ export interface ProductBundle {
     items?: ProductBundleItem[] | null;
 }
 
+export interface Modifier {
+    id: string;
+    name: string;
+    price: number;
+}
+
+export interface ModifierGroup {
+    id: string;
+    name: string;
+    modifiers: Modifier[];
+}
+
 export interface Product {
     id: string;
     slug?: string;
@@ -145,6 +157,8 @@ export interface Product {
     }[];
     /** Набори товарів — джерело блоку «З цим товаром купують» */
     bundles?: ProductBundle[] | null;
+    /** Групи модифікаторів товару */
+    modifierGroups?: ModifierGroup[] | null;
 }
 
 /**
@@ -389,6 +403,15 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                     main2x
                     main1x
                     big
+                }
+            }
+            modifierGroups {
+                id
+                name
+                modifiers {
+                    id
+                    name
+                    price
                 }
             }
             images {

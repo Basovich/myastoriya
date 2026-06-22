@@ -10,6 +10,12 @@ import {
 } from '@/lib/graphql/queries/cart';
 import { RootState } from '../index';
 
+export interface CartItemModifier {
+    id: number;
+    name?: string | null;
+    price?: number | null;
+}
+
 export interface CartItem {
     id: string; // Product ID
     rowId?: string; // Unique key returned by backend
@@ -18,6 +24,7 @@ export interface CartItem {
     purchaseCost?: number;
     costVariantId?: number | null;
     costVariantName?: string | null;
+    modifiers?: CartItemModifier[] | null;
 }
 
 export interface CartPromoCode {
@@ -52,6 +59,11 @@ const mapCartItems = (cart: CartGql): CartItem[] => {
         purchaseCost: item.purchaseCost,
         costVariantId: item.costVariantId,
         costVariantName: item.costVariantName,
+        modifiers: item.modifiers ? item.modifiers.map(m => ({
+            id: m.id,
+            name: m.name,
+            price: m.price,
+        })) : null,
     }));
 };
 
@@ -90,7 +102,7 @@ export const fetchCartAsync = createAsyncThunk(
 export const addToCartAsync = createAsyncThunk(
     'cart/add',
     async (
-        payload: { id: string; quantity: number; costVariantId?: number },
+        payload: { id: string; quantity: number; costVariantId?: number; modifierIds?: number[] },
         { getState, dispatch, rejectWithValue }
     ) => {
         try {
@@ -108,7 +120,8 @@ export const addToCartAsync = createAsyncThunk(
             );
 
             let response;
-            if (existingItem && existingItem.rowId) {
+            // If the item has modifiers, we must always use addProductToCartApi so the backend can group/handle modifiers properly.
+            if (existingItem && existingItem.rowId && (!payload.modifierIds || payload.modifierIds.length === 0)) {
                 response = await editCartItemQuantityApi({
                     rowId: existingItem.rowId,
                     quantity: existingItem.quantity,
@@ -118,6 +131,7 @@ export const addToCartAsync = createAsyncThunk(
                     productId: Number(payload.id),
                     quantity: payload.quantity,
                     costVariantId: payload.costVariantId,
+                    modifierIds: payload.modifierIds,
                 });
             }
             dispatch(setPromoCode(response.promoCode || null));

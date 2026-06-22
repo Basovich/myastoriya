@@ -21,6 +21,12 @@ function emitCacheUpdate() {
     listeners.forEach(l => l());
 }
 
+export interface PopulatedCartItemModifier {
+    id: number;
+    name?: string | null;
+    price?: number | null;
+}
+
 export interface PopulatedCartItem {
     id: string;
     rowId?: string;
@@ -35,6 +41,7 @@ export interface PopulatedCartItem {
         slug?: string;
         costVariantName?: string | null;
         categoryId?: number;
+        modifiers?: PopulatedCartItemModifier[] | null;
     };
 }
 
@@ -191,8 +198,9 @@ export function useCartProducts() {
                 // dbProduct.cost (98 ₴) is the catalog promotional price which is already discounted.
                 // When a bundle is active, absolutePriceMap will override this with the bundle price (88 ₴).
                 // When a bundle is broken, the item correctly reverts to its full retail price (127 ₴).
-                const initialPrice = item.purchaseCost ?? dbProduct.cost;
-                const originalPrice = item.purchaseCost ?? dbProduct.oldCost ?? initialPrice;
+                const modifiersPrice = item.modifiers?.reduce((sum, m) => sum + (m.price || 0), 0) || 0;
+                const initialPrice = (item.purchaseCost ?? dbProduct.cost) + modifiersPrice;
+                const originalPrice = (item.purchaseCost ?? dbProduct.oldCost ?? (item.purchaseCost ?? dbProduct.cost)) + modifiersPrice;
                 return {
                     id: item.id,
                     rowId: item.rowId,
@@ -206,7 +214,8 @@ export function useCartProducts() {
                         image: resolveProductImageUrl(dbProduct) || "/images/product-placeholder.svg",
                         slug: dbProduct.slug || dbProduct.id,
                         costVariantName: item.costVariantName,
-                        categoryId: dbProduct.categoryId ? Number(dbProduct.categoryId) : undefined
+                        categoryId: dbProduct.categoryId ? Number(dbProduct.categoryId) : undefined,
+                        modifiers: item.modifiers,
                     }
                 };
             }
