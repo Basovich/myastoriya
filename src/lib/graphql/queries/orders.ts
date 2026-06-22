@@ -14,11 +14,25 @@ export interface OrderItem {
     cost: number;
     totalCost: number;
     totalOldCost?: number | null;
+    unit?: string | null;
+    totalWeight?: string | null;
     image?: {
         list1x?: string | null;
         grid1x?: string | null;
         main1x?: string | null;
     } | null;
+}
+
+export interface OrderDeliveryInfo {
+    deliveryNumber?: number | null;
+    time?: string | null;
+    address?: string | null;
+    service?: string | null;
+}
+
+export interface CalculationRow {
+    name?: string | null;
+    amount: number;
 }
 
 export interface Order {
@@ -30,7 +44,14 @@ export interface Order {
     statusHistory?: (OrderStatus | null)[] | null;
     items?: OrderItem[] | null;
     reviewId?: number | null;
+    personsCount?: number | null;
+    comment?: string | null;
+    receivedBonuses?: number | null;
+    willReceiveBonuses?: number | null;
+    delivery?: OrderDeliveryInfo | null;
+    calculation?: CalculationRow[] | null;
 }
+
 
 export interface OrderSimplePagination {
     data: Order[];
@@ -109,6 +130,72 @@ export async function repeatOrderApi(
         { token, lang },
     );
     return data.repeatOrder;
+}
+
+const GET_ORDER_QUERY = /* GraphQL */ `
+    query GetOrder($id: Int!) {
+        order(id: $id) {
+            id
+            orderNo
+            createdAt
+            personsCount
+            comment
+            total
+            reviewId
+            receivedBonuses
+            willReceiveBonuses
+            calculation {
+                name
+                amount
+            }
+            delivery {
+                deliveryNumber
+                time
+                address
+                service
+            }
+            status {
+                id
+                createdAt
+                name
+                icon
+            }
+            statusHistory {
+                id
+                createdAt
+                name
+                icon
+            }
+            items {
+                id
+                quantity
+                name
+                cost
+                unit
+                totalWeight
+                totalOldCost
+                totalCost
+                image {
+                    list1x
+                    grid1x
+                    main1x
+                }
+            }
+        }
+    }
+`;
+
+export async function getOrderApi(
+    id: number,
+    token: string,
+    lang?: string,
+): Promise<Order | null> {
+    const data = await gqlRequest<{ order: Order | null }>(
+        GET_ORDER_QUERY,
+        { id },
+        { token, lang },
+    );
+    return data.order;
 }
 
 // ── Payments & Order Creation ────────────────────────────────────────────────
