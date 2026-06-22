@@ -43,6 +43,10 @@
         grid-template-columns: 1fr 1fr;
         gap: 24px;
         align-items: stretch;
+
+        &.singleCard {
+            grid-template-columns: 1fr;
+        }
     }
 }
 

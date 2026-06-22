@@ -13,7 +13,14 @@ import RecentOrderCard from '@/app/components/Personal/RecentOrderCard/RecentOrd
 import Button from '@/app/components/ui/Button/Button';
 import ProfileForm, { ProfileFormValues } from '@/app/components/Personal/ProfileForm/ProfileForm';
 import RecentlyViewedSlider, { RecentlyViewedProduct } from '@/app/components/Personal/RecentlyViewedSlider/RecentlyViewedSlider';
-import { getProductsByIdsApi, Product as ApiProduct, resolveProductImageUrl } from '@/lib/graphql/queries/products';
+import { 
+    getProductsByIdsApi, 
+    Product as ApiProduct, 
+    resolveProductImageUrl,
+    getOrdersApi,
+    getUserDiscountInfoApi,
+    UserDiscountInfo
+} from '@/lib/graphql';
 import { updateUserDataApi } from '@/lib/graphql/queries/auth';
 import { setUser } from '@/store/slices/authSlice';
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
@@ -129,6 +136,14 @@ export default function ProfilePage() {
     const hydrated = useIsHydrated();
     const [viewedProducts, setViewedProducts] = React.useState<RecentlyViewedProduct[]>([]);
     const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
+    const [recentOrder, setRecentOrder] = React.useState<{
+        id: string;
+        status: string;
+        totalItems: number;
+        items: string[];
+    } | null>(null);
+    const [discountInfo, setDiscountInfo] = React.useState<UserDiscountInfo | null>(null);
+    const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
         if (submitStatus) {
@@ -207,6 +222,83 @@ export default function ProfilePage() {
         fetchViewedProducts();
     }, [lang, localViewedIds, hydrated]);
 
+    React.useEffect(() => {
+        if (!hydrated || !user) {
+            setLoading(false);
+            return;
+        }
+
+        const fetchProfileData = async () => {
+            setLoading(true);
+            try {
+                const token = await getAccessToken();
+                if (!token) {
+                    setLoading(false);
+                    return;
+                }
+
+                const [discountRes, ordersRes] = await Promise.all([
+                    getUserDiscountInfoApi(token, lang),
+                    getOrdersApi(token, { limit: 1 }, lang)
+                ]);
+
+                if (discountRes) {
+                    setDiscountInfo(discountRes);
+                }
+
+                if (ordersRes && ordersRes.data && ordersRes.data.length > 0) {
+                    const firstOrder = ordersRes.data[0];
+                    const productIds = Array.from(new Set(
+                        (firstOrder.items || [])
+                            .map(item => Number(item.id))
+                            .filter(id => !isNaN(id) && id > 0)
+                    ));
+
+                    let detailsMap: Record<number, string> = {};
+                    if (productIds.length > 0) {
+                        try {
+                            const details = await getProductsByIdsApi(productIds, lang);
+                            details.forEach(prod => {
+                                detailsMap[Number(prod.id)] = resolveProductImageUrl(prod);
+                            });
+                        } catch (e) {
+                            console.error("Failed to fetch product details for recent order images:", e);
+                        }
+                    }
+
+                    const orderImages = (firstOrder.items || []).map(item => {
+                        const productId = Number(item.id);
+                        if (productId && detailsMap[productId]) {
+                            return detailsMap[productId];
+                        }
+                        const url = item.image?.list1x || item.image?.grid1x || item.image?.main1x || null;
+                        if (!url) return '/images/product-placeholder.svg';
+                        if (url.startsWith('/images/')) return url;
+                        if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
+                        return url;
+                    });
+
+                    const totalProductsCount = firstOrder.items?.reduce((acc, item) => acc + (item.quantity || 0), 0) || 0;
+
+                    setRecentOrder({
+                        id: firstOrder.id,
+                        status: firstOrder.status?.name || (lang === 'ru' ? 'Новый заказ' : 'Нове замовлення'),
+                        totalItems: totalProductsCount,
+                        items: orderImages
+                    });
+                } else {
+                    setRecentOrder(null);
+                }
+            } catch (err) {
+                console.error("Error loading profile details:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfileData();
+    }, [hydrated, user, lang]);
+
     const handleFormSubmit = async (values: ProfileFormValues) => {
         try {
             const token = await getAccessToken();
@@ -239,6 +331,7 @@ export default function ProfilePage() {
                 email: updatedUser.email,
                 birthday: updatedUser.birthday,
                 sex: updatedUser.sex,
+                bonuses: updatedUser.bonuses,
             }));
 
             setSubmitStatus({
@@ -254,15 +347,8 @@ export default function ProfilePage() {
         }
     };
 
-    const mockOrder = {
-        status: lang === 'ua' ? 'Видано кур\'єру' : 'Выдано курьеру',
-        totalItems: 5,
-        items: [
-            '/images/products/product-sticks-cheese.png',
-            '/images/products/product-teriyaki.png',
-            '/images/products/product-tartar.png',
-        ]
-    };
+    const showRecentOrder = !loading && !!recentOrder;
+    const isSingleCard = !loading && !recentOrder;
 
     return (
         <>
@@ -276,19 +362,22 @@ export default function ProfilePage() {
                 />
                 
                 <div className={s.profileContainer}>
-                    <div className={s.topCardsRow}>
-                        <div className={s.cardWrapper}>
-                            <RecentOrderCard 
-                                status={mockOrder.status}
-                                items={mockOrder.items}
-                                totalItems={mockOrder.totalItems}
-                                dict={dict.recentOrder}
-                            />
-                        </div>
+                    <div className={`${s.topCardsRow} ${isSingleCard ? s.singleCard : ''}`}>
+                        {showRecentOrder && recentOrder && (
+                            <div className={s.cardWrapper}>
+                                <RecentOrderCard 
+                                    status={recentOrder.status}
+                                    items={recentOrder.items}
+                                    totalItems={recentOrder.totalItems}
+                                    dict={dict.recentOrder}
+                                    onDetails={() => router.push(`/${lang}/personal/orders/${recentOrder.id}`)}
+                                />
+                            </div>
+                        )}
                         <div className={s.cardWrapper}>
                             <BonusCard 
-                                balance={1200} 
-                                percent={3} 
+                                balance={user?.bonuses || 0} 
+                                percent={discountInfo?.discount || 3} 
                                 dict={dict.bonusCard} 
                             />
                         </div>
