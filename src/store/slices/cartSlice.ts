@@ -39,6 +39,7 @@ interface CartState {
     isInitialized: boolean;
     loading: boolean;
     promoCode: CartPromoCode | null;
+    cashback: number;
 }
 
 const initialState: CartState = {
@@ -47,6 +48,7 @@ const initialState: CartState = {
     isInitialized: false,
     loading: false,
     promoCode: null,
+    cashback: 0,
 };
 
 // Helper to map CartGql to local CartItem[]
@@ -90,6 +92,7 @@ export const fetchCartAsync = createAsyncThunk(
         try {
             const response = await getCartApi();
             dispatch(setPromoCode(response.promoCode || null));
+            dispatch(setCashback(response.cashback || 0));
             return mapCartItems(response);
         } catch (error: any) {
             console.error('[Cart] Failed to fetch cart from backend:', error);
@@ -135,6 +138,7 @@ export const addToCartAsync = createAsyncThunk(
                 });
             }
             dispatch(setPromoCode(response.promoCode || null));
+            dispatch(setCashback(response.cashback || 0));
             return mapCartItems(response);
         } catch (error: unknown) {
             console.error('[Cart] Failed to add or update product in backend cart:', error);
@@ -162,6 +166,7 @@ export const updateQuantityAsync = createAsyncThunk(
                     quantity: payload.quantity,
                 });
                 dispatch(setPromoCode(response.promoCode || null));
+                dispatch(setCashback(response.cashback || 0));
                 return mapCartItems(response);
             } else {
                 return rejectWithValue('No rowId found');
@@ -188,6 +193,7 @@ export const removeFromCartAsync = createAsyncThunk(
                     rowId,
                 });
                 dispatch(setPromoCode(response.promoCode || null));
+                dispatch(setCashback(response.cashback || 0));
                 return mapCartItems(response);
             } else {
                 return rejectWithValue('No rowId found');
@@ -287,6 +293,9 @@ const cartSlice = createSlice({
         },
         setPromoCode: (state, action: PayloadAction<CartPromoCode | null>) => {
             state.promoCode = action.payload;
+        },
+        setCashback: (state, action: PayloadAction<number>) => {
+            state.cashback = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -418,5 +427,5 @@ const cartSlice = createSlice({
     }
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart, setPromoCode } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQuantity, clearCart, setPromoCode, setCashback } = cartSlice.actions;
 export default cartSlice.reducer;

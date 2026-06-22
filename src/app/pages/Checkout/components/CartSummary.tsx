@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { useCartProducts } from '@/hooks/useCartProducts';
 import s from './CheckoutShared.module.scss';
 import { useAppSelector } from '@/store/hooks';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
-import { getAccessToken } from '@/app/actions/authActions';
-import { getOrdersApi } from '@/lib/graphql/queries/orders';
 
 const getModifierIconUrl = (name?: string | null): string | null => {
     if (!name) return null;
@@ -33,46 +31,8 @@ interface CartSummaryProps {
 export default function CartSummary({ onEditCart, discountPercent = 0, deliveryPrice }: CartSummaryProps) {
     const hydrated = useIsHydrated();
     const { populatedItems } = useCartProducts();
-    const { user, isGuest, isInitialized } = useAppSelector(state => state.auth);
     const promoCode = useAppSelector(state => state.cart.promoCode);
-    const [showCashback, setShowCashback] = useState(false);
-
-    useEffect(() => {
-        if (!hydrated || !isInitialized || !user || isGuest) {
-            setShowCashback(false);
-            return;
-        }
-
-        const checkOrders = async () => {
-            try {
-                const token = await getAccessToken();
-                if (!token) return;
-                const ordersData = await getOrdersApi(token, { limit: 50 });
-                if (ordersData && ordersData.data) {
-                    const hasPaidAndCompleted = ordersData.data.some(order => {
-                        const currentStatusName = order.status?.name || '';
-                        const historyNames = (order.statusHistory || []).map(h => h?.name || '');
-                        const allStatusNames = [currentStatusName, ...historyNames].map(n => n.toLowerCase());
-
-                        const isCompleted = allStatusNames.some(n =>
-                            n.includes('завершено') || n.includes('виконано') || n.includes('completed') || n.includes('выполнено')
-                        );
-                        const isPaid = allStatusNames.some(n =>
-                            n.includes('оплачено') || n.includes('оплачен') || n.includes('paid')
-                        );
-
-                        return isCompleted && isPaid;
-                    });
-                    setShowCashback(hasPaidAndCompleted);
-                }
-            } catch (error) {
-                console.error('Failed to fetch orders for cashback check', error);
-                setShowCashback(false);
-            }
-        };
-
-        void checkOrders();
-    }, [hydrated, isInitialized, user, isGuest]);
+    const cashback = useAppSelector(state => state.cart.cashback);
 
     const totalSum = useMemo(() => {
         return populatedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
@@ -100,7 +60,6 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
     if (!hydrated) return null;
 
     const delivery = deliveryPrice !== undefined ? deliveryPrice : 0;
-    const cashback = Math.round((totalSum - discountAmount) * 0.03);
 
     const hasAnyDiscount = (originalTotalSum > totalSum) || (discountAmount > 0);
     const finalPrice = totalSum + delivery - discountAmount;
@@ -199,7 +158,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                     <div className={s.cartDivider} />
 
                     <div className={s.cartStats}>
-                        {showCashback && (
+                        {cashback > 0 && (
                             <div className={s.cartStat}>
                                 <span className={s.cartStatLabel}>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">

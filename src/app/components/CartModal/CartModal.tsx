@@ -19,8 +19,6 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import Button from "@/app/components/ui/Button/Button";
 import { useIsHydrated } from '@/hooks/useIsHydrated';
-import { getAccessToken } from '@/app/actions/authActions';
-import { getOrdersApi } from '@/lib/graphql/queries/orders';
 
 const getModifierIconUrl = (name?: string | null): string | null => {
     if (!name) return null;
@@ -48,12 +46,12 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     const lang = (params?.lang as string) || 'ua';
     const { disableScroll, enableScroll } = useScrollLock();
     const dispatch = useAppDispatch();
-    const { user, isGuest, isInitialized } = useAppSelector(state => state.auth);
+    const { isInitialized } = useAppSelector(state => state.auth);
+    const cashback = useAppSelector(state => state.cart.cashback);
     const hydrated = useIsHydrated();
 
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
-    const [showCashback, setShowCashback] = useState(false);
     const [isMobile, setIsMobile] = useState(true);
 
     useEffect(() => {
@@ -66,47 +64,6 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     }, []);
 
     const { populatedItems, suggestedProducts, loading } = useCartProducts();
-
-    useEffect(() => {
-        if (!hydrated || !isInitialized || !user || isGuest) {
-            setShowCashback(false);
-            return;
-        }
-
-        const checkOrders = async () => {
-            try {
-                const token = await getAccessToken();
-                if (!token) return;
-                const ordersData = await getOrdersApi(token, { limit: 50 });
-                if (ordersData && ordersData.data) {
-                    const hasPaidAndCompleted = ordersData.data.some(order => {
-                        const currentStatusName = order.status?.name || '';
-                        const historyNames = (order.statusHistory || []).map(h => h?.name || '');
-                        const allStatusNames = [currentStatusName, ...historyNames].map(n => n.toLowerCase());
-
-                        const isCompleted = allStatusNames.some(n =>
-                            n.includes('завершено') || n.includes('виконано') || n.includes('completed') || n.includes('выполнено')
-                        );
-                        const isPaid = allStatusNames.some(n =>
-                            n.includes('оплачено') || n.includes('оплачен') || n.includes('paid')
-                        );
-
-                        return isCompleted && isPaid;
-                    });
-                    setShowCashback(hasPaidAndCompleted);
-                }
-            } catch (error) {
-                if (error instanceof Error && error.message === 'Unauthorized') {
-                    console.warn('Failed to fetch orders for cashback check: User is unauthorized (guest or session expired)');
-                } else {
-                    console.error('Failed to fetch orders for cashback check:', error);
-                }
-                setShowCashback(false);
-            }
-        };
-
-        void checkOrders();
-    }, [hydrated, isInitialized, user, isGuest]);
 
 
     // Calculate total
@@ -295,7 +252,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                     <div className={s.modalFooter}>
                         <div className={s.footerContent}>
                             <div className={s.summaryStats}>
-                                {showCashback && (
+                                {cashback > 0 && (
                                     <div className={s.statRow}>
                                         <div className={s.statLabel}>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none">
@@ -303,7 +260,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                             </svg>
                                             <span>Кешбек балами:</span>
                                         </div>
-                                        <span className={s.statValBlack}>{Math.round(totalSum * 0.03)} Б</span>
+                                        <span className={s.statValBlack}>{cashback} Б</span>
                                     </div>
                                 )}
                                 <div className={s.statRow}>
