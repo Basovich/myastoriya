@@ -27,6 +27,7 @@ import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import s from './Profile.module.scss';
+import clsx from "clsx";
 
 function getWeight(product: ApiProduct): string {
     const weightSpec = product.specifications?.find(sp =>
@@ -364,7 +365,7 @@ export default function ProfilePage() {
                 <div className={s.profileContainer}>
                     <div className={`${s.topCardsRow} ${isSingleCard ? s.singleCard : ''}`}>
                         {showRecentOrder && recentOrder && (
-                            <div className={s.cardWrapper}>
+                            <div className={clsx(s.cardWrapper, s.cardWrapperRecentOrderCard)}>
                                 <RecentOrderCard 
                                     status={recentOrder.status}
                                     items={recentOrder.items}

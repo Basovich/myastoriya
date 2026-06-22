@@ -12,11 +12,12 @@ interface BonusCardProps {
         howToUse: string;
         orderPercent: string;
     };
+    className?: string;
 }
 
-export default function BonusCard({ balance, percent, dict }: BonusCardProps) {
+export default function BonusCard({ balance, percent, dict, className }: BonusCardProps) {
     return (
-        <div className={s.bonusCard}>
+        <div className={`${s.bonusCard} ${className || ''}`}>
             <div className={s.leftCol}>
                 <div className={s.balanceLabelRow}>
                     <svg className={s.starIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -26,7 +27,7 @@ export default function BonusCard({ balance, percent, dict }: BonusCardProps) {
                 </div>
                 <div className={s.amountRow}>
                     <span className={s.amount}>{balance}</span>
-                    <span className={s.currency}> Б</span>
+                    <span className={s.currency}>Б</span>
                 </div>
                 <div className={s.rate}>{dict.exchangeRate}</div>
             </div>

@@ -40,7 +40,7 @@
 
     @media (min-width: 1024px) {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: auto 1fr;
         gap: 24px;
         align-items: stretch;
 
@@ -52,10 +52,17 @@
 
 .cardWrapper {
     display: flex;
+
+    &.cardWrapperRecentOrderCard {
+        width: 322px;
+    }
+
     & > * {
         width: 100%;
     }
 }
+
+
 
 .deleteBtn {
     color: #E30613 !important;
