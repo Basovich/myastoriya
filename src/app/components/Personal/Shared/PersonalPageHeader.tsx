@@ -9,7 +9,7 @@ import s from '@/app/[lang]/personal/PersonalLayout.module.scss';
 import clsx from 'clsx';
 
 interface PersonalPageHeaderProps {
-    title: string;
+    title: React.ReactNode;
     logoutLabel: string;
     onLogout: () => void;
     user: AuthUser | null;

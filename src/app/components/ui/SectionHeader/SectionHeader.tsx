@@ -1,8 +1,9 @@
+import React from "react";
 import clsx from "clsx";
 import s from "./SectionHeader.module.scss";
 
 interface SectionHeaderProps {
-    title: string;
+    title: React.ReactNode;
     withDots?: boolean;
     classNameWrapper?: string;
     classNameTitle?: string;

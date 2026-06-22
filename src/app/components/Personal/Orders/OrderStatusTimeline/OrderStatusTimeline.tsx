@@ -36,7 +36,9 @@ export default function OrderStatusTimeline({ steps }: OrderStatusTimelineProps)
                     </div>
                     <div className={s.content}>
                         <p className={s.label}>{step.label}</p>
-                        <p className={s.timestamp}>{step.date} {step.time}</p>
+                        {step.date ? (
+                            <p className={s.timestamp}>{step.date} {step.time}</p>
+                        ) : null}
                     </div>
                 </div>
             ))}

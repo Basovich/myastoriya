@@ -262,17 +262,53 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
         new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
     );
 
-    const statusSteps: StatusStep[] = sortedHistory.map((h) => {
-        const hDateTime = formatOrderDateTime(h.createdAt || '');
-        const isCurrent = h.id === order.status?.id;
-        return {
-            label: h.name || '',
-            date: hDateTime.date,
-            time: hDateTime.time,
-            isCompleted: true,
-            isCurrent,
-        };
+    // Standard steps configuration
+    const standardStepsDef = [
+        { key: 'new', label: lang === 'ru' ? 'Новое заказ' : 'Нове замовлення', match: (h: OrderStatus) => h.id === '1' || (h.name || '').toLowerCase().includes('нов') },
+        { key: 'preparing', label: lang === 'ru' ? 'Готовится' : 'Готується', match: (h: OrderStatus) => h.id === '4' || (h.name || '').toLowerCase().includes('готу') || (h.name || '').toLowerCase().includes('прийнят') },
+        { key: 'courier', label: order.delivery?.service?.toLowerCase().includes('самовивіз') || order.delivery?.service?.toLowerCase().includes('самовывоз') 
+            ? (lang === 'ru' ? 'Готово к выдаче' : 'Готово до видачі')
+            : (lang === 'ru' ? 'Выдано курьеру' : 'Видано кур’єру'), 
+          match: (h: OrderStatus) => h.id === '5' || (h.name || '').toLowerCase().includes('кур') || (h.name || '').toLowerCase().includes('відправл') },
+        { key: 'delivered', label: lang === 'ru' ? 'Доставлено' : 'Доставлено', match: (h: OrderStatus) => h.id === '6' || (h.name || '').toLowerCase().includes('достав') },
+        { key: 'completed', label: lang === 'ru' ? 'Завершено' : 'Завершено', match: (h: OrderStatus) => h.id === '2' || (h.name || '').toLowerCase().includes('викон') || (h.name || '').toLowerCase().includes('заверш') }
+    ];
+
+    // Map history to standard steps
+    const statusSteps: StatusStep[] = standardStepsDef.map((def) => {
+        const matchedHistory = sortedHistory.find(def.match);
+        if (matchedHistory) {
+            const hDateTime = formatOrderDateTime(matchedHistory.createdAt || '');
+            return {
+                label: def.label,
+                date: hDateTime.date,
+                time: hDateTime.time,
+                isCompleted: true,
+            };
+        } else {
+            return {
+                label: def.label,
+                date: '',
+                time: '',
+                isCompleted: false,
+            };
+        }
     });
+
+    // Determine the current step index: the last completed step
+    let lastCompletedIndex = -1;
+    for (let i = 0; i < statusSteps.length; i++) {
+        if (statusSteps[i].isCompleted) {
+            lastCompletedIndex = i;
+        }
+    }
+    // Auto-complete all previous steps up to the current progress point
+    if (lastCompletedIndex !== -1) {
+        for (let i = 0; i <= lastCompletedIndex; i++) {
+            statusSteps[i].isCompleted = true;
+        }
+        statusSteps[lastCompletedIndex].isCurrent = true;
+    }
 
     const statusNameLower = (order.status?.name || '').toLowerCase();
     const canLeaveReview = order.status?.id === '2'
@@ -289,16 +325,17 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
         <div className={s.orderDetailsPage}>
             <PersonalContentBlock className={s.detailsBlock}>
                 <PersonalPageHeader 
-                    title={`${dict.orderTitle}${order.orderNo || order.id}`}
+                    title={
+                        <>
+                            {dict.orderTitle}
+                            <span style={{ color: '#E30613' }}>{order.orderNo || order.id}</span>
+                        </>
+                    }
                     logoutLabel={pDict.navigation.logout}
                     onLogout={handleLogout}
                     user={user}
                     navDict={pDict.navigation}
                 />
-                
-                <div className={s.decorativeDots}>
-                    <span /> <span /> <span />
-                </div>
 
                 <div className={s.metaRow}>
                     <div className={s.metaItem}>
@@ -353,7 +390,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                         const isNegative = calc.amount < 0;
                         return (
                             <div key={index} className={s.summaryItem}>
-                                <span className={s.summaryLabel}>{calc.name}</span>
+                                <span className={s.summaryLabel}>{calc.name?.replace(/:$/, '')}</span>
                                 <span className={clsx(s.summaryValue, isNegative && s.negative)}>
                                     {calc.amount === 0 
                                         ? (lang === 'ru' ? 'Бесплатно' : 'Безкоштовно') 
@@ -381,19 +418,21 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                     </div>
                     
                     <div className={s.infoCol}>
-                        {order.delivery?.time && (
-                            <div className={s.infoBlock}>
-                                <h2 className={s.sectionTitle}>{dict.deliveryTime}</h2>
-                                <p className={s.infoText}>{order.delivery.time}</p>
-                            </div>
-                        )}
-                        
-                        {order.delivery?.service && (
-                            <div className={s.infoBlock}>
-                                <h2 className={s.sectionTitle}>{dict.deliveryType}</h2>
-                                <p className={s.infoText}>{order.delivery.service}</p>
-                            </div>
-                        )}
+                        <div className={s.deliveryInfoRow}>
+                            {order.delivery?.time && (
+                                <div className={s.infoBlock}>
+                                    <h2 className={s.sectionTitle}>{dict.deliveryTime}</h2>
+                                    <p className={s.infoText}>{order.delivery.time}</p>
+                                </div>
+                            )}
+                            
+                            {order.delivery?.service && (
+                                <div className={s.infoBlock}>
+                                    <h2 className={s.sectionTitle}>{dict.deliveryType}</h2>
+                                    <p className={s.infoText}>{order.delivery.service}</p>
+                                </div>
+                            )}
+                        </div>
 
                         {order.comment && (
                             <div className={s.infoBlock}>
@@ -404,21 +443,15 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                     </div>
                 </div>
 
-                <div className={s.actionsRow}>
+                <div className={s.actionsContainer}>
                     {canLeaveReview && (
                         <button className={s.reviewLink} onClick={handleLeaveReview}>
                             {hasReview ? dict.editReviewBtn : dict.reviewBtn}
                         </button>
                     )}
-                    <Button variant="black" className={s.repeatBtn} onClick={handleRepeatOrder}>
+                    <Button variant="red" className={s.repeatBtn} onClick={handleRepeatOrder}>
                         {dict.repeatBtn}
                     </Button>
-                </div>
-                
-                <div className={s.backLinkRow}>
-                    <AppLink href={`/${lang}/personal/orders`} className={s.backLink}>
-                        {dict.backToHistory}
-                    </AppLink>
                 </div>
             </PersonalContentBlock>
 
