@@ -168,5 +168,9 @@ export const getShopApi = async (
   id: string,
   lang: string = "ua"
 ): Promise<SingleShopResponse> => {
-  return await gqlRequest<SingleShopResponse>(SHOP_BY_ID_QUERY, { id: parseInt(id) }, { lang });
+  return await gqlRequest<SingleShopResponse>(
+    SHOP_BY_ID_QUERY,
+    { id: parseInt(id) },
+    { lang, next: { revalidate: 3600 } }
+  );
 };

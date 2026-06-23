@@ -24,6 +24,7 @@ interface CategoryCirclesProps {
     withDots?: boolean;
     headerLeft?: React.ReactNode;
     categories?: CategoryCircleItem[];
+    onHashClick?: (targetId: string) => void;
 }
 
 export default function CategoryCircles({
@@ -32,6 +33,7 @@ export default function CategoryCircles({
     withDots,
     headerLeft,
     categories = [],
+    onHashClick,
 }: CategoryCirclesProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
@@ -108,9 +110,13 @@ export default function CategoryCircles({
                     const handleHashClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
                         e.preventDefault();
                         const targetId = item.href.substring(1);
-                        const element = document.getElementById(targetId);
-                        if (element) {
-                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        if (onHashClick) {
+                            onHashClick(targetId);
+                        } else {
+                            const element = document.getElementById(targetId);
+                            if (element) {
+                                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
                         }
                     };
 

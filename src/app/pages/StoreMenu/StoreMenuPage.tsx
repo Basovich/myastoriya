@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import s from './StoreMenuPage.module.scss';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
@@ -77,6 +77,32 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initial
         href: `#${cat.id}`
     }));
 
+    const [visibleCategoriesCount, setVisibleCategoriesCount] = useState(2);
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+        // Фоновий рендеринг решти категорій після монтування
+        const timer = setTimeout(() => {
+            setVisibleCategoriesCount(foodCategories.length);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [foodCategories.length]);
+
+    const handleCategoryHashClick = (targetId: string) => {
+        setVisibleCategoriesCount(foodCategories.length);
+        setTimeout(() => {
+            const element = document.getElementById(targetId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 50);
+    };
+
+    const displayedCategories = isClient 
+        ? foodCategories.slice(0, visibleCategoriesCount) 
+        : foodCategories.slice(0, 2);
+
     return (
         <>
             <main className={s.page}>
@@ -98,13 +124,14 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initial
                             categories={categories}
                             className={s.categories}
                             withDots={true}
+                            onHashClick={handleCategoryHashClick}
                         />
                     </div>
                 </section>
 
                 <div className={s.container}>
                     <div className={s.menuSections}>
-                        {foodCategories.map((category) => {
+                        {displayedCategories.map((category) => {
                             if (category.products.length === 0) return null;
 
                             return (
@@ -128,7 +155,9 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initial
                 </div>
 
                 {/* Tabular menu section for wines and drinks */}
-                <StoreMenuTabular initialMenu={resolvedMenu} />
+                {isClient && visibleCategoriesCount === foodCategories.length && (
+                    <StoreMenuTabular initialMenu={resolvedMenu} />
+                )}
             </main>
         </>
     );

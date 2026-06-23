@@ -39,15 +39,6 @@ export const RESTAURANT_MENU_QUERY = `
           alt
           title
         }
-        modifierGroups {
-          id
-          name
-          modifiers {
-            id
-            name
-            price
-          }
-        }
       }
     }
   }
@@ -118,6 +109,6 @@ export const getRestaurantMenuApi = async (
   return await gqlRequest<RestaurantMenuResponse>(
     RESTAURANT_MENU_QUERY,
     { shopId },
-    { lang }
+    { lang, next: { revalidate: 300 } }
   );
 };
