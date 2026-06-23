@@ -50,21 +50,16 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initial
             products: menuData.products.filter(p => p.categoryId === cat.id).map(p => ({
                 id: String(p.id),
                 name: p.title,
-                slug: '',
                 cost: p.price,
                 oldCost: p.price,
                 available: 1,
                 portionSize: p.weight,
-                isSpicy: false,
                 text: null,
-                specifications: null,
-                dishSpecifics: [],
-                image: p.image ? {
-                    url: { grid2x: p.image, main2x: p.image },
+                images: p.image ? [{
+                    url: { main2x: p.image },
                     alt: p.title,
                     title: p.title
-                } : null,
-                images: null,
+                }] : null,
                 modifierGroups: []
             }))
         }));

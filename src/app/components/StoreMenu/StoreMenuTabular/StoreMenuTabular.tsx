@@ -96,7 +96,7 @@ export default function StoreMenuTabular({ initialMenu = [] }: StoreMenuTabularP
         // Map API products to TabularItems
         const allWines: TabularItem[] = apiWineCategory.products.map(p => ({
             name: p.name,
-            description: p.dishSpecifics?.map(s => s.name).join(", ") || p.portionSize || undefined,
+            description: p.portionSize || undefined,
             price: p.cost
         }));
 
@@ -127,7 +127,7 @@ export default function StoreMenuTabular({ initialMenu = [] }: StoreMenuTabularP
     if (apiDrinksCategory && apiDrinksCategory.products.length > 0) {
         const allDrinks: TabularItem[] = apiDrinksCategory.products.map(p => ({
             name: p.name + (p.portionSize ? ` / ${p.portionSize}` : ""),
-            description: p.dishSpecifics?.map(s => s.name).join(", ") || undefined,
+            description: undefined,
             price: p.cost
         }));
 

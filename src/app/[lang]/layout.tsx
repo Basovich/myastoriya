@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import localFont from "next/font/local";
 import "../globals.css";
 import { siteData } from "@/config/site";
@@ -115,34 +116,42 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }>) {
   const { lang } = await params;
+  
+  // Отримуємо x-pathname із заголовків запиту
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") || "";
+  const isMenuPage = pathname.includes("/menu") && pathname.includes("/our-stores/");
+
   let catalogTree: any[] = [];
   let socialLinks: any[] = [];
 
-  try {
-    const [tree, links] = await Promise.all([
-      getCatalogTreeApi(lang).catch((err) => {
-        console.error("Failed to fetch catalog tree:", err);
-        return [];
-      }),
-      getSocialLinksApi().catch((err) => {
-        console.error("Failed to fetch social links:", err);
-        return [];
-      }),
-    ]);
-    catalogTree = tree;
-    socialLinks = links;
-  } catch (err) {
-    console.error("Error loading layout data:", err);
+  if (!isMenuPage) {
+    try {
+      const [tree, links] = await Promise.all([
+        getCatalogTreeApi(lang).catch((err) => {
+          console.error("Failed to fetch catalog tree:", err);
+          return [];
+        }),
+        getSocialLinksApi().catch((err) => {
+          console.error("Failed to fetch social links:", err);
+          return [];
+        }),
+      ]);
+      catalogTree = tree;
+      socialLinks = links;
+    } catch (err) {
+      console.error("Error loading layout data:", err);
+    }
   }
 
   return (
     <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <body>
         <ReduxProvider>
-          <AuthInitializer />
-          <Header lang={lang as any} initialCategories={catalogTree} />
+          {!isMenuPage && <AuthInitializer />}
+          {!isMenuPage && <Header lang={lang as any} initialCategories={catalogTree} />}
           {children}
-          <Footer lang={lang as any} initialSocialLinks={socialLinks} />
+          {!isMenuPage && <Footer lang={lang as any} initialSocialLinks={socialLinks} />}
         </ReduxProvider>
       </body>
     </html>

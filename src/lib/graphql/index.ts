@@ -204,7 +204,6 @@ export type {
     RestaurantProduct,
     RestaurantMenuCategory,
     RestaurantMenuResponse,
-    DishSpecific,
     ModifierGroup,
     Modifier,
 } from './queries/pages/restaurantMenu';

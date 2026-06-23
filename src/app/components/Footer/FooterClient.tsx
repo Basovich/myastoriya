@@ -1,6 +1,7 @@
 "use client";
 
 import s from "./FooterClient.module.scss";
+import { usePathname } from "next/navigation";
 import { siteData } from "@/config/site";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
@@ -17,7 +18,14 @@ interface FooterProps {
 }
 
 export default function FooterClient({ lang, initialSocialLinks }: FooterProps) {
+    const pathname = usePathname();
+    const isMenuPage = /^\/(?:[a-z]{2}\/)?our-stores\/[^\/]+\/menu$/.test(pathname || "");
+
     const { footer, contact } = siteData;
+    
+    if (isMenuPage) {
+        return null;
+    }
     
     const socialLinks = (initialSocialLinks || [])
         .map(link => ({

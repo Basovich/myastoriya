@@ -25,6 +25,10 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // Create request headers to inject x-pathname
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-pathname', pathname);
+
     // 2. Redirect /ua to / (clean URL for default locale)
     if (pathname === '/ua' || pathname.startsWith('/ua/')) {
         const cleanPath = pathname.replace(/^\/ua/, '') || '/';
@@ -53,14 +57,16 @@ export function middleware(request: NextRequest) {
     if (!pathnameHasLocale) {
         // No locale prefix → rewrite to default locale /ua/path
         return NextResponse.rewrite(
-            new URL(`/ua${pathname}${search}`, request.url)
+            new URL(`/ua${pathname}${search}`, request.url),
+            { request: { headers: requestHeaders } }
         );
     }
 
     // Has a non-default locale (e.g. /ru/...) → explicit rewrite so Next.js
     // resolves it through the [lang] dynamic segment, not a literal folder.
     return NextResponse.rewrite(
-        new URL(`${pathname}${search}`, request.url)
+        new URL(`${pathname}${search}`, request.url),
+        { request: { headers: requestHeaders } }
     );
 }
 

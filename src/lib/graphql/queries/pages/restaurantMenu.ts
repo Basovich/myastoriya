@@ -8,46 +8,20 @@ export const RESTAURANT_MENU_QUERY = `
       products {
         id
         name
-        slug
         cost
         oldCost
         available
         portionSize
-        isSpicy
         text
-        specifications {
-          name
-          values
-        }
-        dishSpecifics {
-          key
-          name
-        }
-        image {
-          url {
-            grid2x
-            main2x
-          }
-          alt
-          title
-        }
         images {
           url {
-            grid2x
             main2x
           }
-          alt
-          title
         }
       }
     }
   }
 `;
-
-export interface DishSpecific {
-  key: string;
-  name: string;
-}
 
 export interface Modifier {
   id: string;
@@ -63,31 +37,21 @@ export interface ModifierGroup {
 
 export interface ProductImage {
   url: {
-    grid2x: string | null;
+    grid2x?: string | null;
     main2x: string | null;
   };
-  alt: string | null;
-  title: string | null;
-}
-
-export interface ProductSpecification {
-  name: string;
-  values: string[];
+  alt?: string | null;
+  title?: string | null;
 }
 
 export interface RestaurantProduct {
   id: string;
   name: string;
-  slug: string;
   cost: number;
   oldCost: number;
   available: number;
   portionSize: string | null;
-  isSpicy: boolean;
   text: string | null;
-  specifications: ProductSpecification[] | null;
-  dishSpecifics: DishSpecific[];
-  image: ProductImage | null;
   images: ProductImage[] | null;
   modifierGroups: ModifierGroup[];
 }

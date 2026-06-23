@@ -9,26 +9,14 @@ interface StoreMenuProductCardProps {
     product: RestaurantProduct;
 }
 
-const SpicyIcon = () => (
-    <div className={s.spicyBadge} title="Гостра страва">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C11.5 3.5 10 5.5 8 7C6 8.5 4.5 10.5 4.1 13C3.5 16.5 6 20 9.5 20.8C13 21.6 16.5 19.5 17.5 16C18.5 12.5 16.5 9 14.5 7.5C13.5 6.7 12.8 5.5 12.5 4.2C12.3 3.5 12.1 2.8 12 2Z" fill="#E30613" />
-            <path d="M12.5 2C13 3 14 3.5 14.5 3C15 2.5 14.5 1.5 14 1" stroke="#2D9A47" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-    </div>
-);
-
 const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) => {
     const isOutOfStock = product.available === 0;
     const hasDiscount = product.oldCost > product.cost;
     
     // Resolve image URL (using product.images[0] as fallback, then placeholder)
-    const imgUrl = product.image?.url?.main2x 
-        || product.image?.url?.grid2x 
-        || product.images?.[0]?.url?.main2x 
-        || product.images?.[0]?.url?.grid2x 
+    const imgUrl = product.images?.[0]?.url?.main2x 
         || '/images/product-placeholder.svg';
-    const altText = product.image?.alt || product.images?.[0]?.alt || product.name;
+    const altText = product.name;
 
     // Helper to strip HTML tags and decode HTML entities
     const stripHtml = (html: string) => {
@@ -71,16 +59,11 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
         }
     }
 
-    // 3. Fallback to specifications
-    if (!weight && product.specifications) {
-        const weightSpec = product.specifications.find(sp =>
-            sp.name.toLowerCase().includes('вага') ||
-            sp.name.toLowerCase().includes('важ') ||
-            sp.name.toLowerCase().includes('вес') ||
-            sp.name.toLowerCase().includes("об'єм")
-        );
-        if (weightSpec && weightSpec.values.length > 0) {
-            weight = weightSpec.values[0].trim();
+    // 3. Fallback to portionSize
+    if (!weight && product.portionSize) {
+        const hasWeightUnit = /[гgкmшт]/i.test(product.portionSize);
+        if (hasWeightUnit) {
+            weight = product.portionSize;
         }
     }
 
@@ -141,8 +124,6 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
                     className={s.productImg}
                 />
                 
-                {product.isSpicy && <SpicyIcon />}
-                
                 {isOutOfStock && (
                     <div className={s.unavailableBadge}>Немає в наявності</div>
                 )}
@@ -166,16 +147,6 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
                 <div className={s.footerRow}>
                     {weight && (
                         <span className={s.weightText}>{weight}</span>
-                    )}
-                    
-                    {product.dishSpecifics && product.dishSpecifics.length > 0 && (
-                        <div className={s.specifics}>
-                            {product.dishSpecifics.map(spec => (
-                                <span key={spec.key} className={s.specBadge}>
-                                    {spec.name}
-                                </span>
-                            ))}
-                        </div>
                     )}
                 </div>
             </div>
