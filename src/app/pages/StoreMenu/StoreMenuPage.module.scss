@@ -81,6 +81,10 @@
     gap: 16px;
     padding-top: 24px;
 
+    @media (min-width: 680px) {
+        grid-template-columns: 1fr 1fr;
+    }
+
     @media (min-width: 1024px) {
         grid-template-columns: 1fr;
         gap: 24px;

@@ -41,7 +41,13 @@ const isDrinksOrWines = (name: string): boolean => {
 };
 
 const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initialMenu = [] }) => {
-    const resolvedMenu = initialMenu;
+    // Filter out products that are not available (available === 0)
+    const resolvedMenu = initialMenu
+        .map(cat => ({
+            ...cat,
+            products: cat.products.filter(p => p.available > 0)
+        }))
+        .filter(cat => cat.products.length > 0);
     // Filter categories to only show food in the standard list
     const foodCategories = resolvedMenu.filter(cat => !isDrinksOrWines(cat.name));
 
