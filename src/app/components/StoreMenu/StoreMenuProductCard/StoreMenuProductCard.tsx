@@ -1,17 +1,40 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import s from './StoreMenuProductCard.module.scss';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import { RestaurantProduct } from '@/lib/graphql/queries/pages/restaurantMenu';
 
 interface StoreMenuProductCardProps {
     product: RestaurantProduct;
 }
 
+const translations = {
+    ua: {
+        showMore: 'Показати все',
+        showLess: 'Приховати',
+    },
+    ru: {
+        showMore: 'Показать все',
+        showLess: 'Скрыть',
+    },
+    en: {
+        showMore: 'Show all',
+        showLess: 'Hide',
+    },
+};
+
 const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) => {
     const isOutOfStock = product.available === 0;
     const hasDiscount = product.oldCost > product.cost;
+    const params = useParams();
+    const lang = (params?.lang as string) || 'ua';
+    const t = translations[lang as keyof typeof translations] || translations.ua;
+
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [showButton, setShowButton] = useState(false);
+    const descRef = useRef<HTMLParagraphElement>(null);
     
     // Resolve image URL (using product.images[0] as fallback, then placeholder)
     const imgUrl = product.images?.[0]?.url?.main2x 
@@ -109,6 +132,19 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
         cleanDescription = desc;
     }
 
+    useEffect(() => {
+        const checkOverflow = () => {
+            if (descRef.current && !isExpanded) {
+                const { scrollHeight, clientHeight } = descRef.current;
+                setShowButton(scrollHeight > clientHeight);
+            }
+        };
+
+        checkOverflow();
+        window.addEventListener('resize', checkOverflow);
+        return () => window.removeEventListener('resize', checkOverflow);
+    }, [cleanDescription, isExpanded]);
+
     // Portion and weight rendering using unit/multiplier
     let portionText = '';
     let calculatedWeight = '';
@@ -178,7 +214,23 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
                 </div>
 
                 {cleanDescription && (
-                    <p className={s.description}>{cleanDescription}</p>
+                    <>
+                        <p 
+                            ref={descRef} 
+                            className={`${s.description} ${!isExpanded ? s.clamped : ''}`}
+                        >
+                            {cleanDescription}
+                        </p>
+                        {showButton && (
+                            <button 
+                                type="button" 
+                                className={s.toggleBtn} 
+                                onClick={() => setIsExpanded(!isExpanded)}
+                            >
+                                {isExpanded ? t.showLess : t.showMore}
+                            </button>
+                        )}
+                    </>
                 )}
             </div>
         </div>
