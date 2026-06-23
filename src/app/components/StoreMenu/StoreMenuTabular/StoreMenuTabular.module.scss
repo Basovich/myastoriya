@@ -1,10 +1,24 @@
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 40px 16px;
   
   @media (min-width: 768px) {
-    padding: 60px 24px;
+    padding: 60px 40px;
+  }
+
+  @media (min-width: 1280px) {
+    padding-left: calc((100% - 1200px) / 2);
+    padding-right: calc((100% - 1200px) / 2);
+  }
+
+  @media (min-width: 1360px) {
+    padding-left: calc((100% - 1280px) / 2);
+    padding-right: calc((100% - 1280px) / 2);
+  }
+
+  @media (min-width: 1440px) {
+    padding-left: calc((100% - 1300px) / 2);
+    padding-right: calc((100% - 1300px) / 2);
   }
 }
 
@@ -16,10 +30,14 @@
   }
 }
 
+.headerWrap {
+  margin-bottom: 30px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 40px;
+  gap: 20px;
   
   @media (min-width: 1024px) {
     grid-template-columns: 1fr 1fr;
@@ -30,21 +48,6 @@
 .column {
   display: flex;
   flex-direction: column;
-}
-
-.subheading {
-  font-size: 16px;
-  font-weight: 800;
-  color: #1a1a1a;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin: 0 0 20px 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #f0f0f0;
-  
-  span {
-    color: #e30613;
-  }
 }
 
 .list {
@@ -71,10 +74,14 @@
   color: #1a1a1a;
   text-transform: uppercase;
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
   flex: 0 1 auto;
+  
+  @media (min-width: 1024px) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .leader {

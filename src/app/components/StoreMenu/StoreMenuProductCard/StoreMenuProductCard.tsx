@@ -180,12 +180,6 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
                 {cleanDescription && (
                     <p className={s.description}>{cleanDescription}</p>
                 )}
-                
-                <div className={s.footerRow}>
-                    {calculatedWeight && (
-                        <span className={s.weightText}>{calculatedWeight}</span>
-                    )}
-                </div>
             </div>
         </div>
     );

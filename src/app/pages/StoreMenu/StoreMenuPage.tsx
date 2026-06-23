@@ -41,30 +41,7 @@ const isDrinksOrWines = (name: string): boolean => {
 };
 
 const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initialMenu = [] }) => {
-    // Resolve menu data (use API dynamic menu if available, otherwise map mock data to API structure)
-    const resolvedMenu: RestaurantMenuCategory[] = (initialMenu && initialMenu.length > 0)
-        ? initialMenu
-        : menuData.categories.map(cat => ({
-            id: cat.id,
-            name: cat.title,
-            products: menuData.products.filter(p => p.categoryId === cat.id).map(p => ({
-                id: String(p.id),
-                name: p.title,
-                cost: p.price,
-                oldCost: p.price,
-                available: 1,
-                portionSize: p.weight,
-                unit: p.unit || null,
-                multiplier: p.weight ? parseFloat(p.weight) / 1000 : null,
-                text: null,
-                images: p.image ? [{
-                    url: { main2x: p.image },
-                    alt: p.title,
-                    title: p.title
-                }] : null,
-                modifierGroups: []
-            }))
-        }));
+    const resolvedMenu = initialMenu;
     // Filter categories to only show food in the standard list
     const foodCategories = resolvedMenu.filter(cat => !isDrinksOrWines(cat.name));
 
