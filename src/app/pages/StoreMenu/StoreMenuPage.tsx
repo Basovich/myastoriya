@@ -54,6 +54,8 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initial
                 oldCost: p.price,
                 available: 1,
                 portionSize: p.weight,
+                unit: p.unit || null,
+                multiplier: p.weight ? parseFloat(p.weight) / 1000 : null,
                 text: null,
                 images: p.image ? [{
                     url: { main2x: p.image },

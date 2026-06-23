@@ -1,6 +1,7 @@
 import React from "react";
 import s from "./StoreMenuTabular.module.scss";
 import { RestaurantMenuCategory } from "@/lib/graphql/queries/pages/restaurantMenu";
+import SectionHeader from "@/app/components/ui/SectionHeader/SectionHeader";
 
 interface StoreMenuTabularProps {
     initialMenu?: RestaurantMenuCategory[];
@@ -84,6 +85,28 @@ const MOCK_DRINKS: TabularSection = {
     ]
 };
 
+const getTabularPortionText = (p: { portionSize: string | null; unit: string | null; multiplier: number | null }) => {
+    if (p.unit !== null && p.unit !== undefined && p.multiplier !== null && p.multiplier !== undefined) {
+        const unitLower = p.unit.trim().toLowerCase();
+        const multiplier = p.multiplier;
+        
+        if (unitLower === '100 г' || unitLower === '100г') {
+            return multiplier > 0 ? `${Math.round(multiplier * 1000)} г` : '';
+        }
+        if (unitLower === '100 мл') {
+            return multiplier > 0 ? `${Math.round(multiplier * 1000)} мл` : '';
+        }
+        if (unitLower === 'шт' || unitLower === '1 шт') {
+            return '1 шт';
+        }
+        if (unitLower === 'уп' || unitLower === 'упаковка') {
+            return '1 уп';
+        }
+        return `1 ${p.unit}`;
+    }
+    return p.portionSize || '';
+};
+
 export default function StoreMenuTabular({ initialMenu = [] }: StoreMenuTabularProps) {
     // 1. Resolve Wine Data from API or Fallback
     const apiWineCategory = initialMenu.find(cat => {
@@ -94,11 +117,14 @@ export default function StoreMenuTabular({ initialMenu = [] }: StoreMenuTabularP
     let wineSection: TabularSection = MOCK_WINES;
     if (apiWineCategory && apiWineCategory.products.length > 0) {
         // Map API products to TabularItems
-        const allWines: TabularItem[] = apiWineCategory.products.map(p => ({
-            name: p.name,
-            description: p.portionSize || undefined,
-            price: p.cost
-        }));
+        const allWines: TabularItem[] = apiWineCategory.products.map(p => {
+            const portion = getTabularPortionText(p);
+            return {
+                name: p.name,
+                description: portion || undefined,
+                price: p.cost
+            };
+        });
 
         // Split wines into two columns (100ml / 750ml or simple half/half)
         const midIndex = Math.ceil(allWines.length / 2);
@@ -125,11 +151,14 @@ export default function StoreMenuTabular({ initialMenu = [] }: StoreMenuTabularP
 
     let drinksSection: TabularSection = MOCK_DRINKS;
     if (apiDrinksCategory && apiDrinksCategory.products.length > 0) {
-        const allDrinks: TabularItem[] = apiDrinksCategory.products.map(p => ({
-            name: p.name + (p.portionSize ? ` / ${p.portionSize}` : ""),
-            description: undefined,
-            price: p.cost
-        }));
+        const allDrinks: TabularItem[] = apiDrinksCategory.products.map(p => {
+            const portion = getTabularPortionText(p);
+            return {
+                name: p.name + (portion ? ` / ${portion}` : ""),
+                description: undefined,
+                price: p.cost
+            };
+        });
 
         const midIndex = Math.ceil(allDrinks.length / 2);
         drinksSection = {
@@ -166,14 +195,7 @@ export default function StoreMenuTabular({ initialMenu = [] }: StoreMenuTabularP
         <div className={s.container}>
             {sections.map((section, secIdx) => (
                 <div key={secIdx} className={s.section}>
-                    <div className={s.titleBlock}>
-                        <h3 className={s.title}>{section.title}</h3>
-                        <div className={s.dots}>
-                            <span />
-                            <span />
-                            <span />
-                        </div>
-                    </div>
+                    <SectionHeader title={section.title} withDots={true} />
                     
                     <div className={s.grid}>
                         {section.columns.map((col, colIdx) => (

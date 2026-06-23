@@ -13,6 +13,8 @@ export const RESTAURANT_MENU_QUERY = `
         available
         portionSize
         text
+        unit
+        multiplier
         images {
           url {
             main2x
@@ -54,6 +56,8 @@ export interface RestaurantProduct {
   text: string | null;
   images: ProductImage[] | null;
   modifierGroups: ModifierGroup[];
+  unit: string | null;
+  multiplier: number | null;
 }
 
 export interface RestaurantMenuCategory {

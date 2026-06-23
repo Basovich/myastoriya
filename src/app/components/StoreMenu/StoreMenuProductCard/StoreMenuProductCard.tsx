@@ -109,10 +109,45 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
         cleanDescription = desc;
     }
 
-    // Portion text rendering: default to "(1 порція)" if portionSize is empty
-    const portionText = product.portionSize
-        ? (product.portionSize.startsWith('(') ? product.portionSize : `(${product.portionSize})`)
-        : '(1 порція)';
+    // Portion and weight rendering using unit/multiplier
+    let portionText = '';
+    let calculatedWeight = '';
+
+    if (product.unit !== null && product.unit !== undefined && product.multiplier !== null && product.multiplier !== undefined) {
+        const normalizedUnit = product.unit.trim().toLowerCase();
+        const multiplier = product.multiplier;
+
+        if (normalizedUnit === '100 г' || normalizedUnit === '100г') {
+            portionText = '(100 г)';
+            if (multiplier > 0) {
+                calculatedWeight = `${Math.round(multiplier * 1000)} г`;
+            }
+        } else if (normalizedUnit === '100 мл') {
+            portionText = '(100 мл)';
+            if (multiplier > 0) {
+                calculatedWeight = `${Math.round(multiplier * 1000)} мл`;
+            }
+        } else if (normalizedUnit === 'шт' || normalizedUnit === '1 шт') {
+            portionText = '(1 шт)';
+        } else if (normalizedUnit === 'уп' || normalizedUnit === 'упаковка') {
+            portionText = '(1 уп)';
+        } else if (normalizedUnit) {
+            portionText = `(1 ${product.unit})`;
+        }
+    }
+
+    // 3. Fallback/use calculated weight
+    if (!weight && calculatedWeight) {
+        weight = calculatedWeight;
+    }
+
+    // // 4. Fallback to portionSize (if any, though it's null on backend)
+    if (!weight && product.portionSize) {
+        const hasWeightUnit = /[гgкmшт]/i.test(product.portionSize);
+        if (hasWeightUnit) {
+            weight = product.portionSize;
+        }
+    }
 
     return (
         <div className={`${s.card} ${isOutOfStock ? s.unavailable : ''}`}>
@@ -137,7 +172,9 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
                     {hasDiscount && (
                         <span className={s.oldPrice}>{product.oldCost} ₴</span>
                     )}
-                    <span className={s.unit}>{portionText}</span>
+                    {portionText && (
+                        <span className={s.unit}>{portionText}</span>
+                    )}
                 </div>
 
                 {cleanDescription && (
@@ -145,8 +182,8 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
                 )}
                 
                 <div className={s.footerRow}>
-                    {weight && (
-                        <span className={s.weightText}>{weight}</span>
+                    {calculatedWeight && (
+                        <span className={s.weightText}>{calculatedWeight}</span>
                     )}
                 </div>
             </div>

@@ -16,37 +16,6 @@
   }
 }
 
-.titleBlock {
-  margin-bottom: 30px;
-  text-align: center;
-}
-
-.title {
-  font-size: 24px;
-  font-weight: 800;
-  color: #1a1a1a;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0 0 8px 0;
-  
-  @media (min-width: 768px) {
-    font-size: 32px;
-  }
-}
-
-.dots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  
-  span {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: #e30613;
-  }
-}
-
 .grid {
   display: grid;
   grid-template-columns: 1fr;
