@@ -12,7 +12,7 @@ import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import Button from "../../../components/ui/Button/Button";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import Image from "next/image";
-import { type PopularCategory, type Product, resolveProductImageUrl } from "@/lib/graphql";
+import { type PopularCategory, type Product, resolveProductImageUrl, getProductsApi } from "@/lib/graphql";
 
 
 interface ProductsProps {
@@ -46,22 +46,10 @@ export default function Products({ dict, categories, initialProducts, initialHas
 
             setLoading(true);
             try {
-                const response = await fetch('/api/products', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Content-Language': locale === 'ru' ? 'ru_RU' : 'uk_UA'
-                    },
-                    body: JSON.stringify({ 
-                        categoryId: parseInt(categoryId), 
-                        limit: 8,
-                        page: page
-                    })
-                });
-                
-                if (!response.ok) throw new Error("Failed to fetch products through proxy");
-                
-                const data = await response.json();
+                const data = await getProductsApi(
+                    { categoryId: parseInt(categoryId), limit: 8, page },
+                    locale,
+                );
                 
                 if (isMounted) {
                     if (page === 1) {
@@ -100,6 +88,7 @@ export default function Products({ dict, categories, initialProducts, initialHas
     useEffect(() => {
         setPage(1);
     }, [activeTab]);
+
 
     const handleLoadMore = () => {
         if (!loading && hasMore) {

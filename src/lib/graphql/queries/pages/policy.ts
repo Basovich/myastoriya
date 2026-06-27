@@ -13,7 +13,7 @@ export interface ContractOffer {
 }
 
 export async function getContractOfferApi(): Promise<ContractOffer | null> {
-    const response = await gqlRequest<{ contractOffer: ContractOffer }>(CONTRACT_OFFER_QUERY);
+    const response = await gqlRequest<{ contractOffer: ContractOffer }>(CONTRACT_OFFER_QUERY, {}, { public: true });
     return response.contractOffer || null;
 }
 
@@ -30,7 +30,7 @@ export interface PrivacyPolicy {
 }
 
 export async function getPrivacyPolicyApi(): Promise<PrivacyPolicy | null> {
-    const response = await gqlRequest<{ privacyPolicy: PrivacyPolicy }>(PRIVACY_POLICY_QUERY);
+    const response = await gqlRequest<{ privacyPolicy: PrivacyPolicy }>(PRIVACY_POLICY_QUERY, {}, { public: true });
     return response.privacyPolicy || null;
 }
 
@@ -47,6 +47,6 @@ export interface TermsOfUse {
 }
 
 export async function getTermsOfUseApi(): Promise<TermsOfUse | null> {
-    const response = await gqlRequest<{ termsOfUse: TermsOfUse }>(TERMS_OF_USE_QUERY);
+    const response = await gqlRequest<{ termsOfUse: TermsOfUse }>(TERMS_OF_USE_QUERY, {}, { public: true });
     return response.termsOfUse || null;
 }

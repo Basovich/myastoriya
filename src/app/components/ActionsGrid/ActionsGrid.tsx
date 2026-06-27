@@ -10,7 +10,7 @@ import AppLink from "../ui/AppLink/AppLink";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
-import { type Sale } from "@/lib/graphql";
+import { type Sale, getSalesApi, getSpecialsApi } from "@/lib/graphql";
 
 interface ActionItem {
     id: number;
@@ -111,15 +111,7 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
             setLoading(true);
             try {
                 const nextPage = page + 1;
-                const res = await fetch("/api/specials", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Content-Language": lang === "ru" ? "ru_RU" : "uk_UA"
-                    },
-                    body: JSON.stringify({ page: nextPage, limit: 12 }),
-                });
-                const data = await res.json();
+                const data = await getSpecialsApi(12, nextPage, lang);
 
                 if (data.data && data.data.length > 0) {
                     const newItems: ActionItem[] = data.data.map((special: any) => {
@@ -156,16 +148,7 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
         setLoading(true);
         try {
             const nextPage = page + 1;
-            const res = await fetch("/api/sales", {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Content-Language": lang === "ru" ? "ru_RU" : "uk_UA"
-                },
-                body: JSON.stringify({ page: nextPage, limit: 12 }),
-            });
-            const data = await res.json();
-            console.log("[ActionsGrid Debug] Response:", data);
+            const data = await getSalesApi(12, nextPage, lang, { cache: 'no-store' });
 
             if (data.data && data.data.length > 0) {
                 const newItems: ActionItem[] = data.data.map((sale: any) => ({
@@ -181,7 +164,6 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
                 setItems(prev => [...prev, ...newItems]);
                 setHasMore(data.has_more_pages);
                 setPage(nextPage);
-                console.log("[ActionsGrid Debug] Added items:", newItems.length);
             } else {
                 setHasMore(false);
             }

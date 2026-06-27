@@ -64,7 +64,7 @@ export async function getReviewsApi(lang?: string): Promise<HomeReview[]> {
     const data = await gqlRequest<ProductReviewsResponse>(
         PRODUCT_REVIEWS_QUERY,
         undefined,
-        { next: { revalidate: 3600 }, lang }
+        { next: { revalidate: 3600 }, lang, public: true }
     );
     // User wants only the last 8 reviews. 
     // Usually the API returns them ordered, but we can slice just in case or if it returns more.

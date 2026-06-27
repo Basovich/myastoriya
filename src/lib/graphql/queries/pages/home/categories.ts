@@ -56,7 +56,7 @@ export async function getPopularCategoriesApi(lang?: string): Promise<PopularCat
     const data = await gqlRequest<{ popularCategories: PopularCategory[] }>(
         POPULAR_CATEGORIES_QUERY,
         undefined,
-        { next: { revalidate: 3600 }, lang },
+        { next: { revalidate: 3600 }, lang, public: true },
     );
     const categories = data.popularCategories ?? [];
     

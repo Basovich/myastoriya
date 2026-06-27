@@ -1,7 +1,6 @@
 const isServer = typeof window === 'undefined';
-const GQL_ENDPOINT = isServer 
-    ? 'https://dev-api.myastoriya.com.ua/graphql' 
-    : '/api/graphql';
+const GQL_ENDPOINT_DIRECT = 'https://dev-api.myastoriya.com.ua/graphql';
+const GQL_ENDPOINT_PROXY = '/api/graphql';
 
 export interface GqlError {
     message: string;
@@ -38,6 +37,12 @@ interface RequestOptions {
     _retryCount?: number;
     /** Internal retry flag for token refresh */
     _isRetry?: boolean;
+    /**
+     * If true, client-side requests go directly to the backend,
+     * bypassing the /api/graphql proxy. Use for public (unauthenticated)
+     * queries that don't need the httpOnly access_token cookie.
+     */
+    public?: boolean;
 }
 
 const MAX_RETRIES = 5;
@@ -127,9 +132,15 @@ export async function gqlRequest<T>(
         delete headers['Content-Type']; // Let browser set boundary
     }
 
+    // Public requests bypass the proxy and go directly to the backend.
+    // Authenticated requests use the proxy so it can inject the httpOnly cookie token.
+    const endpoint = isServer
+        ? GQL_ENDPOINT_DIRECT
+        : (options?.public ? GQL_ENDPOINT_DIRECT : GQL_ENDPOINT_PROXY);
+
     let text = "";
     try {
-        const res = await fetch(GQL_ENDPOINT, {
+        const res = await fetch(endpoint, {
             method: 'POST',
             headers,
             body,
@@ -145,7 +156,7 @@ export async function gqlRequest<T>(
                 // Add jitter: base delay * retry + random(0-500ms)
                 const delay = (RETRY_DELAY_MS * nextRetry) + Math.floor(Math.random() * 500);
                 
-                console.warn(`[GQL] ${res.status} error on ${GQL_ENDPOINT}. Retrying in ${delay}ms... (${nextRetry}/${MAX_RETRIES})`);
+                console.warn(`[GQL] ${res.status} error on ${endpoint}. Retrying in ${delay}ms... (${nextRetry}/${MAX_RETRIES})`);
                 
                 await new Promise(resolve => setTimeout(resolve, delay));
                 return gqlRequest(query, variables, { ...options, _retryCount: nextRetry });

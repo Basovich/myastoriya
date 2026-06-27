@@ -134,7 +134,7 @@ export async function getDeliveriesApi(
     const data = await gqlRequest<{ deliveries: Delivery[] }>(
         DELIVERIES_QUERY,
         { type, localityId },
-        { lang }
+        { lang, public: true }
     );
     return data.deliveries;
 }
@@ -147,7 +147,7 @@ export async function getDeliveryTimesApi(
     const data = await gqlRequest<{ deliveryTimes: string[] }>(
         DELIVERY_TIMES_QUERY,
         { id, date },
-        { lang }
+        { lang, public: true }
     );
     return data.deliveryTimes;
 }
@@ -162,7 +162,7 @@ export async function getWarehousesApi(
     const data = await gqlRequest<{ warehouses: WarehousePagination }>(
         WAREHOUSES_QUERY,
         { localityId, search, limit, page },
-        { lang }
+        { lang, public: true }
     );
     return data.warehouses;
 }

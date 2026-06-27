@@ -54,7 +54,7 @@ export async function getSlidesApi(slideType: string = "main", lang?: string): P
     const data = await gqlRequest<{ slides: Slide[] }>(
         SLIDES_QUERY,
         { slide: slideType },
-        { next: { revalidate: 3600 }, lang },
+        { next: { revalidate: 3600 }, lang, public: true },
     );
     return data.slides ?? [];
 }

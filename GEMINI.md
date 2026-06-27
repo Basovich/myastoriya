@@ -194,6 +194,37 @@ export default function НазваКомпонента({ }: Props) {
 
 ---
 
+## GraphQL-проксі `/api/graphql`
+
+На клієнті всі GraphQL-запити йдуть **не напряму** на бекенд, а через внутрішній Next.js API-роут:
+
+```
+Браузер → /api/graphql (src/app/api/graphql/route.ts) → https://dev-api.myastoriya.com.ua/graphql
+```
+
+На **сервері** (SSR, Server Actions) — запити йдуть напряму на бекенд.
+
+### Навіщо проксі?
+
+- **Авторизація:** токен (`access_token`) зберігається в `httpOnly` cookie. JavaScript у браузері **не може** його прочитати. Проксі читає куку на сервері і сам додає `Authorization: Bearer ...` до запиту на бекенд.
+- **Безпека:** токен не потрапляє в Redux/localStorage — захист від XSS.
+- **Приховування адреси бекенду:** клієнт бачить лише `/api/graphql`.
+
+### ❌ Не прибирати проксі
+
+Навіть якщо бекенд пофіксив CORS — **проксі потрібен**. Без нього авторизовані запити з клієнта (wishlist, cart, orders, profile тощо) будуть отримувати `Unauthorized`, бо токен з httpOnly cookie не буде передаватись.
+
+### Як це виглядає в коді
+
+Файл [`src/lib/graphql/client.ts`](src/lib/graphql/client.ts):
+```ts
+const GQL_ENDPOINT = isServer 
+    ? 'https://dev-api.myastoriya.com.ua/graphql'  // сервер — напряму
+    : '/api/graphql';                               // клієнт — через проксі
+```
+
+---
+
 ## Заборонено
 
 - ❌ `any` у TypeScript

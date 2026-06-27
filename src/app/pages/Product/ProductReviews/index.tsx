@@ -7,6 +7,7 @@ import Button from '@/app/components/ui/Button/Button';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import Image from 'next/image';
 import ReviewModal from '@/app/components/ReviewModal';
+import { gqlRequest } from '@/lib/graphql';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -35,7 +36,7 @@ interface ProductReviewsResponse {
 }
 
 // ---------------------------------------------------------------------------
-// API helpers (client-side, through /api/graphql proxy)
+// API helpers (client-side, direct gqlRequest)
 // ---------------------------------------------------------------------------
 
 const PRODUCT_REVIEWS_QUERY = /* GraphQL */ `
@@ -71,32 +72,23 @@ async function fetchProductReviews(
     limit: number,
     page: number,
 ): Promise<ProductReviewsResponse> {
-    const res = await fetch('/api/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            query: PRODUCT_REVIEWS_QUERY,
-            variables: { productId, limit, page },
-        }),
-        cache: 'no-store',
-    });
-    const json = await res.json() as { data?: { productReviews?: ProductReviewsResponse } };
-    return json.data?.productReviews ?? { data: [], per_page: limit, current_page: 1, has_more_pages: false };
+    const data = await gqlRequest<{ productReviews: ProductReviewsResponse }>(
+        PRODUCT_REVIEWS_QUERY,
+        { productId, limit, page },
+        { cache: 'no-store', public: true },
+    );
+    return data.productReviews ?? { data: [], per_page: limit, current_page: 1, has_more_pages: false };
 }
 
 async function fetchReviewsCount(productId: number): Promise<number> {
-    const res = await fetch('/api/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            query: PRODUCT_REVIEWS_COUNT_QUERY,
-            variables: { productId },
-        }),
-        cache: 'no-store',
-    });
-    const json = await res.json() as { data?: { productReviewsCount?: number } };
-    return json.data?.productReviewsCount ?? 0;
+    const data = await gqlRequest<{ productReviewsCount: number }>(
+        PRODUCT_REVIEWS_COUNT_QUERY,
+        { productId },
+        { cache: 'no-store', public: true },
+    );
+    return data.productReviewsCount ?? 0;
 }
+
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -280,7 +280,7 @@ export async function getBlogsApi(filter?: BlogsFilter, lang?: string): Promise<
             limit: filter?.limit ?? null,
             page: filter?.page ?? null,
         },
-        { next: { revalidate: 60 }, lang },
+        { next: { revalidate: 60 }, lang, public: true },
     );
     return data.blogs;
 }
@@ -289,7 +289,7 @@ export async function getBlogBySlugApi(slug: string, lang?: string): Promise<Blo
     const data = await gqlRequest<{ blog: BlogPost | null }>(
         BLOG_BY_SLUG_QUERY,
         { slug },
-        { next: { revalidate: 60 }, lang },
+        { next: { revalidate: 60 }, lang, public: true },
     );
     return data.blog;
 }
@@ -299,7 +299,7 @@ export async function getBlogTypesApi(lang?: string): Promise<BlogType[]> {
         const data = await gqlRequest<{ blogTypes: BlogType[] }>(
             BLOG_TYPES_QUERY,
             {},
-            { next: { revalidate: 60 }, lang },
+            { next: { revalidate: 60 }, lang, public: true },
         );
         return data.blogTypes;
     } catch (error) {

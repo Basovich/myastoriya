@@ -41,7 +41,8 @@ export const GET_ORDERING_INFO_BLOCKS = `
 export async function getPolicyBlocksApi(lang: string): Promise<OrderingInfoBlock[]> {
     const data = await gqlRequest<OrderingInfoBlocksResponse>(GET_ORDERING_INFO_BLOCKS, { type: "payment" }, {
         lang,
-        next: { revalidate: 3600 }
+        next: { revalidate: 3600 },
+        public: true
     });
     return data.orderingInfoBlocks;
 }
@@ -49,7 +50,8 @@ export async function getPolicyBlocksApi(lang: string): Promise<OrderingInfoBloc
 export async function getDeliveryBlocksApi(lang: string): Promise<OrderingInfoBlock[]> {
     const data = await gqlRequest<OrderingInfoBlocksResponse>(GET_ORDERING_INFO_BLOCKS, { type: "delivery" }, {
         lang,
-        next: { revalidate: 3600 }
+        next: { revalidate: 3600 },
+        public: true
     });
     return data.orderingInfoBlocks;
 }

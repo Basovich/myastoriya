@@ -6,7 +6,7 @@ import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
 import ProductCardRow from "@/app/components/ui/ProductCardRow";
 import Button from "@/app/components/ui/Button/Button";
 import type { Product, ProductsResponse } from "@/lib/graphql";
-import { resolveProductImageUrl } from "@/lib/graphql";
+import { resolveProductImageUrl, getProductsApi } from "@/lib/graphql";
 import type { FilterStateInput } from "@/lib/graphql";
 import { Locale } from "@/i18n/config";
 import s from "../CatalogContent/CatalogContent.module.scss";
@@ -65,34 +65,14 @@ export default function CatalogProductsClient({
 
         try {
             const nextPage = currentPage + 1;
-            const headers: Record<string, string> = {
-                "Content-Type": "application/json",
-            };
-            if (lang === "ru") {
-                headers["Content-Language"] = "ru_RU";
-            } else {
-                headers["Content-Language"] = "uk_UA";
-            }
+            const newProductsRes = await getProductsApi({
+                categoryId,
+                limit: 12,
+                page: nextPage,
+                sort,
+                filter: activeFilters && activeFilters.length > 0 ? activeFilters : undefined,
+            }, lang);
 
-            const response = await fetch("/api/products", {
-                method: "POST",
-                headers,
-                body: JSON.stringify({
-                    categoryId,
-                    limit: 12,
-                    page: nextPage,
-                    sort,
-                    filter: activeFilters && activeFilters.length > 0 ? activeFilters : undefined,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to load products");
-            }
-
-            const newProductsRes: ProductsResponse = await response.json();
-            
-            // Append products
             setProducts((prev) => [...prev, ...newProductsRes.data]);
             setCurrentPage(nextPage);
             setHasMorePages(newProductsRes.has_more_pages);

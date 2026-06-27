@@ -7,7 +7,7 @@ import ProductCard from '../ui/ProductCard/ProductCard';
 import Breadcrumbs from '../ui/Breadcrumbs/Breadcrumbs';
 import CountdownTimer from '../ui/CountdownTimer/CountdownTimer';
 import { type Dictionary } from '@/i18n/types';
-import { type Sale, type Product, resolveProductImageUrl } from '@/lib/graphql';
+import { type Sale, type Product, resolveProductImageUrl, getProductsApi } from '@/lib/graphql';
 
 const PAGE_SIZE = 12;
 
@@ -146,22 +146,13 @@ export default function ActionDetail({
                     setLoading(true);
                     try {
                         const nextPage = page + 1;
-                        const res = await fetch('/api/products', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Content-Language': lang === 'ru' ? 'ru_RU' : 'uk_UA',
-                            },
-                            body: JSON.stringify({
-                                page: nextPage,
-                                saleId: parseInt(sale.id),
-                                limit: PAGE_SIZE,
-                            }),
-                        });
-                        const data = await res.json();
-                        if (data.items?.length) {
-                            setProducts((prev) => [...prev, ...data.items]);
-                            setHasMore(data.hasMore);
+                        const data = await getProductsApi(
+                            { saleId: parseInt(sale.id), limit: PAGE_SIZE, page: nextPage },
+                            lang,
+                        );
+                        if (data.data?.length) {
+                            setProducts((prev) => [...prev, ...data.data]);
+                            setHasMore(data.has_more_pages);
                             setPage(nextPage);
                         } else {
                             setHasMore(false);
@@ -179,6 +170,7 @@ export default function ActionDetail({
         observer.observe(sentinel);
         return () => observer.disconnect();
     }, [hasMore, loading, page, sale.id, lang]);
+
 
     const bannerDesktop = sale.bannerWeb?.desktop;
     const bannerLaptop = sale.bannerWeb?.laptop;

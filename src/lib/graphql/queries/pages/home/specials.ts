@@ -197,7 +197,7 @@ export async function getSpecialsApi(limit = 10, page = 1, lang?: string): Promi
     const data = await gqlRequest<SpecialsResponse>(
         SPECIALS_QUERY,
         { limit, page },
-        { next: { revalidate: 3600 }, lang }
+        { next: { revalidate: 3600 }, lang, public: true }
     );
     return data.specials;
 }
@@ -207,7 +207,7 @@ export async function getSpecialApi(id: string | number, lang?: string): Promise
         const data = await gqlRequest<{ special: Special | null }>(
             SPECIAL_BY_ID_QUERY,
             { id: parseInt(String(id)) },
-            { next: { revalidate: 3600 }, lang }
+            { next: { revalidate: 3600 }, lang, public: true }
         );
         return data.special;
     } catch (error) {

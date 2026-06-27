@@ -17,7 +17,7 @@ export interface SocialLink {
 }
 
 export async function getSocialLinksApi(): Promise<SocialLink[]> {
-    const response = await gqlRequest<{ socialLinks: SocialLink[] }>(SOCIAL_LINKS_QUERY);
+    const response = await gqlRequest<{ socialLinks: SocialLink[] }>(SOCIAL_LINKS_QUERY, {}, { public: true });
     return response.socialLinks || [];
 }
 
@@ -31,7 +31,7 @@ export async function subscribeApi(email: string, lang?: string): Promise<boolea
     const data = await gqlRequest<{ subscribe: boolean }>(
         SUBSCRIBE_MUTATION,
         { email },
-        { lang, cache: 'no-store' }
+        { lang, cache: 'no-store', public: true }
     );
     return data.subscribe;
 }

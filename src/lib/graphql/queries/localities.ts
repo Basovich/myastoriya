@@ -61,7 +61,7 @@ export async function autoDetectLocalityApi(lat?: number, lng?: number, lang?: s
     const data = await gqlRequest<{ autoDetectLocality: Locality }>(
         AUTO_DETECT_LOCALITY_MUTATION,
         { lat, lng },
-        { lang }
+        { lang, public: true }
     );
     return data.autoDetectLocality;
 }
@@ -75,7 +75,7 @@ export async function getLocalitiesApi(
     const data = await gqlRequest<LocalitiesResponse>(
         LOCALITIES_QUERY,
         { name, limit, page },
-        { lang }
+        { lang, public: true }
     );
     return data.localities;
 }
@@ -84,7 +84,7 @@ export async function selectLocalityApi(id: number, lang?: string): Promise<Loca
     const data = await gqlRequest<{ selectLocality: Locality }>(
         SELECT_LOCALITY_MUTATION,
         { id },
-        { lang }
+        { lang, public: true }
     );
     return data.selectLocality;
 }
@@ -93,7 +93,7 @@ export async function getSelectedLocalityApi(lang?: string): Promise<Locality | 
     const data = await gqlRequest<{ selectedLocality: Locality | null }>(
         SELECTED_LOCALITY_QUERY,
         undefined,
-        { lang }
+        { lang, public: true }
     );
     return data.selectedLocality;
 }

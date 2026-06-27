@@ -77,6 +77,6 @@ export const getRestaurantMenuApi = async (
   return await gqlRequest<RestaurantMenuResponse>(
     RESTAURANT_MENU_QUERY,
     { shopId },
-    { lang, next: { revalidate: 300 } }
+    { lang, next: { revalidate: 300 }, public: true }
   );
 };

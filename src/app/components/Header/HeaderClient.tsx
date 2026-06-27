@@ -8,6 +8,7 @@ import MobileHeader from "./MobileHeader/MobileHeaderClient";
 import DesktopHeader from "./DesktopHeader/DesktopHeaderClient";
 import CitySelector from "./DesktopHeader/MainBar/CitySelector";
 import { ProductCategory } from "@/lib/graphql/queries/products";
+import { getCatalogTreeApi } from "@/lib/graphql";
 
 interface HeaderProps {
     lang: Locale;
@@ -30,12 +31,7 @@ export default function HeaderClient({ lang, initialCategories }: HeaderProps) {
         if (isMenuPage) return;
         if (initialCategories && initialCategories.length > 0) return;
 
-        fetch("/api/catalog/tree", {
-            headers: {
-                'content-language': lang === 'ru' ? 'ru_RU' : 'uk_UA'
-            }
-        })
-            .then(res => res.json())
+        getCatalogTreeApi(lang)
             .then(data => {
                 if (Array.isArray(data)) {
                     setCategories(getRootCategories(data));

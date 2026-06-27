@@ -99,7 +99,7 @@ export async function getSalesApi(
     const data = await gqlRequest<{ sales: SalesResponse }>(
         SALES_QUERY,
         { limit, page },
-        { next: { revalidate: 3600 }, lang, ...options },
+        { next: { revalidate: 3600 }, lang, public: true, ...options },
     );
     return data.sales;
 }
@@ -143,7 +143,7 @@ export async function getSaleApi(id: string, lang?: string): Promise<Sale | null
         const data = await gqlRequest<{ sale: Sale | null }>(
             SALE_BY_ID_QUERY,
             { id },
-            { next: { revalidate: 3600 }, lang },
+            { next: { revalidate: 3600 }, lang, public: true },
         );
         return data.sale;
     } catch (error) {

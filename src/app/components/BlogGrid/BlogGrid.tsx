@@ -10,7 +10,7 @@ import Pagination from "../ui/Pagination/Pagination";
 import Tabs from "../ui/Tabs/Tabs";
 import SubscribeBanner from "../SubscribeBanner/SubscribeBanner";
 import s from "./BlogGrid.module.scss";
-import { type BlogPost, type BlogType, resolveBlogImageUrl } from "@/lib/graphql";
+import { type BlogPost, type BlogType, resolveBlogImageUrl, getBlogsApi } from "@/lib/graphql";
 
 type TabType = "all" | string;
 
@@ -63,20 +63,12 @@ export default function BlogGrid({
         setLoading(true);
         try {
             const nextPage = currentPage + 1;
-            const res = await fetch("/api/blogs", {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Content-Language": lang === "ru" ? "ru_RU" : "uk_UA"
-                },
-                body: JSON.stringify({ page: nextPage, typeSlug: activeTypeSlug ?? null }),
-            });
-            const data = await res.json();
-            if (data.items?.length) {
-                setItems((prev) => [...prev, ...data.items]);
-                setHasMore(data.hasMore);
+            const result = await getBlogsApi({ page: nextPage, typeSlug: activeTypeSlug ?? null }, lang);
+            if (result.data?.length) {
+                setItems((prev) => [...prev, ...result.data]);
+                setHasMore(result.has_more_pages);
                 setCurrentPage(nextPage);
-                setCurrentTotalPages((prevTotal) => data.hasMore ? prevTotal : nextPage);
+                setCurrentTotalPages((prevTotal) => result.has_more_pages ? prevTotal : nextPage);
             }
         } catch {
             // silent
@@ -111,21 +103,13 @@ export default function BlogGrid({
         if (loading || isPaginating || page === currentPage) return;
         setIsPaginating(true);
         try {
-            const res = await fetch("/api/blogs", {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                    "Content-Language": lang === "ru" ? "ru_RU" : "uk_UA"
-                },
-                body: JSON.stringify({ page, typeSlug: activeTypeSlug ?? null }),
-            });
-            const data = await res.json();
-            if (data.items) {
-                setItems(data.items);
-                setHasMore(data.hasMore);
+            const result = await getBlogsApi({ page, typeSlug: activeTypeSlug ?? null }, lang);
+            if (result.data) {
+                setItems(result.data);
+                setHasMore(result.has_more_pages);
                 setCurrentPage(page);
-                if (data.totalPages) {
-                    setCurrentTotalPages(data.totalPages);
+                if (result.last_page) {
+                    setCurrentTotalPages(result.last_page);
                 }
                 window.scrollTo({ top: 0, behavior: "smooth" });
             }

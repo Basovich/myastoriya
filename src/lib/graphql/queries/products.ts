@@ -696,7 +696,7 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string): Pr
             page: filter?.page ?? undefined,
             sort: sortedValue ?? undefined,
         },
-        { next: { revalidate: 3600 }, lang },
+        { next: { revalidate: 3600 }, lang, public: true },
     );
     return data.products;
 }
@@ -731,7 +731,7 @@ export async function getProductByIdApi(id: number | string, lang?: string): Pro
     const data = await gqlRequest<{ product: Product }>(
         PRODUCT_BY_ID_QUERY,
         { id: parseInt(String(id)) },
-        { next: { revalidate: 60 }, lang },
+        { next: { revalidate: 60 }, lang, public: true },
     );
     return data.product;
 }
@@ -743,7 +743,7 @@ export async function getProductCostVariantsApi(
     const data = await gqlRequest<{ productCostVariants: ProductCostVariant[] }>(
         PRODUCT_COST_VARIANTS_QUERY,
         { productId: String(productId) },
-        { next: { revalidate: 60 }, lang },
+        { next: { revalidate: 60 }, lang, public: true },
     );
     return data.productCostVariants ?? [];
 }
@@ -756,7 +756,7 @@ export async function getPopularProductsApi(
     const data = await gqlRequest<{ popularProducts: { data: Product[] } }>(
         POPULAR_PRODUCTS_QUERY,
         { productId: productId ?? null, limit },
-        { next: { revalidate: 3600 }, lang },
+        { next: { revalidate: 3600 }, lang, public: true },
     );
     return data.popularProducts?.data ?? [];
 }
@@ -771,7 +771,7 @@ export async function getSpecialsByProductApi(
     }>(
         SPECIALS_BY_PRODUCT_QUERY,
         { productId, limit },
-        { next: { revalidate: 3600 }, lang },
+        { next: { revalidate: 3600 }, lang, public: true },
     );
     const items = data.specials?.data ?? [];
     // Flatten: collect all products from all specials, deduplicate by id
@@ -797,7 +797,7 @@ export async function getBoughtTogetherProductsApi(
     const data = await gqlRequest<{ boughtTogetherProducts: Product[] }>(
         BOUGHT_TOGETHER_PRODUCTS_QUERY,
         { categoryId, productId, limit },
-        { next: { revalidate: 3600 }, lang },
+        { next: { revalidate: 3600 }, lang, public: true },
     );
     return data.boughtTogetherProducts ?? [];
 }
@@ -843,7 +843,7 @@ export async function findProductIdBySlug(
         }>(
             SLUG_SCAN_QUERY,
             { limit, page },
-            { next: { revalidate: 3600 }, lang },
+            { next: { revalidate: 3600 }, lang, public: true },
         );
 
         const found = data.products.data.find((p) => p.slug === slug);
@@ -858,7 +858,7 @@ export async function getCategoriesApi(lang?: string): Promise<ProductCategory[]
     const data = await gqlRequest<{ categories: ProductCategory[] }>(
         CATEGORIES_QUERY,
         undefined,
-        { next: { revalidate: 3600 }, lang },
+        { next: { revalidate: 3600 }, lang, public: true },
     );
     return data.categories;
 }
@@ -930,7 +930,7 @@ export async function getCatalogTreeApi(lang?: string, parentId: number = 768): 
     const data = await gqlRequest<{ categories: ProductCategory[] }>(
         CATEGORY_TREE_QUERY,
         { parentId },
-        { next: { revalidate: 3600 }, lang },
+        { next: { revalidate: 3600 }, lang, public: true },
     );
     return data.categories;
 }
@@ -948,7 +948,7 @@ export async function getProductsByIdsApi(ids: number[], lang?: string): Promise
     const data = await gqlRequest<{ productsByIds: Product[] }>(
         PRODUCTS_BY_IDS_QUERY,
         { ids },
-        { next: { revalidate: 60 }, lang }
+        { next: { revalidate: 60 }, lang, public: true }
     );
     return data.productsByIds;
 }
@@ -989,7 +989,7 @@ export async function getSearchPopularQueriesApi(search?: string, limit: number 
     const data = await gqlRequest<{ searchPopularQueries: string[] }>(
         SEARCH_POPULAR_QUERIES_QUERY,
         { search: search ?? null, limit },
-        { next: { revalidate: 3600 }, lang }
+        { next: { revalidate: 3600 }, lang, public: true }
     );
     return data.searchPopularQueries;
 }
@@ -1208,7 +1208,7 @@ export async function getCategoryByIdApi(id: number, lang?: string): Promise<Pro
     const data = await gqlRequest<{ category: ProductCategory | null }>(
         CATEGORY_BY_ID_QUERY,
         { id },
-        { next: { revalidate: 3600 }, lang }
+        { next: { revalidate: 3600 }, lang, public: true }
     );
     return data.category;
 }
@@ -1231,7 +1231,8 @@ export async function getFaqQuestionsApi(groupId: number, lang?: string): Promis
     }>(
         FAQ_QUESTIONS_QUERY,
         { groupId },
-        { next: { revalidate: 3600 }, lang }
+        { next: { revalidate: 3600 }, lang, public: true }
+
     );
     return data.faqQuestions?.data ?? [];
 }
