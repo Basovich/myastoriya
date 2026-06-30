@@ -11,6 +11,7 @@ import Button from "@/app/components/ui/Button/Button";
 import CategorySwitcher from '@/app/components/ui/CategorySwitcher/CategorySwitcher';
 import clsx from 'clsx';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
+import { getProductsFilterApi } from '@/lib/graphql/queries/products';
 import {
     isRangeBlock,
     buildFilterParams,
@@ -114,7 +115,7 @@ export default function CatalogSidebar({
     // Локальний стан «чернетки» ціни — не впливає на isPendingChanged
     const [pendingPrice, setPendingPrice] = useState<Record<string, { from: number; to: number }>>({});
 
-    // Динамічні блоки фільтрів, отримані через /api/catalog/products-filter (з forwarded cookies)
+    // Динамічні блоки фільтрів, отримані напряму через gqlRequest (getProductsFilterApi)
     const [dynamicBlocks, setDynamicBlocks] = useState<FilterBlock[]>(
         (filterBlocks ?? []).filter(block => !shouldExcludeBlock(block))
     );
@@ -144,8 +145,7 @@ export default function CatalogSidebar({
         }
         setIsLoadingFilters(true);
         const langParam = routeParams?.lang === 'ru' ? 'ru' : 'ua';
-        fetch(`/api/catalog/products-filter?categoryId=${categoryId}&lang=${langParam}`)
-            .then(r => r.json())
+        getProductsFilterApi(categoryId, langParam)
             .then(data => {
                 if (data.blocks && Array.isArray(data.blocks)) {
                     setDynamicBlocks(data.blocks.filter((block: FilterBlock) => !shouldExcludeBlock(block)));

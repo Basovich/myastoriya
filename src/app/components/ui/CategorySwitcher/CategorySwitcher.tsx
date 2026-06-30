@@ -5,6 +5,8 @@ import Image from 'next/image';
 import AppLink from '../AppLink/AppLink';
 import s from './CategorySwitcher.module.scss';
 import clsx from 'clsx';
+import { getCategoryByIdApi, getSubcategoriesApi, getCatalogTreeApi } from '@/lib/graphql/queries/products';
+import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
 
 interface CategoryItem {
     id: string;
@@ -39,24 +41,75 @@ export default function CategorySwitcher({
         }
 
         setIsLoading(true);
-        fetch(`/api/catalog/filter-categories?categoryId=${categoryId}&lang=${lang}`)
-            .then(res => {
-                if (!res.ok) throw new Error("Failed to fetch filter categories");
-                return res.json();
-            })
-            .then(data => {
-                setParent(data.parent);
-                setSiblings(data.siblings || []);
+
+        (async () => {
+            try {
+                const [category, catalogTree] = await Promise.all([
+                    getCategoryByIdApi(categoryId, lang),
+                    getCatalogTreeApi(lang),
+                ]);
+
+                if (!category) {
+                    setIsLoading(false);
+                    return;
+                }
+
+                const categoryIndex = buildCategoryIndex(catalogTree);
+
+                const getHref = (id: string | number): string => {
+                    const entry = categoryIndex.get(String(id));
+                    if (!entry) return '';
+                    const rawHref = getCategoryHref(entry.node, entry.parent, entry.grandParent);
+                    return lang === 'ru' ? `/ru${rawHref}` : rawHref;
+                };
+
+                const parentId = category.parentId;
+
+                if (parentId && parentId !== 768) {
+                    const [parentData, siblingsData] = await Promise.all([
+                        getCategoryByIdApi(parentId, lang),
+                        getSubcategoriesApi(parentId, lang),
+                    ]);
+
+                    setParent(parentData ? {
+                        id: parentData.id,
+                        name: parentData.name,
+                        slug: parentData.slug,
+                        href: getHref(parentData.id),
+                    } : null);
+
+                    setSiblings(siblingsData.map(sib => ({
+                        id: sib.id,
+                        name: sib.name,
+                        slug: sib.slug,
+                        href: getHref(sib.id),
+                    })));
+                } else {
+                    setParent({
+                        id: '768',
+                        name: 'Каталог',
+                        slug: '',
+                        href: lang === 'ru' ? '/ru' : '/',
+                    });
+
+                    const siblingsData = await getSubcategoriesApi(768, lang);
+                    setSiblings(siblingsData.map(sib => ({
+                        id: sib.id,
+                        name: sib.name,
+                        slug: sib.slug,
+                        href: getHref(sib.id),
+                    })));
+                }
+            } catch (err) {
+                console.error('Error loading category switcher data:', err);
+            } finally {
                 setIsLoading(false);
-            })
-            .catch(err => {
-                console.error("Error loading category filter data:", err);
-                setIsLoading(false);
-            });
+            }
+        })();
     }, [categoryId, lang]);
 
     if (isLoading || (!parent && siblings.length === 0) || parent?.id === '768') {
-        return null; // Or skeleton loader if preferred
+        return null;
     }
 
     return (
@@ -69,11 +122,11 @@ export default function CategorySwitcher({
                         href={parent.href}
                         className={clsx(s.item, s.parent)}
                     >
-                        <Image 
-                            src="/images/icons/parent-catalog.png" 
-                            alt="" 
-                            width={20} 
-                            height={20} 
+                        <Image
+                            src="/images/icons/parent-catalog.png"
+                            alt=""
+                            width={20}
+                            height={20}
                             className={s.parentIcon}
                         />
                         <span className={s.label}>{parent.name}</span>
