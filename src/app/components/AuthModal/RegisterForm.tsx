@@ -130,6 +130,7 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
                         email: result.user.email,
                         birthday: result.user.birthday,
                         sex: result.user.sex,
+                        token: result.accessToken,
                     }),
                 );
                 onSuccess();

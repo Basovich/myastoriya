@@ -75,7 +75,7 @@ async function fetchProductReviews(
     const data = await gqlRequest<{ productReviews: ProductReviewsResponse }>(
         PRODUCT_REVIEWS_QUERY,
         { productId, limit, page },
-        { cache: 'no-store', public: true },
+        { cache: 'no-store' },
     );
     return data.productReviews ?? { data: [], per_page: limit, current_page: 1, has_more_pages: false };
 }
@@ -84,7 +84,7 @@ async function fetchReviewsCount(productId: number): Promise<number> {
     const data = await gqlRequest<{ productReviewsCount: number }>(
         PRODUCT_REVIEWS_COUNT_QUERY,
         { productId },
-        { cache: 'no-store', public: true },
+        { cache: 'no-store' },
     );
     return data.productReviewsCount ?? 0;
 }

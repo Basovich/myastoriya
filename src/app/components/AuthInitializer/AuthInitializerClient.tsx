@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { loginAsGuest, setUser, setInitialized } from '@/store/slices/authSlice';
+import { loginAsGuest, setUser, setToken, setInitialized } from '@/store/slices/authSlice';
 import { fetchWishlistPayloadAsync, syncWishlistOnAuthAsync } from '@/store/slices/wishlistSlice';
 import { syncViewedProductsOnAuthAsync } from '@/store/slices/viewedProductsSlice';
 import { fetchCartAsync, syncCartOnAuthAsync } from '@/store/slices/cartSlice';
@@ -90,7 +90,10 @@ async function initAuth(dispatch: ReturnType<typeof useAppDispatch>) {
 
         if (token) {
             const user = await tryGetMe(token, dispatch);
-            if (user !== null) return;
+            if (user !== null) {
+                dispatch(setToken(token));
+                return;
+            }
             // getMeApi failed — access token expired, try refresh
         }
 
@@ -99,7 +102,10 @@ async function initAuth(dispatch: ReturnType<typeof useAppDispatch>) {
 
         if (freshToken) {
             const user = await tryGetMe(freshToken, dispatch);
-            if (user !== null) return;
+            if (user !== null) {
+                dispatch(setToken(freshToken));
+                return;
+            }
             // Refresh token also rejected by API — fall through to guest
         }
 
@@ -145,7 +151,7 @@ async function startGuestSession(dispatch: ReturnType<typeof useAppDispatch>) {
         const deviceId = getOrCreateDeviceId();
         const result = await authAsGuestApi(deviceId);
         await setAuthCookies(result.accessToken, result.refreshToken);
-        dispatch(loginAsGuest());
+        dispatch(loginAsGuest({ token: result.accessToken }));
     } catch (err) {
         console.warn('[AuthInitializer] Guest auth failed:', err);
         dispatch(loginAsGuest());

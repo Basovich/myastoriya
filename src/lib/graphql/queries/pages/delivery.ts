@@ -42,7 +42,7 @@ export async function getPolicyBlocksApi(lang: string): Promise<OrderingInfoBloc
     const data = await gqlRequest<OrderingInfoBlocksResponse>(GET_ORDERING_INFO_BLOCKS, { type: "payment" }, {
         lang,
         next: { revalidate: 3600 },
-        public: true
+        
     });
     return data.orderingInfoBlocks;
 }
@@ -51,7 +51,7 @@ export async function getDeliveryBlocksApi(lang: string): Promise<OrderingInfoBl
     const data = await gqlRequest<OrderingInfoBlocksResponse>(GET_ORDERING_INFO_BLOCKS, { type: "delivery" }, {
         lang,
         next: { revalidate: 3600 },
-        public: true
+        
     });
     return data.orderingInfoBlocks;
 }

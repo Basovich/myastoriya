@@ -28,6 +28,11 @@ interface AuthState {
     isGuest: boolean;
     /** True if the initial auth check (cookies/tokens) has completed */
     isInitialized: boolean;
+    /**
+     * In-memory access token for direct backend requests (no proxy).
+     * Not persisted — refreshed via tryRefreshTokenAction on page reload.
+     */
+    token: string | null;
 }
 
 const initialState: AuthState = {
@@ -35,35 +40,45 @@ const initialState: AuthState = {
     isAuthenticated: false,
     isGuest: false,
     isInitialized: false,
+    token: null,
 };
 
 const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        login(state, action: PayloadAction<AuthUser>) {
-            state.user = action.payload;
+        login(state, action: PayloadAction<AuthUser & { token?: string }>) {
+            const { token, ...user } = action.payload;
+            state.user = user;
             state.isAuthenticated = true;
             state.isGuest = false;
             state.isInitialized = true;
+            if (token !== undefined) state.token = token;
         },
-        loginAsGuest(state) {
+        loginAsGuest(state, action: PayloadAction<{ token?: string } | undefined>) {
             state.user = null;
             state.isAuthenticated = true;
             state.isGuest = true;
             state.isInitialized = true;
+            if (action.payload?.token !== undefined) state.token = action.payload.token;
         },
         logout(state) {
             state.user = null;
             state.isAuthenticated = false;
             state.isGuest = false;
             state.isInitialized = true;
+            state.token = null;
         },
-        setUser(state, action: PayloadAction<AuthUser>) {
-            state.user = action.payload;
+        setUser(state, action: PayloadAction<AuthUser & { token?: string }>) {
+            const { token, ...user } = action.payload;
+            state.user = user;
             state.isAuthenticated = true;
             state.isGuest = false;
             state.isInitialized = true;
+            if (token !== undefined) state.token = token;
+        },
+        setToken(state, action: PayloadAction<string | null>) {
+            state.token = action.payload;
         },
         setInitialized(state, action: PayloadAction<boolean>) {
             state.isInitialized = action.payload;
@@ -79,5 +94,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { login, loginAsGuest, logout, setUser, addAddress, setInitialized } = authSlice.actions;
+export const { login, loginAsGuest, logout, setUser, setToken, addAddress, setInitialized } = authSlice.actions;
 export default authSlice.reducer;

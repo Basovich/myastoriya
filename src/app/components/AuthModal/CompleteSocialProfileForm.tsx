@@ -111,7 +111,8 @@ export default function CompleteSocialProfileForm({ googleProfile, onSuccess, on
                     phone: updatedUser.phone,
                     email: updatedUser.email,
                     birthday: updatedUser.birthday,
-                    gender: updatedUser.sex as any,
+                    gender: updatedUser.sex as unknown as 'male' | 'female',
+                    token,
                 }));
                 onSuccess();
             } catch (err) {

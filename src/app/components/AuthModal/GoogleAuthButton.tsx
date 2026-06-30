@@ -34,7 +34,7 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
                     try {
                         const guestResult = await authAsGuestApi(deviceId);
                         await setAuthCookies(guestResult.accessToken, guestResult.refreshToken);
-                        dispatch(loginAsGuest());
+                        dispatch(loginAsGuest({ token: guestResult.accessToken }));
                         currentToken = guestResult.accessToken;
                     } catch (guestErr) {
                         console.error('Failed to establish guest session:', guestErr);
@@ -56,12 +56,13 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
                 
                 await setAuthCookies(result.accessToken, result.refreshToken);
 
-                const userData: AuthUser = {
+                const userData: AuthUser & { token: string } = {
                     id: result.user.id,
                     name: result.user.name || '',
                     surname: result.user.surname || '',
                     email: result.user.email || '',
                     phone: result.user.phone || '',
+                    token: result.accessToken,
                 };
 
                 // If phone is missing from backend, we might need the completion modal

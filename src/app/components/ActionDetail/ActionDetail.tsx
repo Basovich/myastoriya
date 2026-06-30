@@ -6,7 +6,6 @@ import s from './ActionDetail.module.scss';
 import ProductCard from '../ui/ProductCard/ProductCard';
 import Breadcrumbs from '../ui/Breadcrumbs/Breadcrumbs';
 import CountdownTimer from '../ui/CountdownTimer/CountdownTimer';
-import { type Dictionary } from '@/i18n/types';
 import { type Sale, type Product, resolveProductImageUrl, getProductsApi } from '@/lib/graphql';
 
 const PAGE_SIZE = 12;

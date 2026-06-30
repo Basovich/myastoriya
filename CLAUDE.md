@@ -194,34 +194,37 @@ export default function НазваКомпонента({ }: Props) {
 
 ---
 
-## GraphQL-проксі `/api/graphql`
+## GraphQL-клієнт
 
-На клієнті всі GraphQL-запити йдуть **не напряму** на бекенд, а через внутрішній Next.js API-роут:
+Всі GraphQL-запити (як клієнтські, так і серверні) йдуть **напряму** на бекенд:
 
 ```
-Браузер → /api/graphql (src/app/api/graphql/route.ts) → https://dev-api.myastoriya.com.ua/graphql
+Браузер → https://dev-api.myastoriya.com.ua/graphql
+Сервер (SSR) → https://dev-api.myastoriya.com.ua/graphql
 ```
 
-На **сервері** (SSR, Server Actions) — запити йдуть напряму на бекенд.
+### Авторизація
 
-### Навіщо проксі?
-
-- **Авторизація:** токен (`access_token`) зберігається в `httpOnly` cookie. JavaScript у браузері **не може** його прочитати. Проксі читає куку на сервері і сам додає `Authorization: Bearer ...` до запиту на бекенд.
-- **Безпека:** токен не потрапляє в Redux/localStorage — захист від XSS.
-- **Приховування адреси бекенду:** клієнт бачить лише `/api/graphql`.
-
-### ❌ Не прибирати проксі
-
-Навіть якщо бекенд пофіксив CORS — **проксі потрібен**. Без нього авторизовані запити з клієнта (wishlist, cart, orders, profile тощо) будуть отримувати `Unauthorized`, бо токен з httpOnly cookie не буде передаватись.
+- `access_token` зберігається в `httpOnly` cookie (встановлюється через Server Action) **і** в Redux store (`auth.token`) — в пам'яті, для клієнтських запитів.
+- `refresh_token` залишається лише в `httpOnly` cookie.
+- `gqlRequest` на клієнті автоматично читає токен зі Redux store і додає `Authorization: Bearer` до запиту.
+- При закінченні токена — JWT interceptor в `client.ts` автоматично робить refresh через `tryRefreshTokenAction` і зберігає новий токен у store.
 
 ### Як це виглядає в коді
 
 Файл [`src/lib/graphql/client.ts`](src/lib/graphql/client.ts):
 ```ts
-const GQL_ENDPOINT = isServer 
-    ? 'https://dev-api.myastoriya.com.ua/graphql'  // сервер — напряму
-    : '/api/graphql';                               // клієнт — через проксі
+// Завжди напряму на бекенд
+const endpoint = 'https://dev-api.myastoriya.com.ua/graphql';
+
+// Токен — явно через options.token або зі store
+const storeToken = store.getState().auth.token;
+if (storeToken) headers['Authorization'] = `Bearer ${storeToken}`;
 ```
+
+### ❌ Не повертати проксі `/api/graphql`
+
+Проксі видалено. CORS налаштовано на бекенді. Токен зберігається в Redux store і передається напряму у заголовках клієнтом.
 
 ---
 

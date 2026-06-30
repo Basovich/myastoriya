@@ -154,14 +154,14 @@ export const getShopsApi = async (
   params: { limit?: number; page?: number; onlyCompanyStores?: boolean } = { limit: 100, page: 1, onlyCompanyStores: true },
   lang: string = "ua"
 ): Promise<ShopsResponse> => {
-  return await gqlRequest<ShopsResponse>(SHOPS_QUERY, params, { lang, public: true });
+  return await gqlRequest<ShopsResponse>(SHOPS_QUERY, params, { lang });
 };
 
 export const getContactsShopsApi = async (
   params: { limit?: number; onlyCompanyStores?: boolean } = { limit: 100, onlyCompanyStores: true },
   lang: string = "ua"
 ): Promise<ShopsResponse> => {
-  return await gqlRequest<ShopsResponse>(CONTACTS_SHOPS_QUERY, params, { lang, public: true });
+  return await gqlRequest<ShopsResponse>(CONTACTS_SHOPS_QUERY, params, { lang });
 };
 
 export const getShopApi = async (
@@ -171,6 +171,6 @@ export const getShopApi = async (
   return await gqlRequest<SingleShopResponse>(
     SHOP_BY_ID_QUERY,
     { id: parseInt(id) },
-    { lang, next: { revalidate: 3600 }, public: true }
+    { lang, next: { revalidate: 3600 } }
   );
 };

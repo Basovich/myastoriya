@@ -76,6 +76,7 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onInco
                         email: result.user.email,
                         birthday: result.user.birthday,
                         sex: result.user.sex,
+                        token: result.accessToken,
                     }),
                 );
                 onSuccess();

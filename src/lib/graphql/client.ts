@@ -1,6 +1,5 @@
 const isServer = typeof window === 'undefined';
-const GQL_ENDPOINT_DIRECT = 'https://dev-api.myastoriya.com.ua/graphql';
-const GQL_ENDPOINT_PROXY = '/api/graphql';
+const GQL_ENDPOINT = 'https://dev-api.myastoriya.com.ua/graphql';
 
 export interface GqlError {
     message: string;
@@ -37,12 +36,6 @@ interface RequestOptions {
     _retryCount?: number;
     /** Internal retry flag for token refresh */
     _isRetry?: boolean;
-    /**
-     * If true, client-side requests go directly to the backend,
-     * bypassing the /api/graphql proxy. Use for public (unauthenticated)
-     * queries that don't need the httpOnly access_token cookie.
-     */
-    public?: boolean;
 }
 
 const MAX_RETRIES = 5;
@@ -95,6 +88,17 @@ export async function gqlRequest<T>(
 
     if (options?.token) {
         headers['Authorization'] = `Bearer ${options.token}`;
+    } else if (!isServer) {
+        // No explicit token — try to get from Redux store
+        try {
+            const { store } = await import('@/store');
+            const storeToken = store.getState().auth.token;
+            if (storeToken) {
+                headers['Authorization'] = `Bearer ${storeToken}`;
+            }
+        } catch {
+            // store not available yet (e.g. during SSR hydration)
+        }
     }
 
     const langHeader = options?.lang === 'ru' ? 'ru_RU' : 'uk_UA';
@@ -132,11 +136,8 @@ export async function gqlRequest<T>(
         delete headers['Content-Type']; // Let browser set boundary
     }
 
-    // Public requests bypass the proxy and go directly to the backend.
-    // Authenticated requests use the proxy so it can inject the httpOnly cookie token.
-    const endpoint = isServer
-        ? GQL_ENDPOINT_DIRECT
-        : (options?.public ? GQL_ENDPOINT_DIRECT : GQL_ENDPOINT_PROXY);
+    // All requests go directly to the backend — no proxy needed.
+    const endpoint = GQL_ENDPOINT;
 
     let text = "";
     try {
@@ -191,20 +192,20 @@ export async function gqlRequest<T>(
                     if (freshToken) {
                         // Dynamically import store and actions to update UI state
                         const { store } = await import('@/store');
-                        const { loginAsGuest, setUser } = await import('@/store/slices/authSlice');
+                        const { loginAsGuest, setUser, setToken } = await import('@/store/slices/authSlice');
                         const { getMeApi } = await import('@/lib/graphql/queries/auth');
                         
                         try {
                             const user = await getMeApi(freshToken);
                             if (user && (user.phone || user.email)) {
-                                store.dispatch(setUser(user));
+                                store.dispatch(setUser({ ...user, token: freshToken }));
                             } else {
-                                store.dispatch(loginAsGuest());
+                                store.dispatch(loginAsGuest({ token: freshToken }));
                             }
                         } catch {
-                            store.dispatch(loginAsGuest());
+                            store.dispatch(loginAsGuest({ token: freshToken }));
                         }
-                        
+                        store.dispatch(setToken(freshToken));
                         // Retry original request with the fresh token
                         return gqlRequest(query, variables, {
                             ...options,

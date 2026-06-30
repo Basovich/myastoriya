@@ -23,7 +23,7 @@ export async function getCareerApi(lang: string): Promise<Career | null> {
         const response = await gqlRequest<{ career: Career | null }>(CAREER_QUERY, {}, {
             lang,
             next: { revalidate: 3600 },
-            public: true
+            
         });
         return response.career || null;
     } catch (error) {

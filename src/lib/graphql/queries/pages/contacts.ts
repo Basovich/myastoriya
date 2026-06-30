@@ -51,5 +51,5 @@ export interface ContactsCategoriesResponse {
 export const getContactsCategoriesApi = async (
   lang: string = "ua"
 ): Promise<ContactsCategoriesResponse> => {
-  return await gqlRequest<ContactsCategoriesResponse>(GET_CONTACT_CATEGORIES_QUERY, {}, { lang, public: true });
+  return await gqlRequest<ContactsCategoriesResponse>(GET_CONTACT_CATEGORIES_QUERY, {}, { lang });
 };
