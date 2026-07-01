@@ -105,9 +105,22 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
         try {
             const token = await getAccessToken();
             if (token) {
+                const address = addresses.find(a => a.id === addressToDelete);
+                const wasDefault = address?.isDefault;
+
                 const success = await deleteUserAddressApi(addressToDelete, token);
                 if (success) {
-                    setAddresses(prev => prev.filter(a => a.id !== addressToDelete));
+                    const remainingAddresses = addresses.filter(a => a.id !== addressToDelete);
+                    if (wasDefault && remainingAddresses.length > 0) {
+                        const firstAddressId = remainingAddresses[0].id;
+                        await markUserAddressAsDefaultApi(firstAddressId, token);
+                        setAddresses(remainingAddresses.map((a, idx) => ({
+                            ...a,
+                            isDefault: idx === 0
+                        })));
+                    } else {
+                        setAddresses(remainingAddresses);
+                    }
                 }
             }
         } catch (error) {
