@@ -4,12 +4,12 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
-import { sendSmsApi, smsVerifyApi, updateUserDataApi, checkUserPhoneApi } from '@/lib/graphql/queries/auth';
-import { setAuthCookies, getAccessToken } from '@/app/actions/authActions';
+import { sendSmsApi, smsVerifyApi, updateUserDataApi } from '@/lib/graphql/queries/auth';
+
 import { usePhoneMask } from '@/hooks/usePhoneMask';
-import { GraphQLError } from '@/lib/graphql/client';
+
 import s from './AuthModal.module.scss';
 import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
@@ -34,6 +34,8 @@ export default function CompleteSocialProfileForm({ googleProfile, onSuccess, on
     const dispatch = useAppDispatch();
     const params = useParams();
     const locale = (params?.lang as string) || 'ua';
+    // Читаємо токен зі Redux store — він вже є після успішного socialAuthApi у GoogleAuthButton
+    const storeToken = useAppSelector((state) => state.auth.token);
 
     const [phoneVerified, setPhoneVerified] = useState(false);
     const phoneVerifiedRef = useRef(false);
@@ -93,7 +95,7 @@ export default function CompleteSocialProfileForm({ googleProfile, onSuccess, on
         validationSchema: schema,
         onSubmit: async (values, { setStatus }) => {
             try {
-                const token = await getAccessToken();
+                const token = storeToken;
                 if (!token) throw new Error('Unauthorized');
 
                 const updatedUser = await updateUserDataApi({

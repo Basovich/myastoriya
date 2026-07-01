@@ -2,17 +2,17 @@
 
 import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import clsx from 'clsx';
 import { AuthUser, loginAsGuest } from '@/store/slices/authSlice';
 import { socialAuthApi, authAsGuestApi } from '@/lib/graphql/queries/auth';
-import { setAuthCookies, getAccessToken, clearAuthCookies } from '@/app/actions/authActions';
+import { setAuthCookies, clearAuthCookies } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
 import { GraphQLError } from '@/lib/graphql/client';
 import s from './GoogleAuthButton.module.scss';
 
 interface GoogleAuthButtonProps {
-    onSuccess?: (userData: AuthUser, googleProfile?: any) => void;
+    onSuccess?: (userData: AuthUser & { token: string }, googleProfile?: any) => void;
     onIncompleteProfile?: (googleProfile: any) => void;
     text?: string;
     variant?: 'default' | 'outline';
@@ -21,6 +21,9 @@ interface GoogleAuthButtonProps {
 export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text, variant = 'default' }: GoogleAuthButtonProps) {
     const dispatch = useAppDispatch();
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    // Читаємо токен зі Redux store (in-memory) — замість Server Action getAccessToken()
+    const storeToken = useAppSelector((state) => state.auth.token);
 
     const login = useGoogleLogin({
         scope: 'openid profile email',
@@ -28,8 +31,8 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
             setIsLoading(true);
             try {
                 const deviceId = getOrCreateDeviceId();
-                let currentToken = await getAccessToken();
-                
+                let currentToken: string | null = storeToken;
+
                 if (!currentToken) {
                     try {
                         const guestResult = await authAsGuestApi(deviceId);
@@ -81,26 +84,35 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
                 }
             } catch (error) {
                 console.error('Backend Google Auth Error:', error);
+                if (error instanceof GraphQLError) {
+                    // Відома помилка з бекенду — показуємо повідомлення
+                    setError('Помилка авторизації через Google. Спробуйте пізніше або оберіть інший спосіб входу.');
+                } else {
+                    setError('Щось пішло не так. Перевірте з\'єднання та спробуйте ще раз.');
+                }
             } finally {
                 setIsLoading(false);
             }
         },
         onError: (error) => {
             console.error('Google Login Failed:', error);
+            setError('Не вдалося відкрити вікно Google. Перевірте налаштування браузера.');
             setIsLoading(false);
         },
     });
 
     return (
-        <button
-            type="button"
-            className={clsx(s.googleBtn, variant === 'outline' && s.outline)}
-            onClick={() => {
-                setIsLoading(true);
-                login();
-            }}
-            disabled={isLoading}
-        >
+        <div className={s.wrapper}>
+            <button
+                type="button"
+                className={clsx(s.googleBtn, variant === 'outline' && s.outline)}
+                onClick={() => {
+                    setIsLoading(true);
+                    setError(null);
+                    login();
+                }}
+                disabled={isLoading}
+            >
             <svg className={s.googleIcon} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <g clipPath="url(#clip0_574_9779)">
                     <path d="M4.61559 5.43319C5.39247 4.41119 6.62066 3.75 8.00053 3.75C9.13572 3.75 10.203 4.19206 11.0057 4.99478L11.3372 5.32622L13.9888 2.67459L13.6574 2.34316C12.1464 0.832156 10.1374 0 8.00053 0C5.86366 0 3.85469 0.832156 2.34366 2.34313C2.2065 2.48031 2.07509 2.62169 1.94922 2.76678L4.61559 5.43319Z" fill="black" />
@@ -117,6 +129,10 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
             <span className={s.googleBtnText}>
                 {isLoading ? 'ЗАКРИВАЄМО...' : text || 'УВІЙТИ ЧЕРЕЗ GOOGLE'}
             </span>
-        </button>
+            </button>
+            {error && (
+                <p className={s.errorMsg}>{error}</p>
+            )}
+        </div>
     );
 }

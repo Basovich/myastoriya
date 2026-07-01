@@ -185,7 +185,7 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onInco
 
                 <GoogleAuthButton
                     onSuccess={(user) => {
-                        dispatch(login(user));
+                        dispatch(login({ ...user, token: user.token }));
                         onSuccess();
                     }}
                     onIncompleteProfile={onIncompleteProfile}

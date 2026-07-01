@@ -468,7 +468,7 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
                 <GoogleAuthButton
                     text="РЕЄСТРАЦІЯ ЧЕРЕЗ GOOGLE"
                     onSuccess={(user) => {
-                        dispatch(login(user));
+                        dispatch(login({ ...user, token: user.token }));
                         onSuccess();
                     }}
                     onIncompleteProfile={onIncompleteProfile}
