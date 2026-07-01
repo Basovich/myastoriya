@@ -498,7 +498,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                                 <GoogleMap
                                     mapContainerStyle={containerStyle}
                                     center={mapMarker || center}
-                                    zoom={14}
+                                    zoom={mapMarker ? 15 : 11}
                                     onLoad={onMapLoad}
                                     onClick={onMapClick}
                                     options={{
