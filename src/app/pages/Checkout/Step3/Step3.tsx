@@ -49,7 +49,7 @@ const CONTACT_METHODS = [
     { value: 'phone', label: 'Телефон' },
     { value: 'telegram', label: 'Telegram' },
     { value: 'viber', label: 'Viber' },
-    { value: 'no-call', label: 'Не передзвонювати' },
+    { value: 'dontCallBack', label: 'Не передзвонювати' },
 ];
 
 import { type Locale } from '@/i18n/config';
@@ -62,7 +62,7 @@ export default function Step3({ lang }: Step3Props) {
     const hydrated = useIsHydrated();
     const [comment, setComment] = useState('');
     const [personsCount, setPersonsCount] = useState(1);
-    const [contactMethod, setContactMethod] = useState('no-call');
+    const [contactMethod, setContactMethod] = useState('dontCallBack');
     
     // Payments State
     const [payments, setPayments] = useState<Payment[]>([]);
@@ -310,7 +310,7 @@ export default function Step3({ lang }: Step3Props) {
                     comment: comment || undefined,
                     personsCount: personsCount,
                     communicationMethod: contactMethod,
-                    dontCallBack: contactMethod === 'no-call',
+                    dontCallBack: contactMethod === 'dontCallBack',
                     useBonuses: false,
                 },
                 token || '',
