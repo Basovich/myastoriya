@@ -53,6 +53,10 @@ function AuthButton() {
             <AuthModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                onSuccess={() => {
+                    const prefix = lang === 'ua' ? '' : `/${lang}`;
+                    router.push(`${prefix}/personal/profile/`);
+                }}
             />
         </>
     );
