@@ -13,8 +13,6 @@ export async function POST(req: NextRequest) {
         // cache: 'no-store' — відключаємо кеш, щоб кожна сторінка пагінації
         // отримувала свіжі дані, а не закешований результат page=1
         const result = await getSalesApi(limit, page, lang, { cache: 'no-store' });
-        console.log(`[API Sales Debug] Request: page=${page}, limit=${limit}, lang=${lang}`);
-        console.log(`[API Sales Debug] Response: results=${result.data?.length}, has_more=${result.has_more_pages}`);
 
         return NextResponse.json(result);
     } catch (err) {

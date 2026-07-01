@@ -78,7 +78,6 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
             try {
                 // TODO: Replace with actual API call
                 await new Promise((resolve) => setTimeout(resolve, 600));
-                console.log('Review submitted:', values);
                 setSubmitted(true);
             } catch {
                 setStatus('Не вдалося надіслати відгук. Спробуйте ще раз.');

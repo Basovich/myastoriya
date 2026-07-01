@@ -59,7 +59,6 @@ export default function VideoReviewModal({ isOpen, onClose }: VideoReviewModalPr
             try {
                 // TODO: Replace with actual API call (e.g. FormData upload)
                 await new Promise((resolve) => setTimeout(resolve, 1000));
-                console.log('Video Review submitted:', values);
                 setSubmitted(true);
             } catch {
                 setStatus('Не вдалося надіслати відео-відгук. Спробуйте ще раз.');
