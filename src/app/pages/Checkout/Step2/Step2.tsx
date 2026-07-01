@@ -534,6 +534,15 @@ export default function Step2() {
         return [...userPickupPoints, ...guestPickupPoints];
     }, [userPickupPoints, guestPickupPoints]);
 
+    const existingShopIds = React.useMemo(() => {
+        return pickupPoints
+            .map(point => {
+                const matchedShop = shops.find(s => s.name === point.name || s.siteName === point.name);
+                return matchedShop?.id.toString();
+            })
+            .filter((id): id is string => !!id);
+    }, [pickupPoints, shops]);
+
     // Set default selected shop
     useEffect(() => {
         if (pickupPoints.length > 0) {
@@ -1141,6 +1150,7 @@ export default function Step2() {
                 onClose={() => setIsAddPickupModalOpen(false)}
                 onAdd={handleAddPickupPoint}
                 lang={lang}
+                existingShopIds={existingShopIds}
             />
         </div>
     );

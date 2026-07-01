@@ -26,6 +26,7 @@ interface AddPickupModalProps {
     onClose: () => void;
     onAdd: (store: Store) => void;
     lang: 'ua' | 'ru';
+    existingShopIds?: string[];
 }
 
 const containerStyle = {
@@ -65,7 +66,7 @@ const dict = {
     }
 };
 
-export default function AddPickupModal({ isOpen, onClose, onAdd, lang }: AddPickupModalProps) {
+export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingShopIds }: AddPickupModalProps) {
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: GOOGLE_MAPS_API_KEY,
@@ -131,8 +132,9 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang }: AddPick
     };
 
     const filteredStores = stores.filter(store => 
-        store.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        store.name.toLowerCase().includes(searchQuery.toLowerCase())
+        (store.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+         store.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
+        (!existingShopIds || !existingShopIds.includes(store.id))
     );
 
     const onMapLoad = useCallback((mapInstance: google.maps.Map) => {

@@ -151,6 +151,13 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
         // Handled by layout
     };
 
+    const existingShopIds = points
+        .map(point => {
+            const matchedShop = shops.find(s => s.name === point.name || s.siteName === point.name);
+            return matchedShop?.id.toString();
+        })
+        .filter((id): id is string => !!id);
+
     return (
         <div className={s.pickupPage}>
             <PersonalContentBlock className={s.contentBlock}>
@@ -252,6 +259,7 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
                 onClose={() => setIsModalOpen(false)}
                 onAdd={handleAddStore}
                 lang={lang}
+                existingShopIds={existingShopIds}
             />
 
             <DeletePickupModal
