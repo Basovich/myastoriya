@@ -39,14 +39,15 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
             : uniqueRootCategories;
     }, [categories]);
 
-    // Reset states when menu is closed so it starts fresh with only L1 categories next time
-    useEffect(() => {
+    const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+    if (isOpen !== prevIsOpen) {
+        setPrevIsOpen(isOpen);
         if (!isOpen) {
             setActiveCategory(null);
             setHoveredSubCategory(null);
             setHoveredThirdLevel(null);
         }
-    }, [isOpen]);
+    }
 
     // Close on ESC
     useEffect(() => {
@@ -56,12 +57,6 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
         window.addEventListener("keydown", handleEsc);
         return () => window.removeEventListener("keydown", handleEsc);
     }, [onClose]);
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            (window as any).activeCategory = activeCategory;
-        }
-    }, [activeCategory]);
 
     // Scroll Lock using hook
     useEffect(() => {
