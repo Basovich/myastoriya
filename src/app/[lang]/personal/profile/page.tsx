@@ -363,26 +363,28 @@ export default function ProfilePage() {
                 />
                 
                 <div className={s.profileContainer}>
-                    <div className={`${s.topCardsRow} ${isSingleCard ? s.singleCard : ''}`}>
-                        {showRecentOrder && recentOrder && (
-                            <div className={clsx(s.cardWrapper, s.cardWrapperRecentOrderCard)}>
-                                <RecentOrderCard 
-                                    status={recentOrder.status}
-                                    items={recentOrder.items}
-                                    totalItems={recentOrder.totalItems}
-                                    dict={dict.recentOrder}
-                                    onDetails={() => router.push(`/${lang}/personal/orders/${recentOrder.id}`)}
+                    {!loading && (
+                        <div className={`${s.topCardsRow} ${isSingleCard ? s.singleCard : ''}`}>
+                            {showRecentOrder && recentOrder && (
+                                <div className={clsx(s.cardWrapper, s.cardWrapperRecentOrderCard)}>
+                                    <RecentOrderCard 
+                                        status={recentOrder.status}
+                                        items={recentOrder.items}
+                                        totalItems={recentOrder.totalItems}
+                                        dict={dict.recentOrder}
+                                        onDetails={() => router.push(`/${lang}/personal/orders/${recentOrder.id}`)}
+                                    />
+                                </div>
+                            )}
+                            <div className={s.cardWrapper}>
+                                <BonusCard 
+                                    balance={user?.bonuses || 0} 
+                                    percent={discountInfo?.discount || 3} 
+                                    dict={dict.bonusCard} 
                                 />
                             </div>
-                        )}
-                        <div className={s.cardWrapper}>
-                            <BonusCard 
-                                balance={user?.bonuses || 0} 
-                                percent={discountInfo?.discount || 3} 
-                                dict={dict.bonusCard} 
-                            />
                         </div>
-                    </div>
+                    )}
 
                     {hydrated ? (
                         <ProfileForm 
