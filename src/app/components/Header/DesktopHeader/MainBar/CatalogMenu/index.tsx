@@ -57,6 +57,12 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
         return () => window.removeEventListener("keydown", handleEsc);
     }, [onClose]);
 
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            (window as any).activeCategory = activeCategory;
+        }
+    }, [activeCategory]);
+
     // Scroll Lock using hook
     useEffect(() => {
         if (isOpen) {
@@ -64,6 +70,20 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
             return () => enableScroll();
         }
     }, [isOpen, disableScroll, enableScroll]);
+
+    // Resolve the ID of the category whose image should be shown based on priority/nesting fallback
+    const currentVisibleImageCategoryId = useMemo(() => {
+        if (hoveredThirdLevel && hoveredThirdLevel.image?.big2x) {
+            return hoveredThirdLevel.id;
+        }
+        if (hoveredSubCategory && hoveredSubCategory.image?.big2x) {
+            return hoveredSubCategory.id;
+        }
+        if (activeCategory && activeCategory.image?.big2x) {
+            return activeCategory.id;
+        }
+        return null;
+    }, [hoveredThirdLevel, hoveredSubCategory, activeCategory]);
 
     if (!isOpen) return null;
 
@@ -137,8 +157,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                     key={cat.id}
                                     className={clsx(
                                         s.bgImageWrapper,
-                                        activeCategory?.id === cat.id && s.visible,
-                                        hoveredSubCategory?.image?.big2x && s.hiddenBySubHover
+                                        currentVisibleImageCategoryId === cat.id && s.visible
                                     )}
                                 >
                                     <Image
@@ -159,7 +178,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                     key={sub.id}
                                     className={clsx(
                                         s.bgImageWrapper,
-                                        hoveredSubCategory?.id === sub.id && !hoveredThirdLevel?.image?.big2x && s.visible
+                                        currentVisibleImageCategoryId === sub.id && s.visible
                                     )}
                                 >
                                     <Image
@@ -177,7 +196,10 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                             third.image?.big2x && (
                                 <div
                                     key={third.id}
-                                    className={clsx(s.bgImageWrapper, hoveredThirdLevel?.id === third.id && s.visible)}
+                                    className={clsx(
+                                        s.bgImageWrapper,
+                                        currentVisibleImageCategoryId === third.id && s.visible
+                                    )}
                                 >
                                     <Image
                                         src={third.image.big2x}
