@@ -52,6 +52,7 @@ const dict = {
         recenterBtn: "Re-center",
         loading: "Завантаження...",
         noResults: "Нічого не знайдено",
+        allStoresAdded: "Усі заклади вже додано",
     },
     ru: {
         title: "ВЫБРАТЬ ЗАВЕДЕНИЕ",
@@ -64,6 +65,7 @@ const dict = {
         recenterBtn: "Центрировать",
         loading: "Загрузка...",
         noResults: "Ничего не найдено",
+        allStoresAdded: "Все заведения уже добавлены",
     }
 };
 
@@ -137,6 +139,9 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingS
          store.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
         (!existingShopIds || !existingShopIds.includes(store.id))
     );
+
+    const isAllStoresAdded = stores.length > 0 && 
+        stores.every(store => existingShopIds?.includes(store.id));
 
     const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
         setMap(mapInstance);
@@ -214,7 +219,9 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingS
                         <div className={s.listView}>
                             <div className={s.storeList}>
                                 {filteredStores.length === 0 ? (
-                                    <div className={s.noResults}>{t.noResults}</div>
+                                    <div className={s.noResults}>
+                                        {isAllStoresAdded ? t.allStoresAdded : t.noResults}
+                                    </div>
                                 ) : (
                                     filteredStores.map(store => (
                                         <div 
@@ -271,7 +278,7 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingS
                                     <GoogleMap
                                         mapContainerStyle={containerStyle}
                                         center={selectedStore ? {lat: selectedStore.lat, lng: selectedStore.lng} : defaultCenter}
-                                        zoom={12}
+                                        zoom={selectedStore ? 15 : 11}
                                         onLoad={onMapLoad}
                                         options={{
                                             styles: DARK_MAP_STYLE,
