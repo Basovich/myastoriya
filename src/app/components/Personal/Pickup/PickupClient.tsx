@@ -121,9 +121,31 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
         try {
             const token = await getAccessToken();
             if (token) {
+                const point = points.find(p => p.id === pointToDelete);
+                const wasDefault = point?.isDefault;
+
                 const success = await deleteUserPickupPointApi(parseInt(pointToDelete, 10), token, lang);
                 if (success) {
-                    setPoints(prev => prev.filter(p => p.id !== pointToDelete));
+                    const remainingPoints = points.filter(p => p.id !== pointToDelete);
+                    if (wasDefault && remainingPoints.length > 0) {
+                        const newDefaultPoint = remainingPoints[0];
+                        try {
+                            const setSuccess = await markUserPickupPointAsDefaultApi(parseInt(newDefaultPoint.id, 10), token, lang);
+                            if (setSuccess) {
+                                setPoints(remainingPoints.map(p => ({
+                                    ...p,
+                                    isDefault: p.id === newDefaultPoint.id
+                                })));
+                            } else {
+                                setPoints(remainingPoints);
+                            }
+                        } catch (err) {
+                            console.error('Failed to set new default pickup point after delete:', err);
+                            setPoints(remainingPoints);
+                        }
+                    } else {
+                        setPoints(remainingPoints);
+                    }
                 }
             }
         } catch (error) {
