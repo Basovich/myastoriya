@@ -11,6 +11,7 @@ import Search from '@/app/components/ui/Search/Search';
 import Button from '@/app/components/ui/Button/Button';
 import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
 import { getShopsApi } from '@/lib/graphql';
+import Spinner from '@/app/components/ui/Spinner/Spinner';
 
 interface Store {
     id: string;
@@ -206,7 +207,9 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingS
 
                 <div className={s.modalContent}>
                     {isLoadingStores ? (
-                        <div className={s.loading}>{t.loading}</div>
+                        <div className={s.loading}>
+                            <Spinner />
+                        </div>
                     ) : view === 'list' ? (
                         <div className={s.listView}>
                             <div className={s.storeList}>
@@ -289,7 +292,9 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingS
                                         ))}
                                     </GoogleMap>
                                 ) : (
-                                    <div className={s.loading}>{t.loading}</div>
+                                    <div className={s.loading}>
+                                        <Spinner />
+                                    </div>
                                 )}
                             </div>
                             <div className={s.mapInfo}>
