@@ -20,6 +20,22 @@ export interface FaqGroup {
     name: string;
 }
 
+export interface CategoryThumbnails {
+    thumb1x: string | null;
+    thumb2x: string | null;
+    thumb3x: string | null;
+}
+
+export interface CategoryAppMini {
+    mini1x: string | null;
+    mini2x: string | null;
+    mini3x: string | null;
+}
+
+export interface CategoryBanner {
+    size1x?: string | null;
+}
+
 export interface ProductCategory {
     id: string;
     parentId?: number | null;
@@ -43,9 +59,9 @@ export interface ProductCategory {
     } | null;
     children?: ProductCategory[];
     recommendedProducts?: Product[];
-    banner?: {
-        size1x?: string | null;
-    } | null;
+    banner?: CategoryBanner | null;
+    thumbnail?: CategoryThumbnails | null;
+    appMini?: CategoryAppMini | null;
     faqGroups?: FaqGroup[] | null;
     bundles?: ProductBundle[] | null;
 }
@@ -189,6 +205,9 @@ export function resolveCategoryImageUrl(category: ProductCategory): string {
         category.image?.square3x || 
         category.image?.square2x || 
         category.image?.square1x || 
+        category.thumbnail?.thumb3x ||
+        category.thumbnail?.thumb2x ||
+        category.thumbnail?.thumb1x ||
         category.image?.big3x || 
         category.image?.big2x || 
         category.image?.big1x || 
@@ -198,6 +217,10 @@ export function resolveCategoryImageUrl(category: ProductCategory): string {
         category.menuIcon?.icon3x || 
         category.menuIcon?.icon2x || 
         category.menuIcon?.icon1x || 
+        category.appMini?.mini3x ||
+        category.appMini?.mini2x ||
+        category.appMini?.mini1x ||
+        category.banner?.size1x ||
         null;
         
     if (!url) return '';
@@ -885,6 +908,19 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                 big2x
                 big3x
             }
+            thumbnail {
+                thumb1x
+                thumb2x
+                thumb3x
+            }
+            appMini {
+                mini1x
+                mini2x
+                mini3x
+            }
+            banner {
+                size1x
+            }
             children {
                 id
                 name
@@ -905,6 +941,19 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                     big2x
                     big3x
                 }
+                thumbnail {
+                    thumb1x
+                    thumb2x
+                    thumb3x
+                }
+                appMini {
+                    mini1x
+                    mini2x
+                    mini3x
+                }
+                banner {
+                    size1x
+                }
                 children {
                     id
                     name
@@ -919,6 +968,19 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                         big1x
                         big2x
                         big3x
+                    }
+                    thumbnail {
+                        thumb1x
+                        thumb2x
+                        thumb3x
+                    }
+                    appMini {
+                        mini1x
+                        mini2x
+                        mini3x
+                    }
+                    banner {
+                        size1x
                     }
                 }
             }
@@ -1011,6 +1073,19 @@ const SEARCH_CATEGORIES_QUERY = /* GraphQL */ `
                 big2x
                 big3x
             }
+            thumbnail {
+                thumb1x
+                thumb2x
+                thumb3x
+            }
+            appMini {
+                mini1x
+                mini2x
+                mini3x
+            }
+            banner {
+                size1x
+            }
             children {
                 id
                 name
@@ -1026,6 +1101,19 @@ const SEARCH_CATEGORIES_QUERY = /* GraphQL */ `
                     big2x
                     big3x
                 }
+                thumbnail {
+                    thumb1x
+                    thumb2x
+                    thumb3x
+                }
+                appMini {
+                    mini1x
+                    mini2x
+                    mini3x
+                }
+                banner {
+                    size1x
+                }
                 children {
                     id
                     name
@@ -1040,6 +1128,19 @@ const SEARCH_CATEGORIES_QUERY = /* GraphQL */ `
                         big1x
                         big2x
                         big3x
+                    }
+                    thumbnail {
+                        thumb1x
+                        thumb2x
+                        thumb3x
+                    }
+                    appMini {
+                        mini1x
+                        mini2x
+                        mini3x
+                    }
+                    banner {
+                        size1x
                     }
                 }
             }
@@ -1078,6 +1179,19 @@ const SUBCATEGORIES_QUERY = /* GraphQL */ `
                 big2x
                 big3x
             }
+            thumbnail {
+                thumb1x
+                thumb2x
+                thumb3x
+            }
+            appMini {
+                mini1x
+                mini2x
+                mini3x
+            }
+            banner {
+                size1x
+            }
             children {
                 id
                 name
@@ -1098,6 +1212,19 @@ const SUBCATEGORIES_QUERY = /* GraphQL */ `
                     big2x
                     big3x
                 }
+                thumbnail {
+                    thumb1x
+                    thumb2x
+                    thumb3x
+                }
+                appMini {
+                    mini1x
+                    mini2x
+                    mini3x
+                }
+                banner {
+                    size1x
+                }
                 children {
                     id
                     name
@@ -1112,6 +1239,19 @@ const SUBCATEGORIES_QUERY = /* GraphQL */ `
                         big1x
                         big2x
                         big3x
+                    }
+                    thumbnail {
+                        thumb1x
+                        thumb2x
+                        thumb3x
+                    }
+                    appMini {
+                        mini1x
+                        mini2x
+                        mini3x
+                    }
+                    banner {
+                        size1x
                     }
                 }
             }
@@ -1135,6 +1275,32 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
             parentId
             name
             slug
+            image {
+                square1x
+                square2x
+                square3x
+                rectangle1x
+                rectangle2x
+                rectangle3x
+                big1x
+                big2x
+                big3x
+            }
+            menuIcon {
+                icon1x
+                icon2x
+                icon3x
+            }
+            thumbnail {
+                thumb1x
+                thumb2x
+                thumb3x
+            }
+            appMini {
+                mini1x
+                mini2x
+                mini3x
+            }
             banner {
                 size1x
             }

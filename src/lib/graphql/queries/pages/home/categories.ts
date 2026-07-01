@@ -20,6 +20,19 @@ export interface PopularCategory {
         big2x: string | null;
         big3x: string | null;
     } | null;
+    thumbnail?: {
+        thumb1x: string | null;
+        thumb2x: string | null;
+        thumb3x: string | null;
+    } | null;
+    appMini?: {
+        mini1x: string | null;
+        mini2x: string | null;
+        mini3x: string | null;
+    } | null;
+    banner?: {
+        size1x?: string | null;
+    } | null;
     productsCount?: number;
 }
 
@@ -45,6 +58,19 @@ const POPULAR_CATEGORIES_QUERY = /* GraphQL */ `
                 big1x
                 big2x
                 big3x
+            }
+            thumbnail {
+                thumb1x
+                thumb2x
+                thumb3x
+            }
+            appMini {
+                mini1x
+                mini2x
+                mini3x
+            }
+            banner {
+                size1x
             }
         }
     }
