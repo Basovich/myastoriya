@@ -59,6 +59,10 @@
         padding: 0 4px;
         left: 12px;
     }
+
+    &.readOnly {
+        cursor: pointer;
+    }
 }
 
 .label {

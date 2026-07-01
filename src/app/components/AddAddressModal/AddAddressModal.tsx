@@ -302,15 +302,11 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
             streetVal = mapSearch || `${dict.coordinates}: ${mapMarker.lat.toFixed(4)}, ${mapMarker.lng.toFixed(4)}`;
         }
 
-        onAdd({
-            id: Math.random().toString(36).substr(2, 9),
-            title: dict.selectedOnMapTitle,
-            street: streetVal,
-            streetId: streetId,
-            city: cityVal,
-            house: houseVal,
-        });
-        handleClose();
+        setStreet(streetVal);
+        setHouse(houseVal);
+        setCity(cityVal);
+        updateFormFromGeocode(cityVal, streetVal, houseVal);
+        setView('form');
     };
 
     const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
@@ -534,7 +530,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                                     variant="red" 
                                     className={s.confirmBtn}
                                     onClick={handleMapConfirm}
-                                    disabled={!mapMarker && !mapSearch}
+                                    disabled={!mapMarker || !parsedAddress?.street}
                                 >
                                     {dict.confirmBtn}
                                 </Button>

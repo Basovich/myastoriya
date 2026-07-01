@@ -16,8 +16,10 @@ interface SearchableSelectProps {
     placeholder?: string;
     required?: boolean;
     disabled?: boolean;
+    readOnly?: boolean;
     onSearch: (query: string, page: number) => Promise<{ data: Option[]; hasMore: boolean }>;
     onSelect: (option: Option | null) => void;
+    onClick?: () => void;
     className?: string;
 }
 
@@ -28,8 +30,10 @@ export default function SearchableSelect({
     placeholder = ' ',
     required = false,
     disabled = false,
+    readOnly = false,
     onSearch,
     onSelect,
+    onClick,
     className,
 }: SearchableSelectProps) {
     const [isOpen, setIsOpen] = useState(false);
@@ -155,14 +159,17 @@ export default function SearchableSelect({
                     className={clsx(
                         s.input,
                         isOpen && s.inputActive,
-                        hasValue && s.inputHasValue
+                        hasValue && s.inputHasValue,
+                        readOnly && s.readOnly
                     )}
                     placeholder={placeholder}
                     value={searchQuery}
-                    onChange={handleInputChange}
-                    onFocus={handleFocus}
+                    onChange={readOnly ? undefined : handleInputChange}
+                    onFocus={readOnly ? undefined : handleFocus}
                     onBlur={handleBlur}
                     disabled={disabled}
+                    readOnly={readOnly}
+                    onClick={readOnly ? onClick : undefined}
                     autoComplete="off"
                 />
                 <label className={s.label} htmlFor={id}>
