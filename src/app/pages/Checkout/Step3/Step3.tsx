@@ -265,8 +265,8 @@ export default function Step3({ lang }: Step3Props) {
                     phone: formatPhone(user.phone || ''),
                     email: user.email || null,
                     anotherRecipient: true,
-                    recipientFullName: `${savedUserData.firstName} ${savedUserData.lastName}`.trim(),
-                    recipientPhone: formatPhone(savedUserData.phone),
+                    recipientFullName: savedUserData.recipientName || '',
+                    recipientPhone: formatPhone(savedUserData.recipientPhone || ''),
                 };
             } else {
                 userData = {

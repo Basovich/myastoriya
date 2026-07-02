@@ -37,6 +37,8 @@ interface FormData {
     smsCode: string;
     agreed: boolean;
     anotherRecipient: boolean;
+    recipientName: string;
+    recipientPhone: string;
 }
 
 interface FormErrors {
@@ -46,6 +48,8 @@ interface FormErrors {
     email?: string;
     smsCode?: string;
     agreed?: string;
+    recipientName?: string;
+    recipientPhone?: string;
 }
 
 interface Touched {
@@ -55,6 +59,8 @@ interface Touched {
     email?: boolean;
     smsCode?: boolean;
     agreed?: boolean;
+    recipientName?: boolean;
+    recipientPhone?: boolean;
 }
 
 export default function Step1() {
@@ -76,6 +82,8 @@ export default function Step1() {
         smsCode: '',
         agreed: true,
         anotherRecipient: false,
+        recipientName: '',
+        recipientPhone: '',
     });
 
     const [touched, setTouched] = useState<Touched>({});
@@ -103,19 +111,19 @@ export default function Step1() {
     const router = useRouter();
 
     useEffect(() => {
-        if (isAuthenticated && user && !formData.anotherRecipient) {
+        if (isAuthenticated && user) {
             setFormData(prev => ({
                 ...prev,
-                firstName: user.surname ? (user.name || '') : (user.name?.split(' ')[0] || ''),
-                lastName: user.surname || user.name?.split(' ').slice(1).join(' ') || '',
-                phone: (user.phone || '').replace(/\D/g, ''),
-                email: user.email || '',
+                firstName: prev.firstName || user.surname ? (user.name || '') : (user.name?.split(' ')[0] || ''),
+                lastName: prev.lastName || user.surname || user.name?.split(' ').slice(1).join(' ') || '',
+                phone: prev.phone || (user.phone || '').replace(/\D/g, ''),
+                email: prev.email || user.email || '',
             }));
             if (user.phone) {
                 setPhoneVerified(true);
             }
         }
-    }, [isAuthenticated, user, formData.anotherRecipient]);
+    }, [isAuthenticated, user]);
 
     const handleCloseCartModal = () => {
         setIsCartModalOpen(false);
@@ -126,37 +134,7 @@ export default function Step1() {
     };
 
     const handleChange = (field: keyof FormData, value: string | boolean) => {
-        if (field === 'anotherRecipient' && typeof value === 'boolean') {
-            if (value) {
-                // Clearing for another recipient
-                setFormData(prev => ({
-                    ...prev,
-                    [field]: true,
-                    firstName: '',
-                    lastName: '',
-                    phone: '',
-                    email: '',
-                }));
-                setPhoneVerified(false);
-            } else {
-                // Restoring user data if user is present, otherwise just updating the checkbox state
-                setFormData(prev => ({
-                    ...prev,
-                    [field]: false,
-                    ...(user ? {
-                        firstName: user.surname ? (user.name || '') : (user.name?.split(' ')[0] || ''),
-                        lastName: user.surname || user.name?.split(' ').slice(1).join(' ') || '',
-                        phone: (user.phone || '').replace(/\D/g, ''),
-                        email: user.email || '',
-                    } : {})
-                }));
-                if (user && user.phone) {
-                    setPhoneVerified(true);
-                }
-            }
-        } else {
-            setFormData(prev => ({ ...prev, [field]: value }));
-        }
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     const [phoneVerified, setPhoneVerified] = useState(false);
@@ -176,9 +154,23 @@ export default function Step1() {
         if (timerRef.current) clearInterval(timerRef.current);
     };
 
+    const handleRecipientPhoneRawChange = (raw: string) => {
+        handleChange('recipientPhone', raw);
+        setSubmitAttempted(false);
+    };
+
     const { formatted: phoneFormatted, handleChange: handlePhoneChange, handleFocus: handlePhoneFocus } = usePhoneMask(
         formData.phone,
         handlePhoneRawChange,
+    );
+
+    const {
+        formatted: recipientPhoneFormatted,
+        handleChange: handleRecipientPhoneChange,
+        handleFocus: handleRecipientPhoneFocus
+    } = usePhoneMask(
+        formData.recipientPhone,
+        handleRecipientPhoneRawChange,
     );
 
     const handleBlur = (field: keyof Touched) => {
@@ -196,6 +188,18 @@ export default function Step1() {
         } else if ((submitAttempted || forceVerifyCheck) && !phoneVerified) {
             errors.phone = "Підтвердіть номер телефону через SMS";
         }
+        
+        if (formData.anotherRecipient) {
+            if (!formData.recipientName.trim()) {
+                errors.recipientName = "Обов'язкове поле";
+            }
+            if (!formData.recipientPhone.trim()) {
+                errors.recipientPhone = "Обов'язкове поле";
+            } else if (formData.recipientPhone.length < 12) {
+                errors.recipientPhone = "Некоректний номер телефону";
+            }
+        }
+
         if (!formData.agreed) errors.agreed = 'Потрібна згода';
         return errors;
     };
@@ -277,6 +281,8 @@ export default function Step1() {
             email: true,
             smsCode: true,
             agreed: true,
+            recipientName: true,
+            recipientPhone: true,
         };
         setTouched(allTouched);
         
@@ -314,6 +320,8 @@ export default function Step1() {
                 phone: formData.phone,
                 email: formData.email || null,
                 anotherRecipient: formData.anotherRecipient,
+                recipientName: formData.recipientName,
+                recipientPhone: formData.recipientPhone,
             };
             localStorage.setItem('checkout_user_data', JSON.stringify(checkoutUserData));
 
@@ -477,6 +485,39 @@ export default function Step1() {
                                     }
                                 </button>
                             </div>
+                        </div>
+                    )}
+                    {formData.anotherRecipient && (
+                        <div className={s.formRow} style={{ marginTop: '16px' }}>
+                            <InputField
+                                id="checkout-recipient-name"
+                                label="Ім'я отримувача"
+                                required
+                                value={formData.recipientName}
+                                onChange={e => handleChange('recipientName', e.target.value)}
+                                onBlur={() => handleBlur('recipientName')}
+                                error={errors.recipientName}
+                                touched={touched.recipientName}
+                                className={s.checkoutInput}
+                            />
+                            <InputField
+                                id="checkout-recipient-phone"
+                                label="Телефон отримувача"
+                                required
+                                type="tel"
+                                autoComplete="off"
+                                readOnly
+                                onFocus={(e) => {
+                                    e.currentTarget.removeAttribute('readonly');
+                                    handleRecipientPhoneFocus();
+                                }}
+                                value={recipientPhoneFormatted}
+                                onChange={handleRecipientPhoneChange}
+                                onBlur={() => handleBlur('recipientPhone')}
+                                error={errors.recipientPhone}
+                                touched={touched.recipientPhone}
+                                className={s.checkoutInput}
+                            />
                         </div>
                     )}
 
