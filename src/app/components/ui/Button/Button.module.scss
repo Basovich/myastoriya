@@ -26,6 +26,11 @@
             transition: stroke 0.2s linear, fill 0.2s linear;
         }
     }
+
+    &:disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 }
 
 /* Primary — red background */

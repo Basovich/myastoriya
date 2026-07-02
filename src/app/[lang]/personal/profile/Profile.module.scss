@@ -84,3 +84,33 @@
         flex: 1;
     }
 }
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.skeletonCard {
+    background: #F0F0F0;
+    border-radius: var(--radius-xl);
+    height: 160px;
+    width: 100%;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonRecentOrder {
+    max-width: 322px;
+    border: 1px solid #E5E5E5;
+
+    @media (max-width: 767px) {
+        max-width: 100%;
+    }
+}
+
+.skeletonBonus {
+    border: 1px solid #E5E5E5;
+}

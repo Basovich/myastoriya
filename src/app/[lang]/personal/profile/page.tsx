@@ -127,6 +127,7 @@ const profileDict = {
 
 export default function ProfilePage() {
     const { user, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
+    const userId = user?.id;
     const localViewedIds = useAppSelector((state) => state.viewedProducts.items);
     const dispatch = useAppDispatch();
     const router = useRouter();
@@ -224,7 +225,7 @@ export default function ProfilePage() {
     }, [lang, localViewedIds, hydrated]);
 
     React.useEffect(() => {
-        if (!hydrated || !user) {
+        if (!hydrated || !userId) {
             setLoading(false);
             return;
         }
@@ -298,7 +299,7 @@ export default function ProfilePage() {
         };
 
         fetchProfileData();
-    }, [hydrated, user, lang]);
+    }, [hydrated, userId, lang]);
 
     const handleFormSubmit = async (values: ProfileFormValues) => {
         try {
@@ -365,7 +366,16 @@ export default function ProfilePage() {
                 />
                 
                 <div className={s.profileContainer}>
-                    {!loading && (
+                    {loading ? (
+                        <div className={s.topCardsRow}>
+                            <div className={clsx(s.cardWrapper, s.cardWrapperRecentOrderCard)}>
+                                <div className={clsx(s.skeletonCard, s.skeletonRecentOrder)} />
+                            </div>
+                            <div className={s.cardWrapper}>
+                                <div className={clsx(s.skeletonCard, s.skeletonBonus)} />
+                            </div>
+                        </div>
+                    ) : (
                         <div className={`${s.topCardsRow} ${isSingleCard ? s.singleCard : ''}`}>
                             {showRecentOrder && recentOrder && (
                                 <div className={clsx(s.cardWrapper, s.cardWrapperRecentOrderCard)}>

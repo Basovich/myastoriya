@@ -371,7 +371,7 @@ export default function ProfileForm({ user, dict, onSubmit, submitStatus }: Prof
                         type="submit" 
                         variant="black" 
                         className={s.submitBtn}
-                        disabled={formik.isSubmitting || (isNewPhone && !phoneVerified)}
+                        disabled={formik.isSubmitting || !formik.dirty || (isNewPhone && !phoneVerified)}
                     >
                         {formik.isSubmitting ? 'Зберігаємо...' : dict.saveButton}
                     </Button>
