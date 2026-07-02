@@ -290,6 +290,8 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
             return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         });
 
+    const completedOrdersCount = orders.filter((order) => order.status?.id === '2').length;
+
     return (
         <div className={s.reviewsPage}>
             <PersonalContentBlock className={s.reviewsBlock}>
@@ -316,23 +318,26 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                     </button>
                 </div>
 
-                <div className={s.controlsRow}>
-                    <DatePicker
-                        id="reviews-date-range"
-                        label={dict.sortLabel}
-                        prefixLabel={dict.sortPrefix}
-                        hideLabel={true}
-                        hideIcon={true}
-                        selectsRange={true}
-                        startDate={startDate}
-                        endDate={endDate}
-                        onChangeRange={handleDateChange}
-                        onClear={handleClearDate}
-                        maxDate={new Date()}
-                        className={s.reviewsDatePicker}
-                        lang={lang}
-                    />
-                </div>
+                {((activeTab === 'orders' && completedOrdersCount > 0) ||
+                  (activeTab === 'products' && Object.keys(productReviews).length > 0)) && (
+                    <div className={s.controlsRow}>
+                        <DatePicker
+                            id="reviews-date-range"
+                            label={dict.sortLabel}
+                            prefixLabel={dict.sortPrefix}
+                            hideLabel={true}
+                            hideIcon={true}
+                            selectsRange={true}
+                            startDate={startDate}
+                            endDate={endDate}
+                            onChangeRange={handleDateChange}
+                            onClear={handleClearDate}
+                            maxDate={new Date()}
+                            className={s.reviewsDatePicker}
+                            lang={lang}
+                        />
+                    </div>
+                )}
 
                 {loading ? (
                     <Spinner />

@@ -127,7 +127,11 @@ export default function ProductReviewCard({
                         <div className={s.textGroup}>
                             <h4 className={s.reviewLabel}>Ваш відгук</h4>
                             <p className={s.reviewText}>{reviewText}</p>
-
+                            {published === false && (
+                                <div className={s.unmoderatedNote}>
+                                    {lang === 'ru' ? '* Отзыв на модерации' : '* Відгук на модерації'}
+                                </div>
+                            )}
                         </div>
                         <div className={s.ratingGroup}>
                             <h4 className={s.reviewLabel}>Ваша оцінка</h4>
