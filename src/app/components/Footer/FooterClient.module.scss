@@ -152,6 +152,12 @@
     }
 }
 
+.bottomLogo {
+    @media (min-width: 1280px) {
+        display: none !important;
+    }
+}
+
 .linksList {
     display: flex;
     flex-direction: column;

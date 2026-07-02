@@ -197,7 +197,7 @@ export default function FooterClient({ lang, initialSocialLinks }: FooterProps) 
                         <h3 className={s.socialTitle}>Ми в соціальних мережах</h3>
                         {renderSocialIcons()}
                     </div>
-                    <Logo lang={lang} className={s.footerLogo} />
+                    <Logo lang={lang} className={clsx(s.footerLogo, s.bottomLogo)} />
                 </div>
             </div>
         </footer>
