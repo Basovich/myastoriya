@@ -11,6 +11,7 @@ export interface AuthUser {
     phone: string;
     name?: string;
     surname?: string;
+    patronymic?: string;
     email?: string;
     middleName?: string;
     birthday?: string;
@@ -49,6 +50,9 @@ const authSlice = createSlice({
     reducers: {
         login(state, action: PayloadAction<AuthUser & { token?: string }>) {
             const { token, ...user } = action.payload;
+            if (user.patronymic && !user.middleName) {
+                user.middleName = user.patronymic;
+            }
             state.user = user;
             state.isAuthenticated = true;
             state.isGuest = false;
@@ -71,6 +75,9 @@ const authSlice = createSlice({
         },
         setUser(state, action: PayloadAction<AuthUser & { token?: string }>) {
             const { token, ...user } = action.payload;
+            if (user.patronymic && !user.middleName) {
+                user.middleName = user.patronymic;
+            }
             state.user = user;
             state.isAuthenticated = true;
             state.isGuest = false;

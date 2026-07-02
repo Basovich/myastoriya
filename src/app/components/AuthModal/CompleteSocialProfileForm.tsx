@@ -110,6 +110,7 @@ export default function CompleteSocialProfileForm({ googleProfile, onSuccess, on
                     id: updatedUser.id,
                     name: updatedUser.name,
                     surname: updatedUser.surname,
+                    patronymic: updatedUser.patronymic,
                     phone: updatedUser.phone,
                     email: updatedUser.email,
                     birthday: updatedUser.birthday,

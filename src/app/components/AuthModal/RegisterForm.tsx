@@ -126,6 +126,7 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
                         id: result.user.id,
                         name: result.user.name,
                         surname: result.user.surname,
+                        patronymic: result.user.patronymic,
                         phone: result.user.phone,
                         email: result.user.email,
                         birthday: result.user.birthday,

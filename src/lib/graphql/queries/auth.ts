@@ -8,6 +8,7 @@ export interface BackendUser {
     id: string;
     name: string;
     surname: string;
+    patronymic?: string;
     phone: string;
     email?: string;
     birthday?: string;
@@ -95,6 +96,7 @@ const LOGIN_MUTATION = /* GraphQL */ `
                 id
                 name
                 surname
+                patronymic
                 phone
                 email
                 birthday
@@ -137,6 +139,7 @@ const REGISTRATION_MUTATION = /* GraphQL */ `
                 id
                 name
                 surname
+                patronymic
                 phone
                 email
                 birthday
@@ -197,6 +200,7 @@ const SOCIAL_AUTH_MUTATION = /* GraphQL */ `
                 id
                 name
                 surname
+                patronymic
                 phone
                 email
                 birthday
@@ -275,6 +279,7 @@ const ME_QUERY = /* GraphQL */ `
             id
             name
             surname
+            patronymic
             phone
             email
             birthday
@@ -293,6 +298,7 @@ const UPDATE_USER_DATA_MUTATION = /* GraphQL */ `
     mutation UpdateUserData(
         $name: String!
         $surname: String!
+        $patronymic: String
         $phone: String!
         $email: String
         $birthday: String
@@ -302,6 +308,7 @@ const UPDATE_USER_DATA_MUTATION = /* GraphQL */ `
         updateUserData(
             name: $name
             surname: $surname
+            patronymic: $patronymic
             phone: $phone
             email: $email
             birthday: $birthday
@@ -311,6 +318,7 @@ const UPDATE_USER_DATA_MUTATION = /* GraphQL */ `
             id
             name
             surname
+            patronymic
             phone
             email
             birthday
@@ -365,6 +373,7 @@ function formatPhone(phone: string): string {
 export interface UpdateUserInput {
     name: string;
     surname: string;
+    patronymic?: string;
     phone: string;
     email?: string;
     birthday?: string;

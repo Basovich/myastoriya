@@ -315,6 +315,7 @@ export default function ProfilePage() {
                 {
                     name: values.name,
                     surname: values.surname,
+                    patronymic: values.middleName,
                     phone: values.phone,
                     email: values.email || '',
                     birthday: values.birthday || '',
@@ -328,6 +329,7 @@ export default function ProfilePage() {
                 id: updatedUser.id,
                 name: updatedUser.name,
                 surname: updatedUser.surname,
+                patronymic: updatedUser.patronymic,
                 phone: updatedUser.phone,
                 email: updatedUser.email,
                 birthday: updatedUser.birthday,
