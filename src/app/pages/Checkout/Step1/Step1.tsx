@@ -106,8 +106,8 @@ export default function Step1() {
         if (isAuthenticated && user && !formData.anotherRecipient) {
             setFormData(prev => ({
                 ...prev,
-                firstName: user.name?.split(' ')[0] || '',
-                lastName: user.name?.split(' ').slice(1).join(' ') || '',
+                firstName: user.surname ? (user.name || '') : (user.name?.split(' ')[0] || ''),
+                lastName: user.surname || user.name?.split(' ').slice(1).join(' ') || '',
                 phone: (user.phone || '').replace(/\D/g, ''),
                 email: user.email || '',
             }));
@@ -144,8 +144,8 @@ export default function Step1() {
                     ...prev,
                     [field]: false,
                     ...(user ? {
-                        firstName: user.name?.split(' ')[0] || '',
-                        lastName: user.name?.split(' ').slice(1).join(' ') || '',
+                        firstName: user.surname ? (user.name || '') : (user.name?.split(' ')[0] || ''),
+                        lastName: user.surname || user.name?.split(' ').slice(1).join(' ') || '',
                         phone: (user.phone || '').replace(/\D/g, ''),
                         email: user.email || '',
                     } : {})
