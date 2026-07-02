@@ -260,8 +260,8 @@ export default function Step3({ lang }: Step3Props) {
             if (savedUserData.anotherRecipient && isAuthenticated && user) {
                 userData = {
                     localityId,
-                    name: user.name?.split(' ')[0] || 'Покупець',
-                    surname: user.name?.split(' ').slice(1).join(' ') || 'Покупець',
+                    name: user.surname ? (user.name || 'Покупець') : (user.name?.split(' ')[0] || 'Покупець'),
+                    surname: user.surname || user.name?.split(' ').slice(1).join(' ') || 'Покупець',
                     phone: formatPhone(user.phone || ''),
                     email: user.email || null,
                     anotherRecipient: true,
