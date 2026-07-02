@@ -181,6 +181,8 @@ export {
     getProductReviewsApi,
     addOrderReviewApi,
     addProductReviewApi,
+    updateOrderReviewApi,
+    updateProductReviewApi,
 } from './queries/reviews';
 export type {
     OrderReview,

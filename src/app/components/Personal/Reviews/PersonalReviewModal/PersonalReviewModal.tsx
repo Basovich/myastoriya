@@ -10,7 +10,12 @@ import useScrollLock from '@/hooks/useScrollLock';
 import Button from "@/app/components/ui/Button/Button";
 import TextareaField from '@/app/components/ui/TextareaField';
 import { getAccessToken } from '@/app/actions/authActions';
-import { addOrderReviewApi, addProductReviewApi } from '@/lib/graphql';
+import { 
+    addOrderReviewApi, 
+    addProductReviewApi,
+    updateOrderReviewApi,
+    updateProductReviewApi 
+} from '@/lib/graphql';
 import s from './PersonalReviewModal.module.scss';
 
 interface PersonalReviewModalProps {
@@ -22,6 +27,7 @@ interface PersonalReviewModalProps {
     initialData?: {
         review: string;
         ratings?: Record<string, number> | number;
+        reviewId?: string;
     };
     onSuccess?: () => void;
 }
@@ -99,11 +105,19 @@ export default function PersonalReviewModal({
                 }
 
                 if (isProduct) {
-                    await addProductReviewApi(token, {
-                        productId: productId as number,
-                        rating: values.rating,
-                        text: values.review,
-                    });
+                    if (isEditMode && initialData?.reviewId) {
+                        await updateProductReviewApi(token, {
+                            id: parseInt(initialData.reviewId),
+                            rating: values.rating,
+                            text: values.review,
+                        });
+                    } else {
+                        await addProductReviewApi(token, {
+                            productId: productId as number,
+                            rating: values.rating,
+                            text: values.review,
+                        });
+                    }
                 } else {
                     const ratingsArray = [
                         { id: "2", rating: values.ratings.service },
@@ -111,11 +125,19 @@ export default function PersonalReviewModal({
                         { id: "4", rating: values.ratings.delivery },
                         { id: "5", rating: values.ratings.product },
                     ];
-                    await addOrderReviewApi(token, {
-                        orderId: parseInt(orderNumber as string),
-                        ratings: ratingsArray,
-                        text: values.review,
-                    });
+                    if (isEditMode) {
+                        await updateOrderReviewApi(token, {
+                            orderId: parseInt(orderNumber as string),
+                            ratings: ratingsArray,
+                            text: values.review,
+                        });
+                    } else {
+                        await addOrderReviewApi(token, {
+                            orderId: parseInt(orderNumber as string),
+                            ratings: ratingsArray,
+                            text: values.review,
+                        });
+                    }
                 }
                 
                 setSubmitted(true);

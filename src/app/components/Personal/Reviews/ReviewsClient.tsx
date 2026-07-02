@@ -138,7 +138,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<{ id: string; ratings?: Record<string, number>; review?: string } | null>(null);
-    const [selectedProduct, setSelectedProduct] = useState<{ id: number; name: string; rating?: number; review?: string } | null>(null);
+    const [selectedProduct, setSelectedProduct] = useState<{ id: number; name: string; rating?: number; review?: string; reviewId?: string } | null>(null);
 
     const loadData = useCallback(async () => {
         setLoading(true);
@@ -258,7 +258,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         setIsModalOpen(true);
     };
 
-    const openProductReviewModal = (id: number, name: string, initialData?: { review?: string; ratings?: number }) => {
+    const openProductReviewModal = (id: number, name: string, initialData?: { review?: string; ratings?: number; reviewId?: string }) => {
         setSelectedProduct({ id, name, ...initialData });
         setSelectedOrder(null);
         setIsModalOpen(true);
@@ -444,6 +444,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                                         openProductReviewModal(prodId, productName, {
                                             review: rev.text,
                                             ratings: rev.rating,
+                                            reviewId: rev.id,
                                         })
                                     }
                                     date={dateStr}
@@ -469,7 +470,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                                 : undefined
                             : selectedProduct
                             ? selectedProduct.review
-                                ? { review: selectedProduct.review, ratings: selectedProduct.rating }
+                                ? { review: selectedProduct.review, ratings: selectedProduct.rating, reviewId: selectedProduct.reviewId }
                                 : undefined
                             : undefined
                     }

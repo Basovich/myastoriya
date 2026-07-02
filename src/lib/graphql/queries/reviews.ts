@@ -96,6 +96,18 @@ const ADD_PRODUCT_REVIEW_MUTATION = /* GraphQL */ `
     }
 `;
 
+const UPDATE_ORDER_REVIEW_MUTATION = /* GraphQL */ `
+    mutation UpdateOrderReview($orderId: Int!, $ratings: [ReviewRating], $text: String!) {
+        updateOrderReview(orderId: $orderId, ratings: $ratings, text: $text)
+    }
+`;
+
+const UPDATE_PRODUCT_REVIEW_MUTATION = /* GraphQL */ `
+    mutation UpdateProductReview($id: Int!, $rating: Int!, $text: String!) {
+        updateProductReview(id: $id, rating: $rating, text: $text)
+    }
+`;
+
 export async function getOrderReviewsApi(
     token: string,
     params?: { orderId?: number; limit?: number; page?: number },
@@ -146,4 +158,30 @@ export async function addProductReviewApi(
         { token, lang },
     );
     return data.addProductReview;
+}
+
+export async function updateOrderReviewApi(
+    token: string,
+    variables: { orderId: number; ratings: OrderReviewRating[]; text: string },
+    lang?: string,
+): Promise<boolean> {
+    const data = await gqlRequest<{ updateOrderReview: boolean }>(
+        UPDATE_ORDER_REVIEW_MUTATION,
+        variables,
+        { token, lang },
+    );
+    return data.updateOrderReview;
+}
+
+export async function updateProductReviewApi(
+    token: string,
+    variables: { id: number; rating: number; text: string },
+    lang?: string,
+): Promise<boolean> {
+    const data = await gqlRequest<{ updateProductReview: boolean }>(
+        UPDATE_PRODUCT_REVIEW_MUTATION,
+        variables,
+        { token, lang },
+    );
+    return data.updateProductReview;
 }
