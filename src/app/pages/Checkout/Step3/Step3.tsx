@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import s from './Step3.module.scss';
 import StepIndicator from '../components/StepIndicator';
@@ -65,6 +65,7 @@ export default function Step3({ lang }: Step3Props) {
     const [contactMethod, setContactMethod] = useState('dontCallBack');
     
     // Payments State
+    const rawPaymentsRef = useRef<Payment[]>([]);
     const [payments, setPayments] = useState<Payment[]>([]);
     const [isLoadingPayments, setIsLoadingPayments] = useState(true);
     const [paymentMethod, setPaymentMethod] = useState('');
@@ -130,9 +131,26 @@ export default function Step3({ lang }: Step3Props) {
                 }
                 const token = await getAccessToken();
                 const res = await getPaymentsApi(localityId, undefined, token || undefined, lang);
-                setPayments(res);
-                if (res.length > 0) {
-                    setPaymentMethod(res[0].id);
+                
+                rawPaymentsRef.current = res;
+                
+                const hasGPay = res.some(p => p.id === '9');
+                const hasAPay = res.some(p => p.id === '10');
+                
+                let processed = [...res];
+                if (hasGPay || hasAPay) {
+                    processed = processed.filter(p => p.id !== '9' && p.id !== '10');
+                    processed.push({
+                        id: 'merged-gpay-apay',
+                        name: 'Оплата Google pay / Apple pay',
+                        driver: 'merged-gpay-apay',
+                        showChangeField: false
+                    });
+                }
+                
+                setPayments(processed);
+                if (processed.length > 0) {
+                    setPaymentMethod(processed[0].id);
                 }
             } catch (e) {
                 console.error('Failed to load payment methods', e);
@@ -290,8 +308,28 @@ export default function Step3({ lang }: Step3Props) {
                 userPickupPointId: deliveryParams.userPickupPointId ?? null,
             };
 
+            let finalPaymentMethodId = paymentMethod;
+            if (paymentMethod === 'merged-gpay-apay') {
+                const hasGPay = rawPaymentsRef.current.some(p => p.id === '9');
+                const hasAPay = rawPaymentsRef.current.some(p => p.id === '10');
+                
+                const isAppleDevice = typeof window !== 'undefined' && (
+                    /Macintosh|MacIntel|iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                    (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /Mac/.test(navigator.userAgent)) ||
+                    !!(window as any).ApplePaySession
+                );
+                
+                if (isAppleDevice && hasAPay) {
+                    finalPaymentMethodId = '10';
+                } else if (hasGPay) {
+                    finalPaymentMethodId = '9';
+                } else if (hasAPay) {
+                    finalPaymentMethodId = '10';
+                }
+            }
+
             const paymentData: CheckoutPaymentData = {
-                paymentId: Number(paymentMethod),
+                paymentId: Number(finalPaymentMethodId),
                 userCardId: selectedPayment.driver?.includes('liqpay') || selectedPayment.driver?.includes('card')
                     ? (selectedCardId ? Number(selectedCardId.replace('card-', '')) : null) 
                     : null,
