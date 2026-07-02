@@ -80,3 +80,50 @@ export const getRestaurantMenuApi = async (
     { lang, next: { revalidate: 300 } }
   );
 };
+
+export interface ShopCustomMenuProduct {
+  id: string;
+  name: string;
+  volume: string | null;
+  price: number;
+}
+
+export interface ShopCustomMenuCategory {
+  id: string;
+  name: string;
+  subtitle: string | null;
+  volume: string | null;
+  products: ShopCustomMenuProduct[];
+}
+
+export interface ShopCustomMenuResponse {
+  shopCustomMenu: ShopCustomMenuCategory[];
+}
+
+export const SHOP_CUSTOM_MENU_QUERY = `
+  query ShopCustomMenu($shopId: Int!) {
+    shopCustomMenu(shopId: $shopId) {
+      id
+      name
+      subtitle
+      volume
+      products {
+        id
+        name
+        volume
+        price
+      }
+    }
+  }
+`;
+
+export const getShopCustomMenuApi = async (
+  shopId: number,
+  lang: string = "ua"
+): Promise<ShopCustomMenuResponse> => {
+  return await gqlRequest<ShopCustomMenuResponse>(
+    SHOP_CUSTOM_MENU_QUERY,
+    { shopId },
+    { lang, next: { revalidate: 300 } }
+  );
+};

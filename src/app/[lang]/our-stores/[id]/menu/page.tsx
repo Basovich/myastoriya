@@ -2,7 +2,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import StoreMenuPage from "@/app/pages/StoreMenu/StoreMenuPage";
 import { getShopApi } from "@/lib/graphql/queries/shops";
-import { getRestaurantMenuApi } from "@/lib/graphql/queries/pages/restaurantMenu";
+import { getRestaurantMenuApi, getShopCustomMenuApi } from "@/lib/graphql/queries/pages/restaurantMenu";
 import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 
@@ -20,16 +20,21 @@ export default async function StoreMenuPageRoute({
             notFound();
         }
 
-        const [shopResponse, menuResponse] = await Promise.all([
+        const [shopResponse, menuResponse, customMenuResponse] = await Promise.all([
             getShopApi(id, lang),
             getRestaurantMenuApi(shopIdNum, lang).catch(error => {
                 console.error("Failed to fetch restaurant menu from API:", error);
                 return { restaurantMenu: [] };
+            }),
+            getShopCustomMenuApi(shopIdNum, lang).catch(error => {
+                console.error("Failed to fetch custom store menu from API:", error);
+                return { shopCustomMenu: [] };
             })
         ]);
 
         const shop = shopResponse.shop;
         const initialMenu = menuResponse?.restaurantMenu || [];
+        const initialCustomMenu = customMenuResponse?.shopCustomMenu || [];
 
         if (!shop) {
             notFound();
@@ -41,6 +46,7 @@ export default async function StoreMenuPageRoute({
                 lang={lang} 
                 dict={dict} 
                 initialMenu={initialMenu}
+                initialCustomMenu={initialCustomMenu}
             />
         );
     } catch (error) {

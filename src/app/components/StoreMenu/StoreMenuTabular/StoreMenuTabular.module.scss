@@ -31,7 +31,7 @@
 }
 
 .headerWrap {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .grid {
@@ -66,22 +66,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 8px;
-}
-
-.itemName {
-  font-size: 14px;
-  font-weight: 800;
-  color: #1a1a1a;
-  text-transform: uppercase;
-  margin: 0;
-  white-space: normal;
-  flex: 0 1 auto;
-  
-  @media (min-width: 1024px) {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  width: 100%;
 }
 
 .leader {
@@ -91,16 +76,77 @@
   margin-bottom: 4px;
 }
 
-.price {
-  font-size: 16px;
-  font-weight: 800;
-  color: #1a1a1a;
-  white-space: nowrap;
-  flex: 0 0 auto;
-}
-
 .description {
   font-size: 12px;
   color: #777777;
   margin: 4px 0 0 0;
+}
+
+.headerWrapContainer {
+  margin-bottom: 30px;
+}
+
+.categorySubheader {
+  font-size: 14px;
+  font-weight: 800;
+  color: #000000;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.05em;
+}
+
+.subheaderSlash {
+  color: #E30613;
+  font-weight: 900;
+}
+
+.subText {
+  color: #000000;
+}
+
+.itemNameWrapper {
+  display: flex;
+  align-items: baseline;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.itemName {
+  font-size: 14px;
+  font-weight: 800;
+  color: #000000;
+  text-transform: uppercase;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 1 auto;
+}
+
+.slash {
+  color: #E30613;
+  margin: 0 6px;
+  font-weight: 800;
+  font-size: 14px;
+  flex: 0 0 auto;
+}
+
+.productVolume {
+  color: #555555;
+  font-weight: 500;
+  font-size: 13px;
+  text-transform: none;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.price {
+  font-size: 16px;
+  font-weight: 800;
+  color: #000000;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }

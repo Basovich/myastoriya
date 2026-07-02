@@ -12,7 +12,7 @@ import PromotionsSlider from '@/app/components/StoreMenu/PromotionsSlider/Promot
 import StoreMenuTabular from '@/app/components/StoreMenu/StoreMenuTabular/StoreMenuTabular';
 import { Shop } from '@/lib/graphql/queries/shops';
 import { menuData } from '@/app/pages/StoreMenu/store-menu.content';
-import { RestaurantMenuCategory } from '@/lib/graphql/queries/pages/restaurantMenu';
+import { RestaurantMenuCategory, ShopCustomMenuCategory } from '@/lib/graphql/queries/pages/restaurantMenu';
 import clsx from "clsx";
 
 interface StoreMenuPageProps {
@@ -20,6 +20,7 @@ interface StoreMenuPageProps {
     lang: Locale;
     dict: Dictionary;
     initialMenu?: RestaurantMenuCategory[];
+    initialCustomMenu?: ShopCustomMenuCategory[];
 }
 
 const getCategoryImage = (name: string): string => {
@@ -33,14 +34,7 @@ const getCategoryImage = (name: string): string => {
     return "/images/cat-restaurant.png";
 };
 
-const isDrinksOrWines = (name: string): boolean => {
-    const n = name.toLowerCase();
-    return n.includes('вино') || n.includes('вина') || n.includes('wine') || 
-           n.includes('напої') || n.includes('напитки') || n.includes('кава') || 
-           n.includes('чай') || n.includes('drinks') || n.includes('алко');
-};
-
-const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initialMenu = [] }) => {
+const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initialMenu = [], initialCustomMenu = [] }) => {
     // Filter out products that are not available (available === 0)
     const resolvedMenu = initialMenu
         .map(cat => ({
@@ -48,8 +42,8 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initial
             products: cat.products.filter(p => p.available > 0)
         }))
         .filter(cat => cat.products.length > 0);
-    // Filter categories to only show food in the standard list
-    const foodCategories = resolvedMenu.filter(cat => !isDrinksOrWines(cat.name));
+    // All categories from restaurantMenu are treated as food/standard grid categories now
+    const foodCategories = resolvedMenu;
 
     const categories: CategoryCircleItem[] = foodCategories.map(cat => ({
         name: cat.name,
@@ -136,7 +130,7 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initial
 
                 {/* Tabular menu section for wines and drinks */}
                 {isClient && visibleCategoriesCount === foodCategories.length && (
-                    <StoreMenuTabular initialMenu={resolvedMenu} />
+                    <StoreMenuTabular customMenu={initialCustomMenu} />
                 )}
             </main>
         </>
