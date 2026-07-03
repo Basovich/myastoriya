@@ -45,6 +45,43 @@ export interface PopulatedCartItem {
     };
 }
 
+function roundWeightString(val: string): string {
+    if (!val) return '';
+    const trimmed = val.trim();
+    
+    // 1. Try to match a pure number (e.g. "1441.399" or "1,53")
+    if (/^\d+([.,]\d+)?$/.test(trimmed)) {
+        const num = parseFloat(trimmed.replace(',', '.'));
+        if (!isNaN(num)) {
+            if (num >= 10) {
+                return String(Math.round(num));
+            } else {
+                return String(Math.round(num * 100) / 100);
+            }
+        }
+    }
+    
+    // 2. Try to match a number with a trailing unit (e.g. "1441.399 г" or "1.5339 кг" or "0.75 л")
+    const match = trimmed.match(/^(\d+([.,]\d+)?)\s*(л|l|мл|ml|г|g|кг|kg|шт)(?![а-яА-Яa-zA-Z0-9])/i);
+    if (match) {
+        const numPart = match[1];
+        const unitPart = match[3];
+        const num = parseFloat(numPart.replace(',', '.'));
+        if (!isNaN(num)) {
+            let roundedNumStr: string;
+            if (num >= 10) {
+                roundedNumStr = String(Math.round(num));
+            } else {
+                roundedNumStr = String(Math.round(num * 100) / 100);
+            }
+            const originalSpacing = trimmed.substring(numPart.length, trimmed.indexOf(unitPart));
+            return `${roundedNumStr}${originalSpacing}${unitPart}`;
+        }
+    }
+    
+    return val;
+}
+
 export function useCartProducts() {
     const cartItems = useAppSelector(state => state.cart.items);
     const { isInitialized } = useAppSelector(state => state.auth);
@@ -187,16 +224,7 @@ export function useCartProducts() {
                     rawWeight = nameMatch[0];
                 }
 
-                // 2. Try portionWeight or portionSize
-                if (!rawWeight) {
-                    if (dbProduct.portionWeight) rawWeight = dbProduct.portionWeight;
-                    else if (dbProduct.portionSize) {
-                        const hasUnit = /[гgкmшт]/i.test(dbProduct.portionSize);
-                        if (hasUnit) rawWeight = dbProduct.portionSize;
-                    }
-                }
-
-                // 3. Try specifications
+                // 2. Try specifications
                 if (!rawWeight) {
                     let weightSpec = dbProduct.specifications?.find(s => {
                         const name = s.name.toLowerCase();
@@ -212,6 +240,15 @@ export function useCartProducts() {
                         });
                     }
                     rawWeight = weightSpec && weightSpec.values.length > 0 ? weightSpec.values[0] : '';
+                }
+
+                // 3. Try portionWeight or portionSize
+                if (!rawWeight) {
+                    if (dbProduct.portionWeight) rawWeight = dbProduct.portionWeight;
+                    else if (dbProduct.portionSize) {
+                        const hasUnit = /[гgкmшт]/i.test(dbProduct.portionSize);
+                        if (hasUnit) rawWeight = dbProduct.portionSize;
+                    }
                 }
 
                 let weight = rawWeight;
@@ -241,6 +278,8 @@ export function useCartProducts() {
                         weight = dbProduct.unit.toLowerCase() === 'шт' ? '1 шт' : dbProduct.unit;
                     }
                 }
+
+                weight = roundWeightString(weight);
 
                 // Use purchaseCost from the cart API as the base price (true retail price, e.g. 127 ₴).
                 // dbProduct.cost (98 ₴) is the catalog promotional price which is already discounted.

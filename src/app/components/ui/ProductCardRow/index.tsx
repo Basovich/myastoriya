@@ -41,11 +41,14 @@ export default function ProductCardRow({
     // Format weight if it is just a number and not "1"
     let formattedWeight = weight;
     if (weight && weight !== "1" && /^\d+([.,]\d+)?$/.test(weight.trim())) {
+        const num = parseFloat(weight.trim().replace(',', '.'));
+        const roundedWeight = num >= 10 ? Math.round(num) : Math.round(num * 100) / 100;
+        
         const titleLower = title.toLowerCase();
         const unitLower = unit.toLowerCase();
         const isLiquid = unitLower.includes('мл') || unitLower.includes('ml') || 
             /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
-        formattedWeight = `${weight} ${isLiquid ? 'мл' : 'г'}`;
+        formattedWeight = `${roundedWeight} ${isLiquid ? 'мл' : 'г'}`;
     }
 
     const displayWeight = formattedWeight === "1" 
