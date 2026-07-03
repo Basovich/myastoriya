@@ -57,12 +57,6 @@ const profileDict = {
       button: "Видалити акаунт",
       confirm: "Ви впевнені, що хочете видалити свій акаунт? Ця дія є незворотною."
     },
-    recentOrder: {
-      title: "Останнє / Активне замовлення",
-      statusLabel: "Статус:",
-      detailsButton: "ДЕТАЛІ",
-      moreItems: "+{count}"
-    },
     form: {
       personalDataTitle: "Особисті дані",
       firstName: "Ім'я",
@@ -96,12 +90,6 @@ const profileDict = {
     deleteAccount: {
       button: "Удалить аккаунт",
       confirm: "Вы уверены, что хотите удалить свой аккаунт? Это действие необратимо."
-    },
-    recentOrder: {
-      title: "Последний / Активный заказ",
-      statusLabel: "Статус:",
-      detailsButton: "ДЕТАЛИ",
-      moreItems: "+{count}"
     },
     form: {
       personalDataTitle: "Личные данные",
@@ -256,7 +244,7 @@ export default function ProfilePage() {
                             .filter(id => !isNaN(id) && id > 0)
                     ));
 
-                    let detailsMap: Record<number, string> = {};
+                    const detailsMap: Record<number, string> = {};
                     if (productIds.length > 0) {
                         try {
                             const details = await getProductsByIdsApi(productIds, lang);
@@ -350,10 +338,6 @@ export default function ProfilePage() {
             });
         }
     };
-
-    const showRecentOrder = !loading && !!recentOrder;
-    const isSingleCard = !loading && !recentOrder;
-
     return (
         <>
             <PersonalContentBlock>
@@ -376,18 +360,15 @@ export default function ProfilePage() {
                             </div>
                         </div>
                     ) : (
-                        <div className={`${s.topCardsRow} ${isSingleCard ? s.singleCard : ''}`}>
-                            {showRecentOrder && recentOrder && (
-                                <div className={clsx(s.cardWrapper, s.cardWrapperRecentOrderCard)}>
-                                    <RecentOrderCard 
-                                        status={recentOrder.status}
-                                        items={recentOrder.items}
-                                        totalItems={recentOrder.totalItems}
-                                        dict={dict.recentOrder}
-                                        onDetails={() => router.push(`/${lang}/personal/orders/${recentOrder.id}`)}
-                                    />
-                                </div>
-                            )}
+                        <div className={s.topCardsRow}>
+                            <div className={clsx(s.cardWrapper, s.cardWrapperRecentOrderCard)}>
+                                <RecentOrderCard 
+                                    status={recentOrder?.status}
+                                    items={recentOrder?.items}
+                                    totalItems={recentOrder?.totalItems}
+                                    onDetails={recentOrder ? () => router.push(`/${lang}/personal/orders/${recentOrder.id}`) : undefined}
+                                />
+                            </div>
                             <div className={s.cardWrapper}>
                                 <BonusCard 
                                     balance={user?.bonuses || 0} 
