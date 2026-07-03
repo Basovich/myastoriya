@@ -22,12 +22,106 @@ import {
     ProductCategory 
 } from "@/lib/graphql/queries/products";
 
-// Removed MOCKs
+function getProductWeightForSearch(product: Product): string {
+    const nameMatch = product.name.match(/(\d+([.,]\d+)?)\s*(л|l|мл|ml|г|g|кг|kg)(?![а-яА-Яa-zA-Z0-9])/i);
+    if (nameMatch) {
+        return nameMatch[0];
+    }
+
+    let weightSpec = product.specifications?.find(sp => {
+        const name = sp.name.toLowerCase();
+        const hasWeightKeyword = name.includes('вага') || name.includes('важ') || name.includes('вес') || name.includes("об'єм");
+        if (!hasWeightKeyword) return false;
+        const val = sp.values[0] || '';
+        return !(val === '1' && (name === 'вага' || name === 'вес'));
+    });
+
+    if (!weightSpec) {
+        weightSpec = product.specifications?.find(sp => {
+            const name = sp.name.toLowerCase();
+            return name.includes('вага') || name.includes('важ') || name.includes('вес') || name.includes("об'єм");
+        });
+    }
+
+    if (weightSpec && weightSpec.values.length > 0) {
+        const val = weightSpec.values[0];
+        const cleanVal = val.replace(/[0-9.,\s-]/g, '');
+        if (cleanVal.length === 0) {
+            const specName = weightSpec.name.toLowerCase();
+            const titleLower = product.name.toLowerCase();
+            const unitLower = product.unit?.toLowerCase() || '';
+            const isLiquid = specName.includes("об'єм") || specName.includes('обьем') || 
+                specName.includes('мл') || specName.includes('ml') || 
+                unitLower.includes('мл') || unitLower.includes('ml') ||
+                /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
+
+            let formattedVal = val;
+            const unitClean = unitLower.trim();
+            const num = parseFloat(val.replace(',', '.'));
+            const roundedWeight = isNaN(num) ? val : (num >= 10 ? String(Math.round(num)) : String(Math.round(num * 100) / 100));
+            
+            if (!isNaN(num) && num === 1) {
+                if (unitClean === 'шт') {
+                    formattedVal = '1 шт';
+                } else if (unitClean === 'уп') {
+                    formattedVal = '1 уп';
+                } else if (unitClean === 'кг' || unitClean === 'kg') {
+                    formattedVal = '1 кг';
+                } else if (unitClean === 'г' || unitClean === 'g') {
+                    formattedVal = '1 г';
+                } else if (unitClean === 'мл' || unitClean === 'ml') {
+                    formattedVal = '1 мл';
+                } else if (unitClean === 'л' || unitClean === 'l') {
+                    formattedVal = '1 л';
+                } else {
+                    formattedVal = '1 шт';
+                }
+            } else {
+                if (unitClean === 'шт') {
+                    formattedVal = `${roundedWeight} ${isLiquid ? 'мл' : 'г'}`;
+                } else if (unitClean === 'уп') {
+                    formattedVal = `${roundedWeight} уп`;
+                } else if (specName.includes('кг') || specName.includes('kg') || unitClean === 'кг' || unitClean === 'kg') {
+                    formattedVal = `${roundedWeight} кг`;
+                } else if (specName.includes('л') || specName.includes('l') || unitClean === 'л' || unitClean === 'l') {
+                    if (!specName.includes('мл') && !specName.includes('ml') && unitClean !== 'мл' && unitClean !== 'ml') {
+                        formattedVal = `${roundedWeight} л`;
+                    } else {
+                        formattedVal = `${roundedWeight} мл`;
+                    }
+                } else if (unitClean === 'г' || unitClean === 'g') {
+                    formattedVal = `${roundedWeight} г`;
+                } else if (unitClean === 'мл' || unitClean === 'ml') {
+                    formattedVal = `${roundedWeight} мл`;
+                } else {
+                    formattedVal = `${roundedWeight} ${isLiquid ? 'мл' : 'г'}`;
+                }
+            }
+            return formattedVal;
+        }
+        return val;
+    }
+
+    if (product.multiplier && product.multiplier > 0) {
+        const normalizedUnit = product.unit?.trim().toLowerCase() || '';
+        if (normalizedUnit === '100 г' || normalizedUnit === '100г') {
+            return `${Math.round(product.multiplier * 1000)} г`;
+        } else if (normalizedUnit === '100 мл') {
+            return `${Math.round(product.multiplier * 1000)} мл`;
+        } else if (normalizedUnit === 'шт') {
+            return `${product.multiplier} шт`;
+        } else {
+            return `${product.multiplier} ${product.unit}`;
+        }
+    }
+
+    return product.unit ? (product.unit.toLowerCase() === 'шт' ? '1 шт' : product.unit) : '';
+}
 
 interface CategoryLinkProps {
     cat: ProductCategory;
     lang: string;
-    router: any;
+    router: ReturnType<typeof useRouter>;
     isRoot?: boolean;
 }
 
@@ -415,10 +509,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                         <>
                                                             {results.map((product) => {
                                                                 const mainImage = resolveProductImageUrl(product);
-                                                                const weight = product.specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || product.unit;
-                                                                const displayWeight = (weight === "1" || weight?.toLowerCase() === "шт")
-                                                                    ? (lang === 'ru' ? "1 шт" : "1 шт")
-                                                                    : weight;
+                                                                const displayWeight = getProductWeightForSearch(product);
                                                                 
                                                                 return (
                                                                     <div key={product.id} className={s.dishItem} onClick={() => router.push(getLocalizedHref(`/products/${product.slug || product.id}`, lang as Locale))}>
@@ -471,10 +562,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                 >
                                                                     {featuredProposals.map((product) => {
                                                                         const mainImage = resolveProductImageUrl(product);
-                                                                        const weight = product.specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || product.unit;
-                                                                        const displayWeight = (weight === "1" || weight?.toLowerCase() === "шт")
-                                                                            ? (lang === 'ru' ? "1 шт" : "1 шт")
-                                                                            : weight;
+                                                                        const displayWeight = getProductWeightForSearch(product);
                                                                         const displayUnit = product.unit.toLowerCase() === "шт"
                                                                             ? "За 1 шт"
                                                                             : `За ${product.unit}`;

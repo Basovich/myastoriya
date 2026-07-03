@@ -10,8 +10,20 @@ import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from '@/app/components/CartModal/prod
 const globalProductCache: Record<string, Product | null> = {};
 const pendingRequests = new Set<number>();
 
-let globalSpecialsCache: any[] | null = null;
-let pendingSpecialsRequest: Promise<any> | null = null;
+interface SpecialProduct {
+    id: string | number;
+    purchaseCost?: number | null;
+    oldCost?: number | null;
+    cost?: number | null;
+}
+interface Special {
+    id: string;
+    cost?: number | null;
+    products?: SpecialProduct[] | null;
+}
+
+let globalSpecialsCache: Special[] | null = null;
+let pendingSpecialsRequest: Promise<void> | null = null;
 
 const globalCategoryCache: Record<number, ProductCategory | null> = {};
 const pendingCategoryRequests = new Set<number>();
@@ -105,7 +117,7 @@ export function useCartProducts() {
             pendingSpecialsRequest = getSpecialsApi(100, 1)
                 .then(resp => {
                     const data = resp?.data || [];
-                    globalSpecialsCache = data;
+                    globalSpecialsCache = data as Special[];
                     emitCacheUpdate();
                 })
                 .catch(err => {
@@ -257,10 +269,45 @@ export function useCartProducts() {
                     const cleanVal = rawWeight.replace(/[0-9.,\s-]/g, '');
                     if (cleanVal.length === 0) {
                         const titleLower = dbProduct.name.toLowerCase();
-                        const unitLower = dbProduct.unit?.toLowerCase() || '';
-                        const isLiquid = unitLower.includes('мл') || unitLower.includes('ml') ||
-                            /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
-                        weight = `${rawWeight} ${isLiquid ? 'мл' : 'г'}`;
+                        const unitLower = dbProduct.unit?.toLowerCase().trim() || '';
+                        const num = parseFloat(rawWeight.replace(',', '.'));
+                        
+                        if (!isNaN(num) && num === 1) {
+                            if (unitLower === 'шт') {
+                                weight = '1 шт';
+                            } else if (unitLower === 'уп') {
+                                weight = '1 уп';
+                            } else if (unitLower === 'кг' || unitLower === 'kg') {
+                                weight = '1 кг';
+                            } else if (unitLower === 'г' || unitLower === 'g') {
+                                weight = '1 г';
+                            } else if (unitLower === 'мл' || unitLower === 'ml') {
+                                weight = '1 мл';
+                            } else if (unitLower === 'л' || unitLower === 'l') {
+                                weight = '1 л';
+                            } else {
+                                weight = '1 шт';
+                            }
+                        } else {
+                            if (unitLower === 'шт') {
+                                const isLiquid = /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
+                                weight = `${rawWeight} ${isLiquid ? 'мл' : 'г'}`;
+                            } else if (unitLower === 'уп') {
+                                weight = `${rawWeight} уп`;
+                            } else if (unitLower === 'кг' || unitLower === 'kg') {
+                                weight = `${rawWeight} кг`;
+                            } else if (unitLower === 'г' || unitLower === 'g') {
+                                weight = `${rawWeight} г`;
+                            } else if (unitLower === 'мл' || unitLower === 'ml') {
+                                weight = `${rawWeight} мл`;
+                            } else if (unitLower === 'л' || unitLower === 'l') {
+                                weight = `${rawWeight} л`;
+                            } else {
+                                const isLiquid = unitLower.includes('мл') || unitLower.includes('ml') ||
+                                    /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
+                                weight = `${rawWeight} ${isLiquid ? 'мл' : 'г'}`;
+                            }
+                        }
                     }
                 } else {
                     if (dbProduct.multiplier && dbProduct.multiplier > 0) {
@@ -346,14 +393,14 @@ export function useCartProducts() {
 
                 // Use purchaseCost (true retail price) as the base for proportional discount distribution.
                 // Falling back to oldCost then cost prevents wrong results when purchaseCost is unavailable.
-                const totalPrice = specialProducts.reduce((sum: number, p: any) => sum + (p.purchaseCost || p.oldCost || p.cost || 0), 0);
+                const totalPrice = specialProducts.reduce((sum: number, p: SpecialProduct) => sum + (p.purchaseCost || p.oldCost || p.cost || 0), 0);
                 const specialCost = special.cost || 0;
                 if (totalPrice <= 0 || specialCost <= 0 || specialCost >= totalPrice) continue;
 
                 // Distribute the bundle total price proportionally across products
                 const factor = specialCost / totalPrice;
                 let sumDiscounted = 0;
-                specialProducts.forEach((spProduct: any, index: number) => {
+                specialProducts.forEach((spProduct: SpecialProduct, index: number) => {
                     const pid = String(spProduct.id);
                     const origPrice = spProduct.purchaseCost || spProduct.oldCost || spProduct.cost || 0;
                     let discPrice: number;
@@ -496,7 +543,7 @@ export function useCartProducts() {
                         discountedPrice = Math.max(0, origCost - discountAmount);
                     }
 
-                    const imageSrc = resolveProductImageUrl(product as any) || "/images/product-placeholder.svg";
+                    const imageSrc = resolveProductImageUrl(product as Product) || "/images/product-placeholder.svg";
 
                     uniqueBundleProducts.set(pid, {
                         id: pid,

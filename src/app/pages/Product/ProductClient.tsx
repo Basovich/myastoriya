@@ -118,14 +118,45 @@ function getProductWeight(product: Product): string {
                 /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
 
             let formattedVal = val;
-            if (specName.includes('кг') || specName.includes('kg')) {
-                formattedVal = `${val} кг`;
-            } else if (specName.includes('л') || specName.includes('l')) {
-                if (!specName.includes('мл') && !specName.includes('ml')) {
-                    formattedVal = `${val} л`;
+            const unitClean = unitLower.trim();
+            const num = parseFloat(val.replace(',', '.'));
+            
+            if (!isNaN(num) && num === 1) {
+                if (unitClean === 'шт') {
+                    formattedVal = '1 шт';
+                } else if (unitClean === 'уп') {
+                    formattedVal = '1 уп';
+                } else if (unitClean === 'кг' || unitClean === 'kg') {
+                    formattedVal = '1 кг';
+                } else if (unitClean === 'г' || unitClean === 'g') {
+                    formattedVal = '1 г';
+                } else if (unitClean === 'мл' || unitClean === 'ml') {
+                    formattedVal = '1 мл';
+                } else if (unitClean === 'л' || unitClean === 'l') {
+                    formattedVal = '1 л';
+                } else {
+                    formattedVal = '1 шт';
                 }
             } else {
-                formattedVal = `${val} ${isLiquid ? 'мл' : 'г'}`;
+                if (unitClean === 'шт') {
+                    formattedVal = `${val} ${isLiquid ? 'мл' : 'г'}`;
+                } else if (unitClean === 'уп') {
+                    formattedVal = `${val} уп`;
+                } else if (specName.includes('кг') || specName.includes('kg') || unitClean === 'кг' || unitClean === 'kg') {
+                    formattedVal = `${val} кг`;
+                } else if (specName.includes('л') || specName.includes('l') || unitClean === 'л' || unitClean === 'l') {
+                    if (!specName.includes('мл') && !specName.includes('ml') && unitClean !== 'мл' && unitClean !== 'ml') {
+                        formattedVal = `${val} л`;
+                    } else {
+                        formattedVal = `${val} мл`;
+                    }
+                } else if (unitClean === 'г' || unitClean === 'g') {
+                    formattedVal = `${val} г`;
+                } else if (unitClean === 'мл' || unitClean === 'ml') {
+                    formattedVal = `${val} мл`;
+                } else {
+                    formattedVal = `${val} ${isLiquid ? 'мл' : 'г'}`;
+                }
             }
             return roundWeightString(formattedVal);
         }
