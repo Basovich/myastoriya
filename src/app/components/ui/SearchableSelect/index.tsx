@@ -49,6 +49,7 @@ export default function SearchableSelect({
 
     const wrapperRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const isLoadingMoreRef = useRef(false);
 
     // Sync searchQuery when value prop changes (e.g., cleared by parent or set by map)
     useEffect(() => {
@@ -61,9 +62,13 @@ export default function SearchableSelect({
 
         const fetchOptions = async () => {
             setIsLoading(true);
+            isLoadingMoreRef.current = false;
             try {
                 const result = await onSearch(searchQuery, 1);
-                setOptions(result.data);
+                const uniqueData = result.data.filter((opt, index, self) =>
+                    self.findIndex(item => item.id === opt.id) === index
+                );
+                setOptions(uniqueData);
                 setHasMore(result.hasMore);
                 setPage(1);
             } catch (error) {
@@ -124,25 +129,31 @@ export default function SearchableSelect({
     };
 
     const handleLoadMore = async () => {
-        if (isLoadingMore || !hasMore) return;
+        if (isLoadingMoreRef.current || !hasMore) return;
+        isLoadingMoreRef.current = true;
         setIsLoadingMore(true);
         try {
             const nextPage = page + 1;
             const result = await onSearch(searchQuery, nextPage);
-            setOptions(prev => [...prev, ...result.data]);
+            setOptions(prev => {
+                const existingIds = new Set(prev.map(opt => opt.id));
+                const newItems = result.data.filter(opt => !existingIds.has(opt.id));
+                return [...prev, ...newItems];
+            });
             setHasMore(result.hasMore);
             setPage(nextPage);
         } catch (error) {
             console.error('Failed to load more options:', error);
         } finally {
             setIsLoadingMore(false);
+            isLoadingMoreRef.current = false;
         }
     };
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const target = e.currentTarget;
         const reachedBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
-        if (reachedBottom) {
+        if (reachedBottom && !isLoadingMoreRef.current) {
             handleLoadMore();
         }
     };

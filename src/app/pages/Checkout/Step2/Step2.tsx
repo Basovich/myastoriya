@@ -79,6 +79,7 @@ export default function Step2() {
     const citySelectRef = useRef<HTMLDivElement>(null);
     const npSelectRef = useRef<HTMLDivElement>(null);
     const shopSelectRef = useRef<HTMLDivElement>(null);
+    const isLoadingMoreCitiesRef = useRef(false);
 
     // Local states for custom city selector
     const [isOpenCitySelect, setIsOpenCitySelect] = useState(false);
@@ -207,9 +208,13 @@ export default function Step2() {
         if (citySearchQuery.length >= 2) {
             const searchCities = async () => {
                 setIsSearchingCities(true);
+                isLoadingMoreCitiesRef.current = false;
                 try {
                     const res = await getLocalitiesApi(citySearchQuery, PAGE_SIZE, 1, lang);
-                    setCitySearchResults(res.data);
+                    const uniqueData = res.data.filter((c, index, self) =>
+                        self.findIndex(item => item.id === c.id) === index
+                    );
+                    setCitySearchResults(uniqueData);
                     setHasMoreSearchCities(res.has_more_pages);
                     setCitySearchPage(1);
                 } catch (error) {
@@ -222,6 +227,7 @@ export default function Step2() {
             return () => clearTimeout(timer);
         } else {
             setCitySearchResults([]);
+            isLoadingMoreCitiesRef.current = false;
         }
     }, [citySearchQuery, lang]);
 
@@ -243,41 +249,54 @@ export default function Step2() {
     }, []);
 
     const handleLoadMoreCities = async () => {
-        if (isLoadingMoreCities) return;
+        if (isLoadingMoreCitiesRef.current) return;
+        isLoadingMoreCitiesRef.current = true;
+        setIsLoadingMoreCities(true);
 
         if (citySearchQuery.length >= 2 && hasMoreSearchCities) {
-            setIsLoadingMoreCities(true);
             try {
                 const nextPage = citySearchPage + 1;
                 const res = await getLocalitiesApi(citySearchQuery, PAGE_SIZE, nextPage, lang);
-                setCitySearchResults(prev => [...prev, ...res.data]);
+                setCitySearchResults(prev => {
+                    const existingIds = new Set(prev.map(c => c.id));
+                    const newItems = res.data.filter(c => !existingIds.has(c.id));
+                    return [...prev, ...newItems];
+                });
                 setHasMoreSearchCities(res.has_more_pages);
                 setCitySearchPage(nextPage);
             } catch (error) {
                 console.error('Load more search cities error:', error);
             } finally {
                 setIsLoadingMoreCities(false);
+                isLoadingMoreCitiesRef.current = false;
             }
         } else if (citySearchQuery.length < 2 && hasMoreAllCities) {
-            setIsLoadingMoreCities(true);
             try {
                 const nextPage = allCitiesPage + 1;
                 const res = await getLocalitiesApi(undefined, PAGE_SIZE, nextPage, lang);
-                setAllCitiesList(prev => [...prev, ...res.data]);
+                setAllCitiesList(prev => {
+                    const existingIds = new Set(prev.map(c => c.id));
+                    const newItems = res.data.filter(c => !existingIds.has(c.id));
+                    return [...prev, ...newItems];
+                });
                 setHasMoreAllCities(res.has_more_pages);
                 setAllCitiesPage(nextPage);
             } catch (error) {
                 console.error('Load more cities error:', error);
             } finally {
                 setIsLoadingMoreCities(false);
+                isLoadingMoreCitiesRef.current = false;
             }
+        } else {
+            setIsLoadingMoreCities(false);
+            isLoadingMoreCitiesRef.current = false;
         }
     };
 
     const handleCityScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const target = e.currentTarget;
         const reachedBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
-        if (reachedBottom) {
+        if (reachedBottom && !isLoadingMoreCitiesRef.current) {
             handleLoadMoreCities();
         }
     };

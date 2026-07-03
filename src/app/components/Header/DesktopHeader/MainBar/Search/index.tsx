@@ -77,6 +77,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
     const pathname = usePathname();
     const containerRef = useRef<HTMLDivElement>(null);
     const { disableScroll, enableScroll } = useScrollLock();
+    const isLoadingMoreRef = useRef(false);
 
     const handleSearch = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -109,22 +110,29 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
             setSearchCategories([]);
             setPage(1);
             setHasMore(false);
+            isLoadingMoreRef.current = false;
         }
     };
 
     const handleLoadMore = async () => {
-        if (isLoadingMore || !hasMore) return;
+        if (isLoadingMoreRef.current || !hasMore) return;
+        isLoadingMoreRef.current = true;
         setIsLoadingMore(true);
         try {
             const nextPage = page + 1;
             const prodRes = await getProductsApi({ search: query, limit: 12, page: nextPage }, lang);
-            setResults(prev => [...prev, ...prodRes.data]);
+            setResults(prev => {
+                const existingIds = new Set(prev.map(p => p.id));
+                const newItems = prodRes.data.filter(p => !existingIds.has(p.id));
+                return [...prev, ...newItems];
+            });
             setHasMore(prodRes.has_more_pages);
             setPage(nextPage);
         } catch (error) {
             console.error("Load more search results error:", error);
         } finally {
             setIsLoadingMore(false);
+            isLoadingMoreRef.current = false;
         }
     };
 
@@ -159,9 +167,13 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
             setIsLoading(true);
             try {
                 const prodRes = await getProductsApi({ search: query, limit: 12, page: 1 }, lang);
-                setResults(prodRes.data);
+                const uniqueData = prodRes.data.filter((p, index, self) => 
+                    self.findIndex(item => item.id === p.id) === index
+                );
+                setResults(uniqueData);
                 setHasMore(prodRes.has_more_pages);
                 setPage(1);
+                isLoadingMoreRef.current = false;
 
                 // Extract category IDs from found products to include their categories in results
                 const productCategoryIds = new Set(

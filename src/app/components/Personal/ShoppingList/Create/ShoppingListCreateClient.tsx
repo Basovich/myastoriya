@@ -130,6 +130,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const [nameError, setNameError] = useState("");
     const [searchError, setSearchError] = useState("");
     const nameInputRef = useRef<HTMLInputElement>(null);
+    const isFetchingNextRef = useRef(false);
 
     const [addingProductIds, setAddingProductIds] = useState<Set<number>>(new Set());
     const [notification, setNotification] = useState<{
@@ -245,6 +246,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     const performSearch = async (query: string, catId: string) => {
         setHasSearched(true);
         setCurrentPage(1);
+        isFetchingNextRef.current = false;
         try {
             setIsSearching(true);
             const res = await getProductsApi({
@@ -253,7 +255,10 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                 limit: 20,
                 page: 1
             }, lang);
-            setSearchResults(res.data || []);
+            const uniqueData = (res.data || []).filter((p, index, self) =>
+                self.findIndex(item => item.id === p.id) === index
+            );
+            setSearchResults(uniqueData);
             setHasMore(res.has_more_pages);
         } catch (error) {
             console.error('Failed to search products:', error);
@@ -263,8 +268,10 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
     };
 
     const loadNextPage = async () => {
+        if (isFetchingNextRef.current || !hasMore) return;
+        isFetchingNextRef.current = true;
+        setIsFetchingNext(true);
         try {
-            setIsFetchingNext(true);
             const nextPage = currentPage + 1;
             const res = await getProductsApi({
                 search: searchQuery || undefined,
@@ -274,7 +281,11 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
             }, lang);
             
             if (res.data && res.data.length > 0) {
-                setSearchResults(prev => [...prev, ...res.data]);
+                setSearchResults(prev => {
+                    const existingIds = new Set(prev.map(p => p.id));
+                    const newItems = res.data.filter(p => !existingIds.has(p.id));
+                    return [...prev, ...newItems];
+                });
                 setCurrentPage(nextPage);
                 setHasMore(res.has_more_pages);
             } else {
@@ -284,13 +295,14 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
             console.error('Failed to load next page:', error);
         } finally {
             setIsFetchingNext(false);
+            isFetchingNextRef.current = false;
         }
     };
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const target = e.currentTarget;
         const isNearBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 150;
-        if (isNearBottom && hasMore && !isFetchingNext) {
+        if (isNearBottom && hasMore && !isFetchingNextRef.current) {
             void loadNextPage();
         }
     };
