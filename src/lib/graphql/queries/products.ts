@@ -171,6 +171,9 @@ export interface Product {
         name: string;
         values: string[];
     }[];
+    portionWeight?: string | null;
+    portionSize?: string | null;
+    isWeighty?: boolean | null;
     /** Набори товарів — джерело блоку «З цим товаром купують» */
     bundles?: ProductBundle[] | null;
     /** Групи модифікаторів товару */
@@ -311,6 +314,9 @@ const PRODUCTS_QUERY = /* GraphQL */ `
                 multiplier
                 is_new
                 available
+                portionWeight
+                portionSize
+                isWeighty
                 hasCostVariants
                 specifications {
                     name
@@ -357,6 +363,9 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
             is_new
             pre_order
             available
+            portionWeight
+            portionSize
+            isWeighty
             availabilityTracked
             text
             image_alt
@@ -620,6 +629,9 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
             multiplier
             is_new
             available
+            portionWeight
+            portionSize
+            isWeighty
             hasCostVariants
             specifications {
                 name

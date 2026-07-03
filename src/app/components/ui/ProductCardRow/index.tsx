@@ -38,9 +38,19 @@ export default function ProductCardRow({
 }: ProductCardRowProps) {
     const isRu = lang === 'ru';
     
-    const displayWeight = weight === "1" 
+    // Format weight if it is just a number and not "1"
+    let formattedWeight = weight;
+    if (weight && weight !== "1" && /^\d+([.,]\d+)?$/.test(weight.trim())) {
+        const titleLower = title.toLowerCase();
+        const unitLower = unit.toLowerCase();
+        const isLiquid = unitLower.includes('мл') || unitLower.includes('ml') || 
+            /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
+        formattedWeight = `${weight} ${isLiquid ? 'мл' : 'г'}`;
+    }
+
+    const displayWeight = formattedWeight === "1" 
         ? (isRu ? "1 единица" : "1 одиниця") 
-        : weight;
+        : formattedWeight;
 
     const displayUnit = unit.toLowerCase() === "шт"
         ? (isRu ? "За 1 шт" : "За 1 шт")

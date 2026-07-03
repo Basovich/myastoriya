@@ -46,16 +46,79 @@ function getProductBadge(product: Product): string | null {
 }
 
 function getProductWeight(product: Product): string {
-    const weightSpec = product.specifications?.find(sp =>
-        sp.name.toLowerCase().includes('вага') ||
-        sp.name.toLowerCase().includes('важ') ||
-        sp.name.toLowerCase().includes('вес') ||
-        sp.name.toLowerCase().includes("об'єм")
-    );
-    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
-    const multiplier = product.multiplier ? String(product.multiplier) : '';
-    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
-    return multiplier;
+    // 1. Try to extract weight/volume from name (e.g. "0.75 л", "500 г", "330 мл")
+    const nameMatch = product.name.match(/(\d+([.,]\d+)?)\s*(л|l|мл|ml|г|g|кг|kg)(?![а-яА-Яa-zA-Z0-9])/i);
+    if (nameMatch) {
+        return nameMatch[0];
+    }
+
+    // 2. Try portionWeight or portionSize
+    if (product.portionWeight) return product.portionWeight;
+    if (product.portionSize) {
+        const hasUnit = /[гgкmшт]/i.test(product.portionSize);
+        if (hasUnit) return product.portionSize;
+    }
+
+    // 3. Try specifications with a smart finder that ignores "Вага: 1" / "Вес: 1" defaults if other weight specs exist
+    let weightSpec = product.specifications?.find(sp => {
+        const name = sp.name.toLowerCase();
+        const hasWeightKeyword = name.includes('вага') || name.includes('важ') || name.includes('вес') || name.includes("об'єм");
+        if (!hasWeightKeyword) return false;
+        const val = sp.values[0] || '';
+        return !(val === '1' && (name === 'вага' || name === 'вес'));
+    });
+
+    if (!weightSpec) {
+        weightSpec = product.specifications?.find(sp => {
+            const name = sp.name.toLowerCase();
+            return name.includes('вага') || name.includes('важ') || name.includes('вес') || name.includes("об'єм");
+        });
+    }
+
+    if (weightSpec && weightSpec.values.length > 0) {
+        const val = weightSpec.values[0];
+        const cleanVal = val.replace(/[0-9.,\s-]/g, '');
+        if (cleanVal.length === 0) {
+            const specName = weightSpec.name.toLowerCase();
+            const titleLower = product.name.toLowerCase();
+            const unitLower = product.unit?.toLowerCase() || '';
+            const isLiquid = specName.includes("об'єм") || specName.includes('обьем') || 
+                specName.includes('мл') || specName.includes('ml') || 
+                unitLower.includes('мл') || unitLower.includes('ml') ||
+                /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
+
+            if (specName.includes('кг') || specName.includes('kg')) {
+                return `${val} кг`;
+            } else if (specName.includes('л') || specName.includes('l')) {
+                if (!specName.includes('мл') && !specName.includes('ml')) {
+                    return `${val} л`;
+                }
+            }
+            return `${val} ${isLiquid ? 'мл' : 'г'}`;
+        }
+        return val;
+    }
+
+    // 4. Try multiplier with unit
+    if (product.multiplier && product.multiplier > 0) {
+        const normalizedUnit = product.unit?.trim().toLowerCase() || '';
+        if (normalizedUnit === '100 г' || normalizedUnit === '100г') {
+            return `${Math.round(product.multiplier * 1000)} г`;
+        } else if (normalizedUnit === '100 мл') {
+            return `${Math.round(product.multiplier * 1000)} мл`;
+        }
+        if (normalizedUnit === 'шт') {
+            return `${product.multiplier} шт`;
+        }
+        return `${product.multiplier} ${product.unit}`;
+    }
+
+    // 5. Default unit fallback
+    if (product.unit) {
+        return product.unit.toLowerCase() === 'шт' ? '1 шт' : product.unit;
+    }
+
+    return '';
 }
 
 function formatPrice(price: number): string {
@@ -335,20 +398,11 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         </div>
                         {weight && (
                             <div className={s.priceSubtitle}>
-                                {product.unit?.toLowerCase() === 'шт' ? (
+                                {lang === 'ru' ? 'Вес:' : 'Вага:'}{' '}
+                                <span className={s.weight}>{weight}</span>
+                                {((activePurchaseCost !== activeCost) || (getWeightInGrams(weight) >= 200)) && activeUnit && (
                                     <>
-                                        {lang === 'ru' ? 'Количество:' : 'Кількість:'}{' '}
-                                        <span className={s.weight}>{weight} {product.unit}</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        {lang === 'ru' ? 'Вес:' : 'Вага:'}{' '}
-                                        <span className={s.weight}>{weight}</span>
-                                        {((activePurchaseCost !== activeCost) || (getWeightInGrams(weight) >= 200)) && activeUnit && (
-                                            <>
-                                                {' '}({formatPrice(activeCost)} {lang === 'ru' ? 'грн' : 'грн'}/{activeUnit.replace(/\s+/g, '')})
-                                            </>
-                                        )}
+                                        {' '}({formatPrice(activeCost)} {lang === 'ru' ? 'грн' : 'грн'}/{activeUnit.replace(/\s+/g, '')})
                                     </>
                                 )}
                             </div>

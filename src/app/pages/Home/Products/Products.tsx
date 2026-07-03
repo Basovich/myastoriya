@@ -36,6 +36,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
     const [hasMore, setHasMore] = useState(initialHasMore ?? true);
     const [page, setPage] = useState(1);
     const [isLocked, setIsLocked] = useState(false);
+    const [swiperInstance, setSwiperInstance] = useState<any>(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -97,14 +98,77 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
     };
 
     const getWeight = (product: Product) => {
-        const weightSpec = product.specifications?.find(s => 
-            s.name.toLowerCase().includes("вага") || 
-            s.name.toLowerCase().includes("об'єм")
-        );
-        if (weightSpec && weightSpec.values.length > 0) {
-            return weightSpec.values[0];
+        // 1. Try to extract weight/volume from name (e.g. "0.75 л", "500 г", "330 мл")
+        const nameMatch = product.name.match(/(\d+([.,]\d+)?)\s*(л|l|мл|ml|г|g|кг|kg)(?![а-яА-Яa-zA-Z0-9])/i);
+        if (nameMatch) {
+            return nameMatch[0];
         }
-        return product.multiplier ? `${product.multiplier}` : "";
+
+        // 2. Try portionWeight or portionSize
+        if (product.portionWeight) return product.portionWeight;
+        if (product.portionSize) {
+            const hasUnit = /[гgкmшт]/i.test(product.portionSize);
+            if (hasUnit) return product.portionSize;
+        }
+
+        // 3. Try specifications with a smart finder that ignores "Вага: 1" / "Вес: 1" defaults if other weight specs exist
+        let weightSpec = product.specifications?.find(s => {
+            const name = s.name.toLowerCase();
+            const hasWeightKeyword = name.includes("вага") || name.includes("важ") || name.includes("вес") || name.includes("об'єм");
+            if (!hasWeightKeyword) return false;
+            const val = s.values[0] || '';
+            return !(val === '1' && (name === 'вага' || name === 'вес'));
+        });
+        if (!weightSpec) {
+            weightSpec = product.specifications?.find(s => {
+                const name = s.name.toLowerCase();
+                return name.includes("вага") || name.includes("важ") || name.includes("вес") || name.includes("об'єм");
+            });
+        }
+        if (weightSpec && weightSpec.values.length > 0) {
+            const val = weightSpec.values[0];
+            const cleanVal = val.replace(/[0-9.,\s-]/g, '');
+            if (cleanVal.length === 0) {
+                const specName = weightSpec.name.toLowerCase();
+                const titleLower = product.name.toLowerCase();
+                const unitLower = product.unit?.toLowerCase() || '';
+                const isLiquid = specName.includes("об'єм") || specName.includes('обьем') || 
+                    specName.includes('мл') || specName.includes('ml') || 
+                    unitLower.includes('мл') || unitLower.includes('ml') ||
+                    /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
+
+                if (specName.includes('кг') || specName.includes('kg')) {
+                    return `${val} кг`;
+                } else if (specName.includes('л') || specName.includes('l')) {
+                    if (!specName.includes('мл') && !specName.includes('ml')) {
+                        return `${val} л`;
+                    }
+                }
+                return `${val} ${isLiquid ? 'мл' : 'г'}`;
+            }
+            return val;
+        }
+
+        // 3. Try multiplier with unit
+        if (product.multiplier && product.multiplier > 0) {
+            const normalizedUnit = product.unit?.trim().toLowerCase() || '';
+            if (normalizedUnit === '100 г' || normalizedUnit === '100г') {
+                return `${Math.round(product.multiplier * 1000)} г`;
+            } else if (normalizedUnit === '100 мл') {
+                return `${Math.round(product.multiplier * 1000)} мл`;
+            }
+            if (normalizedUnit === 'шт') {
+                return `${product.multiplier} шт`;
+            }
+            return `${product.multiplier} ${product.unit}`;
+        }
+
+        // 4. Default unit fallback
+        if (product.unit) {
+            return product.unit.toLowerCase() === 'шт' ? '1 шт' : product.unit;
+        }
+
+        return '';
     };
 
     const getBadge = (product: Product) => {
@@ -114,8 +178,11 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
     };
 
 
-    if (!dict || !showcases) return null;
+    if (!dict || !showcases || showcases.length === 0) return null;
 
+    const sliderShowcases = showcases.length > 0
+        ? Array(5).fill(showcases).flat()
+        : [];
 
     return (
         <section className={s.wrapper}>
@@ -136,9 +203,16 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                         ref={setPrevEl}
                     />
                     <Swiper
+                        key={showcases.length}
+                        onSwiper={setSwiperInstance}
                         modules={[Navigation]}
                         navigation={{ prevEl, nextEl }}
-                        loop={false}
+                        loop={true}
+                        loopAdditionalSlides={showcases.length}
+                        loopAddBlankSlides={true}
+                        grabCursor={true}
+                        simulateTouch={true}
+                        allowTouchMove={true}
                         slidesPerView="auto"
                         spaceBetween={8}
                         onInit={(swiper) => {
@@ -149,18 +223,26 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                         }}
                         className={clsx(s.tabs, "products-tabs-swiper")}
                     >
-                        {showcases.map((showcase, i) => (
-                            <SwiperSlide key={showcase.id} className={s.tabSlide}>
-                                <Button
-                                    variant="pill"
-                                    active={activeTab === i}
-                                    onClick={() => setActiveTab(i)}
-                                    className={s.tabButton}
-                                >
-                                    {showcase.name}
-                                </Button>
-                            </SwiperSlide>
-                        ))}
+                        {sliderShowcases.map((showcase, i) => {
+                            const realIndex = i % showcases.length;
+                            return (
+                                <SwiperSlide key={`${showcase.id}-${i}`} className={s.tabSlide}>
+                                    <Button
+                                        variant="pill"
+                                        active={activeTab === realIndex}
+                                        onClick={() => {
+                                            setActiveTab(realIndex);
+                                            if (swiperInstance) {
+                                                swiperInstance.slideToLoop(realIndex);
+                                            }
+                                        }}
+                                        className={s.tabButton}
+                                    >
+                                        {showcase.name}
+                                    </Button>
+                                </SwiperSlide>
+                            );
+                        })}
                     </Swiper>
                     <SliderArrow
                         direction="right"

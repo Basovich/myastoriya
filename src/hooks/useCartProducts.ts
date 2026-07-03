@@ -180,18 +180,66 @@ export function useCartProducts() {
         const baseItems = cartItems.map(item => {
             const dbProduct = globalProductCache[item.id];
             if (dbProduct) {
-                const weightSpec = dbProduct.specifications?.find(s => 
-                    s.name.toLowerCase().includes("вага") || 
-                    s.name.toLowerCase().includes("об'єм")
-                );
-                const rawWeight = weightSpec && weightSpec.values.length > 0 ? weightSpec.values[0] : '';
+                // 1. Try to extract weight/volume from name
+                let rawWeight = '';
+                const nameMatch = dbProduct.name.match(/(\d+([.,]\d+)?)\s*(л|l|мл|ml|г|g|кг|kg)(?![а-яА-Яa-zA-Z0-9])/i);
+                if (nameMatch) {
+                    rawWeight = nameMatch[0];
+                }
+
+                // 2. Try portionWeight or portionSize
+                if (!rawWeight) {
+                    if (dbProduct.portionWeight) rawWeight = dbProduct.portionWeight;
+                    else if (dbProduct.portionSize) {
+                        const hasUnit = /[гgкmшт]/i.test(dbProduct.portionSize);
+                        if (hasUnit) rawWeight = dbProduct.portionSize;
+                    }
+                }
+
+                // 3. Try specifications
+                if (!rawWeight) {
+                    let weightSpec = dbProduct.specifications?.find(s => {
+                        const name = s.name.toLowerCase();
+                        const hasWeightKeyword = name.includes("вага") || name.includes("важ") || name.includes("вес") || name.includes("об'єм");
+                        if (!hasWeightKeyword) return false;
+                        const val = s.values[0] || '';
+                        return !(val === '1' && (name === 'вага' || name === 'вес'));
+                    });
+                    if (!weightSpec) {
+                        weightSpec = dbProduct.specifications?.find(s => {
+                            const name = s.name.toLowerCase();
+                            return name.includes("вага") || name.includes("важ") || name.includes("вес") || name.includes("об'єм");
+                        });
+                    }
+                    rawWeight = weightSpec && weightSpec.values.length > 0 ? weightSpec.values[0] : '';
+                }
+
                 let weight = rawWeight;
                 if (rawWeight) {
-                    if (/^\d+([.,]\d+)?$/.test(rawWeight.trim()) && dbProduct.unit) {
-                        weight = `${rawWeight} ${dbProduct.unit}`;
+                    // Check if rawWeight already contains units
+                    const cleanVal = rawWeight.replace(/[0-9.,\s-]/g, '');
+                    if (cleanVal.length === 0) {
+                        const titleLower = dbProduct.name.toLowerCase();
+                        const unitLower = dbProduct.unit?.toLowerCase() || '';
+                        const isLiquid = unitLower.includes('мл') || unitLower.includes('ml') ||
+                            /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
+                        weight = `${rawWeight} ${isLiquid ? 'мл' : 'г'}`;
                     }
                 } else {
-                    weight = dbProduct.multiplier ? `${dbProduct.multiplier} ${dbProduct.unit}` : dbProduct.unit;
+                    if (dbProduct.multiplier && dbProduct.multiplier > 0) {
+                        const normalizedUnit = dbProduct.unit?.trim().toLowerCase() || '';
+                        if (normalizedUnit === '100 г' || normalizedUnit === '100г') {
+                            weight = `${Math.round(dbProduct.multiplier * 1000)} г`;
+                        } else if (normalizedUnit === '100 мл') {
+                            weight = `${Math.round(dbProduct.multiplier * 1000)} мл`;
+                        } else if (normalizedUnit === 'шт') {
+                            weight = `${dbProduct.multiplier} шт`;
+                        } else {
+                            weight = `${dbProduct.multiplier} ${dbProduct.unit}`;
+                        }
+                    } else if (dbProduct.unit) {
+                        weight = dbProduct.unit.toLowerCase() === 'шт' ? '1 шт' : dbProduct.unit;
+                    }
                 }
 
                 // Use purchaseCost from the cart API as the base price (true retail price, e.g. 127 ₴).
