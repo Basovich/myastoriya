@@ -268,6 +268,7 @@ export interface FilterStateInput {
 
 export interface ProductsFilter {
     categoryId?: number | null;
+    showcaseId?: number | null;
     saleId?: number | null;
     search?: string | null;
     limit?: number | null;
@@ -294,8 +295,8 @@ const ADD_PRODUCT_VIEW_MUTATION = /* GraphQL */ `
 `;
 
 const PRODUCTS_QUERY = /* GraphQL */ `
-    query Products($categoryId: Int, $saleId: Int, $search: String, $filter: [FilterState], $limit: Int, $page: Int, $sort: String) {
-        products(categoryId: $categoryId, saleId: $saleId, search: $search, filter: $filter, limit: $limit, page: $page, sort: $sort) {
+    query Products($categoryId: Int, $showcaseId: Int, $saleId: Int, $search: String, $filter: [FilterState], $limit: Int, $page: Int, $sort: String) {
+        products(categoryId: $categoryId, showcaseId: $showcaseId, saleId: $saleId, search: $search, filter: $filter, limit: $limit, page: $page, sort: $sort) {
             per_page
             current_page
             has_more_pages
@@ -712,6 +713,7 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string): Pr
         PRODUCTS_QUERY,
         {
             categoryId: filter?.categoryId ?? undefined,
+            showcaseId: filter?.showcaseId ?? undefined,
             saleId: filter?.saleId ?? undefined,
             search: filter?.search || undefined,
             filter: filterInput ?? undefined,

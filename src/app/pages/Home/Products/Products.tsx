@@ -12,7 +12,7 @@ import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import Button from "../../../components/ui/Button/Button";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import Image from "next/image";
-import { type PopularCategory, type Product, resolveProductImageUrl, getProductsApi } from "@/lib/graphql";
+import { type Showcase, type Product, resolveProductImageUrl, getProductsApi } from "@/lib/graphql";
 
 
 interface ProductsProps {
@@ -20,12 +20,12 @@ interface ProductsProps {
         tabs?: string[];
         showMoreButton: string;
     };
-    categories: PopularCategory[];
+    showcases: Showcase[];
     initialProducts: Product[];
     initialHasMore?: boolean;
 }
 
-export default function Products({ dict, categories, initialProducts, initialHasMore }: ProductsProps) {
+export default function Products({ dict, showcases, initialProducts, initialHasMore }: ProductsProps) {
     const params = useParams();
     const locale = params?.lang as string;
     const [activeTab, setActiveTab] = useState(0);
@@ -41,13 +41,13 @@ export default function Products({ dict, categories, initialProducts, initialHas
         let isMounted = true;
         
         const fetchProducts = async () => {
-            const categoryId = categories[activeTab]?.id;
-            if (!categoryId) return;
+            const showcaseId = showcases[activeTab]?.id;
+            if (!showcaseId) return;
 
             setLoading(true);
             try {
                 const data = await getProductsApi(
-                    { categoryId: parseInt(categoryId), limit: 8, page },
+                    { showcaseId: parseInt(showcaseId), limit: 8, page },
                     locale,
                 );
                 
@@ -73,7 +73,7 @@ export default function Products({ dict, categories, initialProducts, initialHas
         // Don't fetch on first mount if it's the first tab AND page is 1
         if (activeTab === 0 && page === 1) {
             setProducts(initialProducts);
-            // We assume categories[0] might have more pages, or we could fetch it too.
+            // We assume showcases[0] might have more pages, or we could fetch it too.
             // For simplicity, we just use initialProducts.
         } else {
             fetchProducts();
@@ -82,7 +82,7 @@ export default function Products({ dict, categories, initialProducts, initialHas
         return () => {
             isMounted = false;
         };
-    }, [page, activeTab, categories, initialProducts]);
+    }, [page, activeTab, showcases, initialProducts]);
 
     // Reset page when tab changes
     useEffect(() => {
@@ -114,7 +114,7 @@ export default function Products({ dict, categories, initialProducts, initialHas
     };
 
 
-    if (!dict || !categories) return null;
+    if (!dict || !showcases) return null;
 
 
     return (
@@ -149,15 +149,15 @@ export default function Products({ dict, categories, initialProducts, initialHas
                         }}
                         className={clsx(s.tabs, "products-tabs-swiper")}
                     >
-                        {categories.map((cat, i) => (
-                            <SwiperSlide key={cat.id} className={s.tabSlide}>
+                        {showcases.map((showcase, i) => (
+                            <SwiperSlide key={showcase.id} className={s.tabSlide}>
                                 <Button
                                     variant="pill"
                                     active={activeTab === i}
                                     onClick={() => setActiveTab(i)}
                                     className={s.tabButton}
                                 >
-                                    {cat.name}
+                                    {showcase.name}
                                 </Button>
                             </SwiperSlide>
                         ))}

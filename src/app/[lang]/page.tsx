@@ -5,7 +5,7 @@ import { getBlogsApi } from "@/lib/graphql/queries/blog";
 import { getSlidesApi } from "@/lib/graphql/queries/pages/home/slides";
 import { getPopularCategoriesApi } from "@/lib/graphql/queries/pages/home/categories";
 import { getReviewsApi } from "@/lib/graphql/queries/pages/home/reviews";
-import { getProductsApi, getSalesApi, getSpecialsApi, getCatalogTreeApi } from "@/lib/graphql";
+import { getProductsApi, getSalesApi, getSpecialsApi, getCatalogTreeApi, getShowcasesApi } from "@/lib/graphql";
 import { buildCategoryIndex, getCategoryHref } from "@/utils/category-url";
 
 export default async function Home({
@@ -16,9 +16,10 @@ export default async function Home({
   const { lang } = await params;
   const dict = await getDictionary(lang);
 
-  const [popularCategories, catalogTree] = await Promise.all([
+  const [popularCategories, catalogTree, showcases] = await Promise.all([
       getPopularCategoriesApi(lang),
       getCatalogTreeApi(lang),
+      getShowcasesApi(lang),
   ]);
   const categoryIndex = buildCategoryIndex(catalogTree);
   // Build a href map: categoryId -> correct URL based on tree level
@@ -27,13 +28,13 @@ export default async function Home({
       categoryHrefs[id] = getCategoryHref(entry.node, entry.parent ?? undefined, entry.grandParent ?? undefined);
   }
 
-  const firstCategoryId = popularCategories.length > 0 ? parseInt(popularCategories[0].id) : null;
+  const firstShowcaseId = showcases.length > 0 ? parseInt(showcases[0].id) : null;
 
   const [blogsResponse, slides, reviews, initialProductsResponse, salesResponse, specialsResponse] = await Promise.all([
     getBlogsApi({ limit: 3 }, lang),
     getSlidesApi("main", lang),
     getReviewsApi(lang),
-    getProductsApi({ categoryId: firstCategoryId, limit: 8 }, lang),
+    getProductsApi({ showcaseId: firstShowcaseId, limit: 8 }, lang),
     getSalesApi(6, 1, lang),
     getSpecialsApi(10, 1, lang)
   ]);
@@ -51,6 +52,7 @@ export default async function Home({
           initialHasMore={initialProductsResponse.has_more_pages}
           sales={salesResponse.data}
           specials={specialsResponse.data}
+          showcases={showcases}
       />
   );
 }

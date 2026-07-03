@@ -97,6 +97,10 @@ export type { Slide, SlideImage, SlideImageWeb, SlideLinkTo } from './queries/pa
 export { getPopularCategoriesApi } from './queries/pages/home/categories';
 export type { PopularCategory } from './queries/pages/home/categories';
 
+// Re-export showcases
+export { getShowcasesApi } from './queries/pages/home/showcases';
+export type { Showcase } from './queries/pages/home/showcases';
+
 // Re-export reviews
 export { getReviewsApi } from './queries/pages/home/reviews';
 export type { HomeReview, ReviewUser } from './queries/pages/home/reviews';
