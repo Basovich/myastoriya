@@ -8,6 +8,7 @@ import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import Image from 'next/image';
 import ReviewModal from '@/app/components/ReviewModal';
 import { gqlRequest } from '@/lib/graphql';
+import Spinner from '@/app/components/ui/Spinner/Spinner';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -214,7 +215,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
             <div className={styles.reviewsBlock}>
                 <div className={styles.reviewsList}>
                     {loading && reviews.length === 0 ? (
-                        <p className={styles.reviewsLoading}>Завантаження відгуків...</p>
+                        <Spinner centered={true} />
                     ) : reviews.length === 0 ? (
                         <p className={styles.reviewsEmpty}>Відгуків поки немає. Будьте першим!</p>
                     ) : (
