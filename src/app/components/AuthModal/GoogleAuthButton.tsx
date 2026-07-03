@@ -12,13 +12,15 @@ import { GraphQLError } from '@/lib/graphql/client';
 import s from './GoogleAuthButton.module.scss';
 
 interface GoogleAuthButtonProps {
-    onSuccess?: (userData: AuthUser & { token: string }, googleProfile?: any) => void;
-    onIncompleteProfile?: (googleProfile: any) => void;
+    onSuccess?: (userData: AuthUser & { token: string }, googleProfile?: unknown) => void;
+    onIncompleteProfile?: (googleProfile: unknown) => void;
     text?: string;
     variant?: 'default' | 'outline';
+    disabled?: boolean;
+    linked?: boolean;
 }
 
-export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text, variant = 'default' }: GoogleAuthButtonProps) {
+export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text, variant = 'default', disabled = false, linked = false }: GoogleAuthButtonProps) {
     const dispatch = useAppDispatch();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -105,13 +107,14 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
         <div className={s.wrapper}>
             <button
                 type="button"
-                className={clsx(s.googleBtn, variant === 'outline' && s.outline)}
+                className={clsx(s.googleBtn, variant === 'outline' && s.outline, linked && s.linked)}
                 onClick={() => {
+                    if (disabled || linked) return;
                     setIsLoading(true);
                     setError(null);
                     login();
                 }}
-                disabled={isLoading}
+                disabled={isLoading || disabled || linked}
             >
             <svg className={s.googleIcon} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <g clipPath="url(#clip0_574_9779)">

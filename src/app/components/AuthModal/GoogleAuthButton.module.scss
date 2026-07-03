@@ -47,7 +47,7 @@
     height: 52px;
 
     @media (any-hover: hover) {
-        &:hover {
+        &:hover:not(:disabled) {
             background: rgba(0, 0, 0, 0.05);
             border-color: #000;
         }
@@ -73,4 +73,11 @@
     text-align: center;
     line-height: 1.4;
     padding: 0 4px;
+}
+
+.linked {
+    background: rgba(0, 0, 0, 0.05) !important;
+    border-color: #000000 !important;
+    cursor: not-allowed;
+    opacity: 1 !important;
 }

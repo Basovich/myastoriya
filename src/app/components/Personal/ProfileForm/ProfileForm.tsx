@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useParams } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import InputField from '@/app/components/ui/InputField';
@@ -14,7 +15,7 @@ import { sendSmsApi, smsVerifyApi } from '@/lib/graphql/queries/auth';
 import { PHONE_REGEX, normalizePhone } from '@/lib/utils/phone';
 import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
 import Checkbox from '@/app/components/ui/Checkbox/Checkbox';
-import { parseISO, format } from 'date-fns';
+import { format } from 'date-fns';
 import { parseDate } from '@/lib/utils/date';
 
 const COUNTDOWN_SECONDS = 60;
@@ -52,6 +53,13 @@ interface ProfileFormProps {
 }
 
 export default function ProfileForm({ user, dict, onSubmit, submitStatus }: ProfileFormProps) {
+    const params = useParams();
+    const lang = params?.lang || 'ua';
+    const isGoogleLinked = !!user?.email;
+    const googleAuthButtonText = isGoogleLinked
+        ? (lang === 'ru' ? 'Аккаунт связан с Google' : 'Акаунт зв’язано з Google')
+        : (lang === 'ru' ? 'Связать с аккаунтом Google' : 'Зв’язати з аккаунтом Google');
+
     // SMS verification state
     const [phoneVerified, setPhoneVerified] = useState(true);
     const [smsRequested, setSmsRequested] = useState(false);
@@ -344,25 +352,24 @@ export default function ProfileForm({ user, dict, onSubmit, submitStatus }: Prof
                             </Checkbox>
                         </div>
 
-                        {!user?.email && (
-                            <div className={s.googleLinkWrapper}>
-                                <GoogleAuthButton 
-                                    text="Зв'язати з аккаунтом Google"
-                                    variant="outline"
-                                    onSuccess={(updatedUser) => {
-                                        onSubmit({
-                                            name: updatedUser.name || '',
-                                            surname: updatedUser.surname || '',
-                                            middleName: updatedUser.middleName || '',
-                                            phone: updatedUser.phone || '',
-                                            email: updatedUser.email || '',
-                                            birthday: updatedUser.birthday || '',
-                                            gender: updatedUser.gender || updatedUser.sex || 'male',
-                                        });
-                                    }}
-                                />
-                            </div>
-                        )}
+                        <div className={s.googleLinkWrapper}>
+                            <GoogleAuthButton 
+                                text={googleAuthButtonText}
+                                variant="outline"
+                                linked={isGoogleLinked}
+                                onSuccess={(updatedUser) => {
+                                    onSubmit({
+                                        name: updatedUser.name || '',
+                                        surname: updatedUser.surname || '',
+                                        middleName: updatedUser.middleName || '',
+                                        phone: updatedUser.phone || '',
+                                        email: updatedUser.email || '',
+                                        birthday: updatedUser.birthday || '',
+                                        gender: updatedUser.gender || updatedUser.sex || 'male',
+                                    });
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
 
