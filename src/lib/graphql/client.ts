@@ -41,6 +41,8 @@ interface RequestOptions {
 const MAX_RETRIES = 5;
 const RETRY_DELAY_MS = 2000;
 
+let activeRefreshPromise: Promise<string | null> | null = null;
+
 /**
  * Helper to detect files/blobs in variables
  */
@@ -51,11 +53,11 @@ const isFile = (val: unknown): val is File | Blob =>
 /**
  * Deeply extract files and their paths from a variables object
  */
-const getFiles = (obj: any, path = ''): Array<{ path: string, file: File | Blob }> => {
+const getFiles = (obj: unknown, path = ''): Array<{ path: string, file: File | Blob }> => {
     let files: Array<{ path: string, file: File | Blob }> = [];
     if (!obj || typeof obj !== 'object') return files;
 
-    for (const [key, value] of Object.entries(obj)) {
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
         const currentPath = path ? `${path}.${key}` : `variables.${key}`;
         if (isFile(value)) {
             files.push({ path: currentPath, file: value });
@@ -179,33 +181,50 @@ export async function gqlRequest<T>(
             const isUnauthorized = error.message === 'Unauthorized' || error.extensions?.category === 'authentication';
             if (!isServer && isUnauthorized && !options?._isRetry) {
                 try {
-                    const { tryRefreshTokenAction, initializeGuestSessionAction } = await import('@/app/actions/authActions');
-                    let freshToken = await tryRefreshTokenAction();
-                    
-                    if (!freshToken) {
-                        const deviceId = localStorage.getItem('mya_device_id');
-                        if (deviceId) {
-                            freshToken = await initializeGuestSessionAction(deviceId);
-                        }
+                    if (!activeRefreshPromise) {
+                        activeRefreshPromise = (async () => {
+                            try {
+                                const { tryRefreshTokenAction, initializeGuestSessionAction } = await import('@/app/actions/authActions');
+                                let freshToken = await tryRefreshTokenAction();
+                                
+                                if (!freshToken) {
+                                    const deviceId = localStorage.getItem('mya_device_id');
+                                    if (deviceId) {
+                                        freshToken = await initializeGuestSessionAction(deviceId);
+                                    }
+                                }
+                                
+                                if (freshToken) {
+                                    // Dynamically import store and actions to update UI state
+                                    const { store } = await import('@/store');
+                                    const { loginAsGuest, setUser, setToken } = await import('@/store/slices/authSlice');
+                                    const { getMeApi } = await import('@/lib/graphql/queries/auth');
+                                    
+                                    try {
+                                        const user = await getMeApi(freshToken);
+                                        if (user && (user.phone || user.email)) {
+                                            store.dispatch(setUser({ ...user, token: freshToken }));
+                                        } else {
+                                            store.dispatch(loginAsGuest({ token: freshToken }));
+                                        }
+                                    } catch {
+                                        store.dispatch(loginAsGuest({ token: freshToken }));
+                                    }
+                                    store.dispatch(setToken(freshToken));
+                                }
+                                return freshToken;
+                            } catch (refreshErr) {
+                                console.error('[GQL Interceptor] Automatic token refresh failed:', refreshErr);
+                                return null;
+                            } finally {
+                                activeRefreshPromise = null;
+                            }
+                        })();
                     }
+
+                    const freshToken = await activeRefreshPromise;
                     
                     if (freshToken) {
-                        // Dynamically import store and actions to update UI state
-                        const { store } = await import('@/store');
-                        const { loginAsGuest, setUser, setToken } = await import('@/store/slices/authSlice');
-                        const { getMeApi } = await import('@/lib/graphql/queries/auth');
-                        
-                        try {
-                            const user = await getMeApi(freshToken);
-                            if (user && (user.phone || user.email)) {
-                                store.dispatch(setUser({ ...user, token: freshToken }));
-                            } else {
-                                store.dispatch(loginAsGuest({ token: freshToken }));
-                            }
-                        } catch {
-                            store.dispatch(loginAsGuest({ token: freshToken }));
-                        }
-                        store.dispatch(setToken(freshToken));
                         // Retry original request with the fresh token
                         return gqlRequest(query, variables, {
                             ...options,
@@ -214,7 +233,7 @@ export async function gqlRequest<T>(
                         });
                     }
                 } catch (refreshErr) {
-                    console.error('[GQL Interceptor] Automatic token refresh failed:', refreshErr);
+                    console.error('[GQL Interceptor] Error waiting for token refresh:', refreshErr);
                 }
             }
             
@@ -273,16 +292,17 @@ export async function gqlRequest<T>(
         // Final attempt failed - report to Sentry before crashing the build
         if (isServer) {
             try {
-                const Sentry = require("@sentry/nextjs");
-                Sentry.captureException(err, {
-                    tags: { 
-                        component: 'gqlRequest',
-                        query: query.split('{')[0].trim() || 'unknown',
-                    },
-                    extra: { variables, options }
-                });
-                await Sentry.flush(2000).catch(() => {});
-            } catch (sentryErr) {
+                void import("@sentry/nextjs").then((Sentry) => {
+                    Sentry.captureException(err, {
+                        tags: { 
+                            component: 'gqlRequest',
+                            query: query.split('{')[0].trim() || 'unknown',
+                        },
+                        extra: { variables, options }
+                    });
+                    void Sentry.flush(2000).catch(() => {});
+                }).catch(() => {});
+            } catch {
                 // Ignore sentry import errors during build/static rendering
             }
         }
