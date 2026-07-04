@@ -23,9 +23,9 @@ const loyaltyDict = {
         balanceLabel: "Ваш бальний рахунок",
         pointsSuffix: "Б",
         conversionLabel: "1 Б = 1 ₴",
-        progressText: "Для отримання більшого кешбеку, у розмірі +4% нарахувань балами, необхідно зробити замовлень на суму:",
-        progressTarget: "16 000 ГРН",
-        cashbackPromo: "+3% Ваш кешбек балами від замовлення",
+        progressText: "Для отримання більшого кешбеку, у розмірі +2% нарахувань балами, необхідно зробити замовлень на суму:",
+        progressTarget: "8 000 ГРН",
+        cashbackPromo: "Ваш кешбек балами від замовлення",
         stepsTitle: "Етапи накопичення балами",
         termsTitle: "Умови програми лояльності",
         showMore: "ПОКАЗАТИ ЩЕ",
@@ -42,9 +42,9 @@ const loyaltyDict = {
         balanceLabel: "Ваш балльный счет",
         pointsSuffix: "Б",
         conversionLabel: "1 Б = 1 ₴",
-        progressText: "Для получения большего кэшбэка в размере +4% начислений баллами, необходимо совершить заказов на сумму:",
-        progressTarget: "16 000 ГРН",
-        cashbackPromo: "+3% Ваш кэшбэк баллами от заказа",
+        progressText: "Для получения большего кэшбэка в размере +2% начислений баллами, необходимо совершить заказов на сумму:",
+        progressTarget: "8 000 ГРН",
+        cashbackPromo: "Ваш кэшбэк баллами от заказа",
         stepsTitle: "Этапы накопления баллами",
         termsTitle: "Условия программы лояльности",
         showMore: "ПОКАЗАТЬ ЕЩЕ",
@@ -149,14 +149,14 @@ export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms 
                                         {lang === 'ru' ? (
                                             <>
                                                 Для получения большего <strong>кэшбэка</strong>,<br />
-                                                в размере <span className={s.whiteHighlight}>+{discountInfo?.nextDiscount ?? 4}%</span> начислений баллами,<br />
+                                                в размере <span className={s.whiteHighlight}>+{discountInfo?.nextDiscount ?? 2}%</span> начислений баллами,<br />
                                                 необходимо совершить заказов<br />
                                                 на сумму:
                                             </>
                                         ) : (
                                             <>
                                                 Для отримання більшого <strong>кешбеку</strong>,<br />
-                                                у розмірі <span className={s.whiteHighlight}>+{discountInfo?.nextDiscount ?? 4}%</span> нарахувань балами,<br />
+                                                у розмірі <span className={s.whiteHighlight}>+{discountInfo?.nextDiscount ?? 2}%</span> нарахувань балами,<br />
                                                 необхідно зробити замовлень<br />
                                                 на суму:
                                             </>
@@ -168,7 +168,7 @@ export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms 
                                         </svg>
                                         {discountInfo?.leftUntilNextStep !== undefined && discountInfo?.leftUntilNextStep !== null
                                             ? `${discountInfo.leftUntilNextStep.toLocaleString('uk-UA')} ${lang === 'ru' ? 'грн' : 'грн'}`
-                                            : (lang === 'ru' ? '16 000 грн' : '16 000 грн')}
+                                            : (lang === 'ru' ? '8 000 грн' : '8 000 грн')}
                                     </div>
                                 </div>
                                 <div className={s.progressGraphics}>
@@ -191,8 +191,8 @@ export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms 
 
                         <div className={s.stepsCard}>
                             <div className={s.promoBox}>
-                                <div className={s.cashbackValue}>+3%</div>
-                                <span className={s.cashbackLabel}>Ваш кешбек балами від замовлення</span>
+                                <div className={s.cashbackValue}>+{discountInfo?.discount ?? 1}%</div>
+                                <span className={s.cashbackLabel}>{dict.cashbackPromo}</span>
                             </div>
                             
                             <div className={s.timelineWrapper}>
