@@ -301,23 +301,25 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                     user={user}
                     navDict={personalDict[lang].navigation}
                 />
-                <div className={s.controlsRow}>
-                    <DatePicker
-                        id="orders-date-range"
-                        label={dict.sortLabel}
-                        prefixLabel={dict.sortPrefix}
-                        hideLabel={true}
-                        hideIcon={true}
-                        selectsRange={true}
-                        startDate={startDate}
-                        endDate={endDate}
-                        onChangeRange={handleDateChange}
-                        onClear={handleClearDate}
-                        maxDate={new Date()}
-                        className={s.ordersDatePicker}
-                        lang={lang}
-                    />
-                </div>
+                {orders.length > 0 && (
+                    <div className={s.controlsRow}>
+                        <DatePicker
+                            id="orders-date-range"
+                            label={dict.sortLabel}
+                            prefixLabel={dict.sortPrefix}
+                            hideLabel={true}
+                            hideIcon={true}
+                            selectsRange={true}
+                            startDate={startDate}
+                            endDate={endDate}
+                            onChangeRange={handleDateChange}
+                            onClear={handleClearDate}
+                            maxDate={new Date()}
+                            className={s.ordersDatePicker}
+                            lang={lang}
+                        />
+                    </div>
+                )}
 
                 {loading && orders.length === 0 ? (
                     <div className={s.loaderContainer}>
