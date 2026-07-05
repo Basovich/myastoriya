@@ -172,19 +172,30 @@ export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms 
                                     </div>
                                 </div>
                                 <div className={s.progressGraphics}>
-                                    <div className={s.giftBox}>
-                                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <rect x="25" y="45" width="70" height="55" rx="4" fill="#FFC700" />
-                                            <rect x="20" y="35" width="80" height="15" rx="2" fill="#FFD600" />
-                                            <rect x="55" y="35" width="10" height="65" fill="#FF6B00" />
-                                            <path d="M60 35C60 35 40 15 30 25C20 35 50 35 60 35Z" fill="#FF6B00" />
-                                            <path d="M60 35C60 35 80 15 90 25C100 35 70 35 60 35Z" fill="#FF6B00" />
-                                            <rect x="20" y="35" width="80" height="4" fill="white" fillOpacity="0.3" />
-                                        </svg>
-                                    </div>
-                                    <div className={s.percentSign}>
-                                        %
-                                    </div>
+                                    <Image 
+                                        src="/images/personal/loyalty/loyalty_1.webp" 
+                                        alt="Percent" 
+                                        width={232} 
+                                        height={256} 
+                                        className={s.percentImage} 
+                                        priority
+                                    />
+                                    <Image 
+                                        src="/images/personal/loyalty/loyalty_2.webp" 
+                                        alt="Gift large" 
+                                        width={100} 
+                                        height={100} 
+                                        className={s.giftLargeImage} 
+                                        priority
+                                    />
+                                    <Image 
+                                        src="/images/personal/loyalty/loyalty_3.webp" 
+                                        alt="Gift small" 
+                                        width={79} 
+                                        height={79} 
+                                        className={s.giftSmallImage} 
+                                        priority
+                                    />
                                 </div>
                             </div>
                         </div>
