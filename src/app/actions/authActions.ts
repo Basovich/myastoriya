@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { refreshTokenApi, authAsGuestApi } from '@/lib/graphql/queries/auth';
+import { GraphQLError } from '@/lib/graphql/client';
 
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
@@ -63,10 +64,15 @@ export async function tryRefreshTokenAction(): Promise<string | null> {
         const result = await refreshTokenApi(refreshToken);
         await setAuthCookies(result.accessToken, result.refreshToken);
         return result.accessToken;
-    } catch {
-        // Refresh token invalid or expired — clear cookies
-        cookieStore.delete(ACCESS_TOKEN_KEY);
-        cookieStore.delete(REFRESH_TOKEN_KEY);
+    } catch (err) {
+        // Only delete cookies if we are sure the token is invalid/expired (logical Auth error from backend)
+        const isAuthError = err instanceof GraphQLError && 
+            (err.message === 'Unauthorized' || err.errors?.some(e => e.extensions?.category === 'authentication'));
+
+        if (isAuthError) {
+            cookieStore.delete(ACCESS_TOKEN_KEY);
+            cookieStore.delete(REFRESH_TOKEN_KEY);
+        }
         return null;
     }
 }

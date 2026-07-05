@@ -22,6 +22,7 @@ import AddPickupModal from '@/app/components/Personal/Pickup/AddPickupModal';
 import Image from 'next/image';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { getAccessToken } from '@/app/actions/authActions';
+import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { 
     getLocalitiesApi, 
     selectLocalityApi, 
@@ -101,6 +102,7 @@ export default function Step2() {
     const [deliveries, setDeliveries] = useState<Delivery[]>([]);
     const [dbAddresses, setDbAddresses] = useState<any[]>([]);
     const [guestAddresses, setGuestAddresses] = useState<Address[]>([]);
+    const [isLoadingDeliveries, setIsLoadingDeliveries] = useState(true);
     const [shops, setShops] = useState<Shop[]>([]);
     const [userPickupPoints, setUserPickupPoints] = useState<UserPickupPoint[]>([]);
     const [guestPickupPoints, setGuestPickupPoints] = useState<UserPickupPoint[]>([]);
@@ -363,6 +365,7 @@ export default function Step2() {
             setNpSearchQuery('');
             setIsOpenNPDropdown(false);
             prevCityIdRef.current = null;
+            setIsLoadingDeliveries(false);
             return;
         }
 
@@ -374,6 +377,7 @@ export default function Step2() {
         prevCityIdRef.current = checkoutCity.id;
 
         if (isCityChanged) {
+            setIsLoadingDeliveries(true);
             // Reset deliveries and deliveryMethod immediately when city changes to avoid outdated API requests
             setDeliveries([]);
             setDeliveryMethod('');
@@ -416,6 +420,8 @@ export default function Step2() {
                 }
             } catch (e) {
                 console.error('Failed to fetch deliveries for locality', e);
+            } finally {
+                setIsLoadingDeliveries(false);
             }
         };
         fetchDeliveries();
@@ -836,8 +842,14 @@ export default function Step2() {
             <div className={s.formCard}>
                 <StepIndicator current={2} />
 
-                <div className={s.formSection}>
-                    <h2 className={s.sectionTitle}>Ваше місто ?</h2>
+                {!hydrated || isLoadingDeliveries ? (
+                    <div className={s.stepLoading}>
+                        <Spinner />
+                    </div>
+                ) : (
+                    <>
+                        <div className={s.formSection}>
+                            <h2 className={s.sectionTitle}>Ваше місто ?</h2>
                     {hydrated && (
                         <div className={s.citySelectContainer} ref={citySelectRef}>
                             <button
@@ -1124,6 +1136,8 @@ export default function Step2() {
                         ПОВЕРНУТИСЯ НАЗАД
                     </button>
                 </div>
+                    </>
+                )}
             </div>
 
             {/* ── Right: Sidebar ── */}
