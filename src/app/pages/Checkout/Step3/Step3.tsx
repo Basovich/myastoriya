@@ -87,6 +87,7 @@ export default function Step3({ lang }: Step3Props) {
     const [deliveryPrice, setDeliveryPrice] = useState<number | undefined>(undefined);
     // Promo functionality from Redux
     const promoCode = useAppSelector(state => state.cart.promoCode);
+    const useBonuses = useAppSelector(state => state.cart.useBonuses);
     const appliedPromo = React.useMemo(() => {
         if (promoCode && promoCode.isApplied && promoCode.code) {
             const discountStr = promoCode.discount || '0';
@@ -349,7 +350,7 @@ export default function Step3({ lang }: Step3Props) {
                     personsCount: personsCount,
                     communicationMethod: contactMethod,
                     dontCallBack: contactMethod === 'dontCallBack',
-                    useBonuses: false,
+                    useBonuses: useBonuses,
                 },
                 token || '',
                 lang

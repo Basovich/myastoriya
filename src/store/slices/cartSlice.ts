@@ -5,8 +5,7 @@ import {
     addProductToCartApi,
     editCartItemQuantityApi,
     removeCartItemApi,
-    CartGql,
-    CartPromoCodeGql
+    CartGql
 } from '@/lib/graphql/queries/cart';
 import { RootState } from '../index';
 
@@ -40,6 +39,8 @@ interface CartState {
     loading: boolean;
     promoCode: CartPromoCode | null;
     cashback: number;
+    useBonuses: boolean;
+    total: number;
 }
 
 const initialState: CartState = {
@@ -49,6 +50,8 @@ const initialState: CartState = {
     loading: false,
     promoCode: null,
     cashback: 0,
+    useBonuses: false,
+    total: 0,
 };
 
 // Helper to map CartGql to local CartItem[]
@@ -88,16 +91,37 @@ const mergeCartItems = (currentItems: CartItem[], backendItems: CartItem[]): Car
 // Async Thunks
 export const fetchCartAsync = createAsyncThunk(
     'cart/fetch',
-    async (_, { dispatch, rejectWithValue }) => {
+    async (_, { getState, dispatch, rejectWithValue }) => {
         try {
-            const response = await getCartApi();
+            const state = getState() as RootState;
+            const useBonuses = state.cart.useBonuses;
+            const response = await getCartApi({ useBonuses });
             dispatch(setPromoCode(response.promoCode || null));
             dispatch(setCashback(response.cashback || 0));
+            dispatch(setTotal(response.total || 0));
             return mapCartItems(response);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('[Cart] Failed to fetch cart from backend:', error);
             Sentry.captureException(error);
             return rejectWithValue('Failed to fetch cart');
+        }
+    }
+);
+
+export const toggleUseBonusesAsync = createAsyncThunk(
+    'cart/toggleUseBonuses',
+    async (useBonuses: boolean, { dispatch, rejectWithValue }) => {
+        try {
+            dispatch(setUseBonuses(useBonuses));
+            const response = await getCartApi({ useBonuses });
+            dispatch(setPromoCode(response.promoCode || null));
+            dispatch(setCashback(response.cashback || 0));
+            dispatch(setTotal(response.total || 0));
+            return mapCartItems(response);
+        } catch (error: unknown) {
+            console.error('[Cart] Failed to toggle useBonuses:', error);
+            Sentry.captureException(error);
+            return rejectWithValue('Failed to toggle useBonuses');
         }
     }
 );
@@ -110,6 +134,7 @@ export const addToCartAsync = createAsyncThunk(
     ) => {
         try {
             const state = getState() as RootState;
+            const useBonuses = state.cart.useBonuses;
 
             // Auth hasn't completed yet — no access_token cookie exists.
             // The item is already stored optimistically by the pending reducer.
@@ -128,6 +153,7 @@ export const addToCartAsync = createAsyncThunk(
                 response = await editCartItemQuantityApi({
                     rowId: existingItem.rowId,
                     quantity: existingItem.quantity,
+                    useBonuses,
                 });
             } else {
                 response = await addProductToCartApi({
@@ -135,10 +161,12 @@ export const addToCartAsync = createAsyncThunk(
                     quantity: payload.quantity,
                     costVariantId: payload.costVariantId,
                     modifierIds: payload.modifierIds,
+                    useBonuses,
                 });
             }
             dispatch(setPromoCode(response.promoCode || null));
             dispatch(setCashback(response.cashback || 0));
+            dispatch(setTotal(response.total || 0));
             return mapCartItems(response);
         } catch (error: unknown) {
             console.error('[Cart] Failed to add or update product in backend cart:', error);
@@ -156,6 +184,7 @@ export const updateQuantityAsync = createAsyncThunk(
     ) => {
         try {
             const state = getState() as RootState;
+            const useBonuses = state.cart.useBonuses;
             const item = state.cart.items.find(
                 i => payload.rowId ? i.rowId === payload.rowId : i.id === payload.id
             );
@@ -164,14 +193,16 @@ export const updateQuantityAsync = createAsyncThunk(
                 const response = await editCartItemQuantityApi({
                     rowId: item.rowId,
                     quantity: payload.quantity,
+                    useBonuses,
                 });
                 dispatch(setPromoCode(response.promoCode || null));
                 dispatch(setCashback(response.cashback || 0));
+                dispatch(setTotal(response.total || 0));
                 return mapCartItems(response);
             } else {
                 return rejectWithValue('No rowId found');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('[Cart] Failed to update cart item quantity:', error);
             void dispatch(fetchCartAsync());
             return rejectWithValue('Failed to update quantity');
@@ -186,19 +217,23 @@ export const removeFromCartAsync = createAsyncThunk(
         { getState, dispatch, rejectWithValue }
     ) => {
         try {
-            const rowId = payload.rowId || (getState() as RootState).cart.items.find(i => i.id === payload.id)?.rowId;
+            const state = getState() as RootState;
+            const useBonuses = state.cart.useBonuses;
+            const rowId = payload.rowId || state.cart.items.find(i => i.id === payload.id)?.rowId;
 
             if (rowId) {
                 const response = await removeCartItemApi({
                     rowId,
+                    useBonuses,
                 });
                 dispatch(setPromoCode(response.promoCode || null));
                 dispatch(setCashback(response.cashback || 0));
+                dispatch(setTotal(response.total || 0));
                 return mapCartItems(response);
             } else {
                 return rejectWithValue('No rowId found');
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('[Cart] Failed to remove cart item from backend:', error);
             void dispatch(fetchCartAsync());
             return rejectWithValue('Failed to remove from cart');
@@ -290,12 +325,20 @@ const cartSlice = createSlice({
         },
         clearCart: (state) => {
             state.items = [];
+            state.useBonuses = false;
+            state.total = 0;
         },
         setPromoCode: (state, action: PayloadAction<CartPromoCode | null>) => {
             state.promoCode = action.payload;
         },
         setCashback: (state, action: PayloadAction<number>) => {
             state.cashback = action.payload;
+        },
+        setUseBonuses: (state, action: PayloadAction<boolean>) => {
+            state.useBonuses = action.payload;
+        },
+        setTotal: (state, action: PayloadAction<number>) => {
+            state.total = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -423,9 +466,26 @@ const cartSlice = createSlice({
                     const key = rowId || id;
                     state.deletingIds = state.deletingIds.filter(dId => dId !== key);
                 }
+            })
+            // toggleUseBonusesAsync
+            .addCase(toggleUseBonusesAsync.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(toggleUseBonusesAsync.fulfilled, (state, action) => {
+                if (!state.deletingIds) {
+                    state.deletingIds = [];
+                }
+                state.items = mergeCartItems(state.items, action.payload).filter(
+                    item => !state.deletingIds.includes(item.rowId || item.id)
+                );
+                state.isInitialized = true;
+                state.loading = false;
+            })
+            .addCase(toggleUseBonusesAsync.rejected, (state) => {
+                state.loading = false;
             });
     }
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart, setPromoCode, setCashback } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQuantity, clearCart, setPromoCode, setCashback, setUseBonuses, setTotal } = cartSlice.actions;
 export default cartSlice.reducer;
