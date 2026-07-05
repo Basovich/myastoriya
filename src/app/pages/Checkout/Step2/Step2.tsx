@@ -613,7 +613,7 @@ export default function Step2() {
     const isShop = activeDelivery?.driver === 'shop';
     const showDeliveryTimeBlock = activeDelivery ? activeDelivery.showDeliveryTime : true;
     const elapsedForFree = activeDelivery?.elapsedForFree || 0;
-    const deliveryPrice = activeDelivery?.deliveryCost || 0;
+    const deliveryPrice = activeDelivery ? (activeDelivery.deliveryCost ?? 0) : undefined;
 
     const shopOptions = React.useMemo(() => {
         return shops.map(shop => ({
