@@ -21,6 +21,7 @@ interface CategorySwitcherProps {
     isSidebar?: boolean;
     categoryId?: number;
     lang?: string;
+    isSubcategory?: boolean;
 }
 
 export default function CategorySwitcher({
@@ -29,6 +30,7 @@ export default function CategorySwitcher({
     isSidebar = false,
     categoryId,
     lang = 'ua',
+    isSubcategory = false,
 }: CategorySwitcherProps) {
     const [parent, setParent] = useState<CategoryItem | null>(null);
     const [siblings, setSiblings] = useState<CategoryItem[]>([]);
@@ -108,7 +110,23 @@ export default function CategorySwitcher({
         })();
     }, [categoryId, lang]);
 
-    if (isLoading || (!parent && siblings.length === 0) || parent?.id === '768') {
+    if (isLoading) {
+        if (isSubcategory) {
+            return (
+                <div className={clsx(s.wrapper, isSidebar && s.sidebarMode, className)}>
+                    {title && <h3 className={s.title}>{title}</h3>}
+                    <div className={s.loaderContainer}>
+                        <svg className={s.spinner} viewBox="0 0 50 50">
+                            <circle className={s.path} cx="25" cy="25" r="20" fill="none" strokeWidth="4.5"></circle>
+                        </svg>
+                    </div>
+                </div>
+            );
+        }
+        return null;
+    }
+
+    if ((!parent && siblings.length === 0) || parent?.id === '768') {
         return null;
     }
 

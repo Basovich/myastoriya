@@ -114,6 +114,7 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
                 recommendedProducts={categoryDetails?.recommendedProducts}
                 bannerUrl={categoryDetails?.banner?.size1x}
                 faq={faq}
+                isSubcategory={true}
             />
         </main>
     );

@@ -82,6 +82,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
                 recommendedProducts={categoryDetails?.recommendedProducts}
                 bannerUrl={categoryDetails?.banner?.size1x}
                 faq={faq}
+                isSubcategory={true}
             />
         </main>
     );

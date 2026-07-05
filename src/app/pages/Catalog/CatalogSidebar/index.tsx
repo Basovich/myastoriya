@@ -34,6 +34,7 @@ interface CatalogSidebarProps {
     sortOptions?: string[];
     filterBlocks?: FilterBlock[];
     activeFilters?: FilterStateInput[];
+    isSubcategory?: boolean;
 }
 
 const LOCALIZED_SIDEBAR_TEXTS = {
@@ -96,6 +97,7 @@ export default function CatalogSidebar({
     sortOptions,
     filterBlocks,
     activeFilters,
+    isSubcategory,
 }: CatalogSidebarProps) {
     const routeParams = useParams();
     const router = useRouter();
@@ -284,6 +286,7 @@ export default function CatalogSidebar({
                     categoryId={categoryId}
                     lang={lang}
                     isSidebar={false}
+                    isSubcategory={isSubcategory}
                 />
             )}
 

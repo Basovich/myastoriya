@@ -58,6 +58,7 @@ interface CatalogContentProps {
     mobileImage?: string | null;
     /** FAQ дані з API. */
     faq?: FaqQuestion[] | null;
+    isSubcategory?: boolean;
 }
 
 export default async function CatalogContent({
@@ -78,6 +79,7 @@ export default async function CatalogContent({
     bannerUrl,
     mobileImage,
     faq,
+    isSubcategory,
 }: CatalogContentProps) {
     const sortLabel = lang === 'ua' ? 'Сортувати:' : 'Сортировать:';
     const filterLabel = lang === 'ua' ? 'Фільтр' : 'Фильтр';
@@ -209,6 +211,7 @@ export default async function CatalogContent({
                                     categoryId={categoryId}
                                     filterBlocks={filterBlocks}
                                     activeFilters={activeFilters}
+                                    isSubcategory={isSubcategory}
                                 />
                             </aside>
                         )}
