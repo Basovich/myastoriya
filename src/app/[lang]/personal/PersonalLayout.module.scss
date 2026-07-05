@@ -34,7 +34,7 @@
 
     @media (min-width: 1024px) {
         flex-direction: row;
-        align-items: flex-start;
+        align-items: stretch;
         gap: 14px;
     }
 }
@@ -54,6 +54,14 @@
     gap: 24px;
     flex-grow: 1;
     min-width: 0; // Prevent flex overflow
+
+    @media (min-width: 1024px) {
+        & > * {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+    }
 }
 
 .breadcrumbsWrapper {
@@ -193,5 +201,6 @@ button.logoutBtn {
 
     @media (min-width: 1024px) {
         padding: 32px;
+        flex-grow: 1;
     }
 }
