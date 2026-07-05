@@ -121,10 +121,17 @@ export interface ProductBundle {
     items?: ProductBundleItem[] | null;
 }
 
+export interface ModifierImages {
+    icon1x?: string | null;
+    icon2x?: string | null;
+    icon3x?: string | null;
+}
+
 export interface Modifier {
     id: string;
     name: string;
     price: number;
+    image?: ModifierImages | null;
 }
 
 export interface ModifierGroup {
@@ -644,6 +651,20 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
                     main2x
                     main1x
                     big
+                }
+            }
+            modifierGroups {
+                id
+                name
+                modifiers {
+                    id
+                    name
+                    price
+                    image {
+                        icon1x
+                        icon2x
+                        icon3x
+                    }
                 }
             }
             images {

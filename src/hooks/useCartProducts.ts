@@ -37,6 +37,7 @@ export interface PopulatedCartItemModifier {
     id: number;
     name?: string | null;
     price?: number | null;
+    image?: string | null;
 }
 
 export interface PopulatedCartItem {
@@ -332,9 +333,33 @@ export function useCartProducts() {
                 // dbProduct.cost (98 ₴) is the catalog promotional price which is already discounted.
                 // When a bundle is active, absolutePriceMap will override this with the bundle price (88 ₴).
                 // When a bundle is broken, the item correctly reverts to its full retail price (127 ₴).
-                const modifiersPrice = item.modifiers?.reduce((sum, m) => sum + (m.price || 0), 0) || 0;
+                                const modifiersPrice = item.modifiers?.reduce((sum, m) => sum + (m.price || 0), 0) || 0;
                 const initialPrice = (item.purchaseCost ?? dbProduct.cost) + modifiersPrice;
                 const originalPrice = (item.purchaseCost ?? dbProduct.oldCost ?? (item.purchaseCost ?? dbProduct.cost)) + modifiersPrice;
+
+                const modifiersWithImages = item.modifiers?.map(m => {
+                    let modifierImage: string | null = null;
+                    if (dbProduct.modifierGroups) {
+                        for (const group of dbProduct.modifierGroups) {
+                            const found = group.modifiers?.find(mod => Number(mod.id) === m.id);
+                            if (found && found.image) {
+                                const rawUrl = found.image.icon3x || found.image.icon2x || found.image.icon1x;
+                                if (rawUrl) {
+                                    modifierImage = rawUrl.startsWith('/') 
+                                        ? `https://dev-api.myastoriya.com.ua${rawUrl}` 
+                                        : rawUrl;
+                                }
+                            }
+                        }
+                    }
+                    return {
+                        id: m.id,
+                        name: m.name,
+                        price: m.price,
+                        image: modifierImage
+                    };
+                }) || null;
+
                 return {
                     id: item.id,
                     rowId: item.rowId,
@@ -349,7 +374,7 @@ export function useCartProducts() {
                         slug: dbProduct.slug || dbProduct.id,
                         costVariantName: item.costVariantName,
                         categoryId: dbProduct.categoryId ? Number(dbProduct.categoryId) : undefined,
-                        modifiers: item.modifiers,
+                        modifiers: modifiersWithImages,
                     }
                 };
             }

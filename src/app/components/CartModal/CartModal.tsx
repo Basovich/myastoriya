@@ -169,10 +169,10 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                                     {item.product.weight}
                                                     {item.product.costVariantName && ` • ${item.product.costVariantName}`}
                                                 </span>
-                                                {item.product.modifiers && item.product.modifiers.length > 0 && (
+                                                                                                {item.product.modifiers && item.product.modifiers.length > 0 && (
                                                     <div className={s.modifierIconsList}>
                                                         {item.product.modifiers.map(m => {
-                                                            const iconUrl = getModifierIconUrl(m.name);
+                                                            const iconUrl = m.image || getModifierIconUrl(m.name);
                                                             return (
                                                                 <div key={m.id} className={s.modifierIconWrapper} title={m.name || undefined}>
                                                                     {iconUrl ? (
