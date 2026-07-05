@@ -37,7 +37,7 @@ const authErrors = {
 interface LoginFormProps {
     onSwitchToRegister: () => void;
     onForgotPassword: () => void;
-    onIncompleteProfile: (profile: any) => void;
+    onIncompleteProfile: (profile: unknown) => void;
     onSuccess: () => void;
 }
 
@@ -57,7 +57,6 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onInco
                 // Final check before login
                 const exists = await checkUserPhoneApi(values.phone, lang);
                 if (!exists) {
-                    const errorDict = authErrors[lang as keyof typeof authErrors] || authErrors.ua;
                     setStatus(lang === 'ua' ? 'Користувача з таким номером не знайдено' : 'Пользователь с таким номером не найден');
                     return;
                 }
@@ -78,6 +77,7 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onInco
                         birthday: result.user.birthday,
                         sex: result.user.sex,
                         token: result.accessToken,
+                        bonuses: result.user.bonuses,
                     }),
                 );
                 onSuccess();

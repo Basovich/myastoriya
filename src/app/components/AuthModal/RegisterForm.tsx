@@ -23,7 +23,7 @@ const COUNTDOWN_SECONDS = 60;
 
 interface RegisterFormProps {
     onSwitchToLogin: () => void;
-    onIncompleteProfile: (profile: any) => void;
+    onIncompleteProfile: (profile: unknown) => void;
     onSuccess: () => void;
 }
 
@@ -132,6 +132,7 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
                         birthday: result.user.birthday,
                         sex: result.user.sex,
                         token: result.accessToken,
+                        bonuses: result.user.bonuses,
                     }),
                 );
                 onSuccess();

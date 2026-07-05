@@ -68,6 +68,7 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
                     email: result.user.email || '',
                     phone: result.user.phone || '',
                     token: result.accessToken,
+                    bonuses: result.user.bonuses,
                 };
 
                 // If phone is missing from backend, we might need the completion modal

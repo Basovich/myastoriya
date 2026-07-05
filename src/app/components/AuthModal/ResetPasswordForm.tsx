@@ -53,6 +53,8 @@ export default function ResetPasswordForm({ phone, actionToken, onSuccess, onBac
                         email: loginResult.user.email,
                         birthday: loginResult.user.birthday,
                         sex: loginResult.user.sex,
+                        token: loginResult.accessToken,
+                        bonuses: loginResult.user.bonuses,
                     }),
                 );
                 onSuccess();
