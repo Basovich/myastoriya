@@ -32,7 +32,7 @@ interface CartSummaryProps {
 
 export default function CartSummary({ onEditCart, discountPercent = 0, deliveryPrice }: CartSummaryProps) {
     const hydrated = useIsHydrated();
-    const { populatedItems } = useCartProducts();
+        const { populatedItems, loading } = useCartProducts();
     const promoCode = useAppSelector(state => state.cart.promoCode);
     const cashback = useAppSelector(state => state.cart.cashback);
 
@@ -59,7 +59,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
         return Math.round(totalSum * (discountPercent / 100));
     }, [promoCode, discountPercent, totalSum]);
 
-    if (!hydrated) {
+    if (!hydrated || loading) {
         return (
             <div className={s.cartSummary}>
                 <div className={s.cartLoading}>
