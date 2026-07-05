@@ -140,13 +140,14 @@
     max-width: 324px;
     transition: background 0.2s, color 0.2s;
 
+    @media (min-width: 768px) {
+        font-size: 15px;
+    }
+
     @media (min-width: 1024px) {
         height: 46px;
         line-height: 44px;
-    }
-
-    @media (min-width: 768px) {
-        font-size: 15px;
+        margin-bottom: 30px;
     }
 
     @media (any-hover: hover) {

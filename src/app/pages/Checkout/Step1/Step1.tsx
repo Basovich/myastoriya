@@ -368,7 +368,7 @@ export default function Step1() {
             <div className={s.formCard}>
                 <StepIndicator current={1} />
 
-                {hydrated && !isAuthenticated && (
+                {hydrated && (!isAuthenticated || isGuest) && (
                     <button
                         className={s.hasAccountBtn}
                         id="has-account-btn"
