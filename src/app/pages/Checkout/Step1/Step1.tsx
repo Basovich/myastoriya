@@ -406,7 +406,7 @@ export default function Step1() {
                     </div>
 
                     <div className={s.formRow}>
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 0 }}>
+                        <div className={s.phoneInputContainer}>
                             <InputField
                                 id="checkout-phone"
                                 label="Телефон"
@@ -487,8 +487,47 @@ export default function Step1() {
                             </div>
                         </div>
                     )}
+
+                    <div className={s.divider} />
+
+                    <div className={s.checkboxRow}>
+                        <div className={s.agreeCol}>
+                            <Checkbox
+                                id="checkout-agree"
+                                checked={formData.agreed}
+                                onChange={val => {
+                                    handleChange('agreed', val);
+                                    if (!val) setTouched(prev => ({ ...prev, agreed: true }));
+                                }}
+                            >
+                                Я згоден з{' '}
+                                <Link
+                                    href="/oferta"
+                                    className={s.inlineLink}
+                                    target="_blank"
+                                    onClick={e => e.stopPropagation()}
+                                >
+                                    угодою користувача
+                                </Link>
+                            </Checkbox>
+                            {touched.agreed && errors.agreed && (
+                                <span className={clsx(s.fieldError, s.agreeError)}>{errors.agreed}</span>
+                            )}
+                        </div>
+
+                        {hydrated && isAuthenticated && !isGuest && user && (
+                            <Checkbox
+                                id="checkout-another-recipient"
+                                checked={formData.anotherRecipient}
+                                onChange={val => handleChange('anotherRecipient', val)}
+                            >
+                                Додати іншого отримувача
+                            </Checkbox>
+                        )}
+                    </div>
+
                     {formData.anotherRecipient && (
-                        <div className={s.formRow} style={{ marginTop: '16px' }}>
+                        <div className={clsx(s.formRow, s.recipientRow)}>
                             <InputField
                                 id="checkout-recipient-name"
                                 label="Ім'я отримувача"
@@ -521,46 +560,8 @@ export default function Step1() {
                         </div>
                     )}
 
-                    <div className={s.divider} />
-
-                    <div className={s.checkboxRow}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <Checkbox
-                                id="checkout-agree"
-                                checked={formData.agreed}
-                                onChange={val => {
-                                    handleChange('agreed', val);
-                                    if (!val) setTouched(prev => ({ ...prev, agreed: true }));
-                                }}
-                            >
-                                Я згоден з{' '}
-                                <Link
-                                    href="/oferta"
-                                    className={s.inlineLink}
-                                    target="_blank"
-                                    onClick={e => e.stopPropagation()}
-                                >
-                                    угодою користувача
-                                </Link>
-                            </Checkbox>
-                            {touched.agreed && errors.agreed && (
-                                <span className={s.fieldError} style={{ marginLeft: '28px' }}>{errors.agreed}</span>
-                            )}
-                        </div>
-
-                        {hydrated && isAuthenticated && !isGuest && user && (
-                            <Checkbox
-                                id="checkout-another-recipient"
-                                checked={formData.anotherRecipient}
-                                onChange={val => handleChange('anotherRecipient', val)}
-                            >
-                                Додати іншого отримувача
-                            </Checkbox>
-                        )}
-                    </div>
-
                     {submitError && (
-                        <div className={s.fieldError} style={{ marginBottom: '16px' }}>{submitError}</div>
+                        <div className={clsx(s.fieldError, s.formSubmitError)}>{submitError}</div>
                     )}
                     <Button
                         type="submit"

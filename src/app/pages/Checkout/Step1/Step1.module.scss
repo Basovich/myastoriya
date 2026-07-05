@@ -666,3 +666,30 @@
         margin-top: 1px;
     }
 }
+
+.phoneInputContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.recipientRow {
+    margin-top: 16px;
+}
+
+.agreeCol {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.agreeError {
+    margin-left: 28px;
+}
+
+.formSubmitError {
+    margin-bottom: 16px;
+}
+
