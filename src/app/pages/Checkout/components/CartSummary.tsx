@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import Image from 'next/image';
 import { useCartProducts } from '@/hooks/useCartProducts';
 import s from './CheckoutShared.module.scss';
 import { useAppSelector } from '@/store/hooks';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
+import Spinner from '@/app/components/ui/Spinner/Spinner';
+
 
 const getModifierIconUrl = (name?: string | null): string | null => {
     if (!name) return null;
@@ -40,7 +42,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
 
     const originalTotalSum = useMemo(() => {
         return populatedItems.reduce((acc, item) => {
-            const origPrice = (item.product as any).originalPrice || item.product.price;
+            const origPrice = item.product.originalPrice || item.product.price;
             return acc + (origPrice * item.quantity);
         }, 0);
     }, [populatedItems]);
@@ -57,7 +59,15 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
         return Math.round(totalSum * (discountPercent / 100));
     }, [promoCode, discountPercent, totalSum]);
 
-    if (!hydrated) return null;
+    if (!hydrated) {
+        return (
+            <div className={s.cartSummary}>
+                <div className={s.cartLoading}>
+                    <Spinner />
+                </div>
+            </div>
+        );
+    }
 
     const delivery = deliveryPrice !== undefined ? deliveryPrice : 0;
 

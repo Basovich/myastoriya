@@ -363,3 +363,11 @@
     text-decoration: line-through;
     font-weight: 400;
 }
+
+.cartLoading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
