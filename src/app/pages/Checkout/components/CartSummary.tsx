@@ -2,6 +2,9 @@
 
 import React, { useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { getLocalizedHref } from '@/utils/i18n-helpers';
+import { Locale } from '@/i18n/config';
 import { useCartProducts } from '@/hooks/useCartProducts';
 import s from './CheckoutShared.module.scss';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
@@ -87,7 +90,12 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
     const hasAnyDiscount = (originalTotalSum > totalSum) || (discountAmount > 0) || (backendTotal > 0 && backendTotal < totalSum);
 
     return (
-        <div className={`${s.cartSummary} ${cartLoading ? s.blurred : ''}`}>
+        <div className={s.cartSummary}>
+            {cartLoading && (
+                <div className={s.loadingOverlay}>
+                    <Spinner />
+                </div>
+            )}
             <div className={s.cartHeader}>
                 <div className={s.cartTitle}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
@@ -115,19 +123,25 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                 {populatedItems.length === 0 ? (
                     <p className={s.emptyCart}>Кошик порожній</p>
                 ) : (
-                    populatedItems.map(item => (
+                    [...populatedItems].reverse().map(item => (
                         <div key={item.rowId || item.id} className={s.cartItem}>
                             <div className={s.cartItemImg}>
-                                <Image
-                                    src={item.product.image}
-                                    alt={item.product.title}
-                                    width={84}
-                                    height={60}
-                                    className={s.cartImg}
-                                />
+                                <Link href={getLocalizedHref(`/products/${item.product.slug || item.id}`, lang as Locale)} target="_blank">
+                                    <Image
+                                        src={item.product.image}
+                                        alt={item.product.title}
+                                        width={84}
+                                        height={60}
+                                        className={s.cartImg}
+                                    />
+                                </Link>
                             </div>
                             <div className={s.cartItemInfo}>
-                                <p className={s.cartItemTitle}>{item.product.title}</p>
+                                <p className={s.cartItemTitle}>
+                                    <Link href={getLocalizedHref(`/products/${item.product.slug || item.id}`, lang as Locale)} target="_blank">
+                                        {item.product.title}
+                                    </Link>
+                                </p>
                                 <p className={s.cartItemWeight}>
                                     {item.product.weight}
                                     {item.product.costVariantName && ` • ${item.product.costVariantName}`}

@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCartAsync, updateQuantityAsync, removeFromCartAsync, fetchCartAsync } from '@/store/slices/cartSlice';
 import { useCartProducts } from '@/hooks/useCartProducts';
 import clsx from 'clsx';
+import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
@@ -48,6 +49,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     const dispatch = useAppDispatch();
     const { isInitialized } = useAppSelector(state => state.auth);
     const cashback = useAppSelector(state => state.cart.cashback);
+    const cartLoading = useAppSelector(state => state.cart.loading);
     const hydrated = useIsHydrated();
 
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
@@ -75,7 +77,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
 
     const originalTotalSum = useMemo(() => {
         return populatedItems.reduce((acc, item) => {
-            const origPrice = (item.product as any).originalPrice || item.product.price;
+            const origPrice = item.product.originalPrice || item.product.price;
             return acc + (origPrice * item.quantity);
         }, 0);
     }, [populatedItems]);
@@ -122,6 +124,11 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
             </button>
 
             <div className={s.modal}>
+                {cartLoading && (
+                    <div className={s.loadingOverlay}>
+                        <Spinner />
+                    </div>
+                )}
                 <div className={s.modalHeader}>
                     <h2 className={s.title}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
@@ -144,7 +151,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                         </div>
                     ) : (
                         <div className={s.cartItems}>
-                            {populatedItems.map((item) => (
+                            {[...populatedItems].reverse().map((item) => (
                                 <div key={item.rowId || item.id} className={s.cartItem}>
                                     <div className={s.itemImage}>
                                         <Link href={getLocalizedHref(`/products/${item.product.slug || item.id}`, lang as Locale)} target="_blank">
