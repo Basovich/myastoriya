@@ -6,7 +6,7 @@ import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
 import ProductCardRow from "@/app/components/ui/ProductCardRow";
 import Button from "@/app/components/ui/Button/Button";
 import type { Product, ProductsResponse } from "@/lib/graphql";
-import { resolveProductImageUrl, getProductsApi } from "@/lib/graphql";
+import { resolveProductImageUrl, getProductsApi, getProductWeight } from "@/lib/graphql";
 import type { FilterStateInput } from "@/lib/graphql";
 import { Locale } from "@/i18n/config";
 import s from "../CatalogContent/CatalogContent.module.scss";
@@ -15,15 +15,6 @@ function getBadge(product: Product): string | null {
     if (product.is_new) return 'NEW';
     if (product.oldCost && product.oldCost > product.cost) return 'АКЦІЯ';
     return null;
-}
-
-function getWeight(product: Product): string {
-    const weightSpec = product.specifications?.find(sp =>
-        sp.name.toLowerCase().includes('вага') ||
-        sp.name.toLowerCase().includes("об'єм")
-    );
-    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
-    return product.multiplier ? `${product.multiplier}` : '';
 }
 
 interface CatalogProductsClientProps {
@@ -111,7 +102,7 @@ export default function CatalogProductsClient({
                                 id={product.id}
                                 slug={product.slug}
                                 title={product.name}
-                                weight={getWeight(product)}
+                                weight={getProductWeight(product)}
                                 price={product.cost}
                                 unit={product.unit}
                                 badge={getBadge(product)}
@@ -125,7 +116,7 @@ export default function CatalogProductsClient({
                                 id={product.id}
                                 slug={product.slug}
                                 title={product.name}
-                                weight={getWeight(product)}
+                                weight={getProductWeight(product)}
                                 price={product.cost}
                                 oldPrice={product.oldCost ?? undefined}
                                 unit={product.unit}

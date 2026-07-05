@@ -19,7 +19,8 @@ import {
     resolveProductImageUrl,
     getOrdersApi,
     getUserDiscountInfoApi,
-    UserDiscountInfo
+    UserDiscountInfo,
+    getProductWeight,
 } from '@/lib/graphql';
 import { updateUserDataApi } from '@/lib/graphql/queries/auth';
 import { setUser } from '@/store/slices/authSlice';
@@ -28,19 +29,6 @@ import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalConte
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import s from './Profile.module.scss';
 import clsx from "clsx";
-
-function getWeight(product: ApiProduct): string {
-    const weightSpec = product.specifications?.find(sp =>
-        sp.name.toLowerCase().includes('вага') ||
-        sp.name.toLowerCase().includes('важ') ||
-        sp.name.toLowerCase().includes('вес') ||
-        sp.name.toLowerCase().includes("об'єм")
-    );
-    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
-    const multiplier = product.multiplier ? String(product.multiplier) : '';
-    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
-    return multiplier;
-}
 
 const profileDict = {
   ua: {
@@ -200,7 +188,7 @@ export default function ProfilePage() {
                     unit: p.unit,
                     image: resolveProductImageUrl(p),
                     badge: p.is_new ? "NEW" : null,
-                    weight: getWeight(p),
+                    weight: getProductWeight(p),
                     hasCostVariants: p.hasCostVariants
                 }));
                 setViewedProducts(mappedProducts);

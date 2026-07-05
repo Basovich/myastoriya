@@ -17,24 +17,9 @@ import {
     resolveProductImageUrl, 
     resolveCategoryImageUrl,
     Product as ApiProduct,
-    ProductCategory
-} from "@/lib/graphql/queries/products";
-
-
-// Removed MOCKs
-
-function getWeight(product: ApiProduct): string {
-    const weightSpec = product.specifications?.find(sp =>
-        sp.name.toLowerCase().includes('вага') ||
-        sp.name.toLowerCase().includes('важ') ||
-        sp.name.toLowerCase().includes('вес') ||
-        sp.name.toLowerCase().includes("об'єм")
-    );
-    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
-    const multiplier = product.multiplier ? String(product.multiplier) : '';
-    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
-    return multiplier;
-}
+    ProductCategory,
+    getProductWeight
+} from "@/lib/graphql";
 
 export default function SearchContent() {
     const searchParams = useSearchParams();
@@ -191,7 +176,7 @@ export default function SearchContent() {
                              <div className={s.loading}>Завантаження...</div>
                         ) : products.length > 0 ? (
                             products.map((product) => {
-                                const weight = getWeight(product);
+                                const weight = getProductWeight(product);
 
                                 return (
                                     <ProductCard

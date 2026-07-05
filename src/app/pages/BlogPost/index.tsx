@@ -13,22 +13,9 @@ import Button from "@/app/components/ui/Button/Button";
 import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
 import SliderArrow from "@/app/components/ui/SliderArrow/SliderArrow";
 import SectionHeader from "@/app/components/ui/SectionHeader/SectionHeader";
-import { type BlogPost, type Product, resolveProductImageUrl, resolveBlogImageUrl } from "@/lib/graphql";
+import { type BlogPost, type Product, resolveProductImageUrl, resolveBlogImageUrl, getProductWeight } from "@/lib/graphql";
 import { likeBlogApi } from "@/lib/graphql/queries/blog";
 import clsx from "clsx";
-
-function getWeight(product: any): string {
-    const weightSpec = product.specifications?.find((sp: any) =>
-        sp.name.toLowerCase().includes('вага') ||
-        sp.name.toLowerCase().includes('важ') ||
-        sp.name.toLowerCase().includes('вес') ||
-        sp.name.toLowerCase().includes("об'єм")
-    );
-    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
-    const multiplier = product.multiplier ? String(product.multiplier) : '';
-    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
-    return multiplier;
-}
 
 interface BlogPostPageProps {
     dict: Dictionary;
@@ -184,7 +171,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                             id={product.id}
                                             slug={product.slug}
                                             title={product.name}
-                                            weight={getWeight(product)}
+                                            weight={getProductWeight(product)}
                                             price={product.cost}
                                             unit={product.unit ?? ""}
                                             badge={product.is_new ? "NEW" : null}
@@ -216,7 +203,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                     id={product.id}
                                     slug={product.slug}
                                     title={product.name}
-                                    weight={getWeight(product)}
+                                    weight={getProductWeight(product)}
                                     price={product.cost}
                                     unit={product.unit ?? ""}
                                     badge={product.is_new ? "NEW" : null}

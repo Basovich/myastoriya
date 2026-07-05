@@ -50,6 +50,8 @@ export {
     getFaqQuestionsApi,
     getDefaultCostVariant,
     getRoastDegreeScore,
+    getProductWeight,
+    resolveCategoryImageUrl,
 } from './queries/products';
 export type {
     Product,

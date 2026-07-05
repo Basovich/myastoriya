@@ -11,7 +11,7 @@ import clsx from 'clsx';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import type { Product, ProductsResponse, FaqQuestion } from '@/lib/graphql';
-import { resolveProductImageUrl } from '@/lib/graphql';
+import { resolveProductImageUrl, getProductWeight } from '@/lib/graphql';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
 import type { BreadcrumbItem } from '@/utils/category-url';
 
@@ -29,15 +29,6 @@ function getBadge(product: Product): string | null {
     if (product.is_new) return 'NEW';
     if (product.oldCost && product.oldCost > product.cost) return 'АКЦІЯ';
     return null;
-}
-
-function getWeight(product: Product): string {
-    const weightSpec = product.specifications?.find(sp =>
-        sp.name.toLowerCase().includes('вага') ||
-        sp.name.toLowerCase().includes("об'єм")
-    );
-    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
-    return product.multiplier ? `${product.multiplier}` : '';
 }
 
 interface CatalogContentProps {
@@ -128,7 +119,7 @@ export default async function CatalogContent({
                     id={product.id}
                     slug={product.slug}
                     title={product.name}
-                    weight={getWeight(product)}
+                    weight={getProductWeight(product)}
                     price={product.cost}
                     unit={product.unit}
                     badge={getBadge(product)}
@@ -148,7 +139,7 @@ export default async function CatalogContent({
                 id={product.id}
                 slug={product.slug}
                 title={product.name}
-                weight={getWeight(product)}
+                weight={getProductWeight(product)}
                 price={product.cost}
                 unit={product.unit}
                 badge={getBadge(product)}

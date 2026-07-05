@@ -12,45 +12,7 @@ import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import Button from "../../../components/ui/Button/Button";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import Image from "next/image";
-import { type Showcase, type Product, resolveProductImageUrl, getProductsApi } from "@/lib/graphql";
-
-
-function roundWeightString(val: string): string {
-    if (!val) return '';
-    const trimmed = val.trim();
-    
-    // 1. Try to match a pure number (e.g. "1441.399" or "1,53")
-    if (/^\d+([.,]\d+)?$/.test(trimmed)) {
-        const num = parseFloat(trimmed.replace(',', '.'));
-        if (!isNaN(num)) {
-            if (num >= 10) {
-                return String(Math.round(num));
-            } else {
-                return String(Math.round(num * 100) / 100);
-            }
-        }
-    }
-    
-    // 2. Try to match a number with a trailing unit (e.g. "1441.399 г" or "1.5339 кг" or "0.75 л")
-    const match = trimmed.match(/^(\d+([.,]\d+)?)\s*(л|l|мл|ml|г|g|кг|kg|шт)(?![а-яА-Яa-zA-Z0-9])/i);
-    if (match) {
-        const numPart = match[1];
-        const unitPart = match[3];
-        const num = parseFloat(numPart.replace(',', '.'));
-        if (!isNaN(num)) {
-            let roundedNumStr: string;
-            if (num >= 10) {
-                roundedNumStr = String(Math.round(num));
-            } else {
-                roundedNumStr = String(Math.round(num * 100) / 100);
-            }
-            const originalSpacing = trimmed.substring(numPart.length, trimmed.indexOf(unitPart));
-            return `${roundedNumStr}${originalSpacing}${unitPart}`;
-        }
-    }
-    
-    return val;
-}
+import { type Showcase, type Product, resolveProductImageUrl, getProductsApi, getProductWeight } from "@/lib/graphql";
 
 interface ProductsProps {
     dict: {
@@ -73,7 +35,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
     const [hasMore, setHasMore] = useState(initialHasMore ?? true);
     const [page, setPage] = useState(1);
     const [isLocked, setIsLocked] = useState(false);
-    const [swiperInstance, setSwiperInstance] = useState<any>(null);
+    const [swiperInstance, setSwiperInstance] = useState<{ slideToLoop: (index: number) => void } | null>(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -134,82 +96,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
         }
     };
 
-    const getWeight = (product: Product) => {
-        // 1. Try to extract weight/volume from name (e.g. "0.75 л", "500 г", "330 мл")
-        const nameMatch = product.name.match(/(\d+([.,]\d+)?)\s*(л|l|мл|ml|г|g|кг|kg)(?![а-яА-Яa-zA-Z0-9])/i);
-        if (nameMatch) {
-            return roundWeightString(nameMatch[0]);
-        }
 
-        // 2. Try specifications with a smart finder that ignores "Вага: 1" / "Вес: 1" defaults if other weight specs exist
-        let weightSpec = product.specifications?.find(s => {
-            const name = s.name.toLowerCase();
-            const hasWeightKeyword = name.includes("вага") || name.includes("важ") || name.includes("вес") || name.includes("об'єм");
-            if (!hasWeightKeyword) return false;
-            const val = s.values[0] || '';
-            return !(val === '1' && (name === 'вага' || name === 'вес'));
-        });
-        if (!weightSpec) {
-            weightSpec = product.specifications?.find(s => {
-                const name = s.name.toLowerCase();
-                return name.includes("вага") || name.includes("важ") || name.includes("вес") || name.includes("об'єм");
-            });
-        }
-        if (weightSpec && weightSpec.values.length > 0) {
-            const val = weightSpec.values[0];
-            const cleanVal = val.replace(/[0-9.,\s-]/g, '');
-            if (cleanVal.length === 0) {
-                const specName = weightSpec.name.toLowerCase();
-                const titleLower = product.name.toLowerCase();
-                const unitLower = product.unit?.toLowerCase() || '';
-                const isLiquid = specName.includes("об'єм") || specName.includes('обьем') || 
-                    specName.includes('мл') || specName.includes('ml') || 
-                    unitLower.includes('мл') || unitLower.includes('ml') ||
-                    /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
-
-                let formattedVal = val;
-                if (specName.includes('кг') || specName.includes('kg')) {
-                    formattedVal = `${val} кг`;
-                } else if (specName.includes('л') || specName.includes('l')) {
-                    if (!specName.includes('мл') && !specName.includes('ml')) {
-                        formattedVal = `${val} л`;
-                    }
-                } else {
-                    formattedVal = `${val} ${isLiquid ? 'мл' : 'г'}`;
-                }
-                return roundWeightString(formattedVal);
-            }
-            return roundWeightString(val);
-        }
-
-        // 3. Try portionWeight or portionSize
-        if (product.portionWeight) return roundWeightString(product.portionWeight);
-        if (product.portionSize) {
-            const hasUnit = /[гgкmшт]/i.test(product.portionSize);
-            if (hasUnit) return roundWeightString(product.portionSize);
-        }
-
-        // 3. Try multiplier with unit
-        if (product.multiplier && product.multiplier > 0) {
-            const normalizedUnit = product.unit?.trim().toLowerCase() || '';
-            if (normalizedUnit === '100 г' || normalizedUnit === '100г') {
-                return `${Math.round(product.multiplier * 1000)} г`;
-            } else if (normalizedUnit === '100 мл') {
-                return `${Math.round(product.multiplier * 1000)} мл`;
-            }
-            if (normalizedUnit === 'шт') {
-                return `${product.multiplier} шт`;
-            }
-            return roundWeightString(`${product.multiplier} ${product.unit}`);
-        }
-
-        // 4. Default unit fallback
-        if (product.unit) {
-            return product.unit.toLowerCase() === 'шт' ? '1 шт' : product.unit;
-        }
-
-        return '';
-    };
 
     const getBadge = (product: Product) => {
         if (product.is_new) return "NEW";
@@ -300,7 +187,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                             id={product.id}
                             slug={product.slug}
                             title={product.name}
-                            weight={getWeight(product)}
+                            weight={getProductWeight(product)}
                             price={product.cost}
                             unit={product.unit}
                             badge={getBadge(product)}

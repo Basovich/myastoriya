@@ -6,7 +6,7 @@ import s from './ActionDetail.module.scss';
 import ProductCard from '../ui/ProductCard/ProductCard';
 import Breadcrumbs from '../ui/Breadcrumbs/Breadcrumbs';
 import CountdownTimer from '../ui/CountdownTimer/CountdownTimer';
-import { type Sale, type Product, resolveProductImageUrl, getProductsApi } from '@/lib/graphql';
+import { type Sale, type Product, resolveProductImageUrl, getProductsApi, getProductWeight } from '@/lib/graphql';
 
 const PAGE_SIZE = 12;
 
@@ -68,19 +68,6 @@ const LOCALIZED_TEXTS = {
         }
     }
 };
-
-function getWeight(product: Product): string {
-    const weightSpec = product.specifications?.find(sp =>
-        sp.name.toLowerCase().includes('вага') ||
-        sp.name.toLowerCase().includes('важ') ||
-        sp.name.toLowerCase().includes('вес') ||
-        sp.name.toLowerCase().includes("об'єм")
-    );
-    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
-    const multiplier = product.multiplier ? String(product.multiplier) : '';
-    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
-    return multiplier;
-}
 
 interface ActionDetailProps {
     lang: string;
@@ -255,7 +242,7 @@ export default function ActionDetail({
                                 id={product.id}
                                 slug={product.slug}
                                 title={product.name}
-                                weight={getWeight(product)}
+                                weight={getProductWeight(product)}
                                 price={product.cost}
                                 unit={product.unit ?? ''}
                                 badge={product.is_new ? 'NEW' : null}

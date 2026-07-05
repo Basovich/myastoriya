@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { Locale } from '@/i18n/config';
 import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
-import { Product, resolveProductImageUrl, getProductsByIdsApi } from '@/lib/graphql/queries/products';
+import { Product, resolveProductImageUrl, getProductsByIdsApi, getProductWeight } from '@/lib/graphql';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
@@ -16,19 +16,6 @@ import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter } from 'next/navigation';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import s from './Favorites.module.scss';
-
-function getWeight(product: Product): string {
-    const weightSpec = product.specifications?.find(sp =>
-        sp.name.toLowerCase().includes('вага') ||
-        sp.name.toLowerCase().includes('важ') ||
-        sp.name.toLowerCase().includes('вес') ||
-        sp.name.toLowerCase().includes("об'єм")
-    );
-    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
-    const multiplier = product.multiplier ? String(product.multiplier) : '';
-    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
-    return multiplier;
-}
 
 const favDict = {
     ua: {
@@ -148,7 +135,7 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                                     title={product.name}
                                     price={product.cost}
                                     unit={product.unit}
-                                    weight={getWeight(product)}
+                                    weight={getProductWeight(product)}
                                     image={resolveProductImageUrl(product)}
                                     badge={badgeStr}
                                     lang={lang} 

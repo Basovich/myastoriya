@@ -11,7 +11,7 @@ import CartModal from '../CartModal/CartModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCartAsync } from '@/store/slices/cartSlice';
 
-import { type Special, resolveProductImageUrl } from '@/lib/graphql';
+import { type Special, resolveProductImageUrl, getProductWeight } from '@/lib/graphql';
 
 const LOCALIZED_TEXTS = {
     ua: {
@@ -49,19 +49,6 @@ const LOCALIZED_TEXTS = {
         addingToCart: "ДОБАВЛЕНИЕ..."
     }
 };
-
-function getWeight(product: any): string {
-    const weightSpec = product.specifications?.find((sp: any) =>
-        sp.name.toLowerCase().includes('вага') ||
-        sp.name.toLowerCase().includes('важ') ||
-        sp.name.toLowerCase().includes('вес') ||
-        sp.name.toLowerCase().includes("об'єм")
-    );
-    if (weightSpec && weightSpec.values.length > 0) return weightSpec.values[0];
-    const multiplier = product.multiplier ? String(product.multiplier) : '';
-    if (!multiplier && product.unit?.toLowerCase() === 'шт') return '1';
-    return multiplier;
-}
 
 interface ComplexDiscountDetailProps {
     lang: string;
@@ -185,7 +172,7 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                                             id={product.id}
                                             slug={product.slug}
                                             title={product.name}
-                                            weight={getWeight(product)}
+                                            weight={getProductWeight(product)}
                                             price={product.purchaseOldCost ?? product.purchaseCost ?? product.cost ?? 0}
                                             unit={product.unit || "кг"}
                                             badge={null}
