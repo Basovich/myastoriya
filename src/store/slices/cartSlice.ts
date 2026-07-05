@@ -74,7 +74,10 @@ const mapCartItems = (cart: CartGql): CartItem[] => {
 
 // Helper to merge optimistic items with backend state
 const mergeCartItems = (currentItems: CartItem[], backendItems: CartItem[]): CartItem[] => {
-    const getMapKey = (item: CartItem) => `${item.id}_${item.costVariantId ?? ''}`;
+    const getMapKey = (item: CartItem) => {
+        const modKey = item.modifiers ? [...item.modifiers].map(m => m.id).sort((a, b) => a - b).join(',') : '';
+        return `${item.id}_${item.costVariantId ?? ''}_${modKey}`;
+    };
     const backendMap = new Map(backendItems.map(item => [getMapKey(item), item]));
     const optimisticItems = currentItems.filter(item => !item.rowId);
     const merged = [...backendItems];
@@ -254,9 +257,13 @@ export const syncCartOnAuthAsync = createAsyncThunk(
             const state = getState() as RootState;
             const localItems = state.cart.items;
 
-            // Deduplicate items before syncing
+            // Deduplicate items before syncing (including modifiers)
             const uniqueItems = Array.from(
-                new Map(localItems.map(item => [`${item.id}_${item.costVariantId ?? ''}`, item])).values()
+                new Map(localItems.map(item => {
+                    const modKey = item.modifiers ? [...item.modifiers].map(m => m.id).sort((a, b) => a - b).join(',') : '';
+                    const key = `${item.id}_${item.costVariantId ?? ''}_${modKey}`;
+                    return [key, item];
+                })).values()
             );
 
             if (uniqueItems.length > 0) {
@@ -265,10 +272,12 @@ export const syncCartOnAuthAsync = createAsyncThunk(
                 // Sync local items sequentially to avoid 504 errors on dev-api
                 for (const item of uniqueItems) {
                     try {
+                        const modifierIds = item.modifiers ? item.modifiers.map(m => m.id) : undefined;
                         await addProductToCartApi({
                             productId: Number(item.id),
                             quantity: item.quantity,
                             costVariantId: item.costVariantId || undefined,
+                            modifierIds,
                         });
                         // Small delay to prevent rate limits
                         await new Promise(resolve => setTimeout(resolve, 300));
@@ -482,6 +491,16 @@ const cartSlice = createSlice({
                 state.loading = false;
             })
             .addCase(toggleUseBonusesAsync.rejected, (state) => {
+                state.loading = false;
+            })
+            // syncCartOnAuthAsync
+            .addCase(syncCartOnAuthAsync.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(syncCartOnAuthAsync.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(syncCartOnAuthAsync.rejected, (state) => {
                 state.loading = false;
             });
     }
