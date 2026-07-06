@@ -168,12 +168,12 @@
     &::before {
         content: '';
         position: absolute;
-        left: -7px;
+        left: -8px;
         top: 50%;
         transform: translateY(-50%);
-        border-top: 7px solid transparent;
-        border-bottom: 7px solid transparent;
-        border-right: 7px solid #E6000F;
+        border-top: 9px solid transparent;
+        border-bottom: 9px solid transparent;
+        border-right: 9px solid #E6000F;
     }
 
     @media (any-hover: hover) {

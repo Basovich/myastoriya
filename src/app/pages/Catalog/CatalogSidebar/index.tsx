@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -111,8 +112,10 @@ export default function CatalogSidebar({
     const optionsToUse = sortOptions || texts.sortOptions;
     const defaultSortOption = optionsToUse[0] || texts.defaultSortOption;
 
-    // Локальний стан фільтрів (pending до натискання «Застосувати»)
-    const [pendingFilters, setPendingFilters] = useState<FilterStateInput[]>(activeFilters ?? []);
+    // Локальний стан фільтрів (pending до натискання «Застосувати») - тільки спискові фільтри
+    const [pendingFilters, setPendingFilters] = useState<FilterStateInput[]>(() =>
+        (activeFilters ?? []).filter(f => f.minValue === undefined && f.maxValue === undefined)
+    );
 
     // Локальний стан «чернетки» ціни — не впливає на isPendingChanged
     const [pendingPrice, setPendingPrice] = useState<Record<string, { from: number; to: number }>>({});
@@ -121,7 +124,10 @@ export default function CatalogSidebar({
     const [dynamicBlocks, setDynamicBlocks] = useState<FilterBlock[]>(
         (filterBlocks ?? []).filter(block => !shouldExcludeBlock(block))
     );
-    const [isLoadingFilters, setIsLoadingFilters] = useState(!filterBlocks || filterBlocks.length === 0);
+    const [isLoadingFilters, setIsLoadingFilters] = useState(() => {
+        if (!categoryId) return false;
+        return !filterBlocks || filterBlocks.length === 0;
+    });
 
     const renderedBlocks = dynamicBlocks.filter(block => {
         if (!block.key || block.key === 'categories') return false;
@@ -142,7 +148,6 @@ export default function CatalogSidebar({
 
     useEffect(() => {
         if (!categoryId) {
-            setIsLoadingFilters(false);
             return;
         }
         setIsLoadingFilters(true);
@@ -159,7 +164,7 @@ export default function CatalogSidebar({
 
     // Синхронізуємо з props при скиданні через key={clearTrigger}
     useEffect(() => {
-        setPendingFilters(activeFilters ?? []);
+        setPendingFilters((activeFilters ?? []).filter(f => f.minValue === undefined && f.maxValue === undefined));
         setPendingPrice({});
         setFloatingButtonPos(null);
     }, [activeFilters]);
@@ -216,40 +221,37 @@ export default function CatalogSidebar({
         if (!draft) return;
         
         let newFilters: FilterStateInput[];
+        const currentActive = activeFilters ?? [];
         if (draft.from === blockMin && draft.to === blockMax) {
-            newFilters = removeFilter(pendingFilters, blockKey);
+            newFilters = removeFilter(currentActive, blockKey);
         } else {
-            newFilters = setFilterValue(pendingFilters, { key: blockKey, minValue: draft.from, maxValue: draft.to });
+            newFilters = setFilterValue(currentActive, { key: blockKey, minValue: draft.from, maxValue: draft.to });
         }
-        setPendingFilters(newFilters);
 
-        if (isOnlyPriceRange) {
-            const params = buildFilterParams(newFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
-            router.push(`${pathname}?${params.toString()}`, { scroll: false });
-            setFloatingButtonPos(null);
-            onApply?.();
-            onClose?.();
-        }
-    }, [pendingPrice, pendingFilters, isOnlyPriceRange, searchParams, dynamicBlocks, router, pathname, onApply, onClose]);
+        const params = buildFilterParams(newFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        setFloatingButtonPos(null);
+        onApply?.();
+        onClose?.();
+    }, [pendingPrice, activeFilters, searchParams, dynamicBlocks, router, pathname, onApply, onClose]);
 
 
     const clearPriceRange = useCallback((blockKey: string) => {
-        const newFilters = removeFilter(pendingFilters, blockKey);
-        setPendingFilters(newFilters);
+        const currentActive = activeFilters ?? [];
+        const newFilters = removeFilter(currentActive, blockKey);
         setPendingPrice(prev => { const next = { ...prev }; delete next[blockKey]; return next; });
 
-        if (isOnlyPriceRange) {
-            const params = buildFilterParams(newFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
-            router.push(`${pathname}?${params.toString()}`, { scroll: false });
-            setFloatingButtonPos(null);
-            onClearAll?.();
-            onClose?.();
-        }
-    }, [pendingFilters, isOnlyPriceRange, searchParams, dynamicBlocks, router, pathname, onClearAll, onClose]);
+        const params = buildFilterParams(newFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        setFloatingButtonPos(null);
+        onApply?.();
+        onClose?.();
+    }, [activeFilters, searchParams, dynamicBlocks, router, pathname, onApply, onClose]);
 
     // --- isModified ---
 
-    const isPendingChanged = JSON.stringify(pendingFilters) !== JSON.stringify(activeFilters ?? []);
+    const activeListFilters = (activeFilters ?? []).filter(f => f.minValue === undefined && f.maxValue === undefined);
+    const isPendingChanged = JSON.stringify(pendingFilters) !== JSON.stringify(activeListFilters);
     const isSortChanged = sortBy !== undefined && sortBy !== defaultSortOption;
     const isModified = isPendingChanged || isSortChanged || hasActiveFilters(pendingFilters);
 
@@ -261,7 +263,12 @@ export default function CatalogSidebar({
 
     const handleApply = () => {
         if (!isPendingChanged && !isSortChanged) return;
-        const params = buildFilterParams(pendingFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
+        
+        // Об'єднуємо поточні pending спискові фільтри з активними range фільтрами з URL
+        const activeRangeFilters = (activeFilters ?? []).filter(f => f.minValue !== undefined || f.maxValue !== undefined);
+        const filtersToApply = [...pendingFilters, ...activeRangeFilters];
+
+        const params = buildFilterParams(filtersToApply, new URLSearchParams(searchParams.toString()), dynamicBlocks);
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
         setFloatingButtonPos(null);
         onApply?.();
@@ -327,9 +334,9 @@ export default function CatalogSidebar({
                             const blockMin = block.min ?? 0;
                             const blockMax = block.max ?? 10000;
                             if (blockMin === blockMax) return null;
-                            const currentFilter = getFilterForBlock(pendingFilters, blockKey);
-                            const from = currentFilter?.minValue ?? blockMin;
-                            const to = currentFilter?.maxValue ?? blockMax;
+                            const activeFilter = getFilterForBlock(activeFilters ?? [], blockKey);
+                            const from = activeFilter?.minValue ?? blockMin;
+                            const to = activeFilter?.maxValue ?? blockMax;
                             const showClear = from !== blockMin || to !== blockMax;
 
                             return (
