@@ -12,6 +12,7 @@ import { useIsHydrated } from '@/hooks/useIsHydrated';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { useParams } from 'next/navigation';
 import { toggleUseBonusesAsync } from '@/store/slices/cartSlice';
+import clsx from 'clsx';
 
 
 const getModifierIconUrl = (name?: string | null): string | null => {
@@ -224,7 +225,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                                 Загальна сума:
                             </span>
                             <div className={s.priceBlock}>
-                                <span className={s.cartStatVal}>
+                                <span className={clsx(s.cartStatVal, hasAnyDiscount && s.discounted)}>
                                     {finalPrice} ₴
                                 </span>
                                 {hasAnyDiscount && (
