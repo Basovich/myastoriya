@@ -41,7 +41,7 @@ export default function RecentOrderCard({ status = '', items = [], totalItems = 
     const renderedTitle = parts.length > 1 ? (
         <>
             <span className={s.titleBlack}>{parts[0]}/</span>
-            <span className={s.titleGreen}>{parts[1]}</span>
+            <span className={s.titleBlack}>{parts[1]}</span>
         </>
     ) : (
         dict.title

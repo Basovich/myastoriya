@@ -556,8 +556,18 @@ export default function Step2() {
     }, [addresses, selectedAddressId]);
 
     const pickupPoints = React.useMemo(() => {
-        return [...userPickupPoints, ...guestPickupPoints];
-    }, [userPickupPoints, guestPickupPoints]);
+        const list = [...userPickupPoints, ...guestPickupPoints];
+        const seen = new Set<string>();
+        return list.filter(point => {
+            const matchedShop = shops.find(s => s.name === point.name || s.siteName === point.name);
+            const key = matchedShop ? `shop-${matchedShop.id}` : `point-${point.name || point.id}`;
+            if (seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
+    }, [userPickupPoints, guestPickupPoints, shops]);
 
     const existingShopIds = React.useMemo(() => {
         return pickupPoints
