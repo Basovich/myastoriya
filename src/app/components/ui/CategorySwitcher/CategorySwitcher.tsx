@@ -5,6 +5,7 @@ import Image from 'next/image';
 import AppLink from '../AppLink/AppLink';
 import s from './CategorySwitcher.module.scss';
 import clsx from 'clsx';
+import Spinner from '../Spinner/Spinner';
 import { getCategoryByIdApi, getSubcategoriesApi, getCatalogTreeApi } from '@/lib/graphql/queries/products';
 import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
 
@@ -115,11 +116,7 @@ export default function CategorySwitcher({
             return (
                 <div className={clsx(s.wrapper, isSidebar && s.sidebarMode, className)}>
                     {title && <h3 className={s.title}>{title}</h3>}
-                    <div className={s.loaderContainer}>
-                        <svg className={s.spinner} viewBox="0 0 50 50">
-                            <circle className={s.path} cx="25" cy="25" r="20" fill="none" strokeWidth="4.5"></circle>
-                        </svg>
-                    </div>
+                    <Spinner centered={true} />
                 </div>
             );
         }
