@@ -50,6 +50,9 @@ export default function CatalogToolbarClient({
             params.delete(key);
         }
         params.set("page", "1");
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('catalog-loading-start'));
+        }
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
     };
 

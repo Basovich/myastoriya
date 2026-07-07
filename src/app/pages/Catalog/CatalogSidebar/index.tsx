@@ -216,6 +216,12 @@ export default function CatalogSidebar({
         setPendingPrice(prev => ({ ...prev, [blockKey]: { from, to } }));
     }, []);
 
+    const startCatalogTransition = () => {
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('catalog-loading-start'));
+        }
+    };
+
     const handlePriceOk = useCallback((blockKey: string, blockMin: number, blockMax: number) => {
         const draft = pendingPrice[blockKey];
         if (!draft) return;
@@ -229,6 +235,7 @@ export default function CatalogSidebar({
         }
 
         const params = buildFilterParams(newFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
+        startCatalogTransition();
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
         setFloatingButtonPos(null);
         onApply?.();
@@ -242,6 +249,7 @@ export default function CatalogSidebar({
         setPendingPrice(prev => { const next = { ...prev }; delete next[blockKey]; return next; });
 
         const params = buildFilterParams(newFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
+        startCatalogTransition();
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
         setFloatingButtonPos(null);
         onApply?.();
@@ -269,6 +277,7 @@ export default function CatalogSidebar({
         const filtersToApply = [...pendingFilters, ...activeRangeFilters];
 
         const params = buildFilterParams(filtersToApply, new URLSearchParams(searchParams.toString()), dynamicBlocks);
+        startCatalogTransition();
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
         setFloatingButtonPos(null);
         onApply?.();
@@ -278,6 +287,7 @@ export default function CatalogSidebar({
     const handleClear = () => {
         setPendingFilters([]);
         const params = clearFilterParams(new URLSearchParams(searchParams.toString()));
+        startCatalogTransition();
         router.push(`${pathname}?${params.toString()}`, { scroll: false });
         setFloatingButtonPos(null);
         onClearAll?.();

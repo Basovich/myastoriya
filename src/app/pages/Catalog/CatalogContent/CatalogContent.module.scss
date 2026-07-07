@@ -182,6 +182,17 @@ div.sortWrap {
     min-width: 0;
 }
 
+.loadingOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 100;
+    border-radius: 8px;
+}
+
 .toolbar {
     display: flex;
     align-items: center;
@@ -239,6 +250,7 @@ div.sortWrap {
     flex-direction: column;
     gap: 20px;
     overflow-anchor: none;
+    position: relative;
 }
 
 .productListGrid {
@@ -293,11 +305,25 @@ div.sortWrap {
     }
 
     @media (any-hover: hover) {
-        &:hover {
+        &:hover:not(:disabled) {
             svg path {
                 fill: none !important;
                 stroke: #fff !important;
             }
+        }
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        border-color: rgba(0, 0, 0, 0.2);
+        color: rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+        background-color: transparent;
+
+        svg path {
+            stroke: rgba(0, 0, 0, 0.4) !important;
+            fill: none !important;
         }
     }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import clsx from "clsx";
 import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
 import ProductCardRow from "@/app/components/ui/ProductCardRow";
@@ -38,14 +38,34 @@ export default function CatalogProductsClient({
     const [currentPage, setCurrentPage] = useState(initialProducts.current_page);
     const [hasMorePages, setHasMorePages] = useState(initialProducts.has_more_pages);
     const [isLoading, setIsLoading] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
+
+    useEffect(() => {
+        const handleStart = () => setIsNavigating(true);
+        window.addEventListener("catalog-loading-start", handleStart);
+        return () => window.removeEventListener("catalog-loading-start", handleStart);
+    }, []);
 
     // Official React pattern for synchronizing state with props on change:
     const [prevInitialProducts, setPrevInitialProducts] = useState(initialProducts);
-    if (initialProducts !== prevInitialProducts) {
+    const [prevActiveFilters, setPrevActiveFilters] = useState(activeFilters);
+    const [prevSort, setPrevSort] = useState(sort);
+    const [prevCategoryId, setPrevCategoryId] = useState(categoryId);
+
+    if (
+        initialProducts !== prevInitialProducts ||
+        activeFilters !== prevActiveFilters ||
+        sort !== prevSort ||
+        categoryId !== prevCategoryId
+    ) {
         setProducts(initialProducts.data);
         setCurrentPage(initialProducts.current_page);
         setHasMorePages(initialProducts.has_more_pages);
         setPrevInitialProducts(initialProducts);
+        setPrevActiveFilters(activeFilters);
+        setPrevSort(sort);
+        setPrevCategoryId(categoryId);
+        setIsNavigating(false);
     }
 
     const handleLoadMore = async () => {
@@ -94,6 +114,9 @@ export default function CatalogProductsClient({
     return (
         <div className={s.results}>
             <div className={clsx(s.productList, view === "grid" && s.productListGrid, products.length === 0 && s.noResultsList)}>
+                {isNavigating && (
+                    <div className={s.loadingOverlay} />
+                )}
                 {products.length > 0 ? (
                     products.map((product) =>
                         view === "grid" ? (
@@ -140,7 +163,7 @@ export default function CatalogProductsClient({
                         variant="outline-black"
                         onClick={handleLoadMore}
                         className={s.showMoreBtn}
-                        disabled={isLoading}
+                        disabled={isLoading || isNavigating}
                     >
                         <span className={s.showMoreText}>
                             {isLoading
