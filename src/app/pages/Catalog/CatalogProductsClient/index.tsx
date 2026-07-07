@@ -6,10 +6,11 @@ import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
 import ProductCardRow from "@/app/components/ui/ProductCardRow";
 import Button from "@/app/components/ui/Button/Button";
 import type { Product, ProductsResponse } from "@/lib/graphql";
-import { resolveProductImageUrl, getProductsApi, getProductWeight } from "@/lib/graphql";
+import { resolveProductImageUrl, getProductsApi, getProductWeight, getProductsFilterApi } from "@/lib/graphql";
 import type { FilterStateInput } from "@/lib/graphql";
 import { Locale } from "@/i18n/config";
 import s from "../CatalogContent/CatalogContent.module.scss";
+import Pagination from "@/app/components/ui/Pagination/Pagination";
 
 function getBadge(product: Product): string | null {
     if (product.is_new) return 'NEW';
@@ -39,6 +40,26 @@ export default function CatalogProductsClient({
     const [hasMorePages, setHasMorePages] = useState(initialProducts.has_more_pages);
     const [isLoading, setIsLoading] = useState(false);
     const [isNavigating, setIsNavigating] = useState(false);
+    const [isPaginating, setIsPaginating] = useState(false);
+    const [totalItems, setTotalItems] = useState(0);
+
+    useEffect(() => {
+        let isCurrent = true;
+        getProductsFilterApi(categoryId, lang, activeFilters)
+            .then((data) => {
+                if (isCurrent && data) {
+                    setTotalItems(data.productsCount || 0);
+                }
+            })
+            .catch((err) => {
+                console.error("Error fetching filters/count:", err);
+            });
+        return () => {
+            isCurrent = false;
+        };
+    }, [categoryId, lang, activeFilters]);
+
+    const totalPages = Math.ceil(totalItems / 12);
 
     useEffect(() => {
         const handleStart = () => setIsNavigating(true);
@@ -111,10 +132,45 @@ export default function CatalogProductsClient({
         }
     };
 
+    const handlePageChange = async (page: number) => {
+        if (isLoading || isPaginating || isNavigating || page === currentPage) return;
+        setIsPaginating(true);
+
+        try {
+            const newProductsRes = await getProductsApi({
+                categoryId,
+                limit: 12,
+                page: page,
+                sort,
+                filter: activeFilters && activeFilters.length > 0 ? activeFilters : undefined,
+            }, lang);
+
+            setProducts(newProductsRes.data);
+            setCurrentPage(page);
+            setHasMorePages(newProductsRes.has_more_pages);
+
+            // Update URL search parameter page
+            const params = new URLSearchParams(window.location.search);
+            params.set("page", page.toString());
+            window.history.replaceState(
+                null,
+                "",
+                `${window.location.pathname}?${params.toString()}`
+            );
+
+            // Scroll to top of the catalog page smoothly
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (err) {
+            console.error("Error loading products page:", err);
+        } finally {
+            setIsPaginating(false);
+        }
+    };
+
     return (
         <div className={s.results}>
             <div className={clsx(s.productList, view === "grid" && s.productListGrid, products.length === 0 && s.noResultsList)}>
-                {isNavigating && (
+                {(isNavigating || isPaginating) && (
                     <div className={s.loadingOverlay} />
                 )}
                 {products.length > 0 ? (
@@ -177,6 +233,16 @@ export default function CatalogProductsClient({
                             </svg>
                         )}
                     </Button>
+                </div>
+            )}
+
+            {totalPages > 1 && (
+                <div className={clsx(s.paginationRow, !hasMorePages && s.noShowMore)}>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
                 </div>
             )}
         </div>

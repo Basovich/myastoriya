@@ -762,11 +762,12 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string): Pr
 export async function getProductsFilterApi(
     categoryId?: number,
     lang?: string,
+    state?: FilterStateInput[],
 ): Promise<ProductsFilterResponse> {
     try {
         const data = await gqlRequest<{ productsFilter: ProductsFilterResponse }>(
             PRODUCTS_FILTER_QUERY,
-            { categoryId: categoryId ?? undefined, state: undefined },
+            { categoryId: categoryId ?? undefined, state: state ?? undefined },
             { next: { revalidate: 60 }, lang },
         );
         return data.productsFilter ?? { blocks: [], productsCount: 0 };
