@@ -11,6 +11,7 @@ import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
 import Button from "@/app/components/ui/Button/Button";
 import CategorySwitcher from '@/app/components/ui/CategorySwitcher/CategorySwitcher';
 import clsx from 'clsx';
+import Spinner from '@/app/components/ui/Spinner/Spinner';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
 import { getProductsFilterApi } from '@/lib/graphql/queries/products';
 import {
@@ -329,11 +330,7 @@ export default function CatalogSidebar({
 
                 {/* Динамічні блоки фільтрів з API */}
                 {isLoadingFilters ? (
-                    <div className={s.loaderContainer}>
-                        <svg className={s.spinner} viewBox="0 0 50 50">
-                            <circle className={s.path} cx="25" cy="25" r="20" fill="none" strokeWidth="4.5"></circle>
-                        </svg>
-                    </div>
+                    <Spinner centered={true} />
                 ) : dynamicBlocks.length > 0 ? (
                     dynamicBlocks.map((block, idx) => {
                         if (!block.key || block.key === 'categories') return null;
