@@ -16,7 +16,6 @@ import Image from 'next/image';
 import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
 import OrderStatusTimeline, { StatusStep } from '../OrderStatusTimeline/OrderStatusTimeline';
 import Button from '@/app/components/ui/Button/Button';
-import AppLink from '@/app/components/ui/AppLink/AppLink';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import PersonalReviewModal from '@/app/components/Personal/Reviews/PersonalReviewModal/PersonalReviewModal';
 import { fetchCartAsync } from '@/store/slices/cartSlice';
