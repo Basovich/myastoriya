@@ -980,3 +980,10 @@ button.btnApply {
     justify-content: center;
     z-index: 100;
 }
+
+// Приховуємо внутрішній body-спінер, якщо показується оверлей-спінер (щоб уникнути подвійних спінерів)
+.loadingOverlay ~ .body {
+    .loaderContainer {
+        display: none;
+    }
+}
