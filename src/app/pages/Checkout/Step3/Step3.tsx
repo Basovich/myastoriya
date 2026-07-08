@@ -79,7 +79,7 @@ export default function Step3({ lang }: Step3Props) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
-    const [successOrderInfo, setSuccessOrderInfo] = useState<{ id: string; total: number; currency: string } | null>(null);
+    const [successOrderInfo, setSuccessOrderInfo] = useState<{ id: string; total: number; currency: string; wasGuest?: boolean } | null>(null);
 
     // UI state
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -101,7 +101,7 @@ export default function Step3({ lang }: Step3Props) {
     }, [promoCode]);
 
     const dispatch = useAppDispatch();
-    const { user, isAuthenticated } = useAppSelector(state => state.auth);
+    const { user, isAuthenticated, isGuest } = useAppSelector(state => state.auth);
 
     // Load saved delivery parameters, promo, and fetch payment methods
     useEffect(() => {
@@ -341,6 +341,8 @@ export default function Step3({ lang }: Step3Props) {
                 },
             };
 
+            const isGuestUser = !isAuthenticated || !!isGuest;
+
             const res = await createOrderApi(
                 {
                     userData,
@@ -351,21 +353,25 @@ export default function Step3({ lang }: Step3Props) {
                     communicationMethod: contactMethod,
                     dontCallBack: contactMethod === 'dontCallBack',
                     useBonuses: useBonuses,
+                    registerMe: isGuestUser ? true : undefined,
                 },
                 token || '',
                 lang
             );
 
-            if (res.action === 'redirect' && res.url) {
+            if (res.url) {
+                // Будь-який action з url (redirect / authenticate / confirm) — редірект на платіжний шлюз
                 window.location.href = res.url;
             } else {
+                // action === 'success' або невідомий без url — показуємо success-екран
                 setSuccessOrderInfo({
                     id: res.orderId,
                     total: res.total,
                     currency: res.currencyCode || '₴',
+                    wasGuest: isGuestUser,
                 });
                 setIsSuccess(true);
-                
+
                 dispatch(clearCart());
                 localStorage.removeItem('checkout_delivery_data');
                 localStorage.removeItem('checkout_delivery_params');
@@ -430,10 +436,17 @@ export default function Step3({ lang }: Step3Props) {
                             <strong>{successOrderInfo.total} {successOrderInfo.currency}</strong>
                         </div>
                     </div>
+                    {successOrderInfo.wasGuest && (
+                        <p className={s.registrationNote}>
+                            {lang === 'ru'
+                                ? 'Аккаунт создан автоматически. Данные для входа будут отправлены на ваш телефон.'
+                                : 'Акаунт створено автоматично. Дані для входу буде надіслано на ваш телефон.'}
+                        </p>
+                    )}
                     <p className={s.successSubtext}>
                         {lang === 'ru'
                             ? 'В ближайшее время наш менеджер свяжется с вами или вы получите SMS-подтверждение.'
-                            : 'Найближчим часом наш менеджер зв’яжеться з вами або ви отримаєте SMS-підтвердження.'}
+                            : "Найближчим часом наш менеджер зв'яжеться з вами або ви отримаєте SMS-підтвердження."}
                     </p>
                     <Button
                         variant="red"
