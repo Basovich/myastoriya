@@ -39,6 +39,8 @@ const ordersDict = {
         card: {
             orderPrefix: "Замовлення",
             sourcePrefix: "Замовлення",
+            sourceSite: "з сайту",
+            sourceApp: "з додатку",
             sumLabel: "Сума замовлення",
             reviewLink: "Залишити відгук",
             editReviewLink: "Змінити відгук",
@@ -55,6 +57,8 @@ const ordersDict = {
         card: {
             orderPrefix: "Заказ",
             sourcePrefix: "Заказ",
+            sourceSite: "с сайта",
+            sourceApp: "из приложения",
             sumLabel: "Сумма заказа",
             reviewLink: "Оставить отзыв",
             editReviewLink: "Изменить отзыв",
@@ -363,7 +367,7 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                                     orderNumber={order.orderNo || order.id}
                                     status={statusName}
                                     statusVariant={statusVariant}
-                                    source="з сайту"
+                                    source={order.source === 'app' ? dict.card.sourceApp : dict.card.sourceSite}
                                     products={orderImages}
                                     totalProductsCount={totalProductsCount}
                                     sum={orderSum}

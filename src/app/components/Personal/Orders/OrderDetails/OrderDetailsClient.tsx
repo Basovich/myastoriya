@@ -37,7 +37,8 @@ const detailsDict = {
         orderTitle: "ЗАМОВЛЕННЯ",
         backToHistory: "Історія замовлень",
         sourcePrefix: "Замовлення:",
-        sourceValue: "з сайту",
+        sourceSite: "з сайту",
+        sourceApp: "з додатку",
         productsHeading: "Ваше замовлення",
         summary: {
             persons: "Кількість персон",
@@ -58,7 +59,8 @@ const detailsDict = {
         orderTitle: "ЗАКАЗ №",
         backToHistory: "История заказов",
         sourcePrefix: "Заказ:",
-        sourceValue: "с сайта",
+        sourceSite: "с сайта",
+        sourceApp: "из приложения",
         productsHeading: "Ваш заказ",
         summary: {
             persons: "Количество персон",
@@ -367,7 +369,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                 <span>{time}</span>
                             </div>
                             <div className={s.sourceItem}>
-                                {dict.sourcePrefix} <strong>{dict.sourceValue}</strong>
+                                {dict.sourcePrefix} <strong>{order.source === 'app' ? dict.sourceApp : dict.sourceSite}</strong>
                             </div>
                         </div>
 

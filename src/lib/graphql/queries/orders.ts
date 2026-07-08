@@ -57,6 +57,7 @@ export interface Order {
     willReceiveBonuses?: number | null;
     delivery?: OrderDeliveryInfo | null;
     calculation?: CalculationRow[] | null;
+    source?: string | null;
 }
 
 
@@ -86,6 +87,7 @@ const ORDERS_QUERY = /* GraphQL */ `
                     name
                 }
                 reviewId
+                source
                 items {
                     id
                     name
@@ -149,6 +151,7 @@ const GET_ORDER_QUERY = /* GraphQL */ `
             comment
             total
             reviewId
+            source
             receivedBonuses
             willReceiveBonuses
             calculation {
