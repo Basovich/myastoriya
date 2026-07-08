@@ -7,6 +7,12 @@ export interface OrderStatus {
     icon?: string | null;
 }
 
+export interface OrderItemModifier {
+    id: string | number;
+    name?: string | null;
+    price?: number | null;
+}
+
 export interface OrderItem {
     id: string;
     name: string;
@@ -21,6 +27,7 @@ export interface OrderItem {
         grid1x?: string | null;
         main1x?: string | null;
     } | null;
+    modifiers?: OrderItemModifier[] | null;
 }
 
 export interface OrderDeliveryInfo {
@@ -179,6 +186,11 @@ const GET_ORDER_QUERY = /* GraphQL */ `
                     list1x
                     grid1x
                     main1x
+                }
+                modifiers {
+                    id
+                    name
+                    price
                 }
             }
         }

@@ -17,6 +17,7 @@ interface ProductCardProps {
     image: string;
     lang: string;
     hasCostVariants?: boolean;
+    children?: React.ReactNode;
 }
 
 export default function ProductCard({
@@ -30,6 +31,7 @@ export default function ProductCard({
     image,
     lang,
     hasCostVariants = false,
+    children,
 }: ProductCardProps) {
     const isRu = lang === 'ru';
     const productUrl = slug ? `/products/${slug}` : `/products/${id}`;
@@ -125,6 +127,7 @@ export default function ProductCard({
                 <AppLink href={productUrl}>
                     <p className={s.title}>{title}</p>
                 </AppLink>
+                {children}
                 <div className={s.priceRow}>
                     <div className={s.priceGroup}>
                         <span className={s.price}>{price.toLocaleString("uk-UA")} ₴</span>
