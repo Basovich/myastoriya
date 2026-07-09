@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { Locale } from '@/i18n/config';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
@@ -11,7 +11,6 @@ import { logout } from '@/store/slices/authSlice';
 import { logoutApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Button from '@/app/components/ui/Button/Button';
 import ShoppingListCard from './ShoppingListCard/ShoppingListCard';
 import { 
@@ -72,7 +71,7 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
         }
     };
 
-    const loadLists = async () => {
+    const loadLists = useCallback(async () => {
         try {
             setIsLoading(true);
             const token = await getAccessToken();
@@ -84,7 +83,7 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                     fetchedLists.flatMap(list => (list.products || []).map(p => p.productId))
                 ));
 
-                let detailsMap: Record<number, string> = {};
+                const detailsMap: Record<number, string> = {};
                 if (allProductIds.length > 0) {
                     try {
                         const details = await getProductsByIdsApi(allProductIds, lang);
@@ -119,13 +118,13 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [lang]);
 
     useEffect(() => {
         if (hydrated) {
             loadLists();
         }
-    }, [hydrated]);
+    }, [hydrated, loadLists]);
 
     const handleLogout = async () => {
         try {

@@ -209,7 +209,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
 
                             setAddedItems(prods.map(p => {
                                 const detailedProd = detailsMap[p.productId];
-                                let resolvedImg = '';
+                                let resolvedImg: string;
                                 if (detailedProd) {
                                     resolvedImg = resolveProductImageUrl(detailedProd);
                                 } else {

@@ -88,7 +88,7 @@ const CustomInput = forwardRef<
         return (
             <button
                 id={id}
-                className={clsx(s.customInput, error && s.inputError)}
+                className={clsx(s.customInput, 'customInput', error && s.inputError)}
                 onClick={(e) => {
                     if (onToggle) onToggle();
                     if (onClick) onClick();

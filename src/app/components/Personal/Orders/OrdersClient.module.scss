@@ -23,8 +23,36 @@
         width: auto;
     }
 
+    /* Target the pickerRow (direct child div) */
+    > div {
+        width: 100%;
+
+        @media (min-width: 768px) {
+            width: auto;
+        }
+
+        /* Target the pickerContainer (child div of pickerRow) */
+        > div {
+            width: 100%;
+
+            @media (min-width: 768px) {
+                width: auto;
+            }
+        }
+    }
+
     :global {
         .react-datepicker-wrapper {
+            width: 100%;
+
+            @media (min-width: 768px) {
+                width: auto;
+            }
+        }
+
+        .react-datepicker__input-container {
+            width: 100%;
+
             @media (min-width: 768px) {
                 width: auto;
             }
