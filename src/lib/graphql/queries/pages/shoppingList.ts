@@ -30,6 +30,7 @@ export interface ShoppingList {
     count: number | null;
     total: number | null;
     products: ShoppingListProduct[] | null;
+    createdAt?: string | null;
 }
 
 export interface ShoppingListSimplePagination {
@@ -48,6 +49,7 @@ const GET_SHOPPING_LISTS_QUERY = /* GraphQL */ `
             data {
                 id
                 name
+                createdAt
                 count
                 total
                 products {
@@ -77,6 +79,7 @@ const GET_SHOPPING_LIST_QUERY = /* GraphQL */ `
         shoppingList(id: $id) {
             id
             name
+            createdAt
             count
             total
             products {
@@ -105,6 +108,7 @@ const CREATE_SHOPPING_LIST_MUTATION = /* GraphQL */ `
         createShoppingList(name: $name) {
             id
             name
+            createdAt
             count
             total
             products {

@@ -58,6 +58,20 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
     const [listToDelete, setListToDelete] = useState<string | null>(null);
     const todayDate = new Date().toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uk-UA');
 
+    const formatShoppingListDate = (dateStr: string | null | undefined, locale: string) => {
+        if (!dateStr) return '';
+        try {
+            const normalized = dateStr.replace(' ', 'T');
+            const date = new Date(normalized);
+            if (isNaN(date.getTime())) {
+                return dateStr.split(' ')[0] || dateStr;
+            }
+            return date.toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'uk-UA');
+        } catch {
+            return dateStr;
+        }
+    };
+
     const loadLists = async () => {
         try {
             setIsLoading(true);
@@ -193,7 +207,7 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                             <ShoppingListCard
                                 key={item.id}
                                 name={item.name || ''}
-                                date={todayDate}
+                                date={formatShoppingListDate(item.createdAt, lang) || todayDate}
                                 products={item.products || []}
                                 totalSum={item.total || 0}
                                 sumLabel={dict.sumLabel}
