@@ -54,13 +54,6 @@ const reviewsDict = {
     }
 };
 
-interface PurchasedProduct {
-    id: string;
-    name: string;
-    image?: string | null;
-    slug?: string;
-    date: Date;
-}
 
 interface ProductDetails {
     image: string;
@@ -90,35 +83,6 @@ const resolveOrderItemImageUrl = (
     }
 
     return '/images/product-placeholder.svg';
-};
-
-const getPurchasedProducts = (
-    ordersList: Order[],
-    productDetailsMap: Record<number, ProductDetails>
-): PurchasedProduct[] => {
-    const productsMap = new Map<string, PurchasedProduct>();
-    const sortedOrders = [...ordersList].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    for (const order of sortedOrders) {
-        if (!order.items) continue;
-        const orderDate = new Date(order.createdAt);
-        for (const item of order.items) {
-            if (!item.id) continue;
-            if (!productsMap.has(item.id)) {
-                const details = productDetailsMap[Number(item.id)];
-                productsMap.set(item.id, {
-                    id: item.id,
-                    name: item.name,
-                    image: details?.image || resolveOrderItemImageUrl(item.id, item.image, productDetailsMap),
-                    slug: details?.slug,
-                    date: orderDate,
-                });
-            }
-        }
-    }
-    return Array.from(productsMap.values());
 };
 
 export default function ReviewsClient({ lang }: { lang: Locale }) {
