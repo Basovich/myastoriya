@@ -635,6 +635,11 @@ export default function Step2() {
         return deliveries.find(d => d.id === deliveryMethod);
     }, [deliveries, deliveryMethod]);
 
+    const minOrderVal = React.useMemo(() => {
+        const vals = deliveries.map(d => d.needForAvailable || 0).filter(v => v > 0);
+        return vals.length > 0 ? Math.min(...vals) : 0;
+    }, [deliveries]);
+
     const isCourier = activeDelivery?.type === 'courier';
     const isNP = activeDelivery?.driver === 'nova-poshta-postal';
     const isShop = activeDelivery?.driver === 'shop';
@@ -972,20 +977,22 @@ export default function Step2() {
                             const isMethodNP = method.driver === 'nova-poshta-postal';
                             const showNpIcon = isMethodNP || method.name?.toLowerCase().includes('нова пошта') || method.type?.toLowerCase().includes('nova');
 
-                            if (method.disabled) return null;
-
                             const selectedShop = shops.find(shop => shop.id.toString() === selectedShopId);
                             const selectedShopName = selectedShop?.name || selectedShop?.siteName || (lang === 'ua' ? "Оберіть магазин" : "Выберите магазин");
 
                             return (
                                 <div key={method.id} className={s.methodContainer}>
-                                    <label className={s.methodItem}>
+                                    <label 
+                                        className={clsx(s.methodItem, method.disabled && s.methodItemDisabled)}
+                                        onClick={(e) => method.disabled && e.preventDefault()}
+                                    >
                                         <input 
                                             type="radio" 
                                             name="deliveryMethod"
                                             value={method.id}
                                             checked={isSelected}
-                                            onChange={() => setDeliveryMethod(method.id)}
+                                            disabled={method.disabled}
+                                            onChange={() => !method.disabled && setDeliveryMethod(method.id)}
                                             className={s.hiddenRadio}
                                         />
                                         <span className={s.radioCircle} />
@@ -994,6 +1001,11 @@ export default function Step2() {
                                             <span className={s.methodPrice}>
                                                 ({method.deliveryCost === 0 ? 'Безкоштовно' : `${method.deliveryCost} ₴`})
                                             </span>
+                                            {method.disabled && method.needForAvailable && (
+                                                <span className={s.disabledNotice}>
+                                                    ({lang === 'ua' ? `ще ${method.needForAvailable} ₴` : `еще ${method.needForAvailable} ₴`})
+                                                </span>
+                                            )}
                                             {showNpIcon && (
                                                 <div className={s.npIconContainer}>
                                                     <Image
@@ -1008,7 +1020,7 @@ export default function Step2() {
                                         </span>
                                     </label>
                                     
-                                    {(hydrated && isSelected && isMethodCourier) && (
+                                    {(hydrated && isSelected && !method.disabled && isMethodCourier) && (
                                         <div className={s.nestedAddressRow}>
                                             <AddressRow 
                                                 addresses={addresses}
@@ -1019,7 +1031,7 @@ export default function Step2() {
                                         </div>
                                     )}
 
-                                    {(hydrated && isSelected && isMethodShop) && (
+                                    {(hydrated && isSelected && !method.disabled && isMethodShop) && (
                                         <div className={s.nestedAddressRow}>
                                             <PickupPointRow
                                                 points={pickupPoints}
@@ -1033,7 +1045,7 @@ export default function Step2() {
                                     )}
 
 
-                                    {(hydrated && isSelected && isMethodNP) && (
+                                    {(hydrated && isSelected && !method.disabled && isMethodNP) && (
                                         <div className={s.nestedSelectRow} ref={npSelectRef} onFocusCapture={() => setIsOpenNPDropdown(true)}>
                                             <h4 className={s.nestedSelectTitle}>Введіть номер або адресу відділення Нової Пошти:</h4>
                                             <Search 
@@ -1091,6 +1103,13 @@ export default function Step2() {
                             );
                         })}
                     </div>
+                    {deliveries.length > 0 && deliveries.every(d => d.disabled) && minOrderVal > 0 && (
+                        <div className={s.minOrderWarning}>
+                            {lang === 'ua' 
+                                ? `Для можливості доставки у це місто додайте товарів ще на ${minOrderVal} ₴`
+                                : `Для возможности доставки в этот город добавьте товаров еще на ${minOrderVal} ₴`}
+                        </div>
+                    )}
                 </div>
 
                 {hydrated && elapsedForFree > 0 && (
