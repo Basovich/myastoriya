@@ -170,10 +170,12 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                                         {item.product.title}
                                                     </Link>
                                                 </h3>
-                                                <span className={s.itemWeight}>
-                                                    {item.product.weight}
-                                                    {item.product.costVariantName && ` • ${item.product.costVariantName}`}
-                                                </span>
+                                                {(item.product.weight || item.product.costVariantName) && (
+                                                    <span className={s.itemWeight}>
+                                                        {item.product.weight}
+                                                        {item.product.costVariantName && ` • ${item.product.costVariantName}`}
+                                                    </span>
+                                                )}
                                                                                                 {item.product.modifiers && item.product.modifiers.length > 0 && (
                                                     <div className={s.modifierIconsList}>
                                                         {item.product.modifiers.map(m => {

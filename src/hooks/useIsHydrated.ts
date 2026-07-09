@@ -1,4 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
+
+/**
+ * An empty subscribe function since the hydration status is static once mounted on the client.
+ * Because the hydration state transitions from false (server-side) to true (client-side)
+ * immediately upon mounting and does not change dynamically thereafter, no external store
+ * event subscription is needed.
+ */
+const emptySubscribe = () => () => {};
 
 /**
  * Returns `true` only after the component has mounted on the client.
@@ -12,11 +20,9 @@ import { useState, useEffect } from 'react';
  * return <span>{hydrated ? count : null}</span>;
  */
 export function useIsHydrated(): boolean {
-    const [hydrated, setHydrated] = useState(false);
-
-    useEffect(() => {
-        setHydrated(true);
-    }, []);
-
-    return hydrated;
+    return useSyncExternalStore(
+        emptySubscribe,
+        () => true,  // Client snapshot
+        () => false  // Server snapshot
+    );
 }

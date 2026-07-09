@@ -178,7 +178,6 @@ export interface Product {
         name: string;
         values: string[];
     }[];
-    portionWeight?: string | null;
     portionSize?: string | null;
     isWeighty?: boolean | null;
     /** Набори товарів — джерело блоку «З цим товаром купують» */
@@ -321,7 +320,6 @@ const PRODUCTS_QUERY = /* GraphQL */ `
                 multiplier
                 is_new
                 available
-                portionWeight
                 portionSize
                 isWeighty
                 hasCostVariants
@@ -370,7 +368,6 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
             is_new
             pre_order
             available
-            portionWeight
             portionSize
             isWeighty
             availabilityTracked
@@ -636,7 +633,6 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
             multiplier
             is_new
             available
-            portionWeight
             portionSize
             isWeighty
             hasCostVariants
@@ -756,6 +752,17 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string): Pr
         },
         { next: { revalidate: 3600 }, lang },
     );
+    if (!data || !data.products) {
+        return {
+            per_page: filter?.limit || 12,
+            current_page: filter?.page || 1,
+            has_more_pages: false,
+            data: [],
+        };
+    }
+    if (!Array.isArray(data.products.data)) {
+        data.products.data = [];
+    }
     return data.products;
 }
 
@@ -792,7 +799,7 @@ export async function getProductByIdApi(id: number | string, lang?: string): Pro
         { id: parseInt(String(id)) },
         { next: { revalidate: 60 }, lang },
     );
-    return data.product;
+    return data?.product;
 }
 
 export async function getProductCostVariantsApi(
@@ -817,7 +824,7 @@ export async function getPopularProductsApi(
         { productId: productId ?? null, limit },
         { next: { revalidate: 3600 }, lang },
     );
-    return data.popularProducts?.data ?? [];
+    return data?.popularProducts?.data ?? [];
 }
 
 export async function getSpecialsByProductApi(
@@ -1039,7 +1046,7 @@ export async function getViewedProductsApi(limit: number = 10, lang?: string, to
         { limit },
         { next: { revalidate: 60 }, lang, token },
     );
-    return data.products.data;
+    return data?.products?.data ?? [];
 }
 
 export async function getProductsByIdsApi(ids: number[], lang?: string): Promise<Product[]> {
@@ -1048,7 +1055,7 @@ export async function getProductsByIdsApi(ids: number[], lang?: string): Promise
         { ids },
         { next: { revalidate: 60 }, lang }
     );
-    return data.productsByIds;
+    return data?.productsByIds ?? [];
 }
 
 /**
@@ -1481,7 +1488,6 @@ export interface ProductWeightInput {
     unit?: string | null;
     multiplier?: number | null;
     portionSize?: string | null;
-    portionWeight?: string | null;
     specifications?: {
         name: string;
         values: string[];
@@ -1563,8 +1569,7 @@ export function getProductWeight(product: ProductWeightInput): string {
         return roundWeightString(val);
     }
 
-    // 2. Try portionWeight or portionSize
-    if (product.portionWeight) return roundWeightString(product.portionWeight);
+    // 2. Try portionSize
     if (product.portionSize) {
         const hasUnit = /[гgкmшт]/i.test(product.portionSize);
         if (hasUnit) return roundWeightString(product.portionSize);
@@ -1585,8 +1590,8 @@ export function getProductWeight(product: ProductWeightInput): string {
     }
 
     // 4. Default unit fallback
-    if (product.unit) {
-        return product.unit.toLowerCase() === 'шт' ? '1 шт' : product.unit;
+    if (product.unit && product.unit.toLowerCase() !== 'шт') {
+        return product.unit;
     }
 
     return '';

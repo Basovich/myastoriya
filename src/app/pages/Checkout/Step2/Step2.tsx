@@ -62,6 +62,13 @@ function formatDate(date: Date): string {
     return `${dd}.${mm}.${yyyy}`;
 }
 
+function isSameDay(d1: Date | null, d2: Date | null): boolean {
+    if (!d1 || !d2) return d1 === d2;
+    return d1.getFullYear() === d2.getFullYear() &&
+           d1.getMonth() === d2.getMonth() &&
+           d1.getDate() === d2.getDate();
+}
+
 const PAGE_SIZE = 50;
 
 export default function Step2() {
@@ -168,11 +175,11 @@ export default function Step2() {
                     today.setHours(0, 0, 0, 0);
                     const compareDate = new Date(restoredDate);
                     compareDate.setHours(0, 0, 0, 0);
-                    if (compareDate >= today) {
-                        setDeliveryDate(restoredDate);
-                    } else {
-                        setDeliveryDate(new Date());
-                    }
+                    setDeliveryDate(prev => {
+                        const targetDateObj = compareDate >= today ? restoredDate : new Date();
+                        if (isSameDay(prev, targetDateObj)) return prev;
+                        return targetDateObj;
+                    });
                 }
                 if (parsed.deliveryTime) setDeliveryTime(parsed.deliveryTime);
                 if (parsed.selectedCity) {
@@ -200,7 +207,7 @@ export default function Step2() {
             setIsLoadingCitiesList(true);
             try {
                 const res = await getLocalitiesApi(undefined, PAGE_SIZE, 1, lang);
-                let list = [...res.data];
+                const list = [...res.data];
                 if (checkoutCity && !list.some(c => c.id === checkoutCity.id)) {
                     list.unshift(checkoutCity);
                 }
@@ -400,18 +407,19 @@ export default function Step2() {
         const fetchDeliveries = async () => {
             try {
                 const res = await getDeliveriesApi(undefined, checkoutCity.id, lang);
-                setDeliveries(res);
+                const safeDeliveries = Array.isArray(res) ? res.filter(Boolean) : [];
+                setDeliveries(safeDeliveries);
                 
                 // Determine what delivery method to select
                 let restored = '';
-                if (restoredData && res.some(d => d.id === restoredData.deliveryMethod)) {
+                if (restoredData && safeDeliveries.some(d => d?.id === restoredData.deliveryMethod)) {
                     restored = restoredData.deliveryMethod;
                 } else {
                     const saved = localStorage.getItem('checkout_delivery_data');
                     if (saved) {
                         try {
                             const parsed = JSON.parse(saved);
-                            if (parsed.deliveryMethod && res.some(d => d.id === parsed.deliveryMethod)) {
+                            if (parsed.deliveryMethod && safeDeliveries.some(d => d?.id === parsed.deliveryMethod)) {
                                   restored = parsed.deliveryMethod;
                             }
                         } catch (e) {}
@@ -421,9 +429,9 @@ export default function Step2() {
                 if (restored) {
                     setDeliveryMethod(restored);
                 } else {
-                    const currentSelectedExists = res.some(d => d.id === deliveryMethodRef.current && !d.disabled);
+                    const currentSelectedExists = safeDeliveries.some(d => d?.id === deliveryMethodRef.current && !d?.disabled);
                     if (!currentSelectedExists) {
-                        const firstEnabled = res.find(d => !d.disabled);
+                        const firstEnabled = safeDeliveries.find(d => !d?.disabled);
                         if (firstEnabled) {
                             setDeliveryMethod(firstEnabled.id);
                         }
@@ -632,11 +640,11 @@ export default function Step2() {
     }, [restoredData, shops, pickupPoints]);
 
     const activeDelivery = React.useMemo(() => {
-        return deliveries.find(d => d.id === deliveryMethod);
+        return deliveries.find(d => d?.id === deliveryMethod);
     }, [deliveries, deliveryMethod]);
 
     const minOrderVal = React.useMemo(() => {
-        const vals = deliveries.map(d => d.needForAvailable || 0).filter(v => v > 0);
+        const vals = deliveries.map(d => d?.needForAvailable || 0).filter(v => v > 0);
         return vals.length > 0 ? Math.min(...vals) : 0;
     }, [deliveries]);
 
@@ -1103,7 +1111,7 @@ export default function Step2() {
                             );
                         })}
                     </div>
-                    {deliveries.length > 0 && deliveries.every(d => d.disabled) && minOrderVal > 0 && (
+                    {deliveries.length > 0 && deliveries.every(d => d?.disabled) && minOrderVal > 0 && (
                         <div className={s.minOrderWarning}>
                             {lang === 'ua' 
                                 ? `Для можливості доставки у це місто додайте товарів ще на ${minOrderVal} ₴`

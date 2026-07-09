@@ -1,7 +1,19 @@
 import { useState, useEffect } from 'react';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
+import * as Sentry from '@sentry/nextjs';
 
 const addressCache = new Map<string, string>();
+const MAX_CACHE_SIZE = 100;
+
+function cacheSet(key: string, value: string) {
+    if (addressCache.size >= MAX_CACHE_SIZE && !addressCache.has(key)) {
+        const oldestKey = addressCache.keys().next().value;
+        if (oldestKey !== undefined) {
+            addressCache.delete(oldestKey);
+        }
+    }
+    addressCache.set(key, value);
+}
 
 interface AddressComponent {
     long_name: string;
@@ -69,17 +81,26 @@ export function useGeocodedAddress(
     fallbackAddress: string,
     lang: string
 ) {
-    const [address, setAddress] = useState(fallbackAddress);
+    const [address, setAddress] = useState(() => {
+        if (!lat || !lng) return fallbackAddress;
+        const cacheKey = `${lat},${lng},${lang}`;
+        return addressCache.get(cacheKey) || fallbackAddress;
+    });
 
     useEffect(() => {
         if (!lat || !lng) {
-            setAddress(fallbackAddress);
+            Promise.resolve().then(() => {
+                setAddress(fallbackAddress);
+            });
             return;
         }
 
         const cacheKey = `${lat},${lng},${lang}`;
         if (addressCache.has(cacheKey)) {
-            setAddress(addressCache.get(cacheKey)!);
+            const cachedValue = addressCache.get(cacheKey)!;
+            Promise.resolve().then(() => {
+                setAddress(cachedValue);
+            });
             return;
         }
 
@@ -99,12 +120,13 @@ export function useGeocodedAddress(
                         data.results[0].formatted_address
                     );
                     const finalAddress = lang === 'ru' ? translateToRussian(formatted) : formatted;
-                    addressCache.set(cacheKey, finalAddress);
+                    cacheSet(cacheKey, finalAddress);
                     setAddress(finalAddress);
                 }
             })
             .catch((err) => {
                 console.error('Failed to reverse geocode coordinate:', lat, lng, err);
+                Sentry.captureException(err);
                 if (isMounted) {
                     setAddress(fallbackAddress);
                 }

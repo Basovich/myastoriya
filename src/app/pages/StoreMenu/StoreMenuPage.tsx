@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import s from './StoreMenuPage.module.scss';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import CategoryCircles, { CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
@@ -23,7 +24,8 @@ interface StoreMenuPageProps {
     initialCustomMenu?: ShopCustomMenuCategory[];
 }
 
-const getCategoryImage = (name: string): string => {
+const getCategoryImage = (name?: string | null): string => {
+    if (!name) return "/images/cat-restaurant.png";
     const lower = name.toLowerCase();
     if (lower.includes("бургер")) return "/images/cat-burgers.png";
     if (lower.includes("набор") || lower.includes("сет")) return "/images/cat-sets.png";
@@ -52,10 +54,10 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initial
     }));
 
     const [visibleCategoriesCount, setVisibleCategoriesCount] = useState(2);
-    const [isClient, setIsClient] = useState(false);
+    const isClient = useIsHydrated();
 
     useEffect(() => {
-        setIsClient(true);
+        if (foodCategories.length <= 2) return;
         // Фоновий рендеринг решти категорій після монтування
         const timer = setTimeout(() => {
             setVisibleCategoriesCount(foodCategories.length);

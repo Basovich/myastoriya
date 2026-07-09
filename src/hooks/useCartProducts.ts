@@ -255,10 +255,9 @@ export function useCartProducts() {
                     rawWeight = weightSpec && weightSpec.values.length > 0 ? weightSpec.values[0] : '';
                 }
 
-                // 3. Try portionWeight or portionSize
+                // 3. Try portionSize
                 if (!rawWeight) {
-                    if (dbProduct.portionWeight) rawWeight = dbProduct.portionWeight;
-                    else if (dbProduct.portionSize) {
+                    if (dbProduct.portionSize) {
                         const hasUnit = /[гgкmшт]/i.test(dbProduct.portionSize);
                         if (hasUnit) rawWeight = dbProduct.portionSize;
                     }
@@ -322,8 +321,10 @@ export function useCartProducts() {
                         } else {
                             weight = `${dbProduct.multiplier} ${dbProduct.unit}`;
                         }
-                    } else if (dbProduct.unit) {
-                        weight = dbProduct.unit.toLowerCase() === 'шт' ? '1 шт' : dbProduct.unit;
+                    } else if (dbProduct.unit && dbProduct.unit.toLowerCase() !== 'шт') {
+                        weight = dbProduct.unit;
+                    } else {
+                        weight = '';
                     }
                 }
 

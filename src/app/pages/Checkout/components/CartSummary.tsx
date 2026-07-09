@@ -143,10 +143,12 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                                         {item.product.title}
                                     </Link>
                                 </p>
-                                <p className={s.cartItemWeight}>
-                                    {item.product.weight}
-                                    {item.product.costVariantName && ` • ${item.product.costVariantName}`}
-                                </p>
+                                {(item.product.weight || item.product.costVariantName) && (
+                                    <p className={s.cartItemWeight}>
+                                        {item.product.weight}
+                                        {item.product.costVariantName && ` • ${item.product.costVariantName}`}
+                                    </p>
+                                )}
                                 {item.product.modifiers && item.product.modifiers.length > 0 && (
                                      <div className={s.modifierIconsList}>
                                          {item.product.modifiers.map(m => {
