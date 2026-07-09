@@ -82,7 +82,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
         return () => {
             isMounted = false;
         };
-    }, [page, activeTab, showcases, initialProducts]);
+    }, [page, activeTab, showcases, initialProducts, locale]);
 
     // Reset page when tab changes
     useEffect(() => {
@@ -137,6 +137,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                         loop={true}
                         loopAdditionalSlides={showcases.length}
                         loopAddBlankSlides={true}
+                        centeredSlides={true}
                         grabCursor={true}
                         simulateTouch={true}
                         allowTouchMove={true}
