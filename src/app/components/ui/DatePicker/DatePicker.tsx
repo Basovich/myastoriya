@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useState, useEffect, useRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import CustomSelect from '@/app/components/ui/CustomSelect/CustomSelect';
 import { uk } from 'date-fns/locale';
@@ -19,7 +19,7 @@ interface DatePickerProps {
     endDate?: Date | null;
     selectsRange?: boolean;
     onChangeRange?: (dates: [Date | null, Date | null]) => void;
-    onClear?: (e: React.MouseEvent) => void;
+    onClear?: (e: React.SyntheticEvent) => void;
     onBlur?: () => void;
     placeholder?: string;
     className?: string;
@@ -57,13 +57,13 @@ const CustomInput = forwardRef<
         endDate?: Date | null;
         selectsRange?: boolean;
         lang?: 'ua' | 'ru';
-        onClear?: (e: React.MouseEvent) => void;
+        onClear?: (e: React.SyntheticEvent) => void;
         prefixLabel?: string;
         isOpen?: boolean;
         onToggle?: () => void;
     }
 >(
-    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, startDate, endDate, selectsRange, lang = 'ua', onClear, prefixLabel, isOpen, onToggle }, ref) => {
+    ({ id, value, onClick, label, error, hasValue, required, onBlur, hideIcon, hideLabel, leftIcon, arrowVariant = 'down', selectedDate, startDate, endDate, selectsRange, lang = 'ua', prefixLabel, isOpen, onToggle }, ref) => {
         let displayValue = value;
         if (selectsRange) {
             if (startDate) {
@@ -89,7 +89,7 @@ const CustomInput = forwardRef<
             <button
                 id={id}
                 className={clsx(s.customInput, 'customInput', error && s.inputError)}
-                onClick={(e) => {
+                onClick={() => {
                     if (onToggle) onToggle();
                     if (onClick) onClick();
                 }}
@@ -177,7 +177,7 @@ export default function DatePicker({
     const isValidDate = selected instanceof Date && !isNaN(selected.getTime());
     const safeSelected = isValidDate ? selected : null;
     const isErr = touched && !!error;
-    const DatePickerComponent = ReactDatePicker as any;
+    const DatePickerComponent = ReactDatePicker as React.ElementType;
 
     const [isOpen, setIsOpen] = useState(false);
     const [shouldRender, setShouldRender] = useState(false);
@@ -228,18 +228,18 @@ export default function DatePicker({
                         startDate={startDate || undefined}
                         endDate={endDate || undefined}
                         selected={selectsRange ? null : safeSelected}
-                        onChange={(val: any) => {
+                        onChange={(val: Date | [Date | null, Date | null] | null) => {
                             if (selectsRange) {
                                 if (onChangeRange) {
-                                    onChangeRange(val);
+                                    onChangeRange(val as [Date | null, Date | null]);
                                 }
-                                const [start, end] = val || [null, null];
+                                const [start, end] = (val as [Date | null, Date | null]) || [null, null];
                                 if (start && end) {
                                     closeCalendar();
                                 }
                             } else {
                                 if (onChange) {
-                                    onChange(val);
+                                    onChange(val as Date | null);
                                 }
                                 closeCalendar();
                             }
@@ -259,7 +259,15 @@ export default function DatePicker({
                             increaseMonth,
                             prevMonthButtonDisabled,
                             nextMonthButtonDisabled,
-                        }: any) => (
+                        }: {
+                            date: Date;
+                            changeYear: (year: number) => void;
+                            changeMonth: (month: number) => void;
+                            decreaseMonth: () => void;
+                            increaseMonth: () => void;
+                            prevMonthButtonDisabled: boolean;
+                            nextMonthButtonDisabled: boolean;
+                        }) => (
                             <div className={s.customHeaderContainer} onClick={(e) => e.stopPropagation()}>
                                 <button
                                     type="button"
@@ -340,13 +348,13 @@ export default function DatePicker({
                         className={s.clearTextBtn} 
                         onClick={(e) => {
                             e.stopPropagation();
-                            onClear(e as any);
+                            onClear(e);
                         }}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') {
                                 e.stopPropagation();
                                 e.preventDefault();
-                                onClear(e as any);
+                                onClear(e);
                             }
                         }}
                     >

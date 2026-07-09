@@ -77,15 +77,19 @@ const resolveOrderItemImageUrl = (
     } | null,
     productDetailsMap?: Record<number, ProductDetails>
 ): string => {
+    const url = image?.list1x || image?.grid1x || image?.main1x || null;
+    if (url) {
+        if (url.startsWith('/images/')) return url;
+        if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
+        return url;
+    }
+
     const productId = Number(itemId);
     if (productId && productDetailsMap?.[productId]) {
         return productDetailsMap[productId].image;
     }
-    const url = image?.list1x || image?.grid1x || image?.main1x || null;
-    if (!url) return '/images/product-placeholder.svg';
-    if (url.startsWith('/images/')) return url;
-    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
-    return url;
+
+    return '/images/product-placeholder.svg';
 };
 
 const getPurchasedProducts = (
@@ -246,7 +250,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         setEndDate(end);
     };
 
-    const handleClearDate = (e: React.MouseEvent) => {
+    const handleClearDate = (e: React.SyntheticEvent) => {
         e.stopPropagation();
         setStartDate(null);
         setEndDate(null);

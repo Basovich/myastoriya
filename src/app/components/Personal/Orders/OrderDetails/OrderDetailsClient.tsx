@@ -88,15 +88,19 @@ const resolveOrderItemImageUrl = (
     } | null,
     productDetailsMap?: Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null }>
 ): string => {
+    const url = image?.list1x || image?.grid1x || image?.main1x || null;
+    if (url) {
+        if (url.startsWith('/images/')) return url;
+        if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
+        return url;
+    }
+
     const productId = Number(itemId);
     if (productId && productDetailsMap?.[productId]) {
         return productDetailsMap[productId].image;
     }
-    const url = image?.list1x || image?.grid1x || image?.main1x || null;
-    if (!url) return '/images/product-placeholder.svg';
-    if (url.startsWith('/images/')) return url;
-    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
-    return url;
+
+    return '/images/product-placeholder.svg';
 };
 
 const getModifierIconUrl = (name?: string | null): string | null => {
