@@ -5,10 +5,33 @@ import { getProductsByIdsApi, resolveProductImageUrl, type Product, getCategoryB
 import { getSpecialsApi } from '@/lib/graphql/queries/pages/home/specials';
 import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from '@/app/components/CartModal/products_mock';
 
-// Module-level cache to share fetched products across CartModal, CartSummary, etc.
-// Use Product | null so we can cache failed/missing lookups as null and avoid refetching.
-const globalProductCache: Record<string, Product | null> = {};
+// Module-level cache з TTL для синхронізації між CartModal, CartSummary тощо.
+// Записи автоматично стають застарілими після CACHE_TTL_MS мілісекунд,
+// що запобігає відображенню невірних цін після зміни акцій на бекенді.
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 хвилин
+
+interface CacheEntry {
+    product: Product | null;
+    timestamp: number;
+}
+
+const globalProductCache: Record<string, CacheEntry> = {};
 const pendingRequests = new Set<number>();
+
+function getCachedProduct(id: string): Product | null | undefined {
+    const entry = globalProductCache[id];
+    if (entry === undefined) return undefined; // не в кеші — треба завантажити
+    if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+        // Запис застарів — видаляємо, щоб при наступній нагоді перезавантажити
+        delete globalProductCache[id];
+        return undefined;
+    }
+    return entry.product;
+}
+
+function setCachedProduct(id: string, product: Product | null): void {
+    globalProductCache[id] = { product, timestamp: Date.now() };
+}
 
 interface SpecialProduct {
     id: string | number;
@@ -135,11 +158,11 @@ export function useCartProducts() {
             return;
         }
 
-        // Immediately mark non-numeric IDs as null in the cache so they don't block loading
+        // Негайно позначаємо нечислові ID як null у кеші, щоб не блокувати завантаження
         let cacheChanged = false;
         cartItems.forEach(item => {
-            if (isNaN(Number(item.id)) && globalProductCache[item.id] === undefined) {
-                globalProductCache[item.id] = null;
+            if (isNaN(Number(item.id)) && getCachedProduct(item.id) === undefined) {
+                setCachedProduct(item.id, null);
                 cacheChanged = true;
             }
         });
@@ -147,9 +170,10 @@ export function useCartProducts() {
             emitCacheUpdate();
         }
 
+        // Фільтруємо ID, яких немає в кеші АБО кеш яких застарів (TTL вичерпано)
         const missingIds = cartItems
             .map(item => Number(item.id))
-            .filter(id => !isNaN(id) && globalProductCache[String(id)] === undefined && !pendingRequests.has(id));
+            .filter(id => !isNaN(id) && getCachedProduct(String(id)) === undefined && !pendingRequests.has(id));
 
         if (missingIds.length === 0) {
             return;
@@ -172,7 +196,7 @@ export function useCartProducts() {
                     if (!found) {
                         console.warn(`[useCartProducts] Product ID ${idStr} not found in API response.`);
                     }
-                    globalProductCache[idStr] = found || null;
+                    setCachedProduct(idStr, found || null);
                 });
 
                 // Trigger re-render to reflect the newly populated cache.
@@ -182,8 +206,10 @@ export function useCartProducts() {
                 console.error('[useCartProducts] Failed to fetch product details:', err);
                 missingIds.forEach(id => {
                     pendingRequests.delete(id);
-                    // Prevent infinite refetch loop on API failure by setting to null
-                    globalProductCache[String(id)] = null;
+                    // При помилці API — зберігаємо null з коротшим TTL (1 хв),
+                    // щоб не блокувати повторний запит нескінченно.
+                    // Перезаписуємо timestamp як застарілий через 1 хв.
+                    globalProductCache[String(id)] = { product: null, timestamp: Date.now() - CACHE_TTL_MS + 60_000 };
                 });
                 emitCacheUpdate();
             });
@@ -195,7 +221,7 @@ export function useCartProducts() {
 
         const categoryIds = cartItems
             .map(item => {
-                const dbProduct = globalProductCache[item.id];
+                const dbProduct = getCachedProduct(item.id);
                 return dbProduct?.categoryId ? Number(dbProduct.categoryId) : 0;
             })
             .filter((id): id is number => id > 0 && globalCategoryCache[id] === undefined && !pendingCategoryRequests.has(id));
@@ -228,7 +254,7 @@ export function useCartProducts() {
         void cacheVersion;
 
         const baseItems = cartItems.map(item => {
-            const dbProduct = globalProductCache[item.id];
+            const dbProduct = getCachedProduct(item.id);
             if (dbProduct) {
                 // 1. Try to extract weight/volume from name
                 let rawWeight = '';
@@ -334,9 +360,19 @@ export function useCartProducts() {
                 // dbProduct.cost (98 ₴) is the catalog promotional price which is already discounted.
                 // When a bundle is active, absolutePriceMap will override this with the bundle price (88 ₴).
                 // When a bundle is broken, the item correctly reverts to its full retail price (127 ₴).
-                                const modifiersPrice = item.modifiers?.reduce((sum, m) => sum + (m.price || 0), 0) || 0;
-                const initialPrice = (item.purchaseCost ?? dbProduct.cost) + modifiersPrice;
-                const originalPrice = (item.purchaseCost ?? dbProduct.oldCost ?? (item.purchaseCost ?? dbProduct.cost)) + modifiersPrice;
+                const modifiersPrice = item.modifiers?.reduce((sum, m) => sum + (m.price || 0), 0) || 0;
+                
+                // Determine if there is a catalog discount on the product.
+                const hasCatalogDiscount = !!(dbProduct.purchaseOldCost || dbProduct.oldCost);
+                
+                // If the product is discounted in the catalog, prioritize the catalog promo price (dbProduct.purchaseCost).
+                // Otherwise, fall back to the cart API price (item.purchaseCost) or catalog default cost.
+                const basePrice = hasCatalogDiscount 
+                    ? (dbProduct.purchaseCost ?? item.purchaseCost ?? dbProduct.cost) 
+                    : (item.purchaseCost ?? dbProduct.purchaseCost ?? dbProduct.cost);
+                
+                const initialPrice = basePrice + modifiersPrice;
+                const originalPrice = (dbProduct.purchaseOldCost ?? item.purchaseCost ?? dbProduct.oldCost ?? basePrice) + modifiersPrice;
 
                 const modifiersWithImages = item.modifiers?.map(m => {
                     let modifierImage: string | null = null;
@@ -513,11 +549,11 @@ export function useCartProducts() {
     void cartLoading; // used only to invalidate memoization during active operations
 
     const someItemUndefined = cartItems.some(item => {
-        return globalProductCache[item.id] === undefined;
+        return getCachedProduct(item.id) === undefined;
     });
 
     const someCategoryUndefined = cartItems.some(item => {
-        const dbProduct = globalProductCache[item.id];
+        const dbProduct = getCachedProduct(item.id);
         if (!dbProduct || !dbProduct.categoryId) return false;
         const catId = Number(dbProduct.categoryId);
         return catId > 0 && globalCategoryCache[catId] === undefined;

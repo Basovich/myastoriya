@@ -629,6 +629,8 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
             name
             cost
             oldCost
+            purchaseCost
+            purchaseOldCost
             unit
             multiplier
             is_new
@@ -1053,7 +1055,7 @@ export async function getProductsByIdsApi(ids: number[], lang?: string): Promise
     const data = await gqlRequest<{ productsByIds: Product[] }>(
         PRODUCTS_BY_IDS_QUERY,
         { ids },
-        { next: { revalidate: 60 }, lang }
+        { cache: 'no-store', lang }
     );
     return data?.productsByIds ?? [];
 }
