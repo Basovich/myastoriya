@@ -19,7 +19,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { RootState } from '@/store';
 import { recordProductViewAsync } from '@/store/slices/viewedProductsSlice';
 import { addToCartAsync } from '@/store/slices/cartSlice';
-import { useIsHydrated } from '@/hooks/useIsHydrated';
+
 import clsx from 'clsx';
 import Image from 'next/image';
 import { Locale } from '@/i18n/config';
@@ -109,8 +109,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
     deliveryBlocks,
 }) => {
     const dispatch = useAppDispatch();
-    const { isAuthenticated, isGuest, user, isInitialized } = useAppSelector((state: RootState) => state.auth);
-    const hydrated = useIsHydrated();
+    const { isAuthenticated, isInitialized } = useAppSelector((state: RootState) => state.auth);
 
     // Record product view on mount
     React.useEffect(() => {
@@ -242,7 +241,6 @@ const ProductClient: React.FC<ProductClientProps> = ({
     const activeUnit = product.unit;
 
     const hasDiscount = activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost;
-    const badge = product.is_new ? 'NEW' : (hasDiscount ? 'АКЦІЯ' : null);
     const { label: availabilityLabel, inStock } = getAvailabilityLabel(product.available);
 
     const breadcrumbs: BreadcrumbItem[] = breadcrumbsProp ?? [
@@ -296,7 +294,9 @@ const ProductClient: React.FC<ProductClientProps> = ({
                     <ProductGallery
                         id={String(product.id)}
                         images={displayImages}
-                        discount={badge === 'АКЦІЯ' ? '-20%' : undefined}
+                        discount={hasDiscount && activePurchaseOldCost
+                            ? `-${Math.floor(100 - (activePurchaseCost / activePurchaseOldCost) * 100)}%`
+                            : undefined}
                         videoUrl={product.video}
                     />
                 </section>

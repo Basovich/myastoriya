@@ -620,7 +620,7 @@ export function useCartProducts() {
         }
 
         return Array.from(uniqueBundleProducts.values());
-    }, [cartItems, cacheVersion, hookLoading]);
+    }, [cartItems, cacheVersion, hookLoading]); // eslint-disable-line react-hooks/exhaustive-deps -- cacheVersion є тригером для ре-мемоізації при оновленні module-level globalCategoryCache (ESLint не відстежує зовнішні змінні)
 
     return {
         populatedItems,

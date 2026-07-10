@@ -1525,7 +1525,7 @@ export function getProductWeight(product: ProductWeightInput): string {
                 unitLower.includes('мл') || unitLower.includes('ml') ||
                 /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
 
-            let formattedVal = val;
+            let formattedVal: string;
             const unitClean = unitLower.trim();
             const num = parseFloat(val.replace(',', '.'));
             
