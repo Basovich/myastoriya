@@ -236,8 +236,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
     const activeOldCost = selectedVariant?.oldCost ?? product.oldCost;
 
     const activePurchaseCost = selectedVariant?.purchaseCost ?? product.purchaseCost ?? activeCost;
-    const baseOldCost = selectedVariant?.purchaseOldCost ?? product.purchaseOldCost ?? activeOldCost;
-    const activePurchaseOldCost = baseOldCost;
+    const activePurchaseOldCost = selectedVariant?.purchaseOldCost ?? product.purchaseOldCost ?? activeOldCost;
     const activeUnit = product.unit;
 
     const hasDiscount = activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost;
