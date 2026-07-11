@@ -243,6 +243,7 @@ export default function ActionDetail({
                                 title={product.name}
                                 weight={getProductWeight(product)}
                                 price={product.cost}
+                                oldPrice={product.oldCost ?? undefined}
                                 unit={product.unit ?? ''}
                                 badge={getProductBadge(product, lang)}
                                 image={resolveProductImageUrl(product)}

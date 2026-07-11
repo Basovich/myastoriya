@@ -128,6 +128,7 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                                     slug={product.slug}
                                     title={product.name}
                                     price={product.cost}
+                                    oldPrice={product.oldCost ?? undefined}
                                     unit={product.unit}
                                     weight={getProductWeight(product)}
                                     image={resolveProductImageUrl(product)}

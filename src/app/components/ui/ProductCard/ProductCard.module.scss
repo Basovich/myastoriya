@@ -144,6 +144,13 @@
     align-items: flex-start;
 }
 
+.priceRowInner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
 .price {
     color: #000;
     font-size: 16px;
@@ -157,6 +164,24 @@
 
     @media (min-width: 1280px) {
         font-size: 26px;
+    }
+
+    &.newPrice {
+        color: #E3051B;
+    }
+}
+
+.oldPrice {
+    color: rgba(#060606, 0.6);
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 172.48%;
+    text-decoration-line: line-through;
+
+    @media (min-width: 768px) {
+        font-size: 14px;
     }
 }
 

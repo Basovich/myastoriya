@@ -186,6 +186,7 @@ export default function ProfilePage() {
                     slug: p.slug,
                     title: p.name,
                     price: p.cost,
+                    oldPrice: p.oldCost ?? undefined,
                     unit: p.unit,
                     image: resolveProductImageUrl(p),
                     badge: getProductBadge(p, lang),

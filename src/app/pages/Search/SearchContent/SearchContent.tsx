@@ -187,6 +187,7 @@ export default function SearchContent() {
                                         title={product.name}
                                         weight={weight}
                                         price={product.cost}
+                                        oldPrice={product.oldCost ?? undefined}
                                         unit={product.unit}
                                         badge={getProductBadge(product, String(lang))}
                                         image={resolveProductImageUrl(product)}

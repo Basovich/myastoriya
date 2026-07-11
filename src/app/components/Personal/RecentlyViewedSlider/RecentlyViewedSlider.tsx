@@ -18,6 +18,7 @@ export interface RecentlyViewedProduct {
     title: string;
     weight: string;
     price: number;
+    oldPrice?: number;
     unit: string;
     badge?: string | null;
     image: string;

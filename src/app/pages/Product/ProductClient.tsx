@@ -248,6 +248,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
             slug: p.slug,
             title: p.name,
             price: p.cost,
+            oldPrice: p.oldCost ?? undefined,
             weight: getProductWeight(p),
             unit: p.unit || 'шт',
             image: resolveProductImageUrl(p),

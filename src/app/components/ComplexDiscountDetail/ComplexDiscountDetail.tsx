@@ -173,7 +173,8 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                                             slug={product.slug}
                                             title={product.name}
                                             weight={getProductWeight(product)}
-                                            price={product.purchaseOldCost ?? product.purchaseCost ?? product.cost ?? 0}
+                                            price={product.purchaseCost ?? product.cost ?? 0}
+                                            oldPrice={product.purchaseOldCost ?? product.oldCost ?? undefined}
                                             unit={product.unit || "кг"}
                                             badge={getProductBadge(product, lang)}
                                             image={productImage}

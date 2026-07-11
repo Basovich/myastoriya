@@ -182,6 +182,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                             title={product.name}
                             weight={getProductWeight(product)}
                             price={product.cost}
+                            oldPrice={product.oldCost ?? undefined}
                             unit={product.unit}
                             badge={getProductBadge(product, locale)}
                             image={resolveProductImageUrl(product)}

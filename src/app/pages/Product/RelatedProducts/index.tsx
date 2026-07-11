@@ -20,6 +20,7 @@ interface RelatedProduct {
     title: string;
     weight: string;
     price: number;
+    oldPrice?: number;
     unit: string;
     badge?: string | null;
     image: string;
@@ -48,7 +49,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
     const [showArrows, setShowArrows] = useState(false);
 
-    const handleSwiperUpdate = (swiper: any) => {
+    const handleSwiperUpdate = (swiper: { isLocked: boolean }) => {
         setShowArrows(!swiper.isLocked);
     };
 

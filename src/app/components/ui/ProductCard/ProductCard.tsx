@@ -4,6 +4,7 @@ import Badge from "../Badge/Badge";
 import WishButton from "../WishButton/WishButton";
 import AddToCartButton from "../AddToCartButton/AddToCartButton";
 import AppLink from "../AppLink/AppLink";
+import clsx from "clsx";
 
 
 interface ProductCardProps {
@@ -12,6 +13,7 @@ interface ProductCardProps {
     title: string;
     weight: string;
     price: number;
+    oldPrice?: number;
     unit: string;
     badge?: string | null;
     image: string;
@@ -26,6 +28,7 @@ export default function ProductCard({
     title,
     weight,
     price,
+    oldPrice,
     unit,
     badge,
     image,
@@ -130,7 +133,16 @@ export default function ProductCard({
                 {children}
                 <div className={s.priceRow}>
                     <div className={s.priceGroup}>
-                        <span className={s.price}>{price.toLocaleString("uk-UA")} ₴</span>
+                        <div className={s.priceRowInner}>
+                            <span className={clsx(s.price, oldPrice && oldPrice > price && s.newPrice)}>
+                                {price.toLocaleString("uk-UA")} ₴
+                            </span>
+                            {oldPrice && oldPrice > price && (
+                                <span className={s.oldPrice}>
+                                    {oldPrice.toLocaleString("uk-UA")} ₴
+                                </span>
+                            )}
+                        </div>
                         <span className={s.unit}>{displayUnit}</span>
 
                     </div>
