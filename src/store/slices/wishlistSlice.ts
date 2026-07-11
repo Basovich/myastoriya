@@ -49,8 +49,16 @@ export const toggleWishlistAsync = createAsyncThunk(
 // Fetch favorites from backend to sync state
 export const fetchWishlistPayloadAsync = createAsyncThunk(
     'wishlist/fetchPayloadAsync',
-    async (_, { rejectWithValue }) => {
+    async (_, { getState, rejectWithValue }) => {
         try {
+            const state = getState() as RootState;
+            const { isAuthenticated, isGuest } = state.auth;
+            
+            // Only fetch from backend if user is fully authenticated (not a guest)
+            if (!isAuthenticated || isGuest) {
+                return state.wishlist.items;
+            }
+
             const response = await getFavoritesApi({ full: false });
             return response.data.map(item => item.id);
         } catch (error: any) {
