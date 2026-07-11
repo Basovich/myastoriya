@@ -39,7 +39,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
     const categoryId = parseInt(matchedCat.id);
     const [productsResponse, categoryDetails] = await Promise.all([
         getProductsApi(
-            { categoryId, limit: 12 * page, page: 1, sort },
+            { categoryId, limit: 12, page, sort },
             lang,
         ),
         getCategoryByIdApi(categoryId, lang),

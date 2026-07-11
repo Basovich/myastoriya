@@ -33,7 +33,7 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
     // Завантажуємо дерево категорій та товари паралельно
     const [catalogTree, productsResponse] = await Promise.all([
         getCatalogTreeApi(lang),
-        getProductsApi({ limit: 12 * page, page: 1, sort }, lang),
+        getProductsApi({ limit: 12, page, sort }, lang),
     ]);
     productsResponse.current_page = page;
 

@@ -55,7 +55,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
     const [productsResponse, popularProducts, categoryDetails] = await Promise.all([
         getProductsApi(
-            { categoryId, limit: 12 * page, page: 1, sort, filter: activeFilters },
+            { categoryId, limit: 12, page, sort, filter: activeFilters },
             lang,
         ),
         getPopularProductsApi(undefined, 12, lang),
