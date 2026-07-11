@@ -21,7 +21,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     const catalogTree = await getCatalogTreeApi(lang);
 
     // Find level-1 category by slug in the current locale tree
-    let matchedCat = catalogTree.find(c => c.slug === categorySlug);
+    const matchedCat = catalogTree.find(c => c.slug === categorySlug);
 
     // Cross-locale fallback: slug may come from a different locale (e.g. after language switch).
     // Search the slug in all other locale trees, find the category id, then redirect to the
