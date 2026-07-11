@@ -80,7 +80,6 @@ interface ActionDetailProps {
 
 export default function ActionDetail({
     lang,
-    id,
     pageType = 'promotions',
     sale,
     initialProducts = [],

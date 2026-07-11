@@ -11,7 +11,7 @@ import CartModal from '../CartModal/CartModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCartAsync } from '@/store/slices/cartSlice';
 
-import { type Special, resolveProductImageUrl, getProductWeight, getProductBadge } from '@/lib/graphql';
+import { type Special, getProductWeight, getProductBadge } from '@/lib/graphql';
 
 const LOCALIZED_TEXTS = {
     ua: {

@@ -103,7 +103,7 @@ const profileDict = {
 };
 
 export default function ProfilePage() {
-    const { user, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
+    const { user } = useAppSelector((state) => state.auth);
     const userId = user?.id;
     const localViewedIds = useAppSelector((state) => state.viewedProducts.items);
     const dispatch = useAppDispatch();

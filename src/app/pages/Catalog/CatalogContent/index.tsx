@@ -52,7 +52,6 @@ interface CatalogContentProps {
 
 export default async function CatalogContent({
     lang,
-    dict,
     initialProducts,
     categoryId,
     categoryName,
