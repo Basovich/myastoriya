@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { addToFavoritesApi, removeFromFavoritesApi, getFavoritesApi } from '@/lib/graphql/queries/favorites';
 import { GraphQLError } from '@/lib/graphql/client';
-import { RootState } from '../index';
+import { RootState } from '..';
 
 interface WishlistState {
     items: string[]; // List of product IDs
@@ -39,7 +39,7 @@ export const toggleWishlistAsync = createAsyncThunk(
             }
             
             return productId;
-        } catch (error: any) {
+        } catch (error) {
             console.error('[Wishlist] Failed to toggle item:', productId, error);
             return rejectWithValue(productId);
         }
@@ -61,7 +61,7 @@ export const fetchWishlistPayloadAsync = createAsyncThunk(
 
             const response = await getFavoritesApi({ full: false });
             return response.data.map(item => item.id);
-        } catch (error: any) {
+        } catch (error) {
             console.error('[Wishlist] Failed to fetch payload:', error);
             return rejectWithValue('Failed to fetch wishlist');
         }
