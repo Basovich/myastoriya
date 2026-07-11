@@ -18,7 +18,8 @@ import {
     resolveCategoryImageUrl,
     Product as ApiProduct,
     ProductCategory,
-    getProductWeight
+    getProductWeight,
+    getProductBadge
 } from "@/lib/graphql";
 
 export default function SearchContent() {
@@ -187,7 +188,7 @@ export default function SearchContent() {
                                         weight={weight}
                                         price={product.cost}
                                         unit={product.unit}
-                                        badge={product.is_new ? "NEW" : (product.oldCost && product.oldCost > product.cost ? "АКЦІЯ" : null)}
+                                        badge={getProductBadge(product, String(lang))}
                                         image={resolveProductImageUrl(product)}
                                         lang={String(lang)} 
                                         hasCostVariants={product.hasCostVariants}

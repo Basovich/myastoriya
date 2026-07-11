@@ -25,9 +25,8 @@ import Image from 'next/image';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import type { BlogPost, Product, ProductCostVariant, OrderingInfoBlock } from '@/lib/graphql';
-import { resolveProductImageUrl, getProductCostVariantsApi, getPopularProductsApi, getDefaultCostVariant, getProductWeight } from '@/lib/graphql';
+import { resolveProductImageUrl, getProductCostVariantsApi, getPopularProductsApi, getDefaultCostVariant, getProductWeight, getProductBadge } from '@/lib/graphql';
 import type { BreadcrumbItem } from '@/utils/category-url';
-
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -37,12 +36,6 @@ function getProductImageUrl(url: string): string {
     if (!url) return '';
     if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
     return url;
-}
-
-function getProductBadge(product: Product): string | null {
-    if (product.is_new) return 'NEW';
-    if (product.oldCost && product.oldCost > product.cost) return 'АКЦІЯ';
-    return null;
 }
 
 function formatPrice(price: number): string {
@@ -258,7 +251,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
             weight: getProductWeight(p),
             unit: p.unit || 'шт',
             image: resolveProductImageUrl(p),
-            badge: getProductBadge(p),
+            badge: getProductBadge(p, lang),
             hasCostVariants: p.hasCostVariants,
         }));
     }

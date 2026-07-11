@@ -21,6 +21,7 @@ import {
     getUserDiscountInfoApi,
     UserDiscountInfo,
     getProductWeight,
+    getProductBadge,
 } from '@/lib/graphql';
 import { updateUserDataApi } from '@/lib/graphql/queries/auth';
 import { setUser } from '@/store/slices/authSlice';
@@ -187,7 +188,7 @@ export default function ProfilePage() {
                     price: p.cost,
                     unit: p.unit,
                     image: resolveProductImageUrl(p),
-                    badge: p.is_new ? "NEW" : null,
+                    badge: getProductBadge(p, lang),
                     weight: getProductWeight(p),
                     hasCostVariants: p.hasCostVariants
                 }));

@@ -12,7 +12,7 @@ import ProductCard from "../../../components/ui/ProductCard/ProductCard";
 import Button from "../../../components/ui/Button/Button";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import Image from "next/image";
-import { type Showcase, type Product, resolveProductImageUrl, getProductsApi, getProductWeight } from "@/lib/graphql";
+import { type Showcase, type Product, resolveProductImageUrl, getProductsApi, getProductWeight, getProductBadge } from "@/lib/graphql";
 
 interface ProductsProps {
     dict: {
@@ -94,14 +94,6 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
         if (!loading && hasMore) {
             setPage(prev => prev + 1);
         }
-    };
-
-
-
-    const getBadge = (product: Product) => {
-        if (product.is_new) return "NEW";
-        if (product.oldCost && product.oldCost > product.cost) return "АКЦІЯ";
-        return null;
     };
 
 
@@ -191,7 +183,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                             weight={getProductWeight(product)}
                             price={product.cost}
                             unit={product.unit}
-                            badge={getBadge(product)}
+                            badge={getProductBadge(product, locale)}
                             image={resolveProductImageUrl(product)}
                             lang={locale} 
                             hasCostVariants={product.hasCostVariants}

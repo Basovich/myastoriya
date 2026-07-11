@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { Locale } from '@/i18n/config';
 import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
-import { Product, resolveProductImageUrl, getProductsByIdsApi, getProductWeight } from '@/lib/graphql';
+import { Product, resolveProductImageUrl, getProductsByIdsApi, getProductWeight, getProductBadge } from '@/lib/graphql';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
@@ -121,12 +121,6 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                 ) : (
                     <div className={s.productsGrid}>
                         {products.map((product) => {
-                            const badgeStr = product.is_new 
-                                ? "NEW" 
-                                : (product.oldCost && product.oldCost > product.cost) 
-                                    ? "АКЦІЯ" 
-                                    : undefined;
-
                             return (
                                 <ProductCard 
                                     key={product.id}
@@ -137,7 +131,7 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                                     unit={product.unit}
                                     weight={getProductWeight(product)}
                                     image={resolveProductImageUrl(product)}
-                                    badge={badgeStr}
+                                    badge={getProductBadge(product, lang)}
                                     lang={lang} 
                                     hasCostVariants={product.hasCostVariants}
                                 />

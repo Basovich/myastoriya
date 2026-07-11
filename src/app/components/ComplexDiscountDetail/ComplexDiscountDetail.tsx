@@ -11,7 +11,7 @@ import CartModal from '../CartModal/CartModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCartAsync } from '@/store/slices/cartSlice';
 
-import { type Special, resolveProductImageUrl, getProductWeight } from '@/lib/graphql';
+import { type Special, resolveProductImageUrl, getProductWeight, getProductBadge } from '@/lib/graphql';
 
 const LOCALIZED_TEXTS = {
     ua: {
@@ -175,7 +175,7 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                                             weight={getProductWeight(product)}
                                             price={product.purchaseOldCost ?? product.purchaseCost ?? product.cost ?? 0}
                                             unit={product.unit || "кг"}
-                                            badge={null}
+                                            badge={getProductBadge(product, lang)}
                                             image={productImage}
                                             lang={lang}
                                             hasCostVariants={product.hasCostVariants}

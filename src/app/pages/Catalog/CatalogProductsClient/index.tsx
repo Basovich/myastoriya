@@ -6,17 +6,11 @@ import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
 import ProductCardRow from "@/app/components/ui/ProductCardRow";
 import Button from "@/app/components/ui/Button/Button";
 import type { Product, ProductsResponse } from "@/lib/graphql";
-import { resolveProductImageUrl, getProductsApi, getProductWeight, getProductsFilterApi } from "@/lib/graphql";
+import { resolveProductImageUrl, getProductsApi, getProductWeight, getProductsFilterApi, getProductBadge } from "@/lib/graphql";
 import type { FilterStateInput } from "@/lib/graphql";
 import { Locale } from "@/i18n/config";
 import s from "../CatalogContent/CatalogContent.module.scss";
 import Pagination from "@/app/components/ui/Pagination/Pagination";
-
-function getBadge(product: Product): string | null {
-    if (product.is_new) return 'NEW';
-    if (product.oldCost && product.oldCost > product.cost) return 'АКЦІЯ';
-    return null;
-}
 
 interface CatalogProductsClientProps {
     initialProducts: ProductsResponse;
@@ -184,7 +178,7 @@ export default function CatalogProductsClient({
                                 weight={getProductWeight(product)}
                                 price={product.cost}
                                 unit={product.unit}
-                                badge={getBadge(product)}
+                                badge={getProductBadge(product, lang)}
                                 image={resolveProductImageUrl(product)}
                                 lang={lang}
                                 hasCostVariants={product.hasCostVariants}
@@ -199,7 +193,7 @@ export default function CatalogProductsClient({
                                 price={product.cost}
                                 oldPrice={product.oldCost ?? undefined}
                                 unit={product.unit}
-                                badge={getBadge(product)}
+                                badge={getProductBadge(product, lang)}
                                 image={resolveProductImageUrl(product)}
                                 lang={lang}
                                 hasCostVariants={product.hasCostVariants}

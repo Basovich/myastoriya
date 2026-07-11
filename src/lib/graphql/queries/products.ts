@@ -206,6 +206,15 @@ export function resolveProductImageUrl(product: Product): string {
     return url;
 }
 
+export function getProductBadge(product: { is_new?: boolean | null; cost: number; oldCost?: number | null }, lang?: string): string | null {
+    if (product.is_new) return 'NEW';
+    if (product.oldCost && product.oldCost > product.cost) {
+        return lang === 'ru' ? 'АКЦИЯ' : 'АКЦІЯ';
+    }
+    return null;
+}
+
+
 /**
  * Повертає URL зображення категорії.
  */

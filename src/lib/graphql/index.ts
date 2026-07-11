@@ -39,6 +39,7 @@ export {
     findProductIdBySlug,
     getCategoriesApi,
     resolveProductImageUrl,
+    getProductBadge,
     getCatalogTreeApi,
     getSubcategoriesApi,
     getCategoryByIdApi,

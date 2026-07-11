@@ -3,7 +3,7 @@ import HeroBanner from '../../../components/ui/HeroBanner/HeroBanner';
 import Breadcrumbs from '../../../components/ui/Breadcrumbs/Breadcrumbs';
 import CategoryCircles, { type CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
 import Image from 'next/image';
-import ProductCardRow from '@/app/components/ui/ProductCardRow';
+
 import CatalogSidebar from '@/app/pages/Catalog/CatalogSidebar';
 import ProductCard from '../../../components/ui/ProductCard/ProductCard';
 import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
@@ -11,25 +11,14 @@ import clsx from 'clsx';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
 import type { Product, ProductsResponse, FaqQuestion } from '@/lib/graphql';
-import { resolveProductImageUrl, getProductWeight } from '@/lib/graphql';
+import { resolveProductImageUrl, getProductWeight, getProductBadge } from '@/lib/graphql';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
 import type { BreadcrumbItem } from '@/utils/category-url';
-
 
 // Client Islands
 import CatalogToolbarClient from '../CatalogToolbarClient';
 import CatalogProductsClient from '../CatalogProductsClient';
 import CatalogRelatedSlidersClient from '../CatalogRelatedSlidersClient';
-
-
-
-
-
-function getBadge(product: Product): string | null {
-    if (product.is_new) return 'NEW';
-    if (product.oldCost && product.oldCost > product.cost) return 'АКЦІЯ';
-    return null;
-}
 
 interface CatalogContentProps {
     lang: Locale;
@@ -124,7 +113,7 @@ export default async function CatalogContent({
                     weight={getProductWeight(product)}
                     price={product.cost}
                     unit={product.unit}
-                    badge={getBadge(product)}
+                    badge={getProductBadge(product, lang)}
                     image={resolveProductImageUrl(product)}
                     lang={lang}
                     hasCostVariants={product.hasCostVariants}
@@ -144,7 +133,7 @@ export default async function CatalogContent({
                 weight={getProductWeight(product)}
                 price={product.cost}
                 unit={product.unit}
-                badge={getBadge(product)}
+                badge={getProductBadge(product, lang)}
                 image={resolveProductImageUrl(product)}
                 lang={lang}
                 hasCostVariants={product.hasCostVariants}

@@ -13,7 +13,7 @@ import Button from "@/app/components/ui/Button/Button";
 import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
 import SliderArrow from "@/app/components/ui/SliderArrow/SliderArrow";
 import SectionHeader from "@/app/components/ui/SectionHeader/SectionHeader";
-import { type BlogPost, type Product, resolveProductImageUrl, resolveBlogImageUrl, getProductWeight } from "@/lib/graphql";
+import { type BlogPost, type Product, resolveProductImageUrl, resolveBlogImageUrl, getProductWeight, getProductBadge } from "@/lib/graphql";
 import { likeBlogApi } from "@/lib/graphql/queries/blog";
 import clsx from "clsx";
 
@@ -174,7 +174,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                             weight={getProductWeight(product)}
                                             price={product.cost}
                                             unit={product.unit ?? ""}
-                                            badge={product.is_new ? "NEW" : null}
+                                            badge={getProductBadge(product, lang)}
                                             image={resolveProductImageUrl(product as unknown as Product)}
                                             lang={lang} 
                                             hasCostVariants={product.hasCostVariants}
@@ -206,7 +206,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                     weight={getProductWeight(product)}
                                     price={product.cost}
                                     unit={product.unit ?? ""}
-                                    badge={product.is_new ? "NEW" : null}
+                                    badge={getProductBadge(product, lang)}
                                     image={resolveProductImageUrl(product as unknown as Product)}
                                     lang={lang} 
                                     hasCostVariants={product.hasCostVariants}
