@@ -3,7 +3,7 @@ import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
 import { getCatalogTreeApi, getProductsApi, getPopularProductsApi, getCategoryByIdApi, getFaqQuestionsApi } from '@/lib/graphql';
-import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
+import { getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
 import { parseFilterParams } from '@/utils/filter-params';
@@ -19,7 +19,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     const dict = await getDictionary(lang as Locale);
 
     const catalogTree = await getCatalogTreeApi(lang);
-    const categoryIndex = buildCategoryIndex(catalogTree);
 
     // Find level-1 category by slug in the current locale tree
     let matchedCat = catalogTree.find(c => c.slug === categorySlug);
