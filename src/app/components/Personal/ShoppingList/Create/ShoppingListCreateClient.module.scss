@@ -21,6 +21,7 @@ div.contentBlock {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 20px;
 
   @media (min-width: 1024px) {
     gap: 24px;
@@ -493,7 +494,7 @@ button.addBtn {
   gap: 16px;
   margin-top: 32px;
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1280px) {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
