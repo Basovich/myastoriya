@@ -27,6 +27,7 @@ import { Dictionary } from '@/i18n/types';
 import type { BlogPost, Product, ProductCostVariant, OrderingInfoBlock } from '@/lib/graphql';
 import { resolveProductImageUrl, getProductCostVariantsApi, getPopularProductsApi, getDefaultCostVariant, getProductWeight, getProductBadge } from '@/lib/graphql';
 import type { BreadcrumbItem } from '@/utils/category-url';
+import { formatPrice } from '@/utils/price';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -38,9 +39,6 @@ function getProductImageUrl(url: string): string {
     return url;
 }
 
-function formatPrice(price: number): string {
-    return Math.round(price).toLocaleString('uk-UA').replace(/\u00a0/g, ' ');
-}
 
 function getWeightInGrams(weightStr: string): number {
     if (!weightStr) return 0;

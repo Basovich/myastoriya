@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Button from '@/app/components/ui/Button/Button';
 import { Locale } from '@/i18n/config';
+import { formatPrice } from '@/utils/price';
 import s from './ShoppingListCreateClient.module.scss';
 
 const cardDict = {
@@ -36,7 +37,7 @@ export default function SearchProductCard({ name, price, weight, image, onAdd, l
                 <Image src={image} className={s.searchCardImg} alt={name} width={120} height={90} />
                 <div className={s.searchCardInfo}>
                     <h4 className={s.searchCardName}>{name} <span>{weight && `(${weight})`}</span></h4>
-                    <div className={s.searchCardPrice}>{price.toLocaleString()} <span>₴</span></div>
+                    <div className={s.searchCardPrice}>{formatPrice(price)} <span>₴</span></div>
                 </div>
             </div>
             <Button 

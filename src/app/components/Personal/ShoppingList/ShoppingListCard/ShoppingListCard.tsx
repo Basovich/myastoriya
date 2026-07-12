@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Button from '@/app/components/ui/Button/Button';
 import { ShoppingListProduct } from '@/lib/graphql/queries/pages/shoppingList';
+import { formatPrice } from '@/utils/price';
 import s from './ShoppingListCard.module.scss';
 import clsx from 'clsx';
 
@@ -102,7 +103,7 @@ export default function ShoppingListCard({
                 <div className={s.sumBlock}>
                     <span className={s.sumLabel}>{sumLabel}</span>
                     <span className={s.sumValue}>
-                        {totalSum.toLocaleString()} <span>₴</span>
+                        {formatPrice(totalSum)} <span>₴</span>
                     </span>
                 </div>
                 <div className={s.actions}>

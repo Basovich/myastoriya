@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { formatPrice } from '@/utils/price';
 import s from './ShoppingListCreateClient.module.scss';
 
 interface AddedProductItemProps {
@@ -33,7 +34,7 @@ export default function AddedProductItem({
                         {weight && <div className={s.addedItemWeight}>{weight}</div>}
                     </div>
                     <div className={s.addedItemPriceBlock}>
-                        <span className={s.addedItemPrice}>{price.toLocaleString()} <span>₴</span></span>
+                        <span className={s.addedItemPrice}>{formatPrice(price)} <span>₴</span></span>
                         {unitPrice && <span className={s.addedItemUnitPrice}>{unitPrice}</span>}
                     </div>
                 </div>

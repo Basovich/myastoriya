@@ -38,6 +38,7 @@ import {
 import { fetchCartAsync } from '@/store/slices/cartSlice';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import CustomSelect from '@/app/components/ui/CustomSelect';
+import { formatPrice } from '@/utils/price';
 import s from './ShoppingListCreateClient.module.scss';
 
 const createDict = {
@@ -675,7 +676,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                             <div className={s.listFooter}>
                                 <div className={s.sumBlock}>
                                     <span className={s.sumLabel}>{dict.sumLabel}</span>
-                                    <span className={s.sumValue}>{totalSum.toLocaleString()} <span>₴</span></span>
+                                    <span className={s.sumValue}>{formatPrice(totalSum)} <span>₴</span></span>
                                 </div>
                                 <div className={s.footerActions}>
                                     <Button 
