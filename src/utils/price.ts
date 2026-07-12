@@ -9,8 +9,8 @@ export function formatPrice(price: number): string {
     const rounded = Math.round(price * 100) / 100;
     const [intPart, decPart] = rounded.toFixed(2).split('.');
 
-    // Розділяємо тисячі пробілом (використовуємо звичайний пробіл)
-    const intFormatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
+    // Розділяємо тисячі вузьким нерозривним пробілом (\u202f)
+    const intFormatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
 
     // Показуємо копійки лише якщо вони ненульові
     if (decPart === '00') {
