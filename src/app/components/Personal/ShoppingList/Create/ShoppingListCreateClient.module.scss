@@ -328,7 +328,15 @@ button.addBtn {
   gap: 12px;
   margin-top: 18px;
 
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
   @media (min-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 1280px) {
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-top: 24px;

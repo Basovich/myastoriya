@@ -132,8 +132,20 @@
     }
 }
 
-.mobileOnly {
+.xsOnly {
     display: block;
+
+    @media (min-width: 390px) {
+        display: none;
+    }
+}
+
+.smOnly {
+    display: none;
+
+    @media (min-width: 390px) {
+        display: block;
+    }
 
     @media (min-width: 1024px) {
         display: none;
@@ -144,6 +156,18 @@
     display: none;
 
     @media (min-width: 1024px) {
+        display: block;
+    }
+
+    @media (min-width: 1280px) {
+        display: none;
+    }
+}
+
+.wideOnly {
+    display: none;
+
+    @media (min-width: 1280px) {
         display: block;
     }
 }
@@ -163,7 +187,7 @@
     background: #F5F5F5;
     flex-shrink: 0;
 
-    @media (min-width: 1024px) {
+    @media (min-width: 1280px) {
         width: 64px;
         height: 64px;
     }

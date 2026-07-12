@@ -33,30 +33,39 @@ export default function ShoppingListCard({
     const renderProductsList = (maxItems: number) => {
         const visibleProducts = products.slice(0, maxItems);
         const hasMore = products.length > maxItems;
+        const remainingCount = products.length - maxItems;
 
-        return visibleProducts.map((prod, index) => {
+        const resolveImg = (prod: ShoppingListProduct) => {
             const imgUrl = prod.image
                 ? (prod.image.grid2x || prod.image.main2x || prod.image.grid1x || prod.image.main1x || prod.image.big || '')
                 : '';
-            const resolvedImg = imgUrl.startsWith('/')
+            return imgUrl.startsWith('/')
                 ? `https://dev-api.myastoriya.com.ua${imgUrl}`
                 : imgUrl || '/images/product-placeholder.svg';
+        };
 
-            const isLastWithOverlay = hasMore && index === maxItems - 1;
-            const remainingCount = products.length - (maxItems - 1);
+        const items = visibleProducts.map((prod, index) => (
+            <div key={prod.id || index} className={s.productThumb}>
+                <Image src={resolveImg(prod)} alt={prod.name || 'Product'} width={56} height={42} />
+            </div>
+        ));
 
-            return (
-                <div key={prod.id || index} className={s.productThumb}>
-                    <Image src={resolvedImg} alt={prod.name || "Product"} width={56} height={42} />
-                    {isLastWithOverlay && (
-                        <div className={s.overlay}>
-                            <span>{remainingCount}</span>
-                        </div>
-                    )}
+        if (hasMore) {
+            const nextProd = products[maxItems];
+            const nextImg = nextProd ? resolveImg(nextProd) : '/images/product-placeholder.svg';
+            items.push(
+                <div key="overlay" className={s.productThumb}>
+                    <Image src={nextImg} alt="Ще товари" width={56} height={42} />
+                    <div className={s.overlay}>
+                        <span>+{remainingCount}</span>
+                    </div>
                 </div>
             );
-        });
+        }
+
+        return items;
     };
+
 
     return (
         <div className={s.card}>
@@ -87,7 +96,13 @@ export default function ShoppingListCard({
                 </div>
             </div>
 
-            <div className={clsx(s.productsRow, s.mobileOnly)}>
+            <div className={clsx(s.productsRow, s.xsOnly)}>
+                <div className={s.productsList}>
+                    {renderProductsList(3)}
+                </div>
+            </div>
+
+            <div className={clsx(s.productsRow, s.smOnly)}>
                 <div className={s.productsList}>
                     {renderProductsList(4)}
                 </div>
@@ -95,7 +110,13 @@ export default function ShoppingListCard({
 
             <div className={clsx(s.productsRow, s.desktopOnly)}>
                 <div className={s.productsList}>
-                    {renderProductsList(12)}
+                    {renderProductsList(6)}
+                </div>
+            </div>
+
+            <div className={clsx(s.productsRow, s.wideOnly)}>
+                <div className={s.productsList}>
+                    {renderProductsList(9)}
                 </div>
             </div>
 
