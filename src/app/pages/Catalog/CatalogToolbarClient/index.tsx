@@ -42,14 +42,16 @@ export default function CatalogToolbarClient({
     const searchParams = useSearchParams();
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    const updateParams = (key: string, value: string) => {
+    const updateParams = (key: string, value: string, resetPage = true) => {
         const params = new URLSearchParams(searchParams.toString());
         if (value) {
             params.set(key, value);
         } else {
             params.delete(key);
         }
-        params.set("page", "1");
+        if (resetPage) {
+            params.set("page", "1");
+        }
         if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('catalog-loading-start'));
         }
@@ -91,7 +93,7 @@ export default function CatalogToolbarClient({
 
                 <ViewToggle 
                     view={view} 
-                    onViewChange={(newView) => updateParams("view", newView)} 
+                    onViewChange={(newView) => updateParams("view", newView, false)} 
                     className={s.viewToggle} 
                 />
             </div>
