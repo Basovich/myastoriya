@@ -6,7 +6,7 @@ import styles from '../Product.module.scss';
 import Button from '@/app/components/ui/Button/Button';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import Image from 'next/image';
-import ReviewModal from '@/app/components/ReviewModal';
+import PersonalReviewModal from '@/app/components/Personal/Reviews/PersonalReviewModal/PersonalReviewModal';
 import { gqlRequest } from '@/lib/graphql';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 
@@ -120,6 +120,7 @@ function getAuthorName(user?: ReviewUser | null): string {
 
 interface ProductReviewsProps {
     productId: number;
+    productName?: string;
     isAuthenticated?: boolean;
     onAuthRequired?: () => void;
     onVideoReviewRequired?: () => void;
@@ -133,9 +134,10 @@ const PAGE_SIZE = 5;
 
 const ProductReviews: React.FC<ProductReviewsProps> = ({
     productId,
+    productName,
     isAuthenticated,
     onAuthRequired,
-    onVideoReviewRequired,
+    // onVideoReviewRequired,
 }) => {
     // const [activeTab, setActiveTab] = useState<'text' | 'video'>('text');
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -169,6 +171,14 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
         const nextPage = page + 1;
         setPage(nextPage);
         void loadReviews(nextPage, true);
+    };
+
+    const handleLeaveReviewClick = () => {
+        if (!isAuthenticated) {
+            onAuthRequired?.();
+        } else {
+            setIsReviewModalOpen(true);
+        }
     };
 
     // const handleVideoReviewClick = () => {
@@ -205,7 +215,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
             {/*        <Button*/}
             {/*            variant="black"*/}
             {/*            className={styles.leaveReviewBtn}*/}
-            {/*            onClick={() => setIsReviewModalOpen(true)}*/}
+            {/*            onClick={handleLeaveReviewClick}*/}
             {/*        >*/}
             {/*            ЗАЛИШИТИ ВІДГУК*/}
             {/*        </Button>*/}
@@ -274,7 +284,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                     <Button
                         variant="black"
                         className={styles.leaveReviewBtn}
-                        onClick={() => setIsReviewModalOpen(true)}
+                        onClick={handleLeaveReviewClick}
                     >
                         ЗАЛИШИТИ СВІЙ ВІДГУК
                     </Button>
@@ -285,15 +295,20 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
             {/*    <Button*/}
             {/*        variant="black"*/}
             {/*        className={styles.mobileBannerLink}*/}
-            {/*        onClick={() => setIsReviewModalOpen(true)}*/}
+            {/*        onClick={handleLeaveReviewClick}*/}
             {/*    >*/}
             {/*        ЗАЛИШИТИ ВІДГУК*/}
             {/*    </Button>*/}
             {/*</div>*/}
 
-            <ReviewModal
+            <PersonalReviewModal
                 isOpen={isReviewModalOpen}
                 onClose={() => setIsReviewModalOpen(false)}
+                productId={productId}
+                productName={productName}
+                onSuccess={() => {
+                    void loadReviews(1, false);
+                }}
             />
         </div>
     );

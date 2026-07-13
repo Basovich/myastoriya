@@ -401,6 +401,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
 
                 <ProductReviews
                     productId={Number(product.id)}
+                    productName={product.name}
                     isAuthenticated={isAuthenticated}
                     onAuthRequired={() => setIsAuthModalOpen(true)}
                     onVideoReviewRequired={() => setIsVideoReviewModalOpen(true)}
