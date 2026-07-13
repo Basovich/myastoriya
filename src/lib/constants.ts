@@ -1,6 +1,6 @@
 export const GOOGLE_MAPS_API_KEY = 'AIzaSyAcXuCdMzuth_BLGQ0L0foYuE_VeKtJ_Wo';
 export const GOOGLE_MAPS_LIBRARIES: ("places" | "drawing" | "geometry" | "visualization")[] = ['places'];
-export const GOOGLE_CLIENT_ID = '857890084502-u85p6cp357bu5cpntjlcodkcsdm45d9a.apps.googleusercontent.com';
+export const GOOGLE_CLIENT_ID = '419476524211-jcrd74jd0qfdla91g81dntgfm1e212sp.apps.googleusercontent.com';
 
 export const DARK_MAP_STYLE = [
     { "featureType": "all", "elementType": "geometry", "stylers": [{ "color": "#1d2c4d" }] },
