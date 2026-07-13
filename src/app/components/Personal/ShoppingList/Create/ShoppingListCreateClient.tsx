@@ -603,11 +603,12 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                             <div className={s.resultsGrid} onScroll={handleScroll}>
                                 {searchResults.map(prod => {
                                     const price = prod.cost || 0;
+                                    const oldPrice = prod.oldCost || undefined;
                                     const imgUrl = resolveProductImageUrl(prod);
-                                    const weightSpec = prod.specifications?.find(
-                                        s => s.name.toLowerCase().includes('вага') || s.name.toLowerCase().includes('вес')
-                                    );
-                                    const weightVal = weightSpec?.values?.[0] || '';
+                                    const weightVal = getProductWeight(prod);
+                                    const multiplier = getProductPriceMultiplier(weightVal, prod.unit || '');
+                                    const fullPrice = price * multiplier;
+                                    const fullOldPrice = oldPrice ? oldPrice * multiplier : undefined;
 
                                     const isAdded = addedItems.some(item => item.productId === Number(prod.id));
                                     const isCurrentlyAdding = addingProductIds.has(Number(prod.id));
@@ -618,7 +619,8 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                             name={prod.name}
                                             productId={prod.id}
                                             slug={prod.slug}
-                                            price={price}
+                                            price={fullPrice}
+                                            oldPrice={fullOldPrice}
                                             weight={weightVal}
                                             image={imgUrl}
                                             onAdd={() => handleAddProductToList(prod)}

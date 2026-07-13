@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import clsx from 'clsx';
 import Button from '@/app/components/ui/Button/Button';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
 import { Locale } from '@/i18n/config';
@@ -22,6 +23,7 @@ interface SearchProductCardProps {
     productId: number | string;
     slug?: string;
     price: number;
+    oldPrice?: number;
     weight?: string;
     image: string;
     onAdd: () => void;
@@ -34,6 +36,7 @@ export default function SearchProductCard({
     productId,
     slug,
     price, 
+    oldPrice,
     weight, 
     image, 
     onAdd, 
@@ -55,7 +58,16 @@ export default function SearchProductCard({
                         {' '}
                         <span>{weight && `(${weight})`}</span>
                     </h4>
-                    <div className={s.searchCardPrice}>{formatPrice(price)} <span>₴</span></div>
+                    <div className={s.searchCardPriceBlock}>
+                        <span className={clsx(s.searchCardPrice, oldPrice && oldPrice > price && s.searchCardPriceNew)}>
+                            {formatPrice(price)} <span>₴</span>
+                        </span>
+                        {oldPrice && oldPrice > price && (
+                            <span className={s.searchCardPriceOld}>
+                                {formatPrice(oldPrice)} <span>₴</span>
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
             <Button 

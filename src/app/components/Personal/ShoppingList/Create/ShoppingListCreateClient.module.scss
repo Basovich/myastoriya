@@ -249,12 +249,20 @@ div.contentBlock {
   }
 }
 
+.searchCardPriceBlock {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 4px;
+}
+
 .searchCardPrice {
   color: #000;
   font-size: 16px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  white-space: nowrap;
 
   @media (min-width: 1024px) {
     font-size: 20px;
@@ -267,6 +275,18 @@ div.contentBlock {
       font-size: 14px;
     }
   }
+}
+
+.searchCardPriceNew {
+  color: var(--color-accent);
+}
+
+.searchCardPriceOld {
+  color: #999;
+  text-decoration: line-through;
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
 button.addBtn {
