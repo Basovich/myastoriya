@@ -7,6 +7,7 @@ import { getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
 import { parseFilterParams } from '@/utils/filter-params';
+import { getAccessToken } from '@/app/actions/authActions';
 
 interface CategoryPageProps {
     params: Promise<{ lang: string; category: string }>;
@@ -18,7 +19,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     const resolvedSearchParams = await searchParams;
     const dict = await getDictionary(lang as Locale);
 
-    const catalogTree = await getCatalogTreeApi(lang);
+    const token = await getAccessToken();
+
+    const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined);
 
     // Find level-1 category by slug in the current locale tree
     const matchedCat = catalogTree.find(c => c.slug === categorySlug);
@@ -29,7 +32,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     if (!matchedCat) {
         const otherLocales = ['ua', 'ru'].filter(l => l !== lang);
         for (const otherLang of otherLocales) {
-            const otherTree = await getCatalogTreeApi(otherLang);
+            const otherTree = await getCatalogTreeApi(otherLang, 768, token ?? undefined);
             const otherCat = otherTree.find(c => c.slug === categorySlug);
             if (otherCat) {
                 const localizedCat = catalogTree.find(c => c.id === otherCat.id);
@@ -56,6 +59,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         getProductsApi(
             { categoryId, limit: 12, page, sort, filter: activeFilters },
             lang,
+            token ?? undefined,
         ),
         getPopularProductsApi(undefined, 12, lang),
         getCategoryByIdApi(categoryId, lang),

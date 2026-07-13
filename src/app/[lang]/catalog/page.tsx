@@ -5,6 +5,7 @@ import { getCatalogTreeApi, getProductsApi } from '@/lib/graphql';
 import { getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { Metadata } from 'next';
+import { getAccessToken } from '@/app/actions/authActions';
 
 interface CatalogPageProps {
     params: Promise<{ lang: string }>;
@@ -31,9 +32,11 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
     const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
 
     // Завантажуємо дерево категорій та товари паралельно
+    const token = await getAccessToken();
+
     const [catalogTree, productsResponse] = await Promise.all([
-        getCatalogTreeApi(lang),
-        getProductsApi({ limit: 12, page, sort }, lang),
+        getCatalogTreeApi(lang, 768, token ?? undefined),
+        getProductsApi({ limit: 12, page, sort }, lang, token ?? undefined),
     ]);
     productsResponse.current_page = page;
 

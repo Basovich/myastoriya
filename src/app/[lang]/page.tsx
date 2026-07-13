@@ -7,6 +7,7 @@ import { getPopularCategoriesApi } from "@/lib/graphql/queries/pages/home/catego
 import { getReviewsApi } from "@/lib/graphql/queries/pages/home/reviews";
 import { getProductsApi, getSalesApi, getSpecialsApi, getCatalogTreeApi, getShowcasesApi } from "@/lib/graphql";
 import { buildCategoryIndex, getCategoryHref } from "@/utils/category-url";
+import { getAccessToken } from "@/app/actions/authActions";
 
 export default async function Home({
   params,
@@ -16,10 +17,12 @@ export default async function Home({
   const { lang } = await params;
   const dict = await getDictionary(lang);
 
+  const token = await getAccessToken();
+
   const [popularCategories, catalogTree, showcases] = await Promise.all([
       getPopularCategoriesApi(lang),
-      getCatalogTreeApi(lang),
-      getShowcasesApi(lang),
+      getCatalogTreeApi(lang, 768, token ?? undefined),
+      getShowcasesApi(lang, token ?? undefined),
   ]);
   const categoryIndex = buildCategoryIndex(catalogTree);
   // Build a href map: categoryId -> correct URL based on tree level
@@ -28,16 +31,19 @@ export default async function Home({
       categoryHrefs[id] = getCategoryHref(entry.node, entry.parent ?? undefined, entry.grandParent ?? undefined);
   }
 
-  const firstShowcaseId = showcases.length > 0 ? parseInt(showcases[0].id) : null;
+  // Filter showcases that have productsCount > 0 for the user's locality/city
+  const filteredShowcases = showcases.filter(s => s.productsCount === undefined || s.productsCount > 0);
+  const firstShowcaseId = filteredShowcases.length > 0 ? parseInt(filteredShowcases[0].id) : null;
 
   const [blogsResponse, slides, reviews, initialProductsResponse, salesResponse, specialsResponse] = await Promise.all([
     getBlogsApi({ limit: 3 }, lang),
     getSlidesApi("main", lang),
     getReviewsApi(lang),
-    getProductsApi({ showcaseId: firstShowcaseId, limit: 8 }, lang),
+    getProductsApi({ showcaseId: firstShowcaseId, limit: 8 }, lang, token ?? undefined),
     getSalesApi(6, 1, lang),
     getSpecialsApi(10, 1, lang)
   ]);
+
 
   return (
       <HomePage
@@ -52,7 +58,7 @@ export default async function Home({
           initialHasMore={initialProductsResponse.has_more_pages}
           sales={salesResponse.data}
           specials={specialsResponse.data}
-          showcases={showcases}
+          showcases={filteredShowcases}
       />
   );
 }

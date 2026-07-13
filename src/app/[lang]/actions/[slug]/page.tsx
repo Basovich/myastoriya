@@ -1,6 +1,7 @@
 import ActionDetail from "../../../components/ActionDetail/ActionDetail";
 import { getSalesApi, getProductsApi } from "@/lib/graphql";
 import { notFound } from "next/navigation";
+import { getAccessToken } from "@/app/actions/authActions";
 
 // This is the dynamic stub page for individual actions: /[lang]/actions/[slug]
 export default async function ActionDetailPage({
@@ -23,9 +24,12 @@ export default async function ActionDetailPage({
         return notFound();
     }
 
+    const token = await getAccessToken();
+
     const productsResponse = await getProductsApi(
         { saleId: parseInt(sale.id), limit: 24 },
         lang,
+        token ?? undefined,
     );
 
     return (

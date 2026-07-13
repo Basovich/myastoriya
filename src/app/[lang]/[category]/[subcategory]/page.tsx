@@ -4,6 +4,7 @@ import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
 import { getCatalogTreeApi, getProductsApi, getPopularProductsApi, getCategoryByIdApi, getFaqQuestionsApi } from '@/lib/graphql';
 import { parseFilterParams } from '@/utils/filter-params';
+import { getAccessToken } from '@/app/actions/authActions';
 
 interface SubcategoryPageProps {
     params: Promise<{ lang: string; category: string; subcategory: string }>;
@@ -14,7 +15,10 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
     const { lang, category: categorySlug, subcategory: subcategorySlug } = await params;
     const resolvedSearchParams = await searchParams;
     const dict = await getDictionary(lang as Locale);
-    const catalogTree = await getCatalogTreeApi(lang);
+
+    const token = await getAccessToken();
+
+    const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined);
 
     // Find level-1 parent by slug in the current locale tree
     const parentCat = catalogTree.find(c => c.slug === categorySlug);
@@ -23,20 +27,17 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
     if (!parentCat) {
         const otherLocales = ['ua', 'ru'].filter(l => l !== lang);
         for (const otherLang of otherLocales) {
-            const otherTree = await getCatalogTreeApi(otherLang);
+            const otherTree = await getCatalogTreeApi(otherLang, 768, token ?? undefined);
             const otherParent = otherTree.find(c => c.slug === categorySlug);
             if (otherParent) {
+                // Also translate the subcategory slug
+                const otherSub = (otherParent.children ?? []).find(c => c.slug === subcategorySlug);
                 const localizedParent = catalogTree.find(c => c.id === otherParent.id);
-                if (localizedParent) {
-                    // Also translate the subcategory slug
-                    const otherSub = (otherParent.children ?? []).find(c => c.slug === subcategorySlug);
-                    const localizedSub = otherSub
-                        ? (localizedParent.children ?? []).find(c => c.id === otherSub.id)
-                        : null;
-                    const langPrefix = lang === 'ua' ? '' : `/${lang}`;
-                    redirect(`${langPrefix}/${localizedParent.slug}/${localizedSub?.slug ?? subcategorySlug}`);
-                }
-                break;
+                const localizedSub = otherSub && localizedParent
+                    ? (localizedParent.children ?? []).find(c => c.id === otherSub.id)
+                    : null;
+                const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+                redirect(`${langPrefix}/${localizedParent?.slug ?? categorySlug}/${localizedSub?.slug ?? subcategorySlug}`);
             }
         }
         notFound();
@@ -49,7 +50,7 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
     if (!matchedCat) {
         const otherLocales = ['ua', 'ru'].filter(l => l !== lang);
         for (const otherLang of otherLocales) {
-            const otherTree = await getCatalogTreeApi(otherLang);
+            const otherTree = await getCatalogTreeApi(otherLang, 768, token ?? undefined);
             const otherParent = otherTree.find(c => c.id === parentCat.id);
             const otherSub = (otherParent?.children ?? []).find(c => c.slug === subcategorySlug);
             if (otherSub) {
@@ -78,6 +79,7 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
         getProductsApi(
             { categoryId, limit: 12, page, sort, filter: activeFilters },
             lang,
+            token ?? undefined,
         ),
         getPopularProductsApi(undefined, 12, lang),
         getCategoryByIdApi(categoryId, lang),

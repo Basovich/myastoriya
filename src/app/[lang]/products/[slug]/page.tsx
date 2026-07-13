@@ -21,6 +21,7 @@ import {
 } from "@/lib/graphql";
 import { notFound } from "next/navigation";
 import { buildCategoryIndex, buildCategoryBreadcrumbs } from "@/utils/category-url";
+import { getAccessToken } from "@/app/actions/authActions";
 
 type Props = {
     params: Promise<{ slug: string; lang: string }>;
@@ -101,6 +102,8 @@ export default async function ProductPage({ params }: Props) {
     // Cost variants are loaded client-side in ProductClient to avoid unauthorized SSR errors
     const costVariants: ProductCostVariant[] = [];
 
+    const token = await getAccessToken();
+
     // Некритичні запити — паралельно, із retry та fallback
     const [blogsResponse, catalogTree, deliveryBlocks] = await Promise.all([
         safeCall<{ data: BlogPost[] }>(
@@ -108,7 +111,7 @@ export default async function ProductPage({ params }: Props) {
             { data: [] },
         ),
         safeCall<ProductCategory[]>(
-            () => getCatalogTreeApi(lang),
+            () => getCatalogTreeApi(lang, 768, token ?? undefined),
             [],
         ),
         safeCall<OrderingInfoBlock[]>(
@@ -135,7 +138,7 @@ export default async function ProductPage({ params }: Props) {
         ),
         product.categoryId
             ? safeCall<ProductsResponse>(
-                () => getProductsApi({ categoryId: Number(product!.categoryId), sort: "rating", limit: 13 }, lang),
+                () => getProductsApi({ categoryId: Number(product!.categoryId), sort: "rating", limit: 13 }, lang, token ?? undefined),
                 { data: [], per_page: 13, current_page: 1, has_more_pages: false },
             )
             : Promise.resolve<ProductsResponse>({ data: [], per_page: 13, current_page: 1, has_more_pages: false }),

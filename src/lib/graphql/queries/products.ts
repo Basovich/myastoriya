@@ -744,7 +744,7 @@ function mapSortOption(sort?: string | null): string | null {
     }
 }
 
-export async function getProductsApi(filter?: ProductsFilter, lang?: string): Promise<ProductsResponse> {
+export async function getProductsApi(filter?: ProductsFilter, lang?: string, token?: string): Promise<ProductsResponse> {
     const sortedValue = mapSortOption(filter?.sort);
     // Передаємо фільтри тільки якщо масив непустий
     const filterInput =
@@ -761,7 +761,10 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string): Pr
             page: filter?.page ?? undefined,
             sort: sortedValue ?? undefined,
         },
-        { next: { revalidate: 3600 }, lang },
+        // cache: 'no-store' — товари фільтруються за містом юзера (серверна сесія),
+        // тому спільний кеш між юзерами неприпустимий.
+        // token передається для SSR-запитів, щоб бекенд міг визначити місто юзера.
+        { cache: 'no-store', lang, token },
     );
     if (!data || !data.products) {
         return {
@@ -776,6 +779,7 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string): Pr
     }
     return data.products;
 }
+
 
 export async function getProductsFilterApi(
     categoryId?: number,
@@ -1042,11 +1046,15 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
     }
 `;
 
-export async function getCatalogTreeApi(lang?: string, parentId: number = 768): Promise<ProductCategory[]> {
+export async function getCatalogTreeApi(lang?: string, parentId: number = 768, token?: string): Promise<ProductCategory[]> {
     const data = await gqlRequest<{ categories: ProductCategory[] }>(
         CATEGORY_TREE_QUERY,
         { parentId },
-        { next: { revalidate: 3600 }, lang },
+        { 
+            lang,
+            token,
+            ...(token ? { cache: 'no-store' } : { next: { revalidate: 3600 } })
+        },
     );
     return data.categories;
 }

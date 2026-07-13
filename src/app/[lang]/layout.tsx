@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import localFont from "next/font/local";
 import "../globals.css";
 import { siteData } from "@/config/site";
-import { i18n } from "@/i18n/config";
+import { i18n, type Locale } from "@/i18n/config";
 import clsx from "clsx";
 import ReduxProvider from "@/store/ReduxProvider";
 import AuthInitializer from "@/app/components/AuthInitializer/AuthInitializerClient";
@@ -103,10 +103,11 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }));
 }
 
-import { getCatalogTreeApi } from "@/lib/graphql/queries/products";
-import { getSocialLinksApi } from "@/lib/graphql/queries/settings";
+import { getCatalogTreeApi, type ProductCategory } from "@/lib/graphql/queries/products";
+import { getSocialLinksApi, type SocialLink } from "@/lib/graphql/queries/settings";
 import Header from "@/app/components/Header/HeaderClient";
 import Footer from "@/app/components/Footer/FooterClient";
+import { getAccessToken } from "@/app/actions/authActions";
 
 export default async function RootLayout({
   children,
@@ -122,13 +123,14 @@ export default async function RootLayout({
   const pathname = headersList.get("x-pathname") || "";
   const isMenuPage = pathname.includes("/menu") && pathname.includes("/our-stores/");
 
-  let catalogTree: any[] = [];
-  let socialLinks: any[] = [];
+  let catalogTree: ProductCategory[] = [];
+  let socialLinks: SocialLink[] = [];
 
   if (!isMenuPage) {
     try {
+      const token = await getAccessToken();
       const [tree, links] = await Promise.all([
-        getCatalogTreeApi(lang).catch((err) => {
+        getCatalogTreeApi(lang, 768, token ?? undefined).catch((err) => {
           console.error("Failed to fetch catalog tree:", err);
           return [];
         }),
@@ -149,9 +151,9 @@ export default async function RootLayout({
       <body>
         <ReduxProvider>
           {!isMenuPage && <AuthInitializer />}
-          {!isMenuPage && <Header lang={lang as any} initialCategories={catalogTree} />}
+          {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
           {children}
-          {!isMenuPage && <Footer lang={lang as any} initialSocialLinks={socialLinks} />}
+          {!isMenuPage && <Footer lang={lang as Locale} initialSocialLinks={socialLinks} />}
         </ReduxProvider>
       </body>
     </html>

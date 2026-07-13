@@ -262,9 +262,11 @@ export default function CitySelector({
         // Sync with server
         try {
             await selectLocalityApi(city.id, lang);
+            window.location.reload();
         } catch (error) {
             console.warn('[CitySelector] Failed to sync city with server:', error);
-            // We don't block the UI if this fails, as the local state is already updated
+            // Reload even if request failed, to make sure SSR syncs
+            window.location.reload();
         }
     };
 
@@ -276,8 +278,10 @@ export default function CitySelector({
         if (selectedCity) {
             try {
                 await selectLocalityApi(selectedCity.id, lang);
+                window.location.reload();
             } catch (error) {
                 console.warn('[CitySelector] Failed to sync confirmed city with server:', error);
+                window.location.reload();
             }
         }
     };

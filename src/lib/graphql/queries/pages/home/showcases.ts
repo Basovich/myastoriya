@@ -16,11 +16,15 @@ const SHOWCASES_QUERY = /* GraphQL */ `
     }
 `;
 
-export async function getShowcasesApi(lang?: string): Promise<Showcase[]> {
+export async function getShowcasesApi(lang?: string, token?: string): Promise<Showcase[]> {
     const data = await gqlRequest<{ showcases: Showcase[] }>(
         SHOWCASES_QUERY,
         undefined,
-        { next: { revalidate: 3600 }, lang },
+        { 
+            lang,
+            token,
+            ...(token ? { cache: 'no-store' } : { next: { revalidate: 3600 } })
+        },
     );
     return data.showcases ?? [];
 }
