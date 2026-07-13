@@ -123,7 +123,9 @@
   margin: 0 auto;
 
   @media (min-width: 768px) {
-    aspect-ratio: 680 / 160;
+    width: 657px;
+    height: 128px;
+    aspect-ratio: auto;
   }
 }
 
@@ -157,7 +159,10 @@
   background: rgba(0, 0, 0, 0.2); // overlay for readability
 
   @media (min-width: 768px) {
-    padding: 24px;
+    padding: 24px 32px;
+    align-items: flex-start;
+    text-align: left;
+    background: transparent;
   }
 }
 
@@ -177,8 +182,9 @@
 
   @media (min-width: 768px) {
     font-size: 13px;
-    max-width: 500px;
-    margin-bottom: 14px;
+    line-height: 1.5;
+    max-width: 320px;
+    margin-bottom: 12px;
   }
 }
 
@@ -240,26 +246,6 @@
   }
 }
 
-.arrows {
-  color: var(--color-accent);
-  font-weight: 800;
-  font-size: 14px;
-  margin-left: 2px;
-  animation: pulse-arrow 1.5s infinite ease-in-out;
-
-  @media (min-width: 768px) {
-    font-size: 18px;
-  }
-}
-
-@keyframes pulse-arrow {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(4px);
-  }
-}
 
 .toast {
   position: fixed;

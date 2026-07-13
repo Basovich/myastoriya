@@ -15,7 +15,7 @@ export default async function Thanks({
     searchParams,
 }: {
     params: Promise<{ lang: Locale }>;
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+    searchParams: Promise<{ orderId?: string | string[] }>;
 }) {
     const { lang } = await params;
     const { orderId } = await searchParams;
