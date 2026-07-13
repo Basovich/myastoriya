@@ -16,7 +16,6 @@ import {
     ProductCategory,
     BlogPost,
     ProductsResponse,
-    ProductCostVariant,
     GraphQLError,
 } from "@/lib/graphql";
 import { notFound } from "next/navigation";
@@ -99,8 +98,7 @@ export default async function ProductPage({ params }: Props) {
     }
     if (!product) notFound();
 
-    // Cost variants are loaded client-side in ProductClient to avoid unauthorized SSR errors
-    const costVariants: ProductCostVariant[] = [];
+
 
     const token = await getAccessToken();
 
@@ -176,9 +174,9 @@ export default async function ProductPage({ params }: Props) {
 
     return (
         <main>
-            <ProductClient
+             <ProductClient
                 product={product}
-                costVariants={costVariants}
+                costVariants={[]}
                 publications={blogsResponse.data}
                 relatedProducts={finalRelatedProducts}
                 popularProducts={popularProducts}
