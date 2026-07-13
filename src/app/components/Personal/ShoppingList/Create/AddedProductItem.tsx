@@ -2,13 +2,19 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { formatPrice } from '@/utils/price';
+import clsx from 'clsx';
+import AppLink from '@/app/components/ui/AppLink/AppLink';
+import { formatPrice, getProductPriceMultiplier } from '@/utils/price';
 import s from './ShoppingListCreateClient.module.scss';
 
 interface AddedProductItemProps {
     name: string;
+    productId: number;
+    slug?: string;
     price: number;
+    oldPrice?: number;
     unitPrice?: string;
+    unit: string;
     weight: string;
     image: string;
     onRemove: () => void;
@@ -16,12 +22,22 @@ interface AddedProductItemProps {
 
 export default function AddedProductItem({ 
     name, 
+    productId,
+    slug,
     price, 
+    oldPrice,
     unitPrice, 
+    unit,
     weight, 
     image, 
     onRemove 
 }: AddedProductItemProps) {
+    const productUrl = slug ? `/products/${slug}` : `/products/${productId}`;
+
+    const multiplier = getProductPriceMultiplier(weight, unit);
+    const fullPrice = price * multiplier;
+    const fullOldPrice = oldPrice ? oldPrice * multiplier : undefined;
+
     return (
         <div className={s.addedItem}>
             <div className={s.addedItemLeft}>
@@ -30,11 +46,22 @@ export default function AddedProductItem({
                 </div>
                 <div className={s.addedItemInfo}>
                     <div className={s.addedItemInfoHead}>
-                        <h4 className={s.addedItemName}>{name}</h4>
+                        <h4 className={s.addedItemName}>
+                            <AppLink href={productUrl} target="_blank" rel="noopener noreferrer">
+                                {name}
+                            </AppLink>
+                        </h4>
                         {weight && <div className={s.addedItemWeight}>{weight}</div>}
                     </div>
                     <div className={s.addedItemPriceBlock}>
-                        <span className={s.addedItemPrice}>{formatPrice(price)} <span>₴</span></span>
+                        <span className={clsx(s.addedItemPrice, fullOldPrice && fullOldPrice > fullPrice && s.addedItemPriceNew)}>
+                            {formatPrice(fullPrice)} <span>₴</span>
+                        </span>
+                        {fullOldPrice && fullOldPrice > fullPrice && (
+                            <span className={s.addedItemPriceOld}>
+                                {formatPrice(fullOldPrice)} <span>₴</span>
+                            </span>
+                        )}
                         {unitPrice && <span className={s.addedItemUnitPrice}>{unitPrice}</span>}
                     </div>
                 </div>

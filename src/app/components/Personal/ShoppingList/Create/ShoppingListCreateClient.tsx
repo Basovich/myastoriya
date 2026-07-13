@@ -24,7 +24,8 @@ import {
     resolveProductImageUrl,
     getProductsByIdsApi,
     getProductCostVariantsApi,
-    getDefaultCostVariant
+    getDefaultCostVariant,
+    getProductWeight
 } from '@/lib/graphql/queries/products';
 import { 
     getShoppingListByIdApi, 
@@ -38,7 +39,7 @@ import {
 import { fetchCartAsync } from '@/store/slices/cartSlice';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import CustomSelect from '@/app/components/ui/CustomSelect';
-import { formatPrice } from '@/utils/price';
+import { formatPrice, getProductPriceMultiplier } from '@/utils/price';
 import s from './ShoppingListCreateClient.module.scss';
 
 const createDict = {
@@ -95,10 +96,12 @@ interface ClientAddedItem {
     productId: number;
     name: string;
     price: number;
+    oldPrice?: number | null;
     unit: string;
     image: string;
     costVariantId?: number | null;
     weight: string;
+    slug?: string;
 }
 
 export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
@@ -221,28 +224,17 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                         ? `https://dev-api.myastoriya.com.ua${imgUrl}`
                                         : imgUrl || '/images/product-placeholder.svg';
                                 }
-                                let weightVal = '';
-                                if (detailedProd) {
-                                    const weightSpec = detailedProd.specifications?.find(sp =>
-                                        sp.name.toLowerCase().includes('вага') ||
-                                        sp.name.toLowerCase().includes('важ') ||
-                                        sp.name.toLowerCase().includes('вес') ||
-                                        sp.name.toLowerCase().includes("об'єм")
-                                    );
-                                    weightVal = weightSpec && weightSpec.values.length > 0
-                                        ? weightSpec.values.join(' / ')
-                                        : (detailedProd.multiplier ? `${detailedProd.multiplier} ${detailedProd.unit || ''}` : '');
-                                }
-
                                 return {
                                     id: p.id,
                                     productId: p.productId,
                                     name: p.name || "",
                                     price: p.cost || 0,
+                                    oldPrice: p.oldCost ?? null,
                                     unit: p.unit || "шт",
                                     image: resolvedImg,
                                     costVariantId: p.costVariantId,
-                                    weight: weightVal
+                                    weight: detailedProd ? getProductWeight(detailedProd) : "",
+                                    slug: detailedProd?.slug
                                 };
                             }));
                         }
@@ -352,16 +344,6 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
         const tempId = `new_${Date.now()}_${Math.random()}`;
         const imgUrl = resolveProductImageUrl(prod);
         
-        const weightSpec = prod.specifications?.find(sp =>
-            sp.name.toLowerCase().includes('вага') ||
-            sp.name.toLowerCase().includes('важ') ||
-            sp.name.toLowerCase().includes('вес') ||
-            sp.name.toLowerCase().includes("об'єм")
-        );
-        const weightVal = weightSpec && weightSpec.values.length > 0
-            ? weightSpec.values.join(' / ')
-            : (prod.multiplier ? `${prod.multiplier} ${prod.unit || ''}` : '');
-
         let costVariantId: string | null = null;
         if (prod.hasCostVariants) {
             try {
@@ -380,10 +362,12 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
             productId: prodId,
             name: prod.name,
             price: prod.cost || 0,
+            oldPrice: prod.oldCost ?? null,
             unit: prod.unit || 'шт',
             image: imgUrl,
             costVariantId: costVariantId ? Number(costVariantId) : null,
-            weight: weightVal
+            weight: getProductWeight(prod),
+            slug: prod.slug
         };
 
         setAddedItems((prev) => [...prev, newItem]);
@@ -536,7 +520,10 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
         );
     }
 
-    const totalSum = addedItems.reduce((acc, item) => acc + item.price, 0);
+    const totalSum = addedItems.reduce((acc, item) => {
+        const multiplier = getProductPriceMultiplier(item.weight, item.unit);
+        return acc + (item.price * multiplier);
+    }, 0);
     const titleText = editId ? dict.editTitle : dict.title;
 
 
@@ -629,6 +616,8 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                         <SearchProductCard 
                                             key={prod.id}
                                             name={prod.name}
+                                            productId={prod.id}
+                                            slug={prod.slug}
                                             price={price}
                                             weight={weightVal}
                                             image={imgUrl}
@@ -664,8 +653,12 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                     <AddedProductItem 
                                         key={item.id}
                                         name={item.name}
+                                        productId={item.productId}
+                                        slug={item.slug}
                                         price={item.price}
-                                        unitPrice={`${item.price} грн / ${item.unit}`}
+                                        oldPrice={item.oldPrice ?? undefined}
+                                        unitPrice={`${formatPrice(item.price)} грн / ${item.unit}`}
+                                        unit={item.unit}
                                         weight={item.weight}
                                         image={item.image}
                                         onRemove={() => handleRemoveItem(item.id)}
