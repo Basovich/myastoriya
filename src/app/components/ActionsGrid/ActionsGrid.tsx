@@ -8,8 +8,6 @@ import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import Tabs from "../ui/Tabs/Tabs";
 import AppLink from "../ui/AppLink/AppLink";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
-import { format } from "date-fns";
-import { uk } from "date-fns/locale";
 import { type Sale, getSalesApi, getSpecialsApi } from "@/lib/graphql";
 
 interface ActionItem {
@@ -114,15 +112,15 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
                 const data = await getSpecialsApi(12, nextPage, lang);
 
                 if (data.data && data.data.length > 0) {
-                    const activeSpecials = data.data.filter((special: any) => {
+                    const activeSpecials = data.data.filter(special => {
                         if (!special.products || special.products.length === 0) return false;
                         if (typeof special.productsCount === 'number' && special.products.length < special.productsCount) {
                             return false;
                         }
-                        return special.products.every((product: any) => product.available !== false);
+                        return special.products.every(product => product.available);
                     });
 
-                    const newItems: ActionItem[] = activeSpecials.map((special: any) => {
+                    const newItems: ActionItem[] = activeSpecials.map(special => {
                         let image = special.image?.size2x || special.image?.size1x || "";
                         if (image && image.startsWith('/')) {
                             image = `https://dev-api.myastoriya.com.ua${image}`;
@@ -159,7 +157,7 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
             const data = await getSalesApi(12, nextPage, lang, { cache: 'no-store' });
 
             if (data.data && data.data.length > 0) {
-                const newItems: ActionItem[] = data.data.map((sale: any) => ({
+                const newItems: ActionItem[] = data.data.map((sale: Sale) => ({
                     id: parseInt(sale.id),
                     title: sale.name,
                     slug: sale.slug || sale.id,

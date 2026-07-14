@@ -17,7 +17,7 @@ export default async function ComplexDiscountsPage({
         if (typeof special.productsCount === 'number' && special.products.length < special.productsCount) {
             return false;
         }
-        return special.products.every(product => product.available !== false);
+        return special.products.every(product => product.available);
     });
 
     const initialItems = activeSpecials.map(special => {

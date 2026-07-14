@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
             if (typeof special.productsCount === 'number' && special.products.length < special.productsCount) {
                 return false;
             }
-            return special.products.every(product => product.available !== false);
+            return special.products.every(product => product.available);
         });
 
         return NextResponse.json({

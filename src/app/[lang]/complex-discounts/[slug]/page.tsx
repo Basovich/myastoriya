@@ -34,7 +34,7 @@ export default async function ComboDetail({
     const hasUnavailableProduct = !special.products || 
         special.products.length === 0 ||
         (typeof special.productsCount === 'number' && special.products.length < special.productsCount) ||
-        special.products.some(product => product.available === false);
+        special.products.some(product => !product.available);
 
     if (hasUnavailableProduct) {
         redirect(`/${lang}/complex-discounts`);
