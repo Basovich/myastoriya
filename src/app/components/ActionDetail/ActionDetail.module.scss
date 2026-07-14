@@ -205,3 +205,25 @@ nav.breadcrumbsWrapper {
 .sentinel {
     height: 1px;
 }
+
+.noProductsWrapper {
+    @include container-padding;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.noProductsText {
+    font-size: 16px;
+    font-weight: 500;
+    color: #71717a;
+    text-align: center;
+    background: #f4f4f5;
+    padding: 24px 32px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+}

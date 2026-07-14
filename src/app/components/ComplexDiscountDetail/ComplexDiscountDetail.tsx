@@ -29,7 +29,8 @@ const LOCALIZED_TEXTS = {
         buyTogetherDiscount: "При купівлі разом ви отримуєте знижку",
         discount: "Знижка",
         addToCart: "ДОДАТИ ДО КОШИКА",
-        addingToCart: "ДОДАВАННЯ..."
+        addingToCart: "ДОДАВАННЯ...",
+        noProducts: "Товари для цієї комплексної знижки відсутні у вашому місті"
     },
     ru: {
         breadcrumbs: {
@@ -46,7 +47,8 @@ const LOCALIZED_TEXTS = {
         buyTogetherDiscount: "При покупке вместе вы получаете скидку",
         discount: "Скидка",
         addToCart: "ДОБАВИТЬ В КОРЗИНУ",
-        addingToCart: "ДОБАВЛЕНИЕ..."
+        addingToCart: "ДОБАВЛЕНИЕ...",
+        noProducts: "Товары для этой комплексной скидки отсутствуют в вашем городе"
     }
 };
 
@@ -157,69 +159,77 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                         {description}
                     </p>
 
-                    {/* Product set */}
-                    <div className={s.productSet}>
-                        {bundleProducts.map((product, idx) => {
-                            let productImage = product.image?.url?.grid2x || product.image?.url?.grid1x || 
-                                              product.images?.[0]?.url?.grid2x || product.images?.[0]?.url?.grid1x || "";
-                            if (productImage && productImage.startsWith('/')) {
-                                productImage = `https://dev-api.myastoriya.com.ua${productImage}`;
-                            }
-                            return (
-                                <React.Fragment key={product.id}>
-                                    <div className={s.productCardWrapper}>
-                                        <ProductCard
-                                            id={product.id}
-                                            slug={product.slug}
-                                            title={product.name}
-                                            weight={getProductWeight(product)}
-                                            price={product.purchaseCost ?? product.cost ?? 0}
-                                            oldPrice={product.purchaseOldCost ?? product.oldCost ?? undefined}
-                                            unit={product.unit || "кг"}
-                                            badge={getProductBadge(product, lang)}
-                                            image={productImage}
-                                            lang={lang}
-                                            hasCostVariants={product.hasCostVariants}
-                                        />
-                                </div>
-                                {idx < bundleProducts.length - 1 && (
-                                    <span className={s.plus}>+</span>
-                                )}
-                            </React.Fragment>
-                            );
-                        })}
-                    </div>
-
-                    {/* Discount summary */}
-                    <div className={s.discountBlock}>
-                        <span className={s.discountLabel}>{texts.buyTogetherDiscount}</span>
-                        <div className={s.discountValues}>
-                            <div className={s.discountItem}>
-                                <span className={s.discountTitle}>{texts.discount}</span>
-                                <span className={s.discountPercent}>{discountPercent}</span>
-                            </div>
-                            <div className={s.discountItem}>
-                                <span className={s.originalPrice}>{totalPrice.toLocaleString('uk-UA')} ₴</span>
-                                <span className={s.discountPrice}>{discountedPrice.toLocaleString('uk-UA')} ₴</span>
-                            </div>
+                    {bundleProducts.length === 0 ? (
+                        <div className={s.noProductsWrapper}>
+                            <p className={s.noProductsText}>{texts.noProducts}</p>
                         </div>
-                    </div>
+                    ) : (
+                        <>
+                            {/* Product set */}
+                            <div className={s.productSet}>
+                                {bundleProducts.map((product, idx) => {
+                                    let productImage = product.image?.url?.grid2x || product.image?.url?.grid1x || 
+                                                      product.images?.[0]?.url?.grid2x || product.images?.[0]?.url?.grid1x || "";
+                                    if (productImage && productImage.startsWith('/')) {
+                                        productImage = `https://dev-api.myastoriya.com.ua${productImage}`;
+                                    }
+                                    return (
+                                        <React.Fragment key={product.id}>
+                                            <div className={s.productCardWrapper}>
+                                                <ProductCard
+                                                    id={product.id}
+                                                    slug={product.slug}
+                                                    title={product.name}
+                                                    weight={getProductWeight(product)}
+                                                    price={product.purchaseCost ?? product.cost ?? 0}
+                                                    oldPrice={product.purchaseOldCost ?? product.oldCost ?? undefined}
+                                                    unit={product.unit || "кг"}
+                                                    badge={getProductBadge(product, lang)}
+                                                    image={productImage}
+                                                    lang={lang}
+                                                    hasCostVariants={product.hasCostVariants}
+                                                />
+                                        </div>
+                                        {idx < bundleProducts.length - 1 && (
+                                            <span className={s.plus}>+</span>
+                                        )}
+                                    </React.Fragment>
+                                    );
+                                })}
+                            </div>
 
-                    {/* CTA Button */}
-                    <div className={s.ctaWrapper}>
-                        <Button
-                            variant="black"
-                            className={s.ctaButton}
-                            onClick={handleAddToCart}
-                            disabled={isAdding}
-                        >
-                            {isAdding ? (
-                                <svg className={s.btnSpinner} viewBox="0 0 50 50" width="18" height="18">
-                                    <circle cx="25" cy="25" r="20" fill="none" strokeWidth="5" />
-                                </svg>
-                            ) : texts.addToCart}
-                        </Button>
-                    </div>
+                            {/* Discount summary */}
+                            <div className={s.discountBlock}>
+                                <span className={s.discountLabel}>{texts.buyTogetherDiscount}</span>
+                                <div className={s.discountValues}>
+                                    <div className={s.discountItem}>
+                                        <span className={s.discountTitle}>{texts.discount}</span>
+                                        <span className={s.discountPercent}>{discountPercent}</span>
+                                    </div>
+                                    <div className={s.discountItem}>
+                                        <span className={s.originalPrice}>{totalPrice.toLocaleString('uk-UA')} ₴</span>
+                                        <span className={s.discountPrice}>{discountedPrice.toLocaleString('uk-UA')} ₴</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* CTA Button */}
+                            <div className={s.ctaWrapper}>
+                                <Button
+                                    variant="black"
+                                    className={s.ctaButton}
+                                    onClick={handleAddToCart}
+                                    disabled={isAdding}
+                                >
+                                    {isAdding ? (
+                                        <svg className={s.btnSpinner} viewBox="0 0 50 50" width="18" height="18">
+                                            <circle cx="25" cy="25" r="20" fill="none" strokeWidth="5" />
+                                        </svg>
+                                    ) : texts.addToCart}
+                                </Button>
+                            </div>
+                        </>
+                    )}
                 </div>
             </section>
             <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

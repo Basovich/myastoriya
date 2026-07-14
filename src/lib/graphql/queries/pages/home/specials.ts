@@ -193,25 +193,29 @@ export const SPECIAL_BY_ID_QUERY = /* GraphQL */ `
     }
 `;
 
-export async function getSpecialsApi(limit = 10, page = 1, lang?: string): Promise<SpecialsResponse['specials']> {
+export async function getSpecialsApi(limit = 10, page = 1, lang?: string, token?: string): Promise<SpecialsResponse['specials']> {
     const data = await gqlRequest<SpecialsResponse>(
         SPECIALS_QUERY,
         { limit, page },
-        { next: { revalidate: 3600 }, lang }
+        token 
+            ? { cache: 'no-store', lang, token }
+            : { next: { revalidate: 3600 }, lang }
     );
     return data.specials;
 }
 
-export async function getSpecialApi(id: string | number, lang?: string): Promise<Special | null> {
+export async function getSpecialApi(id: string | number, lang?: string, token?: string): Promise<Special | null> {
     try {
         const data = await gqlRequest<{ special: Special | null }>(
             SPECIAL_BY_ID_QUERY,
             { id: parseInt(String(id)) },
-            { next: { revalidate: 3600 }, lang }
+            token
+                ? { cache: 'no-store', lang, token, silent: true }
+                : { next: { revalidate: 3600 }, lang, silent: true }
         );
         return data.special;
     } catch (error) {
-        console.error(`[Special] Failed to fetch special by id: ${id}`, error);
+        console.warn(`[Special] Failed to fetch special by id: ${id}`, error);
         return null;
     }
 }
@@ -219,14 +223,14 @@ export async function getSpecialApi(id: string | number, lang?: string): Promise
 /**
  * Resolves a special slug to its ID by scanning the list of specials.
  */
-export async function findSpecialIdBySlug(slug: string, lang?: string): Promise<string | null> {
+export async function findSpecialIdBySlug(slug: string, lang?: string, token?: string): Promise<string | null> {
     try {
         // Fetch a large number of specials to find the matching slug
-        const response = await getSpecialsApi(100, 1, lang);
+        const response = await getSpecialsApi(100, 1, lang, token);
         const special = response.data.find(s => s.slug === slug);
         return special ? special.id : null;
     } catch (error) {
-        console.error(`[Special] Failed to resolve slug: ${slug}`, error);
+        console.warn(`[Special] Failed to resolve slug: ${slug}`, error);
         return null;
     }
 }

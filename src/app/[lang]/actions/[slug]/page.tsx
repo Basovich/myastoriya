@@ -1,5 +1,5 @@
 import ActionDetail from "../../../components/ActionDetail/ActionDetail";
-import { getSalesApi, getProductsApi } from "@/lib/graphql";
+import { getSalesApi, getProductsApi, type Product } from "@/lib/graphql";
 import { notFound } from "next/navigation";
 import { getAccessToken } from "@/app/actions/authActions";
 
@@ -26,11 +26,16 @@ export default async function ActionDetailPage({
 
     const token = await getAccessToken();
 
-    const productsResponse = await getProductsApi(
-        { saleId: parseInt(sale.id), limit: 24 },
-        lang,
-        token ?? undefined,
-    );
+    let productsResponse = { data: [] as Product[], has_more_pages: false };
+    try {
+        productsResponse = await getProductsApi(
+            { saleId: parseInt(sale.id), limit: 24, silent: true },
+            lang,
+            token ?? undefined,
+        );
+    } catch (err) {
+        console.warn(`[ActionDetailPage] Failed to fetch products for sale ${sale.id}:`, err);
+    }
 
     return (
         <main>

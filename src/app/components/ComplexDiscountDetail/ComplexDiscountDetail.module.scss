@@ -368,3 +368,24 @@ button.ctaButton {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+.noProductsWrapper {
+    width: 100%;
+    padding: 60px 24px;
+    border: 1px dashed #c6c6c8;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fbfbfb;
+    margin-bottom: 24px;
+}
+
+.noProductsText {
+    color: #828282;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 150%;
+    max-width: 480px;
+    text-align: center;
+}

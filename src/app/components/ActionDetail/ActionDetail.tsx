@@ -23,7 +23,8 @@ const LOCALIZED_TEXTS = {
                 hours: "Годин",
                 minutes: "Хвилин",
                 seconds: "Секунд"
-            }
+            },
+            noProducts: "Товари для цієї акції відсутні у вашому місті"
         },
         "complex-discounts": {
             breadcrumbs: {
@@ -36,7 +37,8 @@ const LOCALIZED_TEXTS = {
                 hours: "Годин",
                 minutes: "Хвилин",
                 seconds: "Секунд"
-            }
+            },
+            noProducts: "Товари для цієї акції відсутні у вашому місті"
         }
     },
     ru: {
@@ -51,7 +53,8 @@ const LOCALIZED_TEXTS = {
                 hours: "Часов",
                 minutes: "Минут",
                 seconds: "Секунд"
-            }
+            },
+            noProducts: "Товары для этой акции отсутствуют в вашем городе"
         },
         "complex-discounts": {
             breadcrumbs: {
@@ -64,7 +67,8 @@ const LOCALIZED_TEXTS = {
                 hours: "Часов",
                 minutes: "Минут",
                 seconds: "Секунд"
-            }
+            },
+            noProducts: "Товары для этой акции отсутствуют в вашем городе"
         }
     }
 };
@@ -232,7 +236,7 @@ export default function ActionDetail({
             </div>
 
             {/* Products section */}
-            {products.length > 0 && (
+            {products.length > 0 ? (
                 <div className={s.productsSection}>
                     <div className={s.productsGrid}>
                         {products.map((product) => (
@@ -255,6 +259,12 @@ export default function ActionDetail({
                     {(hasMore || loading) && (
                         <div ref={sentinelRef} className={s.sentinel} aria-hidden="true" />
                     )}
+                </div>
+            ) : (
+                <div className={s.noProductsWrapper}>
+                    <p className={s.noProductsText}>
+                        {currentLoc[pageType].noProducts}
+                    </p>
                 </div>
             )}
         </section>

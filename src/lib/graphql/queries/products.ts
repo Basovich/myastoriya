@@ -293,6 +293,8 @@ export interface ProductsFilter {
     page?: number | null;
     sort?: string | null;
     filter?: FilterStateInput[] | null;
+    /** Suppress console error logging for expected failures */
+    silent?: boolean;
 }
 
 export interface ProductsResponse {
@@ -764,7 +766,7 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string, tok
         // cache: 'no-store' — товари фільтруються за містом юзера (серверна сесія),
         // тому спільний кеш між юзерами неприпустимий.
         // token передається для SSR-запитів, щоб бекенд міг визначити місто юзера.
-        { cache: 'no-store', lang, token },
+        { cache: 'no-store', lang, token, silent: filter?.silent },
     );
     if (!data || !data.products) {
         return {

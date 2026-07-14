@@ -36,6 +36,8 @@ interface RequestOptions {
     _retryCount?: number;
     /** Internal retry flag for token refresh */
     _isRetry?: boolean;
+    /** Suppress console error logging for expected failures */
+    silent?: boolean;
 }
 
 const MAX_RETRIES = 5;
@@ -237,7 +239,7 @@ export async function gqlRequest<T>(
                 }
             }
             
-            if (isServer) {
+            if (isServer && !options?.silent) {
                 // If it's the known backend crash, don't log the full trace to keep build logs clean
                 if (error.message === 'Internal server error' && error.path?.includes('blogTypes')) {
                     console.error('[GQL] Known Backend Bug: blogTypes() failed (Call to undefined method sorted())');
@@ -267,7 +269,7 @@ export async function gqlRequest<T>(
         return json.data;
 
     } catch (err) {
-        if (isServer) {
+        if (isServer && !options?.silent) {
             console.error(`[gqlRequest] Error: ${err instanceof Error ? err.message : String(err)}. Response text: "${text.substring(0, 500)}"`);
         }
 
