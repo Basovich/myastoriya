@@ -138,48 +138,25 @@ export async function gqlRequest<T>(
         body = formData;
         delete headers['Content-Type']; // Let browser set boundary
     }
-
     // All requests go directly to the backend — no proxy needed.
     const endpoint = GQL_ENDPOINT;
 
     let text = "";
     try {
-        const res = await fetch(endpoint, {
-            method: 'POST',
-            headers,
-            body,
-            ...(isServer ? {} : { credentials: 'include' }),
-            ...(options?.cache ? { cache: options.cache } : options?.next ? { next: options.next } : {}),
-        });
+        const result = await performRequest<T>(endpoint, headers, body, query, variables, options);
+        text = result.text;
+        return result.data;
+    } catch (err) {
+        text = (err as any)._rawText || text;
 
-        if (!res.ok) {
-            // Handle retries for 5xx errors (like 504 Gateway Timeout)
-            const currentRetry = options?._retryCount ?? 0;
-            if (res.status >= 500 && currentRetry < MAX_RETRIES) {
-                const nextRetry = currentRetry + 1;
-                // Add jitter: base delay * retry + random(0-500ms)
-                const delay = (RETRY_DELAY_MS * nextRetry) + Math.floor(Math.random() * 500);
-                
-                console.warn(`[GQL] ${res.status} error on ${endpoint}. Retrying in ${delay}ms... (${nextRetry}/${MAX_RETRIES})`);
-                
-                await new Promise(resolve => setTimeout(resolve, delay));
-                return gqlRequest(query, variables, { ...options, _retryCount: nextRetry });
-            }
-            
-            throw new Error(`Network error: ${res.status} ${res.statusText}`);
+        if (isServer && !options?.silent) {
+            console.error(`[gqlRequest] Error: ${err instanceof Error ? err.message : String(err)}. Response text: "${text.substring(0, 500)}"`);
         }
 
-        text = await res.text();
-        if (!text) {
-            throw new Error("Empty response body from GraphQL API");
-        }
-        const json: GqlResponse<T> = JSON.parse(text);
-
-        if (json.errors?.length) {
-            const error = json.errors[0];
-            
-            // JWT Interceptor for Unauthorized (401) errors on the client side
-            const isUnauthorized = error.message === 'Unauthorized' || error.extensions?.category === 'authentication';
+        // JWT Interceptor for Unauthorized (401) errors on the client side
+        if (err instanceof GraphQLError) {
+            const error = err.errors?.[0];
+            const isUnauthorized = error && (error.message === 'Unauthorized' || error.extensions?.category === 'authentication');
             if (!isServer && isUnauthorized && !options?._isRetry) {
                 try {
                     if (!activeRefreshPromise) {
@@ -196,7 +173,6 @@ export async function gqlRequest<T>(
                                 }
                                 
                                 if (freshToken) {
-                                    // Dynamically import store and actions to update UI state
                                     const { store } = await import('@/store');
                                     const { loginAsGuest, setUser, setToken } = await import('@/store/slices/authSlice');
                                     const { getMeApi } = await import('@/lib/graphql/queries/auth');
@@ -226,7 +202,6 @@ export async function gqlRequest<T>(
                     const freshToken = await activeRefreshPromise;
                     
                     if (freshToken) {
-                        // Retry original request with the fresh token
                         return gqlRequest(query, variables, {
                             ...options,
                             token: freshToken,
@@ -237,41 +212,8 @@ export async function gqlRequest<T>(
                     console.error('[GQL Interceptor] Error waiting for token refresh:', refreshErr);
                 }
             }
-            
-            if (isServer && !options?.silent) {
-                // If it's the known backend crash, don't log the full trace to keep build logs clean
-                if (error.message === 'Internal server error' && error.path?.includes('blogTypes')) {
-                    console.error('[GQL] Known Backend Bug: blogTypes() failed (Call to undefined method sorted())');
-                } else {
-                    console.error('GraphQL errors:', JSON.stringify(json.errors, null, 2));
-                }
-            }
-
-            let errorMessage = error.message;
-
-            // Extract deep validation messages if present
-            if (error.extensions && error.extensions.validation) {
-                const validation = error.extensions.validation as Record<string, string[]>;
-                const firstKey = Object.keys(validation)[0];
-                if (firstKey && validation[firstKey] && validation[firstKey].length > 0) {
-                    errorMessage = validation[firstKey][0];
-                }
-            }
-
-            throw new GraphQLError(errorMessage, json.errors);
         }
-
-        if (json.data === undefined) {
-            throw new Error('No data returned from GraphQL');
-        }
-
-        return json.data;
-
-    } catch (err) {
-        if (isServer && !options?.silent) {
-            console.error(`[gqlRequest] Error: ${err instanceof Error ? err.message : String(err)}. Response text: "${text.substring(0, 500)}"`);
-        }
-
+        
         // Don't retry if it's a GraphQLError (means API actually answered with a logical error)
         if (err instanceof GraphQLError) {
             throw err;
@@ -310,4 +252,73 @@ export async function gqlRequest<T>(
 
         throw err;
     }
+}
+
+/**
+ * Executes a network fetch for a GraphQL request.
+ * Isolated to prevent IDE warnings about catch-local throw statements.
+ */
+async function performRequest<T>(
+    endpoint: string,
+    headers: Record<string, string>,
+    body: BodyInit,
+    query: string,
+    variables?: Record<string, unknown>,
+    options?: RequestOptions
+): Promise<{ data: T; text: string }> {
+    const res = await fetch(endpoint, {
+        method: 'POST',
+        headers,
+        body,
+        ...(isServer ? {} : { credentials: 'include' }),
+        ...(options?.cache ? { cache: options.cache } : options?.next ? { next: options.next } : {}),
+    });
+
+    if (!res.ok) {
+        // Handle retries for 5xx errors (like 504 Gateway Timeout)
+        const currentRetry = options?._retryCount ?? 0;
+        if (res.status >= 500 && currentRetry < MAX_RETRIES) {
+            const nextRetry = currentRetry + 1;
+            const delay = (RETRY_DELAY_MS * nextRetry) + Math.floor(Math.random() * 500);
+            
+            console.warn(`[GQL] ${res.status} error on ${endpoint}. Retrying in ${delay}ms... (${nextRetry}/${MAX_RETRIES})`);
+            
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return performRequest<T>(endpoint, headers, body, query, variables, { ...options, _retryCount: nextRetry });
+        }
+        
+        throw new Error(`Network error: ${res.status} ${res.statusText}`);
+    }
+
+    const text = await res.text();
+    if (!text) {
+        throw new Error("Empty response body from GraphQL API");
+    }
+    const json: GqlResponse<T> = JSON.parse(text);
+
+    if (json.errors?.length) {
+        const error = json.errors[0];
+        let errorMessage = error.message;
+
+        // Extract deep validation messages if present
+        if (error.extensions && error.extensions.validation) {
+            const validation = error.extensions.validation as Record<string, string[]>;
+            const firstKey = Object.keys(validation)[0];
+            if (firstKey && validation[firstKey] && validation[firstKey].length > 0) {
+                errorMessage = validation[firstKey][0];
+            }
+        }
+
+        const gqlErr = new GraphQLError(errorMessage, json.errors);
+        (gqlErr as any)._rawText = text;
+        throw gqlErr;
+    }
+
+    if (json.data === undefined) {
+        const err = new Error('No data returned from GraphQL');
+        (err as any)._rawText = text;
+        throw err;
+    }
+
+    return { data: json.data, text };
 }
