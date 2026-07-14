@@ -105,8 +105,7 @@ export async function gqlRequest<T>(
         }
     }
 
-    const langHeader = options?.lang === 'ru' ? 'ru_RU' : 'uk_UA';
-    headers['Content-Language'] = langHeader;
+    headers['Content-Language'] = options?.lang === 'ru' ? 'ru_RU' : 'uk_UA';
 
     let body: BodyInit = JSON.stringify({ query, variables });
 

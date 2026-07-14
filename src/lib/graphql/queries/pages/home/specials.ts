@@ -1,4 +1,4 @@
-import { gqlRequest } from "../../../client";
+import { gqlRequest } from "@/lib/graphql/client";
 
 export interface SpecialImage {
     size1x: string | null;
