@@ -139,10 +139,8 @@ export async function gqlRequest<T>(
         delete headers['Content-Type']; // Let browser set boundary
     }
     // All requests go directly to the backend — no proxy needed.
-    const endpoint = GQL_ENDPOINT;
-
     try {
-        const result = await performRequest<T>(endpoint, headers, body, query, variables, options);
+        const result = await performRequest<T>(GQL_ENDPOINT, headers, body, query, variables, options);
         return result.data;
     } catch (err) {
         const rawText = (err && typeof err === 'object' && '_rawText' in err)

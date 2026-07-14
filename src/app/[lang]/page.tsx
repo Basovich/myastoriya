@@ -62,9 +62,13 @@ export default async function Home({
       .filter(item => item.hasProducts)
       .map(item => item.sale);
 
-  const activeSpecials = (specialsResponse?.data || []).filter(
-      special => special.products && special.products.length > 0
-  );
+  const activeSpecials = (specialsResponse?.data || []).filter(special => {
+      if (!special.products || special.products.length === 0) return false;
+      if (typeof special.productsCount === 'number' && special.products.length < special.productsCount) {
+          return false;
+      }
+      return special.products.every(product => product.available !== false);
+  });
 
   return (
       <HomePage

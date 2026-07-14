@@ -114,7 +114,15 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
                 const data = await getSpecialsApi(12, nextPage, lang);
 
                 if (data.data && data.data.length > 0) {
-                    const newItems: ActionItem[] = data.data.map((special: any) => {
+                    const activeSpecials = data.data.filter((special: any) => {
+                        if (!special.products || special.products.length === 0) return false;
+                        if (typeof special.productsCount === 'number' && special.products.length < special.productsCount) {
+                            return false;
+                        }
+                        return special.products.every((product: any) => product.available !== false);
+                    });
+
+                    const newItems: ActionItem[] = activeSpecials.map((special: any) => {
                         let image = special.image?.size2x || special.image?.size1x || "";
                         if (image && image.startsWith('/')) {
                             image = `https://dev-api.myastoriya.com.ua${image}`;

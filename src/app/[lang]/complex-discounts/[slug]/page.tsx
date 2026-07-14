@@ -1,6 +1,6 @@
 import ComplexDiscountDetail from "../../../components/ComplexDiscountDetail/ComplexDiscountDetail";
 import { findSpecialIdBySlug, getSpecialApi } from "@/lib/graphql";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getAccessToken } from "@/app/actions/authActions";
 
 export default async function ComboDetail({
@@ -29,6 +29,15 @@ export default async function ComboDetail({
 
     if (!special) {
         notFound();
+    }
+
+    const hasUnavailableProduct = !special.products || 
+        special.products.length === 0 ||
+        (typeof special.productsCount === 'number' && special.products.length < special.productsCount) ||
+        special.products.some(product => product.available === false);
+
+    if (hasUnavailableProduct) {
+        redirect(`/${lang}/complex-discounts`);
     }
 
     return (

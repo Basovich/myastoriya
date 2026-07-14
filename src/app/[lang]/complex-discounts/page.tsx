@@ -1,5 +1,6 @@
 import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSpecialsApi } from "@/lib/graphql";
+import { getAccessToken } from "@/app/actions/authActions";
 
 // This is the index page for Complex Discounts: /[lang]/complex-discounts
 export default async function ComplexDiscountsPage({
@@ -8,9 +9,18 @@ export default async function ComplexDiscountsPage({
     params: Promise<{ lang: "ua" | "ru" }>;
 }) {
     const { lang } = await params;
-    const specialsResponse = await getSpecialsApi(12, 1, lang);
+    const token = await getAccessToken();
+    const specialsResponse = await getSpecialsApi(12, 1, lang, token ?? undefined);
 
-    const initialItems = specialsResponse.data.map(special => {
+    const activeSpecials = (specialsResponse?.data || []).filter(special => {
+        if (!special.products || special.products.length === 0) return false;
+        if (typeof special.productsCount === 'number' && special.products.length < special.productsCount) {
+            return false;
+        }
+        return special.products.every(product => product.available !== false);
+    });
+
+    const initialItems = activeSpecials.map(special => {
         let image = special.image?.size2x || special.image?.size1x || "";
         if (image && image.startsWith('/')) {
             image = `https://dev-api.myastoriya.com.ua${image}`;

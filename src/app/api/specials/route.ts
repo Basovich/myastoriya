@@ -10,9 +10,21 @@ export async function POST(req: NextRequest) {
         const langHeader = req.headers.get('content-language');
         const lang = langHeader === 'ru_RU' ? 'ru' : 'ua';
 
-        const result = await getSpecialsApi(limit, page, lang);
+        const token = req.cookies.get('access_token')?.value;
+        const result = await getSpecialsApi(limit, page, lang, token ?? undefined);
 
-        return NextResponse.json(result);
+        const filteredData = (result?.data || []).filter(special => {
+            if (!special.products || special.products.length === 0) return false;
+            if (typeof special.productsCount === 'number' && special.products.length < special.productsCount) {
+                return false;
+            }
+            return special.products.every(product => product.available !== false);
+        });
+
+        return NextResponse.json({
+            ...result,
+            data: filteredData
+        });
     } catch (err) {
         const message = err instanceof Error ? err.message : "Помилка при завантаженні комплексних знижок";
         return NextResponse.json({ error: message }, { status: 500 });
