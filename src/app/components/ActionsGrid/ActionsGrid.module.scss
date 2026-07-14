@@ -252,3 +252,22 @@
         }
     }
 }
+
+.noItems {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 24px;
+    background: #fdfdfd;
+    border-radius: 12px;
+    border: 1px dashed #e2e2e2;
+    margin: 24px 0;
+}
+
+.noItemsText {
+    font-size: 18px;
+    font-weight: 600;
+    color: #888;
+    text-align: center;
+    margin: 0;
+}

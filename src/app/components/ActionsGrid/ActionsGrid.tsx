@@ -39,7 +39,8 @@ const LOCALIZED_TEXTS = {
             },
             showBtn: "ПОКАЗАТИ ЩЕ",
             loading: "Завантаження...",
-            dateLabel: "Акція діє до:"
+            dateLabel: "Акція діє до:",
+            noItems: "Акції відсутні"
         },
         "complex-discounts": {
             title: "КОМПЛЕКСНІ ЗНИЖКИ",
@@ -53,7 +54,8 @@ const LOCALIZED_TEXTS = {
             },
             showBtn: "ПОКАЗАТИ ЩЕ",
             loading: "Завантаження...",
-            dateLabel: "Комплексна знижка діє:"
+            dateLabel: "Комплексна знижка діє:",
+            noItems: "Комплексні знижки відсутні"
         }
     },
     ru: {
@@ -69,7 +71,8 @@ const LOCALIZED_TEXTS = {
             },
             showBtn: "ПОКАЗАТЬ ЕЩЕ",
             loading: "Загрузка...",
-            dateLabel: "Акция действует до:"
+            dateLabel: "Акция действует до:",
+            noItems: "Акции отсутствуют"
         },
         "complex-discounts": {
             title: "КОМПЛЕКСНЫЕ СКИДКИ",
@@ -83,7 +86,8 @@ const LOCALIZED_TEXTS = {
             },
             showBtn: "ПОКАЗАТЬ ЕЩЕ",
             loading: "Загрузка...",
-            dateLabel: "Комплексная скидка действует:"
+            dateLabel: "Комплексная скидка действует:",
+            noItems: "Комплексные скидки отсутствуют"
         }
     }
 };
@@ -113,8 +117,8 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
 
                 if (data.data && data.data.length > 0) {
                     const activeSpecials = data.data.filter(special => {
-                        if (!special.products || special.products.length === 0) return false;
-                        if (typeof special.productsCount === 'number' && special.products.length < special.productsCount) {
+                        if (!special.products || special.products.length < 2) return false;
+                        if (typeof special.productsCount === 'number' && special.productsCount > 0 && special.products.length < special.productsCount) {
                             return false;
                         }
                         return special.products.every(product => product.available);
@@ -212,68 +216,74 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
 
             <Tabs tabs={tabItems} className={s.tabs} classNameBtn={s.tabBtn} />
 
-            <div className={s.grid}>
-                {items.map((item, idx) => {
-                    const identifier = item.slug || item.id;
-                    const path = pageType === 'promotions' ? 'actions' : pageType;
-                    const hasImageWeb = !!item.imageWeb && (!!item.imageWeb.desktop || !!item.imageWeb.laptop || !!item.imageWeb.tablet);
-                    const hasImage = !!item.image || hasImageWeb;
+            {items.length === 0 ? (
+                <div className={s.noItems}>
+                    <p className={s.noItemsText}>{texts.noItems}</p>
+                </div>
+            ) : (
+                <div className={s.grid}>
+                    {items.map((item, idx) => {
+                        const identifier = item.slug || item.id;
+                        const path = pageType === 'promotions' ? 'actions' : pageType;
+                        const hasImageWeb = !!item.imageWeb && (!!item.imageWeb.desktop || !!item.imageWeb.laptop || !!item.imageWeb.tablet);
+                        const hasImage = !!item.image || hasImageWeb;
 
-                    return (
-                        <AppLink key={`${item.id}-${idx}`} href={`/${path}/${identifier}`} className={s.cardLink}>
-                        <div className={s.card}>
-                            <div className={s.cardImage}>
-                                {hasImage ? (
-                                    hasImageWeb ? (
-                                        <picture className={s.cardImgPicture}>
-                                            {item.imageWeb?.desktop && <source media="(min-width: 1280px)" srcSet={item.imageWeb.desktop} />}
-                                            {item.imageWeb?.laptop && <source media="(min-width: 1024px)" srcSet={item.imageWeb.laptop} />}
-                                            {item.imageWeb?.tablet && <source media="(min-width: 768px)" srcSet={item.imageWeb.tablet} />}
-                                            <img
-                                                src={item.image || item.imageWeb?.desktop || item.imageWeb?.laptop || item.imageWeb?.tablet || undefined}
-                                                alt={item.title}
-                                                className={s.cardImg}
+                        return (
+                            <AppLink key={`${item.id}-${idx}`} href={`/${path}/${identifier}`} className={s.cardLink}>
+                            <div className={s.card}>
+                                <div className={s.cardImage}>
+                                    {hasImage ? (
+                                        hasImageWeb ? (
+                                            <picture className={s.cardImgPicture}>
+                                                {item.imageWeb?.desktop && <source media="(min-width: 1280px)" srcSet={item.imageWeb.desktop} />}
+                                                {item.imageWeb?.laptop && <source media="(min-width: 1024px)" srcSet={item.imageWeb.laptop} />}
+                                                {item.imageWeb?.tablet && <source media="(min-width: 768px)" srcSet={item.imageWeb.tablet} />}
+                                                <img
+                                                    src={item.image || item.imageWeb?.desktop || item.imageWeb?.laptop || item.imageWeb?.tablet || undefined}
+                                                    alt={item.title}
+                                                    className={s.cardImg}
+                                                />
+                                            </picture>
+                                        ) : (
+                                            <Image src={item.image}
+                                                   alt={item.title}
+                                                   className={s.cardImg}
+                                                   width={320}
+                                                   height={200}
                                             />
-                                        </picture>
+                                        )
                                     ) : (
-                                        <Image src={item.image}
-                                               alt={item.title}
-                                               className={s.cardImg}
-                                               width={320}
-                                               height={200}
-                                        />
-                                    )
-                                ) : (
-                                    <div className={s.placeholder}>
-                                        <Image
-                                            src="/icons/logo-red.svg"
-                                            alt="Myastoriya"
-                                            width={120}
-                                            height={40}
-                                            className={s.placeholderLogo}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                            <div className={s.cardBody}>
-                                <div className={s.date}>
-                                    <span className={s.dateLabel}>
-                                        {texts.dateLabel}
-                                    </span>
-                                    {' '}
-                                    <span className={s.dateValue}>
-                                        {pageType === 'promotions' ? item.date || '' : (item.dateRange || item.date || '')}
-                                    </span>
+                                        <div className={s.placeholder}>
+                                            <Image
+                                                src="/icons/logo-red.svg"
+                                                alt="Myastoriya"
+                                                width={120}
+                                                height={40}
+                                                className={s.placeholderLogo}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
-                                <h4 className={s.cardTitle}>{item.title}</h4>
+                                <div className={s.cardBody}>
+                                    <div className={s.date}>
+                                        <span className={s.dateLabel}>
+                                            {texts.dateLabel}
+                                        </span>
+                                        {' '}
+                                        <span className={s.dateValue}>
+                                            {pageType === 'promotions' ? item.date || '' : (item.dateRange || item.date || '')}
+                                        </span>
+                                    </div>
+                                    <h4 className={s.cardTitle}>{item.title}</h4>
+                                </div>
                             </div>
-                        </div>
-                    </AppLink>
-                );
-            })}
-            </div>
+                        </AppLink>
+                    );
+                })}
+                </div>
+            )}
 
-            {hasMore && (
+            {hasMore && items.length > 0 && (
                 <div className={s.loadMoreWrapper}>
                     <Button variant="outline-black" onClick={loadMore} className={s.loadMoreBtn} disabled={loading}>
                         <span className={s.loadMoreBtnText}>{loading ? texts.loading : texts.showBtn}</span>

@@ -13,8 +13,8 @@ export default async function ComplexDiscountsPage({
     const specialsResponse = await getSpecialsApi(12, 1, lang, token ?? undefined);
 
     const activeSpecials = (specialsResponse?.data || []).filter(special => {
-        if (!special.products || special.products.length === 0) return false;
-        if (typeof special.productsCount === 'number' && special.products.length < special.productsCount) {
+        if (!special.products || special.products.length < 2) return false;
+        if (typeof special.productsCount === 'number' && special.productsCount > 0 && special.products.length < special.productsCount) {
             return false;
         }
         return special.products.every(product => product.available);

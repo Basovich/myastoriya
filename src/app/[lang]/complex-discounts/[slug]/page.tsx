@@ -14,29 +14,49 @@ export default async function ComboDetail({
     // Try to resolve slug to ID
     let finalId = slug;
     if (isNaN(Number(slug))) {
-        const resolvedId = await findSpecialIdBySlug(slug, lang, token ?? undefined);
+        let resolvedId = await findSpecialIdBySlug(slug, lang, token ?? undefined);
+        if (!resolvedId) {
+            // Fallback to public list (without token) to resolve the ID so we can redirect instead of 404
+            resolvedId = await findSpecialIdBySlug(slug, lang, undefined);
+        }
         if (resolvedId) {
             finalId = resolvedId;
         }
     }
 
     let special = null;
+    let publicSpecial = null;
     try {
-        special = await getSpecialApi(finalId, lang, token ?? undefined);
+        [special, publicSpecial] = await Promise.all([
+            getSpecialApi(finalId, lang, token ?? undefined),
+            getSpecialApi(finalId, lang, undefined)
+        ]);
     } catch (err) {
         console.warn(`[ComboDetailPage] Failed to fetch special with id ${finalId}:`, err);
     }
 
-    if (!special) {
+    // If it doesn't exist even in the public catalog, then it's a true 404
+    if (!publicSpecial) {
         notFound();
     }
 
-    const hasUnavailableProduct = !special.products || 
-        special.products.length === 0 ||
-        (typeof special.productsCount === 'number' && special.products.length < special.productsCount) ||
+    // Determine the expected count of products from the public catalog version
+    const expectedCount = Math.max(
+        publicSpecial.products?.length ?? 0,
+        publicSpecial.productsCount ?? 0,
+        2 // A bundle must have at least 2 products
+    );
+
+    // The special is considered unavailable if:
+    // 1. It wasn't returned for this city (special is null)
+    // 2. The list of products is missing or shorter than expected
+    // 3. Any of the products is marked as not available
+    const hasUnavailableProduct = !special || 
+        !special.products || 
+        special.products.length < expectedCount ||
         special.products.some(product => !product.available);
 
-    if (hasUnavailableProduct) {
+    if (hasUnavailableProduct || !special) {
         redirect(`/${lang}/complex-discounts`);
     }
 
