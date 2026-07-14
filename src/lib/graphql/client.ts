@@ -141,16 +141,16 @@ export async function gqlRequest<T>(
     // All requests go directly to the backend — no proxy needed.
     const endpoint = GQL_ENDPOINT;
 
-    let text = "";
     try {
         const result = await performRequest<T>(endpoint, headers, body, query, variables, options);
-        text = result.text;
         return result.data;
     } catch (err) {
-        text = (err as any)._rawText || text;
+        const rawText = (err && typeof err === 'object' && '_rawText' in err)
+            ? String((err as Record<string, unknown>)._rawText || "")
+            : "";
 
         if (isServer && !options?.silent) {
-            console.error(`[gqlRequest] Error: ${err instanceof Error ? err.message : String(err)}. Response text: "${text.substring(0, 500)}"`);
+            console.error(`[gqlRequest] Error: ${err instanceof Error ? err.message : String(err)}. Response text: "${rawText.substring(0, 500)}"`);
         }
 
         // JWT Interceptor for Unauthorized (401) errors on the client side
@@ -309,14 +309,14 @@ async function performRequest<T>(
             }
         }
 
-        const gqlErr = new GraphQLError(errorMessage, json.errors);
-        (gqlErr as any)._rawText = text;
+        const gqlErr = new GraphQLError(errorMessage, json.errors) as GraphQLError & { _rawText?: string };
+        gqlErr._rawText = text;
         throw gqlErr;
     }
 
     if (json.data === undefined) {
-        const err = new Error('No data returned from GraphQL');
-        (err as any)._rawText = text;
+        const err = new Error('No data returned from GraphQL') as Error & { _rawText?: string };
+        err._rawText = text;
         throw err;
     }
 
