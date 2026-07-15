@@ -187,13 +187,11 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
 
     const handleInputFocus = () => {
         setIsActive(true);
-        setHasError(false);
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setQuery(value);
-        setHasError(false);
 
         if (value.length >= 3) {
             setShowOverlay(true);

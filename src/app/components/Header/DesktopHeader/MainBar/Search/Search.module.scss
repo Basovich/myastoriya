@@ -518,14 +518,21 @@
 
 .featuredWeightOverlay {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    bottom: 12px;
+    left: 12px;
     background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
     color: #fff;
-    padding: 12px 24px;
-    font-size: 16px;
+    padding: 6px 12px;
+    font-size: 14px;
     font-weight: 700;
+    border-radius: 8px;
+    line-height: normal;
+    z-index: 2;
+
+    @media (min-width: 1280px) {
+        font-size: 18px;
+    }
 }
 
 .featuredInfo {
