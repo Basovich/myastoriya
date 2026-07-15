@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import clsx from 'clsx';
 import s from './StoreMenuProductCard.module.scss';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -188,13 +189,21 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
                 <h3 className={s.title}>{product.name}</h3>
                 
                 <div className={s.details}>
-                    <span className={s.price}>{product.cost} ₴</span>
-                    {hasDiscount && (
-                        <span className={s.oldPrice}>{product.oldCost} ₴</span>
-                    )}
-                    {portionText && (
-                        <span className={s.unit}>{portionText}</span>
-                    )}
+                    <div className={s.priceGroup}>
+                        <div className={s.priceRowInner}>
+                            <span className={clsx(s.price, hasDiscount && s.newPrice)}>
+                                {product.cost} ₴
+                            </span>
+                            {hasDiscount && (
+                                <span className={s.oldPrice}>
+                                    {product.oldCost} ₴
+                                </span>
+                            )}
+                        </div>
+                        {portionText && (
+                            <span className={s.unit}>{portionText}</span>
+                        )}
+                    </div>
                 </div>
 
                 {cleanDescription && (

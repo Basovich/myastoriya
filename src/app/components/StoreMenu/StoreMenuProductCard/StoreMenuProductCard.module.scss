@@ -84,6 +84,20 @@
     }
 }
 
+.priceGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.priceRowInner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
 .price {
     color: #000;
     font-size: 18px;
@@ -97,6 +111,10 @@
 
     @media (min-width: 1280px) {
         font-size: 24px;
+    }
+
+    &.newPrice {
+        color: #E3051B;
     }
 }
 
@@ -117,6 +135,7 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+    margin-top: 2px;
 }
 
 .description {

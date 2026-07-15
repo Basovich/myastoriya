@@ -625,14 +625,17 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                         fill
                                                                         draggable={false}
                                                                     />
-                                                                    {(featuredProposals[0].oldCost || featuredProposals[0].is_new) && (
+                                                                    {(() => {
+                                                                        const badgeText = getProductBadge(featuredProposals[0], String(lang));
+                                                                        return badgeText ? (
                                                                         <Badge 
-                                                                            variant={featuredProposals[0].is_new ? "new" : "sale"} 
+                                                                            variant={badgeText.toLowerCase() === "new" ? "new" : "sale"}
                                                                             className={s.featuredBadge}
                                                                         >
-                                                                            {featuredProposals[0].oldCost ? (lang === 'ru' ? 'акция' : 'акція') : 'new'}
+                                                                            {badgeText}
                                                                         </Badge>
-                                                                    )}
+                                                                        ) : null;
+                                                                    })()}
                                                                     <div className={s.featuredWeightOverlay}>
                                                                         {(() => {
                                                                             const fallbackWeight = featuredProposals[0].specifications?.find(s => s.name.toLowerCase().includes('вага'))?.values[0] || featuredProposals[0].unit;
@@ -647,7 +650,22 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                     <div className={s.featuredName}>{featuredProposals[0].name}</div>
                                                                     <div className={s.featuredFooter}>
                                                                         <div className={s.featuredPriceBlock}>
-                                                                            <div className={s.featuredPriceValue}>{featuredProposals[0].cost} ₴</div>
+                                                                            {(() => {
+                                                                                const badgeText = getProductBadge(featuredProposals[0], String(lang));
+                                                                                const hasPromo = badgeText && (badgeText === 'АКЦІЯ' || badgeText === 'АКЦИЯ');
+                                                                                return (
+                                                                                    <>
+                                                                                        <div className={clsx(s.featuredPriceValue, hasPromo && s.featuredNewPrice)}>
+                                                                                            {featuredProposals[0].cost} ₴
+                                                                                        </div>
+                                                                                        {hasPromo && featuredProposals[0].oldCost && (
+                                                                                            <div className={s.featuredOldPrice}>
+                                                                                                {featuredProposals[0].oldCost} ₴
+                                                                                            </div>
+                                                                                        )}
+                                                                                    </>
+                                                                                );
+                                                                            })()}
                                                                             <div className={s.featuredPriceUnit}>
                                                                                 {(() => {
                                                                                     const unit = featuredProposals[0].unit;
