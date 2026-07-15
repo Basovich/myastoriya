@@ -147,22 +147,14 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
 
     // Portion and weight rendering using unit/multiplier
     let portionText = '';
-    let calculatedWeight = '';
 
     if (product.unit !== null && product.unit !== undefined && product.multiplier !== null && product.multiplier !== undefined) {
         const normalizedUnit = product.unit.trim().toLowerCase();
-        const multiplier = product.multiplier;
 
         if (normalizedUnit === '100 г' || normalizedUnit === '100г') {
             portionText = '(100 г)';
-            if (multiplier > 0) {
-                calculatedWeight = `${Math.round(multiplier * 1000)} г`;
-            }
         } else if (normalizedUnit === '100 мл') {
             portionText = '(100 мл)';
-            if (multiplier > 0) {
-                calculatedWeight = `${Math.round(multiplier * 1000)} мл`;
-            }
         } else if (normalizedUnit === 'шт' || normalizedUnit === '1 шт') {
             portionText = '(1 шт)';
         } else if (normalizedUnit === 'уп' || normalizedUnit === 'упаковка') {

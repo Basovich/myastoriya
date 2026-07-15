@@ -27,7 +27,7 @@ export default function ProductCard({
     id,
     slug,
     title,
-    weight: _weight,
+
     price,
     oldPrice,
     unit,
