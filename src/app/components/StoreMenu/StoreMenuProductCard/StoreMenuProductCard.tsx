@@ -177,13 +177,6 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
         weight = calculatedWeight;
     }
 
-    // // 4. Fallback to portionSize (if any, though it's null on backend)
-    if (!weight && product.portionSize) {
-        const hasWeightUnit = /[гgкmшт]/i.test(product.portionSize);
-        if (hasWeightUnit) {
-            weight = product.portionSize;
-        }
-    }
 
     return (
         <div className={`${s.card} ${isOutOfStock ? s.unavailable : ''}`}>

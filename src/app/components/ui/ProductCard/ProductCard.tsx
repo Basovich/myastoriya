@@ -40,58 +40,6 @@ export default function ProductCard({
 }: ProductCardProps) {
     const isRu = lang === 'ru';
     const productUrl = slug ? `/products/${slug}` : `/products/${id}`;
-    
-    // Format weight if it is just a number
-    let formattedWeight = weight;
-    if (weight && /^\d+([.,]\d+)?$/.test(weight.trim())) {
-        const num = parseFloat(weight.trim().replace(',', '.'));
-        const roundedWeight = num >= 10 ? Math.round(num) : Math.round(num * 100) / 100;
-        
-        const titleLower = title.toLowerCase();
-        const unitLower = unit.toLowerCase().trim();
-        
-        if (num === 1) {
-            if (unitLower === 'шт') {
-                formattedWeight = '1 шт';
-            } else if (unitLower === 'уп') {
-                formattedWeight = '1 уп';
-            } else if (unitLower === 'кг' || unitLower === 'kg') {
-                formattedWeight = '1 кг';
-            } else if (unitLower === 'г' || unitLower === 'g') {
-                formattedWeight = '1 г';
-            } else if (unitLower === 'мл' || unitLower === 'ml') {
-                formattedWeight = '1 мл';
-            } else if (unitLower === 'л' || unitLower === 'l') {
-                formattedWeight = '1 л';
-            } else {
-                formattedWeight = '1 шт';
-            }
-        } else {
-            if (unitLower === 'шт') {
-                const isLiquid = /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
-                formattedWeight = `${roundedWeight} ${isLiquid ? 'мл' : 'г'}`;
-            } else if (unitLower === 'уп') {
-                formattedWeight = `${roundedWeight} уп`;
-            } else if (unitLower === 'кг' || unitLower === 'kg') {
-                formattedWeight = `${roundedWeight} кг`;
-            } else if (unitLower === 'г' || unitLower === 'g') {
-                formattedWeight = `${roundedWeight} г`;
-            } else if (unitLower === 'мл' || unitLower === 'ml') {
-                formattedWeight = `${roundedWeight} мл`;
-            } else if (unitLower === 'л' || unitLower === 'l') {
-                formattedWeight = `${roundedWeight} л`;
-            } else {
-                const isLiquid = unitLower.includes('мл') || unitLower.includes('ml') || 
-                    /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
-                formattedWeight = `${roundedWeight} ${isLiquid ? 'мл' : 'г'}`;
-            }
-        }
-    }
-
-    const displayWeight = (formattedWeight === "1" || formattedWeight === "1.0")
-        ? (unit.toLowerCase().trim() === 'шт' ? '1 шт' : (isRu ? "1 единица" : "1 одиниця"))
-        : formattedWeight;
-
     const displayUnit = unit.toLowerCase() === "шт"
         ? (isRu ? "За 1 шт" : "За 1 шт")
         : `За ${unit}`;
