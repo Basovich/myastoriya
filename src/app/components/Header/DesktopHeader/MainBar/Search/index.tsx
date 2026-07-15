@@ -19,7 +19,8 @@ import {
     getCatalogTreeApi,
     resolveProductImageUrl, 
     Product, 
-    ProductCategory 
+    ProductCategory,
+    getProductBadge
 } from "@/lib/graphql/queries/products";
 
 function getProductWeightForSearch(product: Product): string {
@@ -566,7 +567,8 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                         const displayUnit = product.unit.toLowerCase() === "шт"
                                                                             ? "За 1 шт"
                                                                             : `За ${product.unit}`;
-                                                                        const badgeText = product.oldCost ? (lang === 'ru' ? 'акция' : 'акція') : (product.is_new ? 'new' : null);
+                                                                        const badgeText = getProductBadge(product, String(lang));
+                                                                        const hasPromo = badgeText && (badgeText === 'АКЦІЯ' || badgeText === 'АКЦИЯ');
 
                                                                         return (
                                                                             <div key={product.id} className={s.featuredCardSlide}>
@@ -578,7 +580,14 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                                             fill
                                                                                             draggable={false}
                                                                                         />
-                                                                                        {badgeText && <Badge variant={badgeText === "new" ? "new" : "sale"} className={s.featuredBadge}>{badgeText}</Badge>}
+                                                                                        {badgeText && (
+                                                                                            <Badge 
+                                                                                                variant={badgeText.toLowerCase() === "new" ? "new" : "sale"} 
+                                                                                                className={s.featuredBadge}
+                                                                                            >
+                                                                                                {badgeText}
+                                                                                            </Badge>
+                                                                                        )}
                                                                                         <div className={s.featuredWeightOverlay}>
                                                                                             {displayWeight}
                                                                                         </div>
@@ -588,7 +597,14 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                                         <div className={s.featuredName}>{product.name}</div>
                                                                                         <div className={s.featuredFooter}>
                                                                                             <div className={s.featuredPriceBlock}>
-                                                                                                <div className={s.featuredPriceValue}>{product.cost} ₴</div>
+                                                                                                <div className={clsx(s.featuredPriceValue, hasPromo && s.featuredNewPrice)}>
+                                                                                                    {product.cost} ₴
+                                                                                                </div>
+                                                                                                {hasPromo && product.oldCost && (
+                                                                                                    <div className={s.featuredOldPrice}>
+                                                                                                        {product.oldCost} ₴
+                                                                                                    </div>
+                                                                                                )}
                                                                                                 <div className={s.featuredPriceUnit}>{displayUnit}</div>
                                                                                             </div>
                                                                                             <AddToCartButton productId={String(product.id)} className={s.addToCartBtn} hasCostVariants={product.hasCostVariants} />
