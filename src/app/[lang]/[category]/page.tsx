@@ -61,8 +61,8 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             lang,
             token ?? undefined,
         ),
-        getPopularProductsApi(undefined, 12, lang),
-        getCategoryByIdApi(categoryId, lang),
+        getPopularProductsApi(undefined, 12, lang, token ?? undefined),
+        getCategoryByIdApi(categoryId, lang, token ?? undefined),
     ]);
     productsResponse.current_page = page;
 

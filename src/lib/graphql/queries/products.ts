@@ -810,11 +810,15 @@ export async function addProductViewApi(id: number | string, lang?: string, toke
     return data.addProductView;
 }
 
-export async function getProductByIdApi(id: number | string, lang?: string): Promise<Product> {
+export async function getProductByIdApi(id: number | string, lang?: string, token?: string): Promise<Product> {
     const data = await gqlRequest<{ product: Product }>(
         PRODUCT_BY_ID_QUERY,
         { id: parseInt(String(id)) },
-        { next: { revalidate: 60 }, lang },
+        { 
+            lang, 
+            token,
+            ...(token ? { cache: 'no-store' } : { next: { revalidate: 60 } })
+        },
     );
     return data?.product;
 }
@@ -822,11 +826,16 @@ export async function getProductByIdApi(id: number | string, lang?: string): Pro
 export async function getProductCostVariantsApi(
     productId: number | string,
     lang?: string,
+    token?: string,
 ): Promise<ProductCostVariant[]> {
     const data = await gqlRequest<{ productCostVariants: ProductCostVariant[] }>(
         PRODUCT_COST_VARIANTS_QUERY,
         { productId: String(productId) },
-        { next: { revalidate: 60 }, lang },
+        { 
+            lang, 
+            token,
+            ...(token ? { cache: 'no-store' } : { next: { revalidate: 60 } })
+        },
     );
     return data.productCostVariants ?? [];
 }
@@ -835,11 +844,16 @@ export async function getPopularProductsApi(
     productId?: number,
     limit: number = 12,
     lang?: string,
+    token?: string,
 ): Promise<Product[]> {
     const data = await gqlRequest<{ popularProducts: { data: Product[] } }>(
         POPULAR_PRODUCTS_QUERY,
         { productId: productId ?? null, limit },
-        { next: { revalidate: 3600 }, lang },
+        { 
+            lang, 
+            token,
+            ...(token ? { cache: 'no-store' } : { next: { revalidate: 3600 } })
+        },
     );
     return data?.popularProducts?.data ?? [];
 }
@@ -848,13 +862,18 @@ export async function getSpecialsByProductApi(
     productId: number,
     limit: number = 8,
     lang?: string,
+    token?: string,
 ): Promise<Product[]> {
     const data = await gqlRequest<{
         specials: { data: Array<{ id: string; products?: Product[] | null }> };
     }>(
         SPECIALS_BY_PRODUCT_QUERY,
         { productId, limit },
-        { next: { revalidate: 3600 }, lang },
+        { 
+            lang, 
+            token,
+            ...(token ? { cache: 'no-store' } : { next: { revalidate: 3600 } })
+        },
     );
     const items = data.specials?.data ?? [];
     // Flatten: collect all products from all specials, deduplicate by id
@@ -876,11 +895,16 @@ export async function getBoughtTogetherProductsApi(
     productId: number,
     limit: number = 8,
     lang?: string,
+    token?: string,
 ): Promise<Product[]> {
     const data = await gqlRequest<{ boughtTogetherProducts: Product[] }>(
         BOUGHT_TOGETHER_PRODUCTS_QUERY,
         { categoryId, productId, limit },
-        { next: { revalidate: 3600 }, lang },
+        { 
+            lang, 
+            token,
+            ...(token ? { cache: 'no-store' } : { next: { revalidate: 3600 } })
+        },
     );
     return data.boughtTogetherProducts ?? [];
 }
@@ -1070,11 +1094,11 @@ export async function getViewedProductsApi(limit: number = 10, lang?: string, to
     return data?.products?.data ?? [];
 }
 
-export async function getProductsByIdsApi(ids: number[], lang?: string): Promise<Product[]> {
+export async function getProductsByIdsApi(ids: number[], lang?: string, token?: string): Promise<Product[]> {
     const data = await gqlRequest<{ productsByIds: Product[] }>(
         PRODUCTS_BY_IDS_QUERY,
         { ids },
-        { cache: 'no-store', lang }
+        { cache: 'no-store', lang, token }
     );
     return data?.productsByIds ?? [];
 }
@@ -1434,11 +1458,15 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
     }
 `;
 
-export async function getCategoryByIdApi(id: number, lang?: string): Promise<ProductCategory | null> {
+export async function getCategoryByIdApi(id: number, lang?: string, token?: string): Promise<ProductCategory | null> {
     const data = await gqlRequest<{ category: ProductCategory | null }>(
         CATEGORY_BY_ID_QUERY,
         { id },
-        { next: { revalidate: 3600 }, lang }
+        { 
+            lang, 
+            token,
+            ...(token ? { cache: 'no-store' } : { next: { revalidate: 3600 } })
+        }
     );
     return data.category;
 }

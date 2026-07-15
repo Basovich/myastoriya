@@ -81,8 +81,8 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
             lang,
             token ?? undefined,
         ),
-        getPopularProductsApi(undefined, 12, lang),
-        getCategoryByIdApi(categoryId, lang),
+        getPopularProductsApi(undefined, 12, lang, token ?? undefined),
+        getCategoryByIdApi(categoryId, lang, token ?? undefined),
     ]);
     productsResponse.current_page = page;
 

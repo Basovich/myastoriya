@@ -73,6 +73,8 @@ export default async function ProductPage({ params }: Props) {
     const { slug, lang } = await params;
     const dict = await getDictionary(lang as Locale);
 
+    const token = await getAccessToken();
+
     // Resolve slug → id (cached 1h by Next.js fetch cache)
     const productId = await findProductIdBySlug(slug, lang);
     if (!productId) notFound();
@@ -84,7 +86,7 @@ export default async function ProductPage({ params }: Props) {
     // - Мережева / несподівана помилка (тимчасово недоступний API) → re-throw → Next.js 500
     let product: Product | null = null;
     try {
-        product = await getProductByIdApi(productId, lang);
+        product = await getProductByIdApi(productId, lang, token ?? undefined);
     } catch (err) {
         if (err instanceof GraphQLError) {
             // Бекенд відповів логічною помилкою — продукт відсутній
@@ -99,8 +101,6 @@ export default async function ProductPage({ params }: Props) {
     if (!product) notFound();
 
 
-
-    const token = await getAccessToken();
 
     // Некритичні запити — паралельно, із retry та fallback
     const [blogsResponse, catalogTree, deliveryBlocks] = await Promise.all([
@@ -121,17 +121,17 @@ export default async function ProductPage({ params }: Props) {
     // Некритичні запити — паралельно, із retry та fallback
     const [specialsProducts, boughtTogetherProducts, popularProducts, categoryProductsResponse] = await Promise.all([
         safeCall<Product[]>(
-            () => getSpecialsByProductApi(numericId, 8, lang),
+            () => getSpecialsByProductApi(numericId, 8, lang, token ?? undefined),
             [],
         ),
         product.categoryId
             ? safeCall<Product[]>(
-                () => getBoughtTogetherProductsApi(Number(product!.categoryId), numericId, 10, lang),
+                () => getBoughtTogetherProductsApi(Number(product!.categoryId), numericId, 10, lang, token ?? undefined),
                 [],
             )
             : Promise.resolve<Product[]>([]),
         safeCall<Product[]>(
-            () => getPopularProductsApi(undefined, 12, lang),
+            () => getPopularProductsApi(undefined, 12, lang, token ?? undefined),
             [],
         ),
         product.categoryId

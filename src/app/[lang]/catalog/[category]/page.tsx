@@ -4,6 +4,7 @@ import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
 import { getCatalogTreeApi, getProductsApi, getCategoryByIdApi, getFaqQuestionsApi } from '@/lib/graphql';
 import { buildCategoryIndex } from '@/utils/category-url';
+import { getAccessToken } from '@/app/actions/authActions';
 
 interface CategoryCatalogPageProps {
     params: Promise<{ lang: string; category: string }>;
@@ -15,7 +16,9 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
     const resolvedSearchParams = await searchParams;
     const dict = await getDictionary(lang as Locale);
 
-    const catalogTree = await getCatalogTreeApi(lang);
+    const token = await getAccessToken();
+
+    const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined);
     const categoryIndex = buildCategoryIndex(catalogTree);
 
     // Find level-3 category by slug across the full tree
@@ -41,8 +44,9 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
         getProductsApi(
             { categoryId, limit: 12, page, sort },
             lang,
+            token ?? undefined,
         ),
-        getCategoryByIdApi(categoryId, lang),
+        getCategoryByIdApi(categoryId, lang, token ?? undefined),
     ]);
     productsResponse.current_page = page;
 
