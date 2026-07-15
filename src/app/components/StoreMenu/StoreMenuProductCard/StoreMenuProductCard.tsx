@@ -198,6 +198,9 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
                 {isOutOfStock && (
                     <div className={s.unavailableBadge}>Немає в наявності</div>
                 )}
+                {product.portionSize && product.portionSize.trim() && (
+                    <span className={s.weight}>{product.portionSize}</span>
+                )}
             </div>
             
             <div className={s.content}>

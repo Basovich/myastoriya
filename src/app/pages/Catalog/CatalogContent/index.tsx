@@ -116,6 +116,7 @@ export default async function CatalogContent({
                     image={resolveProductImageUrl(product)}
                     lang={lang}
                     hasCostVariants={product.hasCostVariants}
+                    portionSize={product.portionSize}
                 />
             )
         }))
@@ -136,6 +137,7 @@ export default async function CatalogContent({
                 image={resolveProductImageUrl(product)}
                 lang={lang}
                 hasCostVariants={product.hasCostVariants}
+                portionSize={product.portionSize}
             />
         )
     }));

@@ -188,6 +188,7 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                                                     image={productImage}
                                                     lang={lang}
                                                     hasCostVariants={product.hasCostVariants}
+                                                    portionSize={product.portionSize}
                                                 />
                                         </div>
                                         {idx < bundleProducts.length - 1 && (

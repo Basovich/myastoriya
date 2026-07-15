@@ -22,6 +22,7 @@ export interface SpecialProduct {
         values: string[];
     }[] | null;
     available: boolean;
+    portionSize?: string | null;
     hasCostVariants?: boolean;
     image?: {
         url: {
@@ -114,6 +115,7 @@ const SPECIALS_QUERY = /* GraphQL */ `
                         values
                     }
                     available
+                    portionSize
                     hasCostVariants
                     image {
                         url {
@@ -175,6 +177,7 @@ export const SPECIAL_BY_ID_QUERY = /* GraphQL */ `
                     values
                 }
                 available
+                portionSize
                 hasCostVariants
                 image {
                     url {

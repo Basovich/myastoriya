@@ -23,6 +23,7 @@ export interface RecentlyViewedProduct {
     badge?: string | null;
     image: string;
     hasCostVariants?: boolean;
+    portionSize?: string | null;
 }
 
 interface RecentlyViewedSliderProps {

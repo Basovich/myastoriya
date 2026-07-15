@@ -86,7 +86,7 @@ const resolveOrderItemImageUrl = (
         grid1x?: string | null;
         main1x?: string | null;
     } | null,
-    productDetailsMap?: Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null }>
+    productDetailsMap?: Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null; portionSize?: string | null }>
 ): string => {
     const url = image?.list1x || image?.grid1x || image?.main1x || null;
     if (url) {
@@ -155,7 +155,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
     const { user } = useAppSelector((state) => state.auth);
 
     const [order, setOrder] = useState<Order | null>(null);
-    const [productDetailsMap, setProductDetailsMap] = useState<Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null }>>({});
+    const [productDetailsMap, setProductDetailsMap] = useState<Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null; portionSize?: string | null }>>({});
     const [orderReview, setOrderReview] = useState<OrderReview | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -181,7 +181,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                     .filter(id => !isNaN(id) && id > 0)
             ));
 
-            const detailsMap: Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null }> = {};
+            const detailsMap: Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null; portionSize?: string | null }> = {};
             if (productIds.length > 0) {
                 try {
                     const details = await getProductsByIdsApi(productIds, lang);
@@ -191,6 +191,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                             slug: prod.slug,
                             name: prod.name,
                             modifierGroups: prod.modifierGroups,
+                            portionSize: prod.portionSize,
                         };
                     });
                 } catch (e) {
@@ -425,6 +426,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                             image={resolvedImg}
                                             badge={null}
                                             lang={lang}
+                                            portionSize={dbProduct?.portionSize}
                                         >
                                             {renderedModifiers.length > 0 && (
                                                 <div className={s.modifierIconsList}>

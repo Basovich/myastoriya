@@ -47,6 +47,7 @@ export interface BlogProduct {
     image_title: string | null;
     available: boolean;
     is_new: boolean;
+    portionSize?: string | null;
     image?: ProductImageEntry | null;
     images?: ProductImageEntry[] | null;
 }
@@ -201,6 +202,7 @@ const BLOG_BY_SLUG_QUERY = /* GraphQL */ `
                 inLikes
                 available
                 is_new
+                portionSize
                 image_alt
                 image {
                     url {

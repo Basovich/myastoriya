@@ -19,6 +19,7 @@ interface ProductCardProps {
     image: string;
     lang: string;
     hasCostVariants?: boolean;
+    portionSize?: string | null;
     children?: React.ReactNode;
 }
 
@@ -34,6 +35,7 @@ export default function ProductCard({
     image,
     lang,
     hasCostVariants = false,
+    portionSize,
     children,
 }: ProductCardProps) {
     const isRu = lang === 'ru';
@@ -123,7 +125,7 @@ export default function ProductCard({
                     </Badge>
                 )}
                 <WishButton productId={String(id)} className={s.favorite} />
-                {displayWeight && <span className={s.weight}>{displayWeight}</span>}
+                {portionSize && portionSize.trim() && <span className={s.weight}>{portionSize}</span>}
 
             </div>
             <div className={s.info}>

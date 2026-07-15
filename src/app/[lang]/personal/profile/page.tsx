@@ -191,7 +191,8 @@ export default function ProfilePage() {
                     image: resolveProductImageUrl(p),
                     badge: getProductBadge(p, lang),
                     weight: getProductWeight(p),
-                    hasCostVariants: p.hasCostVariants
+                    hasCostVariants: p.hasCostVariants,
+                    portionSize: p.portionSize
                 }));
                 setViewedProducts(mappedProducts);
             } catch (err) {

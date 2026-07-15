@@ -135,6 +135,7 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                                     badge={getProductBadge(product, lang)}
                                     lang={lang} 
                                     hasCostVariants={product.hasCostVariants}
+                                    portionSize={product.portionSize}
                                 />
                             );
                         })}

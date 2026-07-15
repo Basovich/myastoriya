@@ -510,6 +510,7 @@ const POPULAR_PRODUCTS_QUERY = /* GraphQL */ `
                 multiplier
                 is_new
                 available
+                portionSize
                 hasCostVariants
                 specifications {
                     name
@@ -541,6 +542,7 @@ const SPECIALS_BY_PRODUCT_QUERY = /* GraphQL */ `
                     multiplier
                     is_new
                     available
+                    portionSize
                     specifications {
                         name
                         values
@@ -570,6 +572,7 @@ const BOUGHT_TOGETHER_PRODUCTS_QUERY = /* GraphQL */ `
             multiplier
             is_new
             available
+            portionSize
             hasCostVariants
             specifications {
                 name
@@ -612,6 +615,7 @@ const VIEWED_PRODUCTS_QUERY = /* GraphQL */ `
                 unit
                 multiplier
                 is_new
+                portionSize
                 hasCostVariants
                 images {
                     url {
@@ -1411,6 +1415,7 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
                         unit
                         multiplier
                         available
+                        portionSize
                         images {
                             url {
                                 grid2x
@@ -1431,6 +1436,7 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
                 multiplier
                 is_new
                 available
+                portionSize
                 specifications {
                     name
                     values

@@ -178,6 +178,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                             image={resolveProductImageUrl(product as unknown as Product)}
                                             lang={lang} 
                                             hasCostVariants={product.hasCostVariants}
+                                            portionSize={product.portionSize}
                                         />
                                     </SwiperSlide>
                                 ))}
@@ -210,6 +211,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                     image={resolveProductImageUrl(product as unknown as Product)}
                                     lang={lang} 
                                     hasCostVariants={product.hasCostVariants}
+                                    portionSize={product.portionSize}
                                 />
                             ))}
                         </div>

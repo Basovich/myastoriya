@@ -26,6 +26,7 @@ interface RelatedProduct {
     image: string;
     description?: string;
     hasCostVariants?: boolean;
+    portionSize?: string | null;
 }
  
 interface RelatedProductsProps {

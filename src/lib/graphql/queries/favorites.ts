@@ -52,6 +52,7 @@ const GET_FAVORITES_QUERY = /* GraphQL */ `
                 is_new @include(if: $full)
                 available @include(if: $full)
                 hasCostVariants @include(if: $full)
+                portionSize @include(if: $full)
                 specifications @include(if: $full) {
                     name
                     values

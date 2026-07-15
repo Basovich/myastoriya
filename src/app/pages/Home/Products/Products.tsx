@@ -188,6 +188,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                             image={resolveProductImageUrl(product)}
                             lang={locale} 
                             hasCostVariants={product.hasCostVariants}
+                            portionSize={product.portionSize}
                         />
                     ))}
                 </div>

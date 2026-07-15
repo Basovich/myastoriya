@@ -193,6 +193,7 @@ export default function SearchContent() {
                                         image={resolveProductImageUrl(product)}
                                         lang={String(lang)} 
                                         hasCostVariants={product.hasCostVariants}
+                                        portionSize={product.portionSize}
                                     />
                                 );
                             })

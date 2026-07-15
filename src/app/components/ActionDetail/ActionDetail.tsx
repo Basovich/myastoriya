@@ -253,6 +253,7 @@ export default function ActionDetail({
                                 image={resolveProductImageUrl(product)}
                                 lang={lang}
                                 hasCostVariants={product.hasCostVariants}
+                                portionSize={product.portionSize}
                             />
                         ))}
                     </div>

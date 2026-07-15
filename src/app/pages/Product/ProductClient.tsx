@@ -252,6 +252,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
             image: resolveProductImageUrl(p),
             badge: getProductBadge(p, lang),
             hasCostVariants: p.hasCostVariants,
+            portionSize: p.portionSize,
         }));
     }
 
