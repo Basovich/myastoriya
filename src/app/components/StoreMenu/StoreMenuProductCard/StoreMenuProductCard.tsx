@@ -172,10 +172,6 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
         }
     }
 
-    // 3. Fallback/use calculated weight
-    if (!weight && calculatedWeight) {
-        weight = calculatedWeight;
-    }
 
 
     return (
