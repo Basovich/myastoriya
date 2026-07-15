@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { gqlRequest } from '../client';
 import { ProductImageEntry } from './products';
 
@@ -285,11 +286,15 @@ export async function getBlogsApi(filter?: BlogsFilter, lang?: string): Promise<
     return data.blogs;
 }
 
-export async function getBlogBySlugApi(slug: string, lang?: string): Promise<BlogPost | null> {
+export async function getBlogBySlugApi(slug: string, lang?: string, token?: string): Promise<BlogPost | null> {
     const data = await gqlRequest<{ blog: BlogPost | null }>(
         BLOG_BY_SLUG_QUERY,
         { slug },
-        { next: { revalidate: 60 }, lang },
+        { 
+            lang, 
+            token,
+            ...(token ? { cache: 'no-store' } : { next: { revalidate: 60 } })
+        },
     );
     return data.blog;
 }
@@ -304,7 +309,6 @@ export async function getBlogTypesApi(lang?: string): Promise<BlogType[]> {
         return data.blogTypes;
     } catch (error) {
         if (typeof window === 'undefined') {
-            const Sentry = require("@sentry/nextjs");
             Sentry.captureException(error, {
                 tags: { component: 'getBlogTypesApi', bug: 'sorted_method_undefined' }
             });
