@@ -56,7 +56,7 @@ function getProductWeightForSearch(product: Product): string {
                 unitLower.includes('мл') || unitLower.includes('ml') ||
                 /вино|пиво|сік|сок|вод|кола|нектар|напій|напиток|лимонад|сидр|wine|beer|juice|beverage/i.test(titleLower);
 
-            let formattedVal = val;
+            let formattedVal: string;
             const unitClean = unitLower.trim();
             const num = parseFloat(val.replace(',', '.'));
             const roundedWeight = isNaN(num) ? val : (num >= 10 ? String(Math.round(num)) : String(Math.round(num * 100) / 100));
@@ -167,7 +167,6 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [dragOffset, setDragOffset] = useState(0);
-    const [hasError, setHasError] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
     const containerRef = useRef<HTMLDivElement>(null);
@@ -178,7 +177,6 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
         if (e) e.preventDefault();
 
         if (!query.trim()) {
-            setHasError(true);
             return;
         }
 
