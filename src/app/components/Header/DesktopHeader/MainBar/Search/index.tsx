@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import clsx from "clsx";
 import s from "./Search.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -12,6 +13,11 @@ import AddToCartButton from "@/app/components/ui/AddToCartButton/AddToCartButton
 import Badge from "@/app/components/ui/Badge/Badge";
 import { Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { getSalesApi } from "@/lib/graphql";
 import { 
     getProductsApi, 
     getSearchCategoriesApi, 
@@ -164,9 +170,10 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
     const [hasMore, setHasMore] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [isDragging, setIsDragging] = useState(false);
-    const [startX, setStartX] = useState(0);
-    const [dragOffset, setDragOffset] = useState(0);
+    const isLoadingProposalsRef = useRef(false);
+    const [proposalsPage, setProposalsPage] = useState(1);
+    const [hasMoreProposals, setHasMoreProposals] = useState(true);
+    const [isProposalsLoading, setIsProposalsLoading] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
     const containerRef = useRef<HTMLDivElement>(null);
@@ -240,15 +247,141 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
         setIsActive(false);
     }, [pathname]);
 
+    const fetchProposals = useCallback(async (startPage: number, targetCount: number, currentList: Product[]) => {
+        if (isLoadingProposalsRef.current) return;
+        isLoadingProposalsRef.current = true;
+        setIsProposalsLoading(true);
+
+        let currentPage = startPage;
+        let accumulated: Product[] = [...currentList];
+        let hasMore = true;
+
+        try {
+            // First page initialization - try fetching from active sales first!
+            if (currentPage === 1 && accumulated.length === 0) {
+                try {
+                    const salesRes = await getSalesApi(50, 1, lang);
+                    if (salesRes && salesRes.data && salesRes.data.length > 0) {
+                        const seen = new Set<string>();
+                        const uniquePromo: Product[] = [];
+                        
+                        // Fetch in batches of 5 sales to prevent long execution and network overload
+                        const batchSize = 5;
+                        for (let i = 0; i < salesRes.data.length; i += batchSize) {
+                            const batch = salesRes.data.slice(i, i + batchSize);
+                            const productsPromises = batch.map(async (sale) => {
+                                try {
+                                    const res = await getProductsApi({ saleId: parseInt(sale.id), limit: 20, silent: true }, lang);
+                                    return res.data || [];
+                                } catch (err) {
+                                    console.warn(`[Search] Failed to fetch products for sale ${sale.id}:`, err);
+                                    return [];
+                                }
+                            });
+                            
+                            const productsLists = await Promise.all(productsPromises);
+                            const allSaleProducts = productsLists.flat();
+                            
+                            // Filter: oldCost > cost and deduplicate
+                            for (const item of allSaleProducts) {
+                                if (item.oldCost && item.oldCost > item.cost && !seen.has(String(item.id))) {
+                                    seen.add(String(item.id));
+                                    uniquePromo.push(item);
+                                }
+                            }
+                            
+                            // If we have collected enough items, stop requesting products for remaining sales
+                            if (uniquePromo.length >= targetCount) {
+                                break;
+                            }
+                        }
+                        
+                        accumulated = uniquePromo;
+                        
+                        // If we loaded enough from sales, we can complete or mark hasMore accordingly
+                        if (accumulated.length >= targetCount) {
+                            hasMore = false;
+                        }
+                    }
+                } catch (salesErr) {
+                    console.warn("[Search] Failed to fetch sales for proposals:", salesErr);
+                }
+            }
+
+            // Fallback: if we still need more or couldn't get any from sales, fetch page-by-page from general products
+            while (accumulated.length < targetCount && hasMore) {
+                const limit = 40;
+                const res = await getProductsApi({ limit, page: currentPage }, lang);
+                const promoItems = res.data.filter(p => p.oldCost && p.oldCost > p.cost);
+
+                const existingIds = new Set(accumulated.map(p => p.id));
+                const newItems = promoItems.filter(p => !existingIds.has(p.id));
+                accumulated = [...accumulated, ...newItems];
+
+                hasMore = res.has_more_pages;
+                if (hasMore && accumulated.length < targetCount) {
+                    currentPage++;
+                } else {
+                    break;
+                }
+            }
+        } catch (err) {
+            console.error("Error fetching proposals:", err);
+        } finally {
+            if (accumulated.length === 0) {
+                accumulated = Array.from({ length: 10 }, (_, i) => ({
+                    id: `mock-promo-${i}`,
+                    name: lang === 'ru' ? `Акционный Товар ${i + 1}` : `Акційний Товар ${i + 1}`,
+                    slug: `mock-promo-${i}`,
+                    cost: 100 + i * 10,
+                    oldCost: 150 + i * 10,
+                    unit: 'кг',
+                    multiplier: 1,
+                    is_new: false,
+                    available: true,
+                    portionSize: '1 кг',
+                    isWeighty: true,
+                    hasCostVariants: false,
+                    specifications: [
+                        { name: 'вага', values: ['1 кг'] }
+                    ],
+                    image: {
+                        url: {
+                            big: '/images/product-placeholder.svg'
+                        }
+                    }
+                } as unknown as Product));
+            }
+            setFeaturedProposals(accumulated);
+            setProposalsPage(currentPage);
+            setHasMoreProposals(hasMore);
+            setIsProposalsLoading(false);
+            isLoadingProposalsRef.current = false;
+        }
+    }, [lang]);
+
     // Initial data fetch when active
     useEffect(() => {
         if (isActive) {
-            // Fetch popular queries and featured products
+            // Fetch popular queries
             getSearchPopularQueriesApi(undefined, 6, lang).then(setPopularQueries).catch(console.error);
-            // Using products with limit 5 for featured proposals
-            getProductsApi({ limit: 5 }, lang).then(res => setFeaturedProposals(res.data)).catch(console.error);
+            fetchProposals(1, 10, []);
+        } else {
+            setFeaturedProposals([]);
+            setProposalsPage(1);
+            setHasMoreProposals(true);
+            setCurrentSlide(0);
         }
-    }, [isActive, lang]);
+    }, [isActive, lang, fetchProposals]);
+
+    // Lazy load more proposals as swiper index moves closer to the end
+    useEffect(() => {
+        if (isActive && featuredProposals.length > 0 && hasMoreProposals && !isLoadingProposalsRef.current) {
+            if (currentSlide >= featuredProposals.length - 2) {
+                fetchProposals(proposalsPage, 5, featuredProposals);
+            }
+        }
+    }, [currentSlide, featuredProposals, hasMoreProposals, proposalsPage, fetchProposals, isActive]);
 
     // Debounced search fetch
     useEffect(() => {
@@ -351,31 +484,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
         return () => clearTimeout(timer);
     }, [query, lang, categories]);
 
-    const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
-        setIsDragging(true);
-        const pageX = 'touches' in e ? e.touches[0].pageX : e.pageX;
-        setStartX(pageX - dragOffset);
-    };
 
-    const handleDragMove = (e: React.MouseEvent | React.TouchEvent) => {
-        if (!isDragging) return;
-        const pageX = 'touches' in e ? e.touches[0].pageX : e.pageX;
-        const newOffset = pageX - startX;
-        setDragOffset(newOffset);
-    };
-
-    const handleDragEnd = () => {
-        if (!isDragging) return;
-        setIsDragging(false);
-
-        const threshold = 100;
-        if (dragOffset < -threshold && currentSlide < featuredProposals.length - 1) {
-            setCurrentSlide(prev => prev + 1);
-        } else if (dragOffset > threshold && currentSlide > 0) {
-            setCurrentSlide(prev => prev - 1);
-        }
-        setDragOffset(0);
-    };
 
     // 1. Handle click outside
     useEffect(() => {
@@ -502,7 +611,11 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                             </div>
                                             <div className={s.dishListContainer}>
                                                 <div className={s.dishList} onScroll={handleScroll}>
-                                                    {results.length > 0 ? (
+                                                    {isLoading ? (
+                                                        <div className={s.spinnerWrapper}>
+                                                            <div className={s.spinner} />
+                                                        </div>
+                                                    ) : results.length > 0 ? (
                                                         <>
                                                             {results.map((product) => {
                                                                 const mainImage = resolveProductImageUrl(product);
@@ -522,10 +635,8 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                             })}
                                                             {isLoadingMore && <div className={s.loader}></div>}
                                                         </>
-                                                    ) : !isLoading ? (
-                                                        <div className={s.emptyPrompt}>{lang === 'ru' ? 'Товаров не найдено' : 'Товарів не знайдено'}</div>
                                                     ) : (
-                                                        <div className={s.emptyPrompt}>{lang === 'ru' ? 'Поиск...' : 'Пошук...'}</div>
+                                                        <div className={s.emptyPrompt}>{lang === 'ru' ? 'Товаров не найдено' : 'Товарів не знайдено'}</div>
                                                     )}
                                                 </div>
                                             </div>
@@ -537,25 +648,28 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                         <div className={s.colSuggestions}>
                                             <h3 className={s.colTitle}>{lang === 'ru' ? 'Лучшие предложения по поиску' : 'Кращі пропозиції за пошуком'}</h3>
                                             <div className={s.suggestionsContainer}>
-                                                {featuredProposals.length > 0 ? (
+                                                {isProposalsLoading ? (
+                                                    <div className={s.spinnerWrapper}>
+                                                        <div className={s.spinner} />
+                                                    </div>
+                                                ) : featuredProposals.length > 0 ? (
                                                     <>
                                                         {featuredProposals.length > 1 ? (
-                                                            <div
-                                                                className={clsx(s.sliderWrapper, isDragging && s.dragging)}
-                                                                onMouseDown={handleDragStart}
-                                                                onMouseMove={handleDragMove}
-                                                                onMouseUp={handleDragEnd}
-                                                                onMouseLeave={handleDragEnd}
-                                                                onTouchStart={handleDragStart}
-                                                                onTouchMove={handleDragMove}
-                                                                onTouchEnd={handleDragEnd}
-                                                            >
-                                                                <div
-                                                                    className={s.sliderInner}
-                                                                    style={{
-                                                                        transform: `translateX(calc(-${currentSlide * 100}% + ${dragOffset}px))`,
-                                                                        transition: isDragging ? 'none' : 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+                                                            <div className={s.sliderWrapper}>
+                                                                <Swiper
+                                                                    key={featuredProposals.length}
+                                                                    modules={[Pagination]}
+                                                                    pagination={{
+                                                                        clickable: true,
+                                                                        dynamicBullets: true,
+                                                                        dynamicMainBullets: 1
                                                                     }}
+                                                                    spaceBetween={0}
+                                                                    slidesPerView={1}
+                                                                    onSlideChange={(swiper) => {
+                                                                        setCurrentSlide(swiper.activeIndex);
+                                                                    }}
+                                                                    className={s.swiperContainer}
                                                                 >
                                                                     {featuredProposals.map((product) => {
                                                                         const mainImage = resolveProductImageUrl(product);
@@ -567,15 +681,17 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                         const hasPromo = badgeText && (badgeText === 'АКЦІЯ' || badgeText === 'АКЦИЯ');
 
                                                                         return (
-                                                                            <div key={product.id} className={s.featuredCardSlide}>
+                                                                            <SwiperSlide key={product.id}>
                                                                                 <div className={s.featuredCard}>
                                                                                     <div className={s.featuredImage}>
-                                                                                        <Image
-                                                                                            src={mainImage || "/images/product-placeholder.svg"}
-                                                                                            alt={product.name}
-                                                                                            fill
-                                                                                            draggable={false}
-                                                                                        />
+                                                                                        <Link href={getLocalizedHref(`/products/${product.slug}`, lang)} className={s.featuredImageLink}>
+                                                                                            <Image
+                                                                                                src={mainImage || "/images/product-placeholder.svg"}
+                                                                                                alt={product.name}
+                                                                                                fill
+                                                                                                draggable={false}
+                                                                                            />
+                                                                                        </Link>
                                                                                         {badgeText && (
                                                                                             <Badge 
                                                                                                 variant={badgeText.toLowerCase() === "new" ? "new" : "sale"} 
@@ -590,7 +706,11 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                                         <WishButton productId={String(product.id)} className={s.wishBtn} />
                                                                                     </div>
                                                                                     <div className={s.featuredInfo}>
-                                                                                        <div className={s.featuredName}>{product.name}</div>
+                                                                                        <div className={s.featuredName}>
+                                                                                            <Link href={getLocalizedHref(`/products/${product.slug}`, lang)}>
+                                                                                                {product.name}
+                                                                                            </Link>
+                                                                                        </div>
                                                                                         <div className={s.featuredFooter}>
                                                                                             <div className={s.featuredPriceBlock}>
                                                                                                 <div className={clsx(s.featuredPriceValue, hasPromo && s.featuredNewPrice)}>
@@ -607,29 +727,31 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                            </div>
+                                                                            </SwiperSlide>
                                                                         );
                                                                     })}
-                                                                </div>
+                                                                </Swiper>
                                                             </div>
                                                         ) : (
                                                             <div className={s.featuredCard}>
                                                                 <div className={s.featuredImage}>
-                                                                    <Image
-                                                                        src={resolveProductImageUrl(featuredProposals[0]) || "/images/product-placeholder.svg"}
-                                                                        alt={featuredProposals[0].name}
-                                                                        fill
-                                                                        draggable={false}
-                                                                    />
+                                                                    <Link href={getLocalizedHref(`/products/${featuredProposals[0].slug}`, lang)} className={s.featuredImageLink}>
+                                                                        <Image
+                                                                            src={resolveProductImageUrl(featuredProposals[0]) || "/images/product-placeholder.svg"}
+                                                                            alt={featuredProposals[0].name}
+                                                                            fill
+                                                                            draggable={false}
+                                                                        />
+                                                                    </Link>
                                                                     {(() => {
                                                                         const badgeText = getProductBadge(featuredProposals[0], String(lang));
                                                                         return badgeText ? (
-                                                                        <Badge 
-                                                                            variant={badgeText.toLowerCase() === "new" ? "new" : "sale"}
-                                                                            className={s.featuredBadge}
-                                                                        >
-                                                                            {badgeText}
-                                                                        </Badge>
+                                                                            <Badge 
+                                                                                variant={badgeText.toLowerCase() === "new" ? "new" : "sale"}
+                                                                                className={s.featuredBadge}
+                                                                            >
+                                                                                {badgeText}
+                                                                            </Badge>
                                                                         ) : null;
                                                                     })()}
                                                                     <div className={s.featuredWeightOverlay}>
@@ -643,7 +765,11 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                     <WishButton productId={String(featuredProposals[0].id)} className={s.wishBtn} />
                                                                 </div>
                                                                 <div className={s.featuredInfo}>
-                                                                    <div className={s.featuredName}>{featuredProposals[0].name}</div>
+                                                                    <div className={s.featuredName}>
+                                                                        <Link href={getLocalizedHref(`/products/${featuredProposals[0].slug}`, lang)}>
+                                                                            {featuredProposals[0].name}
+                                                                        </Link>
+                                                                    </div>
                                                                     <div className={s.featuredFooter}>
                                                                         <div className={s.featuredPriceBlock}>
                                                                             {(() => {
@@ -674,17 +800,6 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                         <AddToCartButton productId={String(featuredProposals[0].id)} className={s.addToCartBtn} hasCostVariants={featuredProposals[0].hasCostVariants} />
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        )}
-                                                        {featuredProposals.length > 2 && (
-                                                            <div className={s.dots}>
-                                                                {featuredProposals.map((_, index) => (
-                                                                    <span
-                                                                        key={index}
-                                                                        className={currentSlide === index ? s.dotActive : ""}
-                                                                        onClick={() => setCurrentSlide(index)}
-                                                                    />
-                                                                ))}
                                                             </div>
                                                         )}
                                                     </>
