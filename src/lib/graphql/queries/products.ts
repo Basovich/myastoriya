@@ -814,13 +814,19 @@ export async function addProductViewApi(id: number | string, lang?: string, toke
     return data.addProductView;
 }
 
-export async function getProductByIdApi(id: number | string, lang?: string, token?: string): Promise<Product> {
+export async function getProductByIdApi(
+    id: number | string, 
+    lang?: string, 
+    token?: string,
+    silent?: boolean,
+): Promise<Product> {
     const data = await gqlRequest<{ product: Product }>(
         PRODUCT_BY_ID_QUERY,
         { id: parseInt(String(id)) },
         { 
             lang, 
             token,
+            silent,
             ...(token ? { cache: 'no-store' } : { next: { revalidate: 60 } })
         },
     );
@@ -1083,7 +1089,7 @@ export async function getCatalogTreeApi(lang?: string, parentId: number = 768, t
         { 
             lang,
             token,
-            ...(token ? { cache: 'no-store' } : { next: { revalidate: 3600 } })
+            cache: 'no-store',
         },
     );
     return data.categories;

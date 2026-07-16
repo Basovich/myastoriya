@@ -3,6 +3,7 @@ import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
 import { getCatalogTreeApi, getProductsApi, getPopularProductsApi, getCategoryByIdApi, getFaqQuestionsApi } from '@/lib/graphql';
+import { shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
 
@@ -21,18 +22,31 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
     const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined);
 
     // Find level-1 parent by slug in the current locale tree
-    const parentCat = catalogTree.find(c => c.slug === categorySlug);
+    let parentCat = catalogTree.find(c => c.slug === categorySlug);
+
+    // Якщо не знайдено, можливо категорія існує, але прихована (відфільтрована бекендом) для обраного міста.
+    if (!parentCat) {
+        const globalTree = await getCatalogTreeApi(lang, 768, undefined);
+        const parentGlob = globalTree.find(c => c.slug === categorySlug);
+        if (parentGlob) {
+            // Категорія існує глобально, але недоступна в цьому місті. Редиректимо на каталог.
+            const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+            redirect(`${langPrefix}/catalog`);
+        }
+    }
 
     // Cross-locale fallback for parent slug (bidirectional: UA↔RU)
     if (!parentCat) {
         const otherLocales = ['ua', 'ru'].filter(l => l !== lang);
         for (const otherLang of otherLocales) {
-            const otherTree = await getCatalogTreeApi(otherLang, 768, token ?? undefined);
-            const otherParent = otherTree.find(c => c.slug === categorySlug);
+            // Використовуємо глобальне дерево для крос-локалізаційного пошуку
+            const otherGlobalTree = await getCatalogTreeApi(otherLang, 768, undefined);
+            const otherParent = otherGlobalTree.find(c => c.slug === categorySlug);
             if (otherParent) {
                 // Also translate the subcategory slug
                 const otherSub = (otherParent.children ?? []).find(c => c.slug === subcategorySlug);
-                const localizedParent = catalogTree.find(c => c.id === otherParent.id);
+                const globalTree = await getCatalogTreeApi(lang, 768, undefined);
+                const localizedParent = globalTree.find(c => c.id === otherParent.id);
                 const localizedSub = otherSub && localizedParent
                     ? (localizedParent.children ?? []).find(c => c.id === otherSub.id)
                     : null;
@@ -44,17 +58,31 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
     }
 
     // Find level-2 child by slug
-    const matchedCat = (parentCat.children ?? []).find(c => c.slug === subcategorySlug);
+    let matchedCat = (parentCat.children ?? []).find(c => c.slug === subcategorySlug);
+
+    // Якщо не знайдено підкатегорію, перевіряємо, чи існує вона глобально
+    if (!matchedCat) {
+        const globalTree = await getCatalogTreeApi(lang, 768, undefined);
+        const parentGlob = globalTree.find(c => c.id === parentCat.id);
+        const subGlob = parentGlob ? (parentGlob.children ?? []).find(c => c.slug === subcategorySlug) : null;
+        if (subGlob) {
+            // Підкатегорія прихована для міста. Редиректимо на батьківську категорію.
+            const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+            redirect(`${langPrefix}/${parentCat.slug}`);
+        }
+    }
 
     // Cross-locale fallback for subcategory slug (bidirectional: UA↔RU)
     if (!matchedCat) {
         const otherLocales = ['ua', 'ru'].filter(l => l !== lang);
         for (const otherLang of otherLocales) {
-            const otherTree = await getCatalogTreeApi(otherLang, 768, token ?? undefined);
-            const otherParent = otherTree.find(c => c.id === parentCat.id);
+            const otherGlobalTree = await getCatalogTreeApi(otherLang, 768, undefined);
+            const otherParent = otherGlobalTree.find(c => c.id === parentCat.id);
             const otherSub = (otherParent?.children ?? []).find(c => c.slug === subcategorySlug);
             if (otherSub) {
-                const localizedSub = (parentCat.children ?? []).find(c => c.id === otherSub.id);
+                const globalTree = await getCatalogTreeApi(lang, 768, undefined);
+                const parentGlob = globalTree.find(c => c.id === parentCat.id);
+                const localizedSub = parentGlob ? (parentGlob.children ?? []).find(c => c.id === otherSub.id) : null;
                 if (localizedSub) {
                     const langPrefix = lang === 'ua' ? '' : `/${lang}`;
                     redirect(`${langPrefix}/${parentCat.slug}/${localizedSub.slug}`);
@@ -85,6 +113,14 @@ export default async function SubcategoryPage({ params, searchParams }: Subcateg
         getCategoryByIdApi(categoryId, lang, token ?? undefined),
     ]);
     productsResponse.current_page = page;
+
+    // Якщо 0 товарів для обраного міста (і немає активних фільтрів) — редирект на батьківську категорію
+    // Звідти якщо також немає товарів — спрацює редирект на /catalog
+    const hasActiveFilters = activeFilters.length > 0 || !!sort;
+    if (shouldRedirectForLocality(productsResponse.data.length, page, hasActiveFilters)) {
+        const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+        redirect(`${langPrefix}/${parentCat.slug}`);
+    }
 
     // Завантажуємо FAQ для першої групи (якщо є)
     let faq = null;

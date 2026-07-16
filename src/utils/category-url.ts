@@ -122,3 +122,27 @@ export function buildCategoryBreadcrumbs(
 
     return base;
 }
+
+// ---------------------------------------------------------------------------
+// shouldRedirectForLocality
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns true when the page should redirect due to no products being available
+ * for the user's selected locality.
+ *
+ * Redirect only fires when:
+ *  - it's the first page (page 1)
+ *  - no user-applied filters or sort are active (to avoid redirecting on user's own empty search)
+ *  - the backend returned 0 products
+ *
+ * The main catalog (/catalog) always has products for any locality — use it as the safe fallback.
+ */
+export function shouldRedirectForLocality(
+    productsCount: number,
+    page: number,
+    hasActiveFilters: boolean,
+): boolean {
+    return page === 1 && !hasActiveFilters && productsCount === 0;
+}
+

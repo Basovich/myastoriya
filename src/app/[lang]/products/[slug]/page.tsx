@@ -18,8 +18,8 @@ import {
     ProductsResponse,
     GraphQLError,
 } from "@/lib/graphql";
-import { notFound } from "next/navigation";
-import { buildCategoryIndex, buildCategoryBreadcrumbs } from "@/utils/category-url";
+import { notFound, redirect } from "next/navigation";
+import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref } from "@/utils/category-url";
 import { getAccessToken } from "@/app/actions/authActions";
 
 type Props = {
@@ -81,36 +81,112 @@ export default async function ProductPage({ params }: Props) {
 
     const numericId = parseInt(productId);
 
-    // Критичний запит:
-    // - GraphQLError (логічна помилка бекенду, напр. «продукт не знайдено») → 404
-    // - Мережева / несподівана помилка (тимчасово недоступний API) → re-throw → Next.js 500
+    // Критичний запит + catalogTree паралельно (catalogTree потрібен для редиректу при available=false)
     let product: Product | null = null;
+    let catalogTree: ProductCategory[] = [];
+    let fetchError: unknown = null;
+
     try {
-        product = await getProductByIdApi(productId, lang, token ?? undefined);
+        [product, catalogTree] = await Promise.all([
+            getProductByIdApi(productId, lang, token ?? undefined, true).catch((e) => {
+                fetchError = e;
+                return null;
+            }),
+            getCatalogTreeApi(lang, 768, token ?? undefined).catch(() => [] as ProductCategory[]),
+        ]);
     } catch (err) {
-        if (err instanceof GraphQLError) {
-            // Бекенд відповів логічною помилкою — продукт відсутній
-            console.error('[ProductPage] GraphQL error fetching product (notFound):', err.message);
-            notFound();
-        }
-        // Мережева / несподівана помилка — пробрасуємо далі
-        // Next.js покаже error.tsx (500), а не хибний 404
-        console.error('[ProductPage] Network/unexpected error fetching product:', err instanceof Error ? err.message : err);
-        throw err;
+        fetchError = err;
     }
-    if (!product) notFound();
+
+    // Якщо продукт не завантажився локально (або повернув помилку), перевіряємо, чи існує він глобально
+    if (!product) {
+        const globalProduct = await getProductByIdApi(productId, lang, undefined, true).catch(() => null);
+        if (globalProduct) {
+            // Товар існує глобально, але недоступний для поточного міста.
+            const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+            
+            // Спочатку перевіряємо, чи доступна категорія товару локально
+            const localIndex = buildCategoryIndex(catalogTree);
+            const localEntry = globalProduct.categoryId
+                ? localIndex.get(String(globalProduct.categoryId))
+                : undefined;
+                
+            if (localEntry) {
+                const catUrl = getCategoryHref(
+                    localEntry.node,
+                    localEntry.parent,
+                    localEntry.grandParent,
+                );
+                redirect(`${langPrefix}${catUrl}`);
+            }
+            
+            // Якщо локально категорія недоступна, шукаємо в глобальному дереві
+            const globalTree = await getCatalogTreeApi(lang, 768, undefined).catch(() => [] as ProductCategory[]);
+            const globalIndex = buildCategoryIndex(globalTree);
+            const globalEntry = globalProduct.categoryId
+                ? globalIndex.get(String(globalProduct.categoryId))
+                : undefined;
+                
+            if (globalEntry) {
+                const parentSlug = globalEntry.parent?.slug;
+                const localParent = parentSlug ? catalogTree.find(c => c.slug === parentSlug) : undefined;
+                if (localParent) {
+                    redirect(`${langPrefix}/${localParent.slug}`);
+                }
+            }
+            
+            redirect(`${langPrefix}/catalog`);
+        }
+
+        // Якщо товар не знайдено ні локально, ні глобально — показуємо 404
+        notFound();
+    }
+
+    // Якщо товар недоступний для обраного міста — редирект на найближчу доступну категорію
+    if (!product.available) {
+        const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+        
+        // 1. Спочатку перевіряємо, чи доступна категорія товару локально
+        const localIndex = buildCategoryIndex(catalogTree);
+        const localEntry = product.categoryId
+            ? localIndex.get(String(product.categoryId))
+            : undefined;
+            
+        if (localEntry) {
+            const catUrl = getCategoryHref(
+                localEntry.node,
+                localEntry.parent,
+                localEntry.grandParent,
+            );
+            redirect(`${langPrefix}${catUrl}`);
+        }
+        
+        // 2. Якщо локально категорія недоступна, шукаємо її в глобальному дереві
+        const globalTree = await getCatalogTreeApi(lang, 768, undefined).catch(() => [] as ProductCategory[]);
+        const globalIndex = buildCategoryIndex(globalTree);
+        const globalEntry = product.categoryId
+            ? globalIndex.get(String(product.categoryId))
+            : undefined;
+            
+        if (globalEntry) {
+            const parentSlug = globalEntry.parent?.slug;
+            const localParent = parentSlug ? catalogTree.find(c => c.slug === parentSlug) : undefined;
+            if (localParent) {
+                redirect(`${langPrefix}/${localParent.slug}`);
+            }
+        }
+        
+        // 3. Якщо нічого не підходить — редирект на головний каталог
+        redirect(`${langPrefix}/catalog`);
+    }
 
 
 
     // Некритичні запити — паралельно, із retry та fallback
-    const [blogsResponse, catalogTree, deliveryBlocks] = await Promise.all([
+    const [blogsResponse, deliveryBlocks] = await Promise.all([
         safeCall<{ data: BlogPost[] }>(
             () => getBlogsApi({ limit: 3 }, lang),
             { data: [] },
-        ),
-        safeCall<ProductCategory[]>(
-            () => getCatalogTreeApi(lang, 768, token ?? undefined),
-            [],
         ),
         safeCall<OrderingInfoBlock[]>(
             () => getDeliveryBlocksApi(lang),

@@ -1,9 +1,9 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
 import { getCatalogTreeApi, getProductsApi, getCategoryByIdApi, getFaqQuestionsApi } from '@/lib/graphql';
-import { buildCategoryIndex } from '@/utils/category-url';
+import { buildCategoryIndex, shouldRedirectForLocality } from '@/utils/category-url';
 import { getAccessToken } from '@/app/actions/authActions';
 
 interface CategoryCatalogPageProps {
@@ -27,9 +27,23 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
     );
 
     // Fallback: also check level-2 (some slugs may live at level 2 and be accessed via /catalog/)
-    const entryFallback = entry ?? Array.from(categoryIndex.values()).find(
+    let entryFallback = entry ?? Array.from(categoryIndex.values()).find(
         e => e.node.slug === categorySlug,
     );
+
+    if (!entryFallback) {
+        // Перевіряємо в глобальному дереві категорій
+        const globalTree = await getCatalogTreeApi(lang, 768, undefined);
+        const globalIndex = buildCategoryIndex(globalTree);
+        const globalEntry = Array.from(globalIndex.values()).find(
+            e => e.node.slug === categorySlug,
+        );
+        if (globalEntry) {
+            // Категорія прихована для міста. Редиректимо на каталог.
+            const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+            redirect(`${langPrefix}/catalog`);
+        }
+    }
 
     if (!entryFallback) notFound();
 
@@ -49,6 +63,12 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
         getCategoryByIdApi(categoryId, lang, token ?? undefined),
     ]);
     productsResponse.current_page = page;
+
+    // Якщо 0 товарів для обраного міста — редирект на головний каталог (гарантовано має товари)
+    if (shouldRedirectForLocality(productsResponse.data.length, page, !!sort)) {
+        const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+        redirect(`${langPrefix}/catalog`);
+    }
 
     // Завантажуємо FAQ для першої групи (якщо є)
     let faq = null;

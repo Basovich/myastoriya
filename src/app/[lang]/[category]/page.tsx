@@ -3,7 +3,7 @@ import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
 import { getCatalogTreeApi, getProductsApi, getPopularProductsApi, getCategoryByIdApi, getFaqQuestionsApi } from '@/lib/graphql';
-import { getCategoryHref } from '@/utils/category-url';
+import { getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
 import { parseFilterParams } from '@/utils/filter-params';
@@ -23,8 +23,20 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
     const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined);
 
-    // Find level-1 category by slug in the current locale tree
-    const matchedCat = catalogTree.find(c => c.slug === categorySlug);
+    let matchedCat = catalogTree.find(c => c.slug === categorySlug);
+
+    // Якщо не знайдено, можливо категорія існує, але прихована (відфільтрована бекендом) для обраного міста.
+    // Перевіряємо в глобальному дереві категорій (без токена, тобто для дефолтного міста)
+    if (!matchedCat) {
+        const globalTree = await getCatalogTreeApi(lang, 768, undefined);
+        const existsGlobally = globalTree.find(c => c.slug === categorySlug);
+        
+        if (existsGlobally) {
+            // Категорія існує на сайті, але прихована для міста. Редиректимо на каталог.
+            const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+            redirect(`${langPrefix}/catalog`);
+        }
+    }
 
     // Cross-locale fallback: slug may come from a different locale (e.g. after language switch).
     // Search the slug in all other locale trees, find the category id, then redirect to the
@@ -32,10 +44,12 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     if (!matchedCat) {
         const otherLocales = ['ua', 'ru'].filter(l => l !== lang);
         for (const otherLang of otherLocales) {
-            const otherTree = await getCatalogTreeApi(otherLang, 768, token ?? undefined);
-            const otherCat = otherTree.find(c => c.slug === categorySlug);
+            // Використовуємо глобальне дерево для крос-локалізаційного пошуку, оскільки категорія може бути прихована в іншій локалі для обраного міста
+            const otherGlobalTree = await getCatalogTreeApi(otherLang, 768, undefined);
+            const otherCat = otherGlobalTree.find(c => c.slug === categorySlug);
             if (otherCat) {
-                const localizedCat = catalogTree.find(c => c.id === otherCat.id);
+                const globalTree = await getCatalogTreeApi(lang, 768, undefined);
+                const localizedCat = globalTree.find(c => c.id === otherCat.id);
                 if (localizedCat) {
                     const langPrefix = lang === 'ua' ? '' : `/${lang}`;
                     redirect(`${langPrefix}/${localizedCat.slug}`);
@@ -65,6 +79,13 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         getCategoryByIdApi(categoryId, lang, token ?? undefined),
     ]);
     productsResponse.current_page = page;
+
+    // Якщо 0 товарів для обраного міста (і немає активних фільтрів) — редирект на головний каталог
+    const hasActiveFilters = activeFilters.length > 0 || !!sort;
+    if (shouldRedirectForLocality(productsResponse.data.length, page, hasActiveFilters)) {
+        const langPrefix = lang === 'ua' ? '' : `/${lang}`;
+        redirect(`${langPrefix}/catalog`);
+    }
 
     // Завантажуємо FAQ для першої групи (якщо є)
     let faq = null;
