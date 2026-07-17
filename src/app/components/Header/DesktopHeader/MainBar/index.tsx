@@ -13,6 +13,7 @@ import { type Locale } from "@/i18n/config";
 import Image from "next/image";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import { siteData } from "@/config/site";
+import { usePathname } from "next/navigation";
 
 const getScrolledNavItems = (lang: Locale) => [
     { label: lang === "ru" ? "Заведения" : "Заклади", href: "/restaurants" },
@@ -43,6 +44,12 @@ export default function MainBar({
 }: MainBarProps) {
     const [isCatalogOpen, setIsCatalogOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
+
+    // Close catalog menu when pathname changes
+    useEffect(() => {
+        setIsCatalogOpen(false);
+    }, [pathname]);
 
     // Close scrolled menu when clicking outside
     useEffect(() => {
