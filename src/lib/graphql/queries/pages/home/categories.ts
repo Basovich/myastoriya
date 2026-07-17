@@ -76,13 +76,13 @@ const POPULAR_CATEGORIES_QUERY = /* GraphQL */ `
     }
 `;
 
-import { getProductsApi } from "@/lib/graphql/queries/products";
 
-export async function getPopularCategoriesApi(lang?: string): Promise<PopularCategory[]> {
+
+export async function getPopularCategoriesApi(lang?: string, token?: string): Promise<PopularCategory[]> {
     const data = await gqlRequest<{ popularCategories: PopularCategory[] }>(
         POPULAR_CATEGORIES_QUERY,
         undefined,
-        { next: { revalidate: 3600 }, lang },
+        { cache: 'no-store', lang, token },
     );
     const categories = data.popularCategories ?? [];
     

@@ -64,34 +64,48 @@ export default function Categories({ lang, popularCategories, categoryHrefs }: C
                         1280: { slidesPerView: 6, spaceBetween: 0 },
                     }}
                 >
-                    {popularCategories.map((cat) => (
-                        <SwiperSlide key={cat.id} className={s.slide}>
-                            <AppLink href={categoryHrefs[cat.id] ?? `/${cat.slug ?? cat.id}`} className={s.item}>
-                                <div className={s.circle}>
-                                    {(cat.image?.square2x || cat.image?.big2x || cat.image?.square1x || cat.image?.big1x) ? (
-                                        <Image
-                                            src={(cat.image?.square2x || cat.image?.big2x || cat.image?.square1x || cat.image?.big1x)!}
-                                            alt={cat.name}
-                                            width={180}
-                                            height={180}
-                                            className={s.circleImg}
-                                        />
-                                    ) : (
-                                        <div className={s.placeholder}>
-                                            <Image 
-                                                src="/icons/logo-red.svg" 
-                                                alt="" 
-                                                width={60} 
-                                                height={60} 
-                                                className={s.placeholderLogo}
+                    {popularCategories.map((cat) => {
+                        const imageUrl = (() => {
+                            const thumb = cat.thumbnail?.thumb3x || cat.thumbnail?.thumb2x || cat.thumbnail?.thumb1x;
+                            if (thumb) {
+                                return thumb.startsWith("/") ? `https://dev-api.myastoriya.com.ua${thumb}` : thumb;
+                            }
+                            const img = cat.image?.square2x || cat.image?.big2x || cat.image?.square1x || cat.image?.big1x;
+                            if (img) {
+                                return img.startsWith("/") ? `https://dev-api.myastoriya.com.ua${img}` : img;
+                            }
+                            return null;
+                        })();
+
+                        return (
+                            <SwiperSlide key={cat.id} className={s.slide}>
+                                <AppLink href={categoryHrefs[cat.id] ?? `/${cat.slug ?? cat.id}`} className={s.item}>
+                                    <div className={s.circle}>
+                                        {imageUrl ? (
+                                            <Image
+                                                src={imageUrl}
+                                                alt={cat.name}
+                                                width={180}
+                                                height={180}
+                                                className={s.circleImg}
                                             />
-                                        </div>
-                                    )}
-                                </div>
-                                <span className={s.label}>{cat.name}</span>
-                            </AppLink>
-                        </SwiperSlide>
-                    ))}
+                                        ) : (
+                                            <div className={s.placeholder}>
+                                                <Image 
+                                                    src="/icons/logo-red.svg" 
+                                                    alt="" 
+                                                    width={60} 
+                                                    height={60} 
+                                                    className={s.placeholderLogo}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <span className={s.label}>{cat.name}</span>
+                                </AppLink>
+                            </SwiperSlide>
+                        );
+                    })}
                 </Swiper>
             </div>
         </section>

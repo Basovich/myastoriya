@@ -20,7 +20,7 @@ export default async function Home({
   const token = await getAccessToken();
 
   const [popularCategories, catalogTree, showcases, salesResponse] = await Promise.all([
-      getPopularCategoriesApi(lang),
+      getPopularCategoriesApi(lang, token ?? undefined),
       getCatalogTreeApi(lang, 768, token ?? undefined),
       getShowcasesApi(lang, token ?? undefined),
       getSalesApi(6, 1, lang),
