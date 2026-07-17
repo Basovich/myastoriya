@@ -46,10 +46,14 @@ export default function MainBar({
     const menuRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
 
-    // Close catalog menu when pathname changes
-    useEffect(() => {
-        setIsCatalogOpen(false);
-    }, [pathname]);
+і р         // Close catalog menu when pathname changes (adjust state during render)
+    const [prevPathname, setPrevPathname] = useState(pathname);
+    if (pathname !== prevPathname) {
+        setPrevPathname(pathname);
+        if (isCatalogOpen) {
+            setIsCatalogOpen(false);
+        }
+    }
 
     // Close scrolled menu when clicking outside
     useEffect(() => {
