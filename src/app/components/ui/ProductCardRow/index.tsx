@@ -1,3 +1,5 @@
+"use client";
+
 import s from './index.module.scss';
 import Image from 'next/image';
 import Badge from '@/app/components/ui/Badge/Badge';
@@ -5,11 +7,13 @@ import WishButton from '@/app/components/ui/WishButton/WishButton';
 import AddToCartButton from '@/app/components/ui/AddToCartButton/AddToCartButton';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
 import clsx from "clsx";
+import { useProductHref } from '@/hooks/useCategoryTree';
 
 
 interface ProductCardRowProps {
     id: number | string;
     slug?: string;
+    categoryId?: number | string | null;
     title: string;
     weight: string;
     price: number;
@@ -25,6 +29,7 @@ interface ProductCardRowProps {
 export default function ProductCardRow({
     id,
     slug,
+    categoryId,
     title,
     weight,
     price,
@@ -93,7 +98,7 @@ export default function ProductCardRow({
         ? (isRu ? "За 1 шт" : "За 1 шт")
         : `За ${unit}`;
 
-    const productUrl = `/products/${slug || id}`;
+    const productUrl = useProductHref(slug || String(id), categoryId);
 
 
 

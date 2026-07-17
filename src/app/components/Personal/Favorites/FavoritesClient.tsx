@@ -126,6 +126,7 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                                     key={product.id}
                                     id={product.id}
                                     slug={product.slug}
+                                    categoryId={product.categoryId}
                                     title={product.name}
                                     price={product.cost}
                                     oldPrice={product.oldCost ?? undefined}

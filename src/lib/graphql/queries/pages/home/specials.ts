@@ -9,6 +9,7 @@ export interface SpecialImage {
 
 export interface SpecialProduct {
     id: string;
+    categoryId?: string | number | null;
     name: string;
     slug: string;
     cost: number;
@@ -102,6 +103,7 @@ const SPECIALS_QUERY = /* GraphQL */ `
                 }
                 products {
                     id
+                    categoryId
                     name
                     slug
                     cost
@@ -164,6 +166,7 @@ export const SPECIAL_BY_ID_QUERY = /* GraphQL */ `
             }
             products {
                 id
+                categoryId
                 name
                 slug
                 cost

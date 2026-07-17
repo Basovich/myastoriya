@@ -244,6 +244,7 @@ export default function ActionDetail({
                                 key={product.id}
                                 id={product.id}
                                 slug={product.slug}
+                                categoryId={product.categoryId}
                                 title={product.name}
                                 weight={getProductWeight(product)}
                                 price={product.cost}

@@ -108,6 +108,7 @@ import { getSocialLinksApi, type SocialLink } from "@/lib/graphql/queries/settin
 import Header from "@/app/components/Header/HeaderClient";
 import Footer from "@/app/components/Footer/FooterClient";
 import { getAccessToken } from "@/app/actions/authActions";
+import { CategoryProvider } from "@/hooks/useCategoryTree";
 
 export default async function RootLayout({
   children,
@@ -150,10 +151,12 @@ export default async function RootLayout({
     <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <body>
         <ReduxProvider>
-          {!isMenuPage && <AuthInitializer />}
-          {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
-          {children}
-          {!isMenuPage && <Footer lang={lang as Locale} initialSocialLinks={socialLinks} />}
+          <CategoryProvider initialCategories={catalogTree}>
+            {!isMenuPage && <AuthInitializer />}
+            {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
+            {children}
+            {!isMenuPage && <Footer lang={lang as Locale} initialSocialLinks={socialLinks} />}
+          </CategoryProvider>
         </ReduxProvider>
       </body>
     </html>

@@ -21,6 +21,7 @@ import {
     getProductWeight,
     getProductBadge
 } from "@/lib/graphql";
+import { getCategoryHref } from "@/utils/category-url";
 
 export default function SearchContent() {
     const searchParams = useSearchParams();
@@ -118,24 +119,20 @@ export default function SearchContent() {
 
     const categoryCircleItems = (() => {
         const items: { name: string; image: string; href: string }[] = [];
-        const process = (list: ProductCategory[], parentSlug?: string) => {
+        const process = (
+            list: ProductCategory[],
+            parent?: ProductCategory | null,
+            grandParent?: ProductCategory | null,
+        ) => {
             list.forEach(cat => {
-                // Determine href based on available parent context
-                let href: string;
-                if (parentSlug) {
-                    // Level 2: /{parentSlug}/{slug}  or level 3: /catalog/{slug}
-                    href = `/catalog/${cat.slug}`;
-                } else {
-                    // Level 1: /{slug}
-                    href = `/${cat.slug}`;
-                }
+                const href = getCategoryHref(cat, parent, grandParent);
                 items.push({
                     name: cat.name,
                     image: resolveCategoryImageUrl(cat) || "/images/product-placeholder.svg",
                     href: getLocalizedHref(href, (lang as Locale) || "ua")
                 });
                 if (cat.children && cat.children.length > 0) {
-                    process(cat.children, cat.slug);
+                    process(cat.children, cat, parent);
                 }
             });
         };
@@ -184,6 +181,7 @@ export default function SearchContent() {
                                         key={product.id}
                                         id={product.id}
                                         slug={product.slug}
+                                        categoryId={product.categoryId}
                                         title={product.name}
                                         weight={weight}
                                         price={product.cost}

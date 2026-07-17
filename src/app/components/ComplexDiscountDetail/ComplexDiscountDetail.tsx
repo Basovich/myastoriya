@@ -179,6 +179,7 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
                                                 <ProductCard
                                                     id={product.id}
                                                     slug={product.slug}
+                                                    categoryId={product.categoryId}
                                                     title={product.name}
                                                     weight={getProductWeight(product)}
                                                     price={product.purchaseCost ?? product.cost ?? 0}

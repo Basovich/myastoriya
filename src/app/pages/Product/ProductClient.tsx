@@ -244,6 +244,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
         return sliced.map(p => ({
             id: p.id,
             slug: p.slug,
+            categoryId: p.categoryId,
             title: p.name,
             price: p.cost,
             oldPrice: p.oldCost ?? undefined,

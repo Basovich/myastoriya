@@ -179,6 +179,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                             key={`${product.id}-${idx}`}
                             id={product.id}
                             slug={product.slug}
+                            categoryId={product.categoryId}
                             title={product.name}
                             weight={getProductWeight(product)}
                             price={product.cost}

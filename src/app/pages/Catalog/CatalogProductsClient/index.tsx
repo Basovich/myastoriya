@@ -174,6 +174,7 @@ export default function CatalogProductsClient({
                                 key={product.id}
                                 id={product.id}
                                 slug={product.slug}
+                                categoryId={product.categoryId}
                                 title={product.name}
                                 weight={getProductWeight(product)}
                                 price={product.cost}
@@ -190,6 +191,7 @@ export default function CatalogProductsClient({
                                 key={product.id}
                                 id={product.id}
                                 slug={product.slug}
+                                categoryId={product.categoryId}
                                 title={product.name}
                                 weight={getProductWeight(product)}
                                 price={product.cost}

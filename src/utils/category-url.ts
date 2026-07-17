@@ -71,12 +71,12 @@ export function getCategoryHref(
     grandParent?: ProductCategory | null,
 ): string {
     if (grandParent && parent) {
-        return `/catalog/${node.slug}`;
+        return `/catalog/${grandParent.slug}/${parent.slug}/${node.slug}`;
     }
     if (parent) {
-        return `/${parent.slug}/${node.slug}`;
+        return `/catalog/${parent.slug}/${node.slug}`;
     }
-    return `/${node.slug}`;
+    return `/catalog/${node.slug}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -100,23 +100,23 @@ export function buildCategoryBreadcrumbs(
     const { node, parent, grandParent, level } = entry;
 
     if (level === 1) {
-        return [...base, { label: node.name, href: `/${node.slug}` }];
+        return [...base, { label: node.name, href: `/catalog/${node.slug}` }];
     }
 
     if (level === 2 && parent) {
         return [
             ...base,
-            { label: parent.name, href: `/${parent.slug}` },
-            { label: node.name, href: `/${parent.slug}/${node.slug}` },
+            { label: parent.name, href: `/catalog/${parent.slug}` },
+            { label: node.name, href: `/catalog/${parent.slug}/${node.slug}` },
         ];
     }
 
     if (level === 3 && parent && grandParent) {
         return [
             ...base,
-            { label: grandParent.name, href: `/${grandParent.slug}` },
-            { label: parent.name, href: `/${grandParent.slug}/${parent.slug}` },
-            { label: node.name, href: `/catalog/${node.slug}` },
+            { label: grandParent.name, href: `/catalog/${grandParent.slug}` },
+            { label: parent.name, href: `/catalog/${grandParent.slug}/${parent.slug}` },
+            { label: node.name, href: `/catalog/${grandParent.slug}/${parent.slug}/${node.slug}` },
         ];
     }
 
