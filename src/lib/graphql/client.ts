@@ -143,6 +143,14 @@ export async function gqlRequest<T>(
         const result = await performRequest<T>(GQL_ENDPOINT, headers, body, query, variables, options);
         return result.data;
     } catch (err) {
+        const isDynamicServerError = err instanceof Error && (
+            err.message.includes('Dynamic server usage') ||
+            (err as unknown as Record<string, unknown>).digest === 'DYNAMIC_SERVER_USAGE'
+        );
+        if (isDynamicServerError) {
+            throw err;
+        }
+
         const rawText = (err && typeof err === 'object' && '_rawText' in err)
             ? String((err as Record<string, unknown>)._rawText || "")
             : "";
@@ -269,7 +277,7 @@ async function performRequest<T>(
         headers,
         body,
         ...(isServer ? {} : { credentials: 'include' }),
-        ...(options?.cache ? { cache: options.cache } : options?.next ? { next: options.next } : {}),
+        cache: 'no-store',
     });
 
     if (!res.ok) {
