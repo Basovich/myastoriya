@@ -83,18 +83,14 @@ export default async function ProductPage({ params }: Props) {
     // Критичний запит + catalogTree паралельно (catalogTree потрібен для редиректу при available=false)
     let product: Product | null = null;
     let catalogTree: ProductCategory[] = [];
-    let fetchError: unknown = null;
 
     try {
         [product, catalogTree] = await Promise.all([
-            getProductByIdApi(productId, lang, token ?? undefined, true).catch((e) => {
-                fetchError = e;
-                return null;
-            }),
+            getProductByIdApi(productId, lang, token ?? undefined, true).catch(() => null),
             getCatalogTreeApi(lang, 768, token ?? undefined).catch(() => [] as ProductCategory[]),
         ]);
-    } catch (err) {
-        fetchError = err;
+    } catch {
+        // Ignored as we fall back below
     }
 
     // Якщо продукт не завантажився локально (або повернув помилку), перевіряємо, чи існує він глобально
