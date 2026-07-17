@@ -106,6 +106,7 @@ export default async function CatalogContent({
             id: product.id,
             element: (
                 <ProductCard
+                    key={product.id}
                     id={product.id}
                     slug={product.slug}
                     categoryId={product.categoryId}
@@ -128,6 +129,7 @@ export default async function CatalogContent({
         id: product.id,
         element: (
             <ProductCard
+                key={product.id}
                 id={product.id}
                 slug={product.slug}
                 categoryId={product.categoryId}
