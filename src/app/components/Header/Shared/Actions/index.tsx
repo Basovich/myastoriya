@@ -5,14 +5,17 @@ import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { useRouter, useParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import s from './Actions.module.scss';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { setCartModalOpen } from '@/store/slices/cartSlice';
 import AuthButton from '@/app/components/Header/Shared/AuthButton';
 import AuthModal from '@/app/components/AuthModal';
 import CartModal from '@/app/components/CartModal/CartModal';
 
 function Actions() {
+    const dispatch = useAppDispatch();
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+    const isCartModalOpen = useAppSelector((state) => state.cart.isCartModalOpen);
+    const setIsCartModalOpen = (open: boolean) => dispatch(setCartModalOpen(open));
     const router = useRouter();
     const params = useParams();
     const pathname = usePathname();

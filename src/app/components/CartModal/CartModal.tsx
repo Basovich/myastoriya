@@ -10,7 +10,7 @@ import { Locale } from '@/i18n/config';
 import s from './CartModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { addToCartAsync, updateQuantityAsync, removeFromCartAsync, fetchCartAsync } from '@/store/slices/cartSlice';
+import { addToCartAsync, updateQuantityAsync, removeFromCartAsync, fetchCartAsync, clearRemovedItems } from '@/store/slices/cartSlice';
 import { useCartProducts } from '@/hooks/useCartProducts';
 import clsx from 'clsx';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
@@ -50,6 +50,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     const { isInitialized } = useAppSelector(state => state.auth);
     const cashback = useAppSelector(state => state.cart.cashback);
     const cartLoading = useAppSelector(state => state.cart.loading);
+    const removedItems = useAppSelector(state => state.cart.removedItems);
     const hydrated = useIsHydrated();
 
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
@@ -85,12 +86,16 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     useEffect(() => {
         if (isOpen) {
             disableScroll();
-            if (isInitialized) {
+            if (isInitialized && removedItems.length === 0) {
                 void dispatch(fetchCartAsync());
             }
             return () => enableScroll();
         }
-    }, [isOpen, disableScroll, enableScroll, isInitialized, dispatch]);
+    }, [isOpen, disableScroll, enableScroll, isInitialized, dispatch, removedItems.length]);
+
+    const handleClearRemoved = () => {
+        dispatch(clearRemovedItems());
+    };
 
     const handleUpdateQuantity = (id: string, rowId: string | undefined, newQuantity: number) => {
         if (newQuantity < 1) return;
@@ -129,16 +134,66 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                         <Spinner />
                     </div>
                 )}
-                <div className={s.modalHeader}>
-                    <h2 className={s.title}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
-                            <path d="M3.57532 5.99551C2.82203 10.329 9.95312 11.0512 9.57446 5.99551M3.57532 4.10525C2.82203 -0.228233 9.95312 -0.950481 9.57446 4.10525M0.578125 4.55101H12.5781V12.1346C12.5781 12.9324 11.9066 13.5791 11.0781 13.5791H2.07812C1.2497 13.5791 0.578125 12.9324 0.578125 12.1346V4.55101Z" stroke="black" strokeWidth="1.15789" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        {lang === 'ru' ? 'Ваша корзина' : 'Ваш кошик'}
-                    </h2>
-                </div>
+                {removedItems.length > 0 ? (
+                    <>
+                        <div className={s.modalHeader}>
+                            <h2 className={s.title}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
+                                    <path d="M3.57532 5.99551C2.82203 10.329 9.95312 11.0512 9.57446 5.99551M3.57532 4.10525C2.82203 -0.228233 9.95312 -0.950481 9.57446 4.10525M0.578125 4.55101H12.5781V12.1346C12.5781 12.9324 11.9066 13.5791 11.0781 13.5791H2.07812C1.2497 13.5791 0.578125 12.9324 0.578125 12.1346V4.55101Z" stroke="black" strokeWidth="1.15789" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                {lang === 'ru' ? 'Обратите внимание' : 'Зверніть увагу'}
+                            </h2>
+                        </div>
 
-                <div className={clsx(s.body, (populatedItems.length === 0 || loading) && s.bodyEmpty)}>
+                        <div className={s.body}>
+                            <div className={s.removedInfo}>
+                                {lang === 'ru'
+                                    ? 'Следующие товары не доступны в выбранном городе и были удалены из корзины:'
+                                    : 'Наступні товари не доступні у вибраному місті та були видалені з кошика:'}
+                            </div>
+                            <div className={s.cartItems}>
+                                {removedItems.map((item) => (
+                                    <div key={item.id} className={s.cartItem}>
+                                        <div className={s.itemImage}>
+                                            <Image
+                                                src={item.image}
+                                                alt={item.title}
+                                                width={80}
+                                                height={80}
+                                                className={s.image}
+                                            />
+                                        </div>
+                                        <div className={s.removedDetails}>
+                                            <h3 className={s.itemTitle}>{item.title}</h3>
+                                            <span className={s.removedQuantity}>
+                                                {lang === 'ru' ? `Количество: ${item.quantity} шт` : `Кількість: ${item.quantity} шт`}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className={s.modalFooter}>
+                            <div className={s.footerCentered}>
+                                <Button variant="red" onClick={handleClearRemoved} className={s.removedBtn}>
+                                    OK
+                                </Button>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className={s.modalHeader}>
+                            <h2 className={s.title}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="15" viewBox="0 0 14 15" fill="none">
+                                    <path d="M3.57532 5.99551C2.82203 10.329 9.95312 11.0512 9.57446 5.99551M3.57532 4.10525C2.82203 -0.228233 9.95312 -0.950481 9.57446 4.10525M0.578125 4.55101H12.5781V12.1346C12.5781 12.9324 11.9066 13.5791 11.0781 13.5791H2.07812C1.2497 13.5791 0.578125 12.9324 0.578125 12.1346V4.55101Z" stroke="black" strokeWidth="1.15789" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                                {lang === 'ru' ? 'Ваша корзина' : 'Ваш кошик'}
+                            </h2>
+                        </div>
+
+                        <div className={clsx(s.body, (populatedItems.length === 0 || loading) && s.bodyEmpty)}>
                     {loading ? (
                         <div className={s.loaderContainer}>
                             <Spinner />
@@ -368,6 +423,8 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                             </div>
                         )}
                     </div>
+                )}
+                    </>
                 )}
             </div>
         </Modal>

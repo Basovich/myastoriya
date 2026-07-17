@@ -32,6 +32,13 @@ export interface CartPromoCode {
     discount?: string | null;
 }
 
+export interface RemovedCartItem {
+    id: string;
+    title: string;
+    image: string;
+    quantity: number;
+}
+
 interface CartState {
     items: CartItem[];
     deletingIds: string[];
@@ -41,6 +48,9 @@ interface CartState {
     cashback: number;
     useBonuses: boolean;
     total: number;
+    isCartModalOpen: boolean;
+    removedItems: RemovedCartItem[];
+    productDetails: Record<string, { title: string; image: string }>;
 }
 
 const initialState: CartState = {
@@ -52,6 +62,9 @@ const initialState: CartState = {
     cashback: 0,
     useBonuses: false,
     total: 0,
+    isCartModalOpen: false,
+    removedItems: [],
+    productDetails: {},
 };
 
 // Helper to map CartGql to local CartItem[]
@@ -102,7 +115,10 @@ export const fetchCartAsync = createAsyncThunk(
             dispatch(setPromoCode(response.promoCode || null));
             dispatch(setCashback(response.cashback || 0));
             dispatch(setTotal(response.total || 0));
-            return mapCartItems(response);
+            return {
+                items: mapCartItems(response),
+                hasUnavailableProducts: response.hasUnavailableProducts || false,
+            };
         } catch (error: unknown) {
             console.error('[Cart] Failed to fetch cart from backend:', error);
             Sentry.captureException(error);
@@ -348,6 +364,19 @@ const cartSlice = createSlice({
         },
         setTotal: (state, action: PayloadAction<number>) => {
             state.total = action.payload;
+        },
+        setCartModalOpen: (state, action: PayloadAction<boolean>) => {
+            state.isCartModalOpen = action.payload;
+        },
+        saveProductDetails: (state, action: PayloadAction<Record<string, { title: string; image: string }>>) => {
+            state.productDetails = {
+                ...state.productDetails,
+                ...action.payload
+            };
+        },
+        clearRemovedItems: (state) => {
+            state.removedItems = [];
+            state.isCartModalOpen = false;
         }
     },
     extraReducers: (builder) => {
@@ -360,9 +389,32 @@ const cartSlice = createSlice({
                 if (!state.deletingIds) {
                     state.deletingIds = [];
                 }
+                const newItems = action.payload.items;
+                const hasUnavailable = action.payload.hasUnavailableProducts;
+
+                if (hasUnavailable) {
+                    // Find items that were present in state.items but are NOT present in newItems
+                    const removed = state.items.filter(
+                        oldItem => !newItems.some(newItem => newItem.id === oldItem.id)
+                    );
+
+                    if (removed.length > 0) {
+                        state.removedItems = removed.map(item => {
+                            const details = state.productDetails[item.id];
+                            return {
+                                id: item.id,
+                                title: details?.title || 'Товар',
+                                image: details?.image || '/images/product-placeholder.svg',
+                                quantity: item.quantity,
+                            };
+                        });
+                        state.isCartModalOpen = true;
+                    }
+                }
+
                 // Merge backend state with local optimistic items (no rowId yet)
                 // so items added before auth was ready are not wiped.
-                state.items = mergeCartItems(state.items, action.payload).filter(
+                state.items = mergeCartItems(state.items, newItems).filter(
                     item => !state.deletingIds.includes(item.rowId || item.id)
                 );
                 state.isInitialized = true;
@@ -506,5 +558,5 @@ const cartSlice = createSlice({
     }
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart, setPromoCode, setCashback, setUseBonuses, setTotal } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQuantity, clearCart, setPromoCode, setCashback, setUseBonuses, setTotal, setCartModalOpen, saveProductDetails, clearRemovedItems } = cartSlice.actions;
 export default cartSlice.reducer;

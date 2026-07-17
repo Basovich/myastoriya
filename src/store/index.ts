@@ -76,7 +76,7 @@ const authPersistConfig = {
 const cartPersistConfig = {
     key: 'cart',
     storage,
-    blacklist: ['loading', 'deletingIds', 'useBonuses', 'total'],
+    blacklist: ['loading', 'deletingIds', 'useBonuses', 'total', 'isCartModalOpen', 'removedItems'],
 };
 
 const rootReducer = combineReducers({

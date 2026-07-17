@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { saveProductDetails } from '@/store/slices/cartSlice';
 import { useParams } from 'next/navigation';
 import { getProductsByIdsApi, resolveProductImageUrl, type Product, getCategoryByIdApi, type ProductCategory } from '@/lib/graphql/queries/products';
 import { getSpecialsApi } from '@/lib/graphql/queries/pages/home/specials';
@@ -121,6 +122,7 @@ function roundWeightString(val: string): string {
 export function useCartProducts() {
     const cartItems = useAppSelector(state => state.cart.items);
     const { isInitialized } = useAppSelector(state => state.auth);
+    const dispatch = useAppDispatch();
     const [cacheVersion, setCacheVersion] = useState(0);
     const params = useParams();
     const lang = (params?.lang as string) || 'ua';
@@ -188,6 +190,8 @@ export function useCartProducts() {
 
                 const fetchedMap = new Map((fetchedProducts || []).map(p => [String(p.id), p]));
 
+                const detailsToSave: Record<string, { title: string; image: string }> = {};
+
                 // Always update the module-level cache, even if the effect re-ran.
                 // pendingRequests already prevents duplicate in-flight calls.
                 missingIds.forEach(id => {
@@ -195,9 +199,18 @@ export function useCartProducts() {
                     const found = fetchedMap.get(idStr);
                     if (!found) {
                         console.warn(`[useCartProducts] Product ID ${idStr} not found in API response.`);
+                    } else {
+                        detailsToSave[idStr] = {
+                            title: found.name,
+                            image: resolveProductImageUrl(found) || '/images/product-placeholder.svg',
+                        };
                     }
                     setCachedProduct(idStr, found || null);
                 });
+
+                if (Object.keys(detailsToSave).length > 0) {
+                    dispatch(saveProductDetails(detailsToSave));
+                }
 
                 // Trigger re-render to reflect the newly populated cache.
                 emitCacheUpdate();
@@ -213,7 +226,7 @@ export function useCartProducts() {
                 });
                 emitCacheUpdate();
             });
-    }, [cartItems, isInitialized]);
+    }, [cartItems, isInitialized, dispatch]);
 
     useEffect(() => {
         if (!isInitialized) return;
