@@ -46,7 +46,7 @@ export default function MainBar({
     const menuRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
 
-і р         // Close catalog menu when pathname changes (adjust state during render)
+    // Close catalog menu when pathname changes (adjust state during render)
     const [prevPathname, setPrevPathname] = useState(pathname);
     if (pathname !== prevPathname) {
         setPrevPathname(pathname);
