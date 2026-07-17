@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { addProductViewApi } from '@/lib/graphql/queries/products';
 import { GraphQLError } from '@/lib/graphql/client';
-import { RootState } from '../index';
+import { RootState } from '..';
 
 interface ViewedProductsState {
     items: string[]; // List of product IDs
