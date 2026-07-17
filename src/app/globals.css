@@ -58,7 +58,7 @@ html {
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), sans-serif;
   color: var(--color-text-primary);
   line-height: 1.5;
   display: flex;
@@ -104,12 +104,12 @@ p {
 button {
   font: inherit;
   cursor: pointer;
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), sans-serif;
 }
 
 input,
 textarea {
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), sans-serif;
 }
 
 img,
@@ -137,7 +137,7 @@ button.swiper-button-lock {
   border-radius: var(--radius-md);
   margin-top: 8px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), sans-serif;
   z-index: 2000 !important;
   background-color: #fff;
   padding: 8px 0;

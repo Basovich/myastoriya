@@ -1,7 +1,7 @@
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
-import { getCatalogTreeApi, getProductsApi } from '@/lib/graphql';
+import { getCatalogTreeApi, getProductsApi, ProductsResponse, ProductCategory } from '@/lib/graphql';
 import { getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { Metadata } from 'next';
@@ -34,10 +34,32 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
     // Завантажуємо дерево категорій та товари паралельно
     const token = await getAccessToken();
 
-    const [catalogTree, productsResponse] = await Promise.all([
-        getCatalogTreeApi(lang, 768, token ?? undefined),
-        getProductsApi({ limit: 12, page, sort }, lang, token ?? undefined),
-    ]);
+    let catalogTree: ProductCategory[] = [];
+    let productsResponse: ProductsResponse = {
+        data: [],
+        per_page: 12,
+        current_page: page,
+        has_more_pages: false,
+    };
+
+    try {
+        const [tree, products] = await Promise.all([
+            getCatalogTreeApi(lang, 768, token ?? undefined).catch((err) => {
+                console.error("[CatalogPage] Failed to fetch catalog tree:", err);
+                return [] as ProductCategory[];
+            }),
+            getProductsApi({ limit: 12, page, sort }, lang, token ?? undefined).catch((err) => {
+                console.error("[CatalogPage] Failed to fetch products:", err);
+                return null;
+            }),
+        ]);
+        catalogTree = tree;
+        if (products) {
+            productsResponse = products;
+        }
+    } catch (err) {
+        console.error("[CatalogPage] Parallel fetch failed:", err);
+    }
     productsResponse.current_page = page;
 
     const pageTitle = dict.catalog?.pageTitle ?? 'Каталог';

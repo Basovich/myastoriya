@@ -16,7 +16,6 @@ import {
     ProductCategory,
     BlogPost,
     ProductsResponse,
-    GraphQLError,
 } from "@/lib/graphql";
 import { notFound, redirect } from "next/navigation";
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref } from "@/utils/category-url";

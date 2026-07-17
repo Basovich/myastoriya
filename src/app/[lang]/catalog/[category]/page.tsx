@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
-import { getCatalogTreeApi, getProductsApi, getCategoryByIdApi, getFaqQuestionsApi } from '@/lib/graphql';
+import { getCatalogTreeApi, getProductsApi, getCategoryByIdApi, getFaqQuestionsApi, ProductsResponse, ProductCategory } from '@/lib/graphql';
 import { buildCategoryIndex, shouldRedirectForLocality } from '@/utils/category-url';
 import { getAccessToken } from '@/app/actions/authActions';
 
@@ -18,7 +18,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
 
     const token = await getAccessToken();
 
-    const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined);
+    const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined).catch(() => [] as ProductCategory[]);
     const categoryIndex = buildCategoryIndex(catalogTree);
 
     // Find level-3 category by slug across the full tree
@@ -33,7 +33,7 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
 
     if (!entryFallback) {
         // Перевіряємо в глобальному дереві категорій
-        const globalTree = await getCatalogTreeApi(lang, 768, undefined);
+        const globalTree = await getCatalogTreeApi(lang, 768, undefined).catch(() => [] as ProductCategory[]);
         const globalIndex = buildCategoryIndex(globalTree);
         const globalEntry = Array.from(globalIndex.values()).find(
             e => e.node.slug === categorySlug,
@@ -54,14 +54,37 @@ export default async function CategoryCatalogPage({ params, searchParams }: Cate
     const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
 
     const categoryId = parseInt(matchedCat.id);
-    const [productsResponse, categoryDetails] = await Promise.all([
-        getProductsApi(
-            { categoryId, limit: 12, page, sort },
-            lang,
-            token ?? undefined,
-        ),
-        getCategoryByIdApi(categoryId, lang, token ?? undefined),
-    ]);
+    
+    let productsResponse: ProductsResponse = {
+        data: [],
+        per_page: 12,
+        current_page: page,
+        has_more_pages: false,
+    };
+    let categoryDetails = null;
+
+    try {
+        const [products, details] = await Promise.all([
+            getProductsApi(
+                { categoryId, limit: 12, page, sort },
+                lang,
+                token ?? undefined,
+            ).catch((err) => {
+                console.error("[CategoryCatalogPage] Failed to fetch products:", err);
+                return null;
+            }),
+            getCategoryByIdApi(categoryId, lang, token ?? undefined).catch((err) => {
+                console.error("[CategoryCatalogPage] Failed to fetch category details:", err);
+                return null;
+            }),
+        ]);
+        if (products) {
+            productsResponse = products;
+        }
+        categoryDetails = details;
+    } catch (err) {
+        console.error("[CategoryCatalogPage] Parallel fetch failed:", err);
+    }
     productsResponse.current_page = page;
 
     // Якщо 0 товарів для обраного міста — редирект на головний каталог (гарантовано має товари)
