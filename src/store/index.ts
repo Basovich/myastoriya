@@ -14,6 +14,7 @@ import createTransform from 'redux-persist/es/createTransform';
 
 const storage =
     typeof window !== 'undefined'
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         ? require('redux-persist/lib/storage').default
         : createNoopStorage();
 
@@ -28,14 +29,14 @@ const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
 // Auth session expiration transform — now applied directly to the auth slice.
 const authExpireTransform = createTransform(
-    (inboundState: any) => ({
+    (inboundState: object) => ({
         ...inboundState,
         _persistedAt: Date.now(),
     }),
-    (outboundState: any) => {
+    (outboundState: object & { _persistedAt?: number }) => {
         const persistedAt = outboundState?._persistedAt;
         if (persistedAt && Date.now() - persistedAt > SIX_HOURS) {
-            return { user: null, isAuthenticated: false, isGuest: false, isInitialized: false };
+            return { user: null, isAuthenticated: false, isGuest: false, isInitialized: false } as object;
         }
         return outboundState;
     }

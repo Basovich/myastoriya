@@ -7,7 +7,7 @@ import {
     removeCartItemApi,
     CartGql
 } from '@/lib/graphql/queries/cart';
-import { RootState } from '../index';
+import { RootState } from '..';
 
 export interface CartItemModifier {
     id: number;

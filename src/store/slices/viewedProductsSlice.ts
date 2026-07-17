@@ -27,7 +27,7 @@ export const recordProductViewAsync = createAsyncThunk(
             }
             
             return productId;
-        } catch (error: any) {
+        } catch (error) {
             console.error('[ViewedProducts] Failed to record view:', productId, error);
             return rejectWithValue(productId);
         }
