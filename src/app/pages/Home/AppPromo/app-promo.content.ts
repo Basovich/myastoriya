@@ -150,7 +150,7 @@ export const homeData =
         ]
     },
     "appPromo": {
-        "title": "ПРИЛОЖЕНИЕ \"М'ЯСТОРІЯ\"",
+        "title": "ПРИЛОЖЕНИЕ «М'ЯСТОРІЯ»",
         "googlePlay": "#",
         "appStore": "#",
         "image": "/images/app-promo-steak.jpg"

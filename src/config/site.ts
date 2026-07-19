@@ -44,7 +44,7 @@ export const siteData =
     "contact": {
         "phone": "+38 (067) 463 63 63",
         "email": "myastoriya@gmail.com",
-        "workingHours": "Пн. - Вс. з 10:00 до 20:00"
+        "workingHours": "Пн — нд з 10:00 до 22:00"
     },
     "footer": {
         "copyright": "© 2026 М'ясторія. Усі права захищені.",
@@ -86,7 +86,7 @@ export const siteData =
                 "href": "/loyalty-program-rules"
             },
             {
-                "label": "Кар'єра в \"М'ясторія\"",
+                "label": "Кар'єра в «М'ясторія»",
                 "href": "/careers"
             }
         ],
