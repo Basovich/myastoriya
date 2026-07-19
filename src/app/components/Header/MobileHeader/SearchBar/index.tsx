@@ -22,7 +22,6 @@ export default function SearchBar() {
     const [query, setQuery] = useState("");
     const [isActive, setIsActive] = useState(false);
     const [results, setResults] = useState<Product[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
     const [hasError, setHasError] = useState(false);
     const router = useRouter();
     const params = useParams();
@@ -62,14 +61,11 @@ export default function SearchBar() {
         }
 
         const timer = setTimeout(async () => {
-            setIsLoading(true);
             try {
                 const res = await getProductsApi({ search: query, limit: 6 }, String(lang));
                 setResults(res.data);
             } catch (error) {
                 console.error("Mobile search error:", error);
-            } finally {
-                setIsLoading(false);
             }
         }, 400);
 
