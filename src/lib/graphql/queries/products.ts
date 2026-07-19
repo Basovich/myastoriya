@@ -419,6 +419,7 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                     product {
                         id
                         slug
+                        categoryId
                         name
                         cost
                         oldCost
@@ -1415,6 +1416,7 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
                     product {
                         id
                         slug
+                        categoryId
                         name
                         cost
                         oldCost
