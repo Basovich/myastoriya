@@ -6,11 +6,13 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import Button from '@/app/components/ui/Button/Button';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
+import { useProductHref } from '@/hooks/useCategoryTree';
 import s from './ProductReviewCard.module.scss';
 
 interface ProductReviewCardProps {
     productId: string | number;
     productSlug?: string;
+    categoryId?: number | string | null;
     productName: string;
     productImage?: string | null;
     hasReview: boolean;
@@ -26,6 +28,7 @@ interface ProductReviewCardProps {
 export default function ProductReviewCard({
     productId,
     productSlug,
+    categoryId,
     productName,
     productImage,
     hasReview,
@@ -46,7 +49,7 @@ export default function ProductReviewCard({
 
     const fallbackImage = '/images/product-placeholder.svg';
     const displayImage = productImage || fallbackImage;
-    const productUrl = productSlug ? `/products/${productSlug}` : `/products/${productId}`;
+    const productUrl = useProductHref(productSlug || String(productId), categoryId);
 
     return (
         <div className={s.card}>

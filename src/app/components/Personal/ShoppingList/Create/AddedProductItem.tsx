@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
+import { useProductHref } from '@/hooks/useCategoryTree';
 import { formatPrice, getProductPriceMultiplier } from '@/utils/price';
 import s from './ShoppingListCreateClient.module.scss';
 
@@ -11,6 +12,7 @@ interface AddedProductItemProps {
     name: string;
     productId: number;
     slug?: string;
+    categoryId?: number | string | null;
     price: number;
     oldPrice?: number;
     unitPrice?: string;
@@ -24,6 +26,7 @@ export default function AddedProductItem({
     name, 
     productId,
     slug,
+    categoryId,
     price, 
     oldPrice,
     unitPrice, 
@@ -32,7 +35,7 @@ export default function AddedProductItem({
     image, 
     onRemove 
 }: AddedProductItemProps) {
-    const productUrl = slug ? `/products/${slug}` : `/products/${productId}`;
+    const productUrl = useProductHref(slug || String(productId), categoryId);
 
     const multiplier = getProductPriceMultiplier(weight, unit);
     const fullPrice = price * multiplier;

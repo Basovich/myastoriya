@@ -12,6 +12,7 @@ import useScrollLock from '@/hooks/useScrollLock';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addToCartAsync, updateQuantityAsync, removeFromCartAsync, fetchCartAsync, clearRemovedItems } from '@/store/slices/cartSlice';
 import { useCartProducts } from '@/hooks/useCartProducts';
+import { useCategoryTree, getProductHref } from '@/hooks/useCategoryTree';
 import clsx from 'clsx';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -67,6 +68,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     }, []);
 
     const { populatedItems, suggestedProducts, loading } = useCartProducts();
+    const { categoryIndex } = useCategoryTree();
 
 
     // Calculate total
@@ -207,7 +209,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                             {[...populatedItems].reverse().map((item) => (
                                 <div key={item.rowId || item.id} className={s.cartItem}>
                                     <div className={s.itemImage}>
-                                        <Link href={getLocalizedHref(`/products/${item.product.slug || item.id}`, lang as Locale)} target="_blank">
+                                        <Link href={getLocalizedHref(getProductHref(item.product.slug || item.id, item.product.categoryId, categoryIndex), lang as Locale)} target="_blank">
                                             <Image
                                                 src={item.product.image}
                                                 alt={item.product.title}
@@ -221,7 +223,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                         <div className={s.itemTop}>
                                             <div className={s.itemInfo}>
                                                 <h3 className={s.itemTitle}>
-                                                    <Link href={getLocalizedHref(`/products/${item.product.slug || item.id}`, lang as Locale)} target="_blank">
+                                                    <Link href={getLocalizedHref(getProductHref(item.product.slug || item.id, item.product.categoryId, categoryIndex), lang as Locale)} target="_blank">
                                                         {item.product.title}
                                                     </Link>
                                                 </h3>
@@ -403,7 +405,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                             <SwiperSlide key={product.id} className={clsx(s.swiperSlide, !isSliderActive && s.slideFit)}>
                                                 <div className={s.suggestedItem}>
                                                     <Link 
-                                                        href={getLocalizedHref(`/products/${product.slug || product.id}`, lang as Locale)} 
+                                                        href={getLocalizedHref(getProductHref(product.slug || product.id, (product as any).categoryId, categoryIndex), lang as Locale)} 
                                                         target="_blank"
                                                         title={product.title}
                                                         className={s.suggestedImgWrapper}

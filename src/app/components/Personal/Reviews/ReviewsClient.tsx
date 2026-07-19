@@ -59,6 +59,7 @@ interface ProductDetails {
     image: string;
     slug?: string;
     name: string;
+    categoryId?: number | string | null;
 }
 
 const resolveOrderItemImageUrl = (
@@ -164,6 +165,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                             image: resolveProductImageUrl(prod),
                             slug: prod.slug,
                             name: prod.name,
+                            categoryId: prod.categoryId,
                         };
                     });
                 } catch (e) {
@@ -327,6 +329,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                                             name: item.name,
                                             image: details?.image || resolveOrderItemImageUrl(item.id, item.image, productDetailsMap),
                                             slug: details?.slug,
+                                            categoryId: details?.categoryId,
                                         };
                                     }) || [];
                                 
@@ -406,6 +409,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                                     key={rev.id}
                                     productId={prodId}
                                     productSlug={productSlug}
+                                    categoryId={details?.categoryId}
                                     productName={productName}
                                     productImage={productImage}
                                     hasReview={true}

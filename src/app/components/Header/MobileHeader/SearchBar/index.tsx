@@ -13,10 +13,12 @@ import {
     resolveProductImageUrl, 
     Product 
 } from "@/lib/graphql/queries/products";
+import { useCategoryTree, getProductHref } from "@/hooks/useCategoryTree";
 
 // Removed MOCKs
 
 export default function SearchBar() {
+    const { categoryIndex } = useCategoryTree();
     const [query, setQuery] = useState("");
     const [isActive, setIsActive] = useState(false);
     const [results, setResults] = useState<Product[]>([]);
@@ -117,7 +119,10 @@ export default function SearchBar() {
                         {results.length > 0 ? (
                             <div className={s.resultsList}>
                                 {results.map((product) => (
-                                    <div key={product.id} className={s.resultItem} onClick={() => router.push(getLocalizedHref(`/products/${product.slug || product.id}`, lang))}>
+                                    <div key={product.id} className={s.resultItem} onClick={() => {
+                                        const productUrl = getProductHref(product.slug || String(product.id), product.categoryId, categoryIndex);
+                                        router.push(getLocalizedHref(productUrl, lang));
+                                    }}>
                                         <div className={s.resultImage}>
                                             <img src={resolveProductImageUrl(product) || "/images/product-placeholder.svg"} alt={product.name} />
                                         </div>

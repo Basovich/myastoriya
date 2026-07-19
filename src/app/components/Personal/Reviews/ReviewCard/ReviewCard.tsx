@@ -8,12 +8,15 @@ import Button from '@/app/components/ui/Button/Button';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
 import s from './ReviewCard.module.scss';
 
+import { useCategoryTree, getProductHref } from '@/hooks/useCategoryTree';
+
 export interface ReviewProduct {
     id: string;
     name: string;
     image: string;
     slug?: string;
     isDeleted?: boolean;
+    categoryId?: number | string | null;
 }
 
 interface ReviewCardProps {
@@ -45,6 +48,7 @@ export default function ReviewCard({
 }: ReviewCardProps) {
     const params = useParams();
     const lang = params.lang || 'ua';
+    const { categoryIndex } = useCategoryTree();
 
     return (
         <div className={s.card}>
@@ -73,7 +77,7 @@ export default function ReviewCard({
                             const isDeleted = prod.isDeleted || prod.name.startsWith('cms-orders::') || prod.name.toLowerCase().includes('deleted');
                             const deletedTitle = lang === 'ru' ? 'Товар удален' : 'Товар видалено';
                             const titleText = isDeleted ? deletedTitle : prod.name;
-                            const productUrl = prod.slug ? `/products/${prod.slug}` : `/products/${prod.id}`;
+                            const productUrl = getProductHref(prod.slug || prod.id, prod.categoryId, categoryIndex);
 
                             if (isDeleted) {
                                 return (

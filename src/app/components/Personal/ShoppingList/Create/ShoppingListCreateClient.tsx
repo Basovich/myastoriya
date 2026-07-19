@@ -102,6 +102,7 @@ interface ClientAddedItem {
     costVariantId?: number | null;
     weight: string;
     slug?: string;
+    categoryId?: number | string | null;
 }
 
 export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
@@ -234,7 +235,8 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                     image: resolvedImg,
                                     costVariantId: p.costVariantId,
                                     weight: detailedProd ? getProductWeight(detailedProd) : "",
-                                    slug: detailedProd?.slug
+                                    slug: detailedProd?.slug,
+                                    categoryId: detailedProd?.categoryId
                                 };
                             }));
                         }
@@ -367,7 +369,8 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
             image: imgUrl,
             costVariantId: costVariantId ? Number(costVariantId) : null,
             weight: getProductWeight(prod),
-            slug: prod.slug
+            slug: prod.slug,
+            categoryId: prod.categoryId
         };
 
         setAddedItems((prev) => [...prev, newItem]);
@@ -619,6 +622,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                             name={prod.name}
                                             productId={prod.id}
                                             slug={prod.slug}
+                                            categoryId={prod.categoryId}
                                             price={fullPrice}
                                             oldPrice={fullOldPrice}
                                             weight={weightVal}
@@ -657,6 +661,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
                                         name={item.name}
                                         productId={item.productId}
                                         slug={item.slug}
+                                        categoryId={item.categoryId}
                                         price={item.price}
                                         oldPrice={item.oldPrice ?? undefined}
                                         unitPrice={`${formatPrice(item.price)} грн / ${item.unit}`}

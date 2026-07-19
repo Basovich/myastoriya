@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getLocalizedHref } from '@/utils/i18n-helpers';
 import { Locale } from '@/i18n/config';
 import { useCartProducts } from '@/hooks/useCartProducts';
+import { useCategoryTree, getProductHref } from '@/hooks/useCategoryTree';
 import s from './CheckoutShared.module.scss';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
@@ -44,6 +45,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
     const isRu = lang === 'ru';
 
     const { populatedItems, loading } = useCartProducts();
+    const { categoryIndex } = useCategoryTree();
     const promoCode = useAppSelector(state => state.cart.promoCode);
     const cashback = useAppSelector(state => state.cart.cashback);
     const useBonuses = useAppSelector(state => state.cart.useBonuses);
@@ -127,7 +129,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                     [...populatedItems].reverse().map(item => (
                         <div key={item.rowId || item.id} className={s.cartItem}>
                             <div className={s.cartItemImg}>
-                                <Link href={getLocalizedHref(`/products/${item.product.slug || item.id}`, lang as Locale)} target="_blank">
+                                <Link href={getLocalizedHref(getProductHref(item.product.slug || item.id, item.product.categoryId, categoryIndex), lang as Locale)} target="_blank">
                                     <Image
                                         src={item.product.image}
                                         alt={item.product.title}
@@ -139,7 +141,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                             </div>
                             <div className={s.cartItemInfo}>
                                 <p className={s.cartItemTitle}>
-                                    <Link href={getLocalizedHref(`/products/${item.product.slug || item.id}`, lang as Locale)} target="_blank">
+                                    <Link href={getLocalizedHref(getProductHref(item.product.slug || item.id, item.product.categoryId, categoryIndex), lang as Locale)} target="_blank">
                                         {item.product.title}
                                     </Link>
                                 </p>

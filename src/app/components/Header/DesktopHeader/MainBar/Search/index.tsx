@@ -18,6 +18,7 @@ import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { getSalesApi } from "@/lib/graphql";
+import { useCategoryTree, getProductHref } from "@/hooks/useCategoryTree";
 import { 
     getProductsApi, 
     getSearchCategoriesApi, 
@@ -158,6 +159,7 @@ const CategoryLink = ({ cat, lang, router, isRoot = false }: CategoryLinkProps) 
 };
 
 export default function Search({ lang, categories }: { lang: Locale; categories?: ProductCategory[] }) {
+    const { categoryIndex } = useCategoryTree();
     const [query, setQuery] = useState("");
     const [isActive, setIsActive] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false);
@@ -622,7 +624,10 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                 const displayWeight = getProductWeightForSearch(product);
                                                                 
                                                                 return (
-                                                                    <div key={product.id} className={s.dishItem} onClick={() => router.push(getLocalizedHref(`/products/${product.slug || product.id}`, lang as Locale))}>
+                                                                    <div key={product.id} className={s.dishItem} onClick={() => {
+                                                                        const productUrl = getProductHref(product.slug || String(product.id), product.categoryId, categoryIndex);
+                                                                        router.push(getLocalizedHref(productUrl, lang as Locale));
+                                                                    }}>
                                                                         <div className={s.dishThumb}>
                                                                             <Image src={mainImage || "/images/product-placeholder.svg"} alt={product.name} fill />
                                                                         </div>
@@ -684,7 +689,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                             <SwiperSlide key={product.id}>
                                                                                 <div className={s.featuredCard}>
                                                                                     <div className={s.featuredImage}>
-                                                                                        <Link href={getLocalizedHref(`/products/${product.slug}`, lang)} className={s.featuredImageLink}>
+                                                                                        <Link href={getLocalizedHref(getProductHref(product.slug, product.categoryId, categoryIndex), lang)} className={s.featuredImageLink}>
                                                                                             <Image
                                                                                                 src={mainImage || "/images/product-placeholder.svg"}
                                                                                                 alt={product.name}
@@ -707,7 +712,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                                     </div>
                                                                                     <div className={s.featuredInfo}>
                                                                                         <div className={s.featuredName}>
-                                                                                            <Link href={getLocalizedHref(`/products/${product.slug}`, lang)}>
+                                                                                            <Link href={getLocalizedHref(getProductHref(product.slug, product.categoryId, categoryIndex), lang)}>
                                                                                                 {product.name}
                                                                                             </Link>
                                                                                         </div>
@@ -735,7 +740,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                         ) : (
                                                             <div className={s.featuredCard}>
                                                                 <div className={s.featuredImage}>
-                                                                    <Link href={getLocalizedHref(`/products/${featuredProposals[0].slug}`, lang)} className={s.featuredImageLink}>
+                                                                    <Link href={getLocalizedHref(getProductHref(featuredProposals[0].slug, featuredProposals[0].categoryId, categoryIndex), lang)} className={s.featuredImageLink}>
                                                                         <Image
                                                                             src={resolveProductImageUrl(featuredProposals[0]) || "/images/product-placeholder.svg"}
                                                                             alt={featuredProposals[0].name}
@@ -766,7 +771,7 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                                 </div>
                                                                 <div className={s.featuredInfo}>
                                                                     <div className={s.featuredName}>
-                                                                        <Link href={getLocalizedHref(`/products/${featuredProposals[0].slug}`, lang)}>
+                                                                        <Link href={getLocalizedHref(getProductHref(featuredProposals[0].slug, featuredProposals[0].categoryId, categoryIndex), lang)}>
                                                                             {featuredProposals[0].name}
                                                                         </Link>
                                                                     </div>

@@ -645,6 +645,7 @@ export function useCartProducts() {
             originalPrice: number;
             image: string;
             slug?: string;
+            categoryId?: number;
         }>();
 
         const inCartIds = new Set(cartItems.map(item => String(item.id)));
@@ -684,7 +685,8 @@ export function useCartProducts() {
                         price: discountedPrice,
                         originalPrice: origCost,
                         image: imageSrc,
-                        slug: product.slug || undefined
+                        slug: product.slug || undefined,
+                        categoryId: product.categoryId ? Number(product.categoryId) : undefined
                     });
                 }
             }

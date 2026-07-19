@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import Button from '@/app/components/ui/Button/Button';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
 import { Locale } from '@/i18n/config';
+import { useProductHref } from '@/hooks/useCategoryTree';
 import { formatPrice } from '@/utils/price';
 import s from './ShoppingListCreateClient.module.scss';
 
@@ -22,6 +23,7 @@ interface SearchProductCardProps {
     name: string;
     productId: number | string;
     slug?: string;
+    categoryId?: number | string | null;
     price: number;
     oldPrice?: number;
     weight?: string;
@@ -35,6 +37,7 @@ export default function SearchProductCard({
     name, 
     productId,
     slug,
+    categoryId,
     price, 
     oldPrice,
     weight, 
@@ -44,7 +47,7 @@ export default function SearchProductCard({
     isAdded = false 
 }: SearchProductCardProps) {
     const dict = cardDict[lang] || cardDict.ua;
-    const productUrl = slug ? `/products/${slug}` : `/products/${productId}`;
+    const productUrl = useProductHref(slug || String(productId), categoryId);
 
     return (
         <div className={s.searchCard}>
