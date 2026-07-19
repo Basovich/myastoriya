@@ -289,8 +289,21 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                             </div>
                                             <div className={s.itemPriceBlock}>
                                                 <div className={s.itemPriceCol}>
-                                                    <span className={s.itemTotal}>{item.product.price * item.quantity} ₴</span>
-                                                    <span className={s.itemUnitPrice}>{item.product.price} {lang === 'ru' ? 'грн / шт' : 'грн / шт'}</span>
+                                                    {item.product.originalPrice > item.product.price ? (
+                                                        <div className={s.itemTotalRow}>
+                                                            <span className={clsx(s.itemTotal, s.itemTotalDiscount)}>
+                                                                {item.product.price * item.quantity} ₴
+                                                            </span>
+                                                            <span className={s.itemTotalOriginal}>
+                                                                {item.product.originalPrice * item.quantity} ₴
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className={s.itemTotal}>{item.product.price * item.quantity} ₴</span>
+                                                    )}
+                                                    <span className={s.itemUnitPrice}>
+                                                        {item.product.unitPrice ?? item.product.price} грн / {item.product.unit || 'шт'}
+                                                    </span>
                                                 </div>
                                                 <button
                                                     className={s.removeItemBtn}

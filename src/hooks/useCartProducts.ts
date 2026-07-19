@@ -79,6 +79,9 @@ export interface PopulatedCartItem {
         costVariantName?: string | null;
         categoryId?: number;
         modifiers?: PopulatedCartItemModifier[] | null;
+        unit?: string | null;
+        multiplier?: number | null;
+        unitPrice?: number;
     };
 }
 
@@ -117,6 +120,55 @@ function roundWeightString(val: string): string {
     }
     
     return val;
+}
+
+function parseWeightInGrams(weightStr: string): number {
+    if (!weightStr) return 0;
+    const cleanStr = weightStr.toLowerCase().replace(/\s+/g, '');
+    const num = parseFloat(cleanStr);
+    if (isNaN(num)) return 0;
+    if (cleanStr.includes('кг') || cleanStr.includes('kg')) {
+        return num * 1000;
+    }
+    if (cleanStr.includes('г') || cleanStr.includes('g')) {
+        return num;
+    }
+    // If it's a small number like 0.5 or 1 without a unit, assume kg
+    if (num < 10) {
+        return num * 1000;
+    }
+    return num;
+}
+
+function calculateUnitPrice(price: number, weightStr: string, unitStr: string | null | undefined): number {
+    const unit = (unitStr || 'шт').toLowerCase().replace(/\s+/g, '');
+    if (unit === 'шт' || unit === 'уп' || unit === 'упаковка' || unit === 'пачка') {
+        return price;
+    }
+    
+    // Parse weight of the package in grams
+    const packageWeightGrams = parseWeightInGrams(weightStr);
+    if (packageWeightGrams <= 0) {
+        return price;
+    }
+    
+    // Parse unit weight in grams (e.g. "100 г" -> 100, "кг" -> 1000)
+    let unitWeightGrams = 1000; // default to 1kg if not specified
+    if (unit.includes('100г') || unit.includes('100g')) {
+        unitWeightGrams = 100;
+    } else if (unit.includes('кг') || unit.includes('kg')) {
+        unitWeightGrams = 1000;
+    } else if (unit.includes('г') || unit.includes('g')) {
+        const num = parseFloat(unit);
+        unitWeightGrams = isNaN(num) ? 1 : num;
+    }
+    
+    const multiplier = packageWeightGrams / unitWeightGrams;
+    if (multiplier <= 0) {
+        return price;
+    }
+    
+    return Math.round(price / multiplier);
 }
 
 export function useCartProducts() {
@@ -425,6 +477,9 @@ export function useCartProducts() {
                         costVariantName: item.costVariantName,
                         categoryId: dbProduct.categoryId ? Number(dbProduct.categoryId) : undefined,
                         modifiers: modifiersWithImages,
+                        unit: dbProduct.unit,
+                        multiplier: item.multiplier,
+                        unitPrice: calculateUnitPrice(basePrice, weight, dbProduct.unit),
                     }
                 };
             }
@@ -439,7 +494,10 @@ export function useCartProducts() {
                     ...mockProduct,
                     originalPrice: mockProduct.price,
                     slug: mockProduct.id,
-                    costVariantName: item.costVariantName || null
+                    costVariantName: item.costVariantName || null,
+                    unit: 'шт',
+                    multiplier: 1,
+                    unitPrice: mockProduct.price
                 }
             };
         });

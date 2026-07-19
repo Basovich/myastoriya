@@ -183,8 +183,17 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                                 )}
                             </div>
                             <div className={s.cartItemRight}>
-                                <span className={s.cartItemPrice}>{item.product.price * item.quantity} ₴</span>
-                                <span className={s.cartItemUnit}>упаковка</span>
+                                {item.product.originalPrice > item.product.price ? (
+                                    <>
+                                        <span className={clsx(s.cartItemPrice, s.cartItemPriceDiscount)}>{item.product.price * item.quantity} ₴</span>
+                                        <span className={s.cartItemPriceOriginal}>{item.product.originalPrice * item.quantity} ₴</span>
+                                    </>
+                                ) : (
+                                    <span className={s.cartItemPrice}>{item.product.price * item.quantity} ₴</span>
+                                )}
+                                 <span className={s.cartItemUnit}>
+                                     {item.product.unitPrice ?? item.product.price} грн / {item.product.unit || 'шт'}
+                                 </span>
                             </div>
                         </div>
                     ))

@@ -555,6 +555,51 @@
     }
 }
 
+.itemTotalRow {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.itemTotalDiscount {
+    color: #E3051B;
+}
+
+.itemTotalOriginal {
+    font-size: 12px;
+    color: #828282;
+    text-decoration: line-through;
+    font-weight: 400;
+    white-space: nowrap;
+
+    @media (min-width: 1024px) {
+        font-size: 16px;
+    }
+}
+
+.itemUnitRow {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.itemUnitPriceDiscount {
+    color: #E3051B;
+    opacity: 1;
+}
+
+.itemUnitPriceOriginal {
+    font-size: 8px;
+    color: #828282;
+    text-decoration: line-through;
+    font-weight: 400;
+    white-space: nowrap;
+
+    @media (min-width: 1024px) {
+        font-size: 10px;
+    }
+}
+
 .removeItemBtn {
     width: 14px;
     height: 14px;

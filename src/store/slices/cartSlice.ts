@@ -24,6 +24,7 @@ export interface CartItem {
     costVariantId?: number | null;
     costVariantName?: string | null;
     modifiers?: CartItemModifier[] | null;
+    multiplier?: number;
 }
 
 export interface CartPromoCode {
@@ -77,6 +78,7 @@ const mapCartItems = (cart: CartGql): CartItem[] => {
         purchaseCost: item.purchaseCost,
         costVariantId: item.costVariantId,
         costVariantName: item.costVariantName,
+        multiplier: item.multiplier,
         modifiers: item.modifiers ? item.modifiers.map(m => ({
             id: m.id,
             name: m.name,
