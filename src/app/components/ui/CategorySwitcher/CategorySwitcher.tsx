@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import Spinner from '../Spinner/Spinner';
 import { getCategoryByIdApi, getSubcategoriesApi, getCatalogTreeApi } from '@/lib/graphql/queries/products';
 import { buildCategoryIndex, getCategoryHref } from '@/utils/category-url';
+import { useAppSelector } from '@/store/hooks';
 
 interface CategoryItem {
     id: string;
@@ -33,6 +34,8 @@ export default function CategorySwitcher({
     lang = 'ua',
     isSubcategory = false,
 }: CategorySwitcherProps) {
+    const token = useAppSelector((state) => state.auth.token) ?? undefined;
+
     const [parent, setParent] = useState<CategoryItem | null>(null);
     const [siblings, setSiblings] = useState<CategoryItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -48,8 +51,8 @@ export default function CategorySwitcher({
         (async () => {
             try {
                 const [category, catalogTree] = await Promise.all([
-                    getCategoryByIdApi(categoryId, lang),
-                    getCatalogTreeApi(lang),
+                    getCategoryByIdApi(categoryId, lang, token),
+                    getCatalogTreeApi(lang, 768, token),
                 ]);
 
                 if (!category) {
@@ -70,8 +73,8 @@ export default function CategorySwitcher({
 
                 if (parentId && parentId !== 768) {
                     const [parentData, siblingsData] = await Promise.all([
-                        getCategoryByIdApi(parentId, lang),
-                        getSubcategoriesApi(parentId, lang),
+                        getCategoryByIdApi(parentId, lang, token),
+                        getSubcategoriesApi(parentId, lang, token),
                     ]);
 
                     setParent(parentData ? {
@@ -95,7 +98,7 @@ export default function CategorySwitcher({
                         href: lang === 'ru' ? '/ru' : '/',
                     });
 
-                    const siblingsData = await getSubcategoriesApi(768, lang);
+                    const siblingsData = await getSubcategoriesApi(768, lang, token);
                     setSiblings(siblingsData.map(sib => ({
                         id: sib.id,
                         name: sib.name,
@@ -109,7 +112,7 @@ export default function CategorySwitcher({
                 setIsLoading(false);
             }
         })();
-    }, [categoryId, lang]);
+    }, [categoryId, lang, token]);
 
     if (isLoading) {
         if (isSubcategory) {

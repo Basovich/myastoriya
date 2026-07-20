@@ -1358,11 +1358,13 @@ const SUBCATEGORIES_QUERY = /* GraphQL */ `
     }
 `;
 
-export async function getSubcategoriesApi(parentId: number, lang?: string): Promise<ProductCategory[]> {
+export async function getSubcategoriesApi(parentId: number, lang?: string, token?: string): Promise<ProductCategory[]> {
     const data = await gqlRequest<{ categories: ProductCategory[] }>(
         SUBCATEGORIES_QUERY,
         { parentId },
-        { next: { revalidate: 3600 }, lang }
+        // cache: 'no-store' — підкатегорії фільтруються за містом юзера (серверна сесія),
+        // тому спільний кеш між юзерами/містами неприпустимий.
+        { cache: 'no-store', lang, token }
     );
     return data.categories;
 }
