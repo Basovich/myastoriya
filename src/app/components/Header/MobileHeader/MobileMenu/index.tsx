@@ -108,7 +108,7 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
             {/* Scrollable content area */}
             <div className={s.menuBody}>
                 {/* Catalog Header */}
-                <div className={s.catalogHeader} onClick={(e) => {
+                <div className={s.catalogHeader} onClick={() => {
                     toggleCatalog();
                 }}>
                     {lang === "ru" ? "Каталог продукции" : "Каталог продукції"}
