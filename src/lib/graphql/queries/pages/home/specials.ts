@@ -203,9 +203,7 @@ export async function getSpecialsApi(limit = 10, page = 1, lang?: string, token?
     const data = await gqlRequest<SpecialsResponse>(
         SPECIALS_QUERY,
         { limit, page },
-        token 
-            ? { cache: 'no-store', lang, token }
-            : { next: { revalidate: 3600 }, lang }
+        { cache: 'no-store', lang, token }
     );
     return data.specials;
 }
@@ -215,9 +213,7 @@ export async function getSpecialApi(id: string | number, lang?: string, token?: 
         const data = await gqlRequest<{ special: Special | null }>(
             SPECIAL_BY_ID_QUERY,
             { id: parseInt(String(id)) },
-            token
-                ? { cache: 'no-store', lang, token, silent: true }
-                : { next: { revalidate: 3600 }, lang, silent: true }
+            { cache: 'no-store', lang, token, silent: true }
         );
         return data.special;
     } catch (error) {

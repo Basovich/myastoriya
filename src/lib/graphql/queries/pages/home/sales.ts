@@ -94,15 +94,17 @@ export async function getSalesApi(
     limit: number = 10,
     page: number = 1,
     lang?: string,
+    token?: string,
     options?: { cache?: RequestCache },
 ): Promise<SalesResponse> {
     const data = await gqlRequest<{ sales: SalesResponse }>(
         SALES_QUERY,
         { limit, page },
-        { next: { revalidate: 3600 }, lang, ...options },
+        { next: { revalidate: 3600 }, lang, token, ...options },
     );
     return data.sales;
 }
+
 
 export const SALE_BY_ID_QUERY = /* GraphQL */ `
     query Sale($id: ID!) {

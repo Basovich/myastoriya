@@ -13,6 +13,7 @@ import Button from "../../../components/ui/Button/Button";
 import SliderArrow from "../../../components/ui/SliderArrow/SliderArrow";
 import Image from "next/image";
 import { type Showcase, type Product, resolveProductImageUrl, getProductsApi, getProductWeight, getProductBadge } from "@/lib/graphql";
+import { useAppSelector } from "@/store/hooks";
 
 interface ProductsProps {
     dict: {
@@ -27,6 +28,7 @@ interface ProductsProps {
 export default function Products({ dict, showcases, initialProducts, initialHasMore }: ProductsProps) {
     const params = useParams();
     const locale = params?.lang as string;
+    const token = useAppSelector((state) => state.auth.token) ?? undefined;
     const [activeTab, setActiveTab] = useState(0);
     const [products, setProducts] = useState<Product[]>(initialProducts);
     const [loading, setLoading] = useState(false);
@@ -49,6 +51,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                 const data = await getProductsApi(
                     { showcaseId: parseInt(showcaseId), limit: 8, page },
                     locale,
+                    token,
                 );
                 
                 if (isMounted) {
@@ -82,7 +85,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
         return () => {
             isMounted = false;
         };
-    }, [page, activeTab, showcases, initialProducts, locale]);
+    }, [page, activeTab, showcases, initialProducts, locale, token]);
 
     // Reset page when tab changes
     useEffect(() => {

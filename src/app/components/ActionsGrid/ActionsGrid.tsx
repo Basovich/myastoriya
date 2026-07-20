@@ -8,7 +8,8 @@ import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import Tabs from "../ui/Tabs/Tabs";
 import AppLink from "../ui/AppLink/AppLink";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
-import { type Sale, getSalesApi, getSpecialsApi } from "@/lib/graphql";
+import { type Sale, getSalesApi, getSpecialsApi, getProductsApi } from "@/lib/graphql";
+import { useAppSelector } from "@/store/hooks";
 
 interface ActionItem {
     id: number;
@@ -105,6 +106,7 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
     const [hasMore, setHasMore] = useState(initialHasMore ?? true);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
+    const token = useAppSelector((state) => state.auth.token) ?? undefined;
 
     const loadMore = async () => {
         if (loading || !hasMore) return;
@@ -113,7 +115,7 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
             setLoading(true);
             try {
                 const nextPage = page + 1;
-                const data = await getSpecialsApi(12, nextPage, lang);
+                const data = await getSpecialsApi(12, nextPage, lang, token);
 
                 if (data.data && data.data.length > 0) {
                     const activeSpecials = data.data.filter(special => {
@@ -158,10 +160,27 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
         setLoading(true);
         try {
             const nextPage = page + 1;
-            const data = await getSalesApi(12, nextPage, lang, { cache: 'no-store' });
+            const data = await getSalesApi(12, nextPage, lang, token, { cache: 'no-store' });
 
             if (data.data && data.data.length > 0) {
-                const newItems: ActionItem[] = data.data.map((sale: Sale) => ({
+                const activeSalesChecks = await Promise.all(
+                    data.data.map(async (sale) => {
+                        try {
+                            const products = await getProductsApi(
+                                { saleId: parseInt(sale.id), limit: 1, silent: true },
+                                lang,
+                                token,
+                            );
+                            return { sale, hasProducts: products.data.length > 0 };
+                        } catch {
+                            return { sale, hasProducts: false };
+                        }
+                    })
+                );
+
+                const activeSales = activeSalesChecks.filter(c => c.hasProducts).map(c => c.sale);
+
+                const newItems: ActionItem[] = activeSales.map((sale: Sale) => ({
                     id: parseInt(sale.id),
                     title: sale.name,
                     slug: sale.slug || sale.id,

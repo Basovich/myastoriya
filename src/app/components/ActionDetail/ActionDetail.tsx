@@ -7,6 +7,7 @@ import ProductCard from '../ui/ProductCard/ProductCard';
 import Breadcrumbs from '../ui/Breadcrumbs/Breadcrumbs';
 import CountdownTimer from '../ui/CountdownTimer/CountdownTimer';
 import { type Sale, type Product, resolveProductImageUrl, getProductsApi, getProductWeight, getProductBadge } from '@/lib/graphql';
+import { useAppSelector } from '@/store/hooks';
 
 const PAGE_SIZE = 12;
 
@@ -117,6 +118,7 @@ export default function ActionDetail({
 
     const countdown = currentLoc[pageType].countdown;
 
+    const token = useAppSelector((state) => state.auth.token) ?? undefined;
     const [products, setProducts] = useState<Product[]>(initialProducts);
     const [hasMore, setHasMore] = useState(initialHasMore);
     const [page, setPage] = useState(1);
@@ -138,6 +140,7 @@ export default function ActionDetail({
                         const data = await getProductsApi(
                             { saleId: parseInt(sale.id), limit: PAGE_SIZE, page: nextPage },
                             lang,
+                            token,
                         );
                         if (data.data?.length) {
                             setProducts((prev) => [...prev, ...data.data]);
@@ -158,7 +161,7 @@ export default function ActionDetail({
 
         observer.observe(sentinel);
         return () => observer.disconnect();
-    }, [hasMore, loading, page, sale.id, lang]);
+    }, [hasMore, loading, page, sale.id, lang, token]);
 
 
     const bannerDesktop = sale.bannerWeb?.desktop;
@@ -236,7 +239,7 @@ export default function ActionDetail({
             </div>
 
             {/* Products section */}
-            {products.length > 0 ? (
+            {products.length > 0 && (
                 <div className={s.productsSection}>
                     <div className={s.productsGrid}>
                         {products.map((product) => (
@@ -261,12 +264,6 @@ export default function ActionDetail({
                     {(hasMore || loading) && (
                         <div ref={sentinelRef} className={s.sentinel} aria-hidden="true" />
                     )}
-                </div>
-            ) : (
-                <div className={s.noProductsWrapper}>
-                    <p className={s.noProductsText}>
-                        {currentLoc[pageType].noProducts}
-                    </p>
                 </div>
             )}
         </section>

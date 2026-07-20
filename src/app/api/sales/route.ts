@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
         // cache: 'no-store' — відключаємо кеш, щоб кожна сторінка пагінації
         // отримувала свіжі дані, а не закешований результат page=1
-        const result = await getSalesApi(limit, page, lang, { cache: 'no-store' });
+        const result = await getSalesApi(limit, page, lang, undefined, { cache: 'no-store' });
 
         return NextResponse.json(result);
     } catch (err) {

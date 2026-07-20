@@ -10,10 +10,11 @@ export default async function ActionDetailPage({
     params: Promise<{ lang: "ua" | "ru"; slug: string }>;
 }) {
     const { lang, slug } = await params;
+    const token = await getAccessToken();
 
     // Fetch full list of sales to find by slug or numeric id.
     // sale(id) query crashes on the backend (500), so we use the list endpoint.
-    const salesResponse = await getSalesApi(100, 1, lang);
+    const salesResponse = await getSalesApi(100, 1, lang, token ?? undefined);
 
     const isNumericId = /^\d+$/.test(slug);
     const sale = isNumericId
@@ -24,8 +25,6 @@ export default async function ActionDetailPage({
         return notFound();
     }
 
-    const token = await getAccessToken();
-
     let productsResponse = { data: [] as Product[], has_more_pages: false };
     try {
         productsResponse = await getProductsApi(
@@ -35,6 +34,11 @@ export default async function ActionDetailPage({
         );
     } catch (err) {
         console.warn(`[ActionDetailPage] Failed to fetch products for sale ${sale.id}:`, err);
+    }
+
+    // Hide the promotion itself if all products are unavailable in the selected city
+    if (productsResponse.data.length === 0) {
+        return notFound();
     }
 
     return (
