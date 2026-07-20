@@ -1,0 +1,145 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    display: flex;
+    padding: 40px 16px;
+    align-items: flex-start;
+    overflow-y: auto;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    @media (min-width: 481px) {
+        padding: 20px;
+    }
+}
+
+.modalWrapper {
+    position: relative;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 420px;
+    margin: auto;
+
+    &:focus-visible {
+        outline: none;
+    }
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 4px;
+    align-self: flex-end;
+    transition: opacity 0.2s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.75;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    @media (min-width: 768px) {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        right: -40px;
+        top: 0;
+    }
+}
+
+.modal {
+    background: #ffffff;
+    border-radius: 14px;
+    width: 100%;
+    padding: 24px;
+    box-shadow: 0 30px 50px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    @media (min-width: 768px) {
+        padding: 54px 48px 46px;
+    }
+}
+
+.title {
+    color: #000;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 133%;
+    text-transform: uppercase;
+    text-align: center;
+    max-width: 280px;
+    margin: 0 auto 22px;
+
+    @media (min-width: 768px) {
+        margin: 0 auto 32px;
+    }
+}
+
+.titleSuccess {
+    font-size: 18px;
+
+    @media (min-width: 768px) {
+        font-size: 32px;
+        max-width: 100%;
+    }
+}
+
+.titleError {
+    font-size: 18px;
+
+    @media (min-width: 768px) {
+        font-size: 22px;
+        max-width: 100%;
+    }
+}
+
+.iconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 34px;
+
+    @media (min-width: 768px) {
+        margin-bottom: 48px;
+    }
+}
+
+.icon {
+    width: 84px;
+    height: 84px;
+
+    @media (min-width: 768px) {
+        width: 96px;
+        height: 96px;
+    }
+}
+
+.submitBtn {
+    width: 100%;
+    margin-top: 4px;
+
+    @media (any-hover: hover) {
+        &:hover {
+            background: #cc0018;
+        }
+    }
+}

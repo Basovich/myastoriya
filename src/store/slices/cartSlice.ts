@@ -300,7 +300,7 @@ export const syncCartOnAuthAsync = createAsyncThunk(
                         // Small delay to prevent rate limits
                         await new Promise(resolve => setTimeout(resolve, 300));
                     } catch (error) {
-                        console.error(`[Cart Sync] Failed to add product ${item.id}:`, error);
+                        console.warn(`[Cart Sync] Failed to add product ${item.id}:`, error instanceof Error ? error.message : error);
                     }
                 }
             }
@@ -309,7 +309,7 @@ export const syncCartOnAuthAsync = createAsyncThunk(
             await dispatch(fetchCartAsync()).unwrap();
             return true;
         } catch (error) {
-            console.error('[Cart] Failed to sync cart on auth:', error);
+            console.warn('[Cart] Failed to sync cart on auth:', error instanceof Error ? error.message : error);
             return rejectWithValue('Failed to sync cart');
         } finally {
             isSyncingCurrentSession = false;

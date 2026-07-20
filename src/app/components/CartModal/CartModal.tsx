@@ -154,8 +154,8 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                     : 'Наступні товари не доступні у вибраному місті та були видалені з кошика:'}
                             </div>
                             <div className={s.cartItems}>
-                                {removedItems.map((item) => (
-                                    <div key={item.id} className={s.cartItem}>
+                                {removedItems.map((item, idx) => (
+                                    <div key={`${item.id}-${idx}`} className={s.cartItem}>
                                         <div className={s.itemImage}>
                                             <Image
                                                 src={item.image}
@@ -405,7 +405,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                             <SwiperSlide key={product.id} className={clsx(s.swiperSlide, !isSliderActive && s.slideFit)}>
                                                 <div className={s.suggestedItem}>
                                                     <Link 
-                                                        href={getLocalizedHref(getProductHref(product.slug || product.id, (product as any).categoryId, categoryIndex), lang as Locale)} 
+                                                        href={getLocalizedHref(getProductHref(product.slug || product.id, product.categoryId, categoryIndex), lang as Locale)} 
                                                         target="_blank"
                                                         title={product.title}
                                                         className={s.suggestedImgWrapper}
