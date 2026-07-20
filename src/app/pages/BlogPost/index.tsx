@@ -8,13 +8,16 @@ import "swiper/css";
 import "swiper/css/navigation";
 import s from "./BlogPost.module.scss";
 import { type Dictionary } from "@/i18n/types";
+import { type Locale } from "@/i18n/config";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
 import Button from "@/app/components/ui/Button/Button";
+import AppLink from "@/app/components/ui/AppLink/AppLink";
 import ProductCard from "@/app/components/ui/ProductCard/ProductCard";
 import SliderArrow from "@/app/components/ui/SliderArrow/SliderArrow";
 import SectionHeader from "@/app/components/ui/SectionHeader/SectionHeader";
 import { type BlogPost, type Product, resolveProductImageUrl, resolveBlogImageUrl, getProductWeight, getProductBadge } from "@/lib/graphql";
 import { likeBlogApi } from "@/lib/graphql/queries/blog";
+import { getLocalizedHref } from "@/utils/i18n-helpers";
 import clsx from "clsx";
 
 interface BlogPostPageProps {
@@ -237,7 +240,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                             >
                                 {post.recipes.map((recipe) => (
                                     <SwiperSlide key={recipe.id}>
-                                        <a href={`/blog/${recipe.slug}`} className={s.blogCardLink}>
+                                        <AppLink href={getLocalizedHref(`/blog/${recipe.slug}`, lang as Locale)} className={s.blogCardLink}>
                                             <div className={s.blogCard}>
                                                 <div className={s.blogCardImage}>
                                                     {resolveBlogImageUrl(recipe.image) ? (
@@ -252,7 +255,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                                     <h3 className={s.blogCardTitle}>{recipe.name}</h3>
                                                 </div>
                                             </div>
-                                        </a>
+                                        </AppLink>
                                     </SwiperSlide>
                                 ))}
                                 <div className={s.sliderNav}>
@@ -272,7 +275,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
 
                         <div className={s.recommendedGrid}>
                             {post.recipes.map((recipe) => (
-                                <a key={recipe.id} href={`/blog/${recipe.slug}`} className={s.blogCardLink}>
+                                <AppLink key={recipe.id} href={getLocalizedHref(`/blog/${recipe.slug}`, lang as Locale)} className={s.blogCardLink}>
                                     <div className={s.blogCard}>
                                         <div className={s.blogCardImage}>
                                             {resolveBlogImageUrl(recipe.image) ? (
@@ -287,7 +290,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                             <h3 className={s.blogCardTitle}>{recipe.name}</h3>
                                         </div>
                                     </div>
-                                </a>
+                                </AppLink>
                             ))}
                         </div>
                     </section>
@@ -312,7 +315,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                             >
                                 {post.relatedBlogs.map((relatedPost) => (
                                     <SwiperSlide key={relatedPost.id}>
-                                        <a href={`/blog/${relatedPost.slug}`} className={s.blogCardLink}>
+                                        <AppLink href={getLocalizedHref(`/blog/${relatedPost.slug}`, lang as Locale)} className={s.blogCardLink}>
                                             <div className={s.blogCard}>
                                                 <div className={s.blogCardImage}>
                                                     {resolveBlogImageUrl(relatedPost.image) ? (
@@ -328,7 +331,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                                     <h3 className={s.blogCardTitle}>{relatedPost.name}</h3>
                                                 </div>
                                             </div>
-                                        </a>
+                                        </AppLink>
                                     </SwiperSlide>
                                 ))}
                                 <div className={s.sliderNav}>
@@ -348,7 +351,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
 
                         <div className={s.recommendedGrid}>
                             {post.relatedBlogs.map((relatedPost) => (
-                                <a key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className={s.blogCardLink}>
+                                <AppLink key={relatedPost.id} href={getLocalizedHref(`/blog/${relatedPost.slug}`, lang as Locale)} className={s.blogCardLink}>
                                     <div className={s.blogCard}>
                                         <div className={s.blogCardImage}>
                                             {resolveBlogImageUrl(relatedPost.image) ? (
@@ -364,7 +367,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                             <h3 className={s.blogCardTitle}>{relatedPost.name}</h3>
                                         </div>
                                     </div>
-                                </a>
+                                </AppLink>
                             ))}
                         </div>
                     </section>

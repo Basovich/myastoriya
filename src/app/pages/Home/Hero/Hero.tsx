@@ -31,7 +31,7 @@ export default function Hero({ slides, lang }: HeroProps) {
         const identifier = linkTo.slug || linkTo.id;
         if (!identifier) return "/actions";
 
-        if (linkTo.type === "product") return `/products/${identifier}`;
+        if (linkTo.type === "product") return `/catalog/${identifier}`;
         if (linkTo.type === "category") return `/catalog/${identifier}`;
         if (linkTo.type === "page") return `/${identifier}`;
         return `/actions/${identifier}`; // Default fallback for actions/sales

@@ -11,6 +11,7 @@ import type { FilterStateInput } from "@/lib/graphql";
 import { Locale } from "@/i18n/config";
 import s from "../CatalogContent/CatalogContent.module.scss";
 import Pagination from "@/app/components/ui/Pagination/Pagination";
+import { useAppSelector } from "@/store/hooks";
 
 interface CatalogProductsClientProps {
     initialProducts: ProductsResponse;
@@ -36,6 +37,7 @@ export default function CatalogProductsClient({
     const [isNavigating, setIsNavigating] = useState(false);
     const [isPaginating, setIsPaginating] = useState(false);
     const [totalItems, setTotalItems] = useState(0);
+    const token = useAppSelector((state) => state.auth.token) ?? undefined;
 
     useEffect(() => {
         let isCurrent = true;
@@ -97,7 +99,7 @@ export default function CatalogProductsClient({
                 page: nextPage,
                 sort,
                 filter: activeFilters && activeFilters.length > 0 ? activeFilters : undefined,
-            }, lang);
+            }, lang, token);
 
             setProducts((prev) => [...prev, ...newProductsRes.data]);
             setCurrentPage(nextPage);
@@ -137,7 +139,7 @@ export default function CatalogProductsClient({
                 page: page,
                 sort,
                 filter: activeFilters && activeFilters.length > 0 ? activeFilters : undefined,
-            }, lang);
+            }, lang, token);
 
             setProducts(newProductsRes.data);
             setCurrentPage(page);
