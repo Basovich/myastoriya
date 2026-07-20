@@ -8,10 +8,11 @@ import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
 import Logo from "@/app/components/Header/Shared/Logo";
 import { siteData } from "@/config/site";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { useToggleOpenWithAnimation } from "@/hooks/useToggleOpenWithAnimation";
 import CitySelector from "@/app/components/Header/DesktopHeader/MainBar/CitySelector";
 import { ProductCategory } from "@/lib/graphql/queries/products";
+import { getCategoryHref } from "@/utils/category-url";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -21,6 +22,8 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose, lang, categories }: MobileMenuProps) {
+    const params = useParams();
+    const currentLang = (params?.lang as Locale) || lang;
     const getMobileNavItems = (targetLang: Locale) => [
         { label: targetLang === "ru" ? "Заведения" : "Заклади", href: "/our-stores" },
         { label: targetLang === "ru" ? "Акции" : "Акції", href: "/actions" },
@@ -133,10 +136,13 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
                             const isDeep = uniqueRoots.length <= 3 && uniqueRoots.every(c => c.children && c.children.length > 0);
                             const toRender = isDeep ? uniqueRoots.flatMap(cat => cat.children || []) : uniqueRoots;
                             
-                            return toRender.map((cat) => (
+                            return toRender.map((cat) => {
+                                const canonicalHref = getCategoryHref(cat);
+                                const href = getLocalizedHref(canonicalHref, currentLang);
+                                return (
                                 <AppLink 
                                     key={cat.id} 
-                                    href={`/${cat.slug}`} 
+                                    href={href} 
                                     className={s.categoryItem} 
                                     onClick={onClose}
                                 >
@@ -169,7 +175,8 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
                                     </div>
                                     {cat.name}
                                 </AppLink>
-                            ));
+                                );
+                            });
                         })()}
                     </div>
                 </AnimatedDiv>
