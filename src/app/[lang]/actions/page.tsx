@@ -34,8 +34,8 @@ export default async function ActionsPage({
         id: parseInt(sale.id),
         slug: sale.slug,
         title: sale.name,
-        image: sale.image?.size2x || sale.image?.size1x || "",
-        imageWeb: sale.imageWeb,
+        image: sale.banner?.size2x || sale.banner?.size1x || sale.image?.size2x || sale.image?.size1x || "",
+        imageWeb: sale.bannerWeb,
         date: sale.expiresAt ? new Date(sale.expiresAt).toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uk-UA') : ""
     }));
 

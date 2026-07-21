@@ -58,7 +58,7 @@ export default function Actions({ dict, lang, sales }: ActionsProps) {
                     id: parseInt(sale.id),
                     title: sale.name,
                     slug: sale.slug || sale.id,
-                    image: sale.image?.size2x || sale.image?.size1x || null,
+                    image: sale.banner?.size2x || sale.banner?.size1x || sale.image?.size2x || sale.image?.size1x || null,
                     date: formattedDate,
                     discount
                 };

@@ -184,8 +184,8 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
                     id: parseInt(sale.id),
                     title: sale.name,
                     slug: sale.slug || sale.id,
-                    image: sale.image?.size2x || sale.image?.size1x || "",
-                    imageWeb: sale.imageWeb,
+                    image: sale.banner?.size2x || sale.banner?.size1x || sale.image?.size2x || sale.image?.size1x || "",
+                    imageWeb: sale.bannerWeb,
                     date: sale.expiresAt || "",
                     discount: null
                 }));

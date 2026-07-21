@@ -164,10 +164,10 @@ export default function ActionDetail({
     }, [hasMore, loading, page, sale.id, lang, token]);
 
 
-    const bannerDesktop = sale.bannerWeb?.desktop;
-    const bannerLaptop = sale.bannerWeb?.laptop;
-    const bannerTablet = sale.bannerWeb?.tablet;
-    const bannerDefault = sale.banner?.size2x || sale.banner?.size1x || null;
+    const heroDesktop = sale.imageWeb?.desktop;
+    const heroLaptop = sale.imageWeb?.laptop;
+    const heroTablet = sale.imageWeb?.tablet;
+    const heroDefault = heroDesktop || heroLaptop || heroTablet || sale.image?.size2x || sale.image?.size1x || sale.banner?.size2x || sale.banner?.size1x || null;
 
     // Rich HTML description from the backend
     const descriptionHtml = sale.text || sale.description || '';
@@ -179,21 +179,21 @@ export default function ActionDetail({
             {/* Hero banner */}
             <div className={s.heroWrapper}>
                 <div className={s.heroImageWrapper}>
-                    {bannerDefault || bannerDesktop || bannerLaptop || bannerTablet ? (
-                        sale.bannerWeb ? (
+                    {heroDefault ? (
+                        sale.imageWeb && (sale.imageWeb.desktop || sale.imageWeb.laptop || sale.imageWeb.tablet) ? (
                             <picture className={s.heroPicture}>
-                                {sale.bannerWeb.desktop && <source media="(min-width: 1280px)" srcSet={sale.bannerWeb.desktop} />}
-                                {sale.bannerWeb.laptop && <source media="(min-width: 1024px)" srcSet={sale.bannerWeb.laptop} />}
-                                {sale.bannerWeb.tablet && <source media="(min-width: 768px)" srcSet={sale.bannerWeb.tablet} />}
+                                {sale.imageWeb.desktop && <source media="(min-width: 1280px)" srcSet={sale.imageWeb.desktop} />}
+                                {sale.imageWeb.laptop && <source media="(min-width: 1024px)" srcSet={sale.imageWeb.laptop} />}
+                                {sale.imageWeb.tablet && <source media="(min-width: 768px)" srcSet={sale.imageWeb.tablet} />}
                                 <img
-                                    src={bannerDefault || sale.bannerWeb.desktop || sale.bannerWeb.laptop || sale.bannerWeb.tablet || undefined}
+                                    src={heroDefault}
                                     alt={title}
                                     className={s.heroImage}
                                 />
                             </picture>
                         ) : (
                             <Image
-                                src={bannerDefault!}
+                                src={heroDefault}
                                 alt={title}
                                 fill
                                 className={s.heroImage}
