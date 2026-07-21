@@ -50,8 +50,8 @@ export default function Actions({ dict, lang, sales }: ActionsProps) {
                     if (sale.expiresAt) {
                         formattedDate = format(new Date(sale.expiresAt), "dd.MM.yyyy", { locale: uk });
                     }
-                } catch (e) {
-                    console.error("Failed to format date:", sale.expiresAt);
+                } catch (err) {
+                    console.error("Failed to format date:", sale.expiresAt, err);
                 }
 
                 return {
