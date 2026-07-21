@@ -132,7 +132,21 @@ export default async function DynamicCatalogPage({ params, searchParams }: Dynam
         const hasActiveFilters = activeFilters.length > 0 || !!sort;
         if (shouldRedirectForLocality(productsResponse.data.length, page, hasActiveFilters)) {
             const langPrefix = lang === 'ua' ? '' : `/${lang}`;
-            redirect(`${langPrefix}/catalog`);
+            
+            let redirectUrl = `${langPrefix}/catalog`;
+            if (categoryEntry.parent) {
+                const parentEntry = categoryIndex.get(String(categoryEntry.parent.id));
+                if (parentEntry) {
+                    const parentHref = getCategoryHref(
+                        parentEntry.node,
+                        parentEntry.parent,
+                        parentEntry.grandParent
+                    );
+                    redirectUrl = `${langPrefix}${parentHref}`;
+                }
+            }
+            
+            redirect(redirectUrl);
         }
 
         let faq = null;

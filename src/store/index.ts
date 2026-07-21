@@ -77,12 +77,20 @@ const authPersistConfig = {
 const cartPersistConfig = {
     key: 'cart',
     storage,
-    blacklist: ['loading', 'deletingIds', 'useBonuses', 'total', 'isCartModalOpen', 'removedItems'],
+    blacklist: ['loading', 'deletingIds', 'useBonuses', 'total', 'isCartModalOpen', 'removedItems', 'isSyncing'],
+};
+
+const wishlistPersistConfig = {
+    key: 'wishlist',
+    storage,
+    // isSyncing is a transient guard flag — never persist it
+    blacklist: ['isSyncing'],
+    transforms: [generalExpireTransform],
 };
 
 const rootReducer = combineReducers({
     cart: persistReducer(cartPersistConfig, cartReducer),
-    wishlist: wishlistReducer,
+    wishlist: persistReducer(wishlistPersistConfig, wishlistReducer),
     auth: persistReducer(authPersistConfig, authReducer),
     locality: persistReducer(localityPersistConfig, localityReducer),
     viewedProducts: viewedProductsReducer,
@@ -91,8 +99,8 @@ const rootReducer = combineReducers({
 const persistConfig = {
     key: 'myastoriya-root',
     storage,
-    // cart and auth/locality are nested — each has its own persistReducer
-    whitelist: ['wishlist', 'viewedProducts'],
+    // cart, wishlist, auth and locality each have their own persistReducer
+    whitelist: ['viewedProducts'],
     transforms: [generalExpireTransform]
 };
 

@@ -7,12 +7,14 @@ interface WishlistState {
     items: string[]; // List of product IDs
     loadingIds: string[]; // IDs currently being toggled (pending API)
     isInitialized: boolean;
+    isSyncing: boolean;
 }
 
 const initialState: WishlistState = {
     items: [],
     loadingIds: [],
     isInitialized: false,
+    isSyncing: false,
 };
 
 // Toggle item in backend and return product ID
@@ -68,25 +70,22 @@ export const fetchWishlistPayloadAsync = createAsyncThunk(
     }
 );
 
-// Keep track of sync status per session to avoid loops
-let isSyncingCurrentSession = false;
-
 // Sync local items to backend (used after login/register)
 export const syncWishlistOnAuthAsync = createAsyncThunk(
     'wishlist/syncOnAuthAsync',
     async (_, { getState, dispatch, rejectWithValue }) => {
-        if (isSyncingCurrentSession) return false;
+        const state = getState() as RootState;
+        // Guard against concurrent syncs — isSyncing is in Redux state,
+        // so it correctly resets on logout unlike a module-level variable.
+        if (state.wishlist.isSyncing) return false;
         
         try {
-            const state = getState() as RootState;
             const localItems = state.wishlist.items;
             
             // Deduplicate items before syncing
             const uniqueIds = Array.from(new Set(localItems));
             
             if (uniqueIds.length > 0) {
-                isSyncingCurrentSession = true;
-
                 // Upload local items to the backend sequentially to avoid 504 Gateway Timeouts
                 for (const id of uniqueIds) {
                     try {
@@ -113,8 +112,6 @@ export const syncWishlistOnAuthAsync = createAsyncThunk(
         } catch (error) {
             console.error('[Wishlist] Failed to sync wishlist on auth:', error);
             return rejectWithValue('Failed to sync wishlist');
-        } finally {
-            isSyncingCurrentSession = false;
         }
     }
 );
@@ -165,6 +162,16 @@ const wishlistSlice = createSlice({
                 // Deduplicate items from backend
                 state.items = Array.from(new Set(action.payload));
                 state.isInitialized = true;
+            })
+            // syncWishlistOnAuthAsync
+            .addCase(syncWishlistOnAuthAsync.pending, (state) => {
+                state.isSyncing = true;
+            })
+            .addCase(syncWishlistOnAuthAsync.fulfilled, (state) => {
+                state.isSyncing = false;
+            })
+            .addCase(syncWishlistOnAuthAsync.rejected, (state) => {
+                state.isSyncing = false;
             });
     },
 });

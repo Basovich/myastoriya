@@ -9,6 +9,7 @@ import { fetchCartAsync, syncCartOnAuthAsync } from '@/store/slices/cartSlice';
 import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies, getAccessToken, tryRefreshTokenAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
+import { store } from '@/store';
 import * as Sentry from "@sentry/nextjs";
 
 /**
@@ -73,9 +74,18 @@ function AuthInitializerClient() {
         getOrCreateDeviceId();
 
         void initAuth(dispatch).finally(() => {
-            // Once auth is initialized (either as user or guest), fetch the wishlist payload
+            // Once auth is initialized, fetch the wishlist payload
             void dispatch(fetchWishlistPayloadAsync());
-            void dispatch(fetchCartAsync());
+
+            // fetchCartAsync is skipped for real authenticated users because
+            // syncCartOnAuthAsync (triggered by the guest→user effect below)
+            // already includes a fetchCartAsync call after syncing local items.
+            // For guests we fetch immediately since no sync will happen.
+            const authState = store.getState().auth;
+            const isRealUser = authState.isAuthenticated && !authState.isGuest;
+            if (!isRealUser) {
+                void dispatch(fetchCartAsync());
+            }
         });
     }, [dispatch]);
 

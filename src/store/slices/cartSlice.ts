@@ -7,6 +7,7 @@ import {
     removeCartItemApi,
     CartGql
 } from '@/lib/graphql/queries/cart';
+import { getProductsByIdsApi, resolveProductImageUrl } from '@/lib/graphql/queries/products';
 import { RootState } from '..';
 
 export interface CartItemModifier {
@@ -45,6 +46,7 @@ interface CartState {
     deletingIds: string[];
     isInitialized: boolean;
     loading: boolean;
+    isSyncing: boolean;
     promoCode: CartPromoCode | null;
     cashback: number;
     useBonuses: boolean;
@@ -59,6 +61,7 @@ const initialState: CartState = {
     deletingIds: [],
     isInitialized: false,
     loading: false,
+    isSyncing: false,
     promoCode: null,
     cashback: 0,
     useBonuses: false,
@@ -113,19 +116,91 @@ export const fetchCartAsync = createAsyncThunk(
         try {
             const state = getState() as RootState;
             const useBonuses = state.cart.useBonuses;
+            const prevItems = state.cart.items;
             const response = await getCartApi({ useBonuses });
             dispatch(setPromoCode(response.promoCode || null));
             dispatch(setCashback(response.cashback || 0));
             dispatch(setTotal(response.total || 0));
-            return {
-                items: mapCartItems(response),
-                hasUnavailableProducts: response.hasUnavailableProducts || false,
-            };
+
+            const newItems = mapCartItems(response);
+            const hasUnavailableProducts = response.hasUnavailableProducts || false;
+
+            // Detect removed items here (while we still have prevItems)
+            // and dispatch enrichment thunk so modal shows real product names
+            if (hasUnavailableProducts) {
+                const removedPayload = prevItems
+                    .filter(oldItem => !newItems.some(newItem => newItem.id === oldItem.id))
+                    .map(item => ({ id: item.id, quantity: item.quantity }));
+
+                if (removedPayload.length > 0) {
+                    void dispatch(fetchAndSetRemovedItemsAsync(removedPayload));
+                }
+            }
+
+            return { items: newItems, hasUnavailableProducts };
         } catch (error: unknown) {
             console.error('[Cart] Failed to fetch cart from backend:', error);
             Sentry.captureException(error);
             return rejectWithValue('Failed to fetch cart');
         }
+    }
+);
+
+/**
+ * When the backend signals unavailable products after a locality change,
+ * this thunk fetches real product details (name, image) for all removed items
+ * so the cart notification modal shows accurate names instead of a generic fallback.
+ */
+export const fetchAndSetRemovedItemsAsync = createAsyncThunk(
+    'cart/fetchAndSetRemovedItems',
+    async (removedItems: { id: string; quantity: number }[], { getState, dispatch }) => {
+        const state = getState() as RootState;
+        const detailsCache = state.cart.productDetails;
+
+        const missingIds: number[] = [];
+        const enriched: RemovedCartItem[] = removedItems.map(item => {
+            const cached = detailsCache[item.id];
+            if (!cached) missingIds.push(Number(item.id));
+            return {
+                id: item.id,
+                title: cached?.title || '',
+                image: cached?.image || '/images/product-placeholder.svg',
+                quantity: item.quantity,
+            };
+        });
+
+        if (missingIds.length > 0) {
+            try {
+                const fetched = await getProductsByIdsApi(missingIds);
+                const fetchedMap = new Map(fetched.map(p => [String(p.id), p]));
+
+                const detailsToSave: Record<string, { title: string; image: string }> = {};
+                for (const p of fetched) {
+                    detailsToSave[String(p.id)] = {
+                        title: p.name,
+                        image: resolveProductImageUrl(p) || '/images/product-placeholder.svg',
+                    };
+                }
+                dispatch(saveProductDetails(detailsToSave));
+
+                enriched.forEach(item => {
+                    const p = fetchedMap.get(item.id);
+                    if (p) {
+                        item.title = p.name;
+                        item.image = resolveProductImageUrl(p) || '/images/product-placeholder.svg';
+                    } else if (!item.title) {
+                        item.title = 'Товар';
+                    }
+                });
+            } catch (err) {
+                console.warn('[Cart] Failed to fetch removed product details:', err);
+                enriched.forEach(item => { if (!item.title) item.title = 'Товар'; });
+            }
+        } else {
+            enriched.forEach(item => { if (!item.title) item.title = 'Товар'; });
+        }
+
+        return enriched;
     }
 );
 
@@ -262,17 +337,16 @@ export const removeFromCartAsync = createAsyncThunk(
     }
 );
 
-// Keep track of sync status per session to avoid loops
-let isSyncingCurrentSession = false;
-
 // Sync local items to backend (used after login/register)
 export const syncCartOnAuthAsync = createAsyncThunk(
     'cart/syncOnAuth',
     async (_, { getState, dispatch, rejectWithValue }) => {
-        if (isSyncingCurrentSession) return false;
+        const state = getState() as RootState;
+        // Guard against concurrent syncs — isSyncing is stored in Redux state
+        // so it correctly resets on logout unlike a module-level variable.
+        if (state.cart.isSyncing) return false;
 
         try {
-            const state = getState() as RootState;
             const localItems = state.cart.items;
 
             // Deduplicate items before syncing (including modifiers)
@@ -285,24 +359,22 @@ export const syncCartOnAuthAsync = createAsyncThunk(
             );
 
             if (uniqueItems.length > 0) {
-                isSyncingCurrentSession = true;
-
-                // Sync local items sequentially to avoid 504 errors on dev-api
-                for (const item of uniqueItems) {
-                    try {
-                        const modifierIds = item.modifiers ? item.modifiers.map(m => m.id) : undefined;
-                        await addProductToCartApi({
-                            productId: Number(item.id),
-                            quantity: item.quantity,
-                            costVariantId: item.costVariantId || undefined,
-                            modifierIds,
-                        });
-                        // Small delay to prevent rate limits
-                        await new Promise(resolve => setTimeout(resolve, 300));
-                    } catch (error) {
-                        console.warn(`[Cart Sync] Failed to add product ${item.id}:`, error instanceof Error ? error.message : error);
-                    }
-                }
+                // Sync local items in parallel via Promise.all for performance
+                await Promise.all(
+                    uniqueItems.map(async (item) => {
+                        try {
+                            const modifierIds = item.modifiers ? item.modifiers.map(m => m.id) : undefined;
+                            await addProductToCartApi({
+                                productId: Number(item.id),
+                                quantity: item.quantity,
+                                costVariantId: item.costVariantId || undefined,
+                                modifierIds,
+                            });
+                        } catch (error) {
+                            console.warn(`[Cart Sync] Failed to add product ${item.id}:`, error instanceof Error ? error.message : error);
+                        }
+                    })
+                );
             }
 
             // Fetch the combined result from the backend
@@ -311,8 +383,6 @@ export const syncCartOnAuthAsync = createAsyncThunk(
         } catch (error) {
             console.warn('[Cart] Failed to sync cart on auth:', error instanceof Error ? error.message : error);
             return rejectWithValue('Failed to sync cart');
-        } finally {
-            isSyncingCurrentSession = false;
         }
     }
 );
@@ -391,32 +461,9 @@ const cartSlice = createSlice({
                 if (!state.deletingIds) {
                     state.deletingIds = [];
                 }
-                const newItems = action.payload.items;
-                const hasUnavailable = action.payload.hasUnavailableProducts;
-
-                if (hasUnavailable) {
-                    // Find items that were present in state.items but are NOT present in newItems
-                    const removed = state.items.filter(
-                        oldItem => !newItems.some(newItem => newItem.id === oldItem.id)
-                    );
-
-                    if (removed.length > 0) {
-                        state.removedItems = removed.map(item => {
-                            const details = state.productDetails[item.id];
-                            return {
-                                id: item.id,
-                                title: details?.title || 'Товар',
-                                image: details?.image || '/images/product-placeholder.svg',
-                                quantity: item.quantity,
-                            };
-                        });
-                        state.isCartModalOpen = true;
-                    }
-                }
-
-                // Merge backend state with local optimistic items (no rowId yet)
-                // so items added before auth was ready are not wiped.
-                state.items = mergeCartItems(state.items, newItems).filter(
+                // Removed item detection and modal dispatch happen in the fetchCartAsync thunk itself
+                // (via fetchAndSetRemovedItemsAsync). Here we just update the items list.
+                state.items = mergeCartItems(state.items, action.payload.items).filter(
                     item => !state.deletingIds.includes(item.rowId || item.id)
                 );
                 state.isInitialized = true;
@@ -550,12 +597,22 @@ const cartSlice = createSlice({
             // syncCartOnAuthAsync
             .addCase(syncCartOnAuthAsync.pending, (state) => {
                 state.loading = true;
+                state.isSyncing = true;
             })
             .addCase(syncCartOnAuthAsync.fulfilled, (state) => {
                 state.loading = false;
+                state.isSyncing = false;
             })
             .addCase(syncCartOnAuthAsync.rejected, (state) => {
                 state.loading = false;
+                state.isSyncing = false;
+            })
+            // fetchAndSetRemovedItemsAsync — opens cart modal with enriched product data
+            .addCase(fetchAndSetRemovedItemsAsync.fulfilled, (state, action) => {
+                if (action.payload && action.payload.length > 0) {
+                    state.removedItems = action.payload;
+                    state.isCartModalOpen = true;
+                }
             });
     }
 });
