@@ -638,6 +638,9 @@ export function useCartProducts() {
     const suggestedProducts = useMemo(() => {
         if (hookLoading) return [];
 
+        const inCartIds = new Set(cartItems.map(item => String(item.id)));
+        if (inCartIds.size === 0) return [];
+
         const uniqueBundleProducts = new Map<string, {
             id: string;
             title: string;
@@ -648,10 +651,16 @@ export function useCartProducts() {
             categoryId?: number;
         }>();
 
-        const inCartIds = new Set(cartItems.map(item => String(item.id)));
+        const cartCategoryIds = new Set<number>();
+        cartItems.forEach(item => {
+            const dbProduct = getCachedProduct(item.id);
+            if (dbProduct?.categoryId) {
+                cartCategoryIds.add(Number(dbProduct.categoryId));
+            }
+        });
 
-        for (const catIdStr of Object.keys(globalCategoryCache)) {
-            const category = globalCategoryCache[Number(catIdStr)];
+        for (const catId of cartCategoryIds) {
+            const category = globalCategoryCache[catId];
             if (!category) continue;
 
             const bundles = category.bundles || [];
@@ -659,6 +668,11 @@ export function useCartProducts() {
                 const discountAmount = bundle.discountAmount || 0;
                 const discountType = bundle.discountType || 'percent';
                 const bundleItems = bundle.items || [];
+
+                const hasBundleItemInCart = bundleItems.some(bItem =>
+                    bItem.product && inCartIds.has(String(bItem.product.id))
+                );
+                if (!hasBundleItemInCart) continue;
 
                 for (const bItem of bundleItems) {
                     const product = bItem.product;
