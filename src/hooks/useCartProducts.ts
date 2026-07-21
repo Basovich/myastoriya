@@ -669,11 +669,6 @@ export function useCartProducts() {
                 const discountType = bundle.discountType || 'percent';
                 const bundleItems = bundle.items || [];
 
-                const hasBundleItemInCart = bundleItems.some(bItem =>
-                    bItem.product && inCartIds.has(String(bItem.product.id))
-                );
-                if (!hasBundleItemInCart) continue;
-
                 for (const bItem of bundleItems) {
                     const product = bItem.product;
                     if (!product) continue;
