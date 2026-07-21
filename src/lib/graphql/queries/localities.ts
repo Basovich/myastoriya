@@ -80,11 +80,11 @@ export async function getLocalitiesApi(
     return data.localities;
 }
 
-export async function selectLocalityApi(id: number, lang?: string): Promise<Locality> {
+export async function selectLocalityApi(id: number, lang?: string, token?: string): Promise<Locality> {
     const data = await gqlRequest<{ selectLocality: Locality }>(
         SELECT_LOCALITY_MUTATION,
         { id },
-        { lang }
+        { lang, token }
     );
     return data.selectLocality;
 }

@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { refreshTokenApi, authAsGuestApi } from '@/lib/graphql/queries/auth';
+import { selectLocalityApi, Locality } from '@/lib/graphql/queries/localities';
 import { GraphQLError } from '@/lib/graphql/client';
 
 const ACCESS_TOKEN_KEY = 'access_token';
@@ -85,4 +86,21 @@ export async function initializeGuestSessionAction(deviceId: string): Promise<st
     const result = await authAsGuestApi(deviceId);
     await setAuthCookies(result.accessToken, result.refreshToken);
     return result.accessToken;
+}
+
+/**
+ * Selects a locality for the current user or guest session on the backend.
+ * Guarantees that an access_token exists in cookies (creating a guest session if needed),
+ * and syncs the locality to the backend for that session token.
+ */
+export async function selectLocalityAction(
+    localityId: number,
+    lang?: string,
+    deviceId?: string,
+): Promise<Locality> {
+    let token = await getAccessToken();
+    if (!token && deviceId) {
+        token = await initializeGuestSessionAction(deviceId);
+    }
+    return await selectLocalityApi(localityId, lang, token ?? undefined);
 }

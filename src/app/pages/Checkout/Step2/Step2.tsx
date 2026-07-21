@@ -21,11 +21,11 @@ import PickupPointRow from '../components/PickupPointRow/PickupPointRow';
 import AddPickupModal from '@/app/components/Personal/Pickup/AddPickupModal';
 import Image from 'next/image';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
-import { getAccessToken } from '@/app/actions/authActions';
+import { getAccessToken, selectLocalityAction } from '@/app/actions/authActions';
+import { getOrCreateDeviceId } from '@/lib/utils/auth';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { 
     getLocalitiesApi, 
-    selectLocalityApi, 
     getDeliveriesApi, 
     getDeliveryTimesApi, 
     getWarehousesApi, 
@@ -685,7 +685,8 @@ export default function Step2() {
         }
 
         try {
-            await selectLocalityApi(city.id, lang);
+            const deviceId = getOrCreateDeviceId();
+            await selectLocalityAction(city.id, lang, deviceId);
         } catch (e) {
             console.error('Failed to select locality on backend', e);
         }

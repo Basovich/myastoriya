@@ -7,6 +7,7 @@ import { fetchWishlistPayloadAsync, syncWishlistOnAuthAsync } from '@/store/slic
 import { syncViewedProductsOnAuthAsync } from '@/store/slices/viewedProductsSlice';
 import { fetchCartAsync, syncCartOnAuthAsync } from '@/store/slices/cartSlice';
 import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
+import { selectLocalityApi } from '@/lib/graphql/queries/localities';
 import { setAuthCookies, getAccessToken, tryRefreshTokenAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
 import { store } from '@/store';
@@ -162,6 +163,16 @@ async function startGuestSession(dispatch: ReturnType<typeof useAppDispatch>) {
         const result = await authAsGuestApi(deviceId);
         await setAuthCookies(result.accessToken, result.refreshToken);
         dispatch(loginAsGuest({ token: result.accessToken }));
+
+        // Sync existing selected city to newly created guest session on backend
+        const selectedCity = store.getState().locality.selectedCity;
+        if (selectedCity?.id) {
+            try {
+                await selectLocalityApi(selectedCity.id, undefined, result.accessToken);
+            } catch (cityErr) {
+                console.warn('[AuthInitializer] Failed to sync selected city to new guest session:', cityErr);
+            }
+        }
     } catch (err) {
         console.warn('[AuthInitializer] Guest auth failed:', err);
         dispatch(loginAsGuest());

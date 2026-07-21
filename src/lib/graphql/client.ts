@@ -182,6 +182,7 @@ export async function gqlRequest<T>(
                                     const { store } = await import('@/store');
                                     const { loginAsGuest, setUser, setToken } = await import('@/store/slices/authSlice');
                                     const { getMeApi } = await import('@/lib/graphql/queries/auth');
+                                    const { selectLocalityApi } = await import('@/lib/graphql/queries/localities');
                                     
                                     try {
                                         const user = await getMeApi(freshToken);
@@ -194,6 +195,16 @@ export async function gqlRequest<T>(
                                         store.dispatch(loginAsGuest({ token: freshToken }));
                                     }
                                     store.dispatch(setToken(freshToken));
+
+                                    // Sync active locality to the new token session
+                                    const selectedCity = store.getState().locality.selectedCity;
+                                    if (selectedCity?.id) {
+                                        try {
+                                            await selectLocalityApi(selectedCity.id, undefined, freshToken);
+                                        } catch (cityErr) {
+                                            console.warn('[GQL Interceptor] Failed to sync locality to refreshed token:', cityErr);
+                                        }
+                                    }
                                 }
                                 return freshToken;
                             } catch (refreshErr) {

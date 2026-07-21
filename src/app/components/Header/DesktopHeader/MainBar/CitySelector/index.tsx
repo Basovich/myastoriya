@@ -17,8 +17,9 @@ import {
     getLocalitiesApi,
     Locality, 
     getSelectedLocalityApi,
-    selectLocalityApi,
 } from '@/lib/graphql';
+import { selectLocalityAction } from '@/app/actions/authActions';
+import { getOrCreateDeviceId } from '@/lib/utils/auth';
 import s from './CitySelector.module.scss';
 import loaderStyles from '@/app/[lang]/loading.module.scss';
 import clsx from 'clsx';
@@ -124,23 +125,33 @@ export default function CitySelector({
             dispatch(setDetectionLoading(true));
             try {
                 const existing = await getSelectedLocalityApi(lang);
+                let cityToSet: Locality | null = null;
                 if (existing) {
-                    dispatch(setSelectedCity(existing));
+                    cityToSet = existing;
                 } else {
                     const detected = await autoDetectLocalityApi(undefined, undefined, lang);
                     if (detected) {
-                        dispatch(setSelectedCity(detected));
+                        cityToSet = detected;
                     } else {
                         const fallbackTitle = lang === 'ua' ? 'м. Київ' : 'г. Киев';
-                        const fallback = { id: 2581, name: fallbackTitle };
-                        dispatch(setSelectedCity(fallback));
+                        cityToSet = { id: 2581, name: fallbackTitle };
                     }
+                }
+
+                if (cityToSet) {
+                    dispatch(setSelectedCity(cityToSet));
+                    const deviceId = getOrCreateDeviceId();
+                    await selectLocalityAction(cityToSet.id, lang, deviceId).catch((err) => {
+                        console.warn('[CitySelector] Failed to sync auto-detected city to backend:', err);
+                    });
                 }
             } catch (error) {
                 console.warn('[CitySelector] Detection failed:', error);
                 const fallbackTitle = lang === 'ua' ? 'м. Київ' : 'г. Киев';
                 const fallback = { id: 2581, name: fallbackTitle };
                 dispatch(setSelectedCity(fallback));
+                const deviceId = getOrCreateDeviceId();
+                await selectLocalityAction(fallback.id, lang, deviceId).catch(() => {});
             } finally {
                 dispatch(setDetectionLoading(false));
             }
@@ -262,9 +273,10 @@ export default function CitySelector({
         dispatch(setPromptInteractionDone(true));
         dispatch(setManualSelectionOpen(false));
 
-        // Sync with server
+        // Sync with server via Server Action
         try {
-            await selectLocalityApi(city.id, lang);
+            const deviceId = getOrCreateDeviceId();
+            await selectLocalityAction(city.id, lang, deviceId);
             window.location.reload();
         } catch (error) {
             console.warn('[CitySelector] Failed to sync city with server:', error);
@@ -283,7 +295,8 @@ export default function CitySelector({
         // Sync detected city with server
         if (selectedCity) {
             try {
-                await selectLocalityApi(selectedCity.id, lang);
+                const deviceId = getOrCreateDeviceId();
+                await selectLocalityAction(selectedCity.id, lang, deviceId);
                 window.location.reload();
             } catch (error) {
                 console.warn('[CitySelector] Failed to sync confirmed city with server:', error);
