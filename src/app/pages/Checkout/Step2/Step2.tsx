@@ -38,7 +38,8 @@ import {
     Delivery,
     Warehouse,
     Shop,
-    UserPickupPoint
+    UserPickupPoint,
+    UserAddress
 } from '@/lib/graphql';
 
 interface Address {
@@ -86,12 +87,10 @@ export default function Step2() {
     
     const citySelectRef = useRef<HTMLDivElement>(null);
     const npSelectRef = useRef<HTMLDivElement>(null);
-    const shopSelectRef = useRef<HTMLDivElement>(null);
     const isLoadingMoreCitiesRef = useRef(false);
 
     // Local states for custom city selector
     const [isOpenCitySelect, setIsOpenCitySelect] = useState(false);
-    const [isOpenShopSelect, setIsOpenShopSelect] = useState(false);
     const [citySearchQuery, setCitySearchQuery] = useState('');
     const [citySearchResults, setCitySearchResults] = useState<Locality[]>([]);
     const [citySearchPage, setCitySearchPage] = useState(1);
@@ -107,7 +106,7 @@ export default function Step2() {
     // Local states for Nova Poshta selection dropdown
     const [isOpenNPDropdown, setIsOpenNPDropdown] = useState(false);
     const [deliveries, setDeliveries] = useState<Delivery[]>([]);
-    const [dbAddresses, setDbAddresses] = useState<any[]>([]);
+    const [dbAddresses, setDbAddresses] = useState<UserAddress[]>([]);
     const [guestAddresses, setGuestAddresses] = useState<Address[]>([]);
     const [isLoadingDeliveries, setIsLoadingDeliveries] = useState(true);
     const [shops, setShops] = useState<Shop[]>([]);
@@ -133,7 +132,6 @@ export default function Step2() {
     const [deliveryDate, setDeliveryDate] = useState<Date | null>(new Date());
     const [deliveryTimes, setDeliveryTimes] = useState<string[]>([]);
     const [deliveryTime, setDeliveryTime] = useState('');
-    const [isLoadingTimes, setIsLoadingTimes] = useState(false);
     
     // UI states
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -155,7 +153,7 @@ export default function Step2() {
         return null;
     }, [promoCode]);
     
-    const [restoredData, setRestoredData] = useState<any>(null);
+    const [restoredData, setRestoredData] = useState<Record<string, unknown> | null>(null);
 
     // 1. Restore saved states from localStorage on mount
     useEffect(() => {
@@ -259,9 +257,6 @@ export default function Step2() {
             }
             if (npSelectRef.current && !npSelectRef.current.contains(event.target as Node)) {
                 setIsOpenNPDropdown(false);
-            }
-            if (shopSelectRef.current && !shopSelectRef.current.contains(event.target as Node)) {
-                setIsOpenShopSelect(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -413,16 +408,16 @@ export default function Step2() {
                 // Determine what delivery method to select
                 let restored = '';
                 if (restoredData && safeDeliveries.some(d => d?.id === restoredData.deliveryMethod)) {
-                    restored = restoredData.deliveryMethod;
+                    restored = String(restoredData.deliveryMethod);
                 } else {
                     const saved = localStorage.getItem('checkout_delivery_data');
                     if (saved) {
                         try {
                             const parsed = JSON.parse(saved);
                             if (parsed.deliveryMethod && safeDeliveries.some(d => d?.id === parsed.deliveryMethod)) {
-                                  restored = parsed.deliveryMethod;
+                                  restored = String(parsed.deliveryMethod);
                             }
-                        } catch (e) {}
+                        } catch {}
                     }
                 }
                 
@@ -483,7 +478,6 @@ export default function Step2() {
         }
 
         const fetchTimes = async () => {
-            setIsLoadingTimes(true);
             try {
                 const formattedDate = formatDeliveryTimesDate(deliveryDate);
                 const times = await getDeliveryTimesApi(parseInt(deliveryMethod, 10), formattedDate, lang);
@@ -500,12 +494,10 @@ export default function Step2() {
                 console.error('Failed to fetch delivery times', e);
                 setDeliveryTimes([]);
                 setDeliveryTime('');
-            } finally {
-                setIsLoadingTimes(false);
             }
         };
         fetchTimes();
-    }, [deliveryMethod, deliveryDate, lang, deliveries]);
+    }, [deliveryMethod, deliveryDate, lang, deliveries, deliveryTime]);
 
     // Stale localStorage logic removed - promo code is synced via Redux/API
 
@@ -655,13 +647,6 @@ export default function Step2() {
     const elapsedForFree = activeDelivery?.elapsedForFree || 0;
     const deliveryPrice = activeDelivery ? (activeDelivery.deliveryCost ?? 0) : undefined;
 
-    const shopOptions = React.useMemo(() => {
-        return shops.map(shop => ({
-            value: shop.id.toString(),
-            label: shop.name || shop.siteName || `Магазин №${shop.id}`
-        }));
-    }, [shops]);
-
     const timeOptions = React.useMemo(() => {
         return deliveryTimes.map(t => ({
             value: t,
@@ -793,7 +778,7 @@ export default function Step2() {
                 const created = await createUserAddressApi({
                     city: newAddr.city || checkoutCity?.name || 'Київ',
                     street: newAddr.street,
-                    streetId: newAddr.streetId ? parseInt(newAddr.streetId as any, 10) : undefined,
+                    streetId: newAddr.streetId ? parseInt(String(newAddr.streetId), 10) : undefined,
                     house: newAddr.house || '',
                     apartment: newAddr.apartment ? parseInt(newAddr.apartment, 10) : undefined,
                     entrance: newAddr.entrance ? parseInt(newAddr.entrance, 10) : undefined,
@@ -985,9 +970,6 @@ export default function Step2() {
                             const isMethodShop = method.driver === 'shop';
                             const isMethodNP = method.driver === 'nova-poshta-postal';
                             const showNpIcon = isMethodNP || method.name?.toLowerCase().includes('нова пошта') || method.type?.toLowerCase().includes('nova');
-
-                            const selectedShop = shops.find(shop => shop.id.toString() === selectedShopId);
-                            const selectedShopName = selectedShop?.name || selectedShop?.siteName || (lang === 'ua' ? "Оберіть магазин" : "Выберите магазин");
 
                             return (
                                 <div key={method.id} className={s.methodContainer}>
