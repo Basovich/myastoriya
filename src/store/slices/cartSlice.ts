@@ -239,13 +239,20 @@ export const addToCartAsync = createAsyncThunk(
                 return null;
             }
 
-            const existingItem = state.cart.items.find(
-                item => item.id === payload.id && item.costVariantId === (payload.costVariantId ?? null)
-            );
+            const payloadModIds = payload.modifierIds ? [...payload.modifierIds].sort((a, b) => a - b) : [];
+            const existingItem = state.cart.items.find(item => {
+                if (item.id !== payload.id || item.costVariantId !== (payload.costVariantId ?? null)) {
+                    return false;
+                }
+                const itemModIds = item.modifiers ? item.modifiers.map(m => m.id).sort((a, b) => a - b) : [];
+                return (
+                    itemModIds.length === payloadModIds.length &&
+                    itemModIds.every((id, idx) => id === payloadModIds[idx])
+                );
+            });
 
             let response;
-            // If the item has modifiers, we must always use addProductToCartApi so the backend can group/handle modifiers properly.
-            if (existingItem && existingItem.rowId && (!payload.modifierIds || payload.modifierIds.length === 0)) {
+            if (existingItem && existingItem.rowId) {
                 response = await editCartItemQuantityApi({
                     rowId: existingItem.rowId,
                     quantity: existingItem.quantity,
@@ -475,10 +482,18 @@ const cartSlice = createSlice({
             // addToCartAsync
             .addCase(addToCartAsync.pending, (state, action) => {
                 state.loading = true;
-                const { id, quantity, costVariantId } = action.meta.arg;
-                const existingItem = state.items.find(
-                    item => item.id === id && item.costVariantId === (costVariantId ?? null)
-                );
+                const { id, quantity, costVariantId, modifierIds } = action.meta.arg;
+                const payloadModIds = modifierIds ? [...modifierIds].sort((a, b) => a - b) : [];
+                const existingItem = state.items.find(item => {
+                    if (item.id !== id || item.costVariantId !== (costVariantId ?? null)) {
+                        return false;
+                    }
+                    const itemModIds = item.modifiers ? item.modifiers.map(m => m.id).sort((a, b) => a - b) : [];
+                    return (
+                        itemModIds.length === payloadModIds.length &&
+                        itemModIds.every((idVal, idx) => idVal === payloadModIds[idx])
+                    );
+                });
                 if (existingItem) {
                     existingItem.quantity += quantity;
                 } else {
@@ -486,6 +501,7 @@ const cartSlice = createSlice({
                         id,
                         quantity,
                         costVariantId: costVariantId ?? null,
+                        modifiers: modifierIds ? modifierIds.map(mId => ({ id: mId })) : null,
                     });
                 }
             })
@@ -506,16 +522,30 @@ const cartSlice = createSlice({
             .addCase(addToCartAsync.rejected, (state, action) => {
                 state.loading = false;
                 if (action.meta.arg) {
-                    const { id, quantity, costVariantId } = action.meta.arg;
-                    const existingItem = state.items.find(
-                        item => item.id === id && item.costVariantId === (costVariantId ?? null)
-                    );
+                    const { id, quantity, costVariantId, modifierIds } = action.meta.arg;
+                    const payloadModIds = modifierIds ? [...modifierIds].sort((a, b) => a - b) : [];
+                    const existingItem = state.items.find(item => {
+                        if (item.id !== id || item.costVariantId !== (costVariantId ?? null)) {
+                            return false;
+                        }
+                        const itemModIds = item.modifiers ? item.modifiers.map(m => m.id).sort((a, b) => a - b) : [];
+                        return (
+                            itemModIds.length === payloadModIds.length &&
+                            itemModIds.every((idVal, idx) => idVal === payloadModIds[idx])
+                        );
+                    });
                     if (existingItem) {
                         existingItem.quantity -= quantity;
                         if (existingItem.quantity <= 0) {
-                            state.items = state.items.filter(
-                                item => !(item.id === id && item.costVariantId === (costVariantId ?? null))
-                            );
+                            state.items = state.items.filter(item => {
+                                if (item.id !== id || item.costVariantId !== (costVariantId ?? null)) {
+                                    return true;
+                                }
+                                const itemModIds = item.modifiers ? item.modifiers.map(m => m.id).sort((a, b) => a - b) : [];
+                                const isMatch = itemModIds.length === payloadModIds.length &&
+                                    itemModIds.every((idVal, idx) => idVal === payloadModIds[idx]);
+                                return !isMatch;
+                            });
                         }
                     }
                 }
