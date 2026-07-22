@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import s from './Step1.module.scss';
 import InputField from '@/app/components/ui/InputField/index';
 import { GraphQLError } from '@/lib/graphql/client';
@@ -11,8 +10,6 @@ import { setUser } from '@/store/slices/authSlice';
 import { fetchCartAsync } from '@/store/slices/cartSlice';
 import { getAccessToken } from '@/app/actions/authActions';
 import { sendSmsApi, smsVerifyApi, updateCheckoutUserDataApi } from '@/lib/graphql/queries/auth';
-import { MOCK_PRODUCTS, FALLBACK_PRODUCT } from '@/app/components/CartModal/products_mock';
-import { useMemo } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
