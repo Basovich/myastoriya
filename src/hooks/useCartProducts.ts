@@ -192,13 +192,22 @@ export function useCartProducts() {
     useEffect(() => {
         if (!isInitialized) return;
         if (globalSpecialsCache === null && !pendingSpecialsRequest) {
+            const fallbackTimer = setTimeout(() => {
+                if (globalSpecialsCache === null) {
+                    globalSpecialsCache = [];
+                    emitCacheUpdate();
+                }
+            }, 2000);
+
             pendingSpecialsRequest = getSpecialsApi(100, 1)
                 .then(resp => {
+                    clearTimeout(fallbackTimer);
                     const data = resp?.data || [];
                     globalSpecialsCache = data as Special[];
                     emitCacheUpdate();
                 })
                 .catch(err => {
+                    clearTimeout(fallbackTimer);
                     console.error('[useCartProducts] Failed to fetch specials:', err);
                     globalSpecialsCache = [];
                     emitCacheUpdate();

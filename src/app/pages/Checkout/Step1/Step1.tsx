@@ -25,6 +25,18 @@ import { useRouter, useParams } from 'next/navigation';
 import CartModal from '@/app/components/CartModal/CartModal';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 
+function normalizeTo38Phone(phoneStr?: string | null): string {
+    if (!phoneStr) return '';
+    const digits = phoneStr.replace(/\D/g, '');
+    if (digits.length === 10) {
+        return `38${digits}`;
+    }
+    if (digits.length === 12 && digits.startsWith('38')) {
+        return digits;
+    }
+    return digits;
+}
+
 
 
 // ── Main Step1 Component ──────────────────────────────────────────────────────
@@ -112,16 +124,21 @@ export default function Step1() {
 
     useEffect(() => {
         if (isAuthenticated && user) {
+            const userFirstName = user.name?.split(' ')[0] || user.name || '';
+            const userLastName = user.surname || user.name?.split(' ').slice(1).join(' ') || '';
+            const normalizedPhone = normalizeTo38Phone(user.phone);
+
             setFormData(prev => ({
                 ...prev,
-                firstName: prev.firstName || user.surname ? (user.name || '') : (user.name?.split(' ')[0] || ''),
-                lastName: prev.lastName || user.surname || user.name?.split(' ').slice(1).join(' ') || '',
-                phone: prev.phone || (user.phone || '').replace(/\D/g, ''),
-                email: prev.email || user.email || '',
+                firstName: userFirstName || prev.firstName,
+                lastName: userLastName || prev.lastName,
+                phone: normalizedPhone || prev.phone,
+                email: user.email || prev.email,
             }));
-            if (user.phone) {
-                setPhoneVerified(true);
-            }
+
+            setPhoneVerified(true);
+            setSmsError('');
+            setSubmitError('');
         }
     }, [isAuthenticated, user]);
 
@@ -181,11 +198,13 @@ export default function Step1() {
         const errors: FormErrors = {};
         if (!formData.firstName.trim()) errors.firstName = "Обов'язкове поле";
         if (!formData.lastName.trim()) errors.lastName = "Обов'язкове поле";
-        if (!formData.phone.trim()) {
+        
+        const cleanPhone = formData.phone.replace(/\D/g, '');
+        if (!cleanPhone) {
             errors.phone = "Обов'язкове поле";
-        } else if (formData.phone.length < 12) {
+        } else if (cleanPhone.length < 10) {
             errors.phone = "Некоректний номер телефону";
-        } else if ((submitAttempted || forceVerifyCheck) && !phoneVerified) {
+        } else if ((submitAttempted || forceVerifyCheck) && !phoneVerified && !isAuthenticated) {
             errors.phone = "Підтвердіть номер телефону через SMS";
         }
         
@@ -193,9 +212,10 @@ export default function Step1() {
             if (!formData.recipientName.trim()) {
                 errors.recipientName = "Обов'язкове поле";
             }
-            if (!formData.recipientPhone.trim()) {
+            const cleanRecip = formData.recipientPhone.replace(/\D/g, '');
+            if (!cleanRecip) {
                 errors.recipientPhone = "Обов'язкове поле";
-            } else if (formData.recipientPhone.length < 12) {
+            } else if (cleanRecip.length < 10) {
                 errors.recipientPhone = "Некоректний номер телефону";
             }
         }
@@ -293,23 +313,27 @@ export default function Step1() {
         setSubmitError('');
         try {
             const token = await getAccessToken();
+            const formattedPhone = normalizeTo38Phone(formData.phone);
+
             await updateCheckoutUserDataApi(
                 {
                     name: formData.firstName,
                     surname: formData.lastName,
-                    phone: formData.phone,
+                    phone: formattedPhone || formData.phone,
                     email: formData.email || undefined,
                 },
                 token || '',
                 locale
-            );
+            ).catch(err => {
+                console.warn('[Step1] updateCheckoutUserDataApi non-critical error:', err);
+            });
 
-            if (isAuthenticated) {
+            if (isAuthenticated && user) {
                 dispatch(setUser({
                     ...user,
                     name: formData.firstName,
                     surname: formData.lastName,
-                    phone: formData.phone,
+                    phone: formattedPhone || formData.phone,
                     email: formData.email || undefined,
                 }));
             }
@@ -317,7 +341,7 @@ export default function Step1() {
             const checkoutUserData = {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
-                phone: formData.phone,
+                phone: formattedPhone || formData.phone,
                 email: formData.email || null,
                 anotherRecipient: formData.anotherRecipient,
                 recipientName: formData.recipientName,
