@@ -22,8 +22,7 @@ import PickupPointRow from '../components/PickupPointRow/PickupPointRow';
 import AddPickupModal from '@/app/components/Personal/Pickup/AddPickupModal';
 import Image from 'next/image';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
-import { getAccessToken, selectLocalityAction } from '@/app/actions/authActions';
-import { getOrCreateDeviceId } from '@/lib/utils/auth';
+import { getAccessToken } from '@/app/actions/authActions';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { 
     getLocalitiesApi, 
@@ -85,7 +84,6 @@ export default function Step2() {
     const cartLoading = useAppSelector(state => state.cart.loading);
     const headerCity = useAppSelector(state => state.locality.selectedCity);
     const [checkoutCity, setCheckoutCity] = useState<Locality | null>(null);
-    const [isCityManuallyChanged, setIsCityManuallyChanged] = useState(false);
     
     const citySelectRef = useRef<HTMLDivElement>(null);
     const npSelectRef = useRef<HTMLDivElement>(null);
@@ -184,7 +182,6 @@ export default function Step2() {
                 if (parsed.deliveryTime) setDeliveryTime(parsed.deliveryTime);
                 if (parsed.selectedCity) {
                     setCheckoutCity(parsed.selectedCity);
-                    setIsCityManuallyChanged(true);
                 }
             } catch (e) {
                 console.error('Failed to parse checkout delivery data', e);
@@ -668,7 +665,6 @@ export default function Step2() {
 
     const handleSelectCheckoutCity = async (city: Locality) => {
         setCheckoutCity(city);
-        setIsCityManuallyChanged(true);
         setIsOpenCitySelect(false);
         setCitySearchQuery('');
         
