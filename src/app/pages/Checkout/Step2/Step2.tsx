@@ -11,6 +11,7 @@ import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
 import Button from '@/app/components/ui/Button/Button';
 import Search from '@/app/components/ui/Search/Search';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { setSelectedCity } from '@/store/slices/localitySlice';
 import { fetchCartAsync } from '@/store/slices/cartSlice';
 import CartModal from '@/app/components/CartModal/CartModal';
 import AuthModal from '@/app/components/AuthModal';
@@ -34,6 +35,7 @@ import {
     getUserAddressesApi, 
     createUserAddressApi, 
     getShopsApi,
+    selectLocalityApi,
     Locality,
     Delivery,
     Warehouse,
@@ -190,12 +192,12 @@ export default function Step2() {
         }
     }, []);
 
-    // 1b. Initialize local city state with headerCity if not manually changed or restored
+    // 1b. Keep local checkoutCity in sync with headerCity from Redux store
     useEffect(() => {
-        if (headerCity && !isCityManuallyChanged && !checkoutCity) {
+        if (headerCity && (!checkoutCity || checkoutCity.id !== headerCity.id)) {
             setCheckoutCity(headerCity);
         }
-    }, [headerCity, isCityManuallyChanged, checkoutCity]);
+    }, [headerCity, checkoutCity]);
 
     // 2. Load initial cities list on first open
     useEffect(() => {
@@ -401,7 +403,15 @@ export default function Step2() {
 
         const fetchDeliveries = async () => {
             try {
-                const res = await getDeliveriesApi(undefined, checkoutCity.id, lang);
+                const cityId = parseInt(String(checkoutCity.id), 10);
+                if (isNaN(cityId)) return;
+
+                // Sync locality in background without blocking getDeliveriesApi
+                selectLocalityApi(cityId, lang).catch(err => {
+                    console.warn('[Step2] non-critical selectLocalityApi error:', err);
+                });
+
+                const res = await getDeliveriesApi(undefined, cityId, lang);
                 const safeDeliveries = Array.isArray(res) ? res.filter(Boolean) : [];
                 setDeliveries(safeDeliveries);
                 
@@ -415,7 +425,7 @@ export default function Step2() {
                         try {
                             const parsed = JSON.parse(saved);
                             if (parsed.deliveryMethod && safeDeliveries.some(d => d?.id === parsed.deliveryMethod)) {
-                                  restored = String(parsed.deliveryMethod);
+                                restored = String(parsed.deliveryMethod);
                             }
                         } catch {}
                     }
@@ -429,6 +439,8 @@ export default function Step2() {
                         const firstEnabled = safeDeliveries.find(d => !d?.disabled);
                         if (firstEnabled) {
                             setDeliveryMethod(firstEnabled.id);
+                        } else if (safeDeliveries.length > 0) {
+                            setDeliveryMethod(safeDeliveries[0].id);
                         }
                     }
                 }
@@ -660,7 +672,12 @@ export default function Step2() {
         setIsOpenCitySelect(false);
         setCitySearchQuery('');
         
+        // 1. Sync city with global Redux store (Header)
+        dispatch(setSelectedCity(city));
+
+        // 2. Persist chosen city to localStorage for Header and Checkout
         try {
+            localStorage.setItem('mya_selected_city', JSON.stringify(city));
             const saved = localStorage.getItem('checkout_delivery_data');
             const parsed = saved ? JSON.parse(saved) : {};
             parsed.selectedCity = city;
@@ -669,9 +686,12 @@ export default function Step2() {
             console.error('Failed to save selected city to localStorage', e);
         }
 
+        // 3. Sync city to GraphQL backend session
         try {
-            const deviceId = getOrCreateDeviceId();
-            await selectLocalityAction(city.id, lang, deviceId);
+            const cityId = parseInt(String(city.id), 10);
+            if (!isNaN(cityId)) {
+                await selectLocalityApi(cityId, lang);
+            }
         } catch (e) {
             console.error('Failed to select locality on backend', e);
         }
