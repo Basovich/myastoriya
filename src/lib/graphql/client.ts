@@ -140,20 +140,7 @@ export async function gqlRequest<T>(
     }
     // All requests go directly to the backend — no proxy needed.
     try {
-        const opName = query.match(/(query|mutation)\s+([A-Za-z0-9_]+)/)?.[2] || 'GQL';
-        if (opName === 'GetDeliveries' || opName === 'SelectLocality' || opName === 'SelectedLocality') {
-            console.log(`[GQL Client ${isServer ? 'SERVER' : 'CLIENT'}] 📡 FULL HTTP REQUEST FOR ${opName} ->`, {
-                endpoint: GQL_ENDPOINT,
-                headers,
-                variables,
-            });
-        }
         const result = await performRequest<T>(GQL_ENDPOINT, headers, body, query, variables, options);
-        if (opName === 'GetDeliveries' || opName === 'SelectLocality' || opName === 'SelectedLocality') {
-            console.log(`[GQL Client ${isServer ? 'SERVER' : 'CLIENT'}] 📥 FULL HTTP RESPONSE FOR ${opName} ->`, {
-                data: result.data,
-            });
-        }
         return result.data;
     } catch (err) {
         const isDynamicServerError = err instanceof Error && (

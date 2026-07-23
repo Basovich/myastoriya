@@ -34,7 +34,6 @@ import {
     getUserAddressesApi, 
     createUserAddressApi, 
     getShopsApi,
-    selectLocalityApi,
     Locality,
     Delivery,
     Warehouse,
@@ -403,24 +402,8 @@ export default function Step2() {
                 const cityId = parseInt(String(checkoutCity.id), 10);
                 if (isNaN(cityId)) return;
 
-                console.log('[Step2] 📦 Fetching deliveries for locality:', {
-                    checkoutCityId: cityId,
-                    checkoutCityName: checkoutCity.name,
-                    headerCityId: headerCity?.id,
-                    headerCityName: headerCity?.name,
-                });
-
                 const res = await getDeliveriesApi(undefined, cityId, lang);
                 const safeDeliveries = Array.isArray(res) ? res.filter(Boolean) : [];
-                
-                console.log('[Step2] 📦 Received deliveries from API:', safeDeliveries.map(d => ({
-                    id: d.id,
-                    name: d.name,
-                    cost: d.deliveryCost,
-                    disabled: d.disabled,
-                    needForAvailable: d.needForAvailable,
-                })));
-
                 setDeliveries(safeDeliveries);
                 
                 // Determine what delivery method to select
@@ -675,7 +658,6 @@ export default function Step2() {
     }, [deliveryTimes]);
 
     const handleSelectCheckoutCity = async (city: Locality) => {
-        console.log('[Step2] 🏙️ User clicked city in Step2 dropdown:', { id: city.id, name: city.name });
         setCheckoutCity(city);
         setIsOpenCitySelect(false);
         setCitySearchQuery('');
@@ -695,7 +677,6 @@ export default function Step2() {
         }
 
         // 3. Persist city in local state and Redux
-        console.log('[Step2] 🏙️ City selection completed for:', city.name);
     };
 
     const handleBack = () => {

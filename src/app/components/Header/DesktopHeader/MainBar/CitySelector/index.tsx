@@ -121,10 +121,7 @@ export default function CitySelector({
             hasDetectedRef.current = true;
             
             // Only detect if we don't have a city yet
-            if (selectedCity) {
-                console.log('[CitySelector] 📌 Using already selected Redux city:', selectedCity);
-                return;
-            }
+            if (selectedCity) return;
 
             dispatch(setDetectionLoading(true));
             try {
@@ -133,18 +130,15 @@ export default function CitySelector({
                 if (savedCity) {
                     try {
                         cityToSet = JSON.parse(savedCity);
-                        console.log('[CitySelector] 💾 Restored city from localStorage:', cityToSet);
                     } catch {}
                 }
 
                 if (!cityToSet) {
                     const existing = await getSelectedLocalityApi(lang);
-                    console.log('[CitySelector] 🔍 getSelectedLocalityApi existing:', existing);
                     if (existing) {
                         cityToSet = existing;
                     } else {
                         const detected = await autoDetectLocalityApi(undefined, undefined, lang);
-                        console.log('[CitySelector] 🔍 autoDetectLocalityApi detected:', detected);
                         if (detected) {
                             cityToSet = detected;
                         } else {
@@ -155,7 +149,6 @@ export default function CitySelector({
                 }
 
                 if (cityToSet) {
-                    console.log('[CitySelector] 🏙️ Dispatching detected city to Redux:', cityToSet);
                     dispatch(setSelectedCity(cityToSet));
                     if (cityToSet.id === 2581) {
                         selectLocalityApi(cityToSet.id, lang).catch(() => {});
