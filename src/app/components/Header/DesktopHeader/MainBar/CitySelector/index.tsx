@@ -17,6 +17,7 @@ import {
     getLocalitiesApi,
     Locality, 
     getSelectedLocalityApi,
+    selectLocalityApi,
 } from '@/lib/graphql';
 import { selectLocalityAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
@@ -120,38 +121,52 @@ export default function CitySelector({
             hasDetectedRef.current = true;
             
             // Only detect if we don't have a city yet
-            if (selectedCity) return;
+            if (selectedCity) {
+                console.log('[CitySelector] 📌 Using already selected Redux city:', selectedCity);
+                return;
+            }
 
             dispatch(setDetectionLoading(true));
             try {
-                const existing = await getSelectedLocalityApi(lang);
+                const savedCity = localStorage.getItem('mya_selected_city');
                 let cityToSet: Locality | null = null;
-                if (existing) {
-                    cityToSet = existing;
-                } else {
-                    const detected = await autoDetectLocalityApi(undefined, undefined, lang);
-                    if (detected) {
-                        cityToSet = detected;
+                if (savedCity) {
+                    try {
+                        cityToSet = JSON.parse(savedCity);
+                        console.log('[CitySelector] 💾 Restored city from localStorage:', cityToSet);
+                    } catch {}
+                }
+
+                if (!cityToSet) {
+                    const existing = await getSelectedLocalityApi(lang);
+                    console.log('[CitySelector] 🔍 getSelectedLocalityApi existing:', existing);
+                    if (existing) {
+                        cityToSet = existing;
                     } else {
-                        const fallbackTitle = lang === 'ua' ? 'м. Київ' : 'г. Киев';
-                        cityToSet = { id: 2581, name: fallbackTitle };
+                        const detected = await autoDetectLocalityApi(undefined, undefined, lang);
+                        console.log('[CitySelector] 🔍 autoDetectLocalityApi detected:', detected);
+                        if (detected) {
+                            cityToSet = detected;
+                        } else {
+                            const fallbackTitle = lang === 'ua' ? 'м. Київ' : 'г. Киев';
+                            cityToSet = { id: 2581, name: fallbackTitle };
+                        }
                     }
                 }
 
                 if (cityToSet) {
+                    console.log('[CitySelector] 🏙️ Dispatching detected city to Redux:', cityToSet);
                     dispatch(setSelectedCity(cityToSet));
-                    const deviceId = getOrCreateDeviceId();
-                    await selectLocalityAction(cityToSet.id, lang, deviceId).catch((err) => {
-                        console.warn('[CitySelector] Failed to sync auto-detected city to backend:', err);
-                    });
+                    if (cityToSet.id === 2581) {
+                        selectLocalityApi(cityToSet.id, lang).catch(() => {});
+                    }
                 }
             } catch (error) {
                 console.warn('[CitySelector] Detection failed:', error);
                 const fallbackTitle = lang === 'ua' ? 'м. Київ' : 'г. Киев';
                 const fallback = { id: 2581, name: fallbackTitle };
                 dispatch(setSelectedCity(fallback));
-                const deviceId = getOrCreateDeviceId();
-                await selectLocalityAction(fallback.id, lang, deviceId).catch(() => {});
+                selectLocalityApi(fallback.id, lang).catch(() => {});
             } finally {
                 dispatch(setDetectionLoading(false));
             }
