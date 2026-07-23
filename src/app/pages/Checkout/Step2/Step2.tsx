@@ -406,33 +406,38 @@ export default function Step2() {
                 const safeDeliveries = Array.isArray(res) ? res.filter(Boolean) : [];
                 setDeliveries(safeDeliveries);
                 
-                // Determine what delivery method to select
-                let restored = '';
-                if (restoredData && safeDeliveries.some(d => d?.id === restoredData.deliveryMethod)) {
-                    restored = String(restoredData.deliveryMethod);
+                // Determine enabled (active) delivery methods
+                const enabledDeliveries = safeDeliveries.filter(d => !d?.disabled);
+
+                if (enabledDeliveries.length === 0) {
+                    // 1. Якщо жодна доставка неактивна — всі радіобатони неактивні (нічого не вибрано)
+                    setDeliveryMethod('');
+                } else if (enabledDeliveries.length === 1) {
+                    // 2. Якщо одна доставка активна — обирається вона
+                    setDeliveryMethod(enabledDeliveries[0].id);
                 } else {
-                    const saved = localStorage.getItem('checkout_delivery_data');
-                    if (saved) {
-                        try {
-                            const parsed = JSON.parse(saved);
-                            if (parsed.deliveryMethod && safeDeliveries.some(d => d?.id === parsed.deliveryMethod)) {
-                                restored = String(parsed.deliveryMethod);
-                            }
-                        } catch {}
-                    }
-                }
-                
-                if (restored) {
-                    setDeliveryMethod(restored);
-                } else {
-                    const currentSelectedExists = safeDeliveries.some(d => d?.id === deliveryMethodRef.current && !d?.disabled);
-                    if (!currentSelectedExists) {
-                        const firstEnabled = safeDeliveries.find(d => !d?.disabled);
-                        if (firstEnabled) {
-                            setDeliveryMethod(firstEnabled.id);
-                        } else if (safeDeliveries.length > 0) {
-                            setDeliveryMethod(safeDeliveries[0].id);
+                    // 3. Якщо декілька доставок активні — обирається перша активна або раніше збережена активна
+                    let restored = '';
+                    if (restoredData && enabledDeliveries.some(d => d?.id === restoredData.deliveryMethod)) {
+                        restored = String(restoredData.deliveryMethod);
+                    } else {
+                        const saved = localStorage.getItem('checkout_delivery_data');
+                        if (saved) {
+                            try {
+                                const parsed = JSON.parse(saved);
+                                if (parsed.deliveryMethod && enabledDeliveries.some(d => d?.id === parsed.deliveryMethod)) {
+                                    restored = String(parsed.deliveryMethod);
+                                }
+                            } catch {}
                         }
+                    }
+
+                    if (restored) {
+                        setDeliveryMethod(restored);
+                    } else if (enabledDeliveries.some(d => d?.id === deliveryMethodRef.current)) {
+                        setDeliveryMethod(deliveryMethodRef.current);
+                    } else {
+                        setDeliveryMethod(enabledDeliveries[0].id);
                     }
                 }
             } catch (e) {
@@ -635,7 +640,9 @@ export default function Step2() {
     }, [restoredData, shops, pickupPoints]);
 
     const activeDelivery = React.useMemo(() => {
-        return deliveries.find(d => d?.id === deliveryMethod);
+        const found = deliveries.find(d => d?.id === deliveryMethod);
+        if (found && !found.disabled) return found;
+        return undefined;
     }, [deliveries, deliveryMethod]);
 
     const minOrderVal = React.useMemo(() => {
@@ -646,7 +653,8 @@ export default function Step2() {
     const isCourier = activeDelivery?.type === 'courier';
     const isNP = activeDelivery?.driver === 'nova-poshta-postal';
     const isShop = activeDelivery?.driver === 'shop';
-    const showDeliveryTimeBlock = activeDelivery ? activeDelivery.showDeliveryTime : true;
+    const isShopCourierOrPickup = activeDelivery && (activeDelivery.driver === 'courier' || activeDelivery.driver === 'shop');
+    const showDeliveryTimeBlock = Boolean(isShopCourierOrPickup && activeDelivery?.showDeliveryTime);
     const elapsedForFree = activeDelivery?.elapsedForFree || 0;
     const deliveryPrice = activeDelivery ? (activeDelivery.deliveryCost ?? 0) : undefined;
 
