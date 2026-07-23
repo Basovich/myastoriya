@@ -312,7 +312,9 @@ export default function Step3({ lang }: Step3Props) {
             let userData: CheckoutUserData;
             const localityId = savedDeliveryData?.selectedCity?.id;
             if (!localityId) {
-                throw new Error(lang === 'ru' ? 'Не указан населенный пункт для доставки.' : 'Не вказано населений пункт для доставки.');
+                setSubmitError(lang === 'ru' ? 'Не указан населенный пункт для доставки.' : 'Не вказано населений пункт для доставки.');
+                setIsSubmitting(false);
+                return;
             }
 
             if (savedUserData.anotherRecipient && isAuthenticated && user) {
@@ -356,7 +358,7 @@ export default function Step3({ lang }: Step3Props) {
                 const isAppleDevice = typeof window !== 'undefined' && (
                     /Macintosh|MacIntel|iPad|iPhone|iPod/.test(navigator.userAgent) || 
                     (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /Mac/.test(navigator.userAgent)) ||
-                    !!(window as any).ApplePaySession
+                    'ApplePaySession' in window
                 );
                 
                 if (isAppleDevice && hasAPay) {
@@ -380,7 +382,7 @@ export default function Step3({ lang }: Step3Props) {
                 },
             };
 
-            const isGuestUser = !isAuthenticated || !!isGuest;
+            const isGuestUser = !isAuthenticated || isGuest;
 
             const res = await createOrderApi(
                 {
