@@ -67,7 +67,7 @@
 
 .methodItem {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     cursor: pointer;
     padding: 8px 0;
@@ -109,32 +109,35 @@
     border-radius: 50%;
     position: relative;
     flex-shrink: 0;
+    margin-top: 1px;
     transition: all 0.2s;
 }
 
 .methodLabel {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: inline;
     color: #060606;
     font-feature-settings: 'liga' off, 'clig' off;
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
-    line-height: 120%;
-    padding-top: 4px;
+    line-height: 140%;
 }
 
 .methodPrice {
+    display: inline;
     color: #000;
     font-size: 14px;
     font-weight: 600;
+    margin-left: 4px;
+    white-space: nowrap;
 }
 
 .npIconContainer {
-    display: flex;
+    display: inline-flex;
+    vertical-align: middle;
     align-items: center;
     justify-content: center;
+    margin-left: 6px;
     flex-shrink: 0;
 }
 
@@ -545,10 +548,12 @@
 }
 
 .disabledNotice {
+    display: inline;
     color: #e3051b;
     font-size: 13px;
     font-weight: 600;
     margin-left: 6px;
+    white-space: nowrap;
 }
 
 .minOrderWarning {

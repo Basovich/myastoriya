@@ -1008,7 +1008,7 @@ export default function Step2() {
                                                 </span>
                                             )}
                                             {showNpIcon && (
-                                                <div className={s.npIconContainer}>
+                                                <span className={s.npIconContainer}>
                                                     <Image
                                                         src="/icons/novaposhta_rounded.svg"
                                                         alt="Nova Poshta"
@@ -1016,7 +1016,7 @@ export default function Step2() {
                                                         height={20}
                                                         className={s.npIcon}
                                                     />
-                                                </div>
+                                                </span>
                                             )}
                                         </span>
                                     </label>
