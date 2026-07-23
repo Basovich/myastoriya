@@ -136,8 +136,42 @@ export default function Step1() {
             setPhoneVerified(true);
             setSmsError('');
             setSubmitError('');
+        } else {
+            const savedUserData = localStorage.getItem('checkout_user_data');
+            if (savedUserData) {
+                try {
+                    const parsed = JSON.parse(savedUserData);
+                    setFormData(prev => ({
+                        ...prev,
+                        firstName: parsed.firstName || prev.firstName,
+                        lastName: parsed.lastName || prev.lastName,
+                        phone: parsed.phone || prev.phone,
+                        email: parsed.email || prev.email,
+                        anotherRecipient: parsed.anotherRecipient ?? prev.anotherRecipient,
+                        recipientName: parsed.recipientName || prev.recipientName,
+                        recipientPhone: parsed.recipientPhone || prev.recipientPhone,
+                    }));
+                } catch (e) {
+                    console.error('Failed to parse checkout_user_data from localStorage', e);
+                }
+            }
         }
     }, [isAuthenticated, user]);
+
+    // Auto-save Step 1 form data to localStorage whenever formData changes
+    useEffect(() => {
+        if (!formData.firstName && !formData.lastName && !formData.phone && !formData.email) return;
+        const checkoutUserData = {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            phone: normalizeTo38Phone(formData.phone) || formData.phone,
+            email: formData.email || null,
+            anotherRecipient: formData.anotherRecipient,
+            recipientName: formData.recipientName,
+            recipientPhone: formData.recipientPhone,
+        };
+        localStorage.setItem('checkout_user_data', JSON.stringify(checkoutUserData));
+    }, [formData]);
 
     const handleCloseCartModal = () => {
         setIsCartModalOpen(false);

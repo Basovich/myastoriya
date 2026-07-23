@@ -12,7 +12,6 @@ import CustomSelect from '@/app/components/ui/CustomSelect';
 import Button from '@/app/components/ui/Button/Button';
 import CartModal from '@/app/components/CartModal/CartModal';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import BankCardItem, { type BankCard } from '@/app/components/Personal/Cards/BankCardItem';
 import AddBankCardBtn from '@/app/components/Personal/Cards/AddBankCardBtn';
@@ -103,6 +102,36 @@ export default function Step3({ lang }: Step3Props) {
     const dispatch = useAppDispatch();
     const { user, isAuthenticated, isGuest } = useAppSelector(state => state.auth);
 
+    // Restore saved step 3 parameters from localStorage
+    useEffect(() => {
+        const savedStep3 = localStorage.getItem('checkout_step3_data');
+        if (savedStep3) {
+            try {
+                const parsed = JSON.parse(savedStep3);
+                if (parsed.comment !== undefined) setComment(parsed.comment);
+                if (parsed.personsCount !== undefined) setPersonsCount(parsed.personsCount);
+                if (parsed.contactMethod !== undefined) setContactMethod(parsed.contactMethod);
+                if (parsed.changeAmount !== undefined) setChangeAmount(parsed.changeAmount);
+                if (parsed.selectedCardId !== undefined) setSelectedCardId(parsed.selectedCardId);
+            } catch (e) {
+                console.error('Failed to parse checkout_step3_data', e);
+            }
+        }
+    }, []);
+
+    // Auto-save step 3 choices
+    useEffect(() => {
+        const data = {
+            comment,
+            personsCount,
+            contactMethod,
+            paymentMethod,
+            changeAmount,
+            selectedCardId,
+        };
+        localStorage.setItem('checkout_step3_data', JSON.stringify(data));
+    }, [comment, personsCount, contactMethod, paymentMethod, changeAmount, selectedCardId]);
+
     // Load saved delivery parameters, promo, and fetch payment methods
     useEffect(() => {
         const savedParams = localStorage.getItem('checkout_delivery_params');
@@ -151,7 +180,17 @@ export default function Step3({ lang }: Step3Props) {
                 
                 setPayments(processed);
                 if (processed.length > 0) {
-                    setPaymentMethod(processed[0].id);
+                    const savedStep3 = localStorage.getItem('checkout_step3_data');
+                    let restoredMethod = '';
+                    if (savedStep3) {
+                        try {
+                            const parsed = JSON.parse(savedStep3);
+                            if (parsed.paymentMethod && processed.some(p => p.id === parsed.paymentMethod)) {
+                                restoredMethod = parsed.paymentMethod;
+                            }
+                        } catch {}
+                    }
+                    setPaymentMethod(prev => prev || restoredMethod || processed[0].id);
                 }
             } catch (e) {
                 console.error('Failed to load payment methods', e);
@@ -376,9 +415,10 @@ export default function Step3({ lang }: Step3Props) {
                 localStorage.removeItem('checkout_delivery_data');
                 localStorage.removeItem('checkout_delivery_params');
                 localStorage.removeItem('checkout_user_data');
+                localStorage.removeItem('checkout_step3_data');
                 localStorage.removeItem('applied_promo');
             }
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('Failed to create order', e);
             let msg = lang === 'ru' 
                 ? 'Произошла ошибка при создании заказа. Пожалуйста, попробуйте еще раз.'
@@ -568,16 +608,22 @@ export default function Step3({ lang }: Step3Props) {
                                         {isSelected && isCardDriver && (
                                             <div className={s.cardsSection}>
                                                 <div className={s.cardsList}>
-                                                    {userCards.map(card => (
-                                                        <BankCardItem 
-                                                            key={card.id}
-                                                            card={card}
-                                                            isSelected={selectedCardId === card.id}
-                                                            onSelect={setSelectedCardId}
-                                                            lang={lang as 'ua' | 'ru'}
-                                                            className={s.checkoutCard}
-                                                        />
-                                                    ))}
+                                                    {isLoadingCards ? (
+                                                        <div className={s.loadingPayments}>
+                                                            {lang === 'ru' ? 'Загрузка карт...' : 'Завантаження карток...'}
+                                                        </div>
+                                                    ) : (
+                                                        userCards.map(card => (
+                                                            <BankCardItem 
+                                                                key={card.id}
+                                                                card={card}
+                                                                isSelected={selectedCardId === card.id}
+                                                                onSelect={setSelectedCardId}
+                                                                lang={lang as 'ua' | 'ru'}
+                                                                className={s.checkoutCard}
+                                                            />
+                                                        ))
+                                                    )}
                                                     <AddBankCardBtn 
                                                         onClick={handleAddCard}
                                                         lang={lang as 'ua' | 'ru'}

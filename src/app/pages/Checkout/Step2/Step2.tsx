@@ -195,6 +195,22 @@ export default function Step2() {
         }
     }, [headerCity, checkoutCity]);
 
+    // 1c. Auto-save Step 2 fields to localStorage whenever any option changes
+    useEffect(() => {
+        if (!deliveryMethod && !selectedAddressId && !selectedShopId && !selectedNPRef && !checkoutCity) return;
+        const rawData = {
+            deliveryMethod,
+            selectedAddressId,
+            selectedShopId,
+            selectedNPRef,
+            npSearchQuery,
+            deliveryDate: deliveryDate ? deliveryDate.toISOString() : null,
+            deliveryTime,
+            selectedCity: checkoutCity,
+        };
+        localStorage.setItem('checkout_delivery_data', JSON.stringify(rawData));
+    }, [deliveryMethod, selectedAddressId, selectedShopId, selectedNPRef, npSearchQuery, deliveryDate, deliveryTime, checkoutCity]);
+
     // 2. Load initial cities list on first open
     useEffect(() => {
         if (!isOpenCitySelect || allCitiesList.length > 0 || isLoadingCitiesList) return;
