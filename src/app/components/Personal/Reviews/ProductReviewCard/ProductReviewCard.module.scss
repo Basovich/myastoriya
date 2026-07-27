@@ -5,12 +5,11 @@
     padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.02);
+    gap: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
 
     @media (min-width: 1024px) {
         padding: 24px;
-        gap: 20px;
     }
 }
 
@@ -34,8 +33,8 @@
 }
 
 .productImg {
-    width: 72px;
-    height: 54px;
+    width: 46px;
+    height: 46px;
     border-radius: 6px;
     overflow: hidden;
     background: #F5F5F5;
@@ -94,21 +93,21 @@
 
 .actionBtn {
     width: 100%;
-    height: 44px;
-    font-size: 12px;
+    height: 34px;
+    font-size: 10px;
     font-weight: 700;
     padding: 0 20px;
-}
+    border-radius: 8px;
 
-.reviewBlock {
-    padding-top: 16px;
-    border-top: 1px solid #F0F0F0;
+    @media (min-width: 768px) {
+        width: 240px;
+    }
 }
 
 .reviewInfo {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
 
     @media (min-width: 640px) {
         flex-direction: row;
@@ -136,15 +135,25 @@
 
 .ratingGroup {
     @media (min-width: 640px) {
-        text-align: right;
+        text-align: end;
+    }
+
+    @media (min-width: 768px) {
+        width: 240px;
+        text-align: start;
     }
 }
 
 .stars {
     display: flex;
     gap: 4px;
+
     @media (min-width: 640px) {
         justify-content: flex-end;
+    }
+
+    @media (min-width: 768px) {
+        justify-content: flex-start;
     }
 }
 
@@ -180,6 +189,7 @@
 
     svg {
         flex-shrink: 0;
+        margin-top: -4px;
     }
 }
 

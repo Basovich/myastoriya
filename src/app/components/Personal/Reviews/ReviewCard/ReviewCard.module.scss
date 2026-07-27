@@ -5,12 +5,11 @@
     padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.02);
+    gap: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
 
     @media (min-width: 1024px) {
         padding: 24px;
-        gap: 20px;
     }
 }
 
@@ -21,13 +20,14 @@
 }
 
 .orderNum {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 400;
     color: #1C1B1B;
     margin: 0;
 
     strong {
         font-weight: 700;
+        font-size: 18px;
     }
 }
 
@@ -45,13 +45,14 @@
 
     svg {
         flex-shrink: 0;
+        margin-top: -4px;
     }
 }
 
 .content {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
 }
 
 .productsRow {
@@ -73,9 +74,9 @@
 }
 
 .productThumb {
-    width: 56px;
-    height: 42px;
-    border-radius: 6px;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
     overflow: hidden;
     background: #F5F5F5;
     flex-shrink: 0;
@@ -130,15 +131,15 @@
 
 .actionBtn {
     width: 100%;
-    height: 44px;
-    font-size: 12px;
+    height: 34px;
+    font-size: 10px;
     font-weight: 700;
     padding: 0 20px;
-}
+    border-radius: 8px;
 
-.reviewBlock {
-    padding-top: 16px;
-    border-top: 1px solid #F0F0F0;
+    @media (min-width: 768px) {
+        width: 240px;
+    }
 }
 
 .reviewInfo {
@@ -164,23 +165,33 @@
 }
 
 .reviewText {
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.5;
-    color: #666;
+    color: #060606;
     margin: 0;
 }
 
 .ratingGroup {
     @media (min-width: 640px) {
-        text-align: right;
+        text-align: end;
+    }
+
+    @media (min-width: 768px) {
+        width: 240px;
+        text-align: start;
     }
 }
 
 .stars {
     display: flex;
     gap: 4px;
+
     @media (min-width: 640px) {
         justify-content: flex-end;
+    }
+
+    @media (min-width: 768px) {
+        justify-content: flex-start;
     }
 }
 
