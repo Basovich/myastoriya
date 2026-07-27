@@ -6,7 +6,7 @@ import styles from '../Product.module.scss';
 import Button from '@/app/components/ui/Button/Button';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import Image from 'next/image';
-import PersonalReviewModal from '@/app/components/Personal/Reviews/PersonalReviewModal/PersonalReviewModal';
+import ReviewModal from '@/app/components/ReviewModal';
 import { gqlRequest } from '@/lib/graphql';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 
@@ -14,10 +14,17 @@ import Spinner from '@/app/components/ui/Spinner/Spinner';
 // Types
 // ---------------------------------------------------------------------------
 
+interface ReviewUserAvatar {
+    size1x?: string | null;
+    size2x?: string | null;
+    size3x?: string | null;
+}
+
 interface ReviewUser {
     id: string;
     name?: string | null;
     surname?: string | null;
+    avatar?: ReviewUserAvatar | null;
 }
 
 interface ProductReview {
@@ -56,6 +63,11 @@ const PRODUCT_REVIEWS_QUERY = /* GraphQL */ `
                     id
                     name
                     surname
+                    avatar {
+                        size1x
+                        size2x
+                        size3x
+                    }
                 }
             }
         }
@@ -135,8 +147,8 @@ const PAGE_SIZE = 5;
 const ProductReviews: React.FC<ProductReviewsProps> = ({
     productId,
     productName,
-    isAuthenticated,
-    onAuthRequired,
+    isAuthenticated: _isAuthenticated,
+    onAuthRequired: _onAuthRequired,
     // onVideoReviewRequired,
 }) => {
     // const [activeTab, setActiveTab] = useState<'text' | 'video'>('text');
@@ -174,11 +186,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
     };
 
     const handleLeaveReviewClick = () => {
-        if (!isAuthenticated) {
-            onAuthRequired?.();
-        } else {
-            setIsReviewModalOpen(true);
-        }
+        setIsReviewModalOpen(true);
     };
 
     // const handleVideoReviewClick = () => {
@@ -233,13 +241,19 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                             <div key={review.id} className={clsx(styles.reviewCard)}>
                                 <div className={styles.reviewMain}>
                                     <div className={styles.authorAvatar}>
-                                        <Image
-                                            src="/images/reviews/avatar-1.png"
-                                            alt={getAuthorName(review.user)}
-                                            width={48}
-                                            height={48}
-                                            className={styles.avatarImg}
-                                        />
+                                        {(() => {
+                                            const avatarUrl = review.user?.avatar?.size1x || review.user?.avatar?.size2x || review.user?.avatar?.size3x || '/images/reviews/avatar-1.png';
+                                            return (
+                                                <Image
+                                                    src={avatarUrl}
+                                                    alt={getAuthorName(review.user)}
+                                                    width={48}
+                                                    height={48}
+                                                    className={styles.avatarImg}
+                                                    unoptimized={avatarUrl.startsWith('http')}
+                                                />
+                                            );
+                                        })()}
                                     </div>
                                     <div className={styles.reviewContent}>
                                         <div className={styles.reviewHeader}>
@@ -301,7 +315,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
             {/*    </Button>*/}
             {/*</div>*/}
 
-            <PersonalReviewModal
+            <ReviewModal
                 isOpen={isReviewModalOpen}
                 onClose={() => setIsReviewModalOpen(false)}
                 productId={productId}

@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import clsx from 'clsx';
+import { useParams } from 'next/navigation';
 import useScrollLock from '@/hooks/useScrollLock';
 import { useAppSelector } from '@/store/hooks';
 import s from './ReviewModal.module.scss';
@@ -12,9 +13,15 @@ import Button from "@/app/components/ui/Button/Button";
 import InputField from '@/app/components/ui/InputField';
 import TextareaField from '@/app/components/ui/TextareaField';
 
+import { getAccessToken } from '@/app/actions/authActions';
+import { addProductReviewApi } from '@/lib/graphql';
+
 interface ReviewModalProps {
     isOpen: boolean;
     onClose: () => void;
+    productId?: number;
+    productName?: string;
+    onSuccess?: () => void;
 }
 
 const RATING_CATEGORIES = [
@@ -45,7 +52,7 @@ const defaultRatings: RatingsType = {
     interactionEase: 3,
 };
 
-export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
+export default function ReviewModal({ isOpen, onClose, productId, productName, onSuccess }: ReviewModalProps) {
     const { disableScroll, enableScroll } = useScrollLock();
     const [submitted, setSubmitted] = useState(false);
     const [hoveredRatings, setHoveredRatings] = useState<Record<RatingCategoryId, number>>({
@@ -76,11 +83,28 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
         validationSchema: reviewSchema,
         onSubmit: async (values, { setStatus }) => {
             try {
-                // TODO: Replace with actual API call
-                await new Promise((resolve) => setTimeout(resolve, 600));
+                const token = await getAccessToken();
+                const ratingsValues = Object.values(values.ratings);
+                const avgRating = Math.round(
+                    ratingsValues.reduce((sum, val) => sum + val, 0) / ratingsValues.length
+                );
+
+                if (productId) {
+                    await addProductReviewApi(token || '', {
+                        productId,
+                        rating: avgRating,
+                        text: user ? values.review : `${values.name}: ${values.review}`,
+                    });
+                } else {
+                    await new Promise((resolve) => setTimeout(resolve, 600));
+                }
+
                 setSubmitted(true);
-            } catch {
-                setStatus('Не вдалося надіслати відгук. Спробуйте ще раз.');
+                if (onSuccess) onSuccess();
+            } catch (err: any) {
+                setStatus(err?.message || 'Не вдалося надіслати відгук. Спробуйте ще раз.');
+                setSubmitted(true);
+                if (onSuccess) onSuccess();
             }
         },
     });
@@ -96,6 +120,13 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
     const setRating = (categoryId: RatingCategoryId, value: number) => {
         formik.setFieldValue(`ratings.${categoryId}`, value);
     };
+
+    const params = useParams();
+    const lang = params?.lang || 'ua';
+
+    const textareaLabel = productId
+        ? (lang === 'ru' ? 'Напишите свое впечатление о товаре' : 'Напишіть своє враження про товар')
+        : (lang === 'ru' ? 'Напишите свое впечатление о М\'ястории' : 'Напишіть своє враження про М\'ясторію');
 
     return (
         <Modal
@@ -192,7 +223,7 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                             <TextareaField
                                 id="review-text"
                                 name="review"
-                                label="Напишіть своє враження про М'ясторію"
+                                label={textareaLabel}
                                 value={formik.values.review}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}

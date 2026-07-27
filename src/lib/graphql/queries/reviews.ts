@@ -31,6 +31,11 @@ export interface ProductReview {
         id: string;
         name?: string | null;
         surname?: string | null;
+        avatar?: {
+            size1x?: string | null;
+            size2x?: string | null;
+            size3x?: string | null;
+        } | null;
     } | null;
 }
 
@@ -75,6 +80,11 @@ const PRODUCT_REVIEWS_QUERY = /* GraphQL */ `
                     id
                     name
                     surname
+                    avatar {
+                        size1x
+                        size2x
+                        size3x
+                    }
                 }
             }
             per_page
