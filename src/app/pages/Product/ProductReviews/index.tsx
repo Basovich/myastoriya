@@ -147,9 +147,6 @@ const PAGE_SIZE = 5;
 const ProductReviews: React.FC<ProductReviewsProps> = ({
     productId,
     productName,
-    isAuthenticated: _isAuthenticated,
-    onAuthRequired: _onAuthRequired,
-    // onVideoReviewRequired,
 }) => {
     // const [activeTab, setActiveTab] = useState<'text' | 'video'>('text');
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);

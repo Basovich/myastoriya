@@ -52,7 +52,7 @@ const defaultRatings: RatingsType = {
     interactionEase: 3,
 };
 
-export default function ReviewModal({ isOpen, onClose, productId, productName, onSuccess }: ReviewModalProps) {
+export default function ReviewModal({ isOpen, onClose, productId, onSuccess }: ReviewModalProps) {
     const { disableScroll, enableScroll } = useScrollLock();
     const [submitted, setSubmitted] = useState(false);
     const [hoveredRatings, setHoveredRatings] = useState<Record<RatingCategoryId, number>>({
@@ -101,8 +101,9 @@ export default function ReviewModal({ isOpen, onClose, productId, productName, o
 
                 setSubmitted(true);
                 if (onSuccess) onSuccess();
-            } catch (err: any) {
-                setStatus(err?.message || 'Не вдалося надіслати відгук. Спробуйте ще раз.');
+            } catch (err: unknown) {
+                const errorMessage = err instanceof Error ? err.message : String(err);
+                setStatus(errorMessage || 'Не вдалося надіслати відгук. Спробуйте ще раз.');
                 setSubmitted(true);
                 if (onSuccess) onSuccess();
             }
