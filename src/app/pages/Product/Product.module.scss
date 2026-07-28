@@ -1085,7 +1085,7 @@ button.reviewTabBtn {
 }
 
 .reviewCard {
-    padding: 32px 0;
+    padding: 32px 0 0;
     border-bottom: 1px solid #F0F0F0;
 
     &:first-child {
@@ -1093,7 +1093,6 @@ button.reviewTabBtn {
     }
 
     &:last-of-type {
-        padding-bottom: 30px;
         margin-bottom: 22px;
         border-bottom: 1px solid #F0F0F0;
     }

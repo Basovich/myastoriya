@@ -25,14 +25,14 @@
     outline: none;
     position: relative;
     max-width: 90%;
-    width: 500px;
+    width: 420px;
 }
 
 .modal {
     background: #fff;
     border-radius: 20px;
     padding: 32px 24px;
-    box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
 
     @media (min-width: 1024px) {
         padding: 48px;
@@ -55,17 +55,13 @@
 }
 
 .title {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 800;
     text-align: center;
     text-transform: uppercase;
     margin-bottom: 24px;
     color: #1C1B1B;
     line-height: 1.4;
-
-    @media (min-width: 1024px) {
-        font-size: 22px;
-    }
 }
 
 .orderNum {
@@ -97,7 +93,7 @@
 }
 
 .ratingLabel {
-    font-size: 14px;
+    font-size: 12px;
     color: #000;
     font-weight: 400;
 }
@@ -136,8 +132,9 @@
 
 .submitBtn {
     margin-top: 12px;
-    height: 56px;
+    height: 46px;
     font-weight: 700;
+    width: 100%;
 }
 
 .successView {
