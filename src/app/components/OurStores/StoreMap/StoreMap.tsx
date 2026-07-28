@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useState } from "react";
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api";
 import s from "./StoreMap.module.scss";
 import { type Store } from "../StoreCard/StoreCard";
@@ -51,20 +51,12 @@ const MAPS_LOADER_OPTIONS = {
 export default function StoreMap({ stores, dict }: StoreMapProps) {
     const { isLoaded } = useJsApiLoader(MAPS_LOADER_OPTIONS);
 
-    const [map, setMap] = useState<google.maps.Map | null>(null);
     const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 
-    const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
-        setMap(mapInstance);
-    }, []);
-
-    // Close InfoWindow if the selected store is filtered out
-    useEffect(() => {
-        if (selectedStore && !stores.some(s => s.id === selectedStore.id)) {
-            setSelectedStore(null);
-        }
-    }, [stores, selectedStore]);
-
+    // If selectedStore is filtered out, clear it during render (derived state pattern)
+    const activeSelectedStore = selectedStore && stores.some(s => s.id === selectedStore.id)
+        ? selectedStore
+        : null;
 
     return isLoaded ? (
         <div className={s.mapWrapper}>
@@ -72,7 +64,6 @@ export default function StoreMap({ stores, dict }: StoreMapProps) {
                 mapContainerStyle={containerStyle}
                 center={center}
                 zoom={11}
-                onLoad={onMapLoad}
                 options={{
                     styles: DARK_MAP_STYLE,
                     disableDefaultUI: true,
@@ -91,9 +82,9 @@ export default function StoreMap({ stores, dict }: StoreMapProps) {
                     />
                 ))}
 
-                {selectedStore && (
+                {activeSelectedStore && (
                     <InfoWindow
-                        position={{ lat: selectedStore.lat, lng: selectedStore.lng }}
+                        position={{ lat: activeSelectedStore.lat, lng: activeSelectedStore.lng }}
                         onCloseClick={() => setSelectedStore(null)}
                         options={{
                             pixelOffset: new window.google.maps.Size(0, -30)
@@ -101,7 +92,7 @@ export default function StoreMap({ stores, dict }: StoreMapProps) {
                     >
                         <div className={s.infoWindowContainer}>
                             <StoreCard 
-                                store={selectedStore} 
+                                store={activeSelectedStore} 
                                 dict={dict} 
                                 variant="map" 
                                 onClose={() => setSelectedStore(null)}
