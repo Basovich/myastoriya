@@ -174,25 +174,52 @@ const ProductClient: React.FC<ProductClientProps> = ({
         if (isAddingToCart) return;
         setIsAddingToCart(true);
 
-        const selectedRelatedDetails = (product.relatedProductGroups || [])
-            .flatMap(g => g.products || [])
-            .filter(p => selectedModifierIds.includes(String(p.id)))
-            .map(p => ({
+        try {
+            // Collect valid modifier IDs from modifierGroups
+            const validModifierIdSet = new Set(
+                (product.modifierGroups || []).flatMap(g => g.modifiers || []).map(m => String(m.id))
+            );
+
+            // Filter actual modifier IDs for backend
+            const actualModifierIds = selectedModifierIds
+                .filter(id => validModifierIdSet.has(id))
+                .map(Number);
+
+            // Find selected related products
+            const selectedRelatedProducts = (product.relatedProductGroups || [])
+                .flatMap(g => g.products || [])
+                .filter(p => selectedModifierIds.includes(String(p.id)));
+
+            const selectedRelatedDetails = selectedRelatedProducts.map(p => ({
                 id: Number(p.id),
                 title: p.name,
                 image: resolveProductImageUrl(p) || '/images/product-placeholder.svg',
             }));
 
-        try {
+            // 1. Add main product to cart with valid modifierIds
             await dispatch(
                 addToCartAsync({
                     id: String(product.id),
                     quantity,
                     costVariantId: selectedCostVariantId ? Number(selectedCostVariantId) : undefined,
-                    modifierIds: selectedModifierIds.map(Number),
+                    modifierIds: actualModifierIds.length > 0 ? actualModifierIds : undefined,
                     relatedProductsDetails: selectedRelatedDetails,
                 })
             ).unwrap();
+
+            // 2. Add selected related products as items to cart
+            for (const relProd of selectedRelatedProducts) {
+                try {
+                    await dispatch(
+                        addToCartAsync({
+                            id: String(relProd.id),
+                            quantity: 1,
+                        })
+                    ).unwrap();
+                } catch (relErr) {
+                    console.warn(`Failed to add related product ${relProd.id} to backend cart:`, relErr);
+                }
+            }
         } catch (err) {
             console.error('[ProductClient] Failed to add to cart:', err);
         } finally {
