@@ -24,6 +24,7 @@ export interface OrderCardProps {
         sourcePrefix: string;
         sumLabel: string;
         reviewLink: string;
+        editReviewLink?: string;
         repeatBtn: string;
         detailsBtn: string;
     };

@@ -353,7 +353,7 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                             const statusName = order.status?.name || (lang === 'ru' ? 'Новый заказ' : 'Нове замовлення');
                             const statusVariant = getStatusVariant(order.status?.id, order.status?.name);
 
-                            const review = orderReviews[order.id.toString()];
+                            const review = orderReviews[order.id.toString()] || (order.orderNo ? orderReviews[order.orderNo.toString()] : undefined);
                             const hasReview = !!review;
 
                             const statusNameLower = (order.status?.name || '').toLowerCase();

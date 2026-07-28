@@ -201,17 +201,17 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
             }
             setProductDetailsMap(detailsMap);
 
-            // 3. Fetch Order Review if order has reviewId
-            if (orderData.reviewId) {
-                try {
-                    const reviewData = await getOrderReviewsApi(token, { orderId: Number(orderId) }, lang);
-                    if (reviewData.data && reviewData.data.length > 0) {
-                        setOrderReview(reviewData.data[0]);
-                    }
-                } catch (e) {
-                    console.error("Failed to fetch order review:", e);
+            // 3. Fetch Order Review
+            try {
+                const targetOrderId = Number(orderData.id || orderId);
+                const reviewData = await getOrderReviewsApi(token, { orderId: targetOrderId }, lang);
+                if (reviewData.data && reviewData.data.length > 0) {
+                    setOrderReview(reviewData.data[0]);
+                } else {
+                    setOrderReview(null);
                 }
-            } else {
+            } catch (e) {
+                console.error("Failed to fetch order review:", e);
                 setOrderReview(null);
             }
         } catch (error) {
