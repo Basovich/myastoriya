@@ -32,13 +32,8 @@ nav.breadcrumbsWrapper {
 }
 
 .mainGrid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-        "gallery"
-        "info"
-        "tabs"
-        "reviews";
+    display: flex;
+    flex-direction: column;
     gap: 20px;
     padding: 18px 16px 40px;
     background-color: #F6F6F6;
@@ -50,11 +45,8 @@ nav.breadcrumbsWrapper {
     }
 
     @media (min-width: 1280px) {
+        display: grid;
         grid-template-columns: minmax(0, 1fr) 382px;
-        grid-template-areas:
-            "gallery info"
-            "tabs info"
-            "reviews info";
         gap: 34px;
         align-items: start;
         padding: 32px calc((100% - 1180px) / 2) 88px;
@@ -71,14 +63,25 @@ nav.breadcrumbsWrapper {
     }
 }
 
+.leftColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+
+    @media (min-width: 1280px) {
+        grid-column: 1;
+        grid-row: 1;
+        gap: 32px;
+    }
+}
+
 .gallery,
 .info {
     min-width: 0;
 }
 
 .gallery {
-    grid-area: gallery;
-
     @media (min-width: 1280px) {
         background-color: transparent;
         padding: 0;
@@ -86,7 +89,6 @@ nav.breadcrumbsWrapper {
 }
 
 .info {
-    grid-area: info;
     border-radius: 14px;
     background: #FFF;
     padding: 18px 20px 30px;
@@ -96,6 +98,8 @@ nav.breadcrumbsWrapper {
     }
 
     @media (min-width: 1280px) {
+        grid-column: 2;
+        grid-row: 1;
         background-color: #FFF;
         padding: 40px;
         border-radius: 12px;
@@ -619,9 +623,9 @@ div.quantitySelector {
 
 /* Modifications */
 .productModifications {
-    padding-bottom: 24px;
+    padding-bottom: 18px;
     border-bottom: 1px solid #E0E0E0;
-    margin-bottom: 24px;
+    margin-bottom: 4px;
 
     &.noBorder {
         border-bottom: none;
@@ -689,6 +693,7 @@ div.quantitySelector {
     flex: 1;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
 }
 
 .modName {
@@ -707,6 +712,8 @@ div.quantitySelector {
     font-style: normal;
     font-weight: 700;
     line-height: 110%;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* Tabs */

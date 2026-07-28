@@ -140,6 +140,12 @@ export interface ModifierGroup {
     modifiers: Modifier[];
 }
 
+export interface RelatedProductGroup {
+    id: string;
+    name: string;
+    products: Product[];
+}
+
 export interface Product {
     id: string;
     slug?: string;
@@ -184,6 +190,8 @@ export interface Product {
     bundles?: ProductBundle[] | null;
     /** Групи модифікаторів товару */
     modifierGroups?: ModifierGroup[] | null;
+    /** Групи додаткових товарів */
+    relatedProductGroups?: RelatedProductGroup[] | null;
 }
 
 /**
@@ -463,6 +471,32 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                     price
                 }
             }
+            relatedProductGroups {
+                id
+                name
+                products {
+                    id
+                    slug
+                    categoryId
+                    name
+                    cost
+                    oldCost
+                    unit
+                    multiplier
+                    is_new
+                    available
+                    portionSize
+                    images {
+                        url {
+                            grid2x
+                            grid1x
+                            main2x
+                            main1x
+                            big
+                        }
+                    }
+                }
+            }
             images {
                 url {
                     grid2x
@@ -678,6 +712,32 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
                         icon1x
                         icon2x
                         icon3x
+                    }
+                }
+            }
+            relatedProductGroups {
+                id
+                name
+                products {
+                    id
+                    slug
+                    categoryId
+                    name
+                    cost
+                    oldCost
+                    unit
+                    multiplier
+                    is_new
+                    available
+                    portionSize
+                    images {
+                        url {
+                            grid2x
+                            grid1x
+                            main2x
+                            main1x
+                            big
+                        }
                     }
                 }
             }

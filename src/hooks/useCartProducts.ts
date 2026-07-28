@@ -449,8 +449,19 @@ export function useCartProducts() {
                 const originalPrice = (dbProduct.purchaseOldCost ?? item.purchaseCost ?? dbProduct.oldCost ?? basePrice) + modifiersPrice;
 
                 const modifiersWithImages = item.modifiers?.map(m => {
-                    let modifierImage: string | null = null;
-                    if (dbProduct.modifierGroups) {
+                    let modifierImage: string | null = m.image || null;
+
+                    if (!modifierImage && dbProduct.relatedProductGroups) {
+                        for (const group of dbProduct.relatedProductGroups) {
+                            const found = group.products?.find(p => String(p.id) === String(m.id) || Number(p.id) === m.id);
+                            if (found) {
+                                modifierImage = resolveProductImageUrl(found);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!modifierImage && dbProduct.modifierGroups) {
                         for (const group of dbProduct.modifierGroups) {
                             const found = group.modifiers?.find(mod => Number(mod.id) === m.id);
                             if (found && found.image) {
@@ -460,9 +471,18 @@ export function useCartProducts() {
                                         ? `https://dev-api.myastoriya.com.ua${rawUrl}` 
                                         : rawUrl;
                                 }
+                                break;
                             }
                         }
                     }
+
+                    if (!modifierImage) {
+                        const cachedRel = getCachedProduct(String(m.id));
+                        if (cachedRel) {
+                            modifierImage = resolveProductImageUrl(cachedRel);
+                        }
+                    }
+
                     return {
                         id: m.id,
                         name: m.name,

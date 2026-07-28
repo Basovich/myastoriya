@@ -14,6 +14,8 @@ export interface CartItemModifier {
     id: number;
     name?: string | null;
     price?: number | null;
+    image?: string | null;
+    isRelatedProduct?: boolean;
 }
 
 export interface CartItem {
@@ -72,7 +74,7 @@ const initialState: CartState = {
 };
 
 // Helper to map CartGql to local CartItem[]
-const mapCartItems = (cart: CartGql): CartItem[] => {
+const mapCartItems = (cart: CartGql, detailsCache?: Record<string, { title: string; image: string }>): CartItem[] => {
     return (cart.items ?? []).map(item => ({
         id: String(item.productId),
         rowId: item.rowId,
@@ -82,11 +84,16 @@ const mapCartItems = (cart: CartGql): CartItem[] => {
         costVariantId: item.costVariantId,
         costVariantName: item.costVariantName,
         multiplier: item.multiplier,
-        modifiers: item.modifiers ? item.modifiers.map(m => ({
-            id: m.id,
-            name: m.name,
-            price: m.price,
-        })) : null,
+        modifiers: item.modifiers ? item.modifiers.map(m => {
+            const cached = detailsCache?.[String(m.id)];
+            return {
+                id: m.id,
+                name: m.name,
+                price: m.price,
+                image: cached?.image || null,
+                isRelatedProduct: Boolean(cached),
+            };
+        }) : null,
     }));
 };
 
@@ -206,14 +213,15 @@ export const fetchAndSetRemovedItemsAsync = createAsyncThunk(
 
 export const toggleUseBonusesAsync = createAsyncThunk(
     'cart/toggleUseBonuses',
-    async (useBonuses: boolean, { dispatch, rejectWithValue }) => {
+    async (useBonuses: boolean, { getState, dispatch, rejectWithValue }) => {
         try {
+            const state = getState() as RootState;
             dispatch(setUseBonuses(useBonuses));
             const response = await getCartApi({ useBonuses });
             dispatch(setPromoCode(response.promoCode || null));
             dispatch(setCashback(response.cashback || 0));
             dispatch(setTotal(response.total || 0));
-            return mapCartItems(response);
+            return mapCartItems(response, state.cart.productDetails);
         } catch (error: unknown) {
             console.error('[Cart] Failed to toggle useBonuses:', error);
             Sentry.captureException(error);
@@ -225,12 +233,26 @@ export const toggleUseBonusesAsync = createAsyncThunk(
 export const addToCartAsync = createAsyncThunk(
     'cart/add',
     async (
-        payload: { id: string; quantity: number; costVariantId?: number; modifierIds?: number[] },
+        payload: {
+            id: string;
+            quantity: number;
+            costVariantId?: number;
+            modifierIds?: number[];
+            relatedProductsDetails?: { id: number; title: string; image: string }[];
+        },
         { getState, dispatch, rejectWithValue }
     ) => {
         try {
             const state = getState() as RootState;
             const useBonuses = state.cart.useBonuses;
+
+            if (payload.relatedProductsDetails && payload.relatedProductsDetails.length > 0) {
+                const detailsToSave: Record<string, { title: string; image: string }> = {};
+                for (const rel of payload.relatedProductsDetails) {
+                    detailsToSave[String(rel.id)] = { title: rel.title, image: rel.image };
+                }
+                dispatch(saveProductDetails(detailsToSave));
+            }
 
             // Auth hasn't completed yet — no access_token cookie exists.
             // The item is already stored optimistically by the pending reducer.
@@ -270,7 +292,7 @@ export const addToCartAsync = createAsyncThunk(
             dispatch(setPromoCode(response.promoCode || null));
             dispatch(setCashback(response.cashback || 0));
             dispatch(setTotal(response.total || 0));
-            return mapCartItems(response);
+            return mapCartItems(response, (getState() as RootState).cart.productDetails);
         } catch (error: unknown) {
             console.error('[Cart] Failed to add or update product in backend cart:', error);
             Sentry.captureException(error, { extra: { payload } });

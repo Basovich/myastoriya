@@ -70,6 +70,7 @@ export type {
     FilterStateInput,
     FaqQuestion,
     FaqGroup,
+    RelatedProductGroup,
 } from './queries/products';
 
 // Re-export blog

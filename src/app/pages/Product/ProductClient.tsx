@@ -173,6 +173,16 @@ const ProductClient: React.FC<ProductClientProps> = ({
     const handleAddToCart = async () => {
         if (isAddingToCart) return;
         setIsAddingToCart(true);
+
+        const selectedRelatedDetails = (product.relatedProductGroups || [])
+            .flatMap(g => g.products || [])
+            .filter(p => selectedModifierIds.includes(String(p.id)))
+            .map(p => ({
+                id: Number(p.id),
+                title: p.name,
+                image: resolveProductImageUrl(p) || '/images/product-placeholder.svg',
+            }));
+
         try {
             await dispatch(
                 addToCartAsync({
@@ -180,6 +190,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                     quantity,
                     costVariantId: selectedCostVariantId ? Number(selectedCostVariantId) : undefined,
                     modifierIds: selectedModifierIds.map(Number),
+                    relatedProductsDetails: selectedRelatedDetails,
                 })
             ).unwrap();
         } catch (err) {
@@ -283,16 +294,32 @@ const ProductClient: React.FC<ProductClientProps> = ({
         <main className={s.productPage}>
             <Breadcrumbs items={breadcrumbs} className={s.breadcrumbsWrapper} />
             <div className={s.mainGrid}>
-                <section className={s.gallery}>
-                    <ProductGallery
-                        id={String(product.id)}
-                        images={displayImages}
-                        discount={hasDiscount && activePurchaseOldCost
-                            ? `-${Math.floor(100 - (activePurchaseCost / activePurchaseOldCost) * 100)}%`
-                            : undefined}
-                        videoUrl={product.video}
+                <div className={s.leftColumn}>
+                    <section className={s.gallery}>
+                        <ProductGallery
+                            id={String(product.id)}
+                            images={displayImages}
+                            discount={hasDiscount && activePurchaseOldCost
+                                ? `-${Math.floor(100 - (activePurchaseCost / activePurchaseOldCost) * 100)}%`
+                                : undefined}
+                            videoUrl={product.video}
+                        />
+                    </section>
+
+                    <ProductTabs
+                        description={product.text ?? product.name}
+                        characteristics={characteristics}
+                        deliveryBlocks={deliveryBlocks}
                     />
-                </section>
+
+                    <ProductReviews
+                        productId={Number(product.id)}
+                        productName={product.name}
+                        isAuthenticated={isAuthenticated}
+                        onAuthRequired={() => setIsAuthModalOpen(true)}
+                        onVideoReviewRequired={() => setIsVideoReviewModalOpen(true)}
+                    />
+                </div>
 
                 <section className={s.info}>
                     <div className={clsx(s.availability, !inStock && s.availabilityUnavailable)}>
@@ -383,6 +410,23 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         />
                     )}
 
+                    {/* Related product groups (Додаткові товари) — виводяться над модифікаторами */}
+                    {product.relatedProductGroups?.map((group) => (
+                        <ProductModifications
+                            key={`rel-${group.id}`}
+                            title={group.name}
+                            items={(group.products || []).map(p => ({
+                                id: String(p.id),
+                                name: p.name,
+                                price: p.cost,
+                            }))}
+                            selectedItems={selectedModifierIds}
+                            onToggle={toggleModifier}
+                            className={clsx(s.productModifications, (!product.modifierGroups || product.modifierGroups.length === 0) && s.noBorder)}
+                        />
+                    ))}
+
+                    {/* Modifier groups (Соуси та добавки) */}
                     {product.modifierGroups?.map((group, index, arr) => (
                         <ProductModifications
                             key={group.id}
@@ -394,20 +438,6 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         />
                     ))}
                 </section>
-
-                <ProductTabs
-                    description={product.text ?? product.name}
-                    characteristics={characteristics}
-                    deliveryBlocks={deliveryBlocks}
-                />
-
-                <ProductReviews
-                    productId={Number(product.id)}
-                    productName={product.name}
-                    isAuthenticated={isAuthenticated}
-                    onAuthRequired={() => setIsAuthModalOpen(true)}
-                    onVideoReviewRequired={() => setIsVideoReviewModalOpen(true)}
-                />
             </div>
 
             <div className={s.relatedProductsGrid}>
