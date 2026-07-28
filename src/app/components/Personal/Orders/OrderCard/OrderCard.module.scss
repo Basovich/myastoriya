@@ -12,7 +12,7 @@
         padding: 24px;
         flex-direction: row;
         align-items: stretch;
-        gap: 32px;
+        gap: 46px;
     }
 }
 
@@ -23,6 +23,12 @@
     gap: 12px;
     flex: 1;
     min-width: 0;
+
+    @media (min-width: 1280px) {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
 }
 
 /* ======= ПРАВА КОЛОНКА (тільки десктоп) ======= */
@@ -35,7 +41,7 @@
         justify-content: space-between;
         align-items: flex-end;
         flex-shrink: 0;
-        min-width: 210px;
+        width: 240px;
     }
 }
 
@@ -85,6 +91,10 @@
     display: flex;
     align-items: center;
     gap: 6px;
+
+    svg {
+        margin-top: -4px;
+    }
 }
 
 .statusText {
@@ -124,6 +134,7 @@
 
     @media (min-width: 1280px) {
         gap: 12px;
+        width: 100%;
     }
 }
 
@@ -179,6 +190,11 @@
     flex-direction: column;
     align-items: flex-end;
     gap: 4px;
+
+    @media (min-width: 1280px) {
+        align-items: flex-start;
+        align-self: flex-start;
+    }
 }
 
 .priceLabel {
@@ -234,6 +250,8 @@
         flex-direction: row;
         align-items: center;
         gap: 16px;
+        justify-content: space-between;
+        width: 100%;
     }
 }
 
@@ -304,6 +322,8 @@ button.repeatBtn {
         height: 34px;
         white-space: nowrap;
         flex-shrink: 0;
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
 
@@ -318,9 +338,9 @@ button.detailsBtn {
     order: 6;
 
     @media (min-width: 1280px) {
-        width: auto;
         height: 34px;
         white-space: nowrap;
+        width: 100%;
     }
 }
 
