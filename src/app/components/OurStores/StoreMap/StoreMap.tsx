@@ -58,19 +58,6 @@ export default function StoreMap({ stores, dict }: StoreMapProps) {
         setMap(mapInstance);
     }, []);
 
-    // Fit map bounds whenever the active list of stores changes
-    useEffect(() => {
-        if (map && stores.length > 0) {
-            const bounds = new window.google.maps.LatLngBounds();
-            stores.forEach((store) => {
-                if (store.lat && store.lng) {
-                    bounds.extend({ lat: store.lat, lng: store.lng });
-                }
-            });
-            map.fitBounds(bounds);
-        }
-    }, [map, stores]);
-
     // Close InfoWindow if the selected store is filtered out
     useEffect(() => {
         if (selectedStore && !stores.some(s => s.id === selectedStore.id)) {
@@ -84,7 +71,7 @@ export default function StoreMap({ stores, dict }: StoreMapProps) {
             <GoogleMap
                 mapContainerStyle={containerStyle}
                 center={center}
-                zoom={12}
+                zoom={11}
                 onLoad={onMapLoad}
                 options={{
                     styles: DARK_MAP_STYLE,
