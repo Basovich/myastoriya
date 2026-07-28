@@ -137,8 +137,10 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                         limit: 100,
                     });
                     pRevData.data.forEach((r) => {
+                        if (r.id) {
+                            pRevMap[r.id.toString()] = r;
+                        }
                         if (r.productId) {
-                            pRevMap[r.productId.toString()] = r;
                             reviewProductIds.push(r.productId);
                         }
                     });
