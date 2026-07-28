@@ -28,13 +28,13 @@ export interface PersonalNavProps {
         changePassword: string;
         logout: string;
     };
-    onLogout: () => void | Promise<void>;
+    onLogout?: () => void | Promise<void>;
     user: AuthUser | null;
     isMobileOnly?: boolean;
     isDesktopOnly?: boolean;
 }
 
-const PersonalNav: React.FC<PersonalNavProps> = ({ dict, onLogout, user, isMobileOnly, isDesktopOnly }) => {
+const PersonalNav: React.FC<PersonalNavProps> = ({ dict, user, isMobileOnly, isDesktopOnly }) => {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const { disableScroll, enableScroll } = useScrollLock();
@@ -194,7 +194,10 @@ const PersonalNav: React.FC<PersonalNavProps> = ({ dict, onLogout, user, isMobil
         try {
             setIsUploading(true);
             const token = await getAccessToken();
-            if (!token) throw new Error('Unauthorized');
+            if (!token) {
+                alert('Помилка авторизації');
+                return;
+            }
 
             const updatedUser = await updateUserAvatarApi(file, token);
             
