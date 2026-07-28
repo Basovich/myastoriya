@@ -38,12 +38,13 @@ span.activeLabel {
     }
 }
 
-.iconUser {
-    width: 20px;
-    height: 20px;
-    background: url('/icons/icon-profile.svg') no-repeat center;
-    background-size: contain;
-    filter: brightness(0) invert(1);
+.triggerIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
 }
 
 .listIcon {

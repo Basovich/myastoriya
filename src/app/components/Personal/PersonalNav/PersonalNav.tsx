@@ -70,8 +70,8 @@ const PersonalNav: React.FC<PersonalNavProps> = ({ dict, onLogout, user, isMobil
 
     const activeItem = menuItems.find(item => pathname.includes(item.href)) || menuItems[0];
 
-    const renderIcon = (type: string, isActive: boolean) => {
-        const color = isActive ? '#E30613' : '#000000';
+    const renderIcon = (type: string, isActive: boolean, colorOverride?: string) => {
+        const color = colorOverride ?? (isActive ? '#E30613' : '#000000');
         switch (type) {
             case 'profile':
                 return (
@@ -302,7 +302,7 @@ const PersonalNav: React.FC<PersonalNavProps> = ({ dict, onLogout, user, isMobil
                     onClick={() => setIsOpen(true)}
                 >
                     <div className={s.triggerContent}>
-                        <div className={s.iconUser} />
+                        <span className={s.triggerIcon}>{renderIcon(activeItem.icon, false, '#FFFFFF')}</span>
                         <span className={s.activeLabel}>{activeItem.label}</span>
                         {burgerIcon}
                     </div>
