@@ -478,11 +478,12 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                             )}
                             {order.calculation?.map((calc, index) => {
                                 const isNegative = calc.amount < 0;
+                                const isFree = calc.amount === 0;
                                 return (
                                     <div key={index} className={s.summaryItem}>
                                         <span className={s.summaryLabel}>{calc.name?.replace(/:$/, '')}</span>
-                                        <span className={clsx(s.summaryValue, isNegative && s.negative)}>
-                                            {calc.amount === 0 
+                                        <span className={clsx(s.summaryValue, isNegative && s.negative, isFree && s.freeText)}>
+                                            {isFree 
                                                 ? (lang === 'ru' ? 'Бесплатно' : 'Безкоштовно') 
                                                 : `${calc.amount.toLocaleString('uk-UA')} ₴`}
                                         </span>
