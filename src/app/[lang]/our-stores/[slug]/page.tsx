@@ -1,20 +1,20 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import StoreDetailPage from "@/app/pages/OurStores/StoreDetailPage/StoreDetailPage";
-import { getShopApi, getShopsApi } from "@/lib/graphql/queries/shops";
+import { getShopBySlugApi } from "@/lib/graphql/queries/shops";
 import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 export default async function StorePage({
     params,
 }: {
-    params: Promise<{ lang: Locale; id: string }>;
+    params: Promise<{ lang: Locale; slug: string }>;
 }) {
-    const { lang, id } = await params;
+    const { lang, slug } = await params;
     const dict = await getDictionary(lang);
 
     try {
-        const response = await getShopApi(id, lang);
+        const response = await getShopBySlugApi(slug, lang);
         const shop = response.shop;
 
         if (!shop) {

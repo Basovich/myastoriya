@@ -9,6 +9,14 @@ export function getLocalizedHref(href: string, lang: Locale): string {
     // Return as is for empty href
     if (!href) return href;
 
+    // If href already has a locale prefix, return as is (don't double-prefix)
+    const hasLocalePrefix = i18n.locales.some(
+        (locale) => href.startsWith(`/${locale}/`) || href === `/${locale}`
+    );
+    if (hasLocalePrefix) {
+        return href;
+    }
+
     // For default locale, ensure clean path (no /ua prefix)
     if (lang === i18n.defaultLocale) {
         return href;

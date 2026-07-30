@@ -8,6 +8,7 @@ export const SHOPS_QUERY = `
         name
         siteName
         siteAddress
+        slug
         status
         phones
         email
@@ -45,6 +46,48 @@ export const SHOPS_QUERY = `
   }
 `;
 
+export const SHOP_BY_SLUG_QUERY = `
+  query GetShopBySlug($slug: String!) {
+    shop(slug: $slug) {
+      id
+      name
+      siteName
+      siteAddress
+      slug
+      status
+      phones
+      email
+      isOpen
+      isCompanyStore
+      schedule {
+        days
+        workTime
+      }
+      lat
+      lng
+      description
+      googleReviewsUrl
+      images {
+        url {
+          size1x
+          size2x
+          size3x
+        }
+      }
+      image {
+        size1x
+        size2x
+        size3x
+      }
+      icon {
+        size1x
+        size2x
+        size3x
+      }
+    }
+  }
+`;
+
 export const SHOP_BY_ID_QUERY = `
   query GetShop($id: Int!) {
     shop(id: $id) {
@@ -52,6 +95,7 @@ export const SHOP_BY_ID_QUERY = `
       name
       siteName
       siteAddress
+      slug
       status
       phones
       email
@@ -123,6 +167,7 @@ export interface Shop {
   name: string;
   siteName?: string | null;
   siteAddress?: string | null;
+  slug?: string | null;
   status: string | null;
   phones: string[];
   email: string | null;
@@ -171,6 +216,17 @@ export const getShopApi = async (
   return await gqlRequest<SingleShopResponse>(
     SHOP_BY_ID_QUERY,
     { id: parseInt(id) },
+    { lang, next: { revalidate: 3600 } }
+  );
+};
+
+export const getShopBySlugApi = async (
+  slug: string,
+  lang: string = "ua"
+): Promise<SingleShopResponse> => {
+  return await gqlRequest<SingleShopResponse>(
+    SHOP_BY_SLUG_QUERY,
+    { slug },
     { lang, next: { revalidate: 3600 } }
   );
 };

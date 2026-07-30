@@ -7,6 +7,7 @@ import GeocodedAddressClient from "@/app/components/ui/GeocodedAddress/GeocodedA
 
 export interface Store {
     id: string;
+    slug: string;
     name: string;
     type: string;
     address: string;
@@ -88,7 +89,7 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                     <div className={s.mapActions}>
                         <Button 
                             variant="black" 
-                            href={`/our-stores/${store.id}`} 
+                            href={`/our-stores/${store.slug}`} 
                             className={s.detailsBtnFull}
                         >
                             {dict.details}
@@ -117,7 +118,7 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                     </div>
 
                     <div className={s.nameWrapper}>
-                        <Link href={`/our-stores/${store.id}`} className={s.nameLink}>
+                        <Link href={`/our-stores/${store.slug}`} className={s.nameLink}>
                             <h4 className={s.name}>{store.name.toUpperCase()}</h4>
                         </Link>
                         <div className={`${s.statusBadge} ${isOpen ? s.open : s.closed}`}>
@@ -192,7 +193,7 @@ export default function StoreCard({ store, dict, variant = "list", onClose }: St
                             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#E3051B"/>
                         </svg>
                     </a>
-                    <Link href={`/our-stores/${store.id}`} className={s.detailsBtn}>
+                    <Link href={`/our-stores/${store.slug}`} className={s.detailsBtn}>
                         <svg width="18" height="15" viewBox="0 0 18 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M9.98467 0.999945L16.3131 7.32837L9.98467 13.6568" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                             <line x1="15" y1="7.17163" x2="1" y2="7.17163" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>

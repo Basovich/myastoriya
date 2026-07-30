@@ -27,6 +27,7 @@ export const parseShopData = (shop: Shop): Store => {
     return {
         id: shop.id,
         name: name,
+        slug: shop.slug || shop.id,
         type: isMeatBar ? "meatbar" : "restaurant",
         address: address,
         workingHours: shop.schedule?.map(s => `${s.days}: ${s.workTime}`) || [],

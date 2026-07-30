@@ -31,6 +31,13 @@ export function middleware(request: NextRequest) {
 
     // 2. Redirect /ua to / (clean URL for default locale)
     if (pathname === '/ua' || pathname.startsWith('/ua/')) {
+        // Exception: /ua/menu/* — menu pages keep the /ua/ prefix intentionally
+        if (pathname.startsWith('/ua/menu/')) {
+            return NextResponse.rewrite(
+                new URL(`${pathname}${search}`, request.url),
+                { request: { headers: requestHeaders } }
+            );
+        }
         const cleanPath = pathname.replace(/^\/ua/, '') || '/';
         return NextResponse.redirect(new URL(`${cleanPath}${search}`, request.url));
     }

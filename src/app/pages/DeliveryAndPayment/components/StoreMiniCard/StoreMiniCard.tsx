@@ -53,7 +53,7 @@ export default function StoreMiniCard({ store, isPromo = false }: StoreMiniCardP
     if (!store) return null;
 
     return (
-        <Link href={`/our-stores/${store.id}`} className={s.card}>
+        <Link href={`/our-stores/${store.slug}`} className={s.card}>
             <div className={s.header}>
                 <div className={s.titleGroup}>
                     <h4 className={s.name}>{store.name}</h4>
