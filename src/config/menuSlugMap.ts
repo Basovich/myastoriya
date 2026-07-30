@@ -35,3 +35,5 @@ export function getMenuSlug(apiSlug: string): string {
 export function getApiSlugFromMenu(menuSlug: string): string {
     return MENU_SLUG_TO_SHOP_SLUG[menuSlug] ?? menuSlug;
 }
+
+
