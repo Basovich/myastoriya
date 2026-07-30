@@ -1,4 +1,4 @@
-import type { Shop } from "../graphql/queries/shops";
+import type { Shop } from "@/lib/graphql/queries/shops";
 import { Store } from "@/app/components/OurStores/StoreCard/StoreCard";
 
 /**
