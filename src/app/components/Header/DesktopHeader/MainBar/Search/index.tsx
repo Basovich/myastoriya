@@ -17,10 +17,10 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { getSalesApi } from "@/lib/graphql";
 import { useCategoryTree, getProductHref } from "@/hooks/useCategoryTree";
 import { 
     getProductsApi, 
+    getSaleProductsApi,
     getSearchCategoriesApi, 
     getSearchPopularQueriesApi, 
     getCatalogTreeApi,
@@ -249,141 +249,86 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
         setIsActive(false);
     }, [pathname]);
 
-    const fetchProposals = useCallback(async (startPage: number, targetCount: number, currentList: Product[]) => {
+    const fetchProposalsNextPage = useCallback(async (nextPage: number, currentList: Product[]) => {
+        if (isLoadingProposalsRef.current || !hasMoreProposals) return;
+        isLoadingProposalsRef.current = true;
+
+        try {
+            const limit = 10;
+            const res = await getSaleProductsApi(limit, nextPage, lang);
+            if (res && res.data && res.data.length > 0) {
+                const existingIds = new Set(currentList.map(p => p.id));
+                const newItems = res.data.filter(p => !existingIds.has(p.id));
+                setFeaturedProposals(prev => {
+                    const prevIds = new Set(prev.map(p => p.id));
+                    const fresh = newItems.filter(p => !prevIds.has(p.id));
+                    return [...prev, ...fresh];
+                });
+                setProposalsPage(nextPage);
+                setHasMoreProposals(res.has_more_pages);
+            } else {
+                setHasMoreProposals(false);
+            }
+        } catch (err) {
+            console.error("Error background prefetching sale products:", err);
+        } finally {
+            isLoadingProposalsRef.current = false;
+        }
+    }, [lang, hasMoreProposals]);
+
+    const fetchInitialProposals = useCallback(async () => {
         if (isLoadingProposalsRef.current) return;
         isLoadingProposalsRef.current = true;
         setIsProposalsLoading(true);
 
-        let currentPage = startPage;
-        let accumulated: Product[] = [...currentList];
-        let hasMore = true;
-
         try {
-            // First page initialization - try fetching from active sales first!
-            if (currentPage === 1 && accumulated.length === 0) {
-                try {
-                    const salesRes = await getSalesApi(50, 1, lang);
-                    if (salesRes && salesRes.data && salesRes.data.length > 0) {
-                        const seen = new Set<string>();
-                        const uniquePromo: Product[] = [];
-                        
-                        // Fetch in batches of 5 sales to prevent long execution and network overload
-                        const batchSize = 5;
-                        for (let i = 0; i < salesRes.data.length; i += batchSize) {
-                            const batch = salesRes.data.slice(i, i + batchSize);
-                            const productsPromises = batch.map(async (sale) => {
-                                try {
-                                    const res = await getProductsApi({ saleId: parseInt(sale.id), limit: 20, silent: true }, lang);
-                                    return res.data || [];
-                                } catch (err) {
-                                    console.warn(`[Search] Failed to fetch products for sale ${sale.id}:`, err);
-                                    return [];
-                                }
-                            });
-                            
-                            const productsLists = await Promise.all(productsPromises);
-                            const allSaleProducts = productsLists.flat();
-                            
-                            // Filter: oldCost > cost and deduplicate
-                            for (const item of allSaleProducts) {
-                                if (item.oldCost && item.oldCost > item.cost && !seen.has(String(item.id))) {
-                                    seen.add(String(item.id));
-                                    uniquePromo.push(item);
-                                }
-                            }
-                            
-                            // If we have collected enough items, stop requesting products for remaining sales
-                            if (uniquePromo.length >= targetCount) {
-                                break;
-                            }
-                        }
-                        
-                        accumulated = uniquePromo;
-                        
-                        // If we loaded enough from sales, we can complete or mark hasMore accordingly
-                        if (accumulated.length >= targetCount) {
-                            hasMore = false;
-                        }
-                    }
-                } catch (salesErr) {
-                    console.warn("[Search] Failed to fetch sales for proposals:", salesErr);
+            const limit = 10;
+            const res = await getSaleProductsApi(limit, 1, lang);
+            if (res && res.data && res.data.length > 0) {
+                setFeaturedProposals(res.data);
+                setProposalsPage(1);
+                setHasMoreProposals(res.has_more_pages);
+
+                // Proactively prefetch page 2 in background right after page 1 finishes
+                if (res.has_more_pages) {
+                    isLoadingProposalsRef.current = false;
+                    fetchProposalsNextPage(2, res.data);
+                    return;
                 }
-            }
-
-            // Fallback: if we still need more or couldn't get any from sales, fetch page-by-page from general products
-            while (accumulated.length < targetCount && hasMore) {
-                const limit = 40;
-                const res = await getProductsApi({ limit, page: currentPage }, lang);
-                const promoItems = res.data.filter(p => p.oldCost && p.oldCost > p.cost);
-
-                const existingIds = new Set(accumulated.map(p => p.id));
-                const newItems = promoItems.filter(p => !existingIds.has(p.id));
-                accumulated = [...accumulated, ...newItems];
-
-                hasMore = res.has_more_pages;
-                if (hasMore && accumulated.length < targetCount) {
-                    currentPage++;
-                } else {
-                    break;
-                }
+            } else {
+                setFeaturedProposals([]);
+                setHasMoreProposals(false);
             }
         } catch (err) {
-            console.error("Error fetching proposals:", err);
+            console.error("Error fetching initial sale products:", err);
         } finally {
-            if (accumulated.length === 0) {
-                accumulated = Array.from({ length: 10 }, (_, i) => ({
-                    id: `mock-promo-${i}`,
-                    name: lang === 'ru' ? `Акционный Товар ${i + 1}` : `Акційний Товар ${i + 1}`,
-                    slug: `mock-promo-${i}`,
-                    cost: 100 + i * 10,
-                    oldCost: 150 + i * 10,
-                    unit: 'кг',
-                    multiplier: 1,
-                    is_new: false,
-                    available: true,
-                    portionSize: '1 кг',
-                    isWeighty: true,
-                    hasCostVariants: false,
-                    specifications: [
-                        { name: 'вага', values: ['1 кг'] }
-                    ],
-                    image: {
-                        url: {
-                            big: '/images/product-placeholder.svg'
-                        }
-                    }
-                } as unknown as Product));
-            }
-            setFeaturedProposals(accumulated);
-            setProposalsPage(currentPage);
-            setHasMoreProposals(hasMore);
             setIsProposalsLoading(false);
             isLoadingProposalsRef.current = false;
         }
-    }, [lang]);
+    }, [lang, fetchProposalsNextPage]);
 
     // Initial data fetch when active
     useEffect(() => {
         if (isActive) {
             // Fetch popular queries
             getSearchPopularQueriesApi(undefined, 6, lang).then(setPopularQueries).catch(console.error);
-            fetchProposals(1, 10, []);
+            fetchInitialProposals();
         } else {
             setFeaturedProposals([]);
             setProposalsPage(1);
             setHasMoreProposals(true);
             setCurrentSlide(0);
         }
-    }, [isActive, lang, fetchProposals]);
+    }, [isActive, lang, fetchInitialProposals]);
 
-    // Lazy load more proposals as swiper index moves closer to the end
+    // Proactive background preloading as swiper index gets within 3 slides of the end
     useEffect(() => {
         if (isActive && featuredProposals.length > 0 && hasMoreProposals && !isLoadingProposalsRef.current) {
-            if (currentSlide >= featuredProposals.length - 2) {
-                fetchProposals(proposalsPage, 5, featuredProposals);
+            if (currentSlide >= featuredProposals.length - 3) {
+                fetchProposalsNextPage(proposalsPage + 1, featuredProposals);
             }
         }
-    }, [currentSlide, featuredProposals, hasMoreProposals, proposalsPage, fetchProposals, isActive]);
+    }, [currentSlide, featuredProposals, hasMoreProposals, proposalsPage, fetchProposalsNextPage, isActive]);
 
     // Debounced search fetch
     useEffect(() => {
@@ -662,13 +607,15 @@ export default function Search({ lang, categories }: { lang: Locale; categories?
                                                         {featuredProposals.length > 1 ? (
                                                             <div className={s.sliderWrapper}>
                                                                 <Swiper
-                                                                    key={featuredProposals.length}
+                                                                    key="search-proposals-swiper"
                                                                     modules={[Pagination]}
                                                                     pagination={{
                                                                         clickable: true,
                                                                         dynamicBullets: true,
                                                                         dynamicMainBullets: 1
                                                                     }}
+                                                                    loop={false}
+                                                                    rewind={false}
                                                                     spaceBetween={0}
                                                                     slidesPerView={1}
                                                                     onSlideChange={(swiper) => {

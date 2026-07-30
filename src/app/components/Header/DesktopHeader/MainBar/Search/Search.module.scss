@@ -648,26 +648,19 @@
         .swiper-pagination {
             position: absolute;
             bottom: 0 !important;
-            left: 50% !important;
-            transform: translateX(-50%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 12px;
             z-index: 10;
         }
 
         .swiper-pagination-bullet {
             background: #DADADA;
             opacity: 1;
-            width: 10px;
-            height: 10px;
-            margin: 0 4px !important;
-            transition: transform 0.3s, background-color 0.3s;
+            border-radius: 50%;
+            transition: background-color 0.3s;
         }
 
         .swiper-pagination-bullet-active {
             background: #E6000F;
+            border-radius: 50%;
         }
     }
 }
@@ -675,7 +668,7 @@
 div.swiperContainer {
     width: 100%;
     overflow: hidden;
-    padding-bottom: 44px;
+    padding-bottom: 32px;
 }
 
 .loadingPlaceholder {

@@ -847,6 +847,70 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string, tok
     return data.products;
 }
 
+const SALE_PRODUCTS_QUERY = /* GraphQL */ `
+    query SaleProducts($limit: Int, $page: Int) {
+        saleProducts(limit: $limit, page: $page) {
+            per_page
+            current_page
+            has_more_pages
+            data {
+                id
+                slug
+                categoryId
+                name
+                cost
+                oldCost
+                purchaseCost
+                purchaseOldCost
+                unit
+                multiplier
+                is_new
+                available
+                portionSize
+                isWeighty
+                hasCostVariants
+                specifications {
+                    name
+                    values
+                }
+                images {
+                    url {
+                        grid2x
+                        grid1x
+                        main2x
+                        main1x
+                        main3x
+                        big
+                    }
+                    title
+                    alt
+                }
+            }
+        }
+    }
+`;
+
+export async function getSaleProductsApi(limit = 10, page = 1, lang?: string, token?: string): Promise<ProductsResponse> {
+    const data = await gqlRequest<{ saleProducts: ProductsResponse }>(
+        SALE_PRODUCTS_QUERY,
+        { limit, page },
+        { cache: 'no-store', lang, token }
+    );
+    if (!data || !data.saleProducts) {
+        return {
+            per_page: limit,
+            current_page: page,
+            has_more_pages: false,
+            data: [],
+        };
+    }
+    if (!Array.isArray(data.saleProducts.data)) {
+        data.saleProducts.data = [];
+    }
+    return data.saleProducts;
+}
+
+
 
 export async function getProductsFilterApi(
     categoryId?: number,

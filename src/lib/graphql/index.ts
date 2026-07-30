@@ -29,6 +29,7 @@ export type {
 // Re-export products
 export {
     getProductsApi,
+    getSaleProductsApi,
     getProductByIdApi,
     getProductCostVariantsApi,
     getPopularProductsApi,
