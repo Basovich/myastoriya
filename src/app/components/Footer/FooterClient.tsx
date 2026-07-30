@@ -66,7 +66,7 @@ interface FooterProps {
 
 export default function FooterClient({ lang, initialSocialLinks }: FooterProps) {
     const pathname = usePathname();
-    const isMenuPage = /^\/(?:[a-z]{2}\/)?our-stores\/[^\/]+\/menu$/.test(pathname || "");
+    const isMenuPage = /^\/(?:[a-z]{2}\/)?menu(?:\/.*)?$/.test(pathname || "");
 
     const { footer, contact } = siteData;
 

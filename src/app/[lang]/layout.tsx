@@ -122,7 +122,7 @@ export default async function RootLayout({
   // Отримуємо x-pathname із заголовків запиту
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "";
-  const isMenuPage = pathname.includes("/menu") && pathname.includes("/our-stores/");
+  const isMenuPage = /^\/(?:[a-z]{2}\/)?menu(?:\/.*)?$/.test(pathname);
 
   let catalogTree: ProductCategory[] = [];
   let socialLinks: SocialLink[] = [];

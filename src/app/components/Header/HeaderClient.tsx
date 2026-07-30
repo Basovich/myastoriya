@@ -17,7 +17,7 @@ interface HeaderProps {
 
 export default function HeaderClient({ lang, initialCategories }: HeaderProps) {
     const pathname = usePathname();
-    const isMenuPage = /^\/(?:[a-z]{2}\/)?our-stores\/[^\/]+\/menu$/.test(pathname || "");
+    const isMenuPage = /^\/(?:[a-z]{2}\/)?menu(?:\/.*)?$/.test(pathname || "");
 
     const getRootCategories = (list: ProductCategory[]) => {
         const mainCat = list.find(c => String(c.id) === "768" || c.name.toLowerCase().includes("для сайта"));
