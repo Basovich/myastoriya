@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const defaultLocale = 'ua';
 const locales = ['ua', 'ru'];
 
 const PROTECTED_PATHS = ['/personal'];
