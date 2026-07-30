@@ -83,7 +83,7 @@ const cartPersistConfig = {
 const wishlistPersistConfig = {
     key: 'wishlist',
     storage,
-    // isSyncing is a transient guard flag — never persist it
+    // isSyncing is a transient guard flags — never persist it
     blacklist: ['isSyncing'],
     transforms: [generalExpireTransform],
 };

@@ -13,14 +13,15 @@ export default async function Privacy({
   const apiData = await getPrivacyPolicyApi();
   const webContent = apiData?.webText;
 
-  const labels = {
+  const labels: Record<string, { home: string; privacy: string }> = {
     ua: { home: "Головна", privacy: "Політика конфіденційності" },
     ru: { home: "Главная", privacy: "Политика конфиденциальности" }
-  }[lang] || { home: "Головна", privacy: "Політика конфіденційності" };
+  };
+  const currentLabels = labels[lang] || labels.ua;
 
   const breadcrumbs = [
-    { label: labels.home, href: "/" },
-    { label: labels.privacy }
+    { label: currentLabels.home, href: "/" },
+    { label: currentLabels.privacy }
   ];
 
   const content: PolicyPageContentItem[] = webContent

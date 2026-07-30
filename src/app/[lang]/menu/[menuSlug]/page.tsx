@@ -10,10 +10,10 @@ export const dynamic = "force-dynamic";
 export default async function MenuPage({
     params,
 }: {
-    params: Promise<{ lang: Locale; menuSlug: string }>;
+    params: Promise<{ lang: string; menuSlug: string }>;
 }) {
     const { lang, menuSlug } = await params;
-    const dict = await getDictionary(lang);
+    const dict = await getDictionary(lang as Locale);
 
     try {
         // Ресторани: menu slug → API slug (obolon → shop-1).

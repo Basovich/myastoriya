@@ -13,14 +13,15 @@ export default async function LoyaltyProgramRules({
   const apiData = await getTermsOfUseApi();
   const webContent = apiData?.webText;
 
-  const labels = {
+  const labels: Record<string, { home: string; loyalty: string }> = {
     ua: { home: "Головна", loyalty: "Правила програми лояльності" },
     ru: { home: "Главная", loyalty: "Правила программы лояльности" }
-  }[lang] || { home: "Головна", loyalty: "Правила програми лояльності" };
+  };
+  const currentLabels = labels[lang] || labels.ua;
 
   const breadcrumbs = [
-    { label: labels.home, href: "/" },
-    { label: labels.loyalty }
+    { label: currentLabels.home, href: "/" },
+    { label: currentLabels.loyalty }
   ];
 
   const content: PolicyPageContentItem[] = webContent

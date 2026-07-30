@@ -18,7 +18,7 @@ import clsx from "clsx";
 
 interface StoreMenuPageProps {
     shop: Shop;
-    lang: Locale;
+    lang: Locale | string;
     dict: Dictionary;
     initialMenu?: RestaurantMenuCategory[];
     initialCustomMenu?: ShopCustomMenuCategory[];

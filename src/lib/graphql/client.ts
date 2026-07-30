@@ -34,7 +34,7 @@ interface RequestOptions {
     cache?: RequestCache;
     /** Internal retry counter */
     _retryCount?: number;
-    /** Internal retry flag for token refresh */
+    /** Internal retry flags for token refresh */
     _isRetry?: boolean;
     /** Suppress console error logging for expected failures */
     silent?: boolean;
@@ -105,7 +105,7 @@ export async function gqlRequest<T>(
         }
     }
 
-    headers['Content-Language'] = options?.lang === 'ru' ? 'ru_RU' : 'uk_UA';
+    headers['Content-Language'] = options?.lang === 'ru' ? 'ru_RU' : options?.lang === 'en' ? 'en_US' : 'uk_UA';
 
     let body: BodyInit = JSON.stringify({ query, variables });
 

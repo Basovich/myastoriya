@@ -13,14 +13,15 @@ export default async function OfertaPage({
   const apiData = await getContractOfferApi();
   const webContent = apiData?.webText;
 
-  const labels = {
+  const labels: Record<string, { home: string; oferta: string }> = {
     ua: { home: "Головна", oferta: "Публічна оферта" },
     ru: { home: "Главная", oferta: "Публичная оферта" }
-  }[lang] || { home: "Головна", oferta: "Публічна оферта" };
+  };
+  const currentLabels = labels[lang] || labels.ua;
 
   const breadcrumbs = [
-    { label: labels.home, href: "/" },
-    { label: labels.oferta }
+    { label: currentLabels.home, href: "/" },
+    { label: currentLabels.oferta }
   ];
 
   const content: PolicyPageContentItem[] = webContent
