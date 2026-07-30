@@ -3,7 +3,6 @@ import s from './StoreMenuHero.module.scss';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Locale } from '@/i18n/config';
 import clsx from 'clsx';
 
 interface StoreMenuHeroProps {

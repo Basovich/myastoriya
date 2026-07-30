@@ -36,16 +36,14 @@ const getCategoryImage = (name?: string | null): string => {
     return "/images/cat-restaurant.png";
 };
 
-const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, dict, initialMenu = [], initialCustomMenu = [] }) => {
+const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ lang, initialMenu = [], initialCustomMenu = [] }) => {
     // Filter out products that are not available (available === 0)
-    const resolvedMenu = initialMenu
+    const foodCategories = initialMenu
         .map(cat => ({
             ...cat,
             products: cat.products.filter(p => p.available > 0)
         }))
         .filter(cat => cat.products.length > 0);
-    // All categories from restaurantMenu are treated as food/standard grid categories now
-    const foodCategories = resolvedMenu;
 
     const categories: CategoryCircleItem[] = foodCategories.map(cat => ({
         name: cat.name,
