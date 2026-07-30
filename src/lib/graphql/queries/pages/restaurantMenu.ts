@@ -1,8 +1,8 @@
 import { gqlRequest } from "../../client";
 
 export const RESTAURANT_MENU_QUERY = `
-  query RestaurantMenu($shopId: Int!) {
-    restaurantMenu(shopId: $shopId) {
+  query RestaurantMenu($shopSlug: String, $shopId: Int) {
+    restaurantMenu(shopSlug: $shopSlug, shopId: $shopId) {
       id
       name  
       products {
@@ -71,12 +71,18 @@ export interface RestaurantMenuResponse {
 }
 
 export const getRestaurantMenuApi = async (
-  shopId: number,
+  shopIdentifier: string | number | { shopSlug?: string; shopId?: number },
   lang: string = "ua"
 ): Promise<RestaurantMenuResponse> => {
+  const variables = typeof shopIdentifier === "object"
+    ? shopIdentifier
+    : typeof shopIdentifier === "string"
+      ? { shopSlug: shopIdentifier }
+      : { shopId: shopIdentifier };
+
   return await gqlRequest<RestaurantMenuResponse>(
     RESTAURANT_MENU_QUERY,
-    { shopId },
+    variables,
     { lang, next: { revalidate: 300 } }
   );
 };
@@ -101,8 +107,8 @@ export interface ShopCustomMenuResponse {
 }
 
 export const SHOP_CUSTOM_MENU_QUERY = `
-  query ShopCustomMenu($shopId: Int!) {
-    shopCustomMenu(shopId: $shopId) {
+  query ShopCustomMenu($shopSlug: String, $shopId: Int) {
+    shopCustomMenu(shopSlug: $shopSlug, shopId: $shopId) {
       id
       name
       subtitle
@@ -118,12 +124,19 @@ export const SHOP_CUSTOM_MENU_QUERY = `
 `;
 
 export const getShopCustomMenuApi = async (
-  shopId: number,
+  shopIdentifier: string | number | { shopSlug?: string; shopId?: number },
   lang: string = "ua"
 ): Promise<ShopCustomMenuResponse> => {
+  const variables = typeof shopIdentifier === "object"
+    ? shopIdentifier
+    : typeof shopIdentifier === "string"
+      ? { shopSlug: shopIdentifier }
+      : { shopId: shopIdentifier };
+
   return await gqlRequest<ShopCustomMenuResponse>(
     SHOP_CUSTOM_MENU_QUERY,
-    { shopId },
+    variables,
     { lang, next: { revalidate: 300 } }
   );
 };
+

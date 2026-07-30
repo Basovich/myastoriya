@@ -27,14 +27,12 @@ export default async function MenuPage({
             notFound();
         }
 
-        const shopIdNum = parseInt(shop.id, 10);
-
         const [menuResponse, customMenuResponse] = await Promise.all([
-            getRestaurantMenuApi(shopIdNum, lang).catch((error) => {
+            getRestaurantMenuApi(apiSlug, lang).catch((error) => {
                 console.error("Failed to fetch restaurant menu:", error);
                 return { restaurantMenu: [] };
             }),
-            getShopCustomMenuApi(shopIdNum, lang).catch((error) => {
+            getShopCustomMenuApi(apiSlug, lang).catch((error) => {
                 console.error("Failed to fetch custom store menu:", error);
                 return { shopCustomMenu: [] };
             }),
