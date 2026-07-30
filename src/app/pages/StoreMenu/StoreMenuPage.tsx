@@ -12,7 +12,6 @@ import StoreMenuHero from '@/app/components/StoreMenu/StoreMenuHero/StoreMenuHer
 import PromotionsSlider from '@/app/components/StoreMenu/PromotionsSlider/PromotionsSlider';
 import StoreMenuTabular from '@/app/components/StoreMenu/StoreMenuTabular/StoreMenuTabular';
 import { Shop } from '@/lib/graphql/queries/shops';
-import { menuData } from '@/app/pages/StoreMenu/store-menu.content';
 import { RestaurantMenuCategory, ShopCustomMenuCategory } from '@/lib/graphql/queries/pages/restaurantMenu';
 import clsx from "clsx";
 
@@ -45,14 +44,12 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, initialMenu =
         }))
         .filter(cat => cat.products.length > 0);
 
-    const storePromotions = (shop?.banners || []).map((banner, idx) => ({
+    const displayedPromotions = (shop?.banners || []).map((banner, idx) => ({
         id: idx,
         title: banner.title || undefined,
         alt: banner.alt || undefined,
         image: banner.url.size2x || banner.url.size1x || banner.url.size3x || '/images/store/menu_promo.png',
     }));
-
-    const displayedPromotions = storePromotions.length > 0 ? storePromotions : menuData.promotions;
 
     const categories: CategoryCircleItem[] = foodCategories.map(cat => ({
         name: cat.name,
