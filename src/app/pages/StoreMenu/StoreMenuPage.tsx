@@ -36,7 +36,7 @@ const getCategoryImage = (name?: string | null): string => {
     return "/images/cat-restaurant.png";
 };
 
-const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ lang, initialMenu = [], initialCustomMenu = [] }) => {
+const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, initialMenu = [], initialCustomMenu = [] }) => {
     // Filter out products that are not available (available === 0)
     const foodCategories = initialMenu
         .map(cat => ({
@@ -44,6 +44,15 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ lang, initialMenu = [], i
             products: cat.products.filter(p => p.available > 0)
         }))
         .filter(cat => cat.products.length > 0);
+
+    const storePromotions = (shop?.banners || []).map((banner, idx) => ({
+        id: idx,
+        title: banner.title || undefined,
+        alt: banner.alt || undefined,
+        image: banner.url.size2x || banner.url.size1x || banner.url.size3x || '/images/store/menu_promo.png',
+    }));
+
+    const displayedPromotions = storePromotions.length > 0 ? storePromotions : menuData.promotions;
 
     const categories: CategoryCircleItem[] = foodCategories.map(cat => ({
         name: cat.name,
@@ -82,14 +91,16 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ lang, initialMenu = [], i
             <main className={s.page}>
                 <StoreMenuHero lang={lang} />
                 
-                <section className={s.whiteSection}>
-                    <div className={s.container}>
-                        <PromotionsSlider 
-                            promotions={menuData.promotions} 
-                            title="АКЦІЯ В ЗАКЛАДІ"
-                        />
-                    </div>
-                </section>
+                {displayedPromotions.length > 0 && (
+                    <section className={s.whiteSection}>
+                        <div className={s.container}>
+                            <PromotionsSlider 
+                                promotions={displayedPromotions} 
+                                title="АКЦІЯ В ЗАКЛАДІ"
+                            />
+                        </div>
+                    </section>
+                )}
 
                 <section className={clsx(s.whiteSection, s.pt)}>
                     <div className={s.container}>

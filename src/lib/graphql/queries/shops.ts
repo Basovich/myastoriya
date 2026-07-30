@@ -39,6 +39,15 @@ export const SHOPS_QUERY = `
           size2x
           size3x
         }
+        banners {
+          title
+          alt
+          url {
+            size1x
+            size2x
+            size3x
+          }
+        }
       }
       per_page
       current_page
@@ -84,6 +93,15 @@ export const SHOP_BY_SLUG_QUERY = `
         size2x
         size3x
       }
+      banners {
+        title
+        alt
+        url {
+          size1x
+          size2x
+          size3x
+        }
+      }
     }
   }
 `;
@@ -126,6 +144,15 @@ export const SHOP_BY_ID_QUERY = `
         size2x
         size3x
       }
+      banners {
+        title
+        alt
+        url {
+          size1x
+          size2x
+          size3x
+        }
+      }
     }
   }
 `;
@@ -162,6 +189,12 @@ export interface ShopSizeImages {
   size3x: string | null;
 }
 
+export interface ShopBanner {
+  title?: string | null;
+  alt?: string | null;
+  url: ShopSizeImages;
+}
+
 export interface Shop {
   id: string;
   name: string;
@@ -181,6 +214,7 @@ export interface Shop {
   images?: { title?: string | null; alt?: string | null; url: ShopSizeImages }[] | null;
   image?: ShopSizeImages | null;
   icon?: ShopSizeImages | null;
+  banners?: ShopBanner[] | null;
 }
 
 export interface ShopsResponse {

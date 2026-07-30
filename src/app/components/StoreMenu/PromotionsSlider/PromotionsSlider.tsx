@@ -13,7 +13,8 @@ import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 
 interface Promotion {
     id: number | string;
-    title: string;
+    title?: string;
+    alt?: string;
     image: string;
     badge?: string;
 }
@@ -62,15 +63,15 @@ const PromotionsSlider: React.FC<PromotionsSliderProps> = ({ promotions, title }
                 slidesPerView={1}
                 className={s.swiper}
             >
-                {promotions.map((promo) => (
+                {promotions.map((promo, idx) => (
                     <SwiperSlide key={promo.id}>
                         <div className={s.slide}>
                             <Image
-                                src="/images/store/menu_promo.png"
-                                alt={promo.title}
+                                src={promo.image}
+                                alt={promo.title || promo.alt || title || "Акція в закладі"}
                                 fill
                                 className={s.promoImg}
-                                priority
+                                priority={idx === 0}
                             />
                         </div>
                     </SwiperSlide>
