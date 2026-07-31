@@ -1,7 +1,7 @@
 "use client";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, EffectFade } from "swiper/modules";
+import { Navigation, Pagination, EffectFade, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/navigation";
@@ -81,8 +81,12 @@ export default function Hero({ slides, lang }: HeroProps) {
     return (
         <section className={s.hero} id="hero">
             <Swiper
-                modules={[Navigation, Pagination, EffectFade]}
+                modules={[Navigation, Pagination, EffectFade, Autoplay]}
                 effect="fade"
+                autoplay={{
+                    delay: 5000,
+                    disableOnInteraction: false,
+                }}
                 navigation={{
                     prevEl: ".hero-swiper-prev",
                     nextEl: ".hero-swiper-next",
