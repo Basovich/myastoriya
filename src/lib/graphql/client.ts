@@ -76,7 +76,7 @@ const getFiles = (obj: unknown, path = ''): Array<{ path: string, file: File | B
  */
 export async function gqlRequest<T>(
     query: string,
-    variables?: Record<string, unknown>,
+    variables?: Record<string, any>,
     options?: RequestOptions,
 ): Promise<T> {
     const headers: Record<string, string> = {
@@ -280,7 +280,7 @@ async function performRequest<T>(
     headers: Record<string, string>,
     body: BodyInit,
     query: string,
-    variables?: Record<string, unknown>,
+    variables?: Record<string, any>,
     options?: RequestOptions
 ): Promise<{ data: T; text: string }> {
     const res = await fetch(endpoint, {

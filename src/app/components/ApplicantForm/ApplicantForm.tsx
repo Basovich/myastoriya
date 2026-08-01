@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useParams } from 'next/navigation';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
@@ -13,13 +14,70 @@ import CustomSelect from '@/app/components/ui/CustomSelect';
 import clsx from "clsx";
 
 import { PHONE_REGEX } from '@/lib/utils/phone';
+import { 
+    getCareerPositionsApi, 
+    submitCareerApplicationApi, 
+    getLocalitiesApi,
+    CareerPosition,
+    Locality 
+} from '@/lib/graphql';
 
 interface ApplicantFormProps {
     dict: ApplicantFormPageDict['form'];
 }
 
 export default function ApplicantForm({ dict }: ApplicantFormProps) {
+    const params = useParams();
+    const lang = (params?.lang as string) || 'ua';
+
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [submitSuccessMessage, setSubmitSuccessMessage] = useState<string>('');
+    const [submitError, setSubmitError] = useState<string>('');
+    
+    const [positions, setPositions] = useState<CareerPosition[]>([]);
+    const [localities, setLocalities] = useState<Locality[]>([]);
+    const [isLoadingData, setIsLoadingData] = useState(true);
+
+    useEffect(() => {
+        const loadInitialData = async () => {
+            setIsLoadingData(true);
+            try {
+                const [fetchedPositions, localitiesRes] = await Promise.all([
+                    getCareerPositionsApi(undefined, lang),
+                    getLocalitiesApi(undefined, 50, 1, lang)
+                ]);
+                setPositions(fetchedPositions);
+                if (localitiesRes && localitiesRes.data) {
+                    setLocalities(localitiesRes.data);
+                }
+            } catch (error) {
+                console.error('Failed to load career form data:', error);
+            } finally {
+                setIsLoadingData(false);
+            }
+        };
+        loadInitialData();
+    }, [lang]);
+
+    const positionOptions = React.useMemo(() => {
+        if (positions.length > 0) {
+            return positions.map(p => ({ label: p.name, value: p.id }));
+        }
+        return [
+            { label: dict.options.manager || 'Менеджер', value: 'manager' },
+            { label: dict.options.cook || 'Шеф кухар', value: 'cook' },
+            { label: dict.options.cashier || 'Касир', value: 'cashier' },
+        ];
+    }, [positions, dict]);
+
+    const locationOptions = React.useMemo(() => {
+        if (localities.length > 0) {
+            return localities.map(loc => ({ label: loc.name, value: String(loc.id) }));
+        }
+        return [
+            { label: dict.options.kyiv || 'м. Київ', value: '2581' },
+        ];
+    }, [localities, dict]);
 
     const validationSchema = Yup.object({
         fullName: Yup.string().required(dict.errors.required),
@@ -47,12 +105,37 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
         },
         validationSchema,
         onSubmit: async (values, { setSubmitting, resetForm }) => {
+            setSubmitError('');
             try {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                setIsSubmitted(true);
-                resetForm();
+                const parsedPositionId = parseInt(values.desiredPosition, 10);
+                const isNumericPosId = !isNaN(parsedPositionId);
+                const matchedPosition = positions.find(p => p.id === values.desiredPosition);
+
+                const parsedLocalityId = parseInt(values.location, 10);
+                const isNumericLocId = !isNaN(parsedLocalityId);
+
+                const result = await submitCareerApplicationApi({
+                    fullName: values.fullName,
+                    dob: values.dob,
+                    phone: values.phone,
+                    desiredPosition: matchedPosition ? matchedPosition.name : values.desiredPosition,
+                    careerPositionId: isNumericPosId ? parsedPositionId : undefined,
+                    localityId: isNumericLocId ? parsedLocalityId : undefined,
+                    hasExperience: values.hasExperience === 'yes',
+                    additionalInfo: values.additionalInfo || undefined,
+                    consent: values.consent,
+                }, lang);
+
+                if (result.success) {
+                    setIsSubmitted(true);
+                    setSubmitSuccessMessage(result.message || '');
+                    resetForm();
+                } else {
+                    setSubmitError(result.message || 'Не вдалося відправити заявку. Спробуйте ще раз.');
+                }
             } catch (error) {
-                console.error(error);
+                console.error('Error submitting career application:', error);
+                setSubmitError('Сталася помилка при відправці заявки. Будь ласка, спробуйте пізніше.');
             } finally {
                 setSubmitting(false);
             }
@@ -72,13 +155,18 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
         return (
             <div className={s.successMessage}>
                 <h3>Дякуємо за вашу заявку!</h3>
-                <p>Ми зв&apos;яжемося з вами найближчим часом.</p>
+                <p>{submitSuccessMessage || "Ми зв'яжемося з вами найближчим часом."}</p>
             </div>
         );
     }
 
     return (
         <form className={s.form} onSubmit={formik.handleSubmit} noValidate>
+            {submitError && (
+                <div style={{ color: 'var(--color-error, #e53935)', marginBottom: '16px', fontWeight: 500 }}>
+                    {submitError}
+                </div>
+            )}
             <div className={s.grid}>
                 {/* Full Name */}
                 <InputField
@@ -134,11 +222,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                     <h3 className={s.groupTitle}>{dict.desiredPosition}</h3>
                     <CustomSelect
                         value={formik.values.desiredPosition}
-                        options={[
-                            { label: dict.options.manager, value: 'manager' },
-                            { label: dict.options.cook, value: 'cook' },
-                            { label: dict.options.cashier, value: 'cashier' },
-                        ]}
+                        options={positionOptions}
                         onChange={(val) => formik.setFieldValue('desiredPosition', val)}
                         onBlur={() => formik.setFieldTouched('desiredPosition', true)}
                         placeholder={dict.options.chooseVariant}
@@ -188,9 +272,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                     <h3 className={s.groupTitle}>{dict.location}</h3>
                     <CustomSelect
                         value={formik.values.location}
-                        options={[
-                            { label: dict.options.kyiv, value: 'kyiv' },
-                        ]}
+                        options={locationOptions}
                         onChange={(val) => formik.setFieldValue('location', val)}
                         onBlur={() => formik.setFieldTouched('location', true)}
                         placeholder={dict.options.chooseVariant}
@@ -241,7 +323,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                     type="submit"
                     variant="red"
                     className={s.submitBtn}
-                    disabled={formik.isSubmitting}
+                    disabled={formik.isSubmitting || isLoadingData}
                 >
                     {dict.submitText}
                 </Button>
@@ -249,3 +331,4 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
         </form>
     );
 }
+

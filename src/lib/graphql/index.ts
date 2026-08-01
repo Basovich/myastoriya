@@ -167,8 +167,8 @@ export { getContactsCategoriesApi } from './queries/pages/contacts';
 export type { Contact, ContactCategory, ContactSchedule, ContactsCategoriesResponse } from './queries/pages/contacts';
 
 // Re-export career
-export { getCareerApi } from './queries/pages/career';
-export type { Career } from './queries/pages/career';
+export { getCareerApi, getCareerPositionsApi, submitCareerApplicationApi } from './queries/pages/career';
+export type { Career, CareerPosition, SubmitCareerApplicationInput, CareerApplicationResult } from './queries/pages/career';
 
 // Re-export orders
 export { getOrdersApi, repeatOrderApi, getOrderApi } from './queries/orders';
