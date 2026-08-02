@@ -66,33 +66,33 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
     const pDict = personalDict[lang];
     const dict = localDict[lang];
 
-    const fetchPoints = async () => {
-        try {
-            setIsLoading(true);
-
-            try {
-                const shopsRes = await getShopsApi({ limit: 100, onlyCompanyStores: true }, lang);
-                setShops(shopsRes.shops.data);
-            } catch (err) {
-                console.error('Failed to fetch shops for mapping:', err);
-            }
-
-            const token = await getAccessToken();
-            if (token) {
-                const data = await getUserPickupPointsApi('brand_store', token, lang);
-                setPoints(data);
-            }
-        } catch (error) {
-            console.error('Failed to fetch user pickup points:', error);
-            Sentry.captureException(error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     useEffect(() => {
+        const fetchPoints = async () => {
+            try {
+                setIsLoading(true);
+
+                try {
+                    const shopsRes = await getShopsApi({ limit: 100, onlyCompanyStores: true }, lang);
+                    setShops(shopsRes.shops.data);
+                } catch (err) {
+                    console.error('Failed to fetch shops for mapping:', err);
+                }
+
+                const token = await getAccessToken();
+                if (token) {
+                    const data = await getUserPickupPointsApi('brand_store', token, lang);
+                    setPoints(data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch user pickup points:', error);
+                Sentry.captureException(error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
         fetchPoints();
-    }, []);
+    }, [lang]);
 
     const handleSetDefault = async (id: string) => {
         try {
