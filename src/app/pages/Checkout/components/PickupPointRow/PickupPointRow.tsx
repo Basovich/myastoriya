@@ -51,6 +51,7 @@ function PickupPointCard({
         : '';
 
     const title = lang === 'ua' ? "Заклад М'ясторія" : "Заведение М'ясторія";
+    const defaultLabel = lang === 'ua' ? "Основна" : "Основной";
 
     const handleCardClick = () => {
         if (matchedShop) {
@@ -63,11 +64,20 @@ function PickupPointCard({
 
     return (
         <div 
-            className={clsx(s.pickupCard, isSelected && s.pickupCardActive)}
+            className={clsx(
+                s.pickupCard, 
+                point.isDefault && s.pickupCardDefault,
+                isSelected && s.pickupCardActive
+            )}
             onClick={handleCardClick}
         >
             <div className={s.cardHeader}>
-                <span className={s.cardTitle}>{title}</span>
+                <div className={s.headerLeft}>
+                    <span className={s.cardTitle}>{title}</span>
+                    {point.isDefault && (
+                        <span className={s.defaultBadge}>{defaultLabel}</span>
+                    )}
+                </div>
                 <div className={s.storeLogo}>
                     <Image 
                         src="/icons/logo-red.svg" 

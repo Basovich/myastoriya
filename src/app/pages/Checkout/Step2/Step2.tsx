@@ -136,6 +136,7 @@ export default function Step2() {
     const [isSearchingNP, setIsSearchingNP] = useState(false);
 
     const prevCityIdRef = useRef<number | null>(null);
+    const hasAutoAppliedDefaultShopRef = useRef(false);
     const deliveryMethodRef = useRef(deliveryMethod);
     useEffect(() => {
         deliveryMethodRef.current = deliveryMethod;
@@ -552,7 +553,9 @@ export default function Step2() {
             return c1 === c2 || c1.includes(c2) || c2.includes(c1);
         });
 
-        return filtered.map(addr => {
+        const sorted = [...filtered].sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+
+        return sorted.map(addr => {
             const title = lang === 'ua' 
                 ? (addr.isDefault ? 'Основна адреса' : 'Адреса') 
                 : (addr.isDefault ? 'Основной адрес' : 'Адрес');
@@ -604,7 +607,8 @@ export default function Step2() {
     }, [addresses, selectedAddressId]);
 
     const pickupPoints = React.useMemo(() => {
-        const list = [...userPickupPoints, ...guestPickupPoints];
+        const sortedUserPoints = [...userPickupPoints].sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+        const list = [...sortedUserPoints, ...guestPickupPoints];
         const seen = new Set<string>();
         return list.filter(point => {
             const matchedShop = shops.find(s => s.name === point.name || s.siteName === point.name);
@@ -626,9 +630,19 @@ export default function Step2() {
             .filter((id): id is string => !!id);
     }, [pickupPoints, shops]);
 
-    // Set default selected shop
+    // Set default selected shop (prioritize user's primary/default pickup point)
     useEffect(() => {
-        if (pickupPoints.length > 0) {
+        if (pickupPoints.length > 0 && shops.length > 0) {
+            const userDefaultPoint = userPickupPoints.find(p => p.isDefault);
+            if (userDefaultPoint && !hasAutoAppliedDefaultShopRef.current) {
+                const matchedShop = shops.find(s => s.name === userDefaultPoint.name || s.siteName === userDefaultPoint.name);
+                if (matchedShop) {
+                    setSelectedShopId(matchedShop.id.toString());
+                    hasAutoAppliedDefaultShopRef.current = true;
+                    return;
+                }
+            }
+
             const exists = pickupPoints.some(point => {
                 const matchedShop = shops.find(s => s.name === point.name || s.siteName === point.name);
                 return matchedShop && matchedShop.id.toString() === selectedShopId;
@@ -641,7 +655,7 @@ export default function Step2() {
                 }
             }
         }
-    }, [pickupPoints, shops, selectedShopId]);
+    }, [pickupPoints, userPickupPoints, shops, selectedShopId]);
 
     // Restore selected shop from restoredData / localStorage as virtual guest point if not in user points
     useEffect(() => {

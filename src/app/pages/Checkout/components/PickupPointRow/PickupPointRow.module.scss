@@ -22,7 +22,7 @@
     min-height: 118px;
     min-width: 208px;
     background: #fff;
-    border: none;
+    border: 1.5px solid transparent;
     border-radius: 12px;
     padding: 16px;
     display: flex;
@@ -30,7 +30,7 @@
     justify-content: space-between;
     cursor: pointer;
     box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.11);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 
     @media (any-hover: hover) {
         &:hover {
@@ -45,6 +45,10 @@
     }
 }
 
+.pickupCardDefault {
+    border: 1.5px solid #E3051B;
+}
+
 .pickupCardActive {
     outline: 1.5px solid #E3051B;
     box-shadow: 0 4px 12px rgba(227, 5, 27, 0.15);
@@ -55,6 +59,24 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.defaultBadge {
+    font-size: 9px;
+    font-weight: 700;
+    color: #E3051B;
+    background: rgba(227, 5, 27, 0.08);
+    border: 1px solid rgba(227, 5, 27, 0.2);
+    border-radius: 4px;
+    padding: 1px 4px;
+    line-height: 1;
+    text-transform: uppercase;
 }
 
 .cardTitle {
