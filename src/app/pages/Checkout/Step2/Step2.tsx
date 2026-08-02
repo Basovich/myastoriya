@@ -772,7 +772,8 @@ export default function Step2() {
             if (isShop || isNP) {
                 const token = await getAccessToken();
                 const type = isShop ? 'brand_store' : 'nova_poshta';
-                const key = isShop ? selectedShopId : selectedNPRef;
+                const matchedShop = isShop ? shops.find(s => s.id.toString() === selectedShopId) : null;
+                const key = isShop ? (matchedShop?.siteName || matchedShop?.name || selectedShopId) : selectedNPRef;
                 
                 const pickupPoint = await addUserPickupPointApi(type, key, token || '', lang);
                 finalPickupPointId = parseInt(pickupPoint.id, 10);
@@ -883,7 +884,7 @@ export default function Step2() {
         try {
             const token = await getAccessToken();
             if (token && isAuthenticated) {
-                const newPoint = await addUserPickupPointApi('brand_store', store.id, token, lang);
+                const newPoint = await addUserPickupPointApi('brand_store', store.name, token, lang);
                 setUserPickupPoints(prev => {
                     if (prev.some(p => p.id === newPoint.id)) return prev;
                     return [...prev, newPoint];

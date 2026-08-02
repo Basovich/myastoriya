@@ -160,7 +160,7 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
         try {
             const token = await getAccessToken();
             if (token) {
-                const newPoint = await addUserPickupPointApi('brand_store', store.id, token, lang);
+                const newPoint = await addUserPickupPointApi('brand_store', store.name, token, lang);
                 setPoints(prev => [...prev, newPoint]);
             }
         } catch (error) {
