@@ -278,7 +278,6 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingS
                                         mapContainerStyle={containerStyle}
                                         center={selectedStore ? {lat: selectedStore.lat, lng: selectedStore.lng} : defaultCenter}
                                         zoom={selectedStore ? 15 : 11}
-                                        onLoad={onMapLoad}
                                         options={{
                                             styles: DARK_MAP_STYLE,
                                             disableDefaultUI: true,
