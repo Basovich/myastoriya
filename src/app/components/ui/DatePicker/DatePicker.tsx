@@ -35,6 +35,7 @@ interface DatePickerProps {
     arrowVariant?: 'down' | 'right';
     lang?: 'ua' | 'ru';
     prefixLabel?: string;
+    popperPlacement?: string;
 }
 
 const CustomInput = forwardRef<
@@ -172,7 +173,8 @@ export default function DatePicker({
     leftIcon,
     arrowVariant,
     lang,
-    prefixLabel
+    prefixLabel,
+    popperPlacement
 }: DatePickerProps) {
     const isValidDate = selected instanceof Date && !isNaN(selected.getTime());
     const safeSelected = isValidDate ? selected : null;
@@ -228,6 +230,7 @@ export default function DatePicker({
                         startDate={startDate || undefined}
                         endDate={endDate || undefined}
                         selected={selectsRange ? null : safeSelected}
+                        popperPlacement={popperPlacement || "bottom"}
                         onChange={(val: Date | [Date | null, Date | null] | null) => {
                             if (selectsRange) {
                                 if (onChangeRange) {

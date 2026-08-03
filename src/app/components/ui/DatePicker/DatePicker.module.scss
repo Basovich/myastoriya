@@ -16,6 +16,8 @@
 
         .react-datepicker-popper {
             z-index: 100;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
         }
 
         .react-datepicker__triangle {
@@ -322,6 +324,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    margin-top: -2px;
 }
 
 .selectValue {

@@ -31,8 +31,10 @@ import { GraphQLError } from '@/lib/graphql/client';
 import { 
     getUserBankCardsApi, 
     requestTokenizeCardApi, 
+    getDeliveryTimesApi,
     type UserBankCard 
 } from '@/lib/graphql';
+import ReselectDeliveryTimeModal from '@/app/components/ReselectDeliveryTimeModal/ReselectDeliveryTimeModal';
 
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -40,6 +42,33 @@ import {
 function formatPhone(phone: string): string {
     const digits = phone.replace(/\D/g, '');
     return digits ? `+${digits}` : phone;
+}
+
+function formatDeliveryTimesDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    
+    const now = new Date();
+    const isToday = date.getFullYear() === now.getFullYear() &&
+                    date.getMonth() === now.getMonth() &&
+                    date.getDate() === now.getDate();
+                    
+    if (isToday) {
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}.000000`;
+    }
+
+    return `${yyyy}-${mm}-${dd} 00:00:00.000000`;
+}
+
+function formatDate(date: Date): string {
+    const dd = String(date.getDate()).padStart(2, '0');
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${dd}.${mm}.${yyyy}`;
 }
 
 // ── Mock Data ────────────────────────────────────────────────────────────────
@@ -79,6 +108,11 @@ export default function Step3({ lang }: Step3Props) {
     const [submitError, setSubmitError] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
     const [successOrderInfo, setSuccessOrderInfo] = useState<{ id: string; total: number; currency: string; wasGuest?: boolean } | null>(null);
+
+    // Stale delivery time modal state
+    const [isReselectTimeModalOpen, setIsReselectTimeModalOpen] = useState(false);
+    const [staleDeliveryId, setStaleDeliveryId] = useState<number | null>(null);
+    const [staleInitialDate, setStaleInitialDate] = useState<Date | null>(null);
 
     // UI state
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
@@ -276,6 +310,40 @@ export default function Step3({ lang }: Step3Props) {
     };
 
 
+    const handleReselectDeliveryTime = (newDate: Date, newTime: string) => {
+        const formattedDateStr = formatDate(newDate);
+        
+        const savedParamsStr = localStorage.getItem('checkout_delivery_params');
+        if (savedParamsStr) {
+            try {
+                const parsed = JSON.parse(savedParamsStr);
+                parsed.desiredDeliveryDate = formattedDateStr;
+                parsed.desiredDeliveryTime = newTime;
+                localStorage.setItem('checkout_delivery_params', JSON.stringify(parsed));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        const savedDeliveryDataStr = localStorage.getItem('checkout_delivery_data');
+        if (savedDeliveryDataStr) {
+            try {
+                const parsed = JSON.parse(savedDeliveryDataStr);
+                parsed.deliveryDate = newDate.toISOString();
+                parsed.deliveryTime = newTime;
+                localStorage.setItem('checkout_delivery_data', JSON.stringify(parsed));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        setIsReselectTimeModalOpen(false);
+        
+        setTimeout(() => {
+            void handleSubmit();
+        }, 100);
+    };
+
     const handleSubmit = async () => {
         setSubmitError('');
         
@@ -306,6 +374,38 @@ export default function Step3({ lang }: Step3Props) {
         }
 
         setIsSubmitting(true);
+
+        // Pre-validate delivery time if specified
+        if (deliveryParams.deliveryId && deliveryParams.desiredDeliveryTime) {
+            let checkDate: Date = new Date();
+            if (savedDeliveryData?.deliveryDate) {
+                checkDate = new Date(savedDeliveryData.deliveryDate);
+            } else if (deliveryParams.desiredDeliveryDate) {
+                const parts = String(deliveryParams.desiredDeliveryDate).split('.');
+                if (parts.length === 3) {
+                    const dd = parseInt(parts[0], 10);
+                    const mm = parseInt(parts[1], 10) - 1;
+                    const yyyy = parseInt(parts[2], 10);
+                    checkDate = new Date(yyyy, mm, dd);
+                }
+            }
+
+            try {
+                const formattedDateStr = formatDeliveryTimesDate(checkDate);
+                const activeTimes = await getDeliveryTimesApi(Number(deliveryParams.deliveryId), formattedDateStr, lang);
+                
+                if (!activeTimes || activeTimes.length === 0 || !activeTimes.includes(deliveryParams.desiredDeliveryTime)) {
+                    setStaleDeliveryId(Number(deliveryParams.deliveryId));
+                    setStaleInitialDate(checkDate);
+                    setIsReselectTimeModalOpen(true);
+                    setIsSubmitting(false);
+                    return;
+                }
+            } catch (err) {
+                console.error('Failed to validate delivery time prior to submit:', err);
+            }
+        }
+
         try {
             const token = await getAccessToken();
 
@@ -422,6 +522,23 @@ export default function Step3({ lang }: Step3Props) {
             }
         } catch (e: unknown) {
             console.error('Failed to create order', e);
+
+            const isDeliveryTimeError = e instanceof GraphQLError && e.errors.some(err => {
+                const msgLower = (err.message || '').toLowerCase();
+                return msgLower.includes('time') || msgLower.includes('date') || msgLower.includes('час') || msgLower.includes('дат') || msgLower.includes('время');
+            });
+            if (isDeliveryTimeError && deliveryParams.deliveryId) {
+                let checkDate: Date = new Date();
+                if (savedDeliveryData?.deliveryDate) {
+                    checkDate = new Date(savedDeliveryData.deliveryDate);
+                }
+                setStaleDeliveryId(Number(deliveryParams.deliveryId));
+                setStaleInitialDate(checkDate);
+                setIsReselectTimeModalOpen(true);
+                setIsSubmitting(false);
+                return;
+            }
+
             let msg = lang === 'ru' 
                 ? 'Произошла ошибка при создании заказа. Пожалуйста, попробуйте еще раз.'
                 : 'Сталася помилка при створенні замовлення. Будь ласка, спробуйте ще раз.';
@@ -701,6 +818,14 @@ export default function Step3({ lang }: Step3Props) {
                 isOpen={isCartModalOpen} 
                 onClose={() => setIsCartModalOpen(false)} 
                 isCheckoutMode={true}
+            />
+            <ReselectDeliveryTimeModal 
+                isOpen={isReselectTimeModalOpen}
+                onClose={() => setIsReselectTimeModalOpen(false)}
+                onConfirm={handleReselectDeliveryTime}
+                deliveryId={staleDeliveryId || 0}
+                initialDate={staleInitialDate}
+                lang={lang as 'ua' | 'ru'}
             />
         </div>
     );
