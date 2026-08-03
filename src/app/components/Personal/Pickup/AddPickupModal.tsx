@@ -134,14 +134,19 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingS
         }
     };
 
+    const isStoreExisting = (storeId: string) => {
+        if (!existingShopIds || existingShopIds.length === 0) return false;
+        return existingShopIds.some(id => String(id) === String(storeId));
+    };
+
     const filteredStores = stores.filter(store => 
         (store.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
          store.name.toLowerCase().includes(searchQuery.toLowerCase())) &&
-        (!existingShopIds || !existingShopIds.includes(store.id))
+        !isStoreExisting(store.id)
     );
 
     const isAllStoresAdded = stores.length > 0 && 
-        stores.every(store => existingShopIds?.includes(store.id));
+        stores.every(store => isStoreExisting(store.id));
 
     const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
         setMap(mapInstance);
