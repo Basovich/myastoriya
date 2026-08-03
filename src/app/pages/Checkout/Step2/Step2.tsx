@@ -777,11 +777,20 @@ export default function Step2() {
             if (isShop || isNP) {
                 const token = await getAccessToken();
                 const type = isShop ? 'brand_store' : 'nova_poshta';
-                const matchedShop = isShop ? shops.find(s => s.id.toString() === selectedShopId) : null;
-                const key = isShop ? (matchedShop?.siteName || matchedShop?.name || selectedShopId) : selectedNPRef;
+                const key = isShop ? selectedShopId : selectedNPRef;
                 
-                const pickupPoint = await addUserPickupPointApi(type, key, token || '', lang);
-                finalPickupPointId = parseInt(pickupPoint.id, 10);
+                if (key) {
+                    if (token) {
+                        try {
+                            const pickupPoint = await addUserPickupPointApi(type, key, token, lang);
+                            finalPickupPointId = parseInt(pickupPoint.id, 10);
+                        } catch (err) {
+                            console.error('Failed to save pickup point for user:', err);
+                        }
+                    } else if (isShop && selectedShopId) {
+                        finalPickupPointId = parseInt(selectedShopId, 10);
+                    }
+                }
             }
             
             // Save state to localStorage for back navigation / reload restoration
@@ -889,7 +898,7 @@ export default function Step2() {
         try {
             const token = await getAccessToken();
             if (token && isAuthenticated) {
-                const newPoint = await addUserPickupPointApi('brand_store', store.name, token, lang);
+                const newPoint = await addUserPickupPointApi('brand_store', store.id, token, lang);
                 setUserPickupPoints(prev => {
                     if (prev.some(p => p.id === newPoint.id)) return prev;
                     return [...prev, newPoint];
@@ -909,8 +918,23 @@ export default function Step2() {
             }
             setSelectedShopId(store.id);
             setIsAddPickupModalOpen(false);
-        } catch (e) {
+        } catch (e: any) {
             console.error('Failed to add pickup point:', e);
+            let msg = lang === 'ua' ? 'Помилка при додаванні закладу' : 'Ошибка при добавлении заведения';
+            if (e?.errors && Array.isArray(e.errors) && e.errors.length > 0) {
+                const valObj = e.errors[0]?.extensions?.validation as Record<string, string[]> | undefined;
+                if (valObj) {
+                    const firstValKey = Object.keys(valObj)[0];
+                    if (firstValKey && valObj[firstValKey]?.[0]) {
+                        msg = valObj[firstValKey][0];
+                    }
+                } else if (e.errors[0]?.message) {
+                    msg = e.errors[0].message;
+                }
+            } else if (e?.message) {
+                msg = e.message;
+            }
+            setValidationError(msg);
         }
     };
 

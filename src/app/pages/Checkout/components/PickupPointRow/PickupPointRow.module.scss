@@ -45,12 +45,8 @@
     }
 }
 
-.pickupCardDefault {
-    border: 1.5px solid #E3051B;
-}
-
 .pickupCardActive {
-    outline: 1.5px solid #E3051B;
+    border-color: #E3051B;
     box-shadow: 0 4px 12px rgba(227, 5, 27, 0.15);
 }
 
@@ -65,18 +61,6 @@
     display: flex;
     align-items: center;
     gap: 6px;
-}
-
-.defaultBadge {
-    font-size: 9px;
-    font-weight: 700;
-    color: #E3051B;
-    background: rgba(227, 5, 27, 0.08);
-    border: 1px solid rgba(227, 5, 27, 0.2);
-    border-radius: 4px;
-    padding: 1px 4px;
-    line-height: 1;
-    text-transform: uppercase;
 }
 
 .cardTitle {
@@ -94,9 +78,9 @@
 .cardBody {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     flex: 1;
-    justify-content: center;
+    padding-top: 10px;
 }
 
 .cardAddress {
