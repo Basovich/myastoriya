@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Modal from 'react-modal';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import Image from 'next/image';
 import clsx from 'clsx';
 import s from './AddPickupModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
@@ -83,7 +82,6 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingS
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedStore, setSelectedStore] = useState<Store | null>(null);
     const { disableScroll, enableScroll } = useScrollLock();
-    const [map, setMap] = useState<google.maps.Map | null>(null);
 
     useEffect(() => {
         const fetchShops = async () => {
@@ -147,10 +145,6 @@ export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingS
 
     const isAllStoresAdded = stores.length > 0 && 
         stores.every(store => isStoreExisting(store.id));
-
-    const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
-        setMap(mapInstance);
-    }, []);
 
     const handleMarkerClick = (store: Store) => {
         setSelectedStore(store);

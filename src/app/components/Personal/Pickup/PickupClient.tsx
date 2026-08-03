@@ -165,21 +165,22 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
                 const newPoint = await addUserPickupPointApi('brand_store', store.id, token, lang);
                 setPoints(prev => [...prev, newPoint]);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Failed to add pickup point:', error);
             let msg = lang === 'ua' ? 'Помилка при додаванні закладу' : 'Ошибка при добавлении заведения';
-            if (error?.errors && Array.isArray(error.errors) && error.errors.length > 0) {
-                const valObj = error.errors[0]?.extensions?.validation as Record<string, string[]> | undefined;
+            const err = error as { errors?: Array<{ message?: string; extensions?: { validation?: Record<string, string[]> } }>; message?: string };
+            if (err?.errors && Array.isArray(err.errors) && err.errors.length > 0) {
+                const valObj = err.errors[0]?.extensions?.validation;
                 if (valObj) {
                     const firstValKey = Object.keys(valObj)[0];
                     if (firstValKey && valObj[firstValKey]?.[0]) {
                         msg = valObj[firstValKey][0];
                     }
-                } else if (error.errors[0]?.message) {
-                    msg = error.errors[0].message;
+                } else if (err.errors[0]?.message) {
+                    msg = err.errors[0].message;
                 }
-            } else if (error?.message) {
-                msg = error.message;
+            } else if (err?.message) {
+                msg = err.message;
             }
             setErrorMessage(msg);
         }

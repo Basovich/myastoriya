@@ -918,21 +918,22 @@ export default function Step2() {
             }
             setSelectedShopId(store.id);
             setIsAddPickupModalOpen(false);
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error('Failed to add pickup point:', e);
             let msg = lang === 'ua' ? 'Помилка при додаванні закладу' : 'Ошибка при добавлении заведения';
-            if (e?.errors && Array.isArray(e.errors) && e.errors.length > 0) {
-                const valObj = e.errors[0]?.extensions?.validation as Record<string, string[]> | undefined;
+            const err = e as { errors?: Array<{ message?: string; extensions?: { validation?: Record<string, string[]> } }>; message?: string };
+            if (err?.errors && Array.isArray(err.errors) && err.errors.length > 0) {
+                const valObj = err.errors[0]?.extensions?.validation;
                 if (valObj) {
                     const firstValKey = Object.keys(valObj)[0];
                     if (firstValKey && valObj[firstValKey]?.[0]) {
                         msg = valObj[firstValKey][0];
                     }
-                } else if (e.errors[0]?.message) {
-                    msg = e.errors[0].message;
+                } else if (err.errors[0]?.message) {
+                    msg = err.errors[0].message;
                 }
-            } else if (e?.message) {
-                msg = e.message;
+            } else if (err?.message) {
+                msg = err.message;
             }
             setValidationError(msg);
         }
