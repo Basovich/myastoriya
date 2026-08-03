@@ -527,6 +527,11 @@ export default function Step2() {
                     }
                 } else {
                     setDeliveryTime('');
+                    if (isSameDay(deliveryDate, new Date())) {
+                        const nextDay = new Date();
+                        nextDay.setDate(nextDay.getDate() + 1);
+                        setDeliveryDate(nextDay);
+                    }
                 }
             } catch (e) {
                 console.error('Failed to fetch delivery times', e);
