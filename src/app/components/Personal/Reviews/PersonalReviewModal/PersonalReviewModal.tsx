@@ -144,8 +144,10 @@ export default function PersonalReviewModal({
                 if (onSuccess) onSuccess();
             } catch (error: unknown) {
                 console.error("Error submitting review:", error);
-                const errMsg = error instanceof Error ? error.message : String(error);
-                setStatus(errMsg || (lang === 'ru' ? 'Не удалось отправить отзыв. Попробуйте еще раз.' : 'Не вдалося надіслати відгук. Спробуйте ще раз.'));
+                const rawMsg = error instanceof Error ? error.message : String(error);
+                const isGenericInternal = rawMsg.toLowerCase().includes('internal server error') || rawMsg.toLowerCase().includes('graphqlerror');
+                const defaultMsg = lang === 'ru' ? 'Не удалось отправить отзыв. Попробуйте еще раз.' : 'Не вдалося надіслати відгук. Спробуйте ще раз.';
+                setStatus(isGenericInternal ? defaultMsg : (rawMsg || defaultMsg));
             }
         },
     });
