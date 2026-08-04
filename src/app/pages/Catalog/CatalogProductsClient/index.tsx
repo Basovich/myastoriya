@@ -12,6 +12,7 @@ import { Locale } from "@/i18n/config";
 import s from "../CatalogContent/CatalogContent.module.scss";
 import Pagination from "@/app/components/ui/Pagination/Pagination";
 import { useAppSelector } from "@/store/hooks";
+import { stripHtml } from "@/utils/strip-html";
 
 interface CatalogProductsClientProps {
     initialProducts: ProductsResponse;
@@ -201,6 +202,7 @@ export default function CatalogProductsClient({
                                 unit={product.unit}
                                 badge={getProductBadge(product, lang)}
                                 image={resolveProductImageUrl(product)}
+                                description={stripHtml(product.text)}
                                 lang={lang}
                                 hasCostVariants={product.hasCostVariants}
                             />

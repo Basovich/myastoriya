@@ -342,6 +342,7 @@ const PRODUCTS_QUERY = /* GraphQL */ `
                 portionSize
                 isWeighty
                 hasCostVariants
+                text
                 specifications {
                     name
                     values
