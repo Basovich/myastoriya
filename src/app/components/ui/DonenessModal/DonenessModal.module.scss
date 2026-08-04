@@ -1,0 +1,135 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    overflow-y: auto;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+
+    @media (min-width: 481px) {
+        padding: 20px;
+    }
+
+    @media (min-width: 1024px) {
+        padding: 40px;
+    }
+}
+
+.overlayAfterOpen {
+    opacity: 1;
+}
+
+.overlayBeforeClose {
+    opacity: 0;
+}
+
+.modalWrapper {
+    position: relative;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 520px;
+    margin: auto;
+
+    &:focus-visible {
+        outline: none;
+    }
+}
+
+.modal {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 32px 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    position: relative;
+    width: 100%;
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+
+    .modalWrapperOpen & {
+        transform: scale(1);
+    }
+
+    @media (max-width: 480px) {
+        padding: 24px 16px;
+    }
+}
+
+.closeBtn {
+    width: 24px;
+    height: 24px;
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-bottom: 4px;
+    padding: 4px;
+    transition: opacity 0.2s;
+    z-index: 10;
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.75;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    @media (min-width: 1024px) {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        right: -40px;
+        top: 0;
+        margin-bottom: 0;
+        padding: 4px;
+    }
+
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 16px 0;
+    text-align: center;
+
+    @media (max-width: 480px) {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+}
+
+.selectorContainer {
+    margin-bottom: 24px;
+}
+
+.confirmBtn {
+    width: 100%;
+    height: 48px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    border-radius: 8px;
+}
