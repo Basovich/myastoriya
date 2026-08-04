@@ -161,15 +161,18 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
         try {
             const [response, count] = await Promise.all([
                 fetchProductReviews(productId, PAGE_SIZE, nextPage),
-                nextPage === 1 ? fetchReviewsCount(productId) : Promise.resolve(totalCount),
+                nextPage === 1 ? fetchReviewsCount(productId) : Promise.resolve(0),
             ]);
-            setReviews(prev => append ? [...prev, ...response.data] : response.data);
+            const publishedData = response.data.filter(r => r.published === true);
+            setReviews(prev => append ? [...prev, ...publishedData] : publishedData);
             setHasMore(response.has_more_pages);
-            if (nextPage === 1) setTotalCount(count);
+            if (nextPage === 1) {
+                setTotalCount(!response.has_more_pages ? publishedData.length : count);
+            }
         } finally {
             setLoading(false);
         }
-    }, [productId, totalCount]);
+    }, [productId]);
 
     useEffect(() => {
         void loadReviews(1, false);
@@ -186,18 +189,10 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
         setIsReviewModalOpen(true);
     };
 
-    // const handleVideoReviewClick = () => {
-    //     if (!isAuthenticated) {
-    //         onAuthRequired?.();
-    //     } else {
-    //         onVideoReviewRequired?.();
-    //     }
-    // };
-
     return (
         <div className={styles.reviewsSection} id="reviews">
             <SectionHeader
-                title={`ВІДГУКИ НАШИХ КЛІЄНТІВ${totalCount > 0 ? ` (${totalCount})` : ''}`}
+                title={`ВІДГУКИ НАШИХ КЛІЄНТІВ (${totalCount})`}
                 classNameWrapper={styles.reviewsTitle}
             />
 

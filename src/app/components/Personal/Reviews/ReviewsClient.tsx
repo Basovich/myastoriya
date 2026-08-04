@@ -217,7 +217,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         setIsModalOpen(true);
     };
 
-    const openProductReviewModal = (id: number, name: string, initialData?: { review?: string; ratings?: number; reviewId?: string }) => {
+    const openProductReviewModal = (id: number, name: string, initialData?: { review?: string; rating?: number; reviewId?: string }) => {
         setSelectedProduct({ id, name, ...initialData });
         setSelectedOrder(null);
         setIsModalOpen(true);
@@ -409,7 +409,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                                     onEditReview={() =>
                                         openProductReviewModal(prodId, productName, {
                                             review: rev.text,
-                                            ratings: rev.rating,
+                                            rating: rev.rating,
                                             reviewId: rev.id,
                                         })
                                     }
@@ -435,8 +435,8 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
                                 ? { review: selectedOrder.review, ratings: selectedOrder.ratings }
                                 : undefined
                             : selectedProduct
-                            ? selectedProduct.review
-                                ? { review: selectedProduct.review, ratings: selectedProduct.rating, reviewId: selectedProduct.reviewId }
+                            ? (selectedProduct.review || selectedProduct.rating !== undefined)
+                                ? { review: selectedProduct.review || '', ratings: selectedProduct.rating, reviewId: selectedProduct.reviewId }
                                 : undefined
                             : undefined
                     }

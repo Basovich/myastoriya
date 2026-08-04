@@ -232,11 +232,11 @@ export default function PersonalReviewModal({
                             {isProduct ? (
                                 <div className={s.ratingsBlock}>
                                     <div className={s.ratingRow}>
-                                        <span className={s.ratingLabel}>Оцінка товару</span>
+                                        <span className={s.ratingLabel}>{lang === 'ru' ? 'Оценка товара' : 'Оцінка товару'}</span>
                                         <RatingStars 
                                             currentRating={formik.values.rating} 
                                             onSetRating={setProductRatingValue}
-                                            label="Оцінка товару"
+                                            label={lang === 'ru' ? 'Оценка товара' : 'Оцінка товару'}
                                         />
                                     </div>
                                 </div>
