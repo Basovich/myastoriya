@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import SafeProductImage from '@/app/components/ui/SafeProductImage/SafeProductImage';
 import clsx from 'clsx';
 import s from './OrderCard.module.scss';

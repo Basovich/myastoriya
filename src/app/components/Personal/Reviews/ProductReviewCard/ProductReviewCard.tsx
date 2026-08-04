@@ -46,8 +46,6 @@ export default function ProductReviewCard({
     const deletedTitle = lang === 'ru' ? 'Товар удален' : 'Товар видалено';
     const displayName = isDeleted ? deletedTitle : productName;
 
-    const fallbackImage = '/images/product-placeholder.svg';
-    const displayImage = productImage || fallbackImage;
     const productUrl = useProductHref(productSlug || String(productId), categoryId);
 
     return (
