@@ -336,18 +336,20 @@ div.quantitySelector {
         align-items: center;
         gap: 9px;
         pointer-events: none;
-        max-width: 220px;
+        padding-right: 80px;
         
         @media (min-width: 768px) {
             max-width: initial;
             gap: 12px;
             top: 24px;
             left: 27px;
+            padding-right: 100px;
         }
 
         @media (min-width: 1280px) {
             top: 34px;
             left: 37px;
+            padding-right: 120px;
         }
     }
 
@@ -365,6 +367,7 @@ div.quantitySelector {
         font-weight: 800;
         line-height: 120%;
         text-transform: uppercase;
+        pointer-events: auto;
 
         @media (min-width: 768px) {
             height: 36px;
@@ -383,9 +386,18 @@ div.quantitySelector {
         font-weight: 800;
         line-height: 120%;
         text-transform: uppercase;
+        text-decoration: none;
+        pointer-events: auto;
+        transition: color 0.2s linear;
 
         @media (min-width: 768px) {
             font-size: 14px;
+        }
+
+        @media (any-hover: hover) {
+            &:hover {
+                color: #E3051B;
+            }
         }
     }
 

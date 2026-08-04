@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
@@ -16,9 +17,18 @@ interface ProductGalleryProps {
     images: string[];
     discount?: string;
     videoUrl?: string | null;
+    promoTitle?: string;
+    promoUrl?: string;
 }
 
-const ProductGallery: React.FC<ProductGalleryProps> = ({ id, images, discount, videoUrl }) => {
+const ProductGallery: React.FC<ProductGalleryProps> = ({
+    id,
+    images,
+    discount,
+    videoUrl,
+    promoTitle,
+    promoUrl,
+}) => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
     const [activeSlideIndex, setActiveSlideIndex] = useState(0);
@@ -64,10 +74,12 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ id, images, discount, v
                         </>
                     )}
 
-                    {discount && (
+                    {(discount || promoTitle) && (
                         <div className={styles.discountWrapper}>
-                            <span className={styles.discountBadge}>{discount}</span>
-                            <span className={styles.promoText}>STEAK DAYS ЩОВІВТОРКА!</span>
+                            {discount && <span className={styles.discountBadge}>{discount}</span>}
+                            <Link href={promoUrl || "/actions"} className={styles.promoText}>
+                                {promoTitle || "STEAK DAYS ЩОВІВТОРКА!"}
+                            </Link>
                         </div>
                     )}
 

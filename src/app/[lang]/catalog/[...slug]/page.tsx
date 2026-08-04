@@ -15,6 +15,7 @@ import {
     getSpecialsByProductApi,
     getBoughtTogetherProductsApi,
     getDeliveryBlocksApi,
+    getSalesApi,
     resolveCategoryImageUrl,
     ProductCategory,
     Product,
@@ -304,7 +305,7 @@ export default async function DynamicCatalogPage({ params, searchParams }: Dynam
     }
 
     // Fetch non-critical product page data
-    const [blogsResponse, deliveryBlocks] = await Promise.all([
+    const [blogsResponse, deliveryBlocks, salesResponse] = await Promise.all([
         safeCall<{ data: BlogPost[] }>(
             () => getBlogsApi({ limit: 3 }, lang),
             { data: [] },
@@ -313,7 +314,29 @@ export default async function DynamicCatalogPage({ params, searchParams }: Dynam
             () => getDeliveryBlocksApi(lang),
             [],
         ),
+        safeCall<{ data: any[] }>(
+            () => getSalesApi(50, 1, lang, token ?? undefined),
+            { data: [] },
+        ),
     ]);
+
+    if (salesResponse?.data && salesResponse.data.length > 0) {
+        const saleChecks = await Promise.all(
+            salesResponse.data.map(async (sale: any) => {
+                const saleProds = await safeCall(
+                    () => getProductsApi({ saleId: Number(sale.id), limit: 50 }, lang, token ?? undefined),
+                    { data: [] },
+                );
+                const isMatch = saleProds?.data?.some(p => String(p.id) === String(product.id));
+                return isMatch ? sale : null;
+            })
+        );
+        const foundSale = saleChecks.find(Boolean);
+        if (foundSale) {
+            (product as any).promoTitle = foundSale.name || foundSale.title;
+            (product as any).promoUrl = `/actions/${foundSale.slug || foundSale.id}`;
+        }
+    }
 
     const [specialsProducts, boughtTogetherProducts, popularProducts, categoryProductsResponse] = await Promise.all([
         safeCall<Product[]>(
