@@ -289,6 +289,7 @@
 .reviewLink {
     text-decoration: underline;
     font-weight: 400;
+    cursor: pointer;
 
     &:focus-visible {
         outline: 2px solid #E30613;

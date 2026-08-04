@@ -88,6 +88,10 @@ const ORDERS_QUERY = /* GraphQL */ `
                 }
                 reviewId
                 source
+                calculation {
+                    name
+                    amount
+                }
                 items {
                     id
                     name

@@ -42,8 +42,6 @@ const detailsDict = {
         productsHeading: "Ваше замовлення",
         summary: {
             persons: "Кількість персон",
-            discount: "Розмір знижки",
-            delivery: "Вартість доставки",
             total: "Вартість замовлення",
             unit: "чол."
         },
@@ -56,7 +54,7 @@ const detailsDict = {
         editReviewBtn: "Змінити відгук"
     },
     ru: {
-        orderTitle: "ЗАКАЗ №",
+        orderTitle: "ЗАКАЗ",
         backToHistory: "История заказов",
         sourcePrefix: "Заказ:",
         sourceSite: "с сайта",
@@ -64,8 +62,6 @@ const detailsDict = {
         productsHeading: "Ваш заказ",
         summary: {
             persons: "Количество персон",
-            discount: "Размер скидки",
-            delivery: "Стоимость доставки",
             total: "Стоимость заказа",
             unit: "чел."
         },
@@ -245,6 +241,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
         }
     };
 
+
     const handleLeaveReview = () => {
         setIsModalOpen(true);
     };
@@ -253,65 +250,94 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
         return null;
     }
 
-    if (!hydrated) {
-        return null;
-    }
-
     const { date, time } = order ? formatOrderDateTime(order.createdAt) : { date: '', time: '' };
-    
+
     // Sort statusHistory by date ascending
     const history = order ? (order.statusHistory || []).filter((h): h is OrderStatus => h !== null) : [];
-    const sortedHistory = [...history].sort((a, b) => 
+    const sortedHistory = [...history].sort((a, b) =>
         new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
     );
 
-    // Standard steps configuration
+    const isPickup =
+        (order?.delivery?.service || '').toLowerCase().includes('самовивіз') ||
+        (order?.delivery?.service || '').toLowerCase().includes('самовывоз');
+
+    // Standard steps configuration — primary match by id, fallback by name
     const standardStepsDef = [
-        { key: 'new', label: lang === 'ru' ? 'Новое заказ' : 'Нове замовлення', match: (h: OrderStatus) => h.id === '1' || (h.name || '').toLowerCase().includes('нов') },
-        { key: 'preparing', label: lang === 'ru' ? 'Готовится' : 'Готується', match: (h: OrderStatus) => h.id === '4' || (h.name || '').toLowerCase().includes('готу') || (h.name || '').toLowerCase().includes('прийнят') },
-        { key: 'courier', label: order?.delivery?.service?.toLowerCase().includes('самовивіз') || order?.delivery?.service?.toLowerCase().includes('самовывоз') 
-            ? (lang === 'ru' ? 'Готово к выдаче' : 'Готово до видачі')
-            : (lang === 'ru' ? 'Выдано курьеру' : 'Видано кур’єру'), 
-          match: (h: OrderStatus) => h.id === '5' || (h.name || '').toLowerCase().includes('кур') || (h.name || '').toLowerCase().includes('відправл') },
-        { key: 'delivered', label: lang === 'ru' ? 'Доставлено' : 'Доставлено', match: (h: OrderStatus) => h.id === '6' || (h.name || '').toLowerCase().includes('достав') },
-        { key: 'completed', label: lang === 'ru' ? 'Завершено' : 'Завершено', match: (h: OrderStatus) => h.id === '2' || (h.name || '').toLowerCase().includes('викон') || (h.name || '').toLowerCase().includes('заверш') }
+        {
+            key: 'new',
+            label: lang === 'ru' ? 'Новый заказ' : 'Нове замовлення',
+            match: (h: OrderStatus) =>
+                h.id === '1' ||
+                (h.name || '').toLowerCase().includes('нов') ||
+                (h.name || '').toLowerCase().includes('прийнят'),
+        },
+        {
+            key: 'preparing',
+            label: lang === 'ru' ? 'Готовится' : 'Готується',
+            match: (h: OrderStatus) =>
+                h.id === '4' || (h.name || '').toLowerCase().includes('готу'),
+        },
+        {
+            key: 'courier',
+            label: isPickup
+                ? (lang === 'ru' ? 'Готово к выдаче' : 'Готово до видачі')
+                : (lang === 'ru' ? 'Выдано курьеру' : "Видано кур'єру"),
+            match: (h: OrderStatus) =>
+                h.id === '5' ||
+                (h.name || '').toLowerCase().includes('кур') ||
+                (h.name || '').toLowerCase().includes('відправл'),
+        },
+        {
+            key: 'delivered',
+            label: lang === 'ru' ? 'Доставлено' : 'Доставлено',
+            match: (h: OrderStatus) =>
+                h.id === '6' || (h.name || '').toLowerCase().includes('достав'),
+        },
+        {
+            key: 'completed',
+            label: lang === 'ru' ? 'Завершено' : 'Завершено',
+            match: (h: OrderStatus) =>
+                h.id === '2' ||
+                (h.name || '').toLowerCase().includes('викон') ||
+                (h.name || '').toLowerCase().includes('заверш'),
+        },
     ];
 
-    // Map history to standard steps
-    const statusSteps: StatusStep[] = order ? standardStepsDef.map((def) => {
-        const matchedHistory = sortedHistory.find(def.match);
-        if (matchedHistory) {
-            const hDateTime = formatOrderDateTime(matchedHistory.createdAt || '');
-            return {
-                label: def.label,
-                date: hDateTime.date,
-                time: hDateTime.time,
-                isCompleted: true,
-            };
-        } else {
-            return {
-                label: def.label,
-                date: '',
-                time: '',
-                isCompleted: false,
-            };
+    // Determine current order status step index based on order.status or last history item
+    const currentStatusObj = order?.status || (sortedHistory.length > 0 ? sortedHistory[sortedHistory.length - 1] : null);
+    let currentStepIndex = -1;
+    if (currentStatusObj) {
+        currentStepIndex = standardStepsDef.findIndex(def => def.match(currentStatusObj));
+    }
+    // Fallback: if status didn't match directly, try finding latest matched history step
+    if (currentStepIndex === -1 && sortedHistory.length > 0) {
+        for (let i = standardStepsDef.length - 1; i >= 0; i--) {
+            if (sortedHistory.some(standardStepsDef[i].match)) {
+                currentStepIndex = i;
+                break;
+            }
         }
-    }) : [];
+    }
+    if (currentStepIndex === -1 && order) {
+        currentStepIndex = 0; // Default to first step for active orders
+    }
 
-    // Determine the current step index: the last completed step
-    let lastCompletedIndex = -1;
-    for (let i = 0; i < statusSteps.length; i++) {
-        if (statusSteps[i].isCompleted) {
-            lastCompletedIndex = i;
-        }
-    }
-    // Auto-complete all previous steps up to the current progress point
-    if (lastCompletedIndex !== -1) {
-        for (let i = 0; i <= lastCompletedIndex; i++) {
-            statusSteps[i].isCompleted = true;
-        }
-        statusSteps[lastCompletedIndex].isCurrent = true;
-    }
+    // Build statusSteps: completed up to currentStepIndex, uncompleted after
+    const statusSteps: StatusStep[] = order ? standardStepsDef.map((def, idx) => {
+        const matchedHistory = sortedHistory.find(def.match);
+        const hDateTime = matchedHistory ? formatOrderDateTime(matchedHistory.createdAt || '') : { date: '', time: '' };
+        const isCompleted = idx <= currentStepIndex;
+        const isCurrent = idx === currentStepIndex;
+
+        return {
+            label: def.label,
+            date: matchedHistory ? hDateTime.date : '',
+            time: matchedHistory ? hDateTime.time : '',
+            isCompleted,
+            isCurrent,
+        };
+    }) : [];
 
     const statusNameLower = (order?.status?.name || '').toLowerCase();
     const canLeaveReview = order ? (order.status?.id === '2'
@@ -476,20 +502,19 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                     <span className={s.summaryValue}>{order.personsCount} <strong>{dict.summary.unit}</strong></span>
                                 </div>
                             )}
-                            {order.calculation?.map((calc, index) => {
-                                const isNegative = calc.amount < 0;
-                                const isFree = calc.amount === 0;
-                                return (
-                                    <div key={index} className={s.summaryItem}>
-                                        <span className={s.summaryLabel}>{calc.name?.replace(/:$/, '')}</span>
-                                        <span className={clsx(s.summaryValue, isNegative && s.negative, isFree && s.freeText)}>
-                                            {isFree 
-                                                ? (lang === 'ru' ? 'Бесплатно' : 'Безкоштовно') 
-                                                : `${calc.amount.toLocaleString('uk-UA')} ₴`}
-                                        </span>
-                                    </div>
-                                );
-                            })}
+                            {(order.calculation ?? []).map((calc, i) => (
+                                <div key={i} className={s.summaryItem}>
+                                    <span className={s.summaryLabel}>{calc.name?.replace(/:$/, '')}</span>
+                                    <span className={clsx(
+                                        s.summaryValue,
+                                        calc.amount < 0 && s.negative
+                                    )}>
+                                        {calc.amount < 0
+                                            ? `-${Math.abs(calc.amount).toLocaleString('uk-UA')}`
+                                            : calc.amount.toLocaleString('uk-UA')} <strong>₴</strong>
+                                    </span>
+                                </div>
+                            ))}
                             <div className={s.summaryItem}>
                                 <span className={s.summaryLabel}>{dict.summary.total}</span>
                                 <span className={s.summaryValue}>{order.total.toLocaleString("uk-UA")} <strong>₴</strong></span>

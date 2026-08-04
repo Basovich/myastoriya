@@ -202,4 +202,9 @@ button.logoutBtn {
         padding: 32px;
         flex-grow: 1;
     }
+
+    @media (min-width: 1440px) {
+        padding: 42px 50px;
+        flex-grow: 1;
+    }
 }

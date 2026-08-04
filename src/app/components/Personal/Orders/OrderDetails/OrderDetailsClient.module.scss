@@ -43,6 +43,12 @@
     @media (min-width: 1024px) {
         margin-bottom: 0;
     }
+
+    @media (min-width: 1280px) {
+        margin-top: 10px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
 }
 
 .metaItem {
@@ -75,6 +81,11 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    @media (min-width: 1280px) {
+        padding-top: 6px;
+        padding-bottom: 14px;
+    }
 }
 
 .sectionTitle {
@@ -99,8 +110,8 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     padding: 24px 0;
-    border-top: 1px solid #F0F0F0;
-    border-bottom: 1px solid #F0F0F0;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 
     @media (min-width: 1024px) {
         grid-template-columns: repeat(4, 1fr);
@@ -128,16 +139,6 @@
         color: #000; // In screenshot it's black with minus
     }
 
-    &.freeText {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        font-size: 22px;
-
-        @media (min-width: 560px) {
-            font-size: 34px;
-        }
-    }
 
     strong {
         font-size: 24px;

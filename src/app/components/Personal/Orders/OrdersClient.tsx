@@ -345,8 +345,24 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                             const { date, time } = formatOrderDateTime(order.createdAt);
                             const totalProductsCount = order.items?.reduce((acc, item) => acc + (item.quantity || 0), 0) || 0;
                             const orderSum = order.total;
-                            const orderOldSum = order.items?.reduce((acc, item) => acc + (item.totalOldCost || item.totalCost), 0) || 0;
-                            const oldSum = orderOldSum > orderSum ? orderOldSum : undefined;
+
+                            const calculationDiscount = (order.calculation || []).reduce((acc, c) => {
+                                const name = (c.name || '').toLowerCase();
+                                if (c.amount < 0 && (name.includes('знижк') || name.includes('скидк') || name.includes('discount') || name.includes('промо') || name.includes('promo'))) {
+                                    return acc + Math.abs(c.amount);
+                                }
+                                return acc;
+                            }, 0);
+
+                            const itemLevelDiscount = (order.items || []).reduce((acc, item) => {
+                                if (item.totalOldCost && item.totalOldCost > item.totalCost) {
+                                    return acc + (item.totalOldCost - item.totalCost);
+                                }
+                                return acc;
+                            }, 0);
+
+                            const totalDiscount = Math.max(calculationDiscount, itemLevelDiscount);
+                            const oldSum = totalDiscount > 0 ? orderSum + totalDiscount : undefined;
 
                             const orderImages = order.items?.map((item) =>
                                 resolveOrderItemImageUrl(item.id, item.image, productDetailsMap)
