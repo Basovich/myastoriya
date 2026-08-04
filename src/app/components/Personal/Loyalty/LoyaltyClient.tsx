@@ -2,14 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { Locale } from '@/i18n/config';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { logout } from '@/store/slices/authSlice';
-import { logoutApi } from '@/lib/graphql/queries/auth';
-import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
+import { useAppSelector } from '@/store/hooks';
+import { getAccessToken } from '@/app/actions/authActions';
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
@@ -67,14 +64,12 @@ interface LoyaltyClientProps {
 
 export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms }: LoyaltyClientProps) {
     const hydrated = useIsHydrated();
-    const router = useRouter();
-    const dispatch = useAppDispatch();
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
     const dict = loyaltyDict[lang] || loyaltyDict.ua;
     const pDict = personalDict[lang] || personalDict.ua;
     
     const [discountInfo, setDiscountInfo] = useState<UserDiscountInfo | null>(initialDiscountInfo || null);
-    const [terms, setTerms] = useState<string>(initialTerms || dict.terms);
+    const [terms] = useState<string>(initialTerms || dict.terms);
     const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {

@@ -34,7 +34,7 @@ export interface PersonalNavProps {
     isDesktopOnly?: boolean;
 }
 
-const PersonalNav: React.FC<PersonalNavProps> = ({ dict, user, isMobileOnly, isDesktopOnly, onLogout }) => {
+const PersonalNav: React.FC<PersonalNavProps> = ({ dict, user, isMobileOnly, isDesktopOnly }) => {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const { disableScroll, enableScroll } = useScrollLock();

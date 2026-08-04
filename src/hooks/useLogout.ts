@@ -8,7 +8,7 @@ export function useLogout(lang: Locale | string = 'ua') {
     const dispatch = useAppDispatch();
     const { token: storeToken } = useAppSelector((state) => state.auth);
 
-    const handleLogout = async () => {
+    return async () => {
         try {
             const token = storeToken || await getAccessToken();
             if (token) {
@@ -22,6 +22,4 @@ export function useLogout(lang: Locale | string = 'ua') {
             window.location.href = lang === 'ua' ? '/' : `/${lang}`;
         }
     };
-
-    return handleLogout;
 }

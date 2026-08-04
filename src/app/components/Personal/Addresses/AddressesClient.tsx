@@ -148,14 +148,24 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
         }
     };
 
-    const handleAddAddress = async (data: any) => {
+    const handleAddAddress = async (data: { 
+        id?: string;
+        title?: string;
+        city?: string; 
+        street?: string; 
+        streetId?: number | string; 
+        house?: string; 
+        apartment?: string; 
+        entrance?: string; 
+        floor?: string 
+    }) => {
         try {
             const token = await getAccessToken();
             if (token) {
                 const newAddress = await createUserAddressApi({
                     city: data.city || 'Київ',
                     street: data.street,
-                    streetId: data.streetId ? parseInt(data.streetId, 10) : undefined,
+                    streetId: data.streetId ? parseInt(String(data.streetId), 10) : undefined,
                     house: data.house || '',
                     apartment: data.apartment ? parseInt(data.apartment, 10) : undefined,
                     entrance: data.entrance ? parseInt(data.entrance, 10) : undefined,

@@ -12,7 +12,6 @@ import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalConte
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
 import { useLogout } from '@/hooks/useLogout';
-import { useRouter } from 'next/navigation';
 import s from './ChangePassword.module.scss';
 
 const changePasswordDict = {

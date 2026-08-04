@@ -1,15 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { useAppSelector } from '@/store/hooks';
 import { Locale } from '@/i18n/config';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
-import { logout } from '@/store/slices/authSlice';
-import { logoutApi } from '@/lib/graphql/queries/auth';
-import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
+import { getAccessToken } from '@/app/actions/authActions';
 import { useRouter } from 'next/navigation';
 import ReviewCard from './ReviewCard/ReviewCard';
 import ProductReviewCard from './ProductReviewCard/ProductReviewCard';
@@ -91,7 +89,6 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
     const hydrated = useIsHydrated();
     const dict = reviewsDict[lang] || reviewsDict.ua;
     const pDict = personalDict[lang] || personalDict.ua;
-    const dispatch = useAppDispatch();
     const router = useRouter();
     const { user } = useAppSelector((state) => state.auth);
 

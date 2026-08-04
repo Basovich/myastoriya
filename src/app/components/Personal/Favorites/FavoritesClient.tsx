@@ -9,11 +9,7 @@ import { useIsHydrated } from '@/hooks/useIsHydrated';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
-import { useAppDispatch } from '@/store/hooks';
-import { logout } from '@/store/slices/authSlice';
-import { logoutApi } from '@/lib/graphql/queries/auth';
-import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
-import { useRouter } from 'next/navigation';
+import { useLogout } from '@/hooks/useLogout';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import s from './Favorites.module.scss';
 
@@ -81,22 +77,8 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
         };
     }, [wishlistIds, hydrated, isInitialized, lang]);
 
-    const dispatch = useAppDispatch();
-    const router = useRouter();
-    const { user, token: storeToken } = useAppSelector((state) => state.auth);
-
-    const handleLogout = async () => {
-        try {
-            const token = storeToken || await getAccessToken();
-            if (token) await logoutApi(token);
-        } catch {
-            // Ignore
-        } finally {
-            await clearAuthCookies();
-            dispatch(logout());
-            window.location.href = lang === 'ua' ? '/' : `/${lang}`;
-        }
-    };
+    const { user } = useAppSelector((state) => state.auth);
+    const handleLogout = useLogout(lang);
 
     if (!hydrated) {
         return null;
