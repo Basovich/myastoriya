@@ -23,6 +23,7 @@ import AddPickupModal from './AddPickupModal';
 import DeletePickupModal from './DeletePickupModal';
 import ErrorModal from '@/app/components/ui/ErrorModal';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
+import { useLogout } from '@/hooks/useLogout';
 
 interface PickupClientProps {
     user: AuthUser | null;
@@ -186,9 +187,7 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
         }
     };
 
-    const handleLogout = () => {
-        // Handled by layout
-    };
+    const handleLogout = useLogout(lang);
 
     const existingShopIds = points
         .map(point => {

@@ -15,6 +15,7 @@ import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalConte
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import Button from '@/app/components/ui/Button/Button';
 import { getUserDiscountInfoApi, UserDiscountInfo } from '@/lib/graphql';
+import { useLogout } from '@/hooks/useLogout';
 import s from './LoyaltyClient.module.scss';
 
 const loyaltyDict = {
@@ -95,18 +96,7 @@ export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms 
         }
     }, [discountInfo, isAuthenticated, lang]);
 
-    const handleLogout = async () => {
-        try {
-            const token = await getAccessToken();
-            if (token) await logoutApi(token);
-        } catch {
-            // Ignore
-        } finally {
-            await clearAuthCookies();
-            dispatch(logout());
-            router.replace('/');
-        }
-    };
+    const handleLogout = useLogout(lang);
 
     if (!hydrated) return null;
 

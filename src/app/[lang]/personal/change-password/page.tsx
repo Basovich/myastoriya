@@ -11,9 +11,7 @@ import ChangePasswordForm, { ChangePasswordFormValues } from '@/app/components/P
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
-import { logout } from '@/store/slices/authSlice';
-import { logoutApi } from '@/lib/graphql/queries/auth';
-import { clearAuthCookies } from '@/app/actions/authActions';
+import { useLogout } from '@/hooks/useLogout';
 import { useRouter } from 'next/navigation';
 import s from './ChangePassword.module.scss';
 
@@ -109,19 +107,7 @@ export default function ChangePasswordPage() {
         }
     };
 
-    const router = useRouter();
-    const handleLogout = async () => {
-        try {
-            const token = await getAccessToken();
-            if (token) await logoutApi(token);
-        } catch {
-            // Ignore
-        } finally {
-            await clearAuthCookies();
-            dispatch(logout());
-            router.replace('/');
-        }
-    };
+    const handleLogout = useLogout(lang);
 
     return (
         <PersonalContentBlock>

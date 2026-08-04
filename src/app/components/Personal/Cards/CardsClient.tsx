@@ -19,6 +19,8 @@ import {
 } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
 
+import { useLogout } from '@/hooks/useLogout';
+
 const localDict = {
     ua: {
         subtitle: "Ваші банківські картки",
@@ -142,9 +144,7 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
         }
     };
 
-    const handleLogout = () => {
-        // Handled by layout
-    };
+    const handleLogout = useLogout(lang);
 
     return (
         <div className={s.cardsPage}>

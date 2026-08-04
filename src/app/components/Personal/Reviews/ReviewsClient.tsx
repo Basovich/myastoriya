@@ -17,6 +17,7 @@ import PersonalReviewModal from './PersonalReviewModal/PersonalReviewModal';
 import { getOrdersApi, getOrderReviewsApi, getProductReviewsApi, Order, OrderReview, ProductReview, getProductsByIdsApi, resolveProductImageUrl } from '@/lib/graphql';
 import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
+import { useLogout } from '@/hooks/useLogout';
 import { startOfDay, endOfDay } from 'date-fns';
 import clsx from 'clsx';
 import s from './ReviewsClient.module.scss';
@@ -188,18 +189,7 @@ export default function ReviewsClient({ lang }: { lang: Locale }) {
         }
     }, [hydrated, user, loadData]);
 
-    const handleLogout = async () => {
-        try {
-            const token = await getAccessToken();
-            if (token) await logoutApi(token);
-        } catch {
-            // Ignore
-        } finally {
-            await clearAuthCookies();
-            dispatch(logout());
-            router.replace('/');
-        }
-    };
+    const handleLogout = useLogout(lang);
 
     const isDateInRange = (dateToCheck: Date, start: Date | null, end: Date | null) => {
         if (!start) return true;

@@ -24,6 +24,7 @@ import { fetchCartAsync } from '@/store/slices/cartSlice';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import CartModal from '@/app/components/CartModal/CartModal';
 import DeleteShoppingListModal from './DeleteShoppingListModal/DeleteShoppingListModal';
+import { useLogout } from '@/hooks/useLogout';
 import s from './ShoppingListClient.module.scss';
 
 const shoppingListDict = {
@@ -50,6 +51,7 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { user } = useAppSelector((state) => state.auth);
+    const handleLogout = useLogout();
 
     const [lists, setLists] = useState<ShoppingList[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -125,19 +127,6 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
             loadLists();
         }
     }, [hydrated, loadLists]);
-
-    const handleLogout = async () => {
-        try {
-            const token = await getAccessToken();
-            if (token) await logoutApi(token);
-        } catch {
-            // Ignore
-        } finally {
-            await clearAuthCookies();
-            dispatch(logout());
-            router.replace('/');
-        }
-    };
 
     const handleDeleteClick = (id: string) => {
         setListToDelete(id);

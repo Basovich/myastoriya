@@ -17,6 +17,7 @@ import ProductCard from '@/app/components/ui/ProductCard/ProductCard';
 import OrderStatusTimeline, { StatusStep } from '../OrderStatusTimeline/OrderStatusTimeline';
 import Button from '@/app/components/ui/Button/Button';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
+import { useLogout } from '@/hooks/useLogout';
 import PersonalReviewModal from '@/app/components/Personal/Reviews/PersonalReviewModal/PersonalReviewModal';
 import { fetchCartAsync } from '@/store/slices/cartSlice';
 import {
@@ -229,18 +230,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
         }
     }, [hydrated, user, loadData]);
 
-    const handleLogout = async () => {
-        try {
-            const token = await getAccessToken();
-            if (token) await logoutApi(token);
-        } catch {
-            // Ignore
-        } finally {
-            await clearAuthCookies();
-            dispatch(logout());
-            router.replace('/');
-        }
-    };
+    const handleLogout = useLogout(lang);
 
     const handleRepeatOrder = async () => {
         if (!order) return;

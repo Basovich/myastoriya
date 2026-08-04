@@ -12,6 +12,7 @@ import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import Button from '@/app/components/ui/Button/Button';
+import { useLogout } from '@/hooks/useLogout';
 import Search from '@/app/components/ui/Search/Search';
 import SearchProductCard from './SearchProductCard';
 import AddedProductItem from './AddedProductItem';
@@ -500,18 +501,7 @@ export default function ShoppingListCreateClient({ lang }: { lang: Locale }) {
         }
     };
 
-    const handleLogout = async () => {
-        try {
-            const token = await getAccessToken();
-            if (token) await logoutApi(token);
-        } catch {
-            // Ignore
-        } finally {
-            await clearAuthCookies();
-            dispatch(logout());
-            router.replace('/');
-        }
-    };
+    const handleLogout = useLogout(lang);
 
     if (!hydrated || isLoading) {
         return (

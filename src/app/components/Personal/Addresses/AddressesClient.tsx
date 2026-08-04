@@ -16,6 +16,7 @@ import { getAccessToken } from '@/app/actions/authActions';
 import AddAddressModal from '@/app/components/AddAddressModal/AddAddressModal';
 import DeleteAddressModal from './DeleteAddressModal';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
+import { useLogout } from '@/hooks/useLogout';
 import s from './AddressesClient.module.scss';
 import clsx from 'clsx';
 import * as Sentry from "@sentry/nextjs";
@@ -91,9 +92,7 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
         fetchAddresses();
     }, []);
 
-    const handleLogout = () => {
-        // Handled by layout or parent
-    };
+    const handleLogout = useLogout(lang);
 
     const handleDelete = (id: string) => {
         setAddressToDelete(id);

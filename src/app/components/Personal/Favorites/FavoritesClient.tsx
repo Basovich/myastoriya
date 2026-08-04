@@ -83,18 +83,18 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
 
     const dispatch = useAppDispatch();
     const router = useRouter();
-    const { user } = useAppSelector((state) => state.auth);
+    const { user, token: storeToken } = useAppSelector((state) => state.auth);
 
     const handleLogout = async () => {
         try {
-            const token = await getAccessToken();
+            const token = storeToken || await getAccessToken();
             if (token) await logoutApi(token);
         } catch {
             // Ignore
         } finally {
             await clearAuthCookies();
             dispatch(logout());
-            router.replace('/');
+            window.location.href = lang === 'ua' ? '/' : `/${lang}`;
         }
     };
 

@@ -241,16 +241,18 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
         }
     }, [hydrated, user, loadData]);
 
+    const { token: storeToken } = useAppSelector((state) => state.auth);
+
     const handleLogout = async () => {
         try {
-            const token = await getAccessToken();
+            const token = storeToken || await getAccessToken();
             if (token) await logoutApi(token);
         } catch {
             // Ignore
         } finally {
             await clearAuthCookies();
             dispatch(logout());
-            router.replace('/');
+            window.location.href = lang === 'ua' ? '/' : `/${lang}`;
         }
     };
 
