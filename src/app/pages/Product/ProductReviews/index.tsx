@@ -163,7 +163,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                 fetchProductReviews(productId, PAGE_SIZE, nextPage),
                 nextPage === 1 ? fetchReviewsCount(productId) : Promise.resolve(0),
             ]);
-            const publishedData = response.data.filter(r => r.published === true);
+            const publishedData = response.data.filter(r => r.published);
             setReviews(prev => append ? [...prev, ...publishedData] : publishedData);
             setHasMore(response.has_more_pages);
             if (nextPage === 1) {
