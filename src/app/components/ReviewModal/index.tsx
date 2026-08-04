@@ -46,10 +46,10 @@ const reviewSchema = Yup.object({
 });
 
 const defaultRatings: RatingsType = {
-    dishQuality: 3,
-    serviceQuality: 3,
-    deliverySpeed: 3,
-    interactionEase: 3,
+    dishQuality: 5,
+    serviceQuality: 5,
+    deliverySpeed: 5,
+    interactionEase: 5,
 };
 
 export default function ReviewModal({ isOpen, onClose, productId, onSuccess }: ReviewModalProps) {

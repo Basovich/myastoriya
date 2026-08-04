@@ -57,10 +57,10 @@ const productReviewSchema = Yup.object({
 });
 
 const defaultRatings: RatingsType = {
-    service: 3,
-    personnel: 3,
-    delivery: 3,
-    product: 3,
+    service: 5,
+    personnel: 5,
+    delivery: 5,
+    product: 5,
 };
 
 export default function PersonalReviewModal({ 
@@ -142,9 +142,10 @@ export default function PersonalReviewModal({
                 
                 setSubmitted(true);
                 if (onSuccess) onSuccess();
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error("Error submitting review:", error);
-                setStatus(error?.message || (lang === 'ru' ? 'Не удалось отправить отзыв. Попробуйте еще раз.' : 'Не вдалося надіслати відгук. Спробуйте ще раз.'));
+                const errMsg = error instanceof Error ? error.message : String(error);
+                setStatus(errMsg || (lang === 'ru' ? 'Не удалось отправить отзыв. Попробуйте еще раз.' : 'Не вдалося надіслати відгук. Спробуйте ще раз.'));
             }
         },
     });
