@@ -86,6 +86,7 @@ export default function ThanksPage({ lang, orderId }: ThanksPageProps) {
                 {orderId && (
                     <div className={s.orderNumberBlock}>
                         <span className={s.orderLabel}>{t.orderLabel}</span>
+                        {' '}
                         <span className={s.orderNumber}>№ {orderId}</span>
                     </div>
                 )}
