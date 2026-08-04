@@ -13,7 +13,13 @@ import s from './ApplicantForm.module.scss';
 import CustomSelect from '@/app/components/ui/CustomSelect';
 import clsx from "clsx";
 
-import { PHONE_REGEX } from '@/lib/utils/phone';
+import Modal from 'react-modal';
+import useScrollLock from '@/hooks/useScrollLock';
+
+import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
+import { format } from 'date-fns';
+import { parseDate } from '@/lib/utils/date';
+import { PHONE_REGEX, formatPhone } from '@/lib/utils/phone';
 import { 
     getCareerPositionsApi, 
     submitCareerApplicationApi, 
@@ -30,28 +36,34 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
     const params = useParams();
     const lang = (params?.lang as string) || 'ua';
 
-    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
     const [submitSuccessMessage, setSubmitSuccessMessage] = useState<string>('');
     const [submitError, setSubmitError] = useState<string>('');
+    const { disableScroll, enableScroll } = useScrollLock();
     
     const [positions, setPositions] = useState<CareerPosition[]>([]);
     const [localities, setLocalities] = useState<Locality[]>([]);
     const [isLoadingData, setIsLoadingData] = useState(true);
 
     useEffect(() => {
+        if (isSuccessModalOpen) {
+            disableScroll();
+        } else {
+            enableScroll();
+        }
+        return () => enableScroll();
+    }, [isSuccessModalOpen, disableScroll, enableScroll]);
+
+    useEffect(() => {
         const loadInitialData = async () => {
             setIsLoadingData(true);
             try {
-                const [fetchedPositions, localitiesRes] = await Promise.all([
-                    getCareerPositionsApi(undefined, lang),
-                    getLocalitiesApi(undefined, 50, 1, lang)
-                ]);
-                setPositions(fetchedPositions);
+                const localitiesRes = await getLocalitiesApi(undefined, 50, 1, lang, true);
                 if (localitiesRes && localitiesRes.data) {
                     setLocalities(localitiesRes.data);
                 }
             } catch (error) {
-                console.error('Failed to load career form data:', error);
+                console.error('Failed to load localities:', error);
             } finally {
                 setIsLoadingData(false);
             }
@@ -61,7 +73,10 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
 
     const positionOptions = React.useMemo(() => {
         if (positions.length > 0) {
-            return positions.map(p => ({ label: p.name, value: p.id }));
+            const unique = positions.filter((p, index, self) =>
+                index === self.findIndex(t => t.name === p.name)
+            );
+            return unique.map(p => ({ label: p.name, value: p.id }));
         }
         return [
             { label: dict.options.manager || 'Менеджер', value: 'manager' },
@@ -117,30 +132,64 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                 const result = await submitCareerApplicationApi({
                     fullName: values.fullName,
                     dob: values.dob,
-                    phone: values.phone,
+                    phone: formatPhone(values.phone),
                     desiredPosition: matchedPosition ? matchedPosition.name : values.desiredPosition,
                     careerPositionId: isNumericPosId ? parsedPositionId : undefined,
                     localityId: isNumericLocId ? parsedLocalityId : undefined,
                     hasExperience: values.hasExperience === 'yes',
+                    experience: values.hasExperience === 'yes',
                     additionalInfo: values.additionalInfo || undefined,
                     consent: values.consent,
                 }, lang);
 
                 if (result.success) {
-                    setIsSubmitted(true);
-                    setSubmitSuccessMessage(result.message || '');
                     resetForm();
+                    setSubmitSuccessMessage(result.message || '');
+                    setIsSuccessModalOpen(true);
                 } else {
                     setSubmitError(result.message || 'Не вдалося відправити заявку. Спробуйте ще раз.');
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Error submitting career application:', error);
-                setSubmitError('Сталася помилка при відправці заявки. Будь ласка, спробуйте пізніше.');
+                let errMsg = 'Сталася помилка при відправці заявки. Будь ласка, спробуйте пізніше.';
+                if (error?.errors && Array.isArray(error.errors) && error.errors.length > 0) {
+                    const firstErr = error.errors[0];
+                    const valErrors = firstErr?.extensions?.validation;
+                    if (valErrors && typeof valErrors === 'object') {
+                        const firstKey = Object.keys(valErrors)[0];
+                        if (firstKey && valErrors[firstKey]?.[0]) {
+                            errMsg = `${valErrors[firstKey][0]}`;
+                        }
+                    } else if (firstErr?.message) {
+                        errMsg = firstErr.message;
+                    }
+                } else if (error?.message) {
+                    errMsg = error.message;
+                }
+                setSubmitError(errMsg);
             } finally {
                 setSubmitting(false);
             }
         },
     });
+
+    const currentLocation = formik.values.location;
+
+    useEffect(() => {
+        const fetchPositions = async () => {
+            const locId = currentLocation ? parseInt(currentLocation, 10) : undefined;
+            try {
+                const fetchedPositions = await getCareerPositionsApi(
+                    locId && !isNaN(locId) ? locId : undefined,
+                    lang
+                );
+                setPositions(fetchedPositions);
+            } catch (error) {
+                console.error('Failed to load career positions:', error);
+            }
+        };
+        fetchPositions();
+    }, [currentLocation, lang]);
 
     const handlePhoneRawChange = (raw: string) => {
         formik.setFieldValue('phone', raw);
@@ -150,15 +199,6 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
         formik.values.phone,
         handlePhoneRawChange,
     );
-
-    if (isSubmitted) {
-        return (
-            <div className={s.successMessage}>
-                <h3>Дякуємо за вашу заявку!</h3>
-                <p>{submitSuccessMessage || "Ми зв'яжемося з вами найближчим часом."}</p>
-            </div>
-        );
-    }
 
     return (
         <form className={s.form} onSubmit={formik.handleSubmit} noValidate>
@@ -184,18 +224,18 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                 />
 
                 {/* DOB */}
-                <InputField
+                <DatePicker
                     id="dob"
-                    type="text"
-                    name="dob"
                     label={dict.dob}
                     required
-                    value={formik.values.dob}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    onFocus={() => formik.setFieldTouched('dob', false)}
+                    selected={formik.values.dob ? parseDate(formik.values.dob) : null}
+                    onChange={(date) => formik.setFieldValue('dob', date ? format(date, 'dd.MM.yyyy') : '')}
+                    onBlur={() => formik.setFieldTouched('dob', true)}
                     error={formik.errors.dob}
                     touched={formik.touched.dob}
+                    maxDate={new Date()}
+                    minDate={new Date('1940-01-01')}
+                    lang={lang as 'ua' | 'ru'}
                 />
 
                 {/* Phone */}
@@ -328,6 +368,43 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                     {dict.submitText}
                 </Button>
             </div>
+
+            <Modal
+                isOpen={isSuccessModalOpen}
+                onRequestClose={() => setIsSuccessModalOpen(false)}
+                className={s.modalWrapper}
+                overlayClassName={s.modalOverlay}
+                ariaHideApp={false}
+                closeTimeoutMS={200}
+            >
+                <div className={s.modalCard}>
+                    <button
+                        type="button"
+                        className={s.modalCloseBtn}
+                        onClick={() => setIsSuccessModalOpen(false)}
+                        aria-label="Close modal"
+                    >
+                        ✕
+                    </button>
+                    <div className={s.modalIcon}>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </div>
+                    <h3 className={s.modalTitle}>Дякуємо за вашу заявку!</h3>
+                    <p className={s.modalMessage}>
+                        {submitSuccessMessage || (lang === 'ru' ? 'Мы свяжемся с вами в ближайшее время.' : 'Ми зв’яжемося з вами найближчим часом.')}
+                    </p>
+                    <Button
+                        type="button"
+                        variant="red"
+                        className={s.modalButton}
+                        onClick={() => setIsSuccessModalOpen(false)}
+                    >
+                        ОК
+                    </Button>
+                </div>
+            </Modal>
         </form>
     );
 }

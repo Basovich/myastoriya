@@ -31,6 +31,7 @@ export interface SubmitCareerApplicationInput {
     careerPositionId?: number;
     localityId?: number;
     hasExperience?: boolean;
+    experience?: boolean;
     additionalInfo?: string;
     email?: string;
     consent: boolean;
@@ -60,6 +61,7 @@ export const SUBMIT_CAREER_APPLICATION_MUTATION = /* GraphQL */ `
     $careerPositionId: Int
     $localityId: Int
     $hasExperience: Boolean
+    $experience: Boolean
     $additionalInfo: String
     $email: String
     $consent: Boolean!
@@ -72,6 +74,7 @@ export const SUBMIT_CAREER_APPLICATION_MUTATION = /* GraphQL */ `
       careerPositionId: $careerPositionId
       localityId: $localityId
       hasExperience: $hasExperience
+      experience: $experience
       additionalInfo: $additionalInfo
       email: $email
       consent: $consent

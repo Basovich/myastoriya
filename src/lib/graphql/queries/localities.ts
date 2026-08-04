@@ -26,8 +26,8 @@ const AUTO_DETECT_LOCALITY_MUTATION = /* GraphQL */ `
 `;
 
 const LOCALITIES_QUERY = /* GraphQL */ `
-    query Localities($name: String, $limit: Int, $page: Int) {
-        localities(name: $name, limit: $limit, page: $page) {
+    query Localities($name: String, $primary: Boolean, $limit: Int, $page: Int) {
+        localities(name: $name, primary: $primary, limit: $limit, page: $page) {
             data {
                 id
                 name
@@ -70,11 +70,12 @@ export async function getLocalitiesApi(
     name?: string, 
     limit: number = 20, 
     page: number = 1, 
-    lang?: string
+    lang?: string,
+    primary?: boolean
 ): Promise<LocalitiesResponse['localities']> {
     const data = await gqlRequest<LocalitiesResponse>(
         LOCALITIES_QUERY,
-        { name, limit, page },
+        { name, limit, page, primary },
         { lang }
     );
     return data.localities;
