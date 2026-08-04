@@ -1685,7 +1685,18 @@ export interface ProductWeightInput {
 }
 
 export function getProductWeight(product: ProductWeightInput): string {
-    // 1. Try specifications with a smart finder that ignores "Вага: 1" / "Вес: 1" defaults if other weight specs exist
+    // 1. Try portionSize first if available
+    if (product.portionSize && product.portionSize.trim()) {
+        const trimmed = product.portionSize.trim();
+        const hasUnit = /[гgкmшт]/i.test(trimmed);
+        if (hasUnit) return roundWeightString(trimmed);
+        if (/^\d+(\/\d+)+$/.test(trimmed)) {
+            return `${trimmed} г`;
+        }
+        return roundWeightString(trimmed);
+    }
+
+    // 2. Try specifications with a smart finder that ignores "Вага: 1" / "Вес: 1" defaults if other weight specs exist
     let weightSpec = product.specifications?.find(sp => {
         const name = sp.name.toLowerCase();
         const hasWeightKeyword = name.includes('вага') || name.includes('важ') || name.includes('вес') || name.includes("об'єм");
@@ -1757,12 +1768,6 @@ export function getProductWeight(product: ProductWeightInput): string {
             return roundWeightString(formattedVal);
         }
         return roundWeightString(val);
-    }
-
-    // 2. Try portionSize
-    if (product.portionSize) {
-        const hasUnit = /[гgкmшт]/i.test(product.portionSize);
-        if (hasUnit) return roundWeightString(product.portionSize);
     }
 
     // 3. Try multiplier with unit
