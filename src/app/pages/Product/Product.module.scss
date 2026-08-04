@@ -436,7 +436,6 @@ div.quantitySelector {
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: transform 0.2s linear;
 
         @media (min-width: 768px) {
             bottom: 34px;
@@ -448,15 +447,21 @@ div.quantitySelector {
             left: 55px;
         }
 
-        @media (any-hover: hover) {
-          &:hover {
-              transform: scale(1.05);
-          }
-        }
-
         svg {
             width: 26px;
             height: 26px;
+
+            path {
+                transition: fill 0.2s linear;
+            }
+        }
+
+        @media (any-hover: hover) {
+          &:hover {
+              svg path {
+                  fill: #E3051B;
+              }
+          }
         }
     }
 
@@ -472,17 +477,10 @@ div.quantitySelector {
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.3s ease;
 
         @media (min-width: 1280px) {
             bottom: 29px;
             right: 40px;
-        }
-
-        @media (any-hover: hover) {
-          &:hover {
-              transform: scale(1.1);
-          }
         }
 
         svg {
@@ -493,6 +491,25 @@ div.quantitySelector {
                 width: 56px;
                 height: 56px;
             }
+
+            circle {
+                transition: stroke 0.2s ease;
+            }
+
+            path {
+                transition: fill 0.2s ease;
+            }
+        }
+
+        @media (any-hover: hover) {
+          &:hover {
+              svg circle {
+                  stroke: #E3051B;
+              }
+              svg path {
+                  fill: #E3051B;
+              }
+          }
         }
     }
 
@@ -512,7 +529,7 @@ div.quantitySelector {
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background-color 0.2s linear, transform .2s linear;
+        transition: border-color 0.2s linear, color 0.2s linear, background-color 0.2s linear;
 
         @media (min-width: 768px) {
             width: 56px;
@@ -524,9 +541,14 @@ div.quantitySelector {
             display: block;
             width: 22px;
             height: 12px;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
+            background-color: currentColor;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            -webkit-mask-size: contain;
+            transition: background-color 0.2s linear;
 
             @media (min-width: 768px) {
                 height: 18px;
@@ -535,8 +557,9 @@ div.quantitySelector {
 
         @media (any-hover: hover) {
           &:hover {
-              background: rgba(255, 255, 255, 0.1);
-              transform: translateY(-50%) scale(1.05);
+              border-color: #E3051B;
+              background-color: #E3051B;
+              color: white;
           }
         }
 
@@ -554,7 +577,8 @@ div.quantitySelector {
         }
 
         &::after {
-            background-image: url('/icons/gallery-arrow-left.svg');
+            mask-image: url('/icons/gallery-arrow-left.svg');
+            -webkit-mask-image: url('/icons/gallery-arrow-left.svg');
         }
     }
 
@@ -566,7 +590,8 @@ div.quantitySelector {
         }
 
         &::after {
-            background-image: url('/icons/gallery-arrow-right.svg');
+            mask-image: url('/icons/gallery-arrow-right.svg');
+            -webkit-mask-image: url('/icons/gallery-arrow-right.svg');
         }
     }
 
