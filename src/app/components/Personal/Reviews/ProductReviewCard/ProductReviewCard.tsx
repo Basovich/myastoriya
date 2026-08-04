@@ -2,7 +2,7 @@
 
 import React from 'react';
 import clsx from 'clsx';
-import Image from 'next/image';
+import SafeProductImage from '@/app/components/ui/SafeProductImage/SafeProductImage';
 import { useParams } from 'next/navigation';
 import Button from '@/app/components/ui/Button/Button';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
@@ -81,7 +81,7 @@ export default function ProductReviewCard({
                     <div className={s.productImg}>
                         {isDeleted ? (
                             <div title={displayName} style={{ cursor: 'default', width: '100%', height: '100%' }}>
-                                <Image src={displayImage} alt={displayName} width={80} height={60} style={{ objectFit: 'cover' }} />
+                                <SafeProductImage src={productImage} alt={displayName} width={80} height={60} style={{ objectFit: 'cover' }} />
                             </div>
                         ) : (
                             <AppLink
@@ -90,7 +90,7 @@ export default function ProductReviewCard({
                                 rel="noopener noreferrer"
                                 title={displayName}
                             >
-                                <Image src={displayImage} alt={displayName} width={80} height={60} style={{ objectFit: 'cover' }} />
+                                <SafeProductImage src={productImage} alt={displayName} width={80} height={60} style={{ objectFit: 'cover' }} />
                             </AppLink>
                         )}
                     </div>

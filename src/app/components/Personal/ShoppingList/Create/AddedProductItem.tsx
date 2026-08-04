@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
+import SafeProductImage from '@/app/components/ui/SafeProductImage/SafeProductImage';
 import clsx from 'clsx';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
 import { useProductHref } from '@/hooks/useCategoryTree';
@@ -45,7 +45,7 @@ export default function AddedProductItem({
         <div className={s.addedItem}>
             <div className={s.addedItemLeft}>
                 <div className={s.addedItemImg}>
-                    <Image src={image} alt={name} width={88} height={88} />
+                    <SafeProductImage src={image} alt={name} width={88} height={88} />
                 </div>
                 <div className={s.addedItemInfo}>
                     <div className={s.addedItemInfoHead}>

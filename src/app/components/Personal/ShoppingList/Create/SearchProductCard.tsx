@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import SafeProductImage from '@/app/components/ui/SafeProductImage/SafeProductImage';
 import clsx from 'clsx';
 import Button from '@/app/components/ui/Button/Button';
 import AppLink from '@/app/components/ui/AppLink/AppLink';
@@ -52,7 +52,7 @@ export default function SearchProductCard({
     return (
         <div className={s.searchCard}>
             <div className={s.searchCardContent}>
-                <Image src={image} className={s.searchCardImg} alt={name} width={120} height={90} />
+                <SafeProductImage src={image} className={s.searchCardImg} alt={name} width={120} height={90} />
                 <div className={s.searchCardInfo}>
                     <h4 className={s.searchCardName}>
                         <AppLink href={productUrl} target="_blank" rel="noopener noreferrer">

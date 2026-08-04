@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
+import SafeProductImage from '@/app/components/ui/SafeProductImage/SafeProductImage';
 import Button from '@/app/components/ui/Button/Button';
 import { ShoppingListProduct } from '@/lib/graphql/queries/pages/shoppingList';
 import { formatPrice } from '@/utils/price';
@@ -36,26 +36,22 @@ export default function ShoppingListCard({
         const remainingCount = products.length - maxItems;
 
         const resolveImg = (prod: ShoppingListProduct) => {
-            const imgUrl = prod.image
-                ? (prod.image.grid2x || prod.image.main2x || prod.image.grid1x || prod.image.main1x || prod.image.big || '')
-                : '';
-            return imgUrl.startsWith('/')
-                ? `https://dev-api.myastoriya.com.ua${imgUrl}`
-                : imgUrl || '/images/product-placeholder.svg';
+            if (!prod.image) return '';
+            return prod.image.grid2x || prod.image.main2x || prod.image.grid1x || prod.image.main1x || prod.image.big || '';
         };
 
         const items = visibleProducts.map((prod, index) => (
             <div key={prod.id || index} className={s.productThumb}>
-                <Image src={resolveImg(prod)} alt={prod.name || 'Product'} width={56} height={42} />
+                <SafeProductImage src={resolveImg(prod)} alt={prod.name || 'Product'} width={56} height={42} />
             </div>
         ));
 
         if (hasMore) {
             const nextProd = products[maxItems];
-            const nextImg = nextProd ? resolveImg(nextProd) : '/images/product-placeholder.svg';
+            const nextImg = nextProd ? resolveImg(nextProd) : '';
             items.push(
                 <div key="overlay" className={s.productThumb}>
-                    <Image src={nextImg} alt="Ще товари" width={56} height={42} />
+                    <SafeProductImage src={nextImg} alt="Ще товари" width={56} height={42} />
                     <div className={s.overlay}>
                         <span>+{remainingCount}</span>
                     </div>

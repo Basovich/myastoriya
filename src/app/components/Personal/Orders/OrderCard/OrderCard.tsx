@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import SafeProductImage from '@/app/components/ui/SafeProductImage/SafeProductImage';
 import clsx from 'clsx';
 import s from './OrderCard.module.scss';
 import Button from '@/app/components/ui/Button/Button';
@@ -72,12 +73,12 @@ export default function OrderCard({
                 <div className={s.productsList}>
                     {displayProducts.map((src, idx) => (
                         <div key={idx} className={s.productThumb}>
-                            <Image src={src} alt="Product" width={64} height={64} className={s.img} />
+                            <SafeProductImage src={src} alt="Product" width={64} height={64} className={s.img} />
                         </div>
                     ))}
                     {remainingCount > 0 && (
                         <div className={s.productThumb}>
-                            <Image
+                            <SafeProductImage
                                 src={products[displayCount] || products[0]}
                                 alt="Product overlay"
                                 width={64} height={64}

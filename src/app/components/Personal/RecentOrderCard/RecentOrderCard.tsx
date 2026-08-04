@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import SafeProductImage from '@/app/components/ui/SafeProductImage/SafeProductImage';
 import { useParams } from 'next/navigation';
 import s from './RecentOrderCard.module.scss';
 
@@ -63,8 +63,8 @@ export default function RecentOrderCard({ status = '', items = [], totalItems = 
                                 const isOverlayItem = hasMore && i === displayLimit - 1;
                                 return (
                                     <div key={i} className={s.itemThumb}>
-                                        <Image 
-                                            src={src || '/images/product-placeholder.svg'} 
+                                        <SafeProductImage 
+                                            src={src} 
                                             alt="Product" 
                                             width={64} 
                                             height={64} 
