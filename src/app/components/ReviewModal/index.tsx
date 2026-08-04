@@ -24,43 +24,16 @@ interface ReviewModalProps {
     onSuccess?: () => void;
 }
 
-const RATING_CATEGORIES = [
-    { id: 'dishQuality', label: 'Якість страви чи товару' },
-    { id: 'serviceQuality', label: 'Якість сервісу' },
-    { id: 'deliverySpeed', label: 'Швидкість доставки' },
-    { id: 'interactionEase', label: 'Зручність взаємодії' },
-] as const;
-
-type RatingCategoryId = (typeof RATING_CATEGORIES)[number]['id'];
-
-type RatingsType = Record<RatingCategoryId, number>;
-
 const reviewSchema = Yup.object({
     name: Yup.string().trim().required("Ім'я є обов'язковим"),
     review: Yup.string().trim().required("Відгук є обов'язковим"),
-    ratings: Yup.object(
-        Object.fromEntries(
-            RATING_CATEGORIES.map(({ id }) => [id, Yup.number().min(1).max(5)])
-        )
-    ),
+    rating: Yup.number().min(1).max(5).required(),
 });
-
-const defaultRatings: RatingsType = {
-    dishQuality: 5,
-    serviceQuality: 5,
-    deliverySpeed: 5,
-    interactionEase: 5,
-};
 
 export default function ReviewModal({ isOpen, onClose, productId, onSuccess }: ReviewModalProps) {
     const { disableScroll, enableScroll } = useScrollLock();
     const [submitted, setSubmitted] = useState(false);
-    const [hoveredRatings, setHoveredRatings] = useState<Record<RatingCategoryId, number>>({
-        dishQuality: 0,
-        serviceQuality: 0,
-        deliverySpeed: 0,
-        interactionEase: 0,
-    });
+    const [hoveredRating, setHoveredRating] = useState<number>(0);
 
     useEffect(() => {
         if (isOpen) {
@@ -77,22 +50,18 @@ export default function ReviewModal({ isOpen, onClose, productId, onSuccess }: R
         initialValues: {
             name: user?.name || '',
             review: '',
-            ratings: { ...defaultRatings } as RatingsType,
+            rating: 5,
         },
         enableReinitialize: true,
         validationSchema: reviewSchema,
         onSubmit: async (values, { setStatus }) => {
             try {
                 const token = await getAccessToken();
-                const ratingsValues = Object.values(values.ratings);
-                const avgRating = Math.round(
-                    ratingsValues.reduce((sum, val) => sum + val, 0) / ratingsValues.length
-                );
 
                 if (productId) {
                     await addProductReviewApi(token || '', {
                         productId,
-                        rating: avgRating,
+                        rating: values.rating,
                         text: user ? values.review : `${values.name}: ${values.review}`,
                     });
                 } else {
@@ -115,11 +84,8 @@ export default function ReviewModal({ isOpen, onClose, productId, onSuccess }: R
         setTimeout(() => {
             formik.resetForm();
             setSubmitted(false);
+            setHoveredRating(0);
         }, 300);
-    };
-
-    const setRating = (categoryId: RatingCategoryId, value: number) => {
-        formik.setFieldValue(`ratings.${categoryId}`, value);
     };
 
     const params = useParams();
@@ -128,6 +94,10 @@ export default function ReviewModal({ isOpen, onClose, productId, onSuccess }: R
     const textareaLabel = productId
         ? (lang === 'ru' ? 'Напишите свое впечатление о товаре' : 'Напишіть своє враження про товар')
         : (lang === 'ru' ? 'Напишите свое впечатление о М\'ястории' : 'Напишіть своє враження про М\'ясторію');
+
+    const ratingLabel = productId
+        ? (lang === 'ru' ? 'Оценка товара' : 'Оцінка товару')
+        : (lang === 'ru' ? 'Оценка сервиса' : 'Оцінка сервісу');
 
     return (
         <Modal
@@ -187,37 +157,32 @@ export default function ReviewModal({ isOpen, onClose, productId, onSuccess }: R
                                 />
                             )}
 
-                            {/* Rating categories */}
+                            {/* Rating category */}
                             <div className={s.ratingsBlock}>
-                                {RATING_CATEGORIES.map(({ id, label }) => {
-                                    const currentRating = formik.values.ratings[id];
-                                    return (
-                                        <div key={id} className={s.ratingRow}>
-                                            <span className={s.ratingLabel}>{label}</span>
-                                            <div className={s.stars} role="group" aria-label={label}>
-                                                {Array.from({ length: 5 }, (_, i) => {
-                                                    const starValue = i + 1;
-                                                    const isFilled = starValue <= (hoveredRatings[id] || currentRating);
-                                                    return (
-                                                        <button
-                                                            key={i}
-                                                            type="button"
-                                                            aria-label={`${starValue} зірка`}
-                                                            className={clsx(s.starBtn, isFilled && s.starBtnFilled)}
-                                                            onClick={() => setRating(id, starValue)}
-                                                            onMouseEnter={() => setHoveredRatings(prev => ({ ...prev, [id]: starValue }))}
-                                                            onMouseLeave={() => setHoveredRatings(prev => ({ ...prev, [id]: 0 }))}
-                                                        >
-                                                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                <path d="M16 2.66667L20.12 11.0267L29.3333 12.36L22.6667 18.8533L24.24 28.0267L16 23.6933L7.76 28.0267L9.33333 18.8533L2.66667 12.36L11.88 11.0267L16 2.66667Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                            </svg>
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                                <div className={s.ratingRow}>
+                                    <span className={s.ratingLabel}>{ratingLabel}</span>
+                                    <div className={s.stars} role="group" aria-label={ratingLabel}>
+                                        {Array.from({ length: 5 }, (_, i) => {
+                                            const starValue = i + 1;
+                                            const isFilled = starValue <= (hoveredRating || formik.values.rating);
+                                            return (
+                                                <button
+                                                    key={i}
+                                                    type="button"
+                                                    aria-label={`${starValue} зірка`}
+                                                    className={clsx(s.starBtn, isFilled && s.starBtnFilled)}
+                                                    onClick={() => formik.setFieldValue('rating', starValue)}
+                                                    onMouseEnter={() => setHoveredRating(starValue)}
+                                                    onMouseLeave={() => setHoveredRating(0)}
+                                                >
+                                                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M16 2.66667L20.12 11.0267L29.3333 12.36L22.6667 18.8533L24.24 28.0267L16 23.6933L7.76 28.0267L9.33333 18.8533L2.66667 12.36L11.88 11.0267L16 2.66667Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                    </svg>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Review textarea */}
