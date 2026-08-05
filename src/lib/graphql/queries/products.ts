@@ -172,6 +172,8 @@ export interface Product {
     gift?: Product | null;
     giftText?: string | null;
     video?: string | null;
+    promoTitle?: string;
+    promoUrl?: string;
     inLikes?: boolean;
     rating?: number | null;
     favoritesPayload?: string;

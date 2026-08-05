@@ -21,7 +21,8 @@ import {
     Product,
     BlogPost,
     OrderingInfoBlock,
-    ProductsResponse
+    ProductsResponse,
+    Sale
 } from '@/lib/graphql';
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams } from '@/utils/filter-params';
@@ -314,7 +315,7 @@ export default async function DynamicCatalogPage({ params, searchParams }: Dynam
             () => getDeliveryBlocksApi(lang),
             [],
         ),
-        safeCall<{ data: any[] }>(
+        safeCall<{ data: Sale[] }>(
             () => getSalesApi(50, 1, lang, token ?? undefined),
             { data: [] },
         ),
@@ -322,7 +323,7 @@ export default async function DynamicCatalogPage({ params, searchParams }: Dynam
 
     if (salesResponse?.data && salesResponse.data.length > 0) {
         const saleChecks = await Promise.all(
-            salesResponse.data.map(async (sale: any) => {
+            salesResponse.data.map(async (sale: Sale) => {
                 const saleProds = await safeCall(
                     () => getProductsApi({ saleId: Number(sale.id), limit: 50 }, lang, token ?? undefined),
                     { data: [] },
@@ -333,8 +334,8 @@ export default async function DynamicCatalogPage({ params, searchParams }: Dynam
         );
         const foundSale = saleChecks.find(Boolean);
         if (foundSale) {
-            (product as any).promoTitle = foundSale.name || foundSale.title;
-            (product as any).promoUrl = `/actions/${foundSale.slug || foundSale.id}`;
+            product.promoTitle = foundSale.name || foundSale.title || undefined;
+            product.promoUrl = `/actions/${foundSale.slug || foundSale.id}`;
         }
     }
 

@@ -330,8 +330,8 @@ const ProductClient: React.FC<ProductClientProps> = ({
                                 ? `-${Math.floor(100 - (activePurchaseCost / activePurchaseOldCost) * 100)}%`
                                 : undefined}
                             videoUrl={product.video}
-                            promoTitle={(product as any).promoTitle || (product as any).saleName || (product as any).specialTitle}
-                            promoUrl={(product as any).promoUrl}
+                            promoTitle={product.promoTitle}
+                            promoUrl={product.promoUrl}
                         />
                     </section>
 
