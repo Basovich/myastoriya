@@ -20,7 +20,7 @@ interface DonenessModalProps {
 
 const translations = {
     ua: {
-        title: 'Виберіть ступінь просмажки',
+        title: 'Виберіть ступінь прожарки',
         buy: 'ДОДАТИ У КОШИК',
         adding: 'ДОДАВАННЯ...',
         close: 'Закрити',
