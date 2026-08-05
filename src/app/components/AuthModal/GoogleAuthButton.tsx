@@ -65,8 +65,12 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
                     id: result.user.id,
                     name: result.user.name || '',
                     surname: result.user.surname || '',
+                    patronymic: result.user.patronymic || '',
                     email: result.user.email || '',
                     phone: result.user.phone || '',
+                    birthday: result.user.birthday || '',
+                    sex: result.user.sex || '',
+                    avatar: result.user.avatar ?? null,
                     token: result.accessToken,
                     bonuses: result.user.bonuses,
                 };
@@ -76,8 +80,11 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
                     onIncompleteProfile({
                         name: result.user.name,
                         surname: result.user.surname,
+                        patronymic: result.user.patronymic,
                         email: result.user.email,
+                        birthday: result.user.birthday,
                         gender: result.user.sex,
+                        avatar: result.user.avatar,
                     });
                     return;
                 }
