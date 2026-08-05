@@ -9,7 +9,7 @@ import CountdownTimer from '../ui/CountdownTimer/CountdownTimer';
 import { type Sale, type Product, resolveProductImageUrl, getProductsApi, getProductWeight, getProductBadge } from '@/lib/graphql';
 import { useAppSelector } from '@/store/hooks';
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 24;
 
 const LOCALIZED_TEXTS = {
     ua: {
@@ -143,7 +143,11 @@ export default function ActionDetail({
                             token,
                         );
                         if (data.data?.length) {
-                            setProducts((prev) => [...prev, ...data.data]);
+                            setProducts((prev) => {
+                                const existingIds = new Set(prev.map((p) => String(p.id)));
+                                const uniqueNew = data.data.filter((p) => !existingIds.has(String(p.id)));
+                                return [...prev, ...uniqueNew];
+                            });
                             setHasMore(data.has_more_pages);
                             setPage(nextPage);
                         } else {
@@ -242,9 +246,9 @@ export default function ActionDetail({
             {products.length > 0 && (
                 <div className={s.productsSection}>
                     <div className={s.productsGrid}>
-                        {products.map((product) => (
+                        {products.map((product, index) => (
                             <ProductCard
-                                key={product.id}
+                                key={`${product.id}-${index}`}
                                 id={product.id}
                                 slug={product.slug}
                                 categoryId={product.categoryId}
