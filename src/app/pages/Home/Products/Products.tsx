@@ -37,7 +37,6 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
     const [hasMore, setHasMore] = useState(initialHasMore ?? true);
     const [page, setPage] = useState(1);
     const [isLocked, setIsLocked] = useState(false);
-    const [swiperInstance, setSwiperInstance] = useState<{ slideTo: (index: number) => void; slideToLoop: (index: number) => void } | null>(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -126,7 +125,6 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                     />
                     <Swiper
                         key={showcases.length}
-                        onSwiper={(swiper) => setSwiperInstance(swiper as any)}
                         modules={[Navigation]}
                         navigation={{ prevEl, nextEl }}
                         loop={true}
