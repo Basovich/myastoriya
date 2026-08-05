@@ -175,6 +175,14 @@ nav.breadcrumbsWrapper {
     &.newPrice {
         color: #E3051B;
     }
+
+    .currency {
+        font-size: 18px;
+
+        @media (min-width: 768px) {
+            font-size: 24px;
+        }
+    }
 }
 
 .oldPrice {
@@ -254,9 +262,16 @@ button.mainBuyBtn {
     text-transform: initial;
     background-color: #E3051B;
     border-radius: 8px;
+    transition: background-color 0.2s ease;
 
     @media (min-width: 768px) {
         height: 48px;
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            background-color: #000000 !important;
+        }
     }
 }
 

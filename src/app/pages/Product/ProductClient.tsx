@@ -361,11 +361,11 @@ const ProductClient: React.FC<ProductClientProps> = ({
                     <div className={s.priceSection}>
                         <div className={s.priceWrapper}>
                             <span className={clsx(s.price, activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost && s.newPrice)}>
-                                {formatPrice(activePurchaseCost)} ₴
+                                {formatPrice(activePurchaseCost)} <span className={s.currency}>₴</span>
                             </span>
                             {activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost && (
                                 <span className={s.oldPrice}>
-                                    {formatPrice(activePurchaseOldCost)} ₴
+                                    {formatPrice(activePurchaseOldCost)} <span className={s.currency}>₴</span>
                                 </span>
                             )}
                         </div>
