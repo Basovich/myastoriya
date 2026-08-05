@@ -182,6 +182,10 @@ export default function CatalogProductsClient({
                                 weight={getProductWeight(product)}
                                 price={product.cost}
                                 oldPrice={product.oldCost ?? undefined}
+
+                                purchaseCost={product.purchaseCost}
+
+                                purchaseOldCost={product.purchaseOldCost}
                                 unit={product.unit}
                                 badge={getProductBadge(product, lang)}
                                 image={resolveProductImageUrl(product)}
@@ -199,6 +203,10 @@ export default function CatalogProductsClient({
                                 weight={getProductWeight(product)}
                                 price={product.cost}
                                 oldPrice={product.oldCost ?? undefined}
+
+                                purchaseCost={product.purchaseCost}
+
+                                purchaseOldCost={product.purchaseOldCost}
                                 unit={product.unit}
                                 badge={getProductBadge(product, lang)}
                                 image={resolveProductImageUrl(product)}

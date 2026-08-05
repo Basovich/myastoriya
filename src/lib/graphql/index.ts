@@ -53,6 +53,7 @@ export {
     getDefaultCostVariant,
     getRoastDegreeScore,
     getProductWeight,
+    getProductFullPrice,
     resolveCategoryImageUrl,
 } from './queries/products';
 export type {

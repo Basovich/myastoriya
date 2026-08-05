@@ -34,6 +34,8 @@ export interface BlogProduct {
     productType: string | null;
     oldCost: number | null;
     cost: number;
+    purchaseCost?: number | null;
+    purchaseOldCost?: number | null;
     unit: string | null;
     multiplier: number | null;
     rating: number | null;
@@ -194,6 +196,8 @@ const BLOG_BY_SLUG_QUERY = /* GraphQL */ `
                 slug
                 cost
                 oldCost
+                purchaseCost
+                purchaseOldCost
                 unit
                 rating
                 hasCostVariants

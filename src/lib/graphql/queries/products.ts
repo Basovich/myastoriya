@@ -337,6 +337,8 @@ const PRODUCTS_QUERY = /* GraphQL */ `
                 name
                 cost
                 oldCost
+                purchaseCost
+                purchaseOldCost
                 unit
                 multiplier
                 is_new
@@ -484,6 +486,8 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                     name
                     cost
                     oldCost
+                    purchaseCost
+                    purchaseOldCost
                     unit
                     multiplier
                     is_new
@@ -544,6 +548,8 @@ const POPULAR_PRODUCTS_QUERY = /* GraphQL */ `
                 name
                 cost
                 oldCost
+                purchaseCost
+                purchaseOldCost
                 unit
                 multiplier
                 is_new
@@ -576,6 +582,8 @@ const SPECIALS_BY_PRODUCT_QUERY = /* GraphQL */ `
                     name
                     cost
                     oldCost
+                    purchaseCost
+                    purchaseOldCost
                     unit
                     multiplier
                     is_new
@@ -606,6 +614,8 @@ const BOUGHT_TOGETHER_PRODUCTS_QUERY = /* GraphQL */ `
             name
             cost
             oldCost
+            purchaseCost
+            purchaseOldCost
             unit
             multiplier
             is_new
@@ -650,6 +660,8 @@ const VIEWED_PRODUCTS_QUERY = /* GraphQL */ `
                 name
                 cost
                 oldCost
+                purchaseCost
+                purchaseOldCost
                 unit
                 multiplier
                 is_new
@@ -728,6 +740,8 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
                     name
                     cost
                     oldCost
+                    purchaseCost
+                    purchaseOldCost
                     unit
                     multiplier
                     is_new
@@ -1569,11 +1583,14 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
                 name
                 cost
                 oldCost
+                purchaseCost
+                purchaseOldCost
                 unit
                 multiplier
                 is_new
                 available
                 portionSize
+                hasCostVariants
                 specifications {
                     name
                     values
@@ -1684,6 +1701,42 @@ export interface ProductWeightInput {
         name: string;
         values: string[];
     }[] | null;
+}
+
+/**
+ * Повертає повну ціну товару для відображення у картці (вгорі великим шрифтом).
+ * Для вагових товарів (unit = "100 г" / "100 мл") — purchaseCost (ціна за весь об'єм).
+ * Для звичайних штучних товарів — cost (і є повною ціною).
+ */
+export function getProductFullPrice(product: {
+    cost: number;
+    oldCost?: number | null;
+    purchaseCost?: number | null;
+    purchaseOldCost?: number | null;
+    unit?: string | null;
+}): { fullPrice: number; fullOldPrice: number | undefined; isPricePerWeight: boolean } {
+    const unitLower = product.unit?.toLowerCase().trim() ?? '';
+    const isPricePerWeight =
+        unitLower === '100 г' || unitLower === '100г' ||
+        unitLower === '100 мл' || unitLower === '100мл';
+
+    if (isPricePerWeight && product.purchaseCost != null && product.purchaseCost > 0) {
+        return {
+            fullPrice: product.purchaseCost,
+            fullOldPrice: (product.purchaseOldCost != null && product.purchaseOldCost > product.purchaseCost)
+                ? product.purchaseOldCost
+                : undefined,
+            isPricePerWeight: true,
+        };
+    }
+
+    return {
+        fullPrice: product.cost,
+        fullOldPrice: (product.oldCost != null && product.oldCost > product.cost)
+            ? product.oldCost
+            : undefined,
+        isPricePerWeight: false,
+    };
 }
 
 export function getProductWeight(product: ProductWeightInput): string {

@@ -176,6 +176,10 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                             title={product.name}
                                             weight={getProductWeight(product)}
                                             price={product.cost}
+
+                                            purchaseCost={product.purchaseCost}
+
+                                            purchaseOldCost={product.purchaseOldCost}
                                             unit={product.unit ?? ""}
                                             badge={getProductBadge(product, lang)}
                                             image={resolveProductImageUrl(product as unknown as Product)}
@@ -209,6 +213,10 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                     title={product.name}
                                     weight={getProductWeight(product)}
                                     price={product.cost}
+
+                                    purchaseCost={product.purchaseCost}
+
+                                    purchaseOldCost={product.purchaseOldCost}
                                     unit={product.unit ?? ""}
                                     badge={getProductBadge(product, lang)}
                                     image={resolveProductImageUrl(product as unknown as Product)}

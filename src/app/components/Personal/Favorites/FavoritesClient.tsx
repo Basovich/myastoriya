@@ -112,6 +112,10 @@ export default function FavoritesClient({ lang }: FavoritesClientProps) {
                                     title={product.name}
                                     price={product.cost}
                                     oldPrice={product.oldCost ?? undefined}
+
+                                    purchaseCost={product.purchaseCost}
+
+                                    purchaseOldCost={product.purchaseOldCost}
                                     unit={product.unit}
                                     weight={getProductWeight(product)}
                                     image={resolveProductImageUrl(product)}

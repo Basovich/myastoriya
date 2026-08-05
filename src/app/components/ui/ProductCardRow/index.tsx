@@ -8,6 +8,7 @@ import AddToCartButton from '@/app/components/ui/AddToCartButton/AddToCartButton
 import AppLink from '@/app/components/ui/AppLink/AppLink';
 import clsx from "clsx";
 import { useProductHref } from '@/hooks/useCategoryTree';
+import { getProductFullPrice } from '@/lib/graphql';
 
 
 interface ProductCardRowProps {
@@ -18,6 +19,8 @@ interface ProductCardRowProps {
     weight: string;
     price: number;
     oldPrice?: number;
+    purchaseCost?: number | null;
+    purchaseOldCost?: number | null;
     unit: string;
     badge?: string | null;
     image: string;
@@ -34,6 +37,8 @@ export default function ProductCardRow({
     weight,
     price,
     oldPrice,
+    purchaseCost,
+    purchaseOldCost,
     unit,
     badge,
     image,
@@ -94,9 +99,19 @@ export default function ProductCardRow({
         ? (unit.toLowerCase().trim() === 'шт' ? '1 шт' : (isRu ? "1 единица" : "1 одиниця"))
         : formattedWeight;
 
-    const displayUnit = unit.toLowerCase() === "шт"
-        ? (isRu ? "За 1 шт" : "За 1 шт")
-        : `За ${unit}`;
+    const { fullPrice, fullOldPrice, isPricePerWeight } = getProductFullPrice({
+        cost: price,
+        oldCost: oldPrice,
+        purchaseCost,
+        purchaseOldCost,
+        unit,
+    });
+
+    const displayUnit = isPricePerWeight
+        ? `${price.toLocaleString('uk-UA')} ₴/${unit.replace(/\s+/g, '')}`
+        : (unit.toLowerCase() === "шт"
+            ? (isRu ? "За 1 шт" : "За 1 шт")
+            : `За ${unit}`);
 
     const productUrl = useProductHref(slug || String(id), categoryId);
 
@@ -150,12 +165,12 @@ export default function ProductCardRow({
                 <div className={s.footer}>
                     <div className={s.priceGroup}>
                         <div className={s.priceRow}>
-                            <span className={clsx(s.price, oldPrice && oldPrice > price && s.newPrice)}>{price.toLocaleString('uk-UA')} ₴</span>
-                            {oldPrice && oldPrice > price && (
-                                <span className={s.oldPrice}>{oldPrice.toLocaleString('uk-UA')} ₴</span>
+                            <span className={clsx(s.price, fullOldPrice && s.newPrice)}>{fullPrice.toLocaleString('uk-UA')} ₴</span>
+                            {fullOldPrice && (
+                                <span className={s.oldPrice}>{fullOldPrice.toLocaleString('uk-UA')} ₴</span>
                             )}
                         </div>
-                        <span className={s.unit}>{displayUnit}</span>
+                        <span className={clsx(s.unit, isPricePerWeight && s.unitPerWeight)}>{displayUnit}</span>
 
                     </div>
                     <AddToCartButton productId={String(id)} variant="full" className={s.buyBtn} hasCostVariants={hasCostVariants} />

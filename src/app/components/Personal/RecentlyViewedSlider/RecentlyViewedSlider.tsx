@@ -20,6 +20,8 @@ export interface RecentlyViewedProduct {
     weight: string;
     price: number;
     oldPrice?: number;
+    purchaseCost?: number | null;
+    purchaseOldCost?: number | null;
     unit: string;
     badge?: string | null;
     image: string;
