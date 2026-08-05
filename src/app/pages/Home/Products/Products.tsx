@@ -37,7 +37,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
     const [hasMore, setHasMore] = useState(initialHasMore ?? true);
     const [page, setPage] = useState(1);
     const [isLocked, setIsLocked] = useState(false);
-    const [swiperInstance, setSwiperInstance] = useState<{ slideToLoop: (index: number) => void } | null>(null);
+    const [swiperInstance, setSwiperInstance] = useState<{ slideTo: (index: number) => void; slideToLoop: (index: number) => void } | null>(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -126,7 +126,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                     />
                     <Swiper
                         key={showcases.length}
-                        onSwiper={setSwiperInstance}
+                        onSwiper={(swiper) => setSwiperInstance(swiper as any)}
                         modules={[Navigation]}
                         navigation={{ prevEl, nextEl }}
                         loop={true}
@@ -138,6 +138,21 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                         allowTouchMove={true}
                         slidesPerView="auto"
                         spaceBetween={8}
+                        onClick={(swiper) => {
+                            if (typeof swiper.clickedIndex === "number" && !isNaN(swiper.clickedIndex)) {
+                                swiper.slideTo(swiper.clickedIndex);
+                                const clickedEl = swiper.clickedSlide;
+                                if (clickedEl) {
+                                    const realIdxStr = clickedEl.getAttribute("data-real-index");
+                                    if (realIdxStr !== null) {
+                                        const realIdx = parseInt(realIdxStr, 10);
+                                        if (!isNaN(realIdx)) {
+                                            setActiveTab(realIdx);
+                                        }
+                                    }
+                                }
+                            }
+                        }}
                         onInit={(swiper) => {
                             setIsLocked(swiper.isLocked);
                         }}
@@ -149,16 +164,14 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                         {sliderShowcases.map((showcase, i) => {
                             const realIndex = i % showcases.length;
                             return (
-                                <SwiperSlide key={`${showcase.id}-${i}`} className={s.tabSlide}>
+                                <SwiperSlide 
+                                    key={`${showcase.id}-${i}`} 
+                                    className={s.tabSlide}
+                                    data-real-index={realIndex}
+                                >
                                     <Button
                                         variant="pill"
                                         active={activeTab === realIndex}
-                                        onClick={() => {
-                                            setActiveTab(realIndex);
-                                            if (swiperInstance) {
-                                                swiperInstance.slideToLoop(realIndex);
-                                            }
-                                        }}
                                         className={s.tabButton}
                                     >
                                         {showcase.name}
