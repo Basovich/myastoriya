@@ -1,5 +1,5 @@
 .mainBar {
-    background: #000000;
+    background: var(--color-header-bg);
     padding: 0;
     position: relative;
 }
@@ -119,7 +119,7 @@
 .scrolledMenu {
     overflow: hidden;
     max-height: 0;
-    background: #111111;
+    background: var(--color-header-bg);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     transition: max-height 0.35s ease, opacity 0.35s ease;
     opacity: 0;
