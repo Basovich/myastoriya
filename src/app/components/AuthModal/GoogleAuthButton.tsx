@@ -46,18 +46,20 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
                     }
                 }
 
-                let result;
-                try {
-                    result = await socialAuthApi('google', tokenResponse.access_token, deviceId, undefined, currentToken || undefined);
-                } catch (err) {
-                    const isUnauthorized = err instanceof GraphQLError && (err.errors.some(e => e.extensions?.error_code === 401 || e.message === 'Unauthorized'));
-                    if (isUnauthorized && currentToken) {
-                        await clearAuthCookies();
-                        result = await socialAuthApi('google', tokenResponse.access_token, deviceId, undefined, undefined);
-                    } else {
+                const executeSocialAuth = async (googleAccessToken: string, devId: string, userToken?: string) => {
+                    try {
+                        return await socialAuthApi('google', googleAccessToken, devId, undefined, userToken);
+                    } catch (err) {
+                        const isUnauthorized = err instanceof GraphQLError && (err.errors.some(e => e.extensions?.error_code === 401 || e.message === 'Unauthorized'));
+                        if (isUnauthorized && userToken) {
+                            await clearAuthCookies();
+                            return await socialAuthApi('google', googleAccessToken, devId, undefined, undefined);
+                        }
                         throw err;
                     }
-                }
+                };
+
+                const result = await executeSocialAuth(tokenResponse.access_token, deviceId, currentToken || undefined);
                 
                 await setAuthCookies(result.accessToken, result.refreshToken);
 
