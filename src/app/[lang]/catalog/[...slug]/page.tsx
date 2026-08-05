@@ -324,9 +324,9 @@ export default async function DynamicCatalogPage({ params, searchParams }: Dynam
     if (salesResponse?.data && salesResponse.data.length > 0) {
         const saleChecks = await Promise.all(
             salesResponse.data.map(async (sale: Sale) => {
-                const saleProds = await safeCall(
+                const saleProds = await safeCall<ProductsResponse>(
                     () => getProductsApi({ saleId: Number(sale.id), limit: 50 }, lang, token ?? undefined),
-                    { data: [] },
+                    { data: [], per_page: 50, current_page: 1, has_more_pages: false },
                 );
                 const isMatch = saleProds?.data?.some(p => String(p.id) === String(product.id));
                 return isMatch ? sale : null;

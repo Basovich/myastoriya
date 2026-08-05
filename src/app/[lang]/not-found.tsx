@@ -5,11 +5,16 @@ import { type Locale } from "@/i18n/config";
 export const dynamic = "force-dynamic";
 
 export default async function NotFound() {
-    // Next.js `not-found.tsx` does not receive `params` so we extract locale from headers
-    const headersList = await headers();
-    const pathname = headersList.get("x-invoke-path") || "";
-    const isRu = pathname.startsWith("/ru/") || pathname === "/ru";
-    const lang: Locale = isRu ? "ru" : "ua";
+    let lang: Locale = "ua";
+    try {
+        const headersList = await headers();
+        const pathname = headersList.get("x-pathname") || headersList.get("x-invoke-path") || "";
+        if (pathname.startsWith("/ru/") || pathname === "/ru") {
+            lang = "ru";
+        }
+    } catch {
+        // Fallback to default locale
+    }
     const dict = await getDictionary(lang);
 
     return (
