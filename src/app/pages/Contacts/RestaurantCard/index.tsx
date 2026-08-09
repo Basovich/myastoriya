@@ -1,10 +1,13 @@
+'use client';
+
 import s from "@/app/pages/Contacts/Contacts.module.scss";
-import React from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import {InfoItem} from "@/app/pages/Contacts/InfoItem";
 import Button from "@/app/components/ui/Button/Button";
 import { type Contact } from "@/lib/graphql";
 import { type Locale } from "@/i18n/config";
+import ContactFeedbackModal from "../ContactFeedbackModal/ContactFeedbackModal";
 
 const localLabels = {
     ua: {
@@ -12,14 +15,16 @@ const localLabels = {
         email: "E-mail",
         restaurantAddress: "Адреса",
         workingHours: "Графік роботи:",
-        buildRoute: "Побудувати маршрут на карті"
+        buildRoute: "Побудувати маршрут на карті",
+        writeLetter: "Написати листа"
     },
     ru: {
         phone: "Телефон",
         email: "E-mail",
         restaurantAddress: "Адрес",
         workingHours: "График работы:",
-        buildRoute: "Построить маршрут на карте"
+        buildRoute: "Построить маршрут на карте",
+        writeLetter: "Написать письмо"
     }
 };
 
@@ -30,6 +35,7 @@ interface ContactCardProps {
 }
 
 export function ContactCard({ contact, lang, className }: ContactCardProps) {
+    const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
     const labels = localLabels[lang];
     const phone = contact.phone || "";
     
@@ -59,55 +65,73 @@ export function ContactCard({ contact, lang, className }: ContactCardProps) {
         : `https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(displayAddress)}`;
 
     return (
-        <div className={clsx(s.restaurantCard, className)}>
-            <div className={s.cardInfo}>
-                {phone && (
-                    <InfoItem
-                        icon="phone"
-                        label={labels.phone}
-                        value={phone}
-                        isLink
-                        href={`tel:${phone.replace(/\s+/g, '')}`}
-                    />
+        <>
+            <div className={clsx(s.restaurantCard, className)}>
+                <div className={s.cardInfo}>
+                    {phone && (
+                        <InfoItem
+                            icon="phone"
+                            label={labels.phone}
+                            value={phone}
+                            isLink
+                            href={`tel:${phone.replace(/\s+/g, '')}`}
+                        />
+                    )}
+                    {contact.email && (
+                        <InfoItem
+                            icon="email"
+                            label={labels.email}
+                            value={contact.email}
+                            isLink
+                            href={`mailto:${contact.email}`}
+                        />
+                    )}
+                    {displayAddress && (
+                        <InfoItem
+                            icon="address"
+                            label={labels.restaurantAddress}
+                            value={displayAddress}
+                            isLink
+                            href={mapSearchUrl}
+                        />
+                    )}
+                    {workingHoursNode && (
+                        <InfoItem
+                            icon="time"
+                            label={labels.workingHours}
+                            value={workingHoursNode}
+                        />
+                    )}
+                    {!isMainOffice && <p className={s.location}>{displayName}</p>}
+                </div>
+                {isMainOffice ? (
+                    <Button
+                        variant="outline-black"
+                        className={s.mapButton}
+                        onClick={() => setIsFeedbackOpen(true)}
+                    >
+                        {labels.writeLetter}
+                    </Button>
+                ) : (
+                    displayAddress && (
+                        <Button
+                            href={mapDirUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="outline-black"
+                            className={s.mapButton}
+                        >
+                            {labels.buildRoute}
+                        </Button>
+                    )
                 )}
-                {contact.email && (
-                    <InfoItem
-                        icon="email"
-                        label={labels.email}
-                        value={contact.email}
-                        isLink
-                        href={`mailto:${contact.email}`}
-                    />
-                )}
-                {displayAddress && (
-                    <InfoItem
-                        icon="address"
-                        label={labels.restaurantAddress}
-                        value={displayAddress}
-                        isLink
-                        href={mapSearchUrl}
-                    />
-                )}
-                {workingHoursNode && (
-                    <InfoItem
-                        icon="time"
-                        label={labels.workingHours}
-                        value={workingHoursNode}
-                    />
-                )}
-                {!isMainOffice && <p className={s.location}>{displayName}</p>}
             </div>
-            {!isMainOffice && displayAddress && (
-                <Button
-                    href={mapDirUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    variant="outline-black"
-                    className={s.mapButton}
-                >
-                    {labels.buildRoute}
-                </Button>
-            )}
-        </div>
+
+            <ContactFeedbackModal
+                isOpen={isFeedbackOpen}
+                onClose={() => setIsFeedbackOpen(false)}
+                lang={lang}
+            />
+        </>
     );
 }

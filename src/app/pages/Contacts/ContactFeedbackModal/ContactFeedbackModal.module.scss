@@ -1,0 +1,156 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    overflow-y: auto;
+}
+
+.modalContainer {
+    position: relative;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+
+    @media (min-width: 1024px) {
+        align-items: stretch;
+    }
+
+    &:focus-visible {
+        outline: none;
+    }
+}
+
+.closeBtn {
+    width: 24px;
+    height: 24px;
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-bottom: 4px;
+    padding: 4px;
+    transition: opacity 0.2s;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.75;
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    @media (min-width: 1024px) {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        right: -40px;
+        top: 0;
+        margin-bottom: 0;
+    }
+
+    svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+
+        path {
+            fill: #ffffff;
+        }
+    }
+}
+
+.modal {
+    position: relative;
+    background: #ffffff;
+    border-radius: 14px;
+    width: 100%;
+    padding: 28px 24px 32px;
+    box-shadow: 0 14px 20px 0 rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    @media (min-width: 768px) {
+        padding: 32px 36px 36px;
+    }
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000000;
+    margin: 0;
+
+    @media (min-width: 768px) {
+        font-size: 22px;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+
+
+.submitBtn {
+    height: 46px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.successMessage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    padding: 20px 0;
+
+    .successIcon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #2a9d5c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+
+    .successText {
+        font-size: 16px;
+        font-weight: 700;
+        color: #000000;
+    }
+}
