@@ -26,7 +26,12 @@ export default function Hero({ slides, lang }: HeroProps) {
 
     // Helper to generate correct link from linkTo
     const getLink = (linkTo: Slide['linkTo']) => {
-        if (!linkTo || !linkTo.type) return "/actions";
+        if (!linkTo) return "/actions";
+
+        // If direct URL is specified by backend, use it
+        if (linkTo.url) return linkTo.url;
+        
+        if (!linkTo.type) return "/actions";
         
         const identifier = linkTo.slug || linkTo.id;
         if (!identifier) return "/actions";

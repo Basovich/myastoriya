@@ -14,8 +14,9 @@ export interface SlideImageWeb {
 
 export interface SlideLinkTo {
     type?: string | null;
-    id?: string | null;
+    id?: string | number | null;
     slug?: string | null;
+    url?: string | null;
 }
 
 export interface Slide {
@@ -27,8 +28,8 @@ export interface Slide {
 }
 
 export const SLIDES_QUERY = /* GraphQL */ `
-    query Slides($slide: String!) {
-        slides(slide: $slide) {
+    query Slides($slide: String!, $platform: String) {
+        slides(slide: $slide, platform: $platform) {
             id
             name
             image {
@@ -45,15 +46,16 @@ export const SLIDES_QUERY = /* GraphQL */ `
                 type
                 id
                 slug
+                url
             }
         }
     }
 `;
 
-export async function getSlidesApi(slideType: string = "main", lang?: string): Promise<Slide[]> {
+export async function getSlidesApi(slideType: string = "main", lang?: string, platform: string = "web"): Promise<Slide[]> {
     const data = await gqlRequest<{ slides: Slide[] }>(
         SLIDES_QUERY,
-        { slide: slideType },
+        { slide: slideType, platform },
         { next: { revalidate: 3600 }, lang },
     );
     return data.slides ?? [];
