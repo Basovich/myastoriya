@@ -1,5 +1,6 @@
 import s from "@/app/pages/Contacts/Contacts.module.scss";
 import React from "react";
+import clsx from "clsx";
 import {InfoItem} from "@/app/pages/Contacts/InfoItem";
 import Button from "@/app/components/ui/Button/Button";
 import { type Contact } from "../../../../lib/graphql/queries/pages/contacts";
@@ -22,7 +23,13 @@ const localLabels = {
     }
 };
 
-export function ContactCard({ contact, lang }: { contact: Contact; lang: Locale }) {
+interface ContactCardProps {
+    contact: Contact;
+    lang: Locale;
+    className?: string;
+}
+
+export function ContactCard({ contact, lang, className }: ContactCardProps) {
     const labels = localLabels[lang];
     const phone = contact.phone || "";
     
@@ -52,7 +59,7 @@ export function ContactCard({ contact, lang }: { contact: Contact; lang: Locale 
         : `https://www.google.com/maps/dir/?api=1&origin=My+Location&destination=${encodeURIComponent(displayAddress)}`;
 
     return (
-        <div className={s.restaurantCard}>
+        <div className={clsx(s.restaurantCard, className)}>
             <div className={s.cardInfo}>
                 {phone && (
                     <InfoItem

@@ -30,12 +30,17 @@ export default function ContactsPage({ dict, lang, categories }: ContactsPagePro
                 />
                 <Breadcrumbs items={breadcrumbs} className={s.breadcrumbsContainer} />
 
-                {categories.map((category) => (
+                {categories.map((category, catIndex) => (
                     <section className={s.section} key={category.id}>
                         <h2 className={s.sectionTitle}>{category.name}</h2>
                         <div className={s.restaurantList}>
-                            {category.contacts.map((contact) => (
-                                <ContactCard key={contact.id} contact={contact} lang={lang} />
+                            {category.contacts.map((contact, contactIndex) => (
+                                <ContactCard 
+                                    key={contact.id} 
+                                    contact={contact} 
+                                    lang={lang} 
+                                    className={catIndex === 0 && contactIndex === 0 ? s.firstCard : undefined}
+                                />
                             ))}
                         </div>
                     </section>
