@@ -359,6 +359,11 @@ textarea.commentTextarea {
     color: #000;
     opacity: 0.7;
     line-height: 1.4;
+    margin-top: 20px;
+
+    @media (min-width: 1024px) {
+        margin-top: 0;
+    }
 
     svg {
         flex-shrink: 0;

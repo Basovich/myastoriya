@@ -1074,11 +1074,11 @@ export default function Step2() {
                                         <span className={s.methodLabel}>
                                             {method.name} 
                                             <span className={s.methodPrice}>
-                                                ({method.deliveryCost === 0 ? 'Безкоштовно' : `${method.deliveryCost} ₴`})
+                                                ({method.deliveryCost === 0 ? 'Безкоштовно' : <>{method.deliveryCost} <span className={s.currency}>₴</span></>})
                                             </span>
                                             {method.disabled && method.needForAvailable && (
                                                 <span className={s.disabledNotice}>
-                                                    ({lang === 'ua' ? `ще ${method.needForAvailable} ₴` : `еще ${method.needForAvailable} ₴`})
+                                                    ({lang === 'ua' ? <>ще {method.needForAvailable} <span className={s.currency}>₴</span></> : <>еще {method.needForAvailable} <span className={s.currency}>₴</span></>})
                                                 </span>
                                             )}
                                             {showNpIcon && (
@@ -1181,8 +1181,8 @@ export default function Step2() {
                     {deliveries.length > 0 && deliveries.every(d => d?.disabled) && minOrderVal > 0 && (
                         <div className={s.minOrderWarning}>
                             {lang === 'ua' 
-                                ? `Для можливості доставки у це місто додайте товарів ще на ${minOrderVal} ₴`
-                                : `Для возможности доставки в этот город добавьте товаров еще на ${minOrderVal} ₴`}
+                                ? <>Для можливості доставки у це місто додайте товарів ще на {minOrderVal} <span className={s.currency}>₴</span></>
+                                : <>Для возможности доставки в этот город добавьте товаров еще на {minOrderVal} <span className={s.currency}>₴</span></>}
                         </div>
                     )}
                 </div>
@@ -1190,7 +1190,7 @@ export default function Step2() {
                 {hydrated && elapsedForFree > 0 && (
                     <div className={s.freeDeliveryBlock}>
                         <div className={s.freeDeliveryText}>
-                            Для безкоштовної доставки не вистачає <span>{elapsedForFree} ₴</span>
+                            Для безкоштовної доставки не вистачає <span>{elapsedForFree} <span className={s.currency}>₴</span></span>
                         </div>
                     </div>
                 )}

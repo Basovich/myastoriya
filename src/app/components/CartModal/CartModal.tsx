@@ -283,26 +283,26 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                                     readOnly
                                                 />
                                                 <button
-                                                    className={s.qtyBtn}
-                                                    onClick={() => handleUpdateQuantity(item.id, item.rowId, item.quantity + 1)}
-                                                >
-                                                    +
-                                                </button>
-                                            </div>
-                                            <div className={s.itemPriceBlock}>
-                                                <div className={s.itemPriceCol}>
-                                                    {item.product.originalPrice > item.product.price ? (
-                                                        <div className={s.itemTotalRow}>
-                                                            <span className={clsx(s.itemTotal, s.itemTotalDiscount)}>
-                                                                {item.product.price * item.quantity} ₴
-                                                            </span>
-                                                            <span className={s.itemTotalOriginal}>
-                                                                {item.product.originalPrice * item.quantity} ₴
-                                                            </span>
-                                                        </div>
-                                                    ) : (
-                                                        <span className={s.itemTotal}>{item.product.price * item.quantity} ₴</span>
-                                                    )}
+                                                     className={s.qtyBtn}
+                                                     onClick={() => handleUpdateQuantity(item.id, item.rowId, item.quantity + 1)}
+                                                 >
+                                                     +
+                                                 </button>
+                                             </div>
+                                             <div className={s.itemPriceBlock}>
+                                                 <div className={s.itemPriceCol}>
+                                                     {item.product.originalPrice > item.product.price ? (
+                                                         <div className={s.itemTotalRow}>
+                                                             <span className={clsx(s.itemTotal, s.itemTotalDiscount)}>
+                                                                 {item.product.price * item.quantity} <span className={s.currency}>₴</span>
+                                                             </span>
+                                                             <span className={s.itemTotalOriginal}>
+                                                                 {item.product.originalPrice * item.quantity} <span className={s.currency}>₴</span>
+                                                             </span>
+                                                         </div>
+                                                     ) : (
+                                                         <span className={s.itemTotal}>{item.product.price * item.quantity} <span className={s.currency}>₴</span></span>
+                                                     )}
                                                     <span className={s.itemUnitPrice}>
                                                         {item.product.unitPrice ?? item.product.price} грн / {item.product.unit || 'шт'}
                                                     </span>
@@ -337,7 +337,7 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                             </svg>
                                             <span>{lang === 'ru' ? 'Кешбэк баллами:' : 'Кешбек балами:'}</span>
                                         </div>
-                                        <span className={s.statValBlack}>{cashback} {lang === 'ru' ? 'Б' : 'Б'}</span>
+                                        <span className={s.statValBlack}>{cashback} <span className={s.currency}>{lang === 'ru' ? 'Б' : 'Б'}</span></span>
                                     </div>
                                 )}
                                 <div className={s.statRow}>
@@ -349,10 +349,10 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                     </div>
                                     <div className={s.totalPriceWrapper}>
                                         <span className={clsx(s.statValRed, originalTotalSum > totalSum && s.hasDiscount)}>
-                                            {totalSum.toLocaleString('uk-UA')} ₴
+                                            {totalSum.toLocaleString('uk-UA')} <span className={s.currency}>₴</span>
                                         </span>
                                         {originalTotalSum > totalSum && (
-                                            <span className={s.statValCrossed}>{originalTotalSum.toLocaleString('uk-UA')} ₴</span>
+                                            <span className={s.statValCrossed}>{originalTotalSum.toLocaleString('uk-UA')} <span className={s.currency}>₴</span></span>
                                         )}
                                     </div>
                                 </div>
@@ -414,8 +414,8 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
                                                     </Link>
                                                     <div className={s.sugInfo}>
                                                         <div className={s.sugPriceRow}>
-                                                            <span className={s.sugPriceRed}>{product.price} ₴</span>
-                                                            <span className={s.sugPriceCrossed}>{product.originalPrice} ₴</span>
+                                                            <span className={s.sugPriceRed}>{product.price} <span className={s.currency}>₴</span></span>
+                                                            <span className={s.sugPriceCrossed}>{product.originalPrice} <span className={s.currency}>₴</span></span>
                                                         </div>
                                                         <button className={s.sugAddBtn} onClick={() => handleAddToCart(product.id)}>
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">

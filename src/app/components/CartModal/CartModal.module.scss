@@ -553,6 +553,16 @@
     }
 }
 
+.currency {
+    font-size: 12px;
+    font-weight: inherit;
+    display: inline-block;
+
+    @media (min-width: 768px) {
+        font-size: 20px;
+    }
+}
+
 .itemUnitPrice {
     font-size: 10px;
     color: #000;

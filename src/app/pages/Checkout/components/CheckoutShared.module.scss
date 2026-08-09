@@ -327,6 +327,30 @@
     font-weight: 700;
     color: #000;
     margin-bottom: 2px;
+
+    @media (min-width: 1280px) {
+        font-size: 22px;
+    }
+}
+
+.currency {
+    font-size: 12px;
+    font-weight: inherit;
+    display: inline-block;
+
+    @media (min-width: 1280px) {
+        font-size: 18px;
+    }
+}
+
+.currencyLG {
+    font-size: 14px;
+    font-weight: inherit;
+    display: inline-block;
+
+    @media (min-width: 1280px) {
+        font-size: 20px;
+    }
 }
 
 .cartItemPriceDiscount {
@@ -376,9 +400,14 @@
 }
 
 .cartStatVal {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: #000;
+    line-height: 1;
+
+    @media (min-width: 1280px) {
+        font-size: 26px;
+    }
 
     &.discounted {
         color: #E3051B;
@@ -400,6 +429,7 @@
     color: #828282;
     text-decoration: line-through;
     font-weight: 400;
+    line-height: 1;
 }
 
 .cartLoading {

@@ -3,6 +3,7 @@
     border-radius: 14px;
     box-shadow: 0 14px 18px 0 rgba(0, 0, 0, 0.05);
     padding: 20px 16px;
+    margin-top: 16px;
 
     @media (min-width: 768px) {
         padding: 24px 28px;
@@ -10,6 +11,7 @@
 
     @media (min-width: 1024px) {
         padding: 28px 30px;
+        margin-top: 0;
     }
 
     &.applied {
