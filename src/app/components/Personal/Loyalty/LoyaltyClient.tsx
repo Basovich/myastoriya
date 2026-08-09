@@ -223,7 +223,10 @@ export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms,
                                         const rangeParts = step.range.includes(' до ') 
                                             ? step.range.split('Від ')[1].split(' до ')
                                             : [step.range.split('Від ')[1]];
-
+                                        
+                                        const stepPercent = discountPageData?.discountSteps?.[idx]?.discount 
+                                            ? `${discountPageData.discountSteps[idx].discount}%` 
+                                            : step.percent;
 
                                         return (
                                             <div key={step.id} className={s.stepItem}>
@@ -232,7 +235,7 @@ export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms,
                                                     <div className={s.stepRange}>
                                                         Від <strong>{rangeParts[0]}</strong>
                                                         {rangeParts[1] && <> до <strong>{rangeParts[1]}</strong></>} 
-                                                        {isLast && <> до</>} — <span className={s.redText}>{step.percent}</span> балами <br/> від суми чеку на рахунок клієнта;
+                                                        {isLast && <> до</>} — <span className={s.redText}>{stepPercent}</span> балами <br/> від суми чеку на рахунок клієнта;
                                                     </div>
                                                 </div>
                                             </div>
