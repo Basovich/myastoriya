@@ -184,7 +184,7 @@ export default async function CatalogContent({
                 <Image
                     src="/images/products/products-bg-logo.svg"
                     alt=""
-                    width={786}
+                    width={428}
                     height={1011}
                     className={s.bgLogo}
                     aria-hidden="true"

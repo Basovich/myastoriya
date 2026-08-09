@@ -106,20 +106,22 @@ nav.breadcrumbsCategory {
 
 .bgLogo {
     position: absolute;
-    right: -100px;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.04;
+    right: 0;
+    top: 60px;
+    opacity: 0.8;
     pointer-events: none;
     user-select: none;
     display: none;
+    z-index: 0;
 
-    @media (min-width: 1280px) {
+    @media (min-width: 1024px) {
         display: block;
     }
 }
 
 .mainInner {
+    position: relative;
+    z-index: 1;
     margin: 0 auto;
     padding: 24px 16px;
     display: flex;
