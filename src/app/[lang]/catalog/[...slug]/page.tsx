@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
@@ -17,6 +18,7 @@ import {
     getDeliveryBlocksApi,
     getSalesApi,
     resolveCategoryImageUrl,
+    resolveProductImageUrl,
     ProductCategory,
     Product,
     BlogPost,
@@ -31,6 +33,76 @@ import { getAccessToken } from '@/app/actions/authActions';
 interface DynamicCatalogPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export async function generateMetadata({ params }: DynamicCatalogPageProps): Promise<Metadata> {
+    const { lang, slug } = await params;
+    if (!slug || slug.length === 0) return {};
+
+    const lastSegment = slug[slug.length - 1];
+    const catalogTree = await getCatalogTreeApi(lang as Locale, 768, undefined).catch(() => [] as ProductCategory[]);
+    const categoryIndex = buildCategoryIndex(catalogTree);
+
+    // 1. Check if category
+    const categoryEntry = Array.from(categoryIndex.values()).find(
+        e => e.node.slug === lastSegment
+    );
+
+    if (categoryEntry) {
+        const categoryName = categoryEntry.node.name;
+        const categoryImage = resolveCategoryImageUrl(categoryEntry.node);
+        const description = `${categoryName} — замовляйте з доставкою від М'ясторія.`;
+
+        return {
+            title: categoryName,
+            description,
+            openGraph: {
+                title: categoryName,
+                description,
+                images: categoryImage ? [{ url: categoryImage, alt: categoryName }] : undefined,
+            },
+            twitter: {
+                card: 'summary_large_image',
+                title: categoryName,
+                description,
+                images: categoryImage ? [categoryImage] : undefined,
+            },
+        };
+    }
+
+    // 2. Check if product
+    const productId = await findProductIdBySlug(lastSegment, lang as Locale).catch(() => null);
+    if (productId) {
+        const product = await getProductByIdApi(productId, lang as Locale).catch(() => null);
+        if (product) {
+            const productName = product.name;
+            const productImage = resolveProductImageUrl(product);
+            const rawDescription = product.text
+                ? product.text.replace(/<[^>]*>/g, '').trim()
+                : '';
+            const description = rawDescription
+                ? rawDescription.slice(0, 160)
+                : `Купити ${productName} за найкращою ціною з доставкою від М'ясторія.`;
+
+            return {
+                title: productName,
+                description,
+                openGraph: {
+                    title: productName,
+                    description,
+                    images: productImage ? [{ url: productImage, alt: productName }] : undefined,
+                },
+                twitter: {
+                    card: 'summary_large_image',
+                    title: productName,
+                    description,
+                    images: productImage ? [productImage] : undefined,
+                },
+            };
+        }
+    }
+
+    return {};
 }
 
 /**

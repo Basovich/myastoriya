@@ -16,9 +16,21 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
     const { lang } = await params;
     const dict = await getDictionary(lang as Locale);
     const title = dict.catalog?.pageTitle ?? 'Каталог';
+    const description = `${title} — свіже м'ясо, стейки, бургери та напівфабрикати від М'ясторія.`;
     return {
         title,
-        description: title,
+        description,
+        openGraph: {
+            title,
+            description,
+            images: [{ url: '/images/og-image.jpg', alt: title }],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: ['/images/og-image.jpg'],
+        },
     };
 }
 
