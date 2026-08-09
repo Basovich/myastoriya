@@ -64,6 +64,52 @@ export async function getLoyaltyTermsApi(lang?: string): Promise<string | null> 
     }
 }
 
+export interface DiscountProgramContent {
+    block1Text?: string | null;
+    block2Text?: string | null;
+    block3TopText?: string | null;
+    block3StepsText?: string | null;
+}
+
+export interface DiscountStep {
+    discount: number;
+}
+
+export interface DiscountPageData {
+    discountProgramContent?: DiscountProgramContent | null;
+    discountSteps?: DiscountStep[] | null;
+    loyaltyTerms?: string | null;
+}
+
+const GET_DISCOUNT_PAGE_DATA = /* GraphQL */ `
+    query GetDiscountPageData {
+        discountProgramContent {
+            block1Text
+            block2Text
+            block3TopText
+            block3StepsText
+        }
+        discountSteps {
+            discount
+        }
+        loyaltyTerms
+    }
+`;
+
+export async function getDiscountPageDataApi(lang?: string): Promise<DiscountPageData | null> {
+    try {
+        const data = await gqlRequest<DiscountPageData>(
+            GET_DISCOUNT_PAGE_DATA,
+            undefined,
+            { lang }
+        );
+        return data;
+    } catch (error) {
+        console.error('Error fetching discountPageData:', error);
+        return null;
+    }
+}
+
 export async function getLoyaltyBarcodeApi(token: string, lang?: string): Promise<string | null> {
     try {
         const data = await gqlRequest<{ loyaltyBarcode: string | null }>(

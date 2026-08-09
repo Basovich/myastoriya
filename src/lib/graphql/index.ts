@@ -207,8 +207,14 @@ export {
     getUserDiscountInfoApi,
     getLoyaltyTermsApi,
     getLoyaltyBarcodeApi,
+    getDiscountPageDataApi,
 } from './queries/pages/loyalty';
-export type { UserDiscountInfo } from './queries/pages/loyalty';
+export type {
+    UserDiscountInfo,
+    DiscountProgramContent,
+    DiscountStep,
+    DiscountPageData,
+} from './queries/pages/loyalty';
 
 // Re-export restaurant menu
 export { getRestaurantMenuApi, getShopCustomMenuApi } from './queries/pages/restaurantMenu';
