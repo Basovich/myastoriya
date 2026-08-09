@@ -286,7 +286,7 @@ const CREATE_ORDER_MUTATION = /* GraphQL */ `
         $personsCount: Int,
         $communicationMethod: String,
         $source: String,
-        $device_type: String,
+        $platform: String,
         $dontCallBack: Boolean,
         $registerMe: Boolean,
         $password: String
@@ -339,7 +339,7 @@ export async function createOrderApi(
         personsCount?: number;
         communicationMethod?: string;
         source?: string;
-        device_type?: string;
+        platform?: string;
         dontCallBack?: boolean;
         registerMe?: boolean;
         password?: string;
@@ -349,7 +349,7 @@ export async function createOrderApi(
 ): Promise<CreateOrderResponse> {
     const finalVariables = {
         source: 'web',
-        device_type: 'web',
+        platform: 'web',
         ...variables,
     };
     const data = await gqlRequest<{ createOrder: CreateOrderResponse }>(
