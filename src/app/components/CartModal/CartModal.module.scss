@@ -320,7 +320,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 24px;
-        flex: initial;
+        flex: 1;
     }
 }
 
@@ -537,7 +537,8 @@
 
     @media (min-width: 1024px) {
         align-items: flex-start;
-        min-width: 100px;
+        min-width: initial;
+        width: fit-content;
     }
 }
 
@@ -575,8 +576,9 @@
 
 .itemTotalRow {
     display: flex;
-    align-items: baseline;
-    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
 }
 
 .itemTotalDiscount {
