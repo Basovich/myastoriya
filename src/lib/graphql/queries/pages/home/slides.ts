@@ -1,4 +1,4 @@
-import { gqlRequest } from "../../../client";
+import { gqlRequest } from "@/lib/graphql";
 
 export interface SlideImage {
     size1x?: string | null;
