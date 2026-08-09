@@ -285,6 +285,8 @@ const CREATE_ORDER_MUTATION = /* GraphQL */ `
         $comment: String,
         $personsCount: Int,
         $communicationMethod: String,
+        $source: String,
+        $device_type: String,
         $dontCallBack: Boolean,
         $registerMe: Boolean,
         $password: String
@@ -297,6 +299,7 @@ const CREATE_ORDER_MUTATION = /* GraphQL */ `
             comment: $comment,
             personsCount: $personsCount,
             communicationMethod: $communicationMethod,
+            source: $source,
             dontCallBack: $dontCallBack,
             registerMe: $registerMe,
             password: $password
@@ -314,7 +317,7 @@ const CREATE_ORDER_MUTATION = /* GraphQL */ `
 
 export async function getPaymentsApi(
     localityId?: number,
-    os?: string,
+    os: string = 'web',
     token?: string,
     lang?: string,
 ): Promise<Payment[]> {
@@ -335,6 +338,8 @@ export async function createOrderApi(
         comment?: string;
         personsCount?: number;
         communicationMethod?: string;
+        source?: string;
+        device_type?: string;
         dontCallBack?: boolean;
         registerMe?: boolean;
         password?: string;
@@ -342,9 +347,14 @@ export async function createOrderApi(
     token: string,
     lang?: string,
 ): Promise<CreateOrderResponse> {
+    const finalVariables = {
+        source: 'web',
+        device_type: 'web',
+        ...variables,
+    };
     const data = await gqlRequest<{ createOrder: CreateOrderResponse }>(
         CREATE_ORDER_MUTATION,
-        variables,
+        finalVariables,
         { token, lang },
     );
     return data.createOrder;
