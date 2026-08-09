@@ -198,9 +198,4 @@ button.mapButton {
     height: 36px;
     text-transform: none;
     flex-shrink: 0;
-
-    @media (min-width: 1280px) {
-        //width: 300px;
-        //margin-top: 4px;
-    }
 }
