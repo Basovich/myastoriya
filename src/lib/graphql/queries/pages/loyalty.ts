@@ -1,4 +1,4 @@
-import { gqlRequest } from '../../client';
+import {gqlRequest} from '../../client';
 
 export interface UserDiscountInfo {
     discount?: number | null;
@@ -98,12 +98,11 @@ const GET_DISCOUNT_PAGE_DATA = /* GraphQL */ `
 
 export async function getDiscountPageDataApi(lang?: string): Promise<DiscountPageData | null> {
     try {
-        const data = await gqlRequest<DiscountPageData>(
+        return await gqlRequest<DiscountPageData>(
             GET_DISCOUNT_PAGE_DATA,
             undefined,
-            { lang }
+            {lang}
         );
-        return data;
     } catch (error) {
         console.error('Error fetching discountPageData:', error);
         return null;
