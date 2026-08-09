@@ -21,6 +21,7 @@ export interface SlideLinkTo {
 
 export interface Slide {
     id: string;
+    slug?: string | null;
     name: string | null;
     image?: SlideImage | null;
     imageWeb?: SlideImageWeb | null;
@@ -31,6 +32,7 @@ export const SLIDES_QUERY = /* GraphQL */ `
     query Slides($slide: String!, $platform: String) {
         slides(slide: $slide, platform: $platform) {
             id
+            slug
             name
             image {
                 size1x

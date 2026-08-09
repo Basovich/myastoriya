@@ -24,28 +24,32 @@ export default function Hero({ slides, lang }: HeroProps) {
 
     const btnText = lang === 'ua' ? 'Дізнатися більше' : 'Узнать больше';
 
-    // Helper to generate correct link from linkTo
-    const getLink = (linkTo: Slide['linkTo']) => {
-        if (!linkTo) return "/actions";
+    // Helper to generate correct link from linkTo or slide.slug
+    const getLink = (linkTo: Slide['linkTo'], slideSlug?: string | null) => {
+        // Priority 1: Direct URL from linkTo
+        if (linkTo?.url) return linkTo.url;
 
-        // If direct URL is specified by backend, use it
-        if (linkTo.url) return linkTo.url;
-        
-        if (!linkTo.type) return "/actions";
-        
-        const identifier = linkTo.slug || linkTo.id;
-        if (!identifier) return "/actions";
+        // Priority 2: Structured linkTo type + identifier
+        if (linkTo && linkTo.type) {
+            const identifier = linkTo.slug || linkTo.id || slideSlug;
+            if (identifier) {
+                if (linkTo.type === "product") return `/catalog/${identifier}`;
+                if (linkTo.type === "category") return `/catalog/${identifier}`;
+                if (linkTo.type === "page") return `/${identifier}`;
+                return `/actions/${identifier}`;
+            }
+        }
 
-        if (linkTo.type === "product") return `/catalog/${identifier}`;
-        if (linkTo.type === "category") return `/catalog/${identifier}`;
-        if (linkTo.type === "page") return `/${identifier}`;
-        return `/actions/${identifier}`; // Default fallback for actions/sales
+        // Priority 3: Root-level slide.slug
+        if (slideSlug) return `/actions/${slideSlug}`;
+
+        return "/actions";
     };
 
     if (slides.length === 1) {
         const slide = slides[0];
         const imageUrl = slide.imageWeb?.desktop || slide.image?.size3x || slide.image?.size2x || '';
-        const href = getLink(slide.linkTo);
+        const href = getLink(slide.linkTo, slide.slug);
 
         return (
             <section className={s.hero} id="hero">
@@ -104,7 +108,7 @@ export default function Hero({ slides, lang }: HeroProps) {
             >
                 {slides.map((slide, index) => {
                     const imageUrl = slide.imageWeb?.desktop || slide.image?.size3x || slide.image?.size2x || '';
-                    const slideHref = getLink(slide.linkTo);
+                    const slideHref = getLink(slide.linkTo, slide.slug);
 
                     return (
                         <SwiperSlide key={slide.id || index}>

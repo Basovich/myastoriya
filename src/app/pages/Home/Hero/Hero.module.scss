@@ -12,6 +12,10 @@
         height: 522px;
     }
 
+    @media (min-width: 1280px) {
+        height: 560px;
+    }
+
     :global(.swiper-pagination) {
         display: flex;
         align-items: center;
