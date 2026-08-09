@@ -36,13 +36,17 @@
     background: transparent;
     border: 1px solid #3E3E3E;
     color: #ffffff;
-    padding: 0 24px;
+    padding: 0 12px;
     height: 48px;
     border-radius: 12px;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+
+    @media (min-width: 1440px) {
+        padding: 0 24px;
+    }
 
     @media (any-hover: hover) {
         &:hover {

@@ -55,7 +55,7 @@ const profileDict = {
       email: "E-mail",
       birthday: "День народження",
       gender: {
-        title: "Стать",
+        title: "Ваша стать",
         male: "Чоловіча",
         female: "Жіноча"
       },
@@ -89,7 +89,7 @@ const profileDict = {
       email: "E-mail",
       birthday: "День рождения",
       gender: {
-        title: "Пол",
+        title: "Ваш пол",
         male: "Мужской",
         female: "Женский"
       },

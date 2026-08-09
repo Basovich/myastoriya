@@ -213,7 +213,6 @@ export default function ProfileForm({ user, dict, onSubmit, submitStatus }: Prof
     return (
         <div className={s.profileFormContainer}>
             <h2 className={s.sectionTitle}>{dict.personalDataTitle}</h2>
-            
             <form className={s.form} onSubmit={formik.handleSubmit}>
                 <div className={s.fieldsGrid}>
                     <InputField
@@ -336,20 +335,23 @@ export default function ProfileForm({ user, dict, onSubmit, submitStatus }: Prof
                 </div>
 
                 <div className={s.genderSection}>
+                    <p className={s.sectionTitle}>{dict.gender.title}</p>
                     <div className={s.genderRow}>
-                        <div className={s.genderOptions}>
-                            <Checkbox
-                                checked={formik.values.gender === 'male'}
-                                onChange={() => formik.setFieldValue('gender', 'male')}
-                            >
-                                {dict.gender.male}
-                            </Checkbox>
-                            <Checkbox
-                                checked={formik.values.gender === 'female'}
-                                onChange={() => formik.setFieldValue('gender', 'female')}
-                            >
-                                {dict.gender.female}
-                            </Checkbox>
+                        <div className={s.genderGroup}>
+                            <div className={s.genderOptions}>
+                                <Checkbox
+                                    checked={formik.values.gender === 'male'}
+                                    onChange={() => formik.setFieldValue('gender', 'male')}
+                                >
+                                    {dict.gender.male}
+                                </Checkbox>
+                                <Checkbox
+                                    checked={formik.values.gender === 'female'}
+                                    onChange={() => formik.setFieldValue('gender', 'female')}
+                                >
+                                    {dict.gender.female}
+                                </Checkbox>
+                            </div>
                         </div>
 
                         <div className={s.googleLinkWrapper}>
