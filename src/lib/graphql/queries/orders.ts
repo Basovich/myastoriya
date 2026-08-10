@@ -300,6 +300,7 @@ const CREATE_ORDER_MUTATION = /* GraphQL */ `
             personsCount: $personsCount,
             communicationMethod: $communicationMethod,
             source: $source,
+            platform: $platform,
             dontCallBack: $dontCallBack,
             registerMe: $registerMe,
             password: $password
@@ -317,13 +318,13 @@ const CREATE_ORDER_MUTATION = /* GraphQL */ `
 
 export async function getPaymentsApi(
     localityId?: number,
-    os: string = 'web',
+    os?: string,
     token?: string,
     lang?: string,
 ): Promise<Payment[]> {
     const data = await gqlRequest<{ payments: Payment[] }>(
         PAYMENTS_QUERY,
-        { localityId, os },
+        { localityId, os: os || undefined },
         { token, lang },
     );
     return data.payments;
