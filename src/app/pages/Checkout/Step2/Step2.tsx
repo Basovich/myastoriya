@@ -1074,8 +1074,8 @@ export default function Step2() {
                                         <span className={s.methodLabel}>
                                             {method.name} 
                                             <span className={s.methodPrice}>
-                                                ({method.deliveryCost === 0 ? 'Безкоштовно' : <>{method.deliveryCost} <span className={s.currency}>₴</span></>})
-                                            </span>
+                                                 ({method.deliveryCost} <span className={s.currency}>₴</span>)
+                                             </span>
                                             {method.disabled && method.needForAvailable && (
                                                 <span className={s.disabledNotice}>
                                                     ({lang === 'ua' ? <>ще {method.needForAvailable} <span className={s.currency}>₴</span></> : <>еще {method.needForAvailable} <span className={s.currency}>₴</span></>})

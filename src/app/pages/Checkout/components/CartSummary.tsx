@@ -227,7 +227,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                                 </svg>
                                 Доставка:
                             </span>
-                            <span className={s.cartStatVal}>{deliveryPrice === undefined ? '—' : deliveryPrice === 0 ? 'Безкоштовно' : <>{deliveryPrice} <span className={s.currencyLG}>₴</span></>}</span>
+                            <span className={s.cartStatVal}>{deliveryPrice === undefined ? '---' : <>{deliveryPrice} <span className={s.currencyLG}>₴</span></>}</span>
                         </div>
 
                         <div className={s.cartStat}>
