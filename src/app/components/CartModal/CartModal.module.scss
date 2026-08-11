@@ -64,16 +64,25 @@
     align-self: flex-end;
     margin-bottom: 4px;
     padding: 4px;
-    transition: opacity 0.2s;
+    transition: color 0.2s ease, opacity 0.2s ease;
     z-index: 10;
 
     @media (min-width: 1024px) {
         padding: 4px;
     }
 
+    svg path {
+        transition: fill 0.2s ease;
+    }
+
     @media (any-hover: hover) {
         &:hover {
-            opacity: 0.75;
+            color: var(--color-accent);
+            opacity: 1;
+
+            svg path {
+                fill: var(--color-accent);
+            }
         }
     }
 
@@ -643,6 +652,23 @@
     position: absolute;
     top: 20px;
     right: 0;
+    color: #000000;
+    transition: color 0.2s ease, opacity 0.2s ease;
+
+    svg path {
+        transition: fill 0.2s ease;
+    }
+
+    @media (any-hover: hover) {
+        &:hover {
+            color: var(--color-accent);
+            opacity: 1;
+
+            svg path {
+                fill: var(--color-accent);
+            }
+        }
+    }
 
     @media (min-width: 1024px) {
         position: static;
