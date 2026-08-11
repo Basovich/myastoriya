@@ -304,40 +304,34 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
         },
     ];
 
-    // Determine current order status step index based on order.status or last history item
-    const currentStatusObj = order?.status || (sortedHistory.length > 0 ? sortedHistory[sortedHistory.length - 1] : null);
-    let currentStepIndex = -1;
-    if (currentStatusObj) {
-        currentStepIndex = standardStepsDef.findIndex(def => def.match(currentStatusObj));
-    }
-    // Fallback: if status didn't match directly, try finding latest matched history step
-    if (currentStepIndex === -1 && sortedHistory.length > 0) {
-        for (let i = standardStepsDef.length - 1; i >= 0; i--) {
-            if (sortedHistory.some(standardStepsDef[i].match)) {
-                currentStepIndex = i;
-                break;
-            }
-        }
-    }
-    if (currentStepIndex === -1 && order) {
-        currentStepIndex = 0; // Default to first step for active orders
+    // Build statusSteps: deduplicate statuses by label/key to avoid repeated entries (e.g. duplicate "Завершено")
+    const historyToRender = sortedHistory.length > 0
+        ? sortedHistory
+        : (order?.status ? [order.status] : []);
+
+    const uniqueStepsMap = new Map<string, { label: string; date: string; time: string }>();
+    for (const h of historyToRender) {
+        const matchedDef = standardStepsDef.find(def => def.match(h));
+        const label = matchedDef ? matchedDef.label : (h.name || '');
+        const hDateTime = formatOrderDateTime(h.createdAt || '');
+        
+        // Retain or update to latest entry for each distinct status label
+        uniqueStepsMap.set(label, {
+            label,
+            date: hDateTime.date,
+            time: hDateTime.time,
+        });
     }
 
-    // Build statusSteps: completed up to currentStepIndex, uncompleted after
-    const statusSteps: StatusStep[] = order ? standardStepsDef.map((def, idx) => {
-        const matchedHistory = sortedHistory.find(def.match);
-        const hDateTime = matchedHistory ? formatOrderDateTime(matchedHistory.createdAt || '') : { date: '', time: '' };
-        const isCompleted = idx <= currentStepIndex;
-        const isCurrent = idx === currentStepIndex;
+    const uniqueSteps = Array.from(uniqueStepsMap.values());
 
-        return {
-            label: def.label,
-            date: matchedHistory ? hDateTime.date : '',
-            time: matchedHistory ? hDateTime.time : '',
-            isCompleted,
-            isCurrent,
-        };
-    }) : [];
+    const statusSteps: StatusStep[] = order ? uniqueSteps.map((step, idx) => ({
+        label: step.label,
+        date: step.date,
+        time: step.time,
+        isCompleted: true,
+        isCurrent: idx === uniqueSteps.length - 1,
+    })) : [];
 
     const statusNameLower = (order?.status?.name || '').toLowerCase();
     const canLeaveReview = order ? (order.status?.id === '2'
