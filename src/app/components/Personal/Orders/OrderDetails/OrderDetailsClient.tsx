@@ -151,7 +151,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
     const { user } = useAppSelector((state) => state.auth);
 
     const [order, setOrder] = useState<Order | null>(null);
-    const [productDetailsMap, setProductDetailsMap] = useState<Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null; relatedProductGroups?: RelatedProductGroup[] | null; portionSize?: string | null; categoryId?: number | string | null }>>({});
+    const [productDetailsMap, setProductDetailsMap] = useState<Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null; relatedProductGroups?: RelatedProductGroup[] | null; portionSize?: string | null; categoryId?: number | string | null; purchaseCost?: number | null; purchaseOldCost?: number | null }>>({});
     const [orderReview, setOrderReview] = useState<OrderReview | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -177,7 +177,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                     .filter(id => !isNaN(id) && id > 0)
             ));
 
-            const detailsMap: Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null; relatedProductGroups?: RelatedProductGroup[] | null; portionSize?: string | null; categoryId?: number | string | null }> = {};
+            const detailsMap: Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null; relatedProductGroups?: RelatedProductGroup[] | null; portionSize?: string | null; categoryId?: number | string | null; purchaseCost?: number | null; purchaseOldCost?: number | null }> = {};
             if (productIds.length > 0) {
                 try {
                     const details = await getProductsByIdsApi(productIds, lang);
@@ -189,7 +189,9 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                             modifierGroups: prod.modifierGroups,
                             relatedProductGroups: prod.relatedProductGroups,
                             portionSize: prod.portionSize,
-                            categoryId: prod.categoryId
+                            categoryId: prod.categoryId,
+                            purchaseCost: prod.purchaseCost,
+                            purchaseOldCost: prod.purchaseOldCost,
                         };
                     });
                 } catch (e) {
@@ -402,6 +404,12 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                     const modifiersPrice = modifiersList.reduce((sum, m) => sum + (m.price || 0), 0);
                                     const finalPrice = product.cost + modifiersPrice;
 
+                                    const basePurchaseCost = product.totalCost ?? dbProduct?.purchaseCost;
+                                    const basePurchaseOldCost = product.totalOldCost ?? dbProduct?.purchaseOldCost;
+
+                                    const purchaseCost = basePurchaseCost != null ? (basePurchaseCost + modifiersPrice) : undefined;
+                                    const purchaseOldCost = basePurchaseOldCost != null ? (basePurchaseOldCost + modifiersPrice) : undefined;
+
                                     // Resolve image/icon for each modifier or related product
                                     const renderedModifiers = modifiersList.map((m) => {
                                         let modifierImage: string | null = null;
@@ -444,6 +452,8 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                             title={product.name}
                                             weight={product.totalWeight || (lang === 'ru' ? '1 шт.' : '1 шт.')}
                                             price={finalPrice}
+                                            purchaseCost={purchaseCost}
+                                            purchaseOldCost={purchaseOldCost}
                                             unit={product.unit || (lang === 'ru' ? 'шт.' : 'шт.')}
                                             image={resolvedImg}
                                             badge={null}
