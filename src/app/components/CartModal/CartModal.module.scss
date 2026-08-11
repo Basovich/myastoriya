@@ -333,7 +333,8 @@
 
     @media (min-width: 1024px) {
         padding-right: 0;
-        width: 290px;
+        flex: 1;
+        min-width: 0;
     }
 }
 
@@ -430,18 +431,21 @@
     gap: 12px;
 
     @media (min-width: 1024px) {
-        gap: 48px;
         flex-shrink: 0;
+        gap: 20px;
     }
 }
 
 .quantitySelector {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     border: 1px solid #060606;
     border-radius: 6px;
     height: 26px;
     width: 70px;
+    flex-shrink: 0;
+    box-sizing: border-box;
 
     @media (min-width: 1024px) {
         height: 36px;
@@ -462,6 +466,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    padding: 0;
 
     &:disabled {
         color: #CCCCCC;
@@ -487,6 +493,7 @@
 
 .qtyInput {
     flex: 1;
+    min-width: 0;
     width: 100%;
     height: 100%;
     background: transparent;
@@ -497,7 +504,8 @@
     font-weight: 700;
     line-height: 92.593%;
     text-align: center;
-    padding: 3px 0 0;
+    padding: 0;
+    margin: 0;
 
     &:focus-visible {
         outline: none;
@@ -526,7 +534,8 @@
     gap: 16px;
 
     @media (min-width: 1024px) {
-        gap: 32px;
+        gap: 20px;
+        flex-shrink: 0;
     }
 }
 
@@ -536,9 +545,10 @@
     gap: 2px;
 
     @media (min-width: 1024px) {
-        align-items: flex-start;
-        min-width: initial;
-        width: fit-content;
+        align-items: flex-end;
+        text-align: right;
+        width: 110px;
+        flex-shrink: 0;
     }
 }
 
@@ -577,7 +587,7 @@
 .itemTotalRow {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-end;
     gap: 2px;
 }
 
