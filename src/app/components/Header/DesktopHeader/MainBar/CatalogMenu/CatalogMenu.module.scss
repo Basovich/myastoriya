@@ -7,7 +7,33 @@
     background: rgba(0, 0, 0, 0.4);
     z-index: 1100;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.closeOverlayBtn {
+    margin: 32px auto 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    color: var(--color-accent);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+
+    span {
+        padding-top: 2px;
+    }
 }
 
 .menuWrapper {
@@ -17,6 +43,7 @@
     display: flex;
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    cursor: default;
 }
 
 .sidebar {

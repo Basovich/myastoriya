@@ -55,6 +55,18 @@
         }
     }
 
+    &.active {
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+
+        @media (any-hover: hover) {
+            &:hover {
+                border-color: var(--color-accent-hover);
+                background: rgba(227, 6, 19, 0.08);
+            }
+        }
+    }
+
     .catalogBtnInner {
         padding-top: 4px;
     }
