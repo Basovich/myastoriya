@@ -23,15 +23,24 @@ interface StoreMenuPageProps {
     initialCustomMenu?: ShopCustomMenuCategory[];
 }
 
-const getCategoryImage = (name?: string | null): string => {
-    if (!name) return "/images/cat-restaurant.png";
+const getCategoryImage = (cat: RestaurantMenuCategory): string => {
+    const name = cat.name || '';
     const lower = name.toLowerCase();
     if (lower.includes("бургер")) return "/images/cat-burgers.png";
     if (lower.includes("набор") || lower.includes("сет")) return "/images/cat-sets.png";
-    if (lower.includes("гриль") || lower.includes("м'яс") || lower.includes("стейк")) return "/images/cat-grill.png";
-    if (lower.includes("напівфаб")) return "/images/cat-branded.png";
-    if (lower.includes("ковбас") || lower.includes("сосис")) return "/images/cat-branded.png";
-    if (lower.includes("сир")) return "/images/cat-shashlik.png";
+    if (lower.includes("гриль") || lower.includes("м'яс") || lower.includes("стейк") || lower.includes("шашлик")) return "/images/cat-grill.png";
+    if (lower.includes("напівфаб") || lower.includes("ковбас") || lower.includes("сосис")) return "/images/cat-branded.png";
+    if (lower.includes("піц")) return "/images/cat-shashlik.png";
+    if (lower.includes("гарнір")) return "/images/cat-sets.png";
+    if (lower.includes("десерт")) return "/images/cat-sets.png";
+    if (lower.includes("напої") || lower.includes("напиток") || lower.includes("бар")) return "/images/cat-branded.png";
+
+    // Fallback: use first available product's image if present
+    const firstProductImg = cat.products?.find(p => p.images && p.images.length > 0)?.images?.[0]?.url?.main2x;
+    if (firstProductImg) {
+        return firstProductImg.startsWith('/') ? `https://dev-api.myastoriya.com.ua${firstProductImg}` : firstProductImg;
+    }
+
     return "/images/cat-restaurant.png";
 };
 
@@ -53,7 +62,7 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, initialMenu =
 
     const categories: CategoryCircleItem[] = foodCategories.map(cat => ({
         name: cat.name,
-        image: getCategoryImage(cat.name),
+        image: getCategoryImage(cat),
         href: `#${cat.id}`
     }));
 
