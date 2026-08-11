@@ -254,12 +254,6 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
 
     const { date, time } = order ? formatOrderDateTime(order.createdAt) : { date: '', time: '' };
 
-    // Sort statusHistory by date ascending
-    const history = order ? (order.statusHistory || []).filter((h): h is OrderStatus => h !== null) : [];
-    const sortedHistory = [...history].sort((a, b) =>
-        new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
-    );
-
     const isPickup =
         (order?.delivery?.service || '').toLowerCase().includes('самовивіз') ||
         (order?.delivery?.service || '').toLowerCase().includes('самовывоз');
@@ -305,6 +299,35 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                 (h.name || '').toLowerCase().includes('заверш'),
         },
     ];
+
+    // Combine statusHistory and order.status if order.status is missing from history
+    const history = order ? (order.statusHistory || []).filter((h): h is OrderStatus => h !== null) : [];
+    const allHistory = [...history];
+    if (order?.status) {
+        const alreadyPresent = allHistory.some(h =>
+            h.id === order.status?.id ||
+            (h.name && order.status?.name && h.name.toLowerCase() === order.status.name.toLowerCase())
+        );
+        if (!alreadyPresent) {
+            allHistory.push(order.status);
+        }
+    }
+
+    const getDefIndex = (h: OrderStatus) => {
+        const idx = standardStepsDef.findIndex(def => def.match(h));
+        return idx !== -1 ? idx : 999;
+    };
+
+    const sortedHistory = [...allHistory].sort((a, b) => {
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+
+        if (timeA > 0 && timeB > 0 && timeA !== timeB) {
+            return timeA - timeB;
+        }
+
+        return getDefIndex(a) - getDefIndex(b);
+    });
 
     // Build statusSteps: deduplicate statuses by label/key to avoid repeated entries (e.g. duplicate "Завершено")
     const historyToRender = sortedHistory.length > 0
