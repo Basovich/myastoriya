@@ -248,4 +248,30 @@ div.contentBlock {
     }
 }
 
+// ── Nova Poshta card styles ───────────────────────────────────────────────
+
+.npStoreLogo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #D42B1E;
+    border-radius: 4px;
+}
+
+.npTypeBadge {
+    font-size: 10px;
+    color: #D42B1E;
+    font-weight: 400;
+}
+
+.npCard {
+    border-color: transparent;
+
+    &.defaultCard {
+        border-color: #D42B1E;
+        box-shadow: 0 4px 12px rgba(212, 43, 30, 0.15);
+    }
+}
 

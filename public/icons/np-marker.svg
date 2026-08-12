@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="56" viewBox="0 0 44 56" fill="none">
+  <!-- Pin drop shadow -->
+  <ellipse cx="22" cy="54" rx="8" ry="2.5" fill="rgba(0,0,0,0.18)"/>
+  <!-- Pin body -->
+  <path d="M22 0C10.402 0 1 9.402 1 21C1 36.5 22 54 22 54C22 54 43 36.5 43 21C43 9.402 33.598 0 22 0Z" fill="#D42B1E"/>
+  <path d="M22 1C10.954 1 2 9.954 2 21C2 35.8 22 53 22 53C22 53 42 35.8 42 21C42 9.954 33.046 1 22 1Z" fill="#E8372A"/>
+  <!-- White circle -->
+  <circle cx="22" cy="21" r="14" fill="white"/>
+  <!-- NP Logo mark: stylized N shape -->
+  <path d="M13.5 14.5V27.5L22 19L30.5 27.5V14.5" stroke="#D42B1E" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Accent dots -->
+  <circle cx="22" cy="32" r="1.5" fill="#D42B1E" opacity="0"/>
+</svg>

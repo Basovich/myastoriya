@@ -1,0 +1,433 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: flex-start;
+    overflow-y: auto;
+    z-index: 1000;
+    padding: 40px 16px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+
+    @media (min-width: 768px) {
+        padding: 40px;
+    }
+}
+
+.overlayAfterOpen {
+    opacity: 1;
+}
+
+.overlayBeforeClose {
+    opacity: 0;
+}
+
+.modalWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    outline: none;
+    z-index: 1000;
+    margin: auto;
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    width: 100%;
+    max-width: 900px;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+
+    @media (min-width: 1024px) {
+        width: 1024px;
+        max-width: 100%;
+    }
+}
+
+.modalWrapperOpen {
+    .modal {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalWrapperBeforeClose {
+    .modal {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.closeBtn {
+    position: absolute;
+    top: -35px;
+    right: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1010;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: transform 0.2s, opacity 0.2s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        top: 0;
+        right: -40px;
+    }
+}
+
+.modalHeader {
+    padding: 28px 16px 20px;
+
+    @media (min-width: 768px) {
+        padding: 32px 40px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    @media (min-width: 1280px) {
+        gap: 24px;
+    }
+}
+
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+
+    @media (min-width: 768px) {
+        margin-bottom: 0;
+    }
+}
+
+.npBadge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFF0EF;
+    border-radius: 8px;
+    padding: 4px 10px;
+    flex-shrink: 0;
+}
+
+.npBadgeIcon {
+    width: 20px;
+    height: 20px;
+    background: #D42B1E;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.npBadgeText {
+    font-size: 11px;
+    font-weight: 700;
+    color: #D42B1E;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.title {
+    font-size: 16px;
+    color: #000;
+    text-transform: uppercase;
+    font-weight: 700;
+
+    @media (min-width: 768px) {
+        font-size: 18px;
+    }
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+    }
+
+    @media (min-width: 1280px) {
+        flex: 1 1;
+    }
+}
+
+.tabs {
+    display: flex;
+    background: #fff;
+    border-radius: 10px;
+    padding: 4px;
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.10);
+
+    @media (min-width: 768px) {
+        width: fit-content;
+    }
+
+    @media (min-width: 1280px) {
+        flex: 1 1;
+    }
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #000;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &.active {
+        color: #D42B1E;
+        border-color: #D42B1E;
+
+        svg {
+            color: #D42B1E;
+        }
+    }
+
+    span {
+        padding-top: 4px;
+    }
+}
+
+.search {
+    width: 100%;
+
+    @media (min-width: 768px) {
+        width: 320px;
+    }
+
+    @media (min-width: 1280px) {
+        flex: 1 1;
+        max-width: 240px;
+    }
+}
+
+.modalContent {
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    overflow: hidden;
+    height: 100%;
+}
+
+// ── List View ──────────────────────────────────────────────────────────────
+
+.listView {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1;
+}
+
+.warehouseList {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    max-height: 460px;
+    overflow-y: auto;
+
+    @media (min-width: 768px) {
+        padding: 0 40px;
+    }
+}
+
+.noResults {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 16px;
+    font-size: 16px;
+    color: #999;
+    font-weight: 500;
+    text-align: center;
+    width: 100%;
+    flex: 1;
+}
+
+.warehouseCard {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 16px;
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            border-color: rgba(212, 43, 30, 0.3);
+        }
+    }
+
+    &.selected {
+        border-color: #D42B1E;
+        box-shadow: 0 4px 12px rgba(212, 43, 30, 0.15);
+    }
+}
+
+.warehouseLogo {
+    width: 40px;
+    height: 40px;
+    background: #D42B1E;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    @media (min-width: 1280px) {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+.warehouseInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+}
+
+.warehouseName {
+    font-size: 13px;
+    font-weight: 600;
+    color: #000;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    @media (min-width: 768px) {
+        white-space: normal;
+    }
+}
+
+.warehouseSchedule {
+    font-size: 12px;
+    color: #666;
+    font-weight: 400;
+}
+
+.footer {
+    padding: 20px 16px 32px;
+    display: flex;
+    justify-content: flex-end;
+
+    @media (min-width: 768px) {
+        padding: 24px 40px 22px;
+    }
+}
+
+.confirmBtn {
+    width: 100%;
+    height: 48px;
+    font-size: 13px;
+    font-weight: 700;
+
+    @media (min-width: 768px) {
+        width: 280px;
+    }
+}
+
+// ── Map View ───────────────────────────────────────────────────────────────
+
+.mapView {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+
+    @media (min-width: 1024px) {
+        height: 600px;
+    }
+}
+
+.mapContainer {
+    flex: 1;
+    width: 100%;
+    position: relative;
+    background: #f0f0f0;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 14px;
+    color: #999;
+    flex: 1;
+}
+
+.mapInfo {
+    padding: 20px 24px 32px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    @media (min-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 24px 40px 32px;
+    }
+}
+
+.selectedAddress {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+    flex: 1;
+    text-align: start;
+    line-height: 1.4;
+}
+
+.mapHint {
+    font-size: 13px;
+    color: #999;
+    flex: 1;
+    text-align: start;
+}
