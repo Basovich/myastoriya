@@ -18,6 +18,7 @@ import s from './OrdersClient.module.scss';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import PersonalReviewModal from '@/app/components/Personal/Reviews/PersonalReviewModal/PersonalReviewModal';
 import { addToCartAsync, setCartModalOpen } from '@/store/slices/cartSlice';
+import UnavailableProductsModal, { UnavailableProduct } from './UnavailableProductsModal/UnavailableProductsModal';
 
 import {
     getOrdersApi,
@@ -181,9 +182,15 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
     const [productDetailsMap, setProductDetailsMap] = useState<Record<number, ProductDetails>>({});
     const [loading, setLoading] = useState(false);
 
-    // Modal state
+    // Review modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<{ id: string; ratings?: Record<string, number>; review?: string } | null>(null);
+
+    // Unavailable products modal state
+    const [unavailableProducts, setUnavailableProducts] = useState<UnavailableProduct[]>([]);
+    const [isUnavailableModalOpen, setIsUnavailableModalOpen] = useState(false);
+    // Whether to open cart after closing unavailable modal
+    const [openCartAfterUnavailable, setOpenCartAfterUnavailable] = useState(false);
 
     const loadData = useCallback(async () => {
         setLoading(true);
@@ -260,18 +267,48 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
             const items = order.items;
             if (!items || items.length === 0) return;
 
-            await Promise.all(
+            const results = await Promise.allSettled(
                 items.map((item) =>
                     dispatch(addToCartAsync({
                         id: item.id,
                         quantity: item.quantity,
-                    }))
+                    })).unwrap()
                 )
             );
-            dispatch(setCartModalOpen(true));
+
+            const failed: UnavailableProduct[] = [];
+            results.forEach((result, idx) => {
+                if (result.status === 'rejected') {
+                    const item = items[idx];
+                    failed.push({
+                        id: item.id,
+                        name: item.name,
+                        quantity: item.quantity,
+                    });
+                }
+            });
+
+            const hasAdded = failed.length < items.length;
+
+            if (failed.length > 0) {
+                setUnavailableProducts(failed);
+                setOpenCartAfterUnavailable(hasAdded);
+                setIsUnavailableModalOpen(true);
+            } else {
+                dispatch(setCartModalOpen(true));
+            }
         } catch (error) {
             console.error('Failed to repeat order:', error);
         }
+    };
+
+    const handleCloseUnavailableModal = () => {
+        setIsUnavailableModalOpen(false);
+        if (openCartAfterUnavailable) {
+            dispatch(setCartModalOpen(true));
+        }
+        setUnavailableProducts([]);
+        setOpenCartAfterUnavailable(false);
     };
 
     const handleLeaveReview = (orderId: string) => {
@@ -440,6 +477,13 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                     onSuccess={loadData}
                 />
             )}
+
+            <UnavailableProductsModal
+                isOpen={isUnavailableModalOpen}
+                onClose={handleCloseUnavailableModal}
+                products={unavailableProducts}
+                lang={lang}
+            />
         </div>
     );
 }
