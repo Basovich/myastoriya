@@ -17,11 +17,10 @@ import OrderCard from './OrderCard/OrderCard';
 import s from './OrdersClient.module.scss';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import PersonalReviewModal from '@/app/components/Personal/Reviews/PersonalReviewModal/PersonalReviewModal';
-import { fetchCartAsync } from '@/store/slices/cartSlice';
+import { addToCartAsync, setCartModalOpen } from '@/store/slices/cartSlice';
 
 import {
     getOrdersApi,
-    repeatOrderApi,
     getProductsByIdsApi,
     resolveProductImageUrl,
     getOrderReviewsApi,
@@ -256,14 +255,20 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
         }
     };
 
-    const handleRepeatOrder = async (orderId: string) => {
+    const handleRepeatOrder = async (order: Order) => {
         try {
-            const token = await getAccessToken();
-            if (!token) return;
-            const success = await repeatOrderApi(orderId, token, lang);
-            if (success) {
-                await dispatch(fetchCartAsync()).unwrap();
-            }
+            const items = order.items;
+            if (!items || items.length === 0) return;
+
+            await Promise.all(
+                items.map((item) =>
+                    dispatch(addToCartAsync({
+                        id: item.id,
+                        quantity: item.quantity,
+                    }))
+                )
+            );
+            dispatch(setCartModalOpen(true));
         } catch (error) {
             console.error('Failed to repeat order:', error);
         }
@@ -397,7 +402,7 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                                     date={date}
                                     time={time}
                                     dict={dict.card}
-                                    onRepeatOrder={() => handleRepeatOrder(order.id)}
+                                    onRepeatOrder={() => handleRepeatOrder(order)}
                                     onDetails={() => router.push(`/${lang}/personal/orders/${order.id}`)}
                                     onReview={
                                         canLeaveReview
