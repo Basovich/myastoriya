@@ -11,7 +11,6 @@ import s from './StatusModals.module.scss';
 
 interface Props {
     lang: Locale;
-    isCheckout?: boolean;
 }
 
 const translations = {
@@ -29,7 +28,7 @@ const translations = {
     }
 };
 
-function StatusModalsContent({ lang, isCheckout = false }: Props) {
+function StatusModalsContent({ lang }: Props) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -125,10 +124,10 @@ function StatusModalsContent({ lang, isCheckout = false }: Props) {
     );
 }
 
-export default function StatusModals({ lang, isCheckout }: Props) {
+export default function StatusModals({ lang }: Props) {
     return (
         <Suspense fallback={null}>
-            <StatusModalsContent lang={lang} isCheckout={isCheckout} />
+            <StatusModalsContent lang={lang} />
         </Suspense>
     );
 }
