@@ -10,7 +10,6 @@ import Step3 from './Step3/Step3';
 import s from './CheckoutPage.module.scss';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUseBonuses } from '@/store/slices/cartSlice';
-import StatusModals from '@/app/components/StatusModals/StatusModals';
 
 interface CheckoutPageProps {
     lang: Locale;
@@ -70,7 +69,6 @@ function CheckoutContent({ lang }: CheckoutPageProps) {
                     {currentStep === 3 && <Step3 lang={lang} />}
                 </div>
             </main>
-            <StatusModals lang={lang} isCheckout={true} />
         </>
     );
 }

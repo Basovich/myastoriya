@@ -12,7 +12,6 @@ import Breadcrumbs from '@/app/components/ui/Breadcrumbs/Breadcrumbs';
 import s from '@/app/[lang]/personal/PersonalLayout.module.scss';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { personalDict } from '../Shared/PersonalShared';
-import StatusModals from '@/app/components/StatusModals/StatusModals';
 
 interface PersonalLayoutClientProps {
     children: React.ReactNode;
@@ -79,7 +78,6 @@ export default function PersonalLayoutClient({ children, lang: paramsLang }: Per
                     </div>
                 </div>
             </div>
-            <StatusModals lang={lang} isCheckout={false} />
         </main>
     );
 }

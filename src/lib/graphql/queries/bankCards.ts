@@ -27,8 +27,8 @@ export const MARK_USER_BANK_CARD_AS_DEFAULT_MUTATION = `
 `;
 
 export const REQUEST_TOKENIZE_CARD_MUTATION = `
-  mutation RequestTokenizeCard {
-    requestTokenizeCard
+  mutation RequestTokenizeCard($returnPath: String) {
+    requestTokenizeCard(returnPath: $returnPath)
   }
 `;
 
@@ -82,11 +82,12 @@ export const markUserBankCardAsDefaultApi = async (
 
 export const requestTokenizeCardApi = async (
   token: string,
-  lang?: string
+  lang?: string,
+  returnPath?: string
 ): Promise<string | null> => {
   const data = await gqlRequest<{ requestTokenizeCard: string | null }>(
     REQUEST_TOKENIZE_CARD_MUTATION,
-    {},
+    { returnPath },
     { token, lang }
   );
   return data.requestTokenizeCard;

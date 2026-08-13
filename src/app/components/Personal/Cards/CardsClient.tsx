@@ -133,7 +133,7 @@ export default function CardsClient({ user, lang }: CardsClientProps) {
         try {
             const token = await getAccessToken();
             if (!token) return;
-            const url = await requestTokenizeCardApi(token, lang);
+            const url = await requestTokenizeCardApi(token, lang, '/personal/cards');
             if (url) {
                 window.open(url, '_blank');
             } else {

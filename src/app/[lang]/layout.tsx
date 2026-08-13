@@ -110,6 +110,8 @@ import Footer from "@/app/components/Footer/FooterClient";
 import { getAccessToken } from "@/app/actions/authActions";
 import { CategoryProvider } from "@/hooks/useCategoryTree";
 
+import StatusModals from "@/app/components/StatusModals/StatusModals";
+
 export default async function RootLayout({
   children,
   params,
@@ -156,6 +158,7 @@ export default async function RootLayout({
             {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
             {children}
             {!isMenuPage && <Footer lang={lang as Locale} initialSocialLinks={socialLinks} />}
+            <StatusModals lang={lang as Locale} />
           </CategoryProvider>
         </ReduxProvider>
       </body>

@@ -39,7 +39,7 @@ function StatusModalsContent({ lang, isCheckout = false }: Props) {
 
     const isCardSuccessOpen = cardStatus === 'success';
     const isCardErrorOpen = cardStatus === 'error';
-    const isPaymentFailedOpen = isCheckout && paymentStatus === 'failed';
+    const isPaymentFailedOpen = paymentStatus === 'failed';
 
     const isOpen = isCardSuccessOpen || isCardErrorOpen || isPaymentFailedOpen;
 

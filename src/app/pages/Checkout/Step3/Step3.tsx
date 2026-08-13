@@ -298,7 +298,7 @@ export default function Step3({ lang }: Step3Props) {
         try {
             const token = await getAccessToken();
             if (!token) return;
-            const url = await requestTokenizeCardApi(token, lang);
+            const url = await requestTokenizeCardApi(token, lang, '/checkout?step=3');
             if (url) {
                 window.open(url, '_blank');
             } else {
@@ -495,6 +495,7 @@ export default function Step3({ lang }: Step3Props) {
                     dontCallBack: contactMethod === 'dontCallBack',
                     useBonuses: useBonuses,
                     registerMe: isGuestUser ? true : undefined,
+                    returnPath: '/checkout?step=3',
                 },
                 token || '',
                 lang

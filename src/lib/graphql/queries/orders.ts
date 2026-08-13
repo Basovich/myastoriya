@@ -289,7 +289,8 @@ const CREATE_ORDER_MUTATION = /* GraphQL */ `
         $platform: String,
         $dontCallBack: Boolean,
         $registerMe: Boolean,
-        $password: String
+        $password: String,
+        $returnPath: String
     ) {
         createOrder(
             userData: $userData,
@@ -303,7 +304,8 @@ const CREATE_ORDER_MUTATION = /* GraphQL */ `
             platform: $platform,
             dontCallBack: $dontCallBack,
             registerMe: $registerMe,
-            password: $password
+            password: $password,
+            returnPath: $returnPath
         ) {
             action
             actionToken
@@ -344,6 +346,7 @@ export async function createOrderApi(
         dontCallBack?: boolean;
         registerMe?: boolean;
         password?: string;
+        returnPath?: string;
     },
     token: string,
     lang?: string,
