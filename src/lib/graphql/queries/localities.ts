@@ -90,11 +90,11 @@ export async function selectLocalityApi(id: number, lang?: string, token?: strin
     return data.selectLocality;
 }
 
-export async function getSelectedLocalityApi(lang?: string): Promise<Locality | null> {
+export async function getSelectedLocalityApi(lang?: string, token?: string): Promise<Locality | null> {
     const data = await gqlRequest<{ selectedLocality: Locality | null }>(
         SELECTED_LOCALITY_QUERY,
         undefined,
-        { lang }
+        { lang, token }
     );
     return data.selectedLocality;
 }

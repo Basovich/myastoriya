@@ -21,6 +21,7 @@ import {
 } from '@/lib/graphql';
 import { selectLocalityAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
+import { persistor } from '@/store';
 import s from './CitySelector.module.scss';
 import loaderStyles from '@/app/[lang]/loading.module.scss';
 import clsx from 'clsx';
@@ -134,7 +135,11 @@ export default function CitySelector({
                 }
 
                 if (!cityToSet) {
-                    const existing = await getSelectedLocalityApi(lang);
+                    // Pass auth token so backend can resolve city for authenticated users
+                    // even when the locality cookie for this session is not yet set
+                    const { store } = await import('@/store');
+                    const authToken = store.getState().auth.token ?? undefined;
+                    const existing = await getSelectedLocalityApi(lang, authToken);
                     if (existing) {
                         cityToSet = existing;
                     } else {
@@ -285,10 +290,12 @@ export default function CitySelector({
         try {
             const deviceId = getOrCreateDeviceId();
             await selectLocalityAction(city.id, lang, deviceId);
+            // Flush persist to localStorage before reload to avoid race condition
+            await persistor.flush();
             window.location.reload();
         } catch (error) {
             console.warn('[CitySelector] Failed to sync city with server:', error);
-            // Reload even if request failed, to make sure SSR syncs
+            await persistor.flush();
             window.location.reload();
         }
     };
@@ -305,9 +312,12 @@ export default function CitySelector({
             try {
                 const deviceId = getOrCreateDeviceId();
                 await selectLocalityAction(selectedCity.id, lang, deviceId);
+                // Flush persist to localStorage before reload to avoid race condition
+                await persistor.flush();
                 window.location.reload();
             } catch (error) {
                 console.warn('[CitySelector] Failed to sync confirmed city with server:', error);
+                await persistor.flush();
                 window.location.reload();
             }
         }
