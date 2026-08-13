@@ -45,10 +45,6 @@ function PickupPointCard({
     const shopSchedule = (matchedShop?.schedule && matchedShop.schedule.length > 0) 
         ? matchedShop.schedule 
         : point.schedule;
-        
-    const scheduleText = shopSchedule && shopSchedule.length > 0
-        ? shopSchedule.map(s => `${s.days}: ${s.workTime}`).join(', ')
-        : '';
 
     const title = lang === 'ua' ? "Заклад М'ясторія" : "Заведение М'ясторія";
 

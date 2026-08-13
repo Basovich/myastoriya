@@ -98,7 +98,6 @@ export default function Step2() {
     const [checkoutCity, setCheckoutCity] = useState<Locality | null>(null);
     
     const citySelectRef = useRef<HTMLDivElement>(null);
-    const npSelectRef = useRef<HTMLDivElement>(null);
     const isLoadingMoreCitiesRef = useRef(false);
 
     // Local states for custom city selector

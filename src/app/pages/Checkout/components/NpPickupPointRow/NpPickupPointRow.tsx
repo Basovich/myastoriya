@@ -26,10 +26,6 @@ function NpPickupPointCard({
 }) {
     const title = lang === 'ua' ? 'Нова Пошта' : 'Новая Почта';
 
-    const scheduleText = point.schedule && point.schedule.length > 0
-        ? point.schedule.map(sc => `${sc.days}: ${sc.workTime}`).join(', ')
-        : '';
-
     return (
         <div 
             className={clsx(
