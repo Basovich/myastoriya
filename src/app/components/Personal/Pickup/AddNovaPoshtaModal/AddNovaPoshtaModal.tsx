@@ -43,11 +43,19 @@ const dict = {
     },
 };
 
-// NP logo SVG for list cards
+// NP logo — letter Н
 function NpLogoIcon() {
     return (
-        <svg width="20" height="20" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 12V32L22 20L34 32V12" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <text
+                x="12"
+                y="18"
+                textAnchor="middle"
+                fontFamily="Arial, Helvetica, sans-serif"
+                fontWeight="900"
+                fontSize="17"
+                fill="white"
+            >Н</text>
         </svg>
     );
 }

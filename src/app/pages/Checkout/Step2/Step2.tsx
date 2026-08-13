@@ -9,7 +9,6 @@ import PromoBlock from '../components/PromoBlock/Index';
 import CustomSelect from '@/app/components/ui/CustomSelect/CustomSelect';
 import DatePicker from '@/app/components/ui/DatePicker/DatePicker';
 import Button from '@/app/components/ui/Button/Button';
-import Search from '@/app/components/ui/Search/Search';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { setSelectedCity } from '@/store/slices/localitySlice';
 import { fetchCartAsync } from '@/store/slices/cartSlice';
@@ -19,7 +18,9 @@ import { useParams } from 'next/navigation';
 import AddressRow from '../components/AddressRow/AddressRow';
 import AddAddressModal from '@/app/components/AddAddressModal/AddAddressModal';
 import PickupPointRow from '../components/PickupPointRow/PickupPointRow';
+import NpPickupPointRow from '../components/NpPickupPointRow/NpPickupPointRow';
 import AddPickupModal from '@/app/components/Personal/Pickup/AddPickupModal';
+import AddNovaPoshtaModal from '@/app/components/Personal/Pickup/AddNovaPoshtaModal/AddNovaPoshtaModal';
 import Image from 'next/image';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { getAccessToken } from '@/app/actions/authActions';
@@ -28,7 +29,6 @@ import {
     getLocalitiesApi, 
     getDeliveriesApi, 
     getDeliveryTimesApi, 
-    getWarehousesApi, 
     addUserPickupPointApi, 
     getUserPickupPointsApi,
     getUserAddressesApi, 
@@ -115,8 +115,7 @@ export default function Step2() {
     const [isLoadingCitiesList, setIsLoadingCitiesList] = useState(false);
     const [isLoadingMoreCities, setIsLoadingMoreCities] = useState(false);
 
-    // Local states for Nova Poshta selection dropdown
-    const [isOpenNPDropdown, setIsOpenNPDropdown] = useState(false);
+    // Local states for Nova Poshta selection
     const [deliveries, setDeliveries] = useState<Delivery[]>([]);
     const [dbAddresses, setDbAddresses] = useState<UserAddress[]>([]);
     const [guestAddresses, setGuestAddresses] = useState<Address[]>([]);
@@ -130,10 +129,8 @@ export default function Step2() {
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [selectedShopId, setSelectedShopId] = useState<string>('');
     const [isAddPickupModalOpen, setIsAddPickupModalOpen] = useState(false);
-    const [npSearchQuery, setNpSearchQuery] = useState('');
-    const [npResults, setNpResults] = useState<Warehouse[]>([]);
+    const [isAddNPModalOpen, setIsAddNPModalOpen] = useState(false);
     const [selectedNPRef, setSelectedNPRef] = useState<string>('');
-    const [isSearchingNP, setIsSearchingNP] = useState(false);
 
     const prevCityIdRef = useRef<number | null>(null);
     const hasAutoAppliedDefaultShopRef = useRef(false);
@@ -179,7 +176,6 @@ export default function Step2() {
                 if (parsed.selectedAddressId) setSelectedAddressId(parsed.selectedAddressId);
                 if (parsed.selectedShopId) setSelectedShopId(parsed.selectedShopId);
                 if (parsed.selectedNPRef) setSelectedNPRef(parsed.selectedNPRef);
-                if (parsed.npSearchQuery) setNpSearchQuery(parsed.npSearchQuery);
                 if (parsed.deliveryDate) {
                     const restoredDate = new Date(parsed.deliveryDate);
                     const today = new Date();
@@ -217,13 +213,12 @@ export default function Step2() {
             selectedAddressId,
             selectedShopId,
             selectedNPRef,
-            npSearchQuery,
             deliveryDate: deliveryDate ? deliveryDate.toISOString() : null,
             deliveryTime,
             selectedCity: checkoutCity,
         };
         localStorage.setItem('checkout_delivery_data', JSON.stringify(rawData));
-    }, [deliveryMethod, selectedAddressId, selectedShopId, selectedNPRef, npSearchQuery, deliveryDate, deliveryTime, checkoutCity]);
+    }, [deliveryMethod, selectedAddressId, selectedShopId, selectedNPRef, deliveryDate, deliveryTime, checkoutCity]);
 
     // 2. Load initial cities list on first open
     useEffect(() => {
@@ -282,9 +277,6 @@ export default function Step2() {
         const handleClickOutside = (event: MouseEvent) => {
             if (citySelectRef.current && !citySelectRef.current.contains(event.target as Node)) {
                 setIsOpenCitySelect(false);
-            }
-            if (npSelectRef.current && !npSelectRef.current.contains(event.target as Node)) {
-                setIsOpenNPDropdown(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -387,7 +379,7 @@ export default function Step2() {
             try {
                 const token = await getAccessToken();
                 if (token) {
-                    const data = await getUserPickupPointsApi('brand_store', token, lang);
+                    const data = await getUserPickupPointsApi(undefined, token, lang);
                     setUserPickupPoints(data);
                 }
             } catch (e) {
@@ -403,8 +395,6 @@ export default function Step2() {
             setDeliveries([]);
             setDeliveryMethod('');
             setSelectedNPRef('');
-            setNpSearchQuery('');
-            setIsOpenNPDropdown(false);
             prevCityIdRef.current = null;
             setIsLoadingDeliveries(false);
             return;
@@ -423,8 +413,6 @@ export default function Step2() {
             setDeliveries([]);
             setDeliveryMethod('');
             setSelectedNPRef('');
-            setNpSearchQuery('');
-            setIsOpenNPDropdown(false);
         }
 
         const fetchDeliveries = async () => {
@@ -479,26 +467,7 @@ export default function Step2() {
         fetchDeliveries();
     }, [checkoutCity, lang, restoredData, cartItems, cartLoading]);
 
-    // 7. Debounced search for Nova Poshta warehouses
-    useEffect(() => {
-        if (!checkoutCity) {
-            setNpResults([]);
-            return;
-        }
-        const fetchNP = async () => {
-            setIsSearchingNP(true);
-            try {
-                const res = await getWarehousesApi(checkoutCity.id, npSearchQuery, 50, 1, lang);
-                setNpResults(res.data);
-            } catch (e) {
-                console.error('Failed to fetch Nova Poshta warehouses', e);
-            } finally {
-                setIsSearchingNP(false);
-            }
-        };
-        const timer = setTimeout(fetchNP, 300);
-        return () => clearTimeout(timer);
-    }, [npSearchQuery, checkoutCity, lang]);
+
 
     // 8. Fetch dynamic delivery times
     useEffect(() => {
@@ -612,8 +581,10 @@ export default function Step2() {
     }, [addresses, selectedAddressId]);
 
     const pickupPoints = React.useMemo(() => {
-        const sortedUserPoints = [...userPickupPoints].sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
-        const list = [...sortedUserPoints, ...guestPickupPoints];
+        const sortedUserPoints = [...userPickupPoints]
+            .filter(p => p.type === 'brand_store' || !p.type)
+            .sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+        const list = [...sortedUserPoints, ...guestPickupPoints.filter(p => p.type === 'brand_store' || !p.type)];
         const seen = new Set<string>();
         return list.filter(point => {
             const matchedShop = shops.find(s => s.name === point.name || s.siteName === point.name);
@@ -625,6 +596,33 @@ export default function Step2() {
             return true;
         });
     }, [userPickupPoints, guestPickupPoints, shops]);
+
+    const npPickupPoints = React.useMemo(() => {
+        const sortedUserPoints = [...userPickupPoints]
+            .filter(p => p.type === 'nova_poshta')
+            .sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0));
+        const list = [...sortedUserPoints, ...guestPickupPoints.filter(p => p.type === 'nova_poshta')];
+        const seen = new Set<string>();
+        return list.filter(point => {
+            const key = point.name || point.id;
+            if (seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
+    }, [userPickupPoints, guestPickupPoints]);
+
+    // Set default selected Nova Poshta point
+    useEffect(() => {
+        if (npPickupPoints.length > 0) {
+            const exists = npPickupPoints.some(p => p.name === selectedNPRef || p.id === selectedNPRef);
+            if (!exists) {
+                const defaultNP = npPickupPoints.find(p => p.isDefault) || npPickupPoints[0];
+                setSelectedNPRef(defaultNP.name || defaultNP.id);
+            }
+        }
+    }, [npPickupPoints, selectedNPRef]);
 
     const existingShopIds = React.useMemo(() => {
         return pickupPoints
@@ -777,9 +775,25 @@ export default function Step2() {
             if (isShop || isNP) {
                 const token = await getAccessToken();
                 const type = isShop ? 'brand_store' : 'nova_poshta';
-                const key = isShop ? selectedShopId : selectedNPRef;
+                let key = '';
                 
-                if (key) {
+                if (isShop) {
+                    key = selectedShopId;
+                } else {
+                    const selectedPoint = npPickupPoints.find(p => p.name === selectedNPRef || p.id === selectedNPRef);
+                    if (selectedPoint) {
+                        const numericId = parseInt(selectedPoint.id, 10);
+                        if (!isNaN(numericId) && !selectedPoint.id.startsWith('guest')) {
+                            finalPickupPointId = numericId;
+                        } else {
+                            key = selectedPoint.name || selectedNPRef;
+                        }
+                    } else {
+                        key = selectedNPRef;
+                    }
+                }
+                
+                if (key && !finalPickupPointId) {
                     if (token) {
                         try {
                             const pickupPoint = await addUserPickupPointApi(type, key, token, lang);
@@ -799,7 +813,6 @@ export default function Step2() {
                 selectedAddressId,
                 selectedShopId,
                 selectedNPRef,
-                npSearchQuery,
                 deliveryDate: deliveryDate ? deliveryDate.toISOString() : null,
                 deliveryTime,
                 selectedCity: checkoutCity,
@@ -936,6 +949,49 @@ export default function Step2() {
                 msg = err.message;
             }
             setValidationError(msg);
+        }
+    };
+
+    const handleAddNPPoint = async (warehouse: Warehouse) => {
+        try {
+            const token = await getAccessToken();
+            if (token && isAuthenticated) {
+                const newPoint = await addUserPickupPointApi('nova_poshta', warehouse.ref, token, lang);
+                setUserPickupPoints(prev => {
+                    if (prev.some(p => p.id === newPoint.id)) return prev;
+                    return [...prev, newPoint];
+                });
+                setSelectedNPRef(newPoint.name || newPoint.id);
+            } else {
+                const tempPoint: UserPickupPoint = {
+                    id: `guest-np-${warehouse.ref}`,
+                    isDefault: false,
+                    type: 'nova_poshta',
+                    name: warehouse.name,
+                    schedule: warehouse.schedule,
+                };
+                setGuestPickupPoints(prev => {
+                    if (prev.some(p => p.id === tempPoint.id)) return prev;
+                    return [...prev, tempPoint];
+                });
+                setSelectedNPRef(tempPoint.name);
+            }
+            setIsAddNPModalOpen(false);
+        } catch (e) {
+            console.error('Failed to add Nova Poshta point:', e);
+            const tempPoint: UserPickupPoint = {
+                id: `guest-np-${warehouse.ref}`,
+                isDefault: false,
+                type: 'nova_poshta',
+                name: warehouse.name,
+                schedule: warehouse.schedule,
+            };
+            setGuestPickupPoints(prev => {
+                if (prev.some(p => p.id === tempPoint.id)) return prev;
+                return [...prev, tempPoint];
+            });
+            setSelectedNPRef(tempPoint.name);
+            setIsAddNPModalOpen(false);
         }
     };
 
@@ -1121,57 +1177,14 @@ export default function Step2() {
 
 
                                     {(hydrated && isSelected && !method.disabled && isMethodNP) && (
-                                        <div className={s.nestedSelectRow} ref={npSelectRef} onFocusCapture={() => setIsOpenNPDropdown(true)}>
-                                            <h4 className={s.nestedSelectTitle}>Введіть номер або адресу відділення Нової Пошти:</h4>
-                                            <Search 
-                                                value={npSearchQuery}
-                                                onChange={(val) => {
-                                                    setNpSearchQuery(val);
-                                                    setSelectedNPRef('');
-                                                    setIsOpenNPDropdown(true);
-                                                }}
-                                                placeholder="Пошук відділення (наприклад: 125 або Хрещатик)"
-                                                showButton={false}
-                                                className={s.nestedSearch}
+                                        <div className={s.nestedAddressRow}>
+                                            <NpPickupPointRow
+                                                points={npPickupPoints}
+                                                selectedNPRef={selectedNPRef}
+                                                onSelect={(point) => setSelectedNPRef(point.name || point.id)}
+                                                onAddClick={() => setIsAddNPModalOpen(true)}
+                                                lang={lang}
                                             />
-                                            {isOpenNPDropdown && (
-                                                <>
-                                                    {isSearchingNP ? (
-                                                        <div className={s.npLoader}>Пошук відділень...</div>
-                                                    ) : (
-                                                        <div className={s.npResultsList}>
-                                                            {npResults.map(wh => {
-                                                                const isWhSelected = selectedNPRef === wh.ref;
-                                                                return (
-                                                                    <div 
-                                                                        key={wh.ref} 
-                                                                        className={clsx(s.npResultItem, isWhSelected && s.npResultItemActive)}
-                                                                        onClick={() => {
-                                                                            setSelectedNPRef(wh.ref);
-                                                                            setNpSearchQuery(wh.name);
-                                                                            setIsOpenNPDropdown(false);
-                                                                        }}
-                                                                    >
-                                                                        <div className={s.npName}>{wh.name}</div>
-                                                                        {wh.schedule && wh.schedule.length > 0 && (
-                                                                            <div className={s.npSchedule}>
-                                                                                {wh.schedule.map((sch, idx) => (
-                                                                                    <span key={idx} className={s.npScheduleItem}>
-                                                                                        {sch.days}: {sch.workTime}
-                                                                                    </span>
-                                                                                ))}
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                            {!isSearchingNP && npResults.length === 0 && (
-                                                                <div className={s.npNoResults}>Нічого не знайдено</div>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                </>
-                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -1301,6 +1314,15 @@ export default function Step2() {
                 lang={lang}
                 existingShopIds={existingShopIds}
             />
+            {checkoutCity && (
+                <AddNovaPoshtaModal
+                    isOpen={isAddNPModalOpen}
+                    onClose={() => setIsAddNPModalOpen(false)}
+                    onAdd={handleAddNPPoint}
+                    lang={lang}
+                    localityId={checkoutCity.id}
+                />
+            )}
         </div>
     );
 }

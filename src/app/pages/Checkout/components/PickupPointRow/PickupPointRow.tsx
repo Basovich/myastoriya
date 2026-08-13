@@ -84,7 +84,15 @@ function PickupPointCard({
             </div>
             <div className={s.cardBody}>
                 <span className={s.cardAddress}>{displayAddress}</span>
-                {scheduleText && <span className={s.cardSchedule}>{scheduleText}</span>}
+                {shopSchedule && shopSchedule.length > 0 && (
+                    <div className={s.cardSchedule}>
+                        {shopSchedule.map((sc, idx) => (
+                            <div key={idx} className={s.scheduleItem}>
+                                {sc.days}: {sc.workTime}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
