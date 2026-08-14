@@ -533,7 +533,6 @@ export default function Step2() {
                 ? (addr.isDefault ? 'Основна адреса' : 'Адреса') 
                 : (addr.isDefault ? 'Основной адрес' : 'Адрес');
             
-            const streetPrefix = lang === 'ua' ? 'вул. ' : 'ул. ';
             const housePrefix = lang === 'ua' ? ', буд. ' : ', дом ';
             const aptPrefix = lang === 'ua' ? ', кв. ' : ', кв. ';
             
@@ -541,10 +540,16 @@ export default function Step2() {
             const houseVal = addr.house ? `${housePrefix}${addr.house}` : '';
             const aptVal = addr.apartment ? `${aptPrefix}${addr.apartment}` : '';
             
+            const STREET_PREFIXES = /^(вул\.|вулиця|просп\.|проспект|пров\.|провулок|бульв\.|бульвар|пл\.|площа|наб\.|набережна|ул\.|улица|пер\.|переулок|площадь|набережная)/i;
+            const streetPrefixStr = STREET_PREFIXES.test(streetVal.trim()) ? '' : (lang === 'ua' ? 'вул. ' : 'ул. ');
+            
+            const cityVal = addr.city || checkoutCity.name;
+            const cityStr = cityVal ? `${cityVal}, ` : '';
+
             return {
                 id: addr.id.toString(),
                 title,
-                street: `${streetPrefix}${streetVal}${houseVal}${aptVal}`,
+                street: `${cityStr}${streetPrefixStr}${streetVal}${houseVal}${aptVal}`,
                 city: addr.city
             };
         });
@@ -869,30 +874,38 @@ export default function Step2() {
                 setDbAddresses(prev => [created, ...prev]);
                 setSelectedAddressId(created.id.toString());
             } else {
-                const streetPrefix = lang === 'ua' ? 'вул. ' : 'ул. ';
+                const STREET_PREFIXES = /^(вул\.|вулиця|просп\.|проспект|пров\.|провулок|бульв\.|бульвар|пл\.|площа|наб\.|набережна|ул\.|улица|пер\.|переулок|площадь|набережная)/i;
+                const streetPrefixStr = STREET_PREFIXES.test((newAddr.street || '').trim()) ? '' : (lang === 'ua' ? 'вул. ' : 'ул. ');
                 const housePrefix = lang === 'ua' ? ', буд. ' : ', дом ';
                 const aptPrefix = lang === 'ua' ? ', кв. ' : ', кв. ';
                 
+                const cityVal = newAddr.city || checkoutCity?.name;
+                const cityStr = cityVal ? `${cityVal}, ` : '';
+
                 const tempAddr: Address = {
                     id: newAddr.id || Math.random().toString(),
                     title: newAddr.title || (lang === 'ua' ? 'Тимчасова адреса' : 'Временный адрес'),
-                    street: `${streetPrefix}${newAddr.street}${newAddr.house ? `${housePrefix}${newAddr.house}` : ''}${newAddr.apartment ? `${aptPrefix}${newAddr.apartment}` : ''}`,
-                    city: newAddr.city || checkoutCity?.name || 'Київ',
+                    street: `${cityStr}${streetPrefixStr}${newAddr.street}${newAddr.house ? `${housePrefix}${newAddr.house}` : ''}${newAddr.apartment ? `${aptPrefix}${newAddr.apartment}` : ''}`,
+                    city: cityVal,
                 };
                 setGuestAddresses(prev => [...prev, tempAddr]);
                 setSelectedAddressId(tempAddr.id);
             }
         } catch (e) {
             console.error('Failed to create address:', e);
-            const streetPrefix = lang === 'ua' ? 'вул. ' : 'ул. ';
+            const STREET_PREFIXES = /^(вул\.|вулиця|просп\.|проспект|пров\.|провулок|бульв\.|бульвар|пл\.|площа|наб\.|набережна|ул\.|улица|пер\.|переулок|площадь|набережная)/i;
+            const streetPrefixStr = STREET_PREFIXES.test((newAddr.street || '').trim()) ? '' : (lang === 'ua' ? 'вул. ' : 'ул. ');
             const housePrefix = lang === 'ua' ? ', буд. ' : ', дом ';
             const aptPrefix = lang === 'ua' ? ', кв. ' : ', кв. ';
             
+            const cityVal = newAddr.city || checkoutCity?.name;
+            const cityStr = cityVal ? `${cityVal}, ` : '';
+
             const tempAddr: Address = {
                 id: newAddr.id || Math.random().toString(),
                 title: newAddr.title || (lang === 'ua' ? 'Тимчасова адреса' : 'Временный адрес'),
-                street: `${streetPrefix}${newAddr.street}${newAddr.house ? `${housePrefix}${newAddr.house}` : ''}${newAddr.apartment ? `${aptPrefix}${newAddr.apartment}` : ''}`,
-                city: newAddr.city || checkoutCity?.name || 'Київ',
+                street: `${cityStr}${streetPrefixStr}${newAddr.street}${newAddr.house ? `${housePrefix}${newAddr.house}` : ''}${newAddr.apartment ? `${aptPrefix}${newAddr.apartment}` : ''}`,
+                city: cityVal,
             };
             setGuestAddresses(prev => [...prev, tempAddr]);
             setSelectedAddressId(tempAddr.id);
@@ -1304,6 +1317,7 @@ export default function Step2() {
             <AddAddressModal 
                 isOpen={isAddAddressModalOpen} 
                 onClose={() => setIsAddAddressModalOpen(false)} 
+                initialCity={checkoutCity ? { id: checkoutCity.id, name: checkoutCity.name } : null}
                 onAdd={handleAddAddress}
             />
             <AddPickupModal 

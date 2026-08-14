@@ -19,6 +19,7 @@ import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { useLogout } from '@/hooks/useLogout';
 import s from './AddressesClient.module.scss';
 import clsx from 'clsx';
+import { useAppSelector } from '@/store/hooks';
 import * as Sentry from "@sentry/nextjs";
 
 interface AddressesClientProps {
@@ -37,7 +38,10 @@ const localDict = {
         error: "Помилка при завантаженні адрес",
         addressTitle: (index: number) => `Моя адреса №${index}`,
         formatAddress: (city: string, street?: string, house?: string, apartment?: string | number) => {
-            const streetStr = street ? (street.startsWith('вул.') ? street : `вул. ${street}`) : '';
+            const STREET_PREFIXES_UA = /^(вул\.|вулиця|просп\.|проспект|пров\.|провулок|бульв\.|бульвар|пл\.|площа|наб\.|набережна)/i;
+            const streetStr = street
+                ? (STREET_PREFIXES_UA.test(street.trim()) ? street : `вул. ${street}`)
+                : '';
             const houseStr = house ? `, буд. ${house}` : '';
             const aptStr = apartment ? `, кв. ${apartment}` : '';
             return `${city}, ${streetStr}${houseStr}${aptStr}`;
@@ -54,7 +58,10 @@ const localDict = {
         error: "Ошибка при загрузке адресов",
         addressTitle: (index: number) => `Мой адрес №${index}`,
         formatAddress: (city: string, street?: string, house?: string, apartment?: string | number) => {
-            const streetStr = street ? (street.startsWith('ул.') ? street : `ул. ${street}`) : '';
+            const STREET_PREFIXES_RU = /^(ул\.|улица|просп\.|проспект|пер\.|переулок|бульв\.|бульвар|пл\.|площадь|наб\.|набережная)/i;
+            const streetStr = street
+                ? (STREET_PREFIXES_RU.test(street.trim()) ? street : `ул. ${street}`)
+                : '';
             const houseStr = house ? `, дом ${house}` : '';
             const aptStr = apartment ? `, кв. ${apartment}` : '';
             return `${city}, ${streetStr}${houseStr}${aptStr}`;
@@ -64,6 +71,7 @@ const localDict = {
 };
 
 export default function AddressesClient({ user, lang }: AddressesClientProps) {
+    const selectedCity = useAppSelector(state => state.locality.selectedCity);
     const [addresses, setAddresses] = useState<UserAddress[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -170,10 +178,19 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
                     apartment: data.apartment ? parseInt(data.apartment, 10) : undefined,
                     entrance: data.entrance ? parseInt(data.entrance, 10) : undefined,
                     floor: data.floor ? parseInt(data.floor, 10) : undefined,
-                    isDefault: addresses.length === 0, // Set as default if it's the first address
+                    isDefault: true, // New address always becomes the default
                 }, token);
-                
-                setAddresses(prev => [...prev, newAddress]);
+
+                // If the new address is default, mark previous default as non-default locally
+                setAddresses(prev => [
+                    ...prev.map(a => ({ ...a, isDefault: false })),
+                    newAddress
+                ]);
+
+                // Also call API to persist the default for the new address
+                if (newAddress.id) {
+                    await markUserAddressAsDefaultApi(newAddress.id, token);
+                }
             }
         } catch (error) {
             console.error('Failed to create address:', error);
@@ -254,6 +271,7 @@ export default function AddressesClient({ user, lang }: AddressesClientProps) {
             <AddAddressModal 
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                initialCity={selectedCity ? { id: selectedCity.id, name: selectedCity.name } : null}
                 onAdd={handleAddAddress}
             />
 

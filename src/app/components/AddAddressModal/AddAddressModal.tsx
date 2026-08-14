@@ -19,6 +19,7 @@ import { useAutocompleteCleaner } from '@/hooks/useAutocompleteCleaner';
 interface AddAddressModalProps {
     isOpen: boolean;
     onClose: () => void;
+    initialCity?: { id: number; name: string } | null;
     onAdd: (address: {
         id: string;
         title: string;
@@ -85,12 +86,12 @@ const containerStyle = {
     height: '100%',
 };
 
-const center = {
+const DEFAULT_CENTER = {
     lat: 50.4501,
     lng: 30.5234
 };
 
-export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressModalProps) {
+export default function AddAddressModal({ isOpen, onClose, initialCity, onAdd }: AddAddressModalProps) {
     const params = useParams();
     const lang = (params?.lang as Locale) || 'ua';
     const dict = modalDict[lang === 'ru' ? 'ru' : 'ua'];
@@ -107,8 +108,8 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
     const { disableScroll, enableScroll } = useScrollLock();
 
     // Form state
-    const [city, setCity] = useState('м. Київ');
-    const [cityId, setCityId] = useState<number | undefined>(2581);
+    const [city, setCity] = useState(initialCity?.name ?? 'м. Київ');
+    const [cityId, setCityId] = useState<number | undefined>(initialCity?.id ?? 2581);
     const [street, setStreet] = useState('');
     const [streetId, setStreetId] = useState<number | undefined>(undefined);
     const [house, setHouse] = useState('');
@@ -120,6 +121,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
     const [mapMarker, setMapMarker] = useState<{lat: number, lng: number} | null>(null);
     const [mapSearch, setMapSearch] = useState('');
     const [map, setMap] = useState<google.maps.Map | null>(null);
+    const [mapCenter, setMapCenter] = useState(DEFAULT_CENTER);
     const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
     const [parsedAddress, setParsedAddress] = useState<{
         city: string;
@@ -129,10 +131,31 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
 
     useEffect(() => {
         if (isOpen) {
+            // Sync city/cityId from initialCity on each open
+            setCity(initialCity?.name ?? 'м. Київ');
+            setCityId(initialCity?.id ?? 2581);
             disableScroll();
             return () => enableScroll();
         }
-    }, [isOpen, disableScroll, enableScroll]);
+    }, [isOpen, initialCity, disableScroll, enableScroll]);
+
+    // Geocode selected city to center the map
+    useEffect(() => {
+        if (!isOpen || !isLoaded || !initialCity) {
+            if (!initialCity) setMapCenter(DEFAULT_CENTER);
+            return;
+        }
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode(
+            { address: `${initialCity.name}, Україна` },
+            (results, status) => {
+                if (status === 'OK' && results?.[0]?.geometry?.location) {
+                    const loc = results[0].geometry.location;
+                    setMapCenter({ lat: loc.lat(), lng: loc.lng() });
+                }
+            }
+        );
+    }, [isOpen, isLoaded, initialCity]);
 
     const handleClose = () => {
         onClose();
@@ -473,10 +496,10 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                                         options={{
                                             componentRestrictions: { country: 'UA' },
                                             bounds: new window.google.maps.LatLngBounds(
-                                                new window.google.maps.LatLng(50.25, 30.20),
-                                                new window.google.maps.LatLng(50.60, 30.85)
+                                                new window.google.maps.LatLng(mapCenter.lat - 0.35, mapCenter.lng - 0.5),
+                                                new window.google.maps.LatLng(mapCenter.lat + 0.35, mapCenter.lng + 0.5)
                                             ),
-                                            strictBounds: true,
+                                            strictBounds: false,
                                             types: ['address']
                                         }}
                                     >
@@ -497,7 +520,7 @@ export default function AddAddressModal({ isOpen, onClose, onAdd }: AddAddressMo
                             {isLoaded ? (
                                 <GoogleMap
                                     mapContainerStyle={containerStyle}
-                                    center={mapMarker || center}
+                                    center={mapMarker || mapCenter}
                                     zoom={mapMarker ? 15 : 11}
                                     onLoad={onMapLoad}
                                     onClick={onMapClick}
