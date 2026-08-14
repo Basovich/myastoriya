@@ -129,22 +129,31 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, onAdd }:
         house: string;
     } | null>(null);
 
-    useEffect(() => {
+    const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+    const [prevInitialCity, setPrevInitialCity] = useState(initialCity);
+
+    if (isOpen !== prevIsOpen || initialCity !== prevInitialCity) {
+        setPrevIsOpen(isOpen);
+        setPrevInitialCity(initialCity);
         if (isOpen) {
-            // Sync city/cityId from initialCity on each open
             setCity(initialCity?.name ?? 'м. Київ');
             setCityId(initialCity?.id ?? 2581);
+            if (!initialCity) {
+                setMapCenter(DEFAULT_CENTER);
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (isOpen) {
             disableScroll();
             return () => enableScroll();
         }
-    }, [isOpen, initialCity, disableScroll, enableScroll]);
+    }, [isOpen, disableScroll, enableScroll]);
 
     // Geocode selected city to center the map
     useEffect(() => {
-        if (!isOpen || !isLoaded || !initialCity) {
-            if (!initialCity) setMapCenter(DEFAULT_CENTER);
-            return;
-        }
+        if (!isOpen || !isLoaded || !initialCity) return;
         const geocoder = new window.google.maps.Geocoder();
         geocoder.geocode(
             { address: `${initialCity.name}, Україна` },
