@@ -56,6 +56,7 @@ export default function Categories({ lang, popularCategories, categoryHrefs }: C
                         nextEl,
                     }}
                     loop={false}
+                    centerInsufficientSlides={true}
                     className={clsx(s.swiperContainer, "categories-swiper")}
                     breakpoints={{
                         0: { slidesPerView: 3.6, spaceBetween: 10 },
