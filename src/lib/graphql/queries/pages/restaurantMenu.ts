@@ -140,3 +140,93 @@ export const getShopCustomMenuApi = async (
   );
 };
 
+export interface ElectronicMenuProduct {
+  id: string;
+  name: string;
+  volume: string | null;
+  price: number;
+}
+
+export interface ElectronicMenuCategory {
+  id: string;
+  name: string;
+  subtitle: string | null;
+  volume: string | null;
+  products: ElectronicMenuProduct[];
+}
+
+export interface StoreFullMenuResponse {
+  restaurantMenu: RestaurantMenuCategory[] | null;
+  shop: {
+    id: string;
+    electronicMenu: ElectronicMenuCategory[] | null;
+  } | null;
+  shopCustomMenu: ShopCustomMenuCategory[] | null;
+}
+
+export const STORE_FULL_MENU_QUERY = `
+  query GetStoreFullMenu($shopSlug: String) {
+    restaurantMenu(shopSlug: $shopSlug) {
+      id
+      name
+      products {
+        id
+        siteId
+        productType
+        cost
+        oldCost
+        available
+        portionSize
+        text
+        unit
+        multiplier
+        name
+        images {
+          url {
+            main2x
+          }
+        }
+      }
+    }
+    shop(slug: $shopSlug) {
+      id
+      electronicMenu {
+        id
+        name
+        subtitle
+        volume
+        products {
+          id
+          name
+          volume
+          price
+        }
+      }
+    }
+    shopCustomMenu(shopSlug: $shopSlug) {
+      id
+      name
+      subtitle
+      volume
+      products {
+        id
+        name
+        volume
+        price
+      }
+    }
+  }
+`;
+
+export const getStoreFullMenuApi = async (
+  shopSlug: string,
+  lang: string = "ua"
+): Promise<StoreFullMenuResponse> => {
+  return await gqlRequest<StoreFullMenuResponse>(
+    STORE_FULL_MENU_QUERY,
+    { shopSlug },
+    { lang, next: { revalidate: 300 } }
+  );
+};
+
+

@@ -2,7 +2,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import StoreMenuPage from "@/app/pages/StoreMenu/StoreMenuPage";
 import { getShopBySlugApi } from "@/lib/graphql/queries/shops";
-import { getRestaurantMenuApi, getShopCustomMenuApi } from "@/lib/graphql/queries/pages/restaurantMenu";
+import { getStoreFullMenuApi } from "@/lib/graphql/queries/pages/restaurantMenu";
 import { getApiSlugFromMenu } from "@/config/menuSlugMap";
 import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
@@ -27,19 +27,14 @@ export default async function MenuPage({
             notFound();
         }
 
-        const [menuResponse, customMenuResponse] = await Promise.all([
-            getRestaurantMenuApi(apiSlug, lang).catch((error) => {
-                console.error("Failed to fetch restaurant menu:", error);
-                return { restaurantMenu: [] };
-            }),
-            getShopCustomMenuApi(apiSlug, lang).catch((error) => {
-                console.error("Failed to fetch custom store menu:", error);
-                return { shopCustomMenu: [] };
-            }),
-        ]);
+        const fullMenuData = await getStoreFullMenuApi(apiSlug, lang).catch((error) => {
+            console.error("Failed to fetch full store menu:", error);
+            return { restaurantMenu: [], shop: null, shopCustomMenu: [] };
+        });
 
-        const initialMenu = menuResponse?.restaurantMenu || [];
-        const initialCustomMenu = customMenuResponse?.shopCustomMenu || [];
+        const initialMenu = fullMenuData?.restaurantMenu || [];
+        const electronicMenu = fullMenuData?.shop?.electronicMenu || [];
+        const initialCustomMenu = fullMenuData?.shopCustomMenu || [];
 
         return (
             <StoreMenuPage
@@ -47,6 +42,7 @@ export default async function MenuPage({
                 lang={lang}
                 dict={dict}
                 initialMenu={initialMenu}
+                electronicMenu={electronicMenu}
                 initialCustomMenu={initialCustomMenu}
             />
         );

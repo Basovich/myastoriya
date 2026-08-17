@@ -12,7 +12,7 @@ import StoreMenuHero from '@/app/components/StoreMenu/StoreMenuHero/StoreMenuHer
 import PromotionsSlider from '@/app/components/StoreMenu/PromotionsSlider/PromotionsSlider';
 import StoreMenuTabular from '@/app/components/StoreMenu/StoreMenuTabular/StoreMenuTabular';
 import { Shop } from '@/lib/graphql/queries/shops';
-import { RestaurantMenuCategory, ShopCustomMenuCategory } from '@/lib/graphql/queries/pages/restaurantMenu';
+import { RestaurantMenuCategory, ShopCustomMenuCategory, ElectronicMenuCategory } from '@/lib/graphql/queries/pages/restaurantMenu';
 import clsx from "clsx";
 
 interface StoreMenuPageProps {
@@ -20,6 +20,7 @@ interface StoreMenuPageProps {
     lang: Locale | string;
     dict: Dictionary;
     initialMenu?: RestaurantMenuCategory[];
+    electronicMenu?: ElectronicMenuCategory[];
     initialCustomMenu?: ShopCustomMenuCategory[];
 }
 
@@ -27,13 +28,13 @@ const getCategoryImage = (cat: RestaurantMenuCategory): string => {
     const name = cat.name || '';
     const lower = name.toLowerCase();
     if (lower.includes("бургер")) return "/images/cat-burgers.png";
-    if (lower.includes("набор") || lower.includes("сет")) return "/images/cat-sets.png";
+    if (lower.includes("набор") || lower.includes("сет") || lower.includes("хліб") || lower.includes("хлеб")) return "/images/cat-sets.png";
     if (lower.includes("гриль") || lower.includes("м'яс") || lower.includes("стейк") || lower.includes("шашлик")) return "/images/cat-grill.png";
     if (lower.includes("напівфаб") || lower.includes("ковбас") || lower.includes("сосис")) return "/images/cat-branded.png";
     if (lower.includes("піц")) return "/images/cat-shashlik.png";
     if (lower.includes("гарнір")) return "/images/cat-sets.png";
-    if (lower.includes("десерт")) return "/images/cat-sets.png";
-    if (lower.includes("напої") || lower.includes("напиток") || lower.includes("бар")) return "/images/cat-branded.png";
+    if (lower.includes("десерт")) return "/images/cat-restaurant.png";
+    if (lower.includes("напої") || lower.includes("напиток") || lower.includes("бар") || lower.includes("алкоголь") || lower.includes("вино") || lower.includes("коктейль")) return "/images/cat-branded.png";
 
     // Fallback: use first available product's image if present
     const firstProductImg = cat.products?.find(p => p.images && p.images.length > 0)?.images?.[0]?.url?.main2x;
@@ -44,9 +45,29 @@ const getCategoryImage = (cat: RestaurantMenuCategory): string => {
     return "/images/cat-restaurant.png";
 };
 
-const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, initialMenu = [], initialCustomMenu = [] }) => {
+const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, initialMenu = [], electronicMenu = [], initialCustomMenu = [] }) => {
+    const mappedElectronicCategories: RestaurantMenuCategory[] = (electronicMenu || []).map(cat => ({
+        id: `electronic-${cat.id}`,
+        name: cat.name,
+        products: (cat.products || []).map(p => ({
+            id: p.id,
+            name: p.name,
+            cost: p.price,
+            oldCost: 0,
+            available: 1,
+            portionSize: p.volume || null,
+            text: cat.subtitle ? `${cat.subtitle}${cat.volume ? ` (${cat.volume})` : ''}` : (cat.volume || null),
+            images: null,
+            modifierGroups: [],
+            unit: null,
+            multiplier: null,
+        }))
+    }));
+
+    const combinedMenu = [...initialMenu, ...mappedElectronicCategories];
+
     // Filter out products that are not available (available === 0)
-    const foodCategories = initialMenu
+    const foodCategories = combinedMenu
         .map(cat => ({
             ...cat,
             products: cat.products.filter(p => p.available > 0)
