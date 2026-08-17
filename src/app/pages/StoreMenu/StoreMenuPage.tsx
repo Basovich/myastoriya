@@ -25,22 +25,26 @@ interface StoreMenuPageProps {
 }
 
 const getCategoryImage = (cat: RestaurantMenuCategory): string => {
+    // 1. First priority: use first available product's real image from this category if present
+    const firstProductWithImg = cat.products?.find(p => p.images && p.images.length > 0 && p.images[0]?.url?.main2x);
+    if (firstProductWithImg && firstProductWithImg.images && firstProductWithImg.images.length > 0) {
+        const main2x = firstProductWithImg.images[0].url?.main2x;
+        if (main2x) {
+            return main2x.startsWith('/') ? `https://dev-api.myastoriya.com.ua${main2x}` : main2x;
+        }
+    }
+
+    // 2. Secondary fallback: category static images by name matching
     const name = cat.name || '';
     const lower = name.toLowerCase();
+    if (lower.includes("десерт")) return "/images/cat-desserts.png";
     if (lower.includes("бургер")) return "/images/cat-burgers.png";
     if (lower.includes("набор") || lower.includes("сет") || lower.includes("хліб") || lower.includes("хлеб")) return "/images/cat-sets.png";
     if (lower.includes("гриль") || lower.includes("м'яс") || lower.includes("стейк") || lower.includes("шашлик")) return "/images/cat-grill.png";
     if (lower.includes("напівфаб") || lower.includes("ковбас") || lower.includes("сосис")) return "/images/cat-branded.png";
     if (lower.includes("піц")) return "/images/cat-shashlik.png";
     if (lower.includes("гарнір")) return "/images/cat-sets.png";
-    if (lower.includes("десерт")) return "/images/cat-restaurant.png";
     if (lower.includes("напої") || lower.includes("напиток") || lower.includes("бар") || lower.includes("алкоголь") || lower.includes("вино") || lower.includes("коктейль")) return "/images/cat-branded.png";
-
-    // Fallback: use first available product's image if present
-    const firstProductImg = cat.products?.find(p => p.images && p.images.length > 0)?.images?.[0]?.url?.main2x;
-    if (firstProductImg) {
-        return firstProductImg.startsWith('/') ? `https://dev-api.myastoriya.com.ua${firstProductImg}` : firstProductImg;
-    }
 
     return "/images/cat-restaurant.png";
 };
