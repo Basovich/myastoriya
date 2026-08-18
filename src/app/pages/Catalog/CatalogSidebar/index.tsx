@@ -257,10 +257,26 @@ export default function CatalogSidebar({
         onClose?.();
     }, [activeFilters, searchParams, dynamicBlocks, router, pathname, onApply, onClose]);
 
-    // --- isModified ---
+    // --- isModified & isPriceChanged ---
 
     const activeListFilters = (activeFilters ?? []).filter(f => f.minValue === undefined && f.maxValue === undefined);
-    const isPendingChanged = JSON.stringify(pendingFilters) !== JSON.stringify(activeListFilters);
+    const isListFiltersChanged = JSON.stringify(pendingFilters) !== JSON.stringify(activeListFilters);
+
+    const isPriceChanged = dynamicBlocks.some(block => {
+        if (!isRangeBlock(block) || !block.key) return false;
+        const blockKey = block.key;
+        const blockMin = block.min ?? 0;
+        const blockMax = block.max ?? 10000;
+        const activeFilter = getFilterForBlock(activeFilters ?? [], blockKey);
+        const activeFrom = activeFilter?.minValue ?? blockMin;
+        const activeTo = activeFilter?.maxValue ?? blockMax;
+
+        const draft = pendingPrice[blockKey];
+        if (!draft) return false;
+        return draft.from !== activeFrom || draft.to !== activeTo;
+    });
+
+    const isPendingChanged = isListFiltersChanged || isPriceChanged;
     const isSortChanged = sortBy !== undefined && sortBy !== defaultSortOption;
     const isModified = isPendingChanged || isSortChanged || hasActiveFilters(pendingFilters);
 
@@ -273,9 +289,31 @@ export default function CatalogSidebar({
     const handleApply = () => {
         if (!isPendingChanged && !isSortChanged) return;
         
-        // Об'єднуємо поточні pending спискові фільтри з активними range фільтрами з URL
-        const activeRangeFilters = (activeFilters ?? []).filter(f => f.minValue !== undefined || f.maxValue !== undefined);
-        const filtersToApply = [...pendingFilters, ...activeRangeFilters];
+        let rangeFiltersToApply: FilterStateInput[] = [];
+
+        // Для кожного range-блоку беремо чернетку pendingPrice або активний фільтр
+        dynamicBlocks.forEach(block => {
+            if (!isRangeBlock(block) || !block.key) return;
+            const blockKey = block.key;
+            const blockMin = block.min ?? 0;
+            const blockMax = block.max ?? 10000;
+
+            const activeFilter = getFilterForBlock(activeFilters ?? [], blockKey);
+            const draft = pendingPrice[blockKey];
+
+            const finalFrom = draft ? draft.from : (activeFilter?.minValue ?? blockMin);
+            const finalTo = draft ? draft.to : (activeFilter?.maxValue ?? blockMax);
+
+            if (finalFrom !== blockMin || finalTo !== blockMax) {
+                rangeFiltersToApply.push({
+                    key: blockKey,
+                    minValue: finalFrom,
+                    maxValue: finalTo,
+                });
+            }
+        });
+
+        const filtersToApply = [...pendingFilters, ...rangeFiltersToApply];
 
         const params = buildFilterParams(filtersToApply, new URLSearchParams(searchParams.toString()), dynamicBlocks);
         startCatalogTransition();
