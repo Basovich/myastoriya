@@ -300,12 +300,12 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
         },
     ];
 
-    // Combine statusHistory and order.status if order.status is missing from history
-    const history = order ? (order.statusHistory || []).filter((h): h is OrderStatus => h !== null) : [];
+    // Filter history to include ONLY steps that actually occurred (have a valid createdAt timestamp)
+    const history = order ? (order.statusHistory || []).filter((h): h is OrderStatus => Boolean(h && h.createdAt)) : [];
     const allHistory = [...history];
-    if (order?.status) {
+    if (order?.status && order.status.createdAt) {
         const alreadyPresent = allHistory.some(h =>
-            h.id === order.status?.id ||
+            (h.id && h.id === order.status?.id) ||
             (h.name && order.status?.name && h.name.toLowerCase() === order.status.name.toLowerCase())
         );
         if (!alreadyPresent) {
@@ -313,34 +313,17 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
         }
     }
 
-    const getDefIndex = (h: OrderStatus) => {
-        const idx = standardStepsDef.findIndex(def => def.match(h));
-        return idx !== -1 ? idx : 999;
-    };
-
     const sortedHistory = [...allHistory].sort((a, b) => {
         const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-
-        if (timeA > 0 && timeB > 0 && timeA !== timeB) {
-            return timeA - timeB;
-        }
-
-        return getDefIndex(a) - getDefIndex(b);
+        return timeA - timeB;
     });
 
-    // Build statusSteps: deduplicate statuses by label/key to avoid repeated entries (e.g. duplicate "Завершено")
-    const historyToRender = sortedHistory.length > 0
-        ? sortedHistory
-        : (order?.status ? [order.status] : []);
-
     const uniqueStepsMap = new Map<string, { label: string; date: string; time: string }>();
-    for (const h of historyToRender) {
-        const matchedDef = standardStepsDef.find(def => def.match(h));
-        const label = matchedDef ? matchedDef.label : (h.name || '');
+    for (const h of sortedHistory) {
+        const label = h.name || '';
+        if (!label) continue;
         const hDateTime = formatOrderDateTime(h.createdAt || '');
-        
-        // Retain or update to latest entry for each distinct status label
         uniqueStepsMap.set(label, {
             label,
             date: hDateTime.date,
