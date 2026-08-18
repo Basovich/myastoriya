@@ -148,3 +148,22 @@
     }
 }
 
+.clearBottomBtn {
+    display: block;
+    margin: 16px auto 0;
+    background: none;
+    border: none;
+    color: #E3051B;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: opacity 0.2s;
+
+    @media (any-hover: hover) {
+        &:hover {
+            opacity: 0.8;
+        }
+    }
+}
+

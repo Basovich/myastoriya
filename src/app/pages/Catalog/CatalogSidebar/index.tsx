@@ -43,6 +43,7 @@ const LOCALIZED_SIDEBAR_TEXTS = {
     ua: {
         applyFilter: 'ЗАСТОСУВАТИ ФІЛЬТР',
         apply: 'ЗАСТОСУВАТИ',
+        clear: 'Очистити',
         defaultSortOption: 'За популярністю',
         sortOptions: [
             'За популярністю',
@@ -56,6 +57,7 @@ const LOCALIZED_SIDEBAR_TEXTS = {
     ru: {
         applyFilter: 'ПРИМЕНИТЬ ФИЛЬТР',
         apply: 'ПРИМЕНИТЬ',
+        clear: 'Очистить',
         defaultSortOption: 'По популярности',
         sortOptions: [
             'По популярности',
@@ -354,9 +356,7 @@ export default function CatalogSidebar({
                             const from = activeFilter?.minValue ?? blockMin;
                             const to = activeFilter?.maxValue ?? blockMax;
                             
-                            const isPriceActive = from !== blockMin || to !== blockMax;
-                            const hasPendingPriceDraft = pendingPrice[blockKey] !== undefined;
-                            const hasAnyFilter = hasActiveFilters(activeFilters ?? []) || hasActiveFilters(pendingFilters) || isPriceActive || hasPendingPriceDraft;
+                            const hasAppliedFilters = hasActiveFilters(activeFilters ?? []);
 
                             return (
                                 <PriceRange
@@ -369,7 +369,7 @@ export default function CatalogSidebar({
                                     onChange={(f, t) => handlePriceChange(blockKey, f, t)}
                                     label={block.label ? block.label.toUpperCase() : undefined}
                                     onClear={handleClear}
-                                    showClear={hasAnyFilter}
+                                    showClear={hasAppliedFilters}
                                     onOk={() => handlePriceOk(blockKey, blockMin, blockMax)}
                                 />
                             );
@@ -435,6 +435,16 @@ export default function CatalogSidebar({
                             ? `${texts.apply} (${selectedCount})`
                             : texts.applyFilter}
                     </Button>
+                )}
+
+                {hasActiveFilters(activeFilters ?? []) && (
+                    <button
+                        type="button"
+                        className={s.clearBottomBtn}
+                        onClick={handleClear}
+                    >
+                        {texts.clear}
+                    </button>
                 )}
 
                 {!isOnlyPriceRange && isPendingChanged && floatingButtonPos && (
