@@ -724,7 +724,7 @@ div.quantitySelector {
             .modTooltip {
                 opacity: 1;
                 visibility: visible;
-                transform: translateX(-50%) translateY(0);
+                transform: translateY(0);
             }
         }
     }
@@ -733,8 +733,8 @@ div.quantitySelector {
 .modTooltip {
     position: absolute;
     bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(6px);
+    left: 40px;
+    transform: translateY(6px);
     margin-bottom: 10px;
     background: var(--color-bg, #FFFFFF);
     border: 1px solid #E5E5E5;
@@ -756,7 +756,7 @@ div.quantitySelector {
         content: '';
         position: absolute;
         top: 100%;
-        left: 50%;
+        left: 24px;
         transform: translateX(-50%);
         width: 0;
         height: 0;
