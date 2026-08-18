@@ -12,6 +12,7 @@ import CustomSelect from '@/app/components/ui/CustomSelect';
 import Button from '@/app/components/ui/Button/Button';
 import CartModal from '@/app/components/CartModal/CartModal';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import BankCardItem, { type BankCard } from '@/app/components/Personal/Cards/BankCardItem';
 import AddBankCardBtn from '@/app/components/Personal/Cards/AddBankCardBtn';
@@ -102,12 +103,11 @@ export default function Step3({ lang }: Step3Props) {
     const [userCards, setUserCards] = useState<BankCard[]>([]);
     const [isLoadingCards, setIsLoadingCards] = useState(false);
 
-    
-    // Submit / Success State
+    const router = useRouter();
+
+    // Submit State
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
-    const [isSuccess, setIsSuccess] = useState(false);
-    const [successOrderInfo, setSuccessOrderInfo] = useState<{ id: string; total: number; currency: string; wasGuest?: boolean } | null>(null);
 
     // Stale delivery time modal state
     const [isReselectTimeModalOpen, setIsReselectTimeModalOpen] = useState(false);
@@ -505,21 +505,15 @@ export default function Step3({ lang }: Step3Props) {
                 // Будь-який action з url (redirect / authenticate / confirm) — редірект на платіжний шлюз
                 window.location.href = res.url;
             } else {
-                // action === 'success' або невідомий без url — показуємо success-екран
-                setSuccessOrderInfo({
-                    id: res.orderId,
-                    total: res.total,
-                    currency: res.currencyCode || '₴',
-                    wasGuest: isGuestUser,
-                });
-                setIsSuccess(true);
-
                 dispatch(clearCart());
                 localStorage.removeItem('checkout_delivery_data');
                 localStorage.removeItem('checkout_delivery_params');
                 localStorage.removeItem('checkout_user_data');
                 localStorage.removeItem('checkout_step3_data');
                 localStorage.removeItem('applied_promo');
+
+                const thanksPath = lang === 'ua' ? `/thanks?orderId=${res.orderId}&payment=offline` : `/${lang}/thanks?orderId=${res.orderId}&payment=offline`;
+                router.push(thanksPath);
             }
         } catch (e: unknown) {
             console.error('Failed to create order', e);
@@ -568,57 +562,6 @@ export default function Step3({ lang }: Step3Props) {
         }
     };
 
-    if (isSuccess && successOrderInfo) {
-        return (
-            <div className={s.successContainer}>
-                <div className={s.successCard}>
-                    <div className={s.successIcon}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
-                            <circle cx="32" cy="32" r="30" fill="#E3051B" />
-                            <path d="M20 32L28 40L44 24" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    </div>
-                    <h1 className={s.successTitle}>
-                        {lang === 'ru' ? 'Спасибо за ваш заказ!' : 'Дякуємо за ваше замовлення!'}
-                    </h1>
-                    <p className={s.successMessage}>
-                        {lang === 'ru' 
-                            ? 'Ваш заказ успешно создан и принят в обработку.' 
-                            : 'Ваше замовлення успішно створено та прийнято в обробку.'}
-                    </p>
-                    <div className={s.orderInfoBlock}>
-                        <div className={s.infoRow}>
-                            <span>{lang === 'ru' ? 'Номер заказа:' : 'Номер замовлення:'}</span>
-                            <strong>#{successOrderInfo.id}</strong>
-                        </div>
-                        <div className={s.infoRow}>
-                            <span>{lang === 'ru' ? 'Сумма к оплате:' : 'Сума до сплати:'}</span>
-                            <strong>{successOrderInfo.total} {successOrderInfo.currency}</strong>
-                        </div>
-                    </div>
-                    {successOrderInfo.wasGuest && (
-                        <p className={s.registrationNote}>
-                            {lang === 'ru'
-                                ? 'Аккаунт создан автоматически. Данные для входа будут отправлены на ваш телефон.'
-                                : 'Акаунт створено автоматично. Дані для входу буде надіслано на ваш телефон.'}
-                        </p>
-                    )}
-                    <p className={s.successSubtext}>
-                        {lang === 'ru'
-                            ? 'В ближайшее время наш менеджер свяжется с вами или вы получите SMS-подтверждение.'
-                            : "Найближчим часом наш менеджер зв'яжеться з вами або ви отримаєте SMS-підтвердження."}
-                    </p>
-                    <Button
-                        variant="red"
-                        onClick={() => window.location.href = lang === 'ua' ? '/' : `/${lang}`}
-                        className={s.homeBtn}
-                    >
-                        {lang === 'ru' ? 'На главную' : 'На головну'}
-                    </Button>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className={s.layout}>

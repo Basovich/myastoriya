@@ -15,15 +15,18 @@ export default async function Thanks({
     searchParams,
 }: {
     params: Promise<{ lang: Locale }>;
-    searchParams: Promise<{ orderId?: string | string[] }>;
+    searchParams: Promise<{ orderId?: string | string[]; payment?: string; isOnline?: string; status?: string }>;
 }) {
     const { lang } = await params;
-    const { orderId } = await searchParams;
+    const { orderId, payment, isOnline, status } = await searchParams;
+
+    const isOnlinePayment = isOnline === 'true' || payment === 'online' || Boolean(status);
 
     return (
         <ThanksPage 
             lang={lang} 
             orderId={typeof orderId === 'string' ? orderId : undefined}
+            isOnline={isOnlinePayment}
         />
     );
 }
