@@ -135,13 +135,10 @@ export default function CatalogSidebar({
         if (isRangeBlock(block)) {
             const blockMin = block.min ?? 0;
             const blockMax = block.max ?? 10000;
-            if (blockMin === blockMax) return false;
-            return true;
+            return blockMin !== blockMax;
         } else {
             const options = block.values ?? [];
-            if (options.length <= 1) return false;
-            if (!block.label) return false;
-            return true;
+            return options.length > 1 && Boolean(block.label);
         }
     });
 
@@ -203,16 +200,6 @@ export default function CatalogSidebar({
         }
     }, [toggleListOption]);
 
-    const setPriceRange = useCallback((blockKey: string, min: number, max: number, blockMin: number, blockMax: number) => {
-        // Якщо значення = межам блоку — видаляємо фільтр (скидаємо)
-        if (min === blockMin && max === blockMax) {
-            setPendingFilters(prev => removeFilter(prev, blockKey));
-        } else {
-            setPendingFilters(prev => setFilterValue(prev, { key: blockKey, minValue: min, maxValue: max }));
-        }
-    }, []);
-
-
     const handlePriceChange = useCallback((blockKey: string, from: number, to: number) => {
         setPendingPrice(prev => ({ ...prev, [blockKey]: { from, to } }));
     }, []);
@@ -242,20 +229,6 @@ export default function CatalogSidebar({
         onApply?.();
         onClose?.();
     }, [pendingPrice, activeFilters, searchParams, dynamicBlocks, router, pathname, onApply, onClose]);
-
-
-    const clearPriceRange = useCallback((blockKey: string) => {
-        const currentActive = activeFilters ?? [];
-        const newFilters = removeFilter(currentActive, blockKey);
-        setPendingPrice(prev => { const next = { ...prev }; delete next[blockKey]; return next; });
-
-        const params = buildFilterParams(newFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
-        startCatalogTransition();
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
-        setFloatingButtonPos(null);
-        onApply?.();
-        onClose?.();
-    }, [activeFilters, searchParams, dynamicBlocks, router, pathname, onApply, onClose]);
 
     // --- isModified & isPriceChanged ---
 
@@ -289,7 +262,7 @@ export default function CatalogSidebar({
     const handleApply = () => {
         if (!isPendingChanged && !isSortChanged) return;
         
-        let rangeFiltersToApply: FilterStateInput[] = [];
+        const rangeFiltersToApply: FilterStateInput[] = [];
 
         // Для кожного range-блоку беремо чернетку pendingPrice або активний фільтр
         dynamicBlocks.forEach(block => {
@@ -370,7 +343,7 @@ export default function CatalogSidebar({
                 {isLoadingFilters ? (
                     <Spinner centered={true} />
                 ) : dynamicBlocks.length > 0 ? (
-                    dynamicBlocks.map((block, idx) => {
+                    dynamicBlocks.map(block => {
                         if (!block.key || block.key === 'categories') return null;
                         const blockKey = block.key;
 
@@ -382,7 +355,10 @@ export default function CatalogSidebar({
                             const activeFilter = getFilterForBlock(activeFilters ?? [], blockKey);
                             const from = activeFilter?.minValue ?? blockMin;
                             const to = activeFilter?.maxValue ?? blockMax;
-                            const showClear = from !== blockMin || to !== blockMax;
+                            
+                            const isPriceActive = from !== blockMin || to !== blockMax;
+                            const hasPendingPriceDraft = pendingPrice[blockKey] !== undefined;
+                            const hasAnyFilter = hasActiveFilters(activeFilters ?? []) || hasActiveFilters(pendingFilters) || isPriceActive || hasPendingPriceDraft;
 
                             return (
                                 <PriceRange
@@ -394,8 +370,8 @@ export default function CatalogSidebar({
                                     step={10}
                                     onChange={(f, t) => handlePriceChange(blockKey, f, t)}
                                     label={block.label ? block.label.toUpperCase() : undefined}
-                                    onClear={() => clearPriceRange(blockKey)}
-                                    showClear={showClear}
+                                    onClear={handleClear}
+                                    showClear={hasAnyFilter}
                                     onOk={() => handlePriceOk(blockKey, blockMin, blockMax)}
                                 />
                             );
