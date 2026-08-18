@@ -254,52 +254,6 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
 
     const { date, time } = order ? formatOrderDateTime(order.createdAt) : { date: '', time: '' };
 
-    const isPickup =
-        (order?.delivery?.service || '').toLowerCase().includes('самовивіз') ||
-        (order?.delivery?.service || '').toLowerCase().includes('самовывоз');
-
-    // Standard steps configuration — primary match by id, fallback by name
-    const standardStepsDef = [
-        {
-            key: 'new',
-            label: lang === 'ru' ? 'Новый заказ' : 'Нове замовлення',
-            match: (h: OrderStatus) =>
-                h.id === '1' ||
-                (h.name || '').toLowerCase().includes('нов') ||
-                (h.name || '').toLowerCase().includes('прийнят'),
-        },
-        {
-            key: 'preparing',
-            label: lang === 'ru' ? 'Готовится' : 'Готується',
-            match: (h: OrderStatus) =>
-                h.id === '4' || (h.name || '').toLowerCase().includes('готу'),
-        },
-        {
-            key: 'courier',
-            label: isPickup
-                ? (lang === 'ru' ? 'Готово к выдаче' : 'Готово до видачі')
-                : (lang === 'ru' ? 'Выдано курьеру' : "Видано кур'єру"),
-            match: (h: OrderStatus) =>
-                h.id === '5' ||
-                (h.name || '').toLowerCase().includes('кур') ||
-                (h.name || '').toLowerCase().includes('відправл'),
-        },
-        {
-            key: 'delivered',
-            label: lang === 'ru' ? 'Доставлено' : 'Доставлено',
-            match: (h: OrderStatus) =>
-                h.id === '6' || (h.name || '').toLowerCase().includes('достав'),
-        },
-        {
-            key: 'completed',
-            label: lang === 'ru' ? 'Завершено' : 'Завершено',
-            match: (h: OrderStatus) =>
-                h.id === '2' ||
-                (h.name || '').toLowerCase().includes('викон') ||
-                (h.name || '').toLowerCase().includes('заверш'),
-        },
-    ];
-
     // Filter history to include ONLY steps that actually occurred (have a valid createdAt timestamp)
     const history = order ? (order.statusHistory || []).filter((h): h is OrderStatus => Boolean(h && h.createdAt)) : [];
     const allHistory = [...history];
