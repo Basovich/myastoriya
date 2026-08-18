@@ -19,6 +19,7 @@ import type { BreadcrumbItem } from '@/utils/category-url';
 import CatalogToolbarClient from '../CatalogToolbarClient';
 import CatalogProductsClient from '../CatalogProductsClient';
 import CatalogRelatedSlidersClient from '../CatalogRelatedSlidersClient';
+import CatalogPopularSliderClient from '../CatalogPopularSliderClient';
 
 interface CatalogContentProps {
     lang: Locale;
@@ -129,30 +130,6 @@ export default async function CatalogContent({
         : [];
 
     const popularProductsList = popularProducts ?? products.slice(0, 12);
-    const orderedProducts = popularProductsList.map(product => ({
-        id: product.id,
-        element: (
-            <ProductCard
-                key={product.id}
-                id={product.id}
-                slug={product.slug}
-                categoryId={product.categoryId}
-                title={product.name}
-                weight={getProductWeight(product)}
-                price={product.cost}
-
-                purchaseCost={product.purchaseCost}
-
-                purchaseOldCost={product.purchaseOldCost}
-                unit={product.unit}
-                badge={getProductBadge(product, lang)}
-                image={resolveProductImageUrl(product)}
-                lang={lang}
-                hasCostVariants={product.hasCostVariants}
-                portionSize={product.portionSize}
-            />
-        )
-    }));
 
     return (
         <div className={s.container}>
@@ -233,7 +210,7 @@ export default async function CatalogContent({
             {relatedProducts.length > 0 && (
                 <CatalogRelatedSlidersClient title="ВАС МОЖЕ ЗАЦІКАВИТИ" products={relatedProducts} />
             )}
-            <CatalogRelatedSlidersClient title="ЧАСТО ЗАМОВЛЯЮТЬ" products={orderedProducts} />
+            <CatalogPopularSliderClient title="ЧАСТО ЗАМОВЛЯЮТЬ" initialProducts={popularProductsList} lang={lang} />
 
             {faq && faq.length > 0 && (
                 <div className={s.faqSection}>

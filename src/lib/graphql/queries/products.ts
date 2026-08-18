@@ -545,6 +545,7 @@ const POPULAR_PRODUCTS_QUERY = /* GraphQL */ `
             data {
                 id
                 slug
+                categoryId
                 name
                 cost
                 oldCost
@@ -579,6 +580,7 @@ const SPECIALS_BY_PRODUCT_QUERY = /* GraphQL */ `
                 products {
                     id
                     slug
+                    categoryId
                     name
                     cost
                     oldCost
