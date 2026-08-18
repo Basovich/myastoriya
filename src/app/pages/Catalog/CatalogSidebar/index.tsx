@@ -83,9 +83,7 @@ function shouldExcludeBlock(block: FilterBlock): boolean {
     // Check for storage conditions
     if (key.includes('zber') || key.includes('storage') || label.includes('зберіг') || label.includes('хранени')) return true;
     // Check for weight
-    if (key.includes('vaga') || key.includes('masa') || key.includes('weight') || label === 'вага' || label === 'вес') return true;
-
-    return false;
+    return key.includes('vaga') || key.includes('masa') || key.includes('weight') || label === 'вага' || label === 'вес';
 }
 
 export default function CatalogSidebar({
