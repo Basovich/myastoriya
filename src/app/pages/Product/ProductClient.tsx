@@ -448,6 +448,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                                 id: String(p.id),
                                 name: p.name,
                                 price: p.cost,
+                                image: p.images?.[0]?.url?.grid1x || p.images?.[0]?.url?.main1x || p.images?.[0]?.url?.grid2x || null,
                             }))}
                             selectedItems={selectedModifierIds}
                             onToggle={toggleModifier}

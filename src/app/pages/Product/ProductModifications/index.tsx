@@ -4,10 +4,13 @@ import React from 'react';
 import clsx from 'clsx';
 import styles from '../Product.module.scss';
 
+import { ModifierImages } from '@/lib/graphql/queries/products';
+
 interface Modification {
     id: string;
     name: string;
     price: number;
+    image?: string | ModifierImages | null;
 }
 
 interface ProductModificationsProps {
@@ -17,6 +20,12 @@ interface ProductModificationsProps {
     onToggle: (id: string) => void;
     className?: string;
 }
+
+const getImageUrl = (image?: string | ModifierImages | null): string | null => {
+    if (!image) return null;
+    if (typeof image === 'string') return image;
+    return image.icon1x || image.icon2x || image.icon3x || null;
+};
 
 const ProductModifications: React.FC<ProductModificationsProps> = ({ 
     title, 
@@ -29,12 +38,19 @@ const ProductModifications: React.FC<ProductModificationsProps> = ({
         <div className={clsx(styles.modificationsSection, className)}>
             <p className={styles.modSectionTitle}>{title}</p>
             <div className={styles.modGrid}>
-                {items?.map((item) => (
-                    <button
-                        key={item.id}
-                        className={clsx(styles.modItem, selectedItems.includes(item.id) && styles.selected)}
-                        onClick={() => onToggle(item.id)}
-                    >
+                {items?.map((item) => {
+                    const imgUrl = getImageUrl(item.image);
+                    return (
+                        <button
+                            key={item.id}
+                            className={clsx(styles.modItem, selectedItems.includes(item.id) && styles.selected)}
+                            onClick={() => onToggle(item.id)}
+                        >
+                            {imgUrl && (
+                                <div className={styles.modTooltip}>
+                                    <img src={imgUrl} alt={item.name} className={styles.modTooltipImg} />
+                                </div>
+                            )}
                         <div className={styles.modCheck}>
                             {selectedItems.includes(item.id) && (
                                 <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -47,7 +63,8 @@ const ProductModifications: React.FC<ProductModificationsProps> = ({
                             <span className={styles.modPrice}>+ {item.price} ₴</span>
                         </div>
                     </button>
-                ))}
+                );
+            })}
             </div>
         </div>
     );

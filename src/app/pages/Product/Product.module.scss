@@ -715,12 +715,63 @@ div.quantitySelector {
     transition: all 0.2s;
     text-align: left;
     cursor: pointer;
+    position: relative;
 
-    @media (any-hover: hover) {
-      &:hover {
-          opacity: 0.8;
-      }
+    @media (hover: hover) and (pointer: fine) {
+        &:hover {
+            opacity: 1;
+
+            .modTooltip {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
     }
+}
+
+.modTooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    margin-bottom: 10px;
+    background: var(--color-bg, #FFFFFF);
+    border: 1px solid #E5E5E5;
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+    padding: 8px;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    display: none;
+
+    @media (hover: hover) and (pointer: fine) {
+        display: block;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 7px solid transparent;
+        border-right: 7px solid transparent;
+        border-top: 7px solid #FFFFFF;
+    }
+}
+
+.modTooltipImg {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
 }
 
 .modCheck {
