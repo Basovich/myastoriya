@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import TopBar from "@/app/components/Header/DesktopHeader/TopBar";
 import MainBar from "@/app/components/Header/DesktopHeader/MainBar";
@@ -14,6 +15,8 @@ interface DesktopHeaderProps {
 }
 
 export default function DesktopHeaderClient({ lang, categories }: DesktopHeaderProps) {
+    const pathname = usePathname();
+    const isHomePage = /^\/(?:ua|ru)?\/?$/.test(pathname || "");
     const [isScrolled, setIsScrolled] = useState(false);
     const [isScrolledMenuOpen, setIsScrolledMenuOpen] = useState(false);
     const [placeholderHeight, setPlaceholderHeight] = useState(0);
@@ -58,11 +61,16 @@ export default function DesktopHeaderClient({ lang, categories }: DesktopHeaderP
             </div>
             <div
                 ref={mainBarRef}
-                className={clsx(s.stickyWrapper, isScrolled && s.fixed)}
+                className={clsx(
+                    s.stickyWrapper,
+                    isHomePage && s.homePageWrapper,
+                    isScrolled && s.fixed
+                )}
             >
                 <MainBar
                     lang={lang}
                     isScrolled={isScrolled}
+                    isHomePage={isHomePage}
                     isMenuOpen={isScrolledMenuOpen}
                     onMenuToggle={() => setIsScrolledMenuOpen((v) => !v)}
                     onMenuClose={() => setIsScrolledMenuOpen(false)}
@@ -70,7 +78,7 @@ export default function DesktopHeaderClient({ lang, categories }: DesktopHeaderP
                 />
             </div>
             <div
-                className={clsx(s.placeholder, isScrolled && s.visible)}
+                className={clsx(s.placeholder, !isHomePage && isScrolled && s.visible)}
                 style={{ height: placeholderHeight }}
             />
         </>

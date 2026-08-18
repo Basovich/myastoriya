@@ -16,6 +16,14 @@
     position: relative;
 }
 
+.stickyWrapper.homePageWrapper:not(.fixed) {
+    position: absolute;
+    top: 44px;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
 .stickyWrapper.fixed {
     position: fixed;
     top: 0;

@@ -28,6 +28,7 @@ import { ProductCategory } from "@/lib/graphql/queries/products";
 interface MainBarProps {
     lang: Locale;
     isScrolled?: boolean;
+    isHomePage?: boolean;
     isMenuOpen?: boolean;
     onMenuToggle?: () => void;
     onMenuClose?: () => void;
@@ -37,6 +38,7 @@ interface MainBarProps {
 export default function MainBar({
     lang,
     isScrolled = false,
+    isHomePage = false,
     isMenuOpen = false,
     onMenuToggle,
     onMenuClose,
@@ -71,7 +73,7 @@ export default function MainBar({
     }, [isMenuOpen, onMenuClose]);
 
     return (
-        <div className={s.mainBar} ref={menuRef}>
+        <div className={clsx(s.mainBar, isHomePage && !isScrolled && s.homePageBar)} ref={menuRef}>
             {/* Scrolled nav menu dropdown */}
             {isScrolled && (
                 <div className={clsx(s.scrolledMenu, isMenuOpen && s.scrolledMenuOpen)}>

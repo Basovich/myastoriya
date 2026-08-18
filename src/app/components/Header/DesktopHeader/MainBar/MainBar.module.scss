@@ -4,6 +4,10 @@
     position: relative;
 }
 
+.mainBar.homePageBar {
+    background: linear-gradient(180deg, #141414 0%, rgba(20, 20, 20, 0.65) 55%, transparent 100%);
+}
+
 .mainBarInner {
     margin: 0 auto;
     padding: 10px 0;
