@@ -119,12 +119,17 @@ const mergeCartItems = (currentItems: CartItem[], backendItems: CartItem[]): Car
 // Async Thunks
 export const fetchCartAsync = createAsyncThunk(
     'cart/fetch',
-    async (_, { getState, dispatch, rejectWithValue }) => {
+    async (params: { deliveryId?: number; localityId?: number; paymentId?: number } | void, { getState, dispatch, rejectWithValue }) => {
         try {
             const state = getState() as RootState;
             const useBonuses = state.cart.useBonuses;
             const prevItems = state.cart.items;
-            const response = await getCartApi({ useBonuses });
+            const response = await getCartApi({ 
+                useBonuses,
+                deliveryId: params?.deliveryId,
+                localityId: params?.localityId,
+                paymentId: params?.paymentId,
+            });
             dispatch(setPromoCode(response.promoCode || null));
             dispatch(setCashback(response.cashback || 0));
             dispatch(setTotal(response.total || 0));

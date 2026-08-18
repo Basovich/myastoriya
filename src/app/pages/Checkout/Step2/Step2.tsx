@@ -833,6 +833,12 @@ export default function Step2() {
                 deliveryPrice: deliveryPrice,
             };
             localStorage.setItem('checkout_delivery_params', JSON.stringify(checkoutDeliveryParams));
+
+            // Sync cart total with backend passing deliveryId and localityId for proper discount calculation
+            void dispatch(fetchCartAsync({
+                deliveryId: parseInt(deliveryMethod, 10),
+                localityId: checkoutCity?.id ? parseInt(String(checkoutCity.id), 10) : undefined,
+            }));
             
             const url = new URL(window.location.href);
             url.searchParams.set('step', '3');

@@ -168,6 +168,24 @@ export default function Step3({ lang }: Step3Props) {
 
     // Load saved delivery parameters, promo, and fetch payment methods
     useEffect(() => {
+        let activeDeliveryId: number | undefined;
+        let activeLocalityId: number | undefined;
+
+        const savedDeliveryData = localStorage.getItem('checkout_delivery_data');
+        if (savedDeliveryData) {
+            try {
+                const parsed = JSON.parse(savedDeliveryData);
+                if (parsed.deliveryMethod) {
+                    activeDeliveryId = parseInt(parsed.deliveryMethod, 10);
+                }
+                if (parsed.selectedCity?.id) {
+                    activeLocalityId = parseInt(String(parsed.selectedCity.id), 10);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
         const savedParams = localStorage.getItem('checkout_delivery_params');
         if (savedParams) {
             try {
@@ -175,20 +193,27 @@ export default function Step3({ lang }: Step3Props) {
                 if (typeof parsed.deliveryPrice === 'number') {
                     setDeliveryPrice(parsed.deliveryPrice);
                 }
+                if (!activeDeliveryId && parsed.deliveryId) {
+                    activeDeliveryId = parseInt(String(parsed.deliveryId), 10);
+                }
             } catch (e) {
                 console.error(e);
             }
         }
-        
-        // Stale localStorage logic removed - promo code is synced via Redux/API
+
+        if (activeDeliveryId) {
+            void dispatch(fetchCartAsync({
+                deliveryId: activeDeliveryId,
+                localityId: activeLocalityId,
+            }));
+        }
 
         const fetchPayments = async () => {
             setIsLoadingPayments(true);
             try {
-                let localityId: number | undefined;
-                const savedDelivery = localStorage.getItem('checkout_delivery_data');
-                if (savedDelivery) {
-                    const parsed = JSON.parse(savedDelivery);
+                let localityId: number | undefined = activeLocalityId;
+                if (!localityId && savedDeliveryData) {
+                    const parsed = JSON.parse(savedDeliveryData);
                     if (parsed.selectedCity?.id) {
                         localityId = parsed.selectedCity.id;
                     }
