@@ -258,7 +258,7 @@ export default function Step3({ lang }: Step3Props) {
             }
         };
         fetchPayments();
-    }, [lang]);
+    }, [dispatch, lang]);
     const handleBack = () => {
         const url = new URL(window.location.href);
         url.searchParams.set('step', '2');
