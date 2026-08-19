@@ -1,15 +1,25 @@
 import React from 'react';
 import SafeProductImage from '@/app/components/ui/SafeProductImage/SafeProductImage';
+import AppLink from '@/app/components/ui/AppLink/AppLink';
+import { useProductHref } from '@/hooks/useCategoryTree';
 import clsx from 'clsx';
 import s from './OrderCard.module.scss';
 import Button from '@/app/components/ui/Button/Button';
+
+export interface OrderCardProductItem {
+    id?: string | number;
+    image: string;
+    slug?: string;
+    categoryId?: number | string | null;
+    name?: string;
+}
 
 export interface OrderCardProps {
     orderNumber: string;
     status: string;
     statusVariant?: 'success' | 'warning' | 'error';
     source: string;
-    products: string[];
+    products: Array<string | OrderCardProductItem>;
     totalProductsCount: number;
     sum: number;
     oldSum?: number;
@@ -30,13 +40,38 @@ export interface OrderCardProps {
     };
 }
 
+function OrderProductThumb({ item, overlayText }: { item: OrderCardProductItem; overlayText?: string }) {
+    const productHref = useProductHref(item.slug || (item.id ? String(item.id) : undefined), item.categoryId);
+    const hasLink = Boolean(item.slug || item.id);
+
+    const thumbContent = (
+        <div className={s.productThumb}>
+            <SafeProductImage src={item.image} alt={item.name || "Product"} width={64} height={64} className={s.img} />
+            {overlayText && <div className={s.moreOverlay}>{overlayText}</div>}
+        </div>
+    );
+
+    if (hasLink) {
+        return (
+            <AppLink href={productHref} target="_blank" rel="noopener noreferrer" className={s.productThumbLink}>
+                {thumbContent}
+            </AppLink>
+        );
+    }
+
+    return thumbContent;
+}
+
 export default function OrderCard({
     orderNumber, status, statusVariant = 'success', source,
     products, totalProductsCount, sum, oldSum, date, time,
     onRepeatOrder, onDetails, onReview, reviewLabel, dict,
 }: OrderCardProps) {
     const displayCount = 6;
-    const displayProducts = products.slice(0, displayCount);
+    const normalizedProducts: OrderCardProductItem[] = products.map((p) =>
+        typeof p === 'string' ? { image: p } : p
+    );
+    const displayProducts = normalizedProducts.slice(0, displayCount);
     const remainingCount = totalProductsCount > displayCount ? totalProductsCount - displayCount : 0;
 
     const statusIcon = statusVariant === 'success' ? (
@@ -70,21 +105,14 @@ export default function OrderCard({
 
                 {/* Зображення */}
                 <div className={s.productsList}>
-                    {displayProducts.map((src, idx) => (
-                        <div key={idx} className={s.productThumb}>
-                            <SafeProductImage src={src} alt="Product" width={64} height={64} className={s.img} />
-                        </div>
+                    {displayProducts.map((prod, idx) => (
+                        <OrderProductThumb key={idx} item={prod} />
                     ))}
                     {remainingCount > 0 && (
-                        <div className={s.productThumb}>
-                            <SafeProductImage
-                                src={products[displayCount] || products[0]}
-                                alt="Product overlay"
-                                width={64} height={64}
-                                className={s.img}
-                            />
-                            <div className={s.moreOverlay}>+{remainingCount}</div>
-                        </div>
+                        <OrderProductThumb
+                            item={normalizedProducts[displayCount] || normalizedProducts[0] || { image: '/images/product-placeholder.svg' }}
+                            overlayText={`+${remainingCount}`}
+                        />
                     )}
                 </div>
 

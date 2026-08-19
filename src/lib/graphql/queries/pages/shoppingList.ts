@@ -9,6 +9,8 @@ export interface ShoppingListProduct {
     cost: number;
     unit: string;
     name: string | null;
+    slug?: string;
+    categoryId?: number | string | null;
     image: {
         grid1x?: string | null;
         grid2x?: string | null;

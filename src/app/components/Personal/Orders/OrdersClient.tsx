@@ -72,6 +72,7 @@ interface ProductDetails {
     image: string;
     slug?: string;
     name: string;
+    categoryId?: number | string | null;
 }
 
 const resolveOrderItemImageUrl = (
@@ -219,6 +220,7 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                             image: resolveProductImageUrl(prod),
                             slug: prod.slug,
                             name: prod.name,
+                            categoryId: prod.categoryId,
                         };
                     });
                 } catch (e) {
@@ -406,9 +408,16 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                             const totalDiscount = Math.max(calculationDiscount, itemLevelDiscount);
                             const oldSum = totalDiscount > 0 ? orderSum + totalDiscount : undefined;
 
-                            const orderImages = order.items?.map((item) =>
-                                resolveOrderItemImageUrl(item.id, item.image, productDetailsMap)
-                            ) || [];
+                            const orderProducts = order.items?.map((item) => {
+                                const dbProduct = productDetailsMap[Number(item.id)];
+                                return {
+                                    id: item.id,
+                                    image: resolveOrderItemImageUrl(item.id, item.image, productDetailsMap),
+                                    slug: dbProduct?.slug,
+                                    categoryId: dbProduct?.categoryId,
+                                    name: item.name || dbProduct?.name,
+                                };
+                            }) || [];
 
                             const statusName = order.status?.name || (lang === 'ru' ? 'Новый заказ' : 'Нове замовлення');
                             const statusVariant = getStatusVariant(order.status?.id, order.status?.name);
@@ -432,7 +441,7 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                                     status={statusName}
                                     statusVariant={statusVariant}
                                     source={order.source === 'app' ? dict.card.sourceApp : dict.card.sourceSite}
-                                    products={orderImages}
+                                    products={orderProducts}
                                     totalProductsCount={totalProductsCount}
                                     sum={orderSum}
                                     oldSum={oldSum}

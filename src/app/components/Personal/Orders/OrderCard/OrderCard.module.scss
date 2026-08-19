@@ -138,6 +138,20 @@
     }
 }
 
+.productThumbLink {
+    display: block;
+    border-radius: 8px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    flex-shrink: 0;
+
+    @media (any-hover: hover) {
+        &:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+    }
+}
+
 .productThumb {
     width: 56px;
     height: 56px;

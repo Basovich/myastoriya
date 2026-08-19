@@ -44,9 +44,11 @@ export default function AddedProductItem({
     return (
         <div className={s.addedItem}>
             <div className={s.addedItemLeft}>
-                <div className={s.addedItemImg}>
-                    <SafeProductImage src={image} alt={name} width={88} height={88} />
-                </div>
+                <AppLink href={productUrl} target="_blank" rel="noopener noreferrer" className={s.addedItemImgLink}>
+                    <div className={s.addedItemImg}>
+                        <SafeProductImage src={image} alt={name} width={88} height={88} />
+                    </div>
+                </AppLink>
                 <div className={s.addedItemInfo}>
                     <div className={s.addedItemInfoHead}>
                         <h4 className={s.addedItemName}>

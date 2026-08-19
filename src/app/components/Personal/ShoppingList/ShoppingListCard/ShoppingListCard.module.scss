@@ -178,6 +178,20 @@
     justify-content: flex-start;
 }
 
+.productThumbLink {
+    display: block;
+    border-radius: 12px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    flex-shrink: 0;
+
+    @media (any-hover: hover) {
+        &:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+    }
+}
+
 .productThumb {
     position: relative;
     width: 62px;

@@ -5,6 +5,8 @@ import SafeProductImage from '@/app/components/ui/SafeProductImage/SafeProductIm
 import Button from '@/app/components/ui/Button/Button';
 import { ShoppingListProduct } from '@/lib/graphql/queries/pages/shoppingList';
 import { formatPrice } from '@/utils/price';
+import AppLink from '@/app/components/ui/AppLink/AppLink';
+import { useProductHref } from '@/hooks/useCategoryTree';
 import s from './ShoppingListCard.module.scss';
 import clsx from 'clsx';
 
@@ -17,6 +19,37 @@ interface ShoppingListCardProps {
     onEdit: () => void;
     onAddToCart: () => void;
     onDelete: () => void;
+}
+
+function ShoppingListProductThumb({ prod, overlayText }: { prod: ShoppingListProduct; overlayText?: string }) {
+    const productHref = useProductHref(prod.slug || (prod.productId ? String(prod.productId) : undefined), prod.categoryId);
+    const hasLink = Boolean(prod.slug || prod.productId);
+
+    const resolveImg = (p: ShoppingListProduct) => {
+        if (!p.image) return '';
+        return p.image.grid2x || p.image.main2x || p.image.grid1x || p.image.main1x || p.image.big || '';
+    };
+
+    const thumbContent = (
+        <div className={s.productThumb}>
+            <SafeProductImage src={resolveImg(prod)} alt={prod.name || 'Product'} width={56} height={42} />
+            {overlayText && (
+                <div className={s.overlay}>
+                    <span>{overlayText}</span>
+                </div>
+            )}
+        </div>
+    );
+
+    if (hasLink) {
+        return (
+            <AppLink href={productHref} target="_blank" rel="noopener noreferrer" className={s.productThumbLink}>
+                {thumbContent}
+            </AppLink>
+        );
+    }
+
+    return thumbContent;
 }
 
 export default function ShoppingListCard({
@@ -35,28 +68,17 @@ export default function ShoppingListCard({
         const hasMore = products.length > maxItems;
         const remainingCount = products.length - maxItems;
 
-        const resolveImg = (prod: ShoppingListProduct) => {
-            if (!prod.image) return '';
-            return prod.image.grid2x || prod.image.main2x || prod.image.grid1x || prod.image.main1x || prod.image.big || '';
-        };
-
         const items = visibleProducts.map((prod, index) => (
-            <div key={prod.id || index} className={s.productThumb}>
-                <SafeProductImage src={resolveImg(prod)} alt={prod.name || 'Product'} width={56} height={42} />
-            </div>
+            <ShoppingListProductThumb key={prod.id || index} prod={prod} />
         ));
 
         if (hasMore) {
-            const nextProd = products[maxItems];
-            const nextImg = nextProd ? resolveImg(nextProd) : '';
-            items.push(
-                <div key="overlay" className={s.productThumb}>
-                    <SafeProductImage src={nextImg} alt="Ще товари" width={56} height={42} />
-                    <div className={s.overlay}>
-                        <span>+{remainingCount}</span>
-                    </div>
-                </div>
-            );
+            const nextProd = products[maxItems] || products[0];
+            if (nextProd) {
+                items.push(
+                    <ShoppingListProductThumb key="overlay" prod={nextProd} overlayText={`+${remainingCount}`} />
+                );
+            }
         }
 
         return items;

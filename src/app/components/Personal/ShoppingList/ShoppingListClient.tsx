@@ -83,12 +83,16 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                     fetchedLists.flatMap(list => (list.products || []).map(p => p.productId))
                 ));
 
-                const detailsMap: Record<number, string> = {};
+                const detailsMap: Record<number, { image: string; slug?: string; categoryId?: number | string | null }> = {};
                 if (allProductIds.length > 0) {
                     try {
                         const details = await getProductsByIdsApi(allProductIds, lang);
                         details.forEach(prod => {
-                            detailsMap[Number(prod.id)] = resolveProductImageUrl(prod);
+                            detailsMap[Number(prod.id)] = {
+                                image: resolveProductImageUrl(prod),
+                                slug: prod.slug,
+                                categoryId: prod.categoryId,
+                            };
                         });
                     } catch (e) {
                         console.error("Failed to fetch product details for images:", e);
@@ -98,12 +102,14 @@ export default function ShoppingListClient({ lang }: ShoppingListClientProps) {
                 const updatedLists = fetchedLists.map(list => ({
                     ...list,
                     products: (list.products || []).map(p => {
-                        const resolvedImgUrl = detailsMap[p.productId];
-                        if (resolvedImgUrl) {
+                        const prodDetail = detailsMap[p.productId];
+                        if (prodDetail) {
                             return {
                                 ...p,
+                                slug: prodDetail.slug,
+                                categoryId: prodDetail.categoryId,
                                 image: {
-                                    grid2x: resolvedImgUrl
+                                    grid2x: prodDetail.image
                                 }
                             };
                         }
