@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
 import clsx from "clsx";
@@ -25,6 +26,12 @@ interface ProductsProps {
     initialHasMore?: boolean;
 }
 
+// Кількість повторів масиву вітрин у слайдері.
+// Слайдер починається з CENTER_REP-го повтору.
+// Коли доходимо до межі (перший або останній повтор), робимо тихий стрибок назад у центр.
+const REPEATS = 7;
+const CENTER_REP = Math.floor(REPEATS / 2); // = 3
+
 export default function Products({ dict, showcases, initialProducts, initialHasMore }: ProductsProps) {
     const params = useParams();
     const locale = params?.lang as string;
@@ -37,6 +44,7 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
     const [hasMore, setHasMore] = useState(initialHasMore ?? true);
     const [page, setPage] = useState(1);
     const [isLocked, setIsLocked] = useState(false);
+    const swiperRef = useRef<SwiperType | null>(null);
 
     useEffect(() => {
         let isMounted = true;
@@ -75,8 +83,6 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
         // Don't fetch on first mount if it's the first tab AND page is 1
         if (activeTab === 0 && page === 1) {
             setProducts(initialProducts);
-            // We assume showcases[0] might have more pages, or we could fetch it too.
-            // For simplicity, we just use initialProducts.
         } else {
             fetchProducts();
         }
@@ -91,19 +97,61 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
         setPage(1);
     }, [activeTab]);
 
-
     const handleLoadMore = () => {
         if (!loading && hasMore) {
             setPage(prev => prev + 1);
         }
     };
 
+    /**
+     * Клік по вкладці: змінює активну вітрину і анімує слайдер до найближчого
+     * екземпляра цього табу в DOM (щоб анімація була мінімальною).
+     */
+    const handleTabClick = (realIndex: number) => {
+        setActiveTab(realIndex);
+        const sw = swiperRef.current;
+        if (!sw) return;
+
+        const n = showcases.length;
+        const currentIdx = sw.activeIndex;
+        const currentRep = Math.floor(currentIdx / n);
+
+        // Знаходимо найближчий екземпляр цього табу
+        const candidates = [
+            (currentRep - 1) * n + realIndex,
+            currentRep * n + realIndex,
+            (currentRep + 1) * n + realIndex,
+        ].filter(idx => idx >= 0 && idx < REPEATS * n);
+
+        const closest = candidates.reduce((best, c) =>
+            Math.abs(c - currentIdx) < Math.abs(best - currentIdx) ? c : best
+        );
+
+        sw.slideTo(closest);
+    };
+
+    /**
+     * Після завершення анімації переходу: якщо знаходимось у першому або
+     * останньому повторі — тихо (без анімації, без колбеків) стрибаємо назад
+     * до еквівалентної позиції у центральному повторі.
+     * Це створює ефект нескінченної зацикленості без жодних DOM-маніпуляцій Swiper.
+     */
+    const handleTransitionEnd = (swiper: SwiperType) => {
+        const n = showcases.length;
+        const idx = swiper.activeIndex;
+        const realIdx = idx % n;
+
+        if (idx < n || idx >= (REPEATS - 1) * n) {
+            const target = CENTER_REP * n + realIdx;
+            swiper.slideTo(target, 0, false);
+        }
+    };
 
     if (!dict || !showcases || showcases.length === 0) return null;
 
-    const sliderShowcases = showcases.length > 0
-        ? Array(5).fill(showcases).flat()
-        : [];
+    const sliderShowcases = Array(REPEATS).fill(showcases).flat();
+    // Починаємо з центрального повтору, перший таб (realIndex=0)
+    const initialSlide = CENTER_REP * showcases.length;
 
     return (
         <section className={s.wrapper}>
@@ -127,30 +175,19 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                         key={showcases.length}
                         modules={[Navigation]}
                         navigation={{ prevEl, nextEl }}
-                        loop={true}
-                        loopAdditionalSlides={showcases.length}
-                        loopAddBlankSlides={true}
+                        loop={false}
+                        initialSlide={initialSlide}
                         centeredSlides={true}
-                        grabCursor={true}
-                        simulateTouch={true}
+                        grabCursor={false}
+                        simulateTouch={false}
                         allowTouchMove={true}
                         slidesPerView="auto"
                         spaceBetween={8}
-                        onClick={(swiper) => {
-                            if (typeof swiper.clickedIndex === "number" && !isNaN(swiper.clickedIndex)) {
-                                swiper.slideTo(swiper.clickedIndex);
-                                const clickedEl = swiper.clickedSlide;
-                                if (clickedEl) {
-                                    const realIdxStr = clickedEl.getAttribute("data-real-index");
-                                    if (realIdxStr !== null) {
-                                        const realIdx = parseInt(realIdxStr, 10);
-                                        if (!isNaN(realIdx)) {
-                                            setActiveTab(realIdx);
-                                        }
-                                    }
-                                }
-                            }
+                        onSwiper={(swiper) => {
+                            swiperRef.current = swiper;
+                            setIsLocked(swiper.isLocked);
                         }}
+                        onTransitionEnd={handleTransitionEnd}
                         onInit={(swiper) => {
                             setIsLocked(swiper.isLocked);
                         }}
@@ -162,15 +199,15 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
                         {sliderShowcases.map((showcase, i) => {
                             const realIndex = i % showcases.length;
                             return (
-                                <SwiperSlide 
-                                    key={`${showcase.id}-${i}`} 
+                                <SwiperSlide
+                                    key={`${showcase.id}-${i}`}
                                     className={s.tabSlide}
-                                    data-real-index={realIndex}
                                 >
                                     <Button
                                         variant="pill"
                                         active={activeTab === realIndex}
                                         className={s.tabButton}
+                                        onClick={() => handleTabClick(realIndex)}
                                     >
                                         {showcase.name}
                                     </Button>
