@@ -371,51 +371,69 @@ export const removeFromCartAsync = createAsyncThunk(
     }
 );
 
+// Module-level sync lock — prevents concurrent syncCartOnAuthAsync calls.
+// Using a Promise instead of Redux state to avoid issues with React Strict Mode
+// double-invocation and Google OAuth loginAsGuest→login rapid state transitions.
+let syncCartPromise: Promise<boolean | unknown> | null = null;
+
 // Sync local items to backend (used after login/register)
 export const syncCartOnAuthAsync = createAsyncThunk(
     'cart/syncOnAuth',
     async (_, { getState, dispatch, rejectWithValue }) => {
-        const state = getState() as RootState;
-        // Guard against concurrent syncs — isSyncing is stored in Redux state
-        // so it correctly resets on logout unlike a module-level variable.
-        if (state.cart.isSyncing) return false;
+        // If a sync is already in flight, skip a new one
+        if (syncCartPromise) {
+            return false;
+        }
+
+        const doSync = async (): Promise<boolean> => {
+            try {
+                const localItems = (getState() as RootState).cart.items;
+
+                // Deduplicate items before syncing (including modifiers)
+                const uniqueItems = Array.from(
+                    new Map(localItems.map(item => {
+                        const modKey = item.modifiers ? [...item.modifiers].map(m => m.id).sort((a, b) => a - b).join(',') : '';
+                        const key = `${item.id}_${item.costVariantId ?? ''}_${modKey}`;
+                        return [key, item];
+                    })).values()
+                );
+
+                if (uniqueItems.length > 0) {
+                    await Promise.all(
+                        uniqueItems.map(async (item) => {
+                            try {
+                                const modifierIds = item.modifiers ? item.modifiers.map(m => m.id) : undefined;
+                                return await addProductToCartApi({
+                                    productId: Number(item.id),
+                                    quantity: item.quantity,
+                                    costVariantId: item.costVariantId || undefined,
+                                    modifierIds,
+                                });
+                            } catch (error) {
+                                console.warn(`[Cart Sync] Failed to add product ${item.id}:`, error instanceof Error ? error.message : error);
+                                return null;
+                            }
+                        })
+                    );
+                }
+
+                // Fetch the combined result from the backend
+                await dispatch(fetchCartAsync()).unwrap();
+                return true;
+            } catch (error) {
+                console.warn('[Cart] Failed to sync cart on auth:', error instanceof Error ? error.message : error);
+                throw error;
+            }
+        };
+
+        syncCartPromise = doSync().finally(() => {
+            syncCartPromise = null;
+        });
 
         try {
-            const localItems = state.cart.items;
-
-            // Deduplicate items before syncing (including modifiers)
-            const uniqueItems = Array.from(
-                new Map(localItems.map(item => {
-                    const modKey = item.modifiers ? [...item.modifiers].map(m => m.id).sort((a, b) => a - b).join(',') : '';
-                    const key = `${item.id}_${item.costVariantId ?? ''}_${modKey}`;
-                    return [key, item];
-                })).values()
-            );
-
-            if (uniqueItems.length > 0) {
-                // Sync local items in parallel via Promise.all for performance
-                await Promise.all(
-                    uniqueItems.map(async (item) => {
-                        try {
-                            const modifierIds = item.modifiers ? item.modifiers.map(m => m.id) : undefined;
-                            await addProductToCartApi({
-                                productId: Number(item.id),
-                                quantity: item.quantity,
-                                costVariantId: item.costVariantId || undefined,
-                                modifierIds,
-                            });
-                        } catch (error) {
-                            console.warn(`[Cart Sync] Failed to add product ${item.id}:`, error instanceof Error ? error.message : error);
-                        }
-                    })
-                );
-            }
-
-            // Fetch the combined result from the backend
-            await dispatch(fetchCartAsync()).unwrap();
+            await syncCartPromise;
             return true;
-        } catch (error) {
-            console.warn('[Cart] Failed to sync cart on auth:', error instanceof Error ? error.message : error);
+        } catch {
             return rejectWithValue('Failed to sync cart');
         }
     }
@@ -483,7 +501,7 @@ const cartSlice = createSlice({
         clearRemovedItems: (state) => {
             state.removedItems = [];
             state.isCartModalOpen = false;
-        }
+        },
     },
     extraReducers: (builder) => {
         builder
