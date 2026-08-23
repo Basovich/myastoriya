@@ -17,7 +17,7 @@ import OrderCard from './OrderCard/OrderCard';
 import s from './OrdersClient.module.scss';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import PersonalReviewModal from '@/app/components/Personal/Reviews/PersonalReviewModal/PersonalReviewModal';
-import { addToCartAsync, setCartModalOpen } from '@/store/slices/cartSlice';
+import { addToCartAsync, fetchCartAsync, setCartModalOpen } from '@/store/slices/cartSlice';
 import UnavailableProductsModal, { UnavailableProduct } from './UnavailableProductsModal/UnavailableProductsModal';
 
 import {
@@ -290,6 +290,9 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                 }
             });
 
+            // Refresh cart from backend to sync items cleanly
+            await dispatch(fetchCartAsync());
+
             const hasAdded = failed.length < items.length;
 
             if (failed.length > 0) {
@@ -301,6 +304,7 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
             }
         } catch (error) {
             console.error('Failed to repeat order:', error);
+            void dispatch(fetchCartAsync());
         }
     };
 
@@ -308,6 +312,8 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
         setIsUnavailableModalOpen(false);
         if (openCartAfterUnavailable) {
             dispatch(setCartModalOpen(true));
+        } else {
+            void dispatch(fetchCartAsync());
         }
         setUnavailableProducts([]);
         setOpenCartAfterUnavailable(false);

@@ -280,10 +280,7 @@ export function useCartProducts() {
                 console.error('[useCartProducts] Failed to fetch product details:', err);
                 missingIds.forEach(id => {
                     pendingRequests.delete(id);
-                    // При помилці API — зберігаємо null з коротшим TTL (1 хв),
-                    // щоб не блокувати повторний запит нескінченно.
-                    // Перезаписуємо timestamp як застарілий через 1 хв.
-                    globalProductCache[String(id)] = { product: null, timestamp: Date.now() - CACHE_TTL_MS + 60_000 };
+                    setCachedProduct(String(id), null);
                 });
                 emitCacheUpdate();
             });
