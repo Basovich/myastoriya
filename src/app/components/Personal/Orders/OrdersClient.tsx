@@ -238,29 +238,37 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
             setOrderReviews(oRevMap);
 
             // 4. Auto-prompt review modal once if there's a completed order without a review
-            if (user?.id) {
-                const storageKey = `order_review_auto_prompt_shown_${user.id}`;
-                const hasBeenPrompted = localStorage.getItem(storageKey);
-                if (!hasBeenPrompted) {
-                    // Filter completed orders without review
-                    const completedUnreviewedOrders = ordersData.data.filter(order => {
-                        const statusVariant = getStatusVariant(order.status?.id, order.status?.name);
-                        const hasReview = !!oRevMap[order.id.toString()];
-                        return statusVariant === 'success' && !hasReview;
-                    });
+            const userId = user?.id || 'current';
+            const storageKey = `order_review_auto_prompt_shown_${userId}`;
+            const hasBeenPrompted = sessionStorage.getItem(storageKey) || localStorage.getItem(storageKey);
 
-                    if (completedUnreviewedOrders.length > 0) {
-                        // Pick the latest (most recent) order by createdAt date
-                        const latestOrder = completedUnreviewedOrders.reduce((latest, current) => {
-                            const latestDate = new Date(latest.createdAt).getTime();
-                            const currentDate = new Date(current.createdAt).getTime();
-                            return currentDate > latestDate ? current : latest;
-                        }, completedUnreviewedOrders[0]);
+            if (!hasBeenPrompted) {
+                // Filter completed orders without review
+                const completedUnreviewedOrders = ordersData.data.filter(order => {
+                    const statusNameLower = (order.status?.name || '').toLowerCase();
+                    const isCompleted = order.status?.id === '2'
+                        || statusNameLower.includes('завершено')
+                        || statusNameLower.includes('виконано')
+                        || statusNameLower.includes('выполнено')
+                        || statusNameLower.includes('доставлено')
+                        || statusNameLower.includes('delivered')
+                        || statusNameLower.includes('completed');
 
-                        localStorage.setItem(storageKey, 'true');
-                        setSelectedOrder({ id: latestOrder.id.toString() });
-                        setIsModalOpen(true);
-                    }
+                    const hasReview = !!oRevMap[order.id.toString()] || (order.orderNo ? !!oRevMap[order.orderNo.toString()] : false);
+                    return isCompleted && !hasReview;
+                });
+
+                if (completedUnreviewedOrders.length > 0) {
+                    // Pick the latest (most recent) order by createdAt date
+                    const latestOrder = completedUnreviewedOrders.reduce((latest, current) => {
+                        const latestDate = new Date(latest.createdAt).getTime();
+                        const currentDate = new Date(current.createdAt).getTime();
+                        return currentDate > latestDate ? current : latest;
+                    }, completedUnreviewedOrders[0]);
+
+                    sessionStorage.setItem(storageKey, 'true');
+                    setSelectedOrder({ id: latestOrder.id.toString() });
+                    setIsModalOpen(true);
                 }
             }
         } catch (error) {
@@ -280,6 +288,11 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
 
     const handleLogout = async () => {
         try {
+            if (user?.id) {
+                const storageKey = `order_review_auto_prompt_shown_${user.id}`;
+                localStorage.removeItem(storageKey);
+                sessionStorage.removeItem(storageKey);
+            }
             const token = storeToken || await getAccessToken();
             if (token) await logoutApi(token);
         } catch {
