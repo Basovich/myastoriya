@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import {usePathname} from "next/navigation";
 import clsx from "clsx";
 import s from "./LanguageSwitch.module.scss";
-import { type Locale } from "@/i18n/config";
+import {type Locale} from "@/i18n/config";
 
 interface LanguageSwitchProps {
     lang: Locale;
@@ -29,8 +29,7 @@ export default function LanguageSwitch({ lang }: LanguageSwitchProps) {
         }
 
         // All internal pages have /ua/ or /ru/ prefix and trailing slash
-        const path = `/${targetLang}/${newSegments.join('/')}/`;
-        return path;
+        return `/${targetLang}/${newSegments.join('/')}/`;
     };
 
     return (
