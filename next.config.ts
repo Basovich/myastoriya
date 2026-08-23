@@ -11,7 +11,8 @@ const nextConfig: NextConfig = {
     cpus: 2,
     workerThreads: false,
   },
-  webpack: (config) => {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  webpack: (config: any) => {
     // Find the rules for CSS modules
     const rules = config.module.rules
       .find((rule: any) => typeof rule.oneOf === 'object')
@@ -56,6 +57,7 @@ const nextConfig: NextConfig = {
 
     return config;
   },
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 };
 
 export default withSentryConfig(nextConfig, {
