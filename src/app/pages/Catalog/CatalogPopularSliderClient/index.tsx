@@ -64,6 +64,7 @@ export default function CatalogPopularSliderClient({
                 lang={lang}
                 hasCostVariants={product.hasCostVariants}
                 portionSize={product.portionSize}
+                loading="lazy"
             />
         ),
     }));

@@ -27,6 +27,7 @@ interface ProductCardProps {
     lang: string;
     hasCostVariants?: boolean;
     portionSize?: string | null;
+    loading?: 'lazy' | 'eager';
     children?: React.ReactNode;
 }
 
@@ -45,6 +46,7 @@ export default function ProductCard({
     lang,
     hasCostVariants = false,
     portionSize,
+    loading = 'lazy',
     children,
 }: ProductCardProps) {
     const isRu = lang === 'ru';
@@ -77,6 +79,7 @@ export default function ProductCard({
                             className={s.productImg}
                             width={162}
                             height={120}
+                            loading={loading}
                         />
                     ) : (
                         <div className={s.imageFallback}>
