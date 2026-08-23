@@ -16,6 +16,7 @@ interface ProductGalleryProps {
     id: string;
     images: string[];
     discount?: string;
+    badge?: string | null;
     videoUrl?: string | null;
     promoTitle?: string;
     promoUrl?: string;
@@ -25,6 +26,7 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
     id,
     images,
     discount,
+    badge,
     videoUrl,
     promoTitle,
     promoUrl,
@@ -74,12 +76,15 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
                         </>
                     )}
 
-                    {(discount || promoTitle) && (
+                    {(discount || badge || promoTitle) && (
                         <div className={styles.discountWrapper}>
                             {discount && <span className={styles.discountBadge}>{discount}</span>}
-                            <Link href={promoUrl || "/actions"} className={styles.promoText}>
-                                {promoTitle || "STEAK DAYS ЩОВІВТОРКА!"}
-                            </Link>
+                            {!discount && badge && <span className={styles.discountBadge}>{badge}</span>}
+                            {promoTitle && (
+                                <Link href={promoUrl || "/actions"} className={styles.promoText}>
+                                    {promoTitle}
+                                </Link>
+                            )}
                         </div>
                     )}
 

@@ -65,6 +65,20 @@ function getAvailabilityLabel(available: number | null | undefined): { label: st
     return { label: 'Є в наявності', inStock: true };
 }
 
+/**
+ * Витягує відсоток знижки з назви акції.
+ * Підтримує формати: "-20%", "20%", "знижка 15%", "-10% на ..."
+ * Повертає рядок типу "-20%" або null якщо відсоток не знайдено.
+ */
+function parseDiscountFromTitle(title?: string | null): string | null {
+    if (!title) return null;
+    const match = title.match(/(-?\d+(?:[.,]\d+)?)\s*%/);
+    if (!match) return null;
+    const value = Math.abs(parseFloat(match[1].replace(',', '.')));
+    if (isNaN(value) || value <= 0 || value >= 100) return null;
+    return `-${Math.round(value)}%`;
+}
+
 // ---------------------------------------------------------------------------
 // Props
 // ---------------------------------------------------------------------------
@@ -326,9 +340,12 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         <ProductGallery
                             id={String(product.id)}
                             images={displayImages}
-                            discount={hasDiscount && activePurchaseOldCost
-                                ? `-${Math.floor(100 - (activePurchaseCost / activePurchaseOldCost) * 100)}%`
-                                : undefined}
+                            discount={
+                                hasDiscount && activePurchaseOldCost
+                                    ? `-${Math.floor(100 - (activePurchaseCost / activePurchaseOldCost) * 100)}%`
+                                    : parseDiscountFromTitle(product.promoTitle) ?? undefined
+                            }
+                            badge={!hasDiscount && !parseDiscountFromTitle(product.promoTitle) ? getProductBadge(product, lang) : undefined}
                             videoUrl={product.video}
                             promoTitle={product.promoTitle}
                             promoUrl={product.promoUrl}

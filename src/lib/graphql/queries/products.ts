@@ -160,6 +160,7 @@ export interface Product {
     unit: string;
     multiplier?: number;
     is_new?: boolean | null;
+    isSale?: boolean | null;
     pre_order?: boolean | null;
     /** 1 = В наявності, 2 = Немає в наявності, 3 = Знято з виробництва */
     available?: number | null;
@@ -216,8 +217,11 @@ export function resolveProductImageUrl(product: Product): string {
     return url;
 }
 
-export function getProductBadge(product: { is_new?: boolean | null; cost: number; oldCost?: number | null }, lang?: string): string | null {
+export function getProductBadge(product: { is_new?: boolean | null; isSale?: boolean | null; cost: number; oldCost?: number | null }, lang?: string): string | null {
     if (product.is_new) return 'NEW';
+    if (product.isSale) {
+        return lang === 'ru' ? 'АКЦИЯ' : 'АКЦІЯ';
+    }
     if (product.oldCost && product.oldCost > product.cost) {
         return lang === 'ru' ? 'АКЦИЯ' : 'АКЦІЯ';
     }
@@ -342,6 +346,7 @@ const PRODUCTS_QUERY = /* GraphQL */ `
                 unit
                 multiplier
                 is_new
+                isSale
                 available
                 portionSize
                 isWeighty
@@ -390,6 +395,7 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
             unit
             multiplier
             is_new
+            isSale
             pre_order
             available
             portionSize
@@ -439,6 +445,7 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                         unit
                         multiplier
                         is_new
+                        isSale
                         available
                         hasCostVariants
                         specifications {
@@ -491,6 +498,7 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                     unit
                     multiplier
                     is_new
+                    isSale
                     available
                     portionSize
                     images {
@@ -554,6 +562,7 @@ const POPULAR_PRODUCTS_QUERY = /* GraphQL */ `
                 unit
                 multiplier
                 is_new
+                isSale
                 available
                 portionSize
                 hasCostVariants
@@ -589,6 +598,7 @@ const SPECIALS_BY_PRODUCT_QUERY = /* GraphQL */ `
                     unit
                     multiplier
                     is_new
+                    isSale
                     available
                     portionSize
                     specifications {
@@ -621,6 +631,7 @@ const BOUGHT_TOGETHER_PRODUCTS_QUERY = /* GraphQL */ `
             unit
             multiplier
             is_new
+            isSale
             available
             portionSize
             hasCostVariants
@@ -667,6 +678,7 @@ const VIEWED_PRODUCTS_QUERY = /* GraphQL */ `
                 unit
                 multiplier
                 is_new
+                isSale
                 portionSize
                 hasCostVariants
                 images {
@@ -701,6 +713,7 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
             unit
             multiplier
             is_new
+            isSale
             available
             portionSize
             isWeighty
@@ -747,6 +760,7 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
                     unit
                     multiplier
                     is_new
+                    isSale
                     available
                     portionSize
                     images {
@@ -884,6 +898,7 @@ const SALE_PRODUCTS_QUERY = /* GraphQL */ `
                 unit
                 multiplier
                 is_new
+                isSale
                 available
                 portionSize
                 isWeighty
@@ -1590,6 +1605,7 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
                 unit
                 multiplier
                 is_new
+                isSale
                 available
                 portionSize
                 hasCostVariants

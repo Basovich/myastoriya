@@ -50,6 +50,7 @@ const GET_FAVORITES_QUERY = /* GraphQL */ `
                 unit @include(if: $full)
                 multiplier @include(if: $full)
                 is_new @include(if: $full)
+                isSale @include(if: $full)
                 available @include(if: $full)
                 hasCostVariants @include(if: $full)
                 portionSize @include(if: $full)
