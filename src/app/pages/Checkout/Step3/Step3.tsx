@@ -145,6 +145,7 @@ export default function Step3({ lang }: Step3Props) {
                 if (parsed.comment !== undefined) setComment(parsed.comment);
                 if (parsed.personsCount !== undefined) setPersonsCount(parsed.personsCount);
                 if (parsed.contactMethod !== undefined) setContactMethod(parsed.contactMethod);
+                if (parsed.paymentMethod !== undefined) setPaymentMethod(parsed.paymentMethod);
                 if (parsed.changeAmount !== undefined) setChangeAmount(parsed.changeAmount);
                 if (parsed.selectedCardId !== undefined) setSelectedCardId(parsed.selectedCardId);
             } catch (e) {
@@ -249,7 +250,11 @@ export default function Step3({ lang }: Step3Props) {
                             }
                         } catch {}
                     }
-                    setPaymentMethod(prev => prev || restoredMethod || processed[0].id);
+                    setPaymentMethod(prev => {
+                        if (prev && processed.some(p => p.id === prev)) return prev;
+                        if (restoredMethod) return restoredMethod;
+                        return processed[0].id;
+                    });
                 }
             } catch (e) {
                 console.error('Failed to load payment methods', e);
