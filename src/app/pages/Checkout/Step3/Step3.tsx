@@ -528,9 +528,11 @@ export default function Step3({ lang }: Step3Props) {
 
             if (res.url) {
                 // Будь-який action з url (redirect / authenticate / confirm) — редірект на платіжний шлюз
+                dispatch(clearCart());
                 window.location.href = res.url;
             } else {
                 dispatch(clearCart());
+                void dispatch(fetchCartAsync());
                 localStorage.removeItem('checkout_delivery_data');
                 localStorage.removeItem('checkout_delivery_params');
                 localStorage.removeItem('checkout_user_data');

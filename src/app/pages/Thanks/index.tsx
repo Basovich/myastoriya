@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import s from "./Thanks.module.scss";
 import { type Locale } from "@/i18n/config";
 import Button from "@/app/components/ui/Button/Button";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs/Breadcrumbs";
+import { useAppDispatch } from "@/store/hooks";
+import { clearCart, fetchCartAsync } from "@/store/slices/cartSlice";
 
 const translations = {
     ua: {
@@ -39,8 +41,14 @@ interface ThanksPageProps {
 }
 
 export default function ThanksPage({ lang, orderId, isOnline }: ThanksPageProps) {
+    const dispatch = useAppDispatch();
     const t = translations[lang] || translations.ua;
     const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        dispatch(clearCart());
+        void dispatch(fetchCartAsync());
+    }, [dispatch]);
 
     const handleCopyPromo = async () => {
         try {
