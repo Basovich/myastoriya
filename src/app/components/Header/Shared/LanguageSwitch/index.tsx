@@ -23,12 +23,14 @@ export default function LanguageSwitch({ lang }: LanguageSwitchProps) {
             newSegments.shift();
         }
 
-        // Add target locale if it's not the default
-        if (targetLang !== 'ua') {
-            newSegments.unshift(targetLang);
+        // Home page special case: UA root is /
+        if (newSegments.length === 0) {
+            return targetLang === 'ua' ? '/' : '/ru/';
         }
 
-        return '/' + newSegments.join('/');
+        // All internal pages have /ua/ or /ru/ prefix and trailing slash
+        const path = `/${targetLang}/${newSegments.join('/')}/`;
+        return path;
     };
 
     return (

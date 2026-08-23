@@ -28,22 +28,38 @@ export function middleware(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-pathname', pathname);
 
-    // 2. Redirect /ua to / (clean URL for default locale)
-    if (pathname === '/ua' || pathname.startsWith('/ua/')) {
-        // Exception: /ua/menu/* — menu pages keep the /ua/ prefix intentionally
-        if (pathname.startsWith('/ua/menu/')) {
-            return NextResponse.rewrite(
-                new URL(`${pathname}${search}`, request.url),
-                { request: { headers: requestHeaders } }
-            );
-        }
-        const cleanPath = pathname.replace(/^\/ua/, '') || '/';
-        return NextResponse.redirect(new URL(`${cleanPath}${search}`, request.url));
+    // 2. SEO Locale & Trailing slash handling
+    // Home page for default locale (UA) MUST be / (without /ua prefix)
+    if (pathname === '/ua' || pathname === '/ua/') {
+        return NextResponse.redirect(new URL(`/${search}`, request.url), 301);
     }
 
-    // 3. Redirect /personal to /personal/profile/
-    if (pathname === '/personal' || pathname === '/personal/') {
-        return NextResponse.redirect(new URL('/personal/profile/', request.url));
+    // Redirect /ua/menu/* to clean internal route
+    if (pathname.startsWith('/ua/menu/')) {
+        const cleanPath = pathname.replace(/^\/ua\/menu/, '/menu');
+        return NextResponse.redirect(new URL(`${cleanPath}${search}`, request.url), 301);
+    }
+
+    // Ensure trailing slash for all non-root paths (301 Permanent Redirect for SEO)
+    if (pathname !== '/' && !pathname.endsWith('/')) {
+        return NextResponse.redirect(
+            new URL(`${pathname}/${search}`, request.url),
+            301
+        );
+    }
+
+    // If path does not start with /ua/ or /ru/ (and is not root /), redirect default locale to /ua/... per SEO specs
+    const hasLocalePrefix = locales.some(locale => pathname.startsWith(`/${locale}/`));
+    if (!hasLocalePrefix && pathname !== '/') {
+        return NextResponse.redirect(
+            new URL(`/ua${pathname}${search}`, request.url),
+            301
+        );
+    }
+
+    // 3. Redirect /personal/ to /personal/profile/
+    if (pathname === '/personal/') {
+        return NextResponse.redirect(new URL('/personal/profile/', request.url), 301);
     }
 
     // 4. Protect /personal/* — require access_token cookie
@@ -55,7 +71,15 @@ export function middleware(request: NextRequest) {
         }
     }
 
-    // 5. Internal rewrite to [lang] structure
+    // 5. Internal rewrite for default locale (UA) on root '/' -> rewrite to /ua/
+    if (pathname === '/') {
+        return NextResponse.rewrite(
+            new URL(`/ua/${search}`, request.url),
+            { request: { headers: requestHeaders } }
+        );
+    }
+
+    // 6. Internal rewrite to [lang] structure
     const pathnameHasLocale = locales.some(
         (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
     );

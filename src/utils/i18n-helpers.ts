@@ -17,20 +17,19 @@ export function getLocalizedHref(href: string, lang: Locale): string {
         return href;
     }
 
-    // For default locale, ensure clean path (no /ua prefix)
-    if (lang === i18n.defaultLocale) {
-        return href;
+    // Ensure internal href starts with /
+    const cleanHref = href.startsWith('/') ? href : `/${href}`;
+
+    // Special rule: Root home page for default locale (UA) is / (without /ua/)
+    if (lang === i18n.defaultLocale && (cleanHref === '/' || cleanHref === '')) {
+        return '/';
     }
 
-    // For other locales, prepend locale if not already present
-    // Assumes href starts with / if it's an internal route from siteData
-    const cleanHref = href.startsWith('/') ? href : `/${href}`;
-    const localized = `/${lang}${cleanHref}`;
-    
-    // Normalize: remove trailing slash for home page in other languages (/ru/ -> /ru)
-    if (localized.length > 3 && localized.endsWith('/')) {
-        return localized.slice(0, -1);
+    // All internal pages (both UA and RU) must have locale prefix /ua/ or /ru/ and trailing slash
+    let result = `/${lang}${cleanHref}`;
+    if (!result.endsWith('/')) {
+        result = `${result}/`;
     }
-    
-    return localized;
+
+    return result;
 }
