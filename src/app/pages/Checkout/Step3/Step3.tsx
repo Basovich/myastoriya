@@ -285,7 +285,7 @@ export default function Step3({ lang }: Step3Props) {
                 setUserCards(mapped);
                 const defaultCard = mapped.find(c => c.isDefault) || mapped[0];
                 if (defaultCard) {
-                    setSelectedCardId(defaultCard.id);
+                    setSelectedCardId(prev => prev || defaultCard.id);
                 }
             } catch (e) {
                 console.error('Failed to load user bank cards:', e);
@@ -310,7 +310,22 @@ export default function Step3({ lang }: Step3Props) {
                     type: (c.icon?.toLowerCase() === 'mastercard' ? 'mastercard' : 'visa') as 'visa' | 'mastercard',
                     isDefault: c.isDefault,
                 }));
-                setUserCards(mapped);
+                setUserCards(prev => {
+                    // Find if a new card was added
+                    const newCard = mapped.find(c => !prev.some(p => p.id === c.id));
+                    if (newCard) {
+                        setSelectedCardId(newCard.id);
+                    }
+                    return mapped;
+                });
+
+                // Make sure payment method remains / switches to card payment option if cards exist
+                if (rawPaymentsRef.current.length > 0) {
+                    const cardPayment = rawPaymentsRef.current.find(p => p.driver?.includes('liqpay') || p.driver?.includes('card'));
+                    if (cardPayment) {
+                        setPaymentMethod(prev => prev || cardPayment.id);
+                    }
+                }
             } catch (e) {
                 console.error('Failed to reload bank cards on focus:', e);
             }
