@@ -14,6 +14,7 @@ import {
     getBoughtTogetherProductsApi,
     getDeliveryBlocksApi,
     getSalesApi,
+    resolveCategoryImageUrl,
     resolveProductImageUrl,
     ProductCategory,
     Product,
