@@ -119,11 +119,7 @@ export default function SearchContent() {
 
     const categoryCircleItems = (() => {
         const items: { name: string; image: string; href: string }[] = [];
-        const process = (
-            list: ProductCategory[],
-            parent?: ProductCategory | null,
-            grandParent?: ProductCategory | null,
-        ) => {
+        const process = (list: ProductCategory[]) => {
             list.forEach(cat => {
                 const href = getCategoryHref(cat);
                 items.push({
@@ -132,7 +128,7 @@ export default function SearchContent() {
                     href: getLocalizedHref(href, (lang as Locale) || "ua")
                 });
                 if (cat.children && cat.children.length > 0) {
-                    process(cat.children, cat, parent);
+                    process(cat.children);
                 }
             });
         };
