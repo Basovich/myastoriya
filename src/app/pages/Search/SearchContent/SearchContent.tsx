@@ -125,7 +125,7 @@ export default function SearchContent() {
             grandParent?: ProductCategory | null,
         ) => {
             list.forEach(cat => {
-                const href = getCategoryHref(cat, parent, grandParent);
+                const href = getCategoryHref(cat);
                 items.push({
                     name: cat.name,
                     image: resolveCategoryImageUrl(cat) || "/images/product-placeholder.svg",

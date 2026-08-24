@@ -198,11 +198,7 @@ export default async function DynamicCatalogPage({ params }: DynamicCatalogPageP
                 : undefined;
                 
             if (localEntry) {
-                const catUrl = getCategoryHref(
-                    localEntry.node,
-                    localEntry.parent,
-                    localEntry.grandParent,
-                );
+                const catUrl = getCategoryHref(localEntry.node);
                 redirect(`${langPrefix}${catUrl}`);
             }
             
@@ -232,11 +228,7 @@ export default async function DynamicCatalogPage({ params }: DynamicCatalogPageP
             : undefined;
             
         if (localEntry) {
-            const catUrl = getCategoryHref(
-                localEntry.node,
-                localEntry.parent,
-                localEntry.grandParent,
-            );
+            const catUrl = getCategoryHref(localEntry.node);
             redirect(`${langPrefix}${catUrl}`);
         }
         

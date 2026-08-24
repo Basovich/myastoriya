@@ -220,7 +220,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                     {/* ── Колонка L2 ── */}
                                     <ul className={clsx(s.subList, hasThirdLevel && s.subListNarrow)}>
                                         {activeCategory.children.map((sub) => {
-                                            const canonicalHref = getCategoryHref(sub, activeCategory);
+                                            const canonicalHref = getCategoryHref(sub);
                                             const localizedHref = getLocalizedHref(canonicalHref, lang);
                                             const isCurrentL2 = pathname === localizedHref;
                                             return (
@@ -248,7 +248,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                     {hasThirdLevel && (
                                         <ul className={s.thirdList}>
                                             {hoveredSubCategory!.children!.map((third) => {
-                                                const canonicalHref = getCategoryHref(third, hoveredSubCategory, activeCategory);
+                                                const canonicalHref = getCategoryHref(third);
                                                 const localizedHref = getLocalizedHref(canonicalHref, lang);
                                                 const isCurrentL3 = pathname === localizedHref;
                                                 return (

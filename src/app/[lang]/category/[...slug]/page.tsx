@@ -120,11 +120,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
             if (categoryEntry.parent) {
                 const parentEntry = categoryIndex.get(String(categoryEntry.parent.id));
                 if (parentEntry) {
-                    const parentHref = getCategoryHref(
-                        parentEntry.node,
-                        parentEntry.parent,
-                        parentEntry.grandParent
-                    );
+                    const parentHref = getCategoryHref(parentEntry.node);
                     redirectUrl = `${langPrefix}${parentHref}`;
                 }
             }
@@ -147,7 +143,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
         const subcategoryItems = (categoryEntry.node.children ?? []).map(sub => ({
             name: sub.name,
             image: resolveCategoryImageUrl(sub) || '/icons/icon-category.svg',
-            href: getCategoryHref(sub, categoryEntry.node, categoryEntry.parent),
+            href: getCategoryHref(sub),
         }));
 
         return (

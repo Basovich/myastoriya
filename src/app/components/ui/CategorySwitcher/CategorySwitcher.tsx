@@ -65,7 +65,7 @@ export default function CategorySwitcher({
                 const getHref = (id: string | number): string => {
                     const entry = categoryIndex.get(String(id));
                     if (!entry) return '';
-                    const rawHref = getCategoryHref(entry.node, entry.parent, entry.grandParent);
+                    const rawHref = getCategoryHref(entry.node);
                     return lang === 'ru' ? `/ru${rawHref}` : rawHref;
                 };
 

@@ -29,7 +29,7 @@ export default async function Home({
   // Build a href map: categoryId -> correct URL based on tree level
   const categoryHrefs: Record<string, string> = {};
   for (const [id, entry] of categoryIndex) {
-      categoryHrefs[id] = getCategoryHref(entry.node, entry.parent ?? undefined, entry.grandParent ?? undefined);
+      categoryHrefs[id] = getCategoryHref(entry.node);
   }
 
   // Filter showcases that have productsCount > 0 for the user's locality/city
