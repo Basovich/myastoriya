@@ -2,14 +2,11 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
-import CatalogContent from '@/app/pages/Catalog/CatalogContent';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import {
     getCatalogTreeApi,
     getProductsApi,
     getPopularProductsApi,
-    getCategoryByIdApi,
-    getFaqQuestionsApi,
     getProductByIdApi,
     findProductIdBySlug,
     getBlogsApi,
@@ -17,7 +14,6 @@ import {
     getBoughtTogetherProductsApi,
     getDeliveryBlocksApi,
     getSalesApi,
-    resolveCategoryImageUrl,
     resolveProductImageUrl,
     ProductCategory,
     Product,
@@ -26,13 +22,11 @@ import {
     ProductsResponse,
     Sale
 } from '@/lib/graphql';
-import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
-import { parseFilterParams } from '@/utils/filter-params';
+import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref } from '@/utils/category-url';
 import { getAccessToken } from '@/app/actions/authActions';
 
 interface DynamicCatalogPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export async function generateMetadata({ params }: DynamicCatalogPageProps): Promise<Metadata> {
@@ -143,9 +137,8 @@ async function safeCall<T>(
     return fallback;
 }
 
-export default async function DynamicCatalogPage({ params, searchParams }: DynamicCatalogPageProps) {
+export default async function DynamicCatalogPage({ params }: DynamicCatalogPageProps) {
     const { lang, slug } = await params;
-    const resolvedSearchParams = await searchParams;
     const dict = await getDictionary(lang as Locale);
     const token = await getAccessToken();
 
