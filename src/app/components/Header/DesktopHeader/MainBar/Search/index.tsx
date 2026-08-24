@@ -18,6 +18,7 @@ import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { useCategoryTree, getProductHref } from "@/hooks/useCategoryTree";
+import { getCategoryHref } from "@/utils/category-url";
 import { 
     getProductsApi, 
     getSaleProductsApi,
@@ -138,7 +139,7 @@ const CategoryLink = ({ cat, lang, router, isRoot = false }: CategoryLinkProps) 
         <li className={isRoot ? s.categoryItem : s.subItemWrapper}>
             <div 
                 className={isRoot ? s.mainCat : s.subItem} 
-                onClick={() => router.push(getLocalizedHref(`/catalog/${cat.slug}`, lang as Locale))}
+                onClick={() => router.push(getLocalizedHref(getCategoryHref(cat), lang as Locale))}
             >
                 {cat.name}
             </div>

@@ -80,7 +80,7 @@ export default function Categories({ lang, popularCategories, categoryHrefs }: C
 
                         return (
                             <SwiperSlide key={cat.id} className={s.slide}>
-                                <AppLink href={categoryHrefs[cat.id] ?? `/catalog/${cat.slug ?? cat.id}`} className={s.item}>
+                                <AppLink href={categoryHrefs[cat.id] ?? `/category/${cat.slug ?? cat.id}`} className={s.item}>
                                     <div className={s.circle}>
                                         {imageUrl ? (
                                             <Image
