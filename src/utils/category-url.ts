@@ -65,11 +65,12 @@ export function buildCategoryIndex(
  *   Level 2 (has parent)           → /{parentSlug}/{slug}
  *   Level 3 (has parent + gParent) → /catalog/{slug}
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getCategoryHref(
     node: ProductCategory,
-    _parent?: ProductCategory | null,
-    _grandParent?: ProductCategory | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    parent?: ProductCategory | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    grandParent?: ProductCategory | null,
 ): string {
     return `/category/${node.slug}`;
 }
