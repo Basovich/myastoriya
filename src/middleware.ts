@@ -34,12 +34,6 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(`/${search}`, request.url), 301);
     }
 
-    // Redirect /ua/menu/* to clean internal route
-    if (pathname.startsWith('/ua/menu/')) {
-        const cleanPath = pathname.replace(/^\/ua\/menu/, '/menu');
-        return NextResponse.redirect(new URL(`${cleanPath}${search}`, request.url), 301);
-    }
-
     // Ensure trailing slash for all non-root paths (301 Permanent Redirect for SEO)
     if (pathname !== '/' && !pathname.endsWith('/')) {
         return NextResponse.redirect(
