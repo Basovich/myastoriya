@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { useAppSelector } from '@/store/hooks';
 import clsx from 'clsx';
@@ -13,14 +13,15 @@ function AuthButton() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter();
     const params = useParams();
+    const pathname = usePathname();
     const lang = params?.lang as string || 'ua';
 
-    const { user, isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
+    const { isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
     const hydrated = useIsHydrated();
 
     const isReallyLoggedIn = hydrated && isAuthenticated && !isGuest;
 
-
+    const isHomePage = pathname === '/' || pathname === '/ua' || pathname === '/ua/' || pathname === '/ru' || pathname === '/ru/';
 
     const handleAuthClick = () => {
         if (isReallyLoggedIn) {
@@ -54,8 +55,10 @@ function AuthButton() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={() => {
-                    const prefix = lang === 'ua' ? '' : `/${lang}`;
-                    router.push(`${prefix}/personal/profile/`);
+                    if (isHomePage) {
+                        const prefix = lang === 'ua' ? '' : `/${lang}`;
+                        router.push(`${prefix}/personal/profile/`);
+                    }
                 }}
             />
         </>
