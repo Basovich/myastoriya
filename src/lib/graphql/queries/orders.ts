@@ -259,10 +259,17 @@ export interface CreateOrderResponse {
     action: string;
     actionToken?: string | null;
     url?: string | null;
+    successUrl?: string | null;
     orderId: string;
     driver?: string | null;
     currencyCode?: string | null;
     total: number;
+}
+
+export interface FinishPayResponse {
+    action: string;
+    url?: string | null;
+    successUrl?: string | null;
 }
 
 const PAYMENTS_QUERY = /* GraphQL */ `
@@ -362,4 +369,92 @@ export async function createOrderApi(
         { token, lang },
     );
     return data.createOrder;
+}
+
+// ── Google Pay / Apple Pay ────────────────────────────────────────────────────
+
+const ORDER_GOOGLE_PAY_MUTATION = /* GraphQL */ `
+    mutation OrderGooglePay(
+        $orderId: Int!
+        $token: String!
+        $browserInfo: BrowserInfo
+        $platform: String
+        $returnPath: String
+    ) {
+        orderGooglePay(
+            orderId: $orderId
+            token: $token
+            browserInfo: $browserInfo
+            platform: $platform
+            returnPath: $returnPath
+        ) {
+            action
+            url
+            successUrl
+        }
+    }
+`;
+
+const ORDER_APPLE_PAY_MUTATION = /* GraphQL */ `
+    mutation OrderApplePay(
+        $orderId: Int!
+        $token: String!
+        $browserInfo: BrowserInfo
+        $platform: String
+        $returnPath: String
+    ) {
+        orderApplePay(
+            orderId: $orderId
+            token: $token
+            browserInfo: $browserInfo
+            platform: $platform
+            returnPath: $returnPath
+        ) {
+            action
+            url
+            successUrl
+        }
+    }
+`;
+
+export async function orderGooglePayApi(
+    orderId: number,
+    payToken: string,
+    browserInfo: { screenWidth: number; screenHeight: number },
+    authToken: string,
+    lang?: string,
+): Promise<FinishPayResponse> {
+    const data = await gqlRequest<{ orderGooglePay: FinishPayResponse }>(
+        ORDER_GOOGLE_PAY_MUTATION,
+        {
+            orderId,
+            token: payToken,
+            browserInfo,
+            platform: 'web',
+            returnPath: '/checkout?step=3',
+        },
+        { token: authToken, lang },
+    );
+    return data.orderGooglePay;
+}
+
+export async function orderApplePayApi(
+    orderId: number,
+    payToken: string,
+    browserInfo: { screenWidth: number; screenHeight: number },
+    authToken: string,
+    lang?: string,
+): Promise<FinishPayResponse> {
+    const data = await gqlRequest<{ orderApplePay: FinishPayResponse }>(
+        ORDER_APPLE_PAY_MUTATION,
+        {
+            orderId,
+            token: payToken,
+            browserInfo,
+            platform: 'web',
+            returnPath: '/checkout?step=3',
+        },
+        { token: authToken, lang },
+    );
+    return data.orderApplePay;
 }

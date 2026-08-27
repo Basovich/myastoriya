@@ -23,6 +23,8 @@ import { getAccessToken } from '@/app/actions/authActions';
 import { 
     getPaymentsApi, 
     createOrderApi, 
+    orderGooglePayApi,
+    FinishPayResponse,
     Payment, 
     CheckoutUserData, 
     CheckoutDeliveryData, 
@@ -451,6 +453,23 @@ export default function Step3({ lang }: Step3Props) {
             }
         }
 
+        const handleFinishAndRedirect = (orderId: string, successUrl?: string | null) => {
+            dispatch(clearCart());
+            void dispatch(fetchCartAsync());
+            localStorage.removeItem('checkout_delivery_data');
+            localStorage.removeItem('checkout_delivery_params');
+            localStorage.removeItem('checkout_user_data');
+            localStorage.removeItem('checkout_step3_data');
+            localStorage.removeItem('applied_promo');
+
+            if (successUrl) {
+                window.location.href = successUrl;
+            } else {
+                const thanksPath = lang === 'ua' ? `/thanks?orderId=${orderId}` : `/${lang}/thanks?orderId=${orderId}`;
+                router.push(thanksPath);
+            }
+        };
+
         try {
             const token = await getAccessToken();
 
@@ -546,21 +565,118 @@ export default function Step3({ lang }: Step3Props) {
                 lang
             );
 
-            if (res.url) {
+            const requestGooglePayToken = async (totalAmount: number, currency: string): Promise<string> => {
+                if (typeof window === 'undefined' || !('PaymentRequest' in window)) {
+                    throw new Error(lang === 'ua' ? 'Google Pay не підтримується цим браузером' : 'Google Pay не поддерживается этим браузером');
+                }
+
+                const paymentDataData = {
+                    environment: process.env.NEXT_PUBLIC_GOOGLE_PAY_ENV || 'TEST',
+                    apiVersion: 2,
+                    apiVersionMinor: 0,
+                    merchantInfo: {
+                        merchantName: "М'ясторія",
+                    },
+                    allowedPaymentMethods: [{
+                        type: 'CARD',
+                        parameters: {
+                            allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
+                            allowedCardNetworks: ['MASTERCARD', 'VISA'],
+                        },
+                        tokenizationSpecification: {
+                            type: 'PAYMENT_GATEWAY',
+                            parameters: {
+                                gateway: 'easypay',
+                                gatewayMerchantId: 'MIASTORIIA-GA',
+                            },
+                        },
+                    }],
+                };
+
+                const methodData: PaymentMethodData[] = [{
+                    supportedMethods: 'https://google.com/pay',
+                    data: paymentDataData,
+                }];
+
+                const details: PaymentDetailsInit = {
+                    total: {
+                        label: "М'ясторія",
+                        amount: {
+                            currency: currency || 'UAH',
+                            value: String(totalAmount),
+                        },
+                    },
+                };
+
+                const request = new PaymentRequest(methodData, details);
+                
+                try {
+                    const canPay = await request.canMakePayment();
+                    if (!canPay) {
+                        throw new Error(lang === 'ua' ? 'Google Pay не налаштовано або недоступний' : 'Google Pay не настроен или недоступен');
+                    }
+                } catch (e) {
+                    console.warn('canMakePayment check failed or returned false', e);
+                }
+
+                try {
+                    const paymentResponse = await request.show();
+                    const tokenData = (paymentResponse.details as any)?.paymentMethodData?.tokenizationData?.token;
+                    await paymentResponse.complete('success');
+                    if (!tokenData) {
+                        throw new Error(lang === 'ua' ? 'Не вдалося отримати токен Google Pay' : 'Не удалось получить токен Google Pay');
+                    }
+                    return typeof tokenData === 'string' ? tokenData : JSON.stringify(tokenData);
+                } catch (e: any) {
+                    if (e && (e.name === 'AbortError' || e.message?.includes('cancel') || e.message?.includes('user closed'))) {
+                        const cancelErr = new Error('USER_CANCELLED');
+                        cancelErr.name = 'USER_CANCELLED';
+                        throw cancelErr;
+                    }
+                    throw e;
+                }
+            };
+
+            const processFinishPay = async (orderIdNum: number, tokenStr: string) => {
+                const browserInfo = {
+                    screenWidth: typeof window !== 'undefined' ? window.innerWidth : 1920,
+                    screenHeight: typeof window !== 'undefined' ? window.innerHeight : 1080,
+                };
+                const finishRes: FinishPayResponse = await orderGooglePayApi(
+                    orderIdNum,
+                    tokenStr,
+                    browserInfo,
+                    token || '',
+                    lang
+                );
+
+                if (finishRes.action === 'redirect_to_url' && finishRes.url) {
+                    dispatch(clearCart());
+                    window.location.href = finishRes.url;
+                } else {
+                    handleFinishAndRedirect(String(orderIdNum), finishRes.successUrl);
+                }
+            };
+
+            if (res.action === 'online_payment' && (res.driver === 'google-pay' || res.driver === 'apple-pay')) {
+                try {
+                    const gpayToken = await requestGooglePayToken(res.total, res.currencyCode || 'UAH');
+                    await processFinishPay(Number(res.orderId), gpayToken);
+                } catch (payErr: any) {
+                    if (payErr?.name === 'USER_CANCELLED' || payErr?.message === 'USER_CANCELLED') {
+                        setSubmitError(lang === 'ua' 
+                            ? 'Оплату скасовано. Ви можете спробувати оплатити ще раз.' 
+                            : 'Оплата отменена. Вы можете попробовать оплатить еще раз.');
+                        return;
+                    }
+                    throw payErr;
+                }
+            } else if (res.url) {
                 // Будь-який action з url (redirect / authenticate / confirm) — редірект на платіжний шлюз
                 dispatch(clearCart());
                 window.location.href = res.url;
             } else {
-                dispatch(clearCart());
-                void dispatch(fetchCartAsync());
-                localStorage.removeItem('checkout_delivery_data');
-                localStorage.removeItem('checkout_delivery_params');
-                localStorage.removeItem('checkout_user_data');
-                localStorage.removeItem('checkout_step3_data');
-                localStorage.removeItem('applied_promo');
-
-                const thanksPath = lang === 'ua' ? `/thanks?orderId=${res.orderId}&payment=offline` : `/${lang}/thanks?orderId=${res.orderId}&payment=offline`;
-                router.push(thanksPath);
+                handleFinishAndRedirect(res.orderId, res.successUrl);
             }
         } catch (e: unknown) {
             console.error('Failed to create order', e);
@@ -587,7 +703,16 @@ export default function Step3({ lang }: Step3Props) {
             if (e instanceof GraphQLError && e.errors.length > 0) {
                 const firstError = e.errors[0];
                 const errorCode = firstError.extensions?.error_code;
-                if (firstError.message === 'Internal server error' || errorCode === 86 || errorCode === '86') {
+
+                if (errorCode === 54 || errorCode === '54') {
+                    // Замовлення вже оплачено
+                    handleFinishAndRedirect(String(deliveryParams.orderId || ''));
+                    return;
+                } else if (errorCode === 53 || errorCode === '53' || errorCode === 55 || errorCode === '55') {
+                    msg = lang === 'ru'
+                        ? 'Ошибка при оплате заказа. Попробуйте еще раз.'
+                        : 'Помилка при оплаті замовлення. Спробуйте ще раз.';
+                } else if (firstError.message === 'Internal server error' || errorCode === 86 || errorCode === '86') {
                     msg = lang === 'ru'
                         ? 'Произошла внутренняя ошибка сервера при создании заказа. Пожалуйста, попробуйте позже или обратитесь в поддержку.'
                         : 'Виникла внутрішня помилка сервера при створенні замовлення. Будь ласка, спробуйте пізніше або зверніться до служби підтримки.';
