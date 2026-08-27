@@ -621,14 +621,19 @@ export default function Step3({ lang }: Step3Props) {
 
                 try {
                     const paymentResponse = await request.show();
-                    const tokenData = (paymentResponse.details as any)?.paymentMethodData?.tokenizationData?.token;
+                    const detailsObj = paymentResponse.details as Record<string, unknown> | undefined;
+                    const paymentMethodData = detailsObj?.paymentMethodData as Record<string, unknown> | undefined;
+                    const tokenizationData = paymentMethodData?.tokenizationData as Record<string, unknown> | undefined;
+                    const tokenData = tokenizationData?.token;
+
                     await paymentResponse.complete('success');
                     if (!tokenData) {
                         throw new Error(lang === 'ua' ? 'Не вдалося отримати токен Google Pay' : 'Не удалось получить токен Google Pay');
                     }
                     return typeof tokenData === 'string' ? tokenData : JSON.stringify(tokenData);
-                } catch (e: any) {
-                    if (e && (e.name === 'AbortError' || e.message?.includes('cancel') || e.message?.includes('user closed'))) {
+                } catch (e: unknown) {
+                    const err = e as { name?: string; message?: string };
+                    if (err && (err.name === 'AbortError' || err.message?.includes('cancel') || err.message?.includes('user closed'))) {
                         const cancelErr = new Error('USER_CANCELLED');
                         cancelErr.name = 'USER_CANCELLED';
                         throw cancelErr;
@@ -662,8 +667,9 @@ export default function Step3({ lang }: Step3Props) {
                 try {
                     const gpayToken = await requestGooglePayToken(res.total, res.currencyCode || 'UAH');
                     await processFinishPay(Number(res.orderId), gpayToken);
-                } catch (payErr: any) {
-                    if (payErr?.name === 'USER_CANCELLED' || payErr?.message === 'USER_CANCELLED') {
+                } catch (payErr: unknown) {
+                    const err = payErr as { name?: string; message?: string };
+                    if (err?.name === 'USER_CANCELLED' || err?.message === 'USER_CANCELLED') {
                         setSubmitError(lang === 'ua' 
                             ? 'Оплату скасовано. Ви можете спробувати оплатити ще раз.' 
                             : 'Оплата отменена. Вы можете попробовать оплатить еще раз.');
