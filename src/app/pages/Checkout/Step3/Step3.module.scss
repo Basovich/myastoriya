@@ -78,8 +78,8 @@ textarea.commentTextarea {
     min-height: initial;
 }
 
-.personsCounter {
-    background: #F2F2F2;
+div.personsCounter {
+    background: #fff;
     border-radius: 8px;
     padding: 8px 12px;
     display: flex;
@@ -88,7 +88,7 @@ textarea.commentTextarea {
     width: 100%;
     max-width: 160px;
     height: 46px;
-    border: 1px solid #E2E2E2;
+    border: 1px solid #060606;
 }
 
 .contactSelect {
