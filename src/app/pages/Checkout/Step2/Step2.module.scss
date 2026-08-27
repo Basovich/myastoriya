@@ -80,12 +80,11 @@
         }
     }
 
-    &.methodItemDisabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        pointer-events: none;
+    .radioCircle {
+        margin-top: -2px;
     }
 }
+
 
 .nestedAddressRow {
     padding-left: 0;
@@ -470,24 +469,26 @@
     min-height: 300px;
 }
 
-.disabledNotice {
-    display: inline;
-    color: #e3051b;
-    font-size: 13px;
-    font-weight: 600;
-    margin-left: 6px;
-    white-space: nowrap;
-}
 
 .minOrderWarning {
-    background: #FFF5F5;
-    border: 1px solid #FFEBEB;
+    background: #F2F2F2;
     border-radius: 8px;
     padding: 16px;
     margin-top: 16px;
-    color: #E3051B;
-    font-size: 14px;
-    font-weight: 600;
     text-align: center;
 }
 
+.minOrderWarningText {
+    font-size: 13px;
+    color: #000;
+    font-weight: 500;
+
+    @media (min-width: 768px) {
+        font-size: 14px;
+    }
+}
+
+.minOrderWarningAmount {
+    color: #E3051B;
+    font-weight: 700;
+}

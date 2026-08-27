@@ -423,39 +423,30 @@ export default function Step2() {
                 const safeDeliveries = Array.isArray(res) ? res.filter(Boolean) : [];
                 setDeliveries(safeDeliveries);
                 
-                // Determine enabled (active) delivery methods
-                const enabledDeliveries = safeDeliveries.filter(d => !d?.disabled);
-
-                if (enabledDeliveries.length === 0) {
-                    // 1. Якщо жодна доставка неактивна — всі радіобатони неактивні (нічого не вибрано)
-                    setDeliveryMethod('');
-                } else if (enabledDeliveries.length === 1) {
-                    // 2. Якщо одна доставка активна — обирається вона
-                    setDeliveryMethod(enabledDeliveries[0].id);
+                // Завжди вибираємо перший метод (навіть якщо disabled), або відновлюємо збережений
+                let restored = '';
+                if (restoredData && safeDeliveries.some(d => d?.id === restoredData.deliveryMethod)) {
+                    restored = String(restoredData.deliveryMethod);
                 } else {
-                    // 3. Якщо декілька доставок активні — обирається перша активна або раніше збережена активна
-                    let restored = '';
-                    if (restoredData && enabledDeliveries.some(d => d?.id === restoredData.deliveryMethod)) {
-                        restored = String(restoredData.deliveryMethod);
-                    } else {
-                        const saved = localStorage.getItem('checkout_delivery_data');
-                        if (saved) {
-                            try {
-                                const parsed = JSON.parse(saved);
-                                if (parsed.deliveryMethod && enabledDeliveries.some(d => d?.id === parsed.deliveryMethod)) {
-                                    restored = String(parsed.deliveryMethod);
-                                }
-                            } catch {}
-                        }
+                    const saved = localStorage.getItem('checkout_delivery_data');
+                    if (saved) {
+                        try {
+                            const parsed = JSON.parse(saved);
+                            if (parsed.deliveryMethod && safeDeliveries.some(d => d?.id === parsed.deliveryMethod)) {
+                                restored = String(parsed.deliveryMethod);
+                            }
+                        } catch {}
                     }
+                }
 
-                    if (restored) {
-                        setDeliveryMethod(restored);
-                    } else if (enabledDeliveries.some(d => d?.id === deliveryMethodRef.current)) {
-                        setDeliveryMethod(deliveryMethodRef.current);
-                    } else {
-                        setDeliveryMethod(enabledDeliveries[0].id);
-                    }
+                if (restored) {
+                    setDeliveryMethod(restored);
+                } else if (safeDeliveries.some(d => d?.id === deliveryMethodRef.current)) {
+                    setDeliveryMethod(deliveryMethodRef.current);
+                } else if (safeDeliveries.length > 0) {
+                    setDeliveryMethod(safeDeliveries[0].id);
+                } else {
+                    setDeliveryMethod('');
                 }
             } catch (e) {
                 console.error('[Step2] Failed to fetch deliveries for locality', e);
@@ -689,16 +680,15 @@ export default function Step2() {
         }
     }, [restoredData, shops, pickupPoints]);
 
+    const selectedDelivery = React.useMemo(() => {
+        return deliveries.find(d => d?.id === deliveryMethod);
+    }, [deliveries, deliveryMethod]);
+
     const activeDelivery = React.useMemo(() => {
         const found = deliveries.find(d => d?.id === deliveryMethod);
         if (found && !found.disabled) return found;
         return undefined;
     }, [deliveries, deliveryMethod]);
-
-    const minOrderVal = React.useMemo(() => {
-        const vals = deliveries.map(d => d?.needForAvailable || 0).filter(v => v > 0);
-        return vals.length > 0 ? Math.min(...vals) : 0;
-    }, [deliveries]);
 
     const isCourier = activeDelivery?.type === 'courier';
     const isNP = activeDelivery?.driver === 'nova-poshta-postal';
@@ -707,6 +697,8 @@ export default function Step2() {
     const showDeliveryTimeBlock = Boolean(isShopCourierOrPickup && activeDelivery?.showDeliveryTime);
     const elapsedForFree = activeDelivery?.elapsedForFree || 0;
     const deliveryPrice = activeDelivery ? (activeDelivery.deliveryCost ?? 0) : undefined;
+
+    const isNextDisabled = isSubmitting || !deliveryMethod || !!selectedDelivery?.disabled;
 
     const timeOptions = React.useMemo(() => {
         return deliveryTimes.map(t => ({
@@ -1131,17 +1123,13 @@ export default function Step2() {
 
                             return (
                                 <div key={method.id} className={s.methodContainer}>
-                                    <label 
-                                        className={clsx(s.methodItem, method.disabled && s.methodItemDisabled)}
-                                        onClick={(e) => method.disabled && e.preventDefault()}
-                                    >
+                                    <label className={s.methodItem}>
                                         <input 
                                             type="radio" 
                                             name="deliveryMethod"
                                             value={method.id}
                                             checked={isSelected}
-                                            disabled={method.disabled}
-                                            onChange={() => !method.disabled && setDeliveryMethod(method.id)}
+                                            onChange={() => setDeliveryMethod(method.id)}
                                             className={s.hiddenRadio}
                                         />
                                         <span className={s.radioCircle} />
@@ -1150,11 +1138,6 @@ export default function Step2() {
                                             <span className={s.methodPrice}>
                                                  ({method.deliveryCost} <span className={s.currency}>₴</span>)
                                              </span>
-                                            {method.disabled && method.needForAvailable && (
-                                                <span className={s.disabledNotice}>
-                                                    ({lang === 'ua' ? <>ще {method.needForAvailable} <span className={s.currency}>₴</span></> : <>еще {method.needForAvailable} <span className={s.currency}>₴</span></>})
-                                                </span>
-                                            )}
                                             {showNpIcon && (
                                                 <span className={s.npIconContainer}>
                                                     <Image
@@ -1209,11 +1192,14 @@ export default function Step2() {
                             );
                         })}
                     </div>
-                    {deliveries.length > 0 && deliveries.every(d => d?.disabled) && minOrderVal > 0 && (
+                    {selectedDelivery?.disabled && selectedDelivery?.needForAvailable && (
                         <div className={s.minOrderWarning}>
-                            {lang === 'ua' 
-                                ? <>Для можливості доставки у це місто додайте товарів ще на {minOrderVal} <span className={s.currency}>₴</span></>
-                                : <>Для возможности доставки в этот город добавьте товаров еще на {minOrderVal} <span className={s.currency}>₴</span></>}
+                            <span className={s.minOrderWarningText}>
+                                {lang === 'ua' 
+                                    ? <>Для можливості доставки у це місто додайте товарів ще на <span className={s.minOrderWarningAmount}>{selectedDelivery.needForAvailable} ₴</span></>
+                                    : <>Для возможности доставки в этот город добавьте товаров еще на <span className={s.minOrderWarningAmount}>{selectedDelivery.needForAvailable} ₴</span></>
+                                }
+                            </span>
                         </div>
                     )}
                 </div>
@@ -1270,7 +1256,7 @@ export default function Step2() {
                         variant="red" 
                         onClick={handleNext}
                         className={s.nextBtn}
-                        disabled={isSubmitting}
+                        disabled={isNextDisabled}
                     >
                         {isSubmitting ? 'ЗБЕРЕЖЕННЯ...' : 'ДАЛІ'}
                     </Button>
