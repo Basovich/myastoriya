@@ -89,8 +89,8 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
     }
 
     // 1. Fetch current catalog tree (locality-aware)
-    let catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined).catch(() => [] as ProductCategory[]);
-    let categoryIndex = buildCategoryIndex(catalogTree);
+    const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined).catch(() => [] as ProductCategory[]);
+    const categoryIndex = buildCategoryIndex(catalogTree);
 
     // 2. Check if category exists in current locality tree by slug
     let categoryEntry = Array.from(categoryIndex.values()).find(
