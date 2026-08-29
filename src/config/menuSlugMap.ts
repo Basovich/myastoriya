@@ -7,7 +7,6 @@ export const RESTAURANT_MENU_SLUG_MAP: Record<string, string> = {
     'shop-1': 'obolon',
     'shop-2': 'poznyaki',
     'shop-4': 'teremky',
-    'shop-326': 'park-avenue',
 };
 
 /**
@@ -17,7 +16,6 @@ export const MENU_SLUG_TO_SHOP_SLUG: Record<string, string> = {
     'obolon': 'shop-1',
     'poznyaki': 'shop-2',
     'teremky': 'shop-4',
-    'park-avenue': 'shop-326',
 };
 
 /**
