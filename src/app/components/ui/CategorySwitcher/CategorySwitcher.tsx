@@ -27,13 +27,14 @@ interface CategorySwitcherProps {
 }
 
 export default function CategorySwitcher({
-    title = 'КАТЕГОРІЇ',
+    title,
     className,
     isSidebar = false,
     categoryId,
     lang = 'ua',
     isSubcategory = false,
 }: CategorySwitcherProps) {
+    const displayTitle = title ?? (lang === 'ru' ? 'КАТЕГОРИИ' : 'КАТЕГОРІЇ');
     const token = useAppSelector((state) => state.auth.token) ?? undefined;
 
     const [parent, setParent] = useState<CategoryItem | null>(null);
@@ -93,7 +94,7 @@ export default function CategorySwitcher({
                 } else {
                     setParent({
                         id: '768',
-                        name: 'Каталог',
+                        name: lang === 'ru' ? 'Каталог' : 'Каталог',
                         slug: '',
                         href: lang === 'ru' ? '/ru' : '/',
                     });
@@ -118,7 +119,7 @@ export default function CategorySwitcher({
         if (isSubcategory) {
             return (
                 <div className={clsx(s.wrapper, isSidebar && s.sidebarMode, className)}>
-                    {title && <h3 className={s.title}>{title}</h3>}
+                    {displayTitle && <h3 className={s.title}>{displayTitle}</h3>}
                     <Spinner centered={true} />
                 </div>
             );
@@ -132,7 +133,7 @@ export default function CategorySwitcher({
 
     return (
         <div className={clsx(s.wrapper, isSidebar && s.sidebarMode, className)}>
-            {title && <h3 className={s.title}>{title}</h3>}
+            {displayTitle && <h3 className={s.title}>{displayTitle}</h3>}
             <div className={s.list}>
                 {/* 1. Parent Category Link with Back Arrow */}
                 {parent && (

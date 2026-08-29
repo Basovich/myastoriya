@@ -155,9 +155,9 @@ export default function CitySelector({
 
                 if (cityToSet) {
                     dispatch(setSelectedCity(cityToSet));
-                    if (cityToSet.id === 2581) {
-                        selectLocalityApi(cityToSet.id, lang).catch(() => {});
-                    }
+                    // Always sync with backend so it knows the selected locality
+                    // for locality-aware product filtering and translations
+                    selectLocalityApi(cityToSet.id, lang).catch(() => {});
                 }
             } catch (error) {
                 console.warn('[CitySelector] Detection failed:', error);

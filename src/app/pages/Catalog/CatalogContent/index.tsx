@@ -208,9 +208,9 @@ export default async function CatalogContent({
             </div>
 
             {relatedProducts.length > 0 && (
-                <CatalogRelatedSlidersClient title="ВАС МОЖЕ ЗАЦІКАВИТИ" products={relatedProducts} />
+                <CatalogRelatedSlidersClient title={lang === 'ru' ? 'ВАС МОЖЕТ ЗАИНТЕРЕСОВАТЬ' : 'ВАС МОЖЕ ЗАЦІКАВИТИ'} products={relatedProducts} />
             )}
-            <CatalogPopularSliderClient title="ЧАСТО ЗАМОВЛЯЮТЬ" initialProducts={popularProductsList} lang={lang} />
+            <CatalogPopularSliderClient title={lang === 'ru' ? 'ЧАСТО ЗАКАЗЫВАЮТ' : 'ЧАСТО ЗАМОВЛЯЮТЬ'} initialProducts={popularProductsList} lang={lang} />
 
             {faq && faq.length > 0 && (
                 <div className={s.faqSection}>

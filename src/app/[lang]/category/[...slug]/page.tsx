@@ -31,9 +31,19 @@ export async function generateMetadata({ params }: DynamicCategoryPageProps): Pr
     const catalogTree = await getCatalogTreeApi(lang as Locale, 768, undefined).catch(() => [] as ProductCategory[]);
     const categoryIndex = buildCategoryIndex(catalogTree);
 
-    const categoryEntry = Array.from(categoryIndex.values()).find(
+    let categoryEntry = Array.from(categoryIndex.values()).find(
         e => e.node.slug === lastSegment
     );
+
+    if (!categoryEntry) {
+        const altLang = lang === 'ua' ? 'ru' : 'ua';
+        const altTree = await getCatalogTreeApi(altLang as Locale, 768, undefined).catch(() => [] as ProductCategory[]);
+        const altIndex = buildCategoryIndex(altTree);
+        const altEntry = Array.from(altIndex.values()).find(e => e.node.slug === lastSegment);
+        if (altEntry) {
+            categoryEntry = categoryIndex.get(altEntry.node.id);
+        }
+    }
 
     if (categoryEntry) {
         const categoryName = categoryEntry.node.name;
@@ -79,13 +89,25 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
     }
 
     // 1. Fetch current catalog tree (locality-aware)
-    const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined).catch(() => [] as ProductCategory[]);
-    const categoryIndex = buildCategoryIndex(catalogTree);
+    let catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined).catch(() => [] as ProductCategory[]);
+    let categoryIndex = buildCategoryIndex(catalogTree);
 
-    // 2. Check if category exists in current locality tree
-    const categoryEntry = Array.from(categoryIndex.values()).find(
+    // 2. Check if category exists in current locality tree by slug
+    let categoryEntry = Array.from(categoryIndex.values()).find(
         e => e.node.slug === lastSegment
     );
+
+    // If not found by slug in target lang (e.g. accessed /ru/category/steyki-na-grili/ where RU slug is steyki-na-grile),
+    // fetch UA tree to find category ID, then map to target lang category node!
+    if (!categoryEntry) {
+        const altLang = lang === 'ua' ? 'ru' : 'ua';
+        const altTree = await getCatalogTreeApi(altLang, 768, token ?? undefined).catch(() => [] as ProductCategory[]);
+        const altIndex = buildCategoryIndex(altTree);
+        const altEntry = Array.from(altIndex.values()).find(e => e.node.slug === lastSegment);
+        if (altEntry) {
+            categoryEntry = categoryIndex.get(altEntry.node.id);
+        }
+    }
 
     if (categoryEntry) {
         const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page as string) : 1;
@@ -134,10 +156,11 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
             faq = await getFaqQuestionsApi(firstGroupId, lang).catch(() => null);
         }
 
+        const currentCategoryName = categoryDetails?.name || categoryEntry.node.name;
+
         const breadcrumbItems = buildCategoryBreadcrumbs(categoryEntry.node.id, categoryIndex);
         if (breadcrumbItems.length > 1) {
-            const lastBreadcrumb = breadcrumbItems[breadcrumbItems.length - 1];
-            breadcrumbItems[breadcrumbItems.length - 1] = { label: lastBreadcrumb.label };
+            breadcrumbItems[breadcrumbItems.length - 1] = { label: currentCategoryName };
         }
 
         const subcategoryItems = (categoryEntry.node.children ?? []).map(sub => ({
@@ -153,7 +176,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
                     dict={dict}
                     initialProducts={productsResponse}
                     categoryId={categoryId}
-                    categoryName={categoryEntry.node.name}
+                    categoryName={currentCategoryName}
                     breadcrumbItems={breadcrumbItems}
                     subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                     view={view}
