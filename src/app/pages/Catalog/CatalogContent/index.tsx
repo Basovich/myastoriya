@@ -4,7 +4,7 @@ import Breadcrumbs from '../../../components/ui/Breadcrumbs/Breadcrumbs';
 import CategoryCircles, { type CategoryCircleItem } from '@/app/components/CategoryCircles/CategoryCircles';
 import Image from 'next/image';
 
-import CatalogSidebar from '@/app/pages/Catalog/CatalogSidebar';
+import CatalogSidebarWrapperClient from '@/app/pages/Catalog/CatalogSidebar/CatalogSidebarWrapperClient';
 import ProductCard from '../../../components/ui/ProductCard/ProductCard';
 import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
 import clsx from 'clsx';
@@ -184,7 +184,7 @@ export default async function CatalogContent({
                     <div className={s.contentLayout}>
                         {!hideSidebar && (
                             <aside className={s.sidebar}>
-                                <CatalogSidebar
+                                <CatalogSidebarWrapperClient
                                     sortBy={currentSort}
                                     sortOptions={sortOptions}
                                     categoryId={categoryId}

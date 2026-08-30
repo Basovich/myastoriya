@@ -10,6 +10,7 @@ import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
 import Button from "@/app/components/ui/Button/Button";
 import CategorySwitcher from '@/app/components/ui/CategorySwitcher/CategorySwitcher';
+import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
 import clsx from 'clsx';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
@@ -45,6 +46,8 @@ const LOCALIZED_SIDEBAR_TEXTS = {
         apply: 'ЗАСТОСУВАТИ',
         clear: 'Очистити',
         defaultSortOption: 'За популярністю',
+        cookedFirst: 'СПОЧАТКУ ГОТОВЕ',
+        rawFirst: 'СПОЧАТКУ СИРЕ',
         sortOptions: [
             'За популярністю',
             'За зниженням ціни',
@@ -59,6 +62,8 @@ const LOCALIZED_SIDEBAR_TEXTS = {
         apply: 'ПРИМЕНИТЬ',
         clear: 'Очистить',
         defaultSortOption: 'По популярности',
+        cookedFirst: 'СНАЧАЛА ГОТОВОЕ',
+        rawFirst: 'СНАЧАЛА СЫРОЕ',
         sortOptions: [
             'По популярности',
             'По снижению цены',
@@ -310,6 +315,69 @@ export default function CatalogSidebar({
 
     return (
         <div className={s.sidebar} ref={sidebarRef}>
+
+
+            {/* Блок 2: Перемикачі "СПОЧАТКУ СИРЕ" / "СПОЧАТКУ ГОТОВЕ" (картка) */}
+            {(() => {
+                const isRawPage = pathname.includes('siri') || pathname.includes('сырые') || searchParams.get('filter_meat_type') === 'raw';
+
+                const handleToggle = (targetType: 'raw' | 'cooked') => {
+                    let targetUrl = pathname;
+
+                    if (targetType === 'raw') {
+                        if (pathname.includes('steyki-na-grili')) {
+                            targetUrl = pathname.replace('steyki-na-grili', 'steyki-siri');
+                        } else if (pathname.includes('steyki-na-grile')) {
+                            targetUrl = pathname.replace('steyki-na-grile', 'steyki-siri');
+                        } else {
+                            const params = new URLSearchParams(searchParams.toString());
+                            params.set('filter_meat_type', 'raw');
+                            params.set('page', '1');
+                            targetUrl = `${pathname}?${params.toString()}`;
+                        }
+                    } else {
+                        if (pathname.includes('steyki-siri')) {
+                            targetUrl = pathname.replace('steyki-siri', 'steyki-na-grili');
+                        } else {
+                            const params = new URLSearchParams(searchParams.toString());
+                            params.set('filter_meat_type', 'cooked');
+                            params.set('page', '1');
+                            targetUrl = `${pathname}?${params.toString()}`;
+                        }
+                    }
+
+                    if (typeof window !== 'undefined') {
+                        window.dispatchEvent(new CustomEvent('catalog-loading-start'));
+                    }
+                    router.push(targetUrl, { scroll: false });
+                };
+
+                return (
+                    <div className={s.toggleCard}>
+                        <button
+                            type="button"
+                            className={clsx(
+                                s.typeBtn,
+                                isRawPage ? s.typeBtnActive : s.typeBtnOutline
+                            )}
+                            onClick={() => handleToggle('raw')}
+                        >
+                            {texts.rawFirst}
+                        </button>
+                        <button
+                            type="button"
+                            className={clsx(
+                                s.typeBtn,
+                                !isRawPage ? s.typeBtnActive : s.typeBtnOutline
+                            )}
+                            onClick={() => handleToggle('cooked')}
+                        >
+                            {texts.cookedFirst}
+                        </button>
+                    </div>
+                );
+            })()}
+
             {categoryId && (
                 <CategorySwitcher
                     categoryId={categoryId}
@@ -320,24 +388,6 @@ export default function CatalogSidebar({
             )}
 
             <div className={s.filtersWrapper}>
-
-                {/* Мобільний блок: Сортування */}
-                <div className={s.onlyMobile}>
-                    <FilterGroup title={sortBy || defaultSortOption} initialOpen={true}>
-                        <div className={s.sortOptions}>
-                            {optionsToUse.map(option => (
-                                <button
-                                    key={option}
-                                    type="button"
-                                    className={clsx(s.sortOption, (sortBy === option || (!sortBy && option === defaultSortOption)) && s.sortOptionActive)}
-                                    onClick={() => onSortChange?.(option)}
-                                >
-                                    {option}
-                                </button>
-                            ))}
-                        </div>
-                    </FilterGroup>
-                </div>
 
                 {/* Динамічні блоки фільтрів з API */}
                 {isLoadingFilters ? (

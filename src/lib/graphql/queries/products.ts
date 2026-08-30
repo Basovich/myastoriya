@@ -840,7 +840,7 @@ function mapSortOption(sort?: string | null): string | null {
         case 'По дате':
             return 'created-at';
         default:
-            return sort;
+            return 'default';
     }
 }
 
