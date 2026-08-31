@@ -80,8 +80,12 @@
     grid-template-columns: 1fr;
     gap: 16px;
     padding-top: 24px;
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
 
     @media (min-width: 680px) {
+        max-width: initial;
         grid-template-columns: 1fr 1fr;
     }
 

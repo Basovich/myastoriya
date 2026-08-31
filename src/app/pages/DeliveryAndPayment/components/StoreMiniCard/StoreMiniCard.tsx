@@ -6,6 +6,7 @@ import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
 import GeocodedAddressClient from '@/app/components/ui/GeocodedAddress/GeocodedAddressClient';
 import { useParams } from 'next/navigation';
 import { Locale } from '@/i18n/config';
+import { getStoreHref } from '@/utils/store-url';
 
 const LOCALIZED_TEXTS = {
     ua: {
@@ -53,7 +54,7 @@ export default function StoreMiniCard({ store, isPromo = false }: StoreMiniCardP
     if (!store) return null;
 
     return (
-        <Link href={`/our-stores/${store.slug}`} className={s.card}>
+        <Link href={getStoreHref(store)} className={s.card}>
             <div className={s.header}>
                 <div className={s.titleGroup}>
                     <h4 className={s.name}>{store.name}</h4>
