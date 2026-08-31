@@ -10,7 +10,6 @@ import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
 import Button from "@/app/components/ui/Button/Button";
 import CategorySwitcher from '@/app/components/ui/CategorySwitcher/CategorySwitcher';
-import SortSelect from '@/app/components/ui/SortSelect/SortSelect';
 import clsx from 'clsx';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
@@ -97,7 +96,6 @@ export default function CatalogSidebar({
     onApply,
     onClose,
     sortBy,
-    onSortChange,
     onClearAll,
     onModifiedChange,
     categoryId,
@@ -322,7 +320,7 @@ export default function CatalogSidebar({
                 const isRawPage = pathname.includes('siri') || pathname.includes('сырые') || searchParams.get('filter_meat_type') === 'raw';
 
                 const handleToggle = (targetType: 'raw' | 'cooked') => {
-                    let targetUrl = pathname;
+                    let targetUrl: string;
 
                     if (targetType === 'raw') {
                         if (pathname.includes('steyki-na-grili')) {
