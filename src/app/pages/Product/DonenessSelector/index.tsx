@@ -167,11 +167,9 @@ const isCurrentInfo = (infoId: string, selectedLabel: string, selectedId: string
     if (infoId === 'medium' && labelLower.includes('medium') && !labelLower.includes('rare') && !labelLower.includes('well')) {
         return true;
     }
-    if (infoId === 'rare' && labelLower.includes('rare') && !labelLower.includes('medium') && !labelLower.includes('blue') && !labelLower.includes('extra') && !labelLower.includes('екстра') && !labelLower.includes('экстра')) {
-        return true;
-    }
+    return infoId === 'rare' && labelLower.includes('rare') && !labelLower.includes('medium') && !labelLower.includes('blue') && !labelLower.includes('extra') && !labelLower.includes('екстра') && !labelLower.includes('экстра');
 
-    return false;
+    
 };
 
 interface DonenessSelectorProps {
