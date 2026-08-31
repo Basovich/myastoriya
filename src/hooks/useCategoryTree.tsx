@@ -49,30 +49,20 @@ export function getProductHref(
     categoryId?: number | string | null,
     categoryIndex?: Map<string, CategoryIndexEntry>,
 ): string {
+    // categoryId and categoryIndex are kept for backward compatibility with existing call sites
+    void categoryId;
+    void categoryIndex;
     if (!slugOrId) return '/catalog';
-    if (!categoryId || !categoryIndex) return `/catalog/${slugOrId}`;
-    const entry = categoryIndex.get(String(categoryId));
-    if (!entry) return `/catalog/${slugOrId}`;
-
-    const { node, parent, grandParent, level } = entry;
-    if (level === 1) {
-        return `/catalog/${node.slug}/${slugOrId}`;
-    }
-    if (level === 2 && parent) {
-        return `/catalog/${parent.slug}/${node.slug}/${slugOrId}`;
-    }
-    if (level === 3 && parent && grandParent) {
-        return `/catalog/${grandParent.slug}/${parent.slug}/${node.slug}/${slugOrId}`;
-    }
-    return `/catalog/${node.slug}/${slugOrId}`;
+    return `/product/${slugOrId}`;
 }
 
 export function useProductHref(
     slugOrId: string | undefined,
     categoryId?: number | string | null,
 ): string {
-    const { categoryIndex } = useCategoryTree();
+    // categoryId is kept for backward compatibility with existing call sites
+    void categoryId;
     return useMemo(() => {
-        return getProductHref(slugOrId, categoryId, categoryIndex);
-    }, [slugOrId, categoryId, categoryIndex]);
+        return getProductHref(slugOrId);
+    }, [slugOrId]);
 }
