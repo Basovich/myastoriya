@@ -571,7 +571,7 @@ export default function Step3({ lang }: Step3Props) {
                 }
 
                 const paymentDataData = {
-                    environment: process.env.NEXT_PUBLIC_GOOGLE_PAY_ENV || 'TEST',
+                    environment: 'PRODUCTION',
                     apiVersion: 2,
                     apiVersionMinor: 0,
                     merchantInfo: {
