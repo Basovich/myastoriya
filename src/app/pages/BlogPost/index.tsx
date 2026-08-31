@@ -20,6 +20,8 @@ import { likeBlogApi } from "@/lib/graphql/queries/blog";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
 import clsx from "clsx";
 
+import { getBlogCategorySegment, getBlogPostHref } from "@/utils/blog-url";
+
 interface BlogPostPageProps {
     dict: Dictionary;
     post: BlogPost;
@@ -68,9 +70,15 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
     const [blogsPrevEl, setBlogsPrevEl] = useState<HTMLButtonElement | null>(null);
     const [blogsNextEl, setBlogsNextEl] = useState<HTMLButtonElement | null>(null);
 
+    const categorySegment = getBlogCategorySegment(post);
+    const categoryLabel = categorySegment === 'recipe'
+        ? (lang === 'ru' ? 'Рецепты' : 'Рецепти')
+        : (lang === 'ru' ? 'Статьи' : 'Статті');
+
     const breadcrumbs = [
         { label: t.breadcrumbs.home, href: "/" },
         { label: t.breadcrumbs.blog, href: "/blog" },
+        { label: categoryLabel, href: `/blog/${categorySegment}` },
         { label: post.name },
     ];
 
@@ -124,7 +132,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                                 <span className={s.shareLabel}>{t.shareText}</span>
                                 <Button
                                     variant="black"
-                                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://myastoriya.com.ua/blog/${post.slug}`)}`}
+                                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://myastoriya.com.ua${getBlogPostHref(post)}`)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={s.facebookBtn}
@@ -248,7 +256,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                             >
                                 {post.recipes.map((recipe) => (
                                     <SwiperSlide key={recipe.id}>
-                                        <AppLink href={getLocalizedHref(`/blog/${recipe.slug}`, lang as Locale)} className={s.blogCardLink}>
+                                        <AppLink href={getLocalizedHref(`/blog/recipe/${recipe.slug}`, lang as Locale)} className={s.blogCardLink}>
                                             <div className={s.blogCard}>
                                                 <div className={s.blogCardImage}>
                                                     {resolveBlogImageUrl(recipe.image) ? (
@@ -283,7 +291,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
 
                         <div className={s.recommendedGrid}>
                             {post.recipes.map((recipe) => (
-                                <AppLink key={recipe.id} href={getLocalizedHref(`/blog/${recipe.slug}`, lang as Locale)} className={s.blogCardLink}>
+                                <AppLink key={recipe.id} href={getLocalizedHref(`/blog/recipe/${recipe.slug}`, lang as Locale)} className={s.blogCardLink}>
                                     <div className={s.blogCard}>
                                         <div className={s.blogCardImage}>
                                             {resolveBlogImageUrl(recipe.image) ? (
@@ -323,7 +331,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
                             >
                                 {post.relatedBlogs.map((relatedPost) => (
                                     <SwiperSlide key={relatedPost.id}>
-                                        <AppLink href={getLocalizedHref(`/blog/${relatedPost.slug}`, lang as Locale)} className={s.blogCardLink}>
+                                        <AppLink href={getLocalizedHref(getBlogPostHref(relatedPost), lang as Locale)} className={s.blogCardLink}>
                                             <div className={s.blogCard}>
                                                 <div className={s.blogCardImage}>
                                                     {resolveBlogImageUrl(relatedPost.image) ? (
@@ -359,7 +367,7 @@ export default function BlogPostPage({ dict, post, lang }: BlogPostPageProps) {
 
                         <div className={s.recommendedGrid}>
                             {post.relatedBlogs.map((relatedPost) => (
-                                <AppLink key={relatedPost.id} href={getLocalizedHref(`/blog/${relatedPost.slug}`, lang as Locale)} className={s.blogCardLink}>
+                                <AppLink key={relatedPost.id} href={getLocalizedHref(getBlogPostHref(relatedPost), lang as Locale)} className={s.blogCardLink}>
                                     <div className={s.blogCard}>
                                         <div className={s.blogCardImage}>
                                             {resolveBlogImageUrl(relatedPost.image) ? (

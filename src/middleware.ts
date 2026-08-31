@@ -86,12 +86,10 @@ export function middleware(request: NextRequest) {
         );
     }
 
-    // Has a non-default locale (e.g. /ru/...) → explicit rewrite so Next.js
-    // resolves it through the [lang] dynamic segment, not a literal folder.
-    return NextResponse.rewrite(
-        new URL(`${pathname}${search}`, request.url),
-        { request: { headers: requestHeaders } }
-    );
+    // Has a locale prefix (e.g. /ru/...) → pass through with updated headers
+    return NextResponse.next({
+        request: { headers: requestHeaders },
+    });
 }
 
 export const config = {

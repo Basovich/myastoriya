@@ -12,7 +12,7 @@ import SubscribeBanner from "../SubscribeBanner/SubscribeBanner";
 import s from "./BlogGrid.module.scss";
 import { type BlogPost, type BlogType, resolveBlogImageUrl, getBlogsApi } from "@/lib/graphql";
 
-type TabType = "all" | string;
+import { getBlogPostHref, mapUrlCategoryToApiTypeSlug } from "@/utils/blog-url";
 
 interface BlogGridProps {
     dict: {
@@ -32,43 +32,70 @@ interface BlogGridProps {
     initialItems: BlogPost[];
     totalPages: number;
     hasMore: boolean;
-    blogTypes: BlogType[];
+    blogTypes?: BlogType[];
     lang: string;
     activeTypeSlug?: string;
+    activeCategory?: 'recipe' | 'article';
+    initialPage?: number;
 }
 
 export default function BlogGrid({
     dict,
-    initialItems,
-    totalPages,
-    hasMore: initialHasMore,
-    blogTypes,
+    initialItems = [],
+    totalPages = 1,
+    hasMore: initialHasMore = false,
     lang,
     activeTypeSlug,
+    activeCategory,
+    initialPage = 1,
 }: BlogGridProps) {
-    const [items, setItems] = useState<BlogPost[]>(initialItems);
+    const [items, setItems] = useState<BlogPost[]>(initialItems ?? []);
     const [hasMore, setHasMore] = useState(initialHasMore);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(initialPage);
     const [loading, setLoading] = useState(false);
     const [isPaginating, setIsPaginating] = useState(false);
     const [currentTotalPages, setCurrentTotalPages] = useState(totalPages);
 
-    const breadcrumbItems = [
-        { label: dict.breadcrumbs.home, href: "/" },
-        { label: dict.breadcrumbs.blog },
-    ];
+    const effectiveTypeSlug = activeTypeSlug ?? (activeCategory ? mapUrlCategoryToApiTypeSlug(activeCategory) : null);
+
+    const updatePageUrl = (page: number) => {
+        if (typeof window === 'undefined') return;
+        const url = new URL(window.location.href);
+        if (page > 1) {
+            url.searchParams.set("page", String(page));
+        } else {
+            url.searchParams.delete("page");
+        }
+        window.history.pushState({}, "", url.toString());
+    };
+
+    const breadcrumbItems = activeCategory
+        ? [
+            { label: dict.breadcrumbs.home, href: "/" },
+            { label: dict.breadcrumbs.blog, href: "/blog" },
+            { label: activeCategory === 'recipe' ? (lang === 'ru' ? 'Рецепты' : 'Рецепти') : (lang === 'ru' ? 'Статьи' : 'Статті') },
+        ]
+        : [
+            { label: dict.breadcrumbs.home, href: "/" },
+            { label: dict.breadcrumbs.blog },
+        ];
 
     const loadMore = async () => {
         if (loading || isPaginating) return;
         setLoading(true);
         try {
             const nextPage = currentPage + 1;
-            const result = await getBlogsApi({ page: nextPage, typeSlug: activeTypeSlug ?? null }, lang);
+            const result = await getBlogsApi({ page: nextPage, typeSlug: effectiveTypeSlug }, lang);
             if (result.data?.length) {
-                setItems((prev) => [...prev, ...result.data]);
+                setItems((prev) => {
+                    const existingIds = new Set(prev.map((i) => i.id));
+                    const newItems = result.data.filter((i) => !existingIds.has(i.id));
+                    return [...prev, ...newItems];
+                });
                 setHasMore(result.has_more_pages);
                 setCurrentPage(nextPage);
                 setCurrentTotalPages((prevTotal) => result.has_more_pages ? prevTotal : nextPage);
+                updatePageUrl(nextPage);
             }
         } catch {
             // silent
@@ -77,18 +104,11 @@ export default function BlogGrid({
         }
     };
 
-    const staticTabs = [
-        { id: "all", label: dict.tabs.all, href: "/blog", active: !activeTypeSlug },
+    const tabsData = [
+        { id: "all", label: dict.tabs.all, href: "/blog", active: !activeCategory && !activeTypeSlug },
+        { id: "recipe", label: lang === 'ru' ? 'Рецепты' : 'Рецепти', href: "/blog/recipe", active: activeCategory === 'recipe' || activeTypeSlug === 'recepty' },
+        { id: "article", label: lang === 'ru' ? 'Статьи' : 'Статті', href: "/blog/article", active: activeCategory === 'article' || activeTypeSlug === 'stati' || activeTypeSlug === 'sovety' },
     ];
-
-    const dynamicTabs = blogTypes.map((t) => ({
-        id: t.slug,
-        label: t.name,
-        href: `/blog/category/${t.slug}`,
-        active: activeTypeSlug === t.slug,
-    }));
-
-    const tabsData = [...staticTabs, ...dynamicTabs];
 
     const formatDate = (iso: string | null) => {
         if (!iso) return "";
@@ -103,7 +123,7 @@ export default function BlogGrid({
         if (loading || isPaginating || page === currentPage) return;
         setIsPaginating(true);
         try {
-            const result = await getBlogsApi({ page, typeSlug: activeTypeSlug ?? null }, lang);
+            const result = await getBlogsApi({ page, typeSlug: effectiveTypeSlug }, lang);
             if (result.data) {
                 setItems(result.data);
                 setHasMore(result.has_more_pages);
@@ -111,6 +131,7 @@ export default function BlogGrid({
                 if (result.last_page) {
                     setCurrentTotalPages(result.last_page);
                 }
+                updatePageUrl(page);
                 window.scrollTo({ top: 0, behavior: "smooth" });
             }
         } catch {
@@ -141,7 +162,7 @@ export default function BlogGrid({
                         {items.map((item) => (
                             <AppLink
                                 key={item.id}
-                                href={`/blog/${item.slug}`}
+                                href={getBlogPostHref(item)}
                                 className={s.cardLink}
                             >
                                 <div className={s.card}>

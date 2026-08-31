@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Locale } from "@/i18n/config";
 import clsx from "clsx";
 import type { BlogPost } from "@/lib/graphql";
+import { getBlogPostHref } from "@/utils/blog-url";
 
 interface PublicationsProps {
   dict: {
@@ -13,11 +14,11 @@ interface PublicationsProps {
     showAllButton: string;
   };
   posts?: BlogPost[];
-  lang: Locale;
+  lang?: Locale;
   className?: string;
 }
 
-export default function Publications({ dict, posts = [], lang, className }: PublicationsProps) {
+export default function Publications({ dict, posts = [], className }: PublicationsProps) {
     if (!posts || posts.length === 0) {
         return null;
     }
@@ -38,7 +39,7 @@ export default function Publications({ dict, posts = [], lang, className }: Publ
             </div>
             <div className={s.carousel}>
                 {posts.map((pub) => (
-                    <AppLink href={`/blog/${pub.slug}`} key={pub.id} className={s.card}>
+                    <AppLink href={getBlogPostHref(pub)} key={pub.id} className={s.card}>
                         <div className={s.imageWrap}>
                             {pub.image?.url?.size2x ? (
                                 <Image src={pub.image.url.size2x} alt={pub.name} fill className={s.cardImg} sizes="(max-width: 768px) 100vw, 33vw" />

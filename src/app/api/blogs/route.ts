@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBlogsApi } from "@/lib/graphql/queries/blog";
+import { mapUrlCategoryToApiTypeSlug } from "@/utils/blog-url";
 
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const page: number = body.page ?? 1;
-        const typeSlug: string | null = body.typeSlug ?? null;
+        const rawTypeSlug: string | null = body.typeSlug ?? null;
+        const typeSlug = rawTypeSlug ? (mapUrlCategoryToApiTypeSlug(rawTypeSlug) ?? rawTypeSlug) : null;
 
         const langHeader = req.headers.get('content-language');
         const lang = langHeader === 'ru_RU' ? 'ru' : 'ua';
