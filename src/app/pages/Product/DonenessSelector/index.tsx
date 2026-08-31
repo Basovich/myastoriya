@@ -169,7 +169,7 @@ const isCurrentInfo = (infoId: string, selectedLabel: string, selectedId: string
     }
     return infoId === 'rare' && labelLower.includes('rare') && !labelLower.includes('medium') && !labelLower.includes('blue') && !labelLower.includes('extra') && !labelLower.includes('екстра') && !labelLower.includes('экстра');
 
-    
+
 };
 
 interface DonenessSelectorProps {
