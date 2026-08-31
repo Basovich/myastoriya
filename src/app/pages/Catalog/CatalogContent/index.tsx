@@ -49,6 +49,7 @@ interface CatalogContentProps {
     /** FAQ дані з API. */
     faq?: FaqQuestion[] | null;
     isSubcategory?: boolean;
+    hasMixedRawProduction?: boolean;
 }
 
 export default async function CatalogContent({
@@ -69,6 +70,7 @@ export default async function CatalogContent({
     mobileImage,
     faq,
     isSubcategory,
+    hasMixedRawProduction,
 }: CatalogContentProps) {
     const sortLabel = lang === 'ua' ? 'Сортувати:' : 'Сортировать:';
     const filterLabel = lang === 'ua' ? 'Фільтр' : 'Фильтр';
@@ -179,6 +181,7 @@ export default async function CatalogContent({
                         clearLabel={clearLabel}
                         filterBlocks={filterBlocks}
                         activeFilters={activeFilters}
+                        hasMixedRawProduction={hasMixedRawProduction}
                     />
 
                     <div className={s.contentLayout}>
@@ -191,6 +194,7 @@ export default async function CatalogContent({
                                     filterBlocks={filterBlocks}
                                     activeFilters={activeFilters}
                                     isSubcategory={isSubcategory}
+                                    hasMixedRawProduction={hasMixedRawProduction}
                                 />
                             </aside>
                         )}

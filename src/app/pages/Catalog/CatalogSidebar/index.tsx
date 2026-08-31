@@ -37,6 +37,7 @@ interface CatalogSidebarProps {
     filterBlocks?: FilterBlock[];
     activeFilters?: FilterStateInput[];
     isSubcategory?: boolean;
+    hasMixedRawProduction?: boolean;
 }
 
 const LOCALIZED_SIDEBAR_TEXTS = {
@@ -103,6 +104,7 @@ export default function CatalogSidebar({
     filterBlocks,
     activeFilters,
     isSubcategory,
+    hasMixedRawProduction,
 }: CatalogSidebarProps) {
     const routeParams = useParams();
     const router = useRouter();
@@ -315,8 +317,8 @@ export default function CatalogSidebar({
         <div className={s.sidebar} ref={sidebarRef}>
 
 
-            {/* Блок 2: Перемикачі "СПОЧАТКУ СИРЕ" / "СПОЧАТКУ ГОТОВЕ" (картка) */}
-            {(() => {
+            {/* Блок 2: Перемикачі "СПОЧАТКУ СИРЕ" / "СПОЧАТКУ ГОТОВЕ" (картка) - тільки якщо у категорії hasMixedRawProduction === true */}
+            {hasMixedRawProduction && (() => {
                 const isRawPage = pathname.includes('siri') || pathname.includes('сырые') || searchParams.get('filter_meat_type') === 'raw';
 
                 const handleToggle = (targetType: 'raw' | 'cooked') => {

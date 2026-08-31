@@ -41,6 +41,7 @@ export interface ProductCategory {
     parentId?: number | null;
     name: string;
     slug: string;
+    hasMixedRawProduction?: boolean | null;
     menuIcon?: {
         icon1x: string | null;
         icon2x: string | null;
@@ -1534,6 +1535,7 @@ const CATEGORY_BY_ID_QUERY = /* GraphQL */ `
             parentId
             name
             slug
+            hasMixedRawProduction
             image {
                 square1x
                 square2x

@@ -22,6 +22,7 @@ interface CatalogToolbarProps {
     clearLabel?: string;
     filterBlocks?: FilterBlock[];
     activeFilters?: FilterStateInput[];
+    hasMixedRawProduction?: boolean;
 }
 
 export default function CatalogToolbarClient({
@@ -36,6 +37,7 @@ export default function CatalogToolbarClient({
     clearLabel = "Очистити",
     filterBlocks,
     activeFilters,
+    hasMixedRawProduction,
 }: CatalogToolbarProps) {
     const router = useRouter();
     const pathname = usePathname();
@@ -109,6 +111,7 @@ export default function CatalogToolbarClient({
                 clearLabel={clearLabel}
                 filterBlocks={filterBlocks}
                 activeFilters={activeFilters}
+                hasMixedRawProduction={hasMixedRawProduction}
             />
         </>
     );

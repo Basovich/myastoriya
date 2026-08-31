@@ -17,9 +17,10 @@ interface FilterModalProps {
     clearLabel?: string;
     filterBlocks?: FilterBlock[];
     activeFilters?: FilterStateInput[];
+    hasMixedRawProduction?: boolean;
 }
 
-export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, categoryId, sortOptions, filterLabel = "Фільтр", clearLabel = "Очистити", filterBlocks, activeFilters }: FilterModalProps) {
+export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, categoryId, sortOptions, filterLabel = "Фільтр", clearLabel = "Очистити", filterBlocks, activeFilters, hasMixedRawProduction }: FilterModalProps) {
     const [clearTrigger, setClearTrigger] = useState(0);
     const [isModified, setIsModified] = useState(false);
 
@@ -98,6 +99,7 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, c
                         sortOptions={sortOptions}
                         filterBlocks={filterBlocks}
                         activeFilters={activeFilters}
+                        hasMixedRawProduction={hasMixedRawProduction}
                     />
                 </div>
             </animated.div>

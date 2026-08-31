@@ -187,6 +187,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
                     bannerUrl={categoryDetails?.banner?.size1x}
                     faq={faq}
                     isSubcategory={categoryEntry.level > 1}
+                    hasMixedRawProduction={Boolean(categoryDetails?.hasMixedRawProduction)}
                 />
             </main>
         );

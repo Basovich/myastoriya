@@ -11,6 +11,7 @@ interface CatalogSidebarWrapperClientProps {
     filterBlocks?: FilterBlock[];
     activeFilters?: FilterStateInput[];
     isSubcategory?: boolean;
+    hasMixedRawProduction?: boolean;
 }
 
 export default function CatalogSidebarWrapperClient({
@@ -20,6 +21,7 @@ export default function CatalogSidebarWrapperClient({
     filterBlocks,
     activeFilters,
     isSubcategory,
+    hasMixedRawProduction,
 }: CatalogSidebarWrapperClientProps) {
     const router = useRouter();
     const pathname = usePathname();
@@ -49,6 +51,7 @@ export default function CatalogSidebarWrapperClient({
             filterBlocks={filterBlocks}
             activeFilters={activeFilters}
             isSubcategory={isSubcategory}
+            hasMixedRawProduction={hasMixedRawProduction}
         />
     );
 }
