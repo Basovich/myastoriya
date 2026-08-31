@@ -146,16 +146,16 @@
     margin-top: 8px;
     font-style: normal;
 
+    &.clamped {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
     @media (min-width: 1024px) {
         font-size: 16px;
         line-height: 177.778%;
-
-        &.clamped {
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
     }
 
     @media (min-width: 1280px) {
@@ -174,7 +174,7 @@
     font-weight: 700;
     cursor: pointer;
     margin-top: 8px;
-    display: none;
+    display: inline-block;
     align-self: flex-start;
     transition: color 0.2s ease;
 
@@ -182,10 +182,6 @@
         &:hover {
             color: #b3050f;
         }
-    }
-
-    @media (min-width: 1024px) {
-        display: block;
     }
 }
 

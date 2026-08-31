@@ -137,13 +137,16 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
         const checkOverflow = () => {
             if (descRef.current && !isExpanded) {
                 const { scrollHeight, clientHeight } = descRef.current;
-                setShowButton(scrollHeight > clientHeight);
+                setShowButton(scrollHeight > clientHeight + 1);
             }
         };
 
-        checkOverflow();
+        const timer = setTimeout(checkOverflow, 50);
         window.addEventListener('resize', checkOverflow);
-        return () => window.removeEventListener('resize', checkOverflow);
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('resize', checkOverflow);
+        };
     }, [cleanDescription, isExpanded]);
 
     // Portion and weight rendering using unit/multiplier
