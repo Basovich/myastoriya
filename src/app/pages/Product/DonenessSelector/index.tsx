@@ -1,7 +1,25 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import s from './DonenessSelector.module.scss';
 import type { ProductCostVariant } from '@/lib/graphql';
+
+const STATIC_IMAGES: Record<string, string> = {
+    rare: '/images/product/doneness/rare.png',
+    'medium-rare': '/images/product/doneness/medium-rare.png',
+    medium: '/images/product/doneness/medium.png',
+    'medium-well': '/images/product/doneness/medium-well.png',
+    'well-done': '/images/product/doneness/well-done.png',
+};
+
+const DEFAULT_IMAGE_LIST = [
+    '/images/product/doneness/rare.png',
+    '/images/product/doneness/medium-rare.png',
+    '/images/product/doneness/medium.png',
+    '/images/product/doneness/medium-well.png',
+    '/images/product/doneness/well-done.png',
+];
 
 /** Статичні варіанти прожарки — використовуються як fallback */
 const STATIC_OPTIONS = [
@@ -12,26 +30,148 @@ const STATIC_OPTIONS = [
     { id: 'well-done', label: 'Well done', image: '/images/product/doneness/well-done.png' },
 ];
 
-const DONENESS_INFO = {
+interface DonenessInfoItem {
+    id: string;
+    name: string;
+    desc: string;
+}
+
+const DONENESS_INFO: Record<'ua' | 'ru', DonenessInfoItem[]> = {
     ua: [
-        { id: 'rare', name: 'Rare', desc: ' — слабке просмажування, з червоним соком та теплою червоною серцевиною (49–52°C).' },
-        { id: 'medium-rare', name: 'Medium Rare', desc: ' — середньо-слабке просмажування, з рожевим соком. Найпопулярніший вибір (52–57°C).' },
-        { id: 'medium', name: 'Medium', desc: ' — середнє просмажування, з рожевим соком та теплою рожевою серцевиною (57–63°C).' },
-        { id: 'medium-well', name: 'Medium Well', desc: ' — майже повністю просмажене, з прозорим соком і сіро-рожевою серцевиною (63–68°C).' },
-        { id: 'well-done', name: 'Well Done', desc: ' — повністю просмажене готове м\'ясо без соку (понад 68°C).' }
+        {
+            id: 'raw',
+            name: 'Без прожарки / Сирий',
+            desc: ' — сирий стейк без термообробки для самостійного приготування.'
+        },
+        {
+            id: 'blue',
+            name: 'Blue (Extra Rare)',
+            desc: ' — екстра-рейр сирий, але не холодний, з тонкою обсмаженою скоринкою (46–49°C).'
+        },
+        {
+            id: 'rare',
+            name: 'Rare',
+            desc: ' — слабке просмажування, з червоним соком та теплою червоною серцевиною (49–52°C).'
+        },
+        {
+            id: 'medium-rare',
+            name: 'Medium Rare',
+            desc: ' — середньо-слабке просмажування, з рожевим соком. Найпопулярніший вибір (52–57°C).'
+        },
+        {
+            id: 'medium',
+            name: 'Medium',
+            desc: ' — середнє просмажування, з рожевим соком та теплою рожевою серцевиною (57–63°C).'
+        },
+        {
+            id: 'medium-well',
+            name: 'Medium Well',
+            desc: ' — майже повністю просмажене, з прозорим соком і сіро-рожевою серцевиною (63–68°C).'
+        },
+        {
+            id: 'well-done',
+            name: 'Well Done',
+            desc: ' — повністю просмажене готове м\'ясо без соку (понад 68°C).'
+        }
     ],
     ru: [
-        { id: 'rare', name: 'Rare', desc: ' — слабая прожарка, с красным соком и теплой красной сердцевиной (49–52°C).' },
-        { id: 'medium-rare', name: 'Medium Rare', desc: ' — средне-слабая прожарка, с розовым соком. Самый популярный выбор (52–57°C).' },
-        { id: 'medium', name: 'Medium', desc: ' — средняя прожарка, со светло-розовым соком и теплой розовой сердцевиной (57–63°C).' },
-        { id: 'medium-well', name: 'Medium Well', desc: ' — почти полностью прожаренное, с прозрачным соком и серо-розовой сердцевиной (63–68°C).' },
-        { id: 'well-done', name: 'Well Done', desc: ' — полностью прожаренное готовое мясо без сока (более 68°C).' }
+        {
+            id: 'raw',
+            name: 'Без прожарки / Сырой',
+            desc: ' — сырой стейк без термообработки для самостоятельного приготовления.'
+        },
+        {
+            id: 'blue',
+            name: 'Blue (Extra Rare)',
+            desc: ' — экстра-рейр сырой, но не холодный, с тонкой обжаренной корочкой (46–49°C).'
+        },
+        {
+            id: 'rare',
+            name: 'Rare',
+            desc: ' — слабая прожарка, с красным соком и теплой красной сердцевиной (49–52°C).'
+        },
+        {
+            id: 'medium-rare',
+            name: 'Medium Rare',
+            desc: ' — средне-слабая прожарка, с розовым соком. Самый популярный выбор (52–57°C).'
+        },
+        {
+            id: 'medium',
+            name: 'Medium',
+            desc: ' — средняя прожарка, со светло-розовым соком и теплой розовой сердцевиной (57–63°C).'
+        },
+        {
+            id: 'medium-well',
+            name: 'Medium Well',
+            desc: ' — почти полностью прожаренное, с прозрачным соком и серо-розовой сердцевиной (63–68°C).'
+        },
+        {
+            id: 'well-done',
+            name: 'Well Done',
+            desc: ' — полностью прожаренное готовое мясо без сока (более 68°C).'
+        }
     ]
 };
 
-const isCurrent = (infoId: string, currentVal: string) => {
-    const normalize = (val: string) => val.toLowerCase().replace(/[^a-z]/g, '');
-    return normalize(infoId) === normalize(currentVal);
+function resolveDonenessImage(item: { id: string; label: string; image?: string | null }, index: number): string {
+    if (item.image && typeof item.image === 'string' && item.image.trim() !== '') {
+        return item.image.startsWith('/') ? `https://dev-api.myastoriya.com.ua${item.image}` : item.image;
+    }
+
+    const idLower = (item.id || '').toLowerCase();
+    if (STATIC_IMAGES[idLower]) {
+        return STATIC_IMAGES[idLower];
+    }
+
+    const labelLower = (item.label || '').toLowerCase();
+    if (labelLower.includes('well') || labelLower.includes('повніст') || labelLower.includes('полност')) {
+        return STATIC_IMAGES['well-done'];
+    }
+    if (labelLower.includes('medium-well') || labelLower.includes('medium well')) {
+        return STATIC_IMAGES['medium-well'];
+    }
+    if (labelLower.includes('medium-rare') || labelLower.includes('medium rare') || labelLower.includes('середньо-слабк') || labelLower.includes('средне-слаб')) {
+        return STATIC_IMAGES['medium-rare'];
+    }
+    if (labelLower.includes('medium') || labelLower.includes('середн') || labelLower.includes('средн')) {
+        return STATIC_IMAGES['medium'];
+    }
+    if (labelLower.includes('rare') || labelLower.includes('blue') || labelLower.includes('слабк') || labelLower.includes('слаб') || labelLower.includes('екстра') || labelLower.includes('экстра')) {
+        return STATIC_IMAGES['rare'];
+    }
+
+    return DEFAULT_IMAGE_LIST[index % DEFAULT_IMAGE_LIST.length];
+}
+
+const isCurrentInfo = (infoId: string, selectedLabel: string, selectedId: string) => {
+    const labelLower = (selectedLabel || '').toLowerCase();
+    const idLower = (selectedId || '').toLowerCase();
+
+    if (idLower === infoId) return true;
+
+    if (infoId === 'blue' && (labelLower.includes('blue') || labelLower.includes('екстра') || labelLower.includes('экстра'))) {
+        return true;
+    }
+    if (infoId === 'raw' && (labelLower.includes('без прож') || labelLower.includes('без просм') || labelLower.includes('сирий') || labelLower.includes('сырой'))) {
+        return true;
+    }
+    if (infoId === 'medium-well' && (labelLower.includes('medium-well') || labelLower.includes('medium well') || labelLower.includes('майже') || labelLower.includes('почти'))) {
+        return true;
+    }
+    if (infoId === 'medium-rare' && (labelLower.includes('medium-rare') || labelLower.includes('medium rare') || (labelLower.includes('слабк') && !labelLower.includes('екстра')) || (labelLower.includes('слабая') && !labelLower.includes('экстра')))) {
+        return true;
+    }
+    if (infoId === 'well-done' && (labelLower.includes('well-done') || labelLower.includes('well done') || labelLower.includes('повністю') || labelLower.includes('полностью'))) {
+        return true;
+    }
+    if (infoId === 'medium' && labelLower.includes('medium') && !labelLower.includes('rare') && !labelLower.includes('well')) {
+        return true;
+    }
+    if (infoId === 'rare' && labelLower.includes('rare') && !labelLower.includes('medium') && !labelLower.includes('blue') && !labelLower.includes('extra') && !labelLower.includes('екстра') && !labelLower.includes('экстра')) {
+        return true;
+    }
+
+    return false;
 };
 
 interface DonenessSelectorProps {
@@ -43,12 +183,64 @@ interface DonenessSelectorProps {
     noBorder?: boolean;
 }
 
-const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange, options, lang = 'ua', noBorder }) => {
-    const [showTooltip, setShowTooltip] = React.useState(false);
-    const tooltipRef = React.useRef<HTMLDivElement>(null);
-    const btnRef = React.useRef<HTMLButtonElement>(null);
+interface DonenessItemProps {
+    item: { id: string; label: string; image?: string | null };
+    index: number;
+    isSelected: boolean;
+    onClick: () => void;
+}
 
-    React.useEffect(() => {
+const DonenessItem: React.FC<DonenessItemProps> = ({ item, index, isSelected, onClick }) => {
+    const initialSrc = resolveDonenessImage(item, index);
+    const [imgSrc, setImgSrc] = useState(initialSrc);
+
+    useEffect(() => {
+        setImgSrc(resolveDonenessImage(item, index));
+    }, [item, index]);
+
+    const handleError = () => {
+        const fallback = DEFAULT_IMAGE_LIST[index % DEFAULT_IMAGE_LIST.length];
+        if (imgSrc !== fallback) {
+            setImgSrc(fallback);
+        }
+    };
+
+    return (
+        <div
+            className={`${s.item} ${isSelected ? s.active : ''}`}
+            onClick={onClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && onClick()}
+            aria-pressed={isSelected}
+            aria-label={item.label}
+        >
+            {isSelected && (
+                <div className={s.activeTag} title={item.label}>
+                    <span>{item.label}</span>
+                </div>
+            )}
+            <div className={s.imageBox}>
+                <Image
+                    src={imgSrc}
+                    alt={item.label}
+                    width={60}
+                    height={34}
+                    style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                    onError={handleError}
+                    unoptimized={imgSrc.startsWith('http')}
+                />
+            </div>
+        </div>
+    );
+};
+
+const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange, options, lang = 'ua', noBorder }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    const tooltipRef = useRef<HTMLDivElement>(null);
+    const btnRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (
                 tooltipRef.current && !tooltipRef.current.contains(event.target as Node) &&
@@ -108,55 +300,28 @@ const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange, op
                         {currentLang === 'ru' ? 'Степени прожарки стейков:' : 'Рівні прожарювання стейків:'}
                     </h4>
                     <ul className={s.tooltipList}>
-                        {DONENESS_INFO[currentLang].map((info) => (
-                            <li key={info.id} className={`${s.tooltipItem} ${isCurrent(info.id, value) ? s.highlighted : ''}`}>
-                                <span className={s.donenessName}>{info.name}</span>
-                                <span className={s.donenessDesc}>{info.desc}</span>
-                            </li>
-                        ))}
+                        {DONENESS_INFO[currentLang].map((info) => {
+                            const isSelected = isCurrentInfo(info.id, selectedItem?.label ?? '', value);
+                            return (
+                                <li key={info.id} className={`${s.tooltipItem} ${isSelected ? s.highlighted : ''}`}>
+                                    <span className={s.donenessName}>{info.name}</span>
+                                    <span className={s.donenessDesc}>{info.desc}</span>
+                                </li>
+                            );
+                        })}
                     </ul>
                 </div>
             )}
 
             <div className={s.grid}>
-                {items.map((item) => (
-                    <div
+                {items.map((item, index) => (
+                    <DonenessItem
                         key={item.id}
-                        className={`${s.item} ${value === item.id ? s.active : ''}`}
+                        item={item}
+                        index={index}
+                        isSelected={value === item.id}
                         onClick={() => onChange(item.id)}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => e.key === 'Enter' && onChange(item.id)}
-                        aria-pressed={value === item.id}
-                        aria-label={item.label}
-                    >
-                        {value === item.id && (
-                            <div className={s.activeTag}>
-                                {item.label}
-                                <div className={s.tagArraw}></div>
-                            </div>
-                        )}
-                        <div className={s.imageBox}>
-                            {item.image ? (
-                                <Image
-                                    src={item.image.startsWith('/') ? `https://dev-api.myastoriya.com.ua${item.image}` : item.image}
-                                    alt={item.label}
-                                    width={60}
-                                    height={34}
-                                    style={{ objectFit: 'cover' }}
-                                    unoptimized
-                                />
-                            ) : (
-                                <Image
-                                    src={`/images/product/doneness/${item.id}.png`}
-                                    alt={item.label}
-                                    width={60}
-                                    height={34}
-                                    style={{ objectFit: 'cover' }}
-                                />
-                            )}
-                        </div>
-                    </div>
+                    />
                 ))}
             </div>
         </div>
