@@ -314,9 +314,10 @@ const ProductClient: React.FC<ProductClientProps> = ({
     const mappedRelated = mapProductsToRelated(relatedProducts, 8);
     const mappedPopular = mapProductsToRelated(popularList);
 
-    // Get current category name from breadcrumbs
-    const categoryName = breadcrumbsProp && breadcrumbsProp.length > 1
-        ? breadcrumbsProp[breadcrumbsProp.length - 1].label
+    // Get current category name from breadcrumbs (excluding the product name itself)
+    const categoryItems = breadcrumbsProp ? breadcrumbsProp.filter(item => item.label !== product.name) : [];
+    const categoryName = categoryItems.length > 1
+        ? categoryItems[categoryItems.length - 1].label
         : '';
 
     const filteredCategoryProducts = categoryProducts
@@ -500,7 +501,11 @@ const ProductClient: React.FC<ProductClientProps> = ({
                 )}
                 {mappedCategoryProducts.length > 0 && (
                     <RelatedProducts
-                        title={lang === 'ru' ? `Популярные товары в категории: ${categoryName}` : `Популярні товари в категорії: ${categoryName}`}
+                        title={
+                            categoryName
+                                ? (lang === 'ru' ? `Популярные товары в категории: ${categoryName}` : `Популярні товари в категорії: ${categoryName}`)
+                                : (lang === 'ru' ? 'Популярные товары в категории' : 'Популярні товари в категорії')
+                        }
                         products={mappedCategoryProducts}
                         className={s.recommendations}
                         alwaysSlider={true}
