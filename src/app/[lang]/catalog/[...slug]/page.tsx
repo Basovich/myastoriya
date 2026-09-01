@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { Locale } from '@/i18n/config';
 import {
@@ -7,7 +8,7 @@ import {
     ProductCategory,
 } from '@/lib/graphql';
 import { buildCategoryIndex } from '@/utils/category-url';
-import { getHreflangAlternates } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
 import { getAccessToken } from '@/app/actions/authActions';
 
 interface DynamicCatalogPageProps {
@@ -17,6 +18,9 @@ interface DynamicCatalogPageProps {
 export async function generateMetadata({ params }: DynamicCatalogPageProps): Promise<Metadata> {
     const { lang, slug } = await params;
     if (!slug || slug.length === 0) return {};
+
+    const headersList = await headers();
+    const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
     const lastSegment = slug[slug.length - 1];
     const catalogTree = await getCatalogTreeApi(lang as Locale, 768, undefined).catch(() => [] as ProductCategory[]);
@@ -31,7 +35,7 @@ export async function generateMetadata({ params }: DynamicCatalogPageProps): Pro
         const categoryImage = resolveCategoryImageUrl(categoryEntry.node);
         const description = `${categoryName} — замовляйте з доставкою від М'ясторія.`;
 
-        const alternates = getHreflangAlternates(`/catalog/${slug.join('/')}/`, lang);
+        const alternates = getHreflangAlternates(`/catalog/${slug.join('/')}/`, lang, dynamicBaseUrl);
 
         return {
             title: categoryName,

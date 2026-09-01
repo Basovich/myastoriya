@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
-import { getHreflangAlternates } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import {
     getCatalogTreeApi,
@@ -32,6 +33,8 @@ interface ProductPageProps {
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
     const { lang, slug } = await params;
+    const headersList = await headers();
+    const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
     const productId = await findProductIdBySlug(slug, lang as Locale).catch(() => null);
     if (!productId) return {};
@@ -48,7 +51,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         ? rawDescription.slice(0, 160)
         : `Купити ${productName} за найкращою ціною з доставкою від М'ясторія.`;
 
-    const alternates = getHreflangAlternates(`/product/${slug}/`, lang);
+    const alternates = getHreflangAlternates(`/product/${slug}/`, lang, dynamicBaseUrl);
 
     return {
         title: productName,

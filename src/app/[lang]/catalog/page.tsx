@@ -5,9 +5,10 @@ import { getCatalogTreeApi, getProductsApi, ProductsResponse, ProductCategory } 
 import { getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { getAccessToken } from '@/app/actions/authActions';
 
-import { getHreflangAlternates } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
 
 interface CatalogPageProps {
     params: Promise<{ lang: string }>;
@@ -16,10 +17,12 @@ interface CatalogPageProps {
 
 export async function generateMetadata({ params }: CatalogPageProps): Promise<Metadata> {
     const { lang } = await params;
+    const headersList = await headers();
+    const dynamicBaseUrl = getDynamicBaseUrl(headersList);
     const dict = await getDictionary(lang as Locale);
     const title = dict.catalog?.pageTitle ?? 'Каталог';
     const description = `${title} — свіже м'ясо, стейки, бургери та напівфабрикати від М'ясторія.`;
-    const alternates = getHreflangAlternates('/catalog/', lang);
+    const alternates = getHreflangAlternates('/catalog/', lang, dynamicBaseUrl);
 
     return {
         title,

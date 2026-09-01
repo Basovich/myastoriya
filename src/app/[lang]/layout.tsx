@@ -40,7 +40,7 @@ const helios = localFont({
   variable: "--font-helios",
 });
 
-import { getHreflangAlternates } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
 
 export async function generateMetadata({
   params,
@@ -50,9 +50,7 @@ export async function generateMetadata({
   const { lang } = await params;
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "/";
-  const host = headersList.get("x-forwarded-host") || headersList.get("host");
-  const proto = headersList.get("x-forwarded-proto") || "https";
-  const dynamicBaseUrl = host ? `${proto}://${host}` : undefined;
+  const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
   const alternates = getHreflangAlternates(pathname, lang, dynamicBaseUrl);
 

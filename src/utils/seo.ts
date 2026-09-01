@@ -6,6 +6,17 @@ export interface HreflangAlternates {
 }
 
 /**
+ * Extracts dynamic base URL from request headers if present.
+ */
+export function getDynamicBaseUrl(headersList?: Headers): string | undefined {
+    if (!headersList) return undefined;
+    const host = headersList.get("x-forwarded-host") || headersList.get("host");
+    if (!host) return undefined;
+    const proto = headersList.get("x-forwarded-proto") || "https";
+    return `${proto}://${host}`;
+}
+
+/**
  * Generates hreflang alternate links and canonical link for SEO.
  * @param pathname The request pathname (e.g., '/ua/contacts/' or '/contacts' or '/ru/our-stores/')
  * @param currentLang The current page language ('ua', 'ru', 'uk', etc.)
