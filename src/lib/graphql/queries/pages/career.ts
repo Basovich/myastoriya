@@ -119,7 +119,7 @@ export async function submitCareerApplicationApi(
 ): Promise<CareerApplicationResult> {
     const response = await gqlRequest<{ submitCareerApplication: CareerApplicationResult }>(
         SUBMIT_CAREER_APPLICATION_MUTATION,
-        input,
+        input as unknown as Record<string, unknown>,
         { lang }
     );
     return response.submitCareerApplication;
