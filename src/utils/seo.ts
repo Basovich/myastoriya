@@ -9,12 +9,17 @@ export interface HreflangAlternates {
  * Generates hreflang alternate links and canonical link for SEO.
  * @param pathname The request pathname (e.g., '/ua/contacts/' or '/contacts' or '/ru/our-stores/')
  * @param currentLang The current page language ('ua', 'ru', 'uk', etc.)
+ * @param overrideBaseUrl Optional dynamic base URL (e.g. from request headers 'https://domain.com')
  */
 export function getHreflangAlternates(
     pathname: string = "/",
-    currentLang: string = "ua"
+    currentLang: string = "ua",
+    overrideBaseUrl?: string
 ): HreflangAlternates {
-    const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || siteData.url).replace(/\/+$/, "");
+    const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL 
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
+
+    const baseUrl = (overrideBaseUrl || fallbackUrl).replace(/\/+$/, "");
 
     // 1. Remove query string if included in pathname
     const cleanPathname = pathname.split("?")[0];

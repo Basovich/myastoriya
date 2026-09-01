@@ -50,8 +50,11 @@ export async function generateMetadata({
   const { lang } = await params;
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "/";
+  const host = headersList.get("x-forwarded-host") || headersList.get("host");
+  const proto = headersList.get("x-forwarded-proto") || "https";
+  const dynamicBaseUrl = host ? `${proto}://${host}` : undefined;
 
-  const alternates = getHreflangAlternates(pathname, lang);
+  const alternates = getHreflangAlternates(pathname, lang, dynamicBaseUrl);
 
   return {
     title: {
