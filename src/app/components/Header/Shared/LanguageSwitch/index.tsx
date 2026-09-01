@@ -24,7 +24,7 @@ export default function LanguageSwitch({ lang }: LanguageSwitchProps) {
             newSegments.shift();
         }
 
-        let basePath = '';
+        let basePath: string;
         // Home page special case: UA root is /
         if (newSegments.length === 0) {
             basePath = targetLang === 'ua' ? '/' : '/ru/';

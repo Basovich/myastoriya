@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { formatDate, buildUrlSetXml, SitemapUrlEntry } from "@/utils/sitemap-helpers";
-import { getSalesApi, getSpecialsApi, Sale } from "@/lib/graphql";
+import { getSalesApi, getSpecialsApi } from "@/lib/graphql";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
     try {
-        const today = formatDate();
         const entries: SitemapUrlEntry[] = [];
         const seenUrls = new Set<string>();
 
