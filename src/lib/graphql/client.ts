@@ -106,6 +106,7 @@ export async function gqlRequest<T>(
     }
 
     headers['Content-Language'] = options?.lang === 'ru' ? 'ru_RU' : options?.lang === 'en' ? 'en_US' : 'uk_UA';
+    headers['Accept-Language'] = options?.lang === 'ru' ? 'ru,ru-RU;q=0.9,uk;q=0.8' : 'uk,uk-UA;q=0.9,ru;q=0.8';
 
     let body: BodyInit = JSON.stringify({ query, variables });
 

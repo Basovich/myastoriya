@@ -92,31 +92,61 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
     }
 
     const lastSegment = slug[slug.length - 1];
-    const langPrefix = lang === 'ua' ? '' : `/${lang}`;
 
     // If multi-segment URL accessed (e.g. /category/parent/child), redirect 301 to single-level flat URL (/category/child)
     if (slug.length > 1) {
-        redirect(`${langPrefix}/category/${lastSegment}`);
+        redirect(`/${lang}/category/${lastSegment}`);
     }
 
     // 1. Fetch current catalog tree (locality-aware)
     const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined).catch(() => [] as ProductCategory[]);
     const categoryIndex = buildCategoryIndex(catalogTree);
 
+    const normalizeSlug = (s: string) => s.toLowerCase().replace(/y/g, 'i').replace(/-\d+$/, '').replace(/-/g, '');
+
     // 2. Check if category exists in current locality tree by slug
     let categoryEntry = Array.from(categoryIndex.values()).find(
         e => e.node.slug === lastSegment
     );
 
-    // If not found by slug in target lang (e.g. accessed /ru/category/steyki-na-grili/ where RU slug is steyki-na-grile),
-    // fetch UA tree to find category ID, then map to target lang category node!
+    // If exact slug not found, check normalized slug (e.g. steyki-2 -> steiky-2, myaso -> miaso)
+    if (!categoryEntry) {
+        const targetNorm = normalizeSlug(lastSegment);
+        categoryEntry = Array.from(categoryIndex.values()).find(
+            e => normalizeSlug(e.node.slug) === targetNorm
+        );
+        if (categoryEntry) {
+            redirect(`/${lang}/category/${categoryEntry.node.slug}`);
+        }
+    }
+
+    // If still not found by slug in target lang, fetch alt tree to find category ID!
     if (!categoryEntry) {
         const altLang = lang === 'ua' ? 'ru' : 'ua';
         const altTree = await getCatalogTreeApi(altLang, 768, token ?? undefined).catch(() => [] as ProductCategory[]);
         const altIndex = buildCategoryIndex(altTree);
-        const altEntry = Array.from(altIndex.values()).find(e => e.node.slug === lastSegment);
+        const targetNorm = normalizeSlug(lastSegment);
+        const altEntry = Array.from(altIndex.values()).find(
+            e => e.node.slug === lastSegment || normalizeSlug(e.node.slug) === targetNorm
+        );
         if (altEntry) {
             categoryEntry = categoryIndex.get(altEntry.node.id);
+            if (categoryEntry) {
+                redirect(`/${lang}/category/${categoryEntry.node.slug}`);
+            }
+        }
+    }
+
+    // If not found under parent 768 or alt tree, check root tree (all categories)
+    if (!categoryEntry) {
+        const rootTree = await getCatalogTreeApi(lang, undefined, token ?? undefined).catch(() => [] as ProductCategory[]);
+        const rootIndex = buildCategoryIndex(rootTree);
+        const targetNorm = normalizeSlug(lastSegment);
+        categoryEntry = Array.from(rootIndex.values()).find(
+            e => e.node.slug === lastSegment || normalizeSlug(e.node.slug) === targetNorm
+        );
+        if (categoryEntry && categoryEntry.node.slug !== lastSegment) {
+            redirect(`/${lang}/category/${categoryEntry.node.slug}`);
         }
     }
 
@@ -126,14 +156,16 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
         const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
         const activeFilters = parseFilterParams(resolvedSearchParams as Record<string, string | string[] | undefined>);
         const categoryId = parseInt(categoryEntry.node.id);
-        const hasMixedRawProduction = Boolean(categoryEntry.node.hasMixedRawProduction);
+        const rawParam = parseRawProductionParam(resolvedSearchParams as Record<string, string | string[] | undefined>);
 
-        let rawProduction = parseRawProductionParam(resolvedSearchParams as Record<string, string | string[] | undefined>);
-        if (rawProduction === undefined && hasMixedRawProduction) {
-            rawProduction = false;
-        }
+        const categoryDetails = await getCategoryByIdApi(categoryId, lang, token ?? undefined).catch(() => null);
+        const hasMixedRawProduction = Boolean(categoryDetails?.hasMixedRawProduction);
 
-        const [productsResponse, popularProducts, categoryDetails] = await Promise.all([
+        const rawProduction = rawParam !== undefined
+            ? rawParam
+            : (hasMixedRawProduction ? false : undefined);
+
+        const [productsResponse, popularProducts] = await Promise.all([
             getProductsApi(
                 { categoryId, limit: 12, page, sort, filter: activeFilters, rawProduction },
                 lang,
@@ -148,18 +180,17 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
                 } as ProductsResponse;
             }),
             getPopularProductsApi(undefined, 12, lang, token ?? undefined).catch(() => [] as Product[]),
-            getCategoryByIdApi(categoryId, lang, token ?? undefined).catch(() => null),
         ]);
         productsResponse.current_page = page;
 
-        const hasActiveFilters = activeFilters.length > 0 || !!sort;
+        const hasActiveFilters = activeFilters.length > 0 || !!sort || rawParam !== undefined;
         if (shouldRedirectForLocality(productsResponse.data.length, page, hasActiveFilters)) {
-            let redirectUrl = `${langPrefix}/catalog`;
+            let redirectUrl = `/${lang}/catalog`;
             if (categoryEntry.parent) {
                 const parentEntry = categoryIndex.get(String(categoryEntry.parent.id));
                 if (parentEntry) {
                     const parentHref = getCategoryHref(parentEntry.node);
-                    redirectUrl = `${langPrefix}${parentHref}`;
+                    redirectUrl = `/${lang}${parentHref}`;
                 }
             }
             
@@ -217,7 +248,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
     );
 
     if (globalCategoryEntry) {
-        redirect(`${langPrefix}/catalog`);
+        redirect(`/${lang}/catalog`);
     }
 
     notFound();

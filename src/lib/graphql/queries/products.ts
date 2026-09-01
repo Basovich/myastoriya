@@ -1171,7 +1171,6 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
             id
             name
             slug
-            hasMixedRawProduction
             menuIcon {
                 icon1x
                 icon2x
@@ -1205,7 +1204,6 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                 id
                 name
                 slug
-                hasMixedRawProduction
                 menuIcon {
                     icon1x
                     icon2x
@@ -1239,7 +1237,6 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                     id
                     name
                     slug
-                    hasMixedRawProduction
                     image {
                         square1x
                         square2x
