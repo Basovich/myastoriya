@@ -39,14 +39,6 @@ function getProductImageUrl(url: string): string {
     return url;
 }
 
-function resolveCostVariantImageUrl(image?: { size1x?: string | null; size2x?: string | null; size3x?: string | null } | null): string | null {
-    if (!image) return null;
-    const url = image.size2x || image.size1x || image.size3x;
-    if (!url) return null;
-    if (url.startsWith('/images/')) return url;
-    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
-    return url;
-}
 
 
 function getWeightInGrams(weightStr: string): number {
