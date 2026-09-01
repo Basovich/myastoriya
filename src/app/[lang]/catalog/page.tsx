@@ -7,6 +7,8 @@ import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import type { Metadata } from 'next';
 import { getAccessToken } from '@/app/actions/authActions';
 
+import { getHreflangAlternates } from '@/utils/seo';
+
 interface CatalogPageProps {
     params: Promise<{ lang: string }>;
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -17,9 +19,15 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
     const dict = await getDictionary(lang as Locale);
     const title = dict.catalog?.pageTitle ?? 'Каталог';
     const description = `${title} — свіже м'ясо, стейки, бургери та напівфабрикати від М'ясторія.`;
+    const alternates = getHreflangAlternates('/catalog/', lang);
+
     return {
         title,
         description,
+        alternates: {
+            canonical: alternates.canonical,
+            languages: alternates.languages,
+        },
         openGraph: {
             title,
             description,

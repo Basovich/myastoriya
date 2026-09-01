@@ -7,6 +7,7 @@ import {
     ProductCategory,
 } from '@/lib/graphql';
 import { buildCategoryIndex } from '@/utils/category-url';
+import { getHreflangAlternates } from '@/utils/seo';
 import { getAccessToken } from '@/app/actions/authActions';
 
 interface DynamicCatalogPageProps {
@@ -30,9 +31,15 @@ export async function generateMetadata({ params }: DynamicCatalogPageProps): Pro
         const categoryImage = resolveCategoryImageUrl(categoryEntry.node);
         const description = `${categoryName} — замовляйте з доставкою від М'ясторія.`;
 
+        const alternates = getHreflangAlternates(`/catalog/${slug.join('/')}/`, lang);
+
         return {
             title: categoryName,
             description,
+            alternates: {
+                canonical: alternates.canonical,
+                languages: alternates.languages,
+            },
             openGraph: {
                 title: categoryName,
                 description,

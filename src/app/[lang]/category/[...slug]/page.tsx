@@ -17,6 +17,7 @@ import {
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
+import { getHreflangAlternates } from '@/utils/seo';
 
 interface DynamicCategoryPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
@@ -50,9 +51,15 @@ export async function generateMetadata({ params }: DynamicCategoryPageProps): Pr
         const categoryImage = resolveCategoryImageUrl(categoryEntry.node);
         const description = `${categoryName} — замовляйте з доставкою від М'ясторія.`;
 
+        const alternates = getHreflangAlternates(`/category/${slug.join('/')}/`, lang);
+
         return {
             title: categoryName,
             description,
+            alternates: {
+                canonical: alternates.canonical,
+                languages: alternates.languages,
+            },
             openGraph: {
                 title: categoryName,
                 description,

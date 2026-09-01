@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
+import { getHreflangAlternates } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import {
     getCatalogTreeApi,
@@ -47,9 +48,15 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         ? rawDescription.slice(0, 160)
         : `Купити ${productName} за найкращою ціною з доставкою від М'ясторія.`;
 
+    const alternates = getHreflangAlternates(`/product/${slug}/`, lang);
+
     return {
         title: productName,
         description,
+        alternates: {
+            canonical: alternates.canonical,
+            languages: alternates.languages,
+        },
         openGraph: {
             title: productName,
             description,
