@@ -156,14 +156,6 @@ const ProductClient: React.FC<ProductClientProps> = ({
         }
     }, [product.id, product.hasCostVariants, lang, isInitialized]);
 
-    const isDoneness = React.useMemo(() => {
-        if (!variants || variants.length === 0) return false;
-        const donenessKeywords = ['rare', 'medium', 'well', 'blue', 'прожар', 'просм', 'сирий', 'сырой', 'raw'];
-        return variants.some(v => {
-            const str = `${v.id} ${v.name || ''}`.toLowerCase();
-            return donenessKeywords.some(kw => str.includes(kw));
-        });
-    }, [variants]);
 
     const [selectedModifierIds, setSelectedModifierIds] = useState<string[]>([]);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -463,31 +455,14 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         ) : null}
                     </div>
 
-                    {/* Doneness selector — shown only when product has steak doneness cost variants */}
-                    {product.hasCostVariants && variants.length > 1 && isDoneness && (
+                    {/* Doneness / cost variants selector */}
+                    {product.hasCostVariants && variants.length > 0 && (
                         <DonenessSelector
                             value={selectedCostVariantId}
                             onChange={setSelectedCostVariantId}
                             options={variants}
                             lang={lang}
                             noBorder={(!product.modifierGroups || product.modifierGroups.length === 0) && (!product.relatedProductGroups || product.relatedProductGroups.length === 0)}
-                        />
-                    )}
-
-                    {/* Non-doneness cost variants — shown as checkbox modifications */}
-                    {product.hasCostVariants && variants.length > 0 && !isDoneness && (
-                        <ProductModifications
-                            key="cost-variants-mods"
-                            title={lang === 'ru' ? 'Дополнительно' : 'Додатково'}
-                            items={variants.map(v => ({
-                                id: String(v.id),
-                                name: v.name || String(v.id),
-                                price: v.cost ?? 0,
-                                image: resolveCostVariantImageUrl(v.image),
-                            }))}
-                            selectedItems={selectedModifierIds}
-                            onToggle={toggleModifier}
-                            className={clsx(s.productModifications, (!product.modifierGroups || product.modifierGroups.length === 0) && (!product.relatedProductGroups || product.relatedProductGroups.length === 0) && s.noBorder)}
                         />
                     )}
 
