@@ -482,6 +482,11 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                     id
                     name
                     price
+                    image {
+                        icon1x
+                        icon2x
+                        icon3x
+                    }
                 }
             }
             relatedProductGroups {
@@ -502,6 +507,15 @@ const PRODUCT_BY_ID_QUERY = /* GraphQL */ `
                     isSale
                     available
                     portionSize
+                    image {
+                        url {
+                            grid2x
+                            grid1x
+                            main2x
+                            main1x
+                            big
+                        }
+                    }
                     images {
                         url {
                             grid2x
@@ -764,6 +778,15 @@ const PRODUCTS_BY_IDS_QUERY = /* GraphQL */ `
                     isSale
                     available
                     portionSize
+                    image {
+                        url {
+                            grid2x
+                            grid1x
+                            main2x
+                            main1x
+                            big
+                        }
+                    }
                     images {
                         url {
                             grid2x

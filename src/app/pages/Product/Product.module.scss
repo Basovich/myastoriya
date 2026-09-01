@@ -717,15 +717,13 @@ div.quantitySelector {
     cursor: pointer;
     position: relative;
 
-    @media (hover: hover) and (pointer: fine) {
-        &:hover {
-            opacity: 1;
+    &:hover {
+        opacity: 1;
 
-            .modTooltip {
-                opacity: 1;
-                visibility: visible;
-                transform: translateY(0);
-            }
+        .modTooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
     }
 }
@@ -741,16 +739,12 @@ div.quantitySelector {
     box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.12);
     border-radius: 12px;
     padding: 8px;
-    z-index: 100;
+    z-index: 1000;
     pointer-events: none;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-    display: none;
-
-    @media (hover: hover) and (pointer: fine) {
-        display: block;
-    }
+    display: block;
 
     &::after {
         content: '';

@@ -62,6 +62,37 @@
     padding-top: 32px; // Space for the active tag
 }
 
+.pillGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.pillItem {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #E0E0E0;
+    background: #FFFFFF;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+
+    &:hover {
+        border-color: #E3051B;
+    }
+
+    &.pillActive {
+        border-color: #E3051B;
+        background: #FFF5F6;
+        color: #E3051B;
+        font-weight: 700;
+    }
+}
+
 .item {
     position: relative;
     cursor: pointer;

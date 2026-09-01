@@ -255,6 +255,19 @@ const DonenessSelector: React.FC<DonenessSelectorProps> = ({ value, onChange, op
         };
     }, [showTooltip]);
 
+    const isDoneness = React.useMemo(() => {
+        if (!options || options.length === 0) return true;
+        const donenessKeywords = ['rare', 'medium', 'well', 'blue', 'прожар', 'просм', 'сирий', 'сырой', 'raw'];
+        return options.some(o => {
+            const str = `${o.id} ${o.name || ''}`.toLowerCase();
+            return donenessKeywords.some(kw => str.includes(kw));
+        });
+    }, [options]);
+
+    if (!isDoneness || (options && options.length === 0)) {
+        return null;
+    }
+
     // Якщо є реальні варіанти з API — будуємо з них
     const items = options && options.length > 0
         ? options.map(v => ({

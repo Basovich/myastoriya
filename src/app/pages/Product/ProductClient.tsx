@@ -39,6 +39,15 @@ function getProductImageUrl(url: string): string {
     return url;
 }
 
+function resolveCostVariantImageUrl(image?: { size1x?: string | null; size2x?: string | null; size3x?: string | null } | null): string | null {
+    if (!image) return null;
+    const url = image.size2x || image.size1x || image.size3x;
+    if (!url) return null;
+    if (url.startsWith('/images/')) return url;
+    if (url.startsWith('/')) return `https://dev-api.myastoriya.com.ua${url}`;
+    return url;
+}
+
 
 function getWeightInGrams(weightStr: string): number {
     if (!weightStr) return 0;
@@ -146,6 +155,15 @@ const ProductClient: React.FC<ProductClientProps> = ({
                 });
         }
     }, [product.id, product.hasCostVariants, lang, isInitialized]);
+
+    const isDoneness = React.useMemo(() => {
+        if (!variants || variants.length === 0) return false;
+        const donenessKeywords = ['rare', 'medium', 'well', 'blue', 'прожар', 'просм', 'сирий', 'сырой', 'raw'];
+        return variants.some(v => {
+            const str = `${v.id} ${v.name || ''}`.toLowerCase();
+            return donenessKeywords.some(kw => str.includes(kw));
+        });
+    }, [variants]);
 
     const [selectedModifierIds, setSelectedModifierIds] = useState<string[]>([]);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -445,14 +463,31 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         ) : null}
                     </div>
 
-                    {/* Doneness selector — shown only when product has cost variants */}
-                    {product.hasCostVariants && variants.length > 1 && (
+                    {/* Doneness selector — shown only when product has steak doneness cost variants */}
+                    {product.hasCostVariants && variants.length > 1 && isDoneness && (
                         <DonenessSelector
                             value={selectedCostVariantId}
                             onChange={setSelectedCostVariantId}
                             options={variants}
                             lang={lang}
-                            noBorder={!product.modifierGroups || product.modifierGroups.length === 0}
+                            noBorder={(!product.modifierGroups || product.modifierGroups.length === 0) && (!product.relatedProductGroups || product.relatedProductGroups.length === 0)}
+                        />
+                    )}
+
+                    {/* Non-doneness cost variants — shown as checkbox modifications */}
+                    {product.hasCostVariants && variants.length > 0 && !isDoneness && (
+                        <ProductModifications
+                            key="cost-variants-mods"
+                            title={lang === 'ru' ? 'Дополнительно' : 'Додатково'}
+                            items={variants.map(v => ({
+                                id: String(v.id),
+                                name: v.name || String(v.id),
+                                price: v.cost ?? 0,
+                                image: resolveCostVariantImageUrl(v.image),
+                            }))}
+                            selectedItems={selectedModifierIds}
+                            onToggle={toggleModifier}
+                            className={clsx(s.productModifications, (!product.modifierGroups || product.modifierGroups.length === 0) && (!product.relatedProductGroups || product.relatedProductGroups.length === 0) && s.noBorder)}
                         />
                     )}
 
@@ -465,7 +500,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                                 id: String(p.id),
                                 name: p.name,
                                 price: p.cost,
-                                image: p.images?.[0]?.url?.grid1x || p.images?.[0]?.url?.main1x || p.images?.[0]?.url?.grid2x || null,
+                                image: resolveProductImageUrl(p),
                             }))}
                             selectedItems={selectedModifierIds}
                             onToggle={toggleModifier}
