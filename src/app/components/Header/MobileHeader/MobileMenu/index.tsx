@@ -8,7 +8,7 @@ import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
 import Logo from "@/app/components/Header/Shared/Logo";
 import { siteData } from "@/config/site";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname, useParams, useSearchParams } from "next/navigation";
 import { useToggleOpenWithAnimation } from "@/hooks/useToggleOpenWithAnimation";
 import CitySelector from "@/app/components/Header/DesktopHeader/MainBar/CitySelector";
 import { ProductCategory } from "@/lib/graphql/queries/products";
@@ -66,6 +66,7 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
 
     // Language switcher logic
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const getSwitchLangHref = (targetLang: Locale) => {
         if (!pathname) return "/";
         const segments = pathname.split('/').filter(Boolean);
@@ -73,7 +74,9 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
             segments.shift();
         }
         const cleanPath = '/' + segments.join('/');
-        return getLocalizedHref(cleanPath, targetLang);
+        const localized = getLocalizedHref(cleanPath, targetLang);
+        const query = searchParams ? searchParams.toString() : '';
+        return query ? `${localized}?${query}` : localized;
     };
 
     return menuTransition((style, item) => item ? (

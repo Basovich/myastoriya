@@ -27,6 +27,7 @@
     cursor: pointer;
     box-shadow: 0 4px 15px 0 rgba(93, 93, 93, 0.25);
     transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
     
     @media (min-width: 1280px) {
         width: 46px;
@@ -47,13 +48,15 @@
         border-radius: 50%;
     }
 
-    &:disabled {
+    &:disabled,
+    &.disabled {
         opacity: 0.5;
         cursor: not-allowed;
+        pointer-events: none;
     }
 
     @media (any-hover: hover) {
-        &:not(:disabled):hover {
+        &:not(:disabled):not(.disabled):hover {
             box-shadow: 0 8px 20px 0 rgba(93, 93, 93, 0.35);
             transform: translateY(-2px);
         }
@@ -76,6 +79,7 @@
     line-height: normal;
     text-transform: uppercase;
     background-color: transparent;
+    text-decoration: none;
     transition: border-color 0.2s, background-color 0.2s, color 0.2s;
 
     @media (any-hover: hover) {

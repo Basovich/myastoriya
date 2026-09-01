@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import {usePathname} from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import s from "./LanguageSwitch.module.scss";
-import {type Locale} from "@/i18n/config";
+import { type Locale } from "@/i18n/config";
 
 interface LanguageSwitchProps {
     lang: Locale;
@@ -12,6 +12,7 @@ interface LanguageSwitchProps {
 
 export default function LanguageSwitch({ lang }: LanguageSwitchProps) {
     const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     const getSwitchUrl = (targetLang: 'ua' | 'ru') => {
         if (!pathname) return '/';
@@ -23,13 +24,17 @@ export default function LanguageSwitch({ lang }: LanguageSwitchProps) {
             newSegments.shift();
         }
 
+        let basePath = '';
         // Home page special case: UA root is /
         if (newSegments.length === 0) {
-            return targetLang === 'ua' ? '/' : '/ru/';
+            basePath = targetLang === 'ua' ? '/' : '/ru/';
+        } else {
+            // All internal pages have /ua/ or /ru/ prefix and trailing slash
+            basePath = `/${targetLang}/${newSegments.join('/')}/`;
         }
 
-        // All internal pages have /ua/ or /ru/ prefix and trailing slash
-        return `/${targetLang}/${newSegments.join('/')}/`;
+        const query = searchParams ? searchParams.toString() : '';
+        return query ? `${basePath}?${query}` : basePath;
     };
 
     return (

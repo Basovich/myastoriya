@@ -98,7 +98,8 @@ export default function CatalogProductsClient({
         try {
             const nextPage = currentPage + 1;
             const currentSearchParams = new URLSearchParams(window.location.search);
-            const rawProduction = parseRawProductionParam(currentSearchParams) ?? (hasMixedRawProduction ? false : undefined);
+            const isCookedPath = typeof window !== 'undefined' && (window.location.pathname.includes('gril') || window.location.pathname.includes('grile'));
+            const rawProduction = parseRawProductionParam(currentSearchParams) ?? (hasMixedRawProduction ? !isCookedPath : undefined);
             const newProductsRes = await getProductsApi({
                 categoryId,
                 limit: 12,
@@ -140,12 +141,16 @@ export default function CatalogProductsClient({
         setIsPaginating(true);
 
         try {
+            const currentSearchParams = new URLSearchParams(window.location.search);
+            const isCookedPath = typeof window !== 'undefined' && (window.location.pathname.includes('gril') || window.location.pathname.includes('grile'));
+            const rawProduction = parseRawProductionParam(currentSearchParams) ?? (hasMixedRawProduction ? !isCookedPath : undefined);
             const newProductsRes = await getProductsApi({
                 categoryId,
                 limit: 12,
                 page: page,
                 sort,
                 filter: activeFilters && activeFilters.length > 0 ? activeFilters : undefined,
+                rawProduction,
             }, lang, token);
 
             setProducts(newProductsRes.data);
