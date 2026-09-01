@@ -319,7 +319,9 @@ export default function CatalogSidebar({
 
             {/* Блок 2: Перемикачі "СПОЧАТКУ СИРЕ" / "СПОЧАТКУ ГОТОВЕ" (картка) - тільки якщо у категорії hasMixedRawProduction === true */}
             {hasMixedRawProduction && (() => {
-                const isRawPage = pathname.includes('siri') || pathname.includes('сырые') || searchParams.get('filter_meat_type') === 'raw';
+                const currentMeatType = searchParams.get('filter_meat_type') ?? searchParams.get('rawProduction');
+                const isRawActive = currentMeatType === 'raw' || currentMeatType === 'true' || (currentMeatType === null && (pathname.includes('siri') || pathname.includes('сырые')));
+                const isCookedActive = !isRawActive;
 
                 const handleToggle = (targetType: 'raw' | 'cooked') => {
                     let targetUrl: string;
@@ -358,7 +360,7 @@ export default function CatalogSidebar({
                             type="button"
                             className={clsx(
                                 s.typeBtn,
-                                isRawPage ? s.typeBtnActive : s.typeBtnOutline
+                                isRawActive ? s.typeBtnActive : s.typeBtnOutline
                             )}
                             onClick={() => handleToggle('raw')}
                         >
@@ -368,7 +370,7 @@ export default function CatalogSidebar({
                             type="button"
                             className={clsx(
                                 s.typeBtn,
-                                !isRawPage ? s.typeBtnActive : s.typeBtnOutline
+                                isCookedActive ? s.typeBtnActive : s.typeBtnOutline
                             )}
                             onClick={() => handleToggle('cooked')}
                         >

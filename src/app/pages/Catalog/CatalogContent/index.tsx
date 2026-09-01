@@ -206,6 +206,7 @@ export default async function CatalogContent({
                             lang={lang}
                             sort={currentSort}
                             activeFilters={activeFilters}
+                            hasMixedRawProduction={hasMixedRawProduction}
                         />
                     </div>
                 </div>

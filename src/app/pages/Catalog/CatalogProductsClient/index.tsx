@@ -13,6 +13,7 @@ import s from "../CatalogContent/CatalogContent.module.scss";
 import Pagination from "@/app/components/ui/Pagination/Pagination";
 import { useAppSelector } from "@/store/hooks";
 import { stripHtml } from "@/utils/strip-html";
+import { parseRawProductionParam } from "@/utils/filter-params";
 
 interface CatalogProductsClientProps {
     initialProducts: ProductsResponse;
@@ -21,6 +22,7 @@ interface CatalogProductsClientProps {
     lang: Locale;
     sort?: string;
     activeFilters?: FilterStateInput[];
+    hasMixedRawProduction?: boolean;
 }
 
 export default function CatalogProductsClient({
@@ -30,6 +32,7 @@ export default function CatalogProductsClient({
     lang,
     sort,
     activeFilters,
+    hasMixedRawProduction,
 }: CatalogProductsClientProps) {
     const [products, setProducts] = useState<Product[]>(initialProducts.data);
     const [currentPage, setCurrentPage] = useState(initialProducts.current_page);
@@ -94,12 +97,15 @@ export default function CatalogProductsClient({
 
         try {
             const nextPage = currentPage + 1;
+            const currentSearchParams = new URLSearchParams(window.location.search);
+            const rawProduction = parseRawProductionParam(currentSearchParams) ?? (hasMixedRawProduction ? false : undefined);
             const newProductsRes = await getProductsApi({
                 categoryId,
                 limit: 12,
                 page: nextPage,
                 sort,
                 filter: activeFilters && activeFilters.length > 0 ? activeFilters : undefined,
+                rawProduction,
             }, lang, token);
 
             setProducts((prev) => [...prev, ...newProductsRes.data]);

@@ -4,6 +4,7 @@ import CatalogContent from '@/app/pages/Catalog/CatalogContent';
 import { getCatalogTreeApi, getProductsApi, ProductsResponse, ProductCategory } from '@/lib/graphql';
 import { getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
+import { parseRawProductionParam } from '@/utils/filter-params';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { getAccessToken } from '@/app/actions/authActions';
@@ -53,6 +54,7 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
     const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page as string) : 1;
     const view = (resolvedSearchParams.view as 'list' | 'grid') || 'grid';
     const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
+    const rawProduction = parseRawProductionParam(resolvedSearchParams as Record<string, string | string[] | undefined>);
 
     // Завантажуємо дерево категорій та товари паралельно
     const token = await getAccessToken();
@@ -71,7 +73,7 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
                 console.error("[CatalogPage] Failed to fetch catalog tree:", err);
                 return [] as ProductCategory[];
             }),
-            getProductsApi({ limit: 12, page, sort }, lang, token ?? undefined).catch((err) => {
+            getProductsApi({ limit: 12, page, sort, rawProduction }, lang, token ?? undefined).catch((err) => {
                 console.error("[CatalogPage] Failed to fetch products:", err);
                 return null;
             }),

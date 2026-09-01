@@ -16,7 +16,7 @@ import {
     ProductsResponse,
 } from '@/lib/graphql';
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
-import { parseFilterParams } from '@/utils/filter-params';
+import { parseFilterParams, parseRawProductionParam } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
 import { getHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
 
@@ -125,12 +125,17 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
         const view = (resolvedSearchParams.view as 'list' | 'grid') || 'grid';
         const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
         const activeFilters = parseFilterParams(resolvedSearchParams as Record<string, string | string[] | undefined>);
-
         const categoryId = parseInt(categoryEntry.node.id);
+        const hasMixedRawProduction = Boolean(categoryEntry.node.hasMixedRawProduction);
+
+        let rawProduction = parseRawProductionParam(resolvedSearchParams as Record<string, string | string[] | undefined>);
+        if (rawProduction === undefined && hasMixedRawProduction) {
+            rawProduction = false;
+        }
 
         const [productsResponse, popularProducts, categoryDetails] = await Promise.all([
             getProductsApi(
-                { categoryId, limit: 12, page, sort, filter: activeFilters },
+                { categoryId, limit: 12, page, sort, filter: activeFilters, rawProduction },
                 lang,
                 token ?? undefined,
             ).catch((err) => {

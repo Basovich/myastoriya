@@ -308,6 +308,7 @@ export interface ProductsFilter {
     page?: number | null;
     sort?: string | null;
     filter?: FilterStateInput[] | null;
+    rawProduction?: boolean | null;
     /** Suppress console error logging for expected failures */
     silent?: boolean;
 }
@@ -330,8 +331,8 @@ const ADD_PRODUCT_VIEW_MUTATION = /* GraphQL */ `
 `;
 
 const PRODUCTS_QUERY = /* GraphQL */ `
-    query Products($categoryId: Int, $showcaseId: Int, $saleId: Int, $search: String, $filter: [FilterState], $limit: Int, $page: Int, $sort: String) {
-        products(categoryId: $categoryId, showcaseId: $showcaseId, saleId: $saleId, search: $search, filter: $filter, limit: $limit, page: $page, sort: $sort) {
+    query Products($categoryId: Int, $showcaseId: Int, $saleId: Int, $search: String, $filter: [FilterState], $rawProduction: Boolean, $limit: Int, $page: Int, $sort: String) {
+        products(categoryId: $categoryId, showcaseId: $showcaseId, saleId: $saleId, search: $search, filter: $filter, rawProduction: $rawProduction, limit: $limit, page: $page, sort: $sort) {
             per_page
             current_page
             has_more_pages
@@ -881,6 +882,7 @@ export async function getProductsApi(filter?: ProductsFilter, lang?: string, tok
             saleId: filter?.saleId ?? undefined,
             search: filter?.search || undefined,
             filter: filterInput ?? undefined,
+            rawProduction: filter?.rawProduction ?? undefined,
             limit: filter?.limit ?? undefined,
             page: filter?.page ?? undefined,
             sort: sortedValue ?? undefined,
@@ -1169,6 +1171,7 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
             id
             name
             slug
+            hasMixedRawProduction
             menuIcon {
                 icon1x
                 icon2x
@@ -1202,6 +1205,7 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                 id
                 name
                 slug
+                hasMixedRawProduction
                 menuIcon {
                     icon1x
                     icon2x
@@ -1235,6 +1239,7 @@ const CATEGORY_TREE_QUERY = /* GraphQL */ `
                     id
                     name
                     slug
+                    hasMixedRawProduction
                     image {
                         square1x
                         square2x

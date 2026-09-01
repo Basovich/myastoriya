@@ -42,6 +42,7 @@ export function parseFilterParams(
 
     for (const key of getAllKeys()) {
         if (!key.startsWith(PARAM_PREFIX)) continue;
+        if (key === 'filter_meat_type') continue;
         const rest = key.slice(PARAM_PREFIX.length);
         const raw = getParam(key);
         if (!raw) continue;
@@ -176,4 +177,27 @@ export function setFilterValue(
 /** Видаляє FilterStateInput для ключа з масиву (immutable). */
 export function removeFilter(filters: FilterStateInput[], blockKey: string): FilterStateInput[] {
     return filters.filter(f => f.key !== blockKey);
+}
+
+/**
+ * Парсить параметр `filter_meat_type` або `rawProduction` з searchParams:
+ * - 'raw' або 'true' -> true (сира продукція)
+ * - 'cooked' або 'false' -> false (готова продукція)
+ * - інакше -> undefined (всі товари)
+ */
+export function parseRawProductionParam(
+    searchParams: URLSearchParams | Record<string, string | string[] | undefined>,
+): boolean | undefined {
+    const getParam = (key: string): string | null => {
+        if (searchParams instanceof URLSearchParams) {
+            return searchParams.get(key);
+        }
+        const val = searchParams[key];
+        return Array.isArray(val) ? (val[0] ?? null) : (val ?? null);
+    };
+
+    const val = getParam('filter_meat_type') ?? getParam('rawProduction');
+    if (val === 'raw' || val === 'true') return true;
+    if (val === 'cooked' || val === 'false') return false;
+    return undefined;
 }
