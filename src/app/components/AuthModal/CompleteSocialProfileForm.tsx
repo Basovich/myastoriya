@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import clsx from 'clsx';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import { sendSmsApi, smsVerifyApi, updateUserDataApi } from '@/lib/graphql/queries/auth';
@@ -13,8 +14,8 @@ import { usePhoneMask } from '@/hooks/usePhoneMask';
 import s from './AuthModal.module.scss';
 import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
-import clsx from 'clsx';
 import { PHONE_REGEX } from '@/lib/utils/phone';
+import * as Sentry from '@sentry/nextjs';
 
 const COUNTDOWN_SECONDS = 60;
 
@@ -96,7 +97,11 @@ export default function CompleteSocialProfileForm({ googleProfile, onSuccess, on
         onSubmit: async (values, { setStatus }) => {
             try {
                 const token = storeToken;
-                if (!token) throw new Error('Unauthorized');
+                if (!token) {
+                    const err = new Error('Unauthorized');
+                    Sentry.captureException(err, { tags: { category: 'auth', action: 'complete_social_profile_unauthorized' } });
+                    throw err;
+                }
 
                 const updatedUser = await updateUserDataApi({
                     name: values.name,
@@ -120,6 +125,9 @@ export default function CompleteSocialProfileForm({ googleProfile, onSuccess, on
                 }));
                 onSuccess();
             } catch (err) {
+                Sentry.captureException(err, {
+                    tags: { category: 'auth', action: 'complete_social_profile' },
+                });
                 setStatus(err instanceof Error ? err.message : 'Помилка збереження даних');
             }
         },

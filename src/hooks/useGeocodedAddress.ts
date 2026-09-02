@@ -110,7 +110,11 @@ export function useGeocodedAddress(
         let isMounted = true;
         fetch(url)
             .then((res) => {
-                if (!res.ok) throw new Error('Network response not OK');
+                if (!res.ok) {
+                    const err = new Error('Network response not OK');
+                    Sentry.captureException(err, { tags: { category: 'geocode', action: 'reverse_geocode' } });
+                    throw err;
+                }
                 return res.json();
             })
             .then((data) => {

@@ -264,18 +264,19 @@ export async function gqlRequest<T>(
             return gqlRequest(query, variables, { ...options, _retryCount: nextRetry });
         }
 
-        // Final attempt failed - report to Sentry before crashing the build
-        if (isServer) {
+        // Final attempt failed - report to Sentry before crashing/throwing
+        if (!options?.silent) {
             try {
                 void import("@sentry/nextjs").then((Sentry) => {
                     Sentry.captureException(err, {
                         tags: { 
                             component: 'gqlRequest',
                             query: query.split('{')[0].trim() || 'unknown',
+                            environment: isServer ? 'server' : 'client',
                         },
                         extra: { variables, options }
                     });
-                    void Sentry.flush(2000).catch(() => {});
+                    if (isServer) void Sentry.flush(2000).catch(() => {});
                 }).catch(() => {});
             } catch {
                 // Ignore sentry import errors during build/static rendering

@@ -56,6 +56,7 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
                             await clearAuthCookies();
                             return await socialAuthApi('google', googleAccessToken, devId, undefined, undefined);
                         }
+                        Sentry.captureException(err, { tags: { category: 'auth', action: 'google_auth_retry' } });
                         throw err;
                     }
                 };

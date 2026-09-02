@@ -568,7 +568,9 @@ export default function Step3({ lang }: Step3Props) {
 
             const requestGooglePayToken = async (totalAmount: number, currency: string): Promise<string> => {
                 if (typeof window === 'undefined' || !('PaymentRequest' in window)) {
-                    throw new Error(lang === 'ua' ? 'Google Pay не підтримується цим браузером' : 'Google Pay не поддерживается этим браузером');
+                    const err = new Error(lang === 'ua' ? 'Google Pay не підтримується цим браузером' : 'Google Pay не поддерживается этим браузером');
+                    Sentry.captureException(err, { tags: { category: 'checkout', action: 'gpay_support' } });
+                    throw err;
                 }
 
                 const paymentDataData = {
@@ -614,7 +616,7 @@ export default function Step3({ lang }: Step3Props) {
                 try {
                     const canPay = await request.canMakePayment();
                     if (!canPay) {
-                        throw new Error(lang === 'ua' ? 'Google Pay не налаштовано або недоступний' : 'Google Pay не настроен или недоступен');
+                        console.warn('Google Pay canMakePayment returned false');
                     }
                 } catch (e) {
                     console.warn('canMakePayment check failed or returned false', e);
@@ -629,7 +631,9 @@ export default function Step3({ lang }: Step3Props) {
 
                     await paymentResponse.complete('success');
                     if (!tokenData) {
-                        throw new Error(lang === 'ua' ? 'Не вдалося отримати токен Google Pay' : 'Не удалось получить токен Google Pay');
+                        const err = new Error(lang === 'ua' ? 'Не вдалося отримати токен Google Pay' : 'Не удалось получить токен Google Pay');
+                        Sentry.captureException(err, { tags: { category: 'checkout', action: 'gpay_empty_token' } });
+                        throw err;
                     }
                     return typeof tokenData === 'string' ? tokenData : JSON.stringify(tokenData);
                 } catch (e: unknown) {
@@ -639,6 +643,7 @@ export default function Step3({ lang }: Step3Props) {
                         cancelErr.name = 'USER_CANCELLED';
                         throw cancelErr;
                     }
+                    Sentry.captureException(e, { tags: { category: 'checkout', action: 'gpay_show' } });
                     throw e;
                 }
             };
@@ -676,7 +681,12 @@ export default function Step3({ lang }: Step3Props) {
                             : 'Оплата отменена. Вы можете попробовать оплатить еще раз.');
                         return;
                     }
-                    throw payErr;
+                    Sentry.captureException(payErr, {
+                        tags: { category: 'checkout', action: 'google_pay_payment' },
+                    });
+                    const msg = payErr instanceof Error ? payErr.message : (lang === 'ru' ? 'Ошибка при оплате заказа. Попробуйте еще раз.' : 'Помилка при оплаті замовлення. Спробуйте ще раз.');
+                    setSubmitError(msg);
+                    return;
                 }
             } else if (res.url) {
                 // Будь-який action з url (redirect / authenticate / confirm) — редірект на платіжний шлюз

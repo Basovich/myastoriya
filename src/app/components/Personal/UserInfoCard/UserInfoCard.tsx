@@ -7,6 +7,7 @@ import { updateUserAvatarApi, resolveAvatarUrl } from '@/lib/graphql/queries/aut
 import { getAccessToken } from '@/app/actions/authActions';
 import s from './UserInfoCard.module.scss';
 import { AuthUser } from '@/store/slices/authSlice';
+import * as Sentry from '@sentry/nextjs';
 
 interface UserInfoCardProps {
     user: AuthUser | null;
@@ -49,7 +50,11 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
         try {
             setIsUploading(true);
             const token = await getAccessToken();
-            if (!token) throw new Error('Unauthorized');
+            if (!token) {
+                const err = new Error('Unauthorized');
+                Sentry.captureException(err, { tags: { category: 'profile', action: 'update_avatar_unauthorized' } });
+                throw err;
+            }
 
             const updatedUser = await updateUserAvatarApi(file, token);
             
@@ -60,6 +65,9 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
             }));
         } catch (error) {
             console.error('Failed to update avatar:', error);
+            Sentry.captureException(error, {
+                tags: { category: 'profile', action: 'update_avatar' },
+            });
             alert('Помилка при завантаженні фото');
         } finally {
             setIsUploading(false);

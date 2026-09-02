@@ -40,7 +40,7 @@ interface ThanksPageProps {
     isOnline?: boolean;
 }
 
-export default function ThanksPage({ lang, orderId, isOnline }: ThanksPageProps) {
+export default function ThanksPage({ lang, orderId }: ThanksPageProps) {
     const dispatch = useAppDispatch();
     const t = translations[lang] || translations.ua;
     // const [copied, setCopied] = useState(false);
