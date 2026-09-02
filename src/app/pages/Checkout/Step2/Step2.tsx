@@ -47,6 +47,20 @@ interface Address {
     title: string;
     street: string;
     city?: string;
+    lat?: number;
+    lng?: number;
+}
+
+function getDistanceFromLatLonInMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371e3; // Radius of the earth in meters
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
 }
 
 function formatDeliveryTimesDate(date: Date): string {
@@ -130,6 +144,7 @@ export default function Step2() {
     const [isAddPickupModalOpen, setIsAddPickupModalOpen] = useState(false);
     const [isAddNPModalOpen, setIsAddNPModalOpen] = useState(false);
     const [selectedNPRef, setSelectedNPRef] = useState<string>('');
+    const [addressCoordsMap, setAddressCoordsMap] = useState<Record<string, { lat: number; lng: number }>>({});
 
     const prevCityIdRef = useRef<number | null>(null);
     const hasAutoAppliedDefaultShopRef = useRef(false);
@@ -503,8 +518,18 @@ export default function Step2() {
 
     // Stale localStorage logic removed - promo code is synced via Redux/API
 
+    const selectedDelivery = React.useMemo(() => {
+        return deliveries.find(d => d?.id === deliveryMethod);
+    }, [deliveries, deliveryMethod]);
+
+    const activeDelivery = React.useMemo(() => {
+        const found = deliveries.find(d => d?.id === deliveryMethod);
+        if (found && !found.disabled) return found;
+        return undefined;
+    }, [deliveries, deliveryMethod]);
+
     // Address list mapping
-    const formattedDbAddresses = React.useMemo(() => {
+    const formattedDbAddresses = React.useMemo((): Address[] => {
         if (!checkoutCity) return [];
 
         const filtered = dbAddresses.filter(addr => {
@@ -546,7 +571,7 @@ export default function Step2() {
         });
     }, [dbAddresses, lang, checkoutCity]);
 
-    const filteredGuestAddresses = React.useMemo(() => {
+    const filteredGuestAddresses = React.useMemo((): Address[] => {
         if (!checkoutCity) return [];
         return guestAddresses.filter(addr => {
             const addrCity = addr.city || '';
@@ -559,21 +584,78 @@ export default function Step2() {
         });
     }, [guestAddresses, checkoutCity]);
 
-    const addresses = React.useMemo(() => {
+    const addresses = React.useMemo((): Address[] => {
         return [...formattedDbAddresses, ...filteredGuestAddresses];
     }, [formattedDbAddresses, filteredGuestAddresses]);
 
+    const is500mDelivery = React.useMemo(() => {
+        if (!selectedDelivery?.name) return false;
+        const name = selectedDelivery.name.toLowerCase();
+        return name.includes('500') || (name.includes('радіус') && name.includes('500'));
+    }, [selectedDelivery]);
+
+    useEffect(() => {
+        if (!is500mDelivery || addresses.length === 0) return;
+        if (typeof window === 'undefined' || !window.google || !window.google.maps) return;
+
+        const geocoder = new window.google.maps.Geocoder();
+
+        addresses.forEach(addr => {
+            if (addr.lat && addr.lng) {
+                setAddressCoordsMap(prev => {
+                    if (prev[addr.id]) return prev;
+                    return { ...prev, [addr.id]: { lat: addr.lat!, lng: addr.lng! } };
+                });
+                return;
+            }
+
+            if (!addressCoordsMap[addr.id]) {
+                const queryStr = `${addr.street}, ${addr.city || checkoutCity?.name || 'Київ'}, Україна`;
+                geocoder.geocode({ address: queryStr }, (results, status) => {
+                    if (status === 'OK' && results?.[0]?.geometry?.location) {
+                        const loc = results[0].geometry.location;
+                        const coords = { lat: loc.lat(), lng: loc.lng() };
+                        setAddressCoordsMap(prev => ({ ...prev, [addr.id]: coords }));
+                    }
+                });
+            }
+        });
+    }, [is500mDelivery, addresses, addressCoordsMap, checkoutCity]);
+
+    const displayAddresses = React.useMemo(() => {
+        if (!is500mDelivery) return addresses;
+        if (shops.length === 0) return addresses;
+
+        const validShops = shops.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+        if (validShops.length === 0) return addresses;
+
+        return addresses.filter(addr => {
+            const coords = (typeof addr.lat === 'number' && typeof addr.lng === 'number') 
+                ? { lat: addr.lat, lng: addr.lng } 
+                : addressCoordsMap[addr.id];
+
+            if (!coords) {
+                return true;
+            }
+
+            return validShops.some(shop => {
+                const dist = getDistanceFromLatLonInMeters(coords.lat, coords.lng, shop.lat!, shop.lng!);
+                return dist <= 500;
+            });
+        });
+    }, [addresses, is500mDelivery, shops, addressCoordsMap]);
+
     // Set default selected address
     useEffect(() => {
-        if (addresses.length > 0) {
-            const exists = addresses.some(addr => addr.id === selectedAddressId);
+        if (displayAddresses.length > 0) {
+            const exists = displayAddresses.some(addr => addr.id === selectedAddressId);
             if (!exists) {
-                setSelectedAddressId(addresses[0].id);
+                setSelectedAddressId(displayAddresses[0].id);
             }
         } else {
             setSelectedAddressId('');
         }
-    }, [addresses, selectedAddressId]);
+    }, [displayAddresses, selectedAddressId]);
 
     const pickupPoints = React.useMemo(() => {
         const sortedUserPoints = [...userPickupPoints]
@@ -679,16 +761,6 @@ export default function Step2() {
             }
         }
     }, [restoredData, shops, pickupPoints]);
-
-    const selectedDelivery = React.useMemo(() => {
-        return deliveries.find(d => d?.id === deliveryMethod);
-    }, [deliveries, deliveryMethod]);
-
-    const activeDelivery = React.useMemo(() => {
-        const found = deliveries.find(d => d?.id === deliveryMethod);
-        if (found && !found.disabled) return found;
-        return undefined;
-    }, [deliveries, deliveryMethod]);
 
     const isCourier = selectedDelivery?.type === 'courier';
     const isNP = selectedDelivery?.driver === 'nova-poshta-postal';
@@ -1155,7 +1227,7 @@ export default function Step2() {
                                     {(hydrated && isSelected && isMethodCourier) && (
                                         <div className={s.nestedAddressRow}>
                                             <AddressRow 
-                                                addresses={addresses}
+                                                addresses={displayAddresses}
                                                 selectedAddressId={selectedAddressId}
                                                 onSelect={setSelectedAddressId}
                                                 onAddClick={() => setIsAddAddressModalOpen(true)}
@@ -1310,6 +1382,8 @@ export default function Step2() {
                 onClose={() => setIsAddAddressModalOpen(false)} 
                 initialCity={checkoutCity ? { id: checkoutCity.id, name: checkoutCity.name } : null}
                 onAdd={handleAddAddress}
+                is500mDelivery={is500mDelivery}
+                shops={shops}
             />
             <AddPickupModal 
                 isOpen={isAddPickupModalOpen}

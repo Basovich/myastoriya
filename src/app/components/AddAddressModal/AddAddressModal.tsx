@@ -20,6 +20,8 @@ interface AddAddressModalProps {
     isOpen: boolean;
     onClose: () => void;
     initialCity?: { id: number; name: string } | null;
+    is500mDelivery?: boolean;
+    shops?: Array<{ lat?: number | null; lng?: number | null }>;
     onAdd: (address: {
         id: string;
         title: string;
@@ -31,7 +33,21 @@ interface AddAddressModalProps {
         entrance?: string;
         floor?: string;
         fullAddress?: string;
+        lat?: number;
+        lng?: number;
     }) => void;
+}
+
+function getDistanceFromLatLonInMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371e3;
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
 }
 
 const modalDict = {
@@ -54,6 +70,7 @@ const modalDict = {
         coordinates: 'Координати',
         myAddress: 'Моя адреса',
         selectedOnMapTitle: 'Вибрана на карті',
+        outOfRadiusError: 'Дана адреса знаходиться поза межами радіусу 500 м від ресторану М’ясторія',
         fullAddressPattern: (street: string, house: string, apartment?: string) => 
             `вул. ${street}, буд. ${house}${apartment ? `, кв. ${apartment}` : ''}`
     },
@@ -76,6 +93,7 @@ const modalDict = {
         coordinates: 'Координаты',
         myAddress: 'Мой адрес',
         selectedOnMapTitle: 'Выбранный на карте',
+        outOfRadiusError: 'Данный адрес находится за пределами радиуса 500 м от ресторана Мястория',
         fullAddressPattern: (street: string, house: string, apartment?: string) => 
             `ул. ${street}, дом ${house}${apartment ? `, кв. ${apartment}` : ''}`
     }
@@ -91,7 +109,7 @@ const DEFAULT_CENTER = {
     lng: 30.5234
 };
 
-export default function AddAddressModal({ isOpen, onClose, initialCity, onAdd }: AddAddressModalProps) {
+export default function AddAddressModal({ isOpen, onClose, initialCity, is500mDelivery, shops, onAdd }: AddAddressModalProps) {
     const params = useParams();
     const lang = (params?.lang as Locale) || 'ua';
     const dict = modalDict[lang === 'ru' ? 'ru' : 'ua'];
@@ -151,20 +169,54 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, onAdd }:
         }
     }, [isOpen, disableScroll, enableScroll]);
 
-    // Geocode selected city to center the map
+    const [radiusError, setRadiusError] = useState<string | null>(null);
+
+    const checkAddressRadius = useCallback((lat: number, lng: number): boolean => {
+        if (!is500mDelivery || !shops || shops.length === 0) {
+            setRadiusError(null);
+            return true;
+        }
+        const validShops = shops.filter(s => typeof s.lat === 'number' && typeof s.lng === 'number');
+        if (validShops.length === 0) {
+            setRadiusError(null);
+            return true;
+        }
+
+        const isWithin = validShops.some(s => {
+            const dist = getDistanceFromLatLonInMeters(lat, lng, s.lat!, s.lng!);
+            return dist <= 500;
+        });
+
+        if (!isWithin) {
+            setRadiusError(dict.outOfRadiusError);
+            return false;
+        } else {
+            setRadiusError(null);
+            return true;
+        }
+    }, [is500mDelivery, shops, dict.outOfRadiusError]);
+
+    // Check radius when street and house are selected in form view
     useEffect(() => {
-        if (!isOpen || !isLoaded || !initialCity) return;
+        if (!isOpen || !is500mDelivery || !street || !house || !isLoaded) {
+            if (!is500mDelivery) setRadiusError(null);
+            return;
+        }
+
         const geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode(
-            { address: `${initialCity.name}, Україна` },
-            (results, status) => {
+        const queryStr = `${street}, буд. ${house}, ${city || 'м. Київ'}, Україна`;
+
+        const timer = setTimeout(() => {
+            geocoder.geocode({ address: queryStr }, (results, status) => {
                 if (status === 'OK' && results?.[0]?.geometry?.location) {
                     const loc = results[0].geometry.location;
-                    setMapCenter({ lat: loc.lat(), lng: loc.lng() });
+                    checkAddressRadius(loc.lat(), loc.lng());
                 }
-            }
-        );
-    }, [isOpen, isLoaded, initialCity]);
+            });
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [isOpen, is500mDelivery, street, house, city, isLoaded, checkAddressRadius]);
 
     const handleClose = () => {
         onClose();
@@ -199,7 +251,9 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, onAdd }:
             apartment,
             entrance,
             floor,
-            fullAddress
+            fullAddress,
+            lat: mapMarker?.lat,
+            lng: mapMarker?.lng
         });
         handleClose();
     };
@@ -352,8 +406,9 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, onAdd }:
             const pos = { lat, lng };
             setMapMarker(pos);
             geocodePosition(pos);
+            checkAddressRadius(lat, lng);
         }
-    }, [geocodePosition]);
+    }, [geocodePosition, checkAddressRadius]);
 
     const onAutocompleteLoad = (autocomplete: google.maps.places.Autocomplete) => {
         autocompleteRef.current = autocomplete;
@@ -369,6 +424,7 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, onAdd }:
                 const newPos = { lat, lng };
                 
                 setMapMarker(newPos);
+                checkAddressRadius(lat, lng);
                 if (map) {
                     map.panTo(newPos);
                     map.setZoom(16);
@@ -483,11 +539,16 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, onAdd }:
                                     disabled={!street}
                                 />
                             </div>
+                            {radiusError && (
+                                <div className={s.errorWarning}>
+                                    {radiusError}
+                                </div>
+                            )}
                             <Button 
                                 variant="red" 
                                 type="submit" 
                                 className={s.submitBtn} 
-                                disabled={!street || !house}
+                                disabled={!street || !house || !!radiusError}
                             >
                                 {lang === 'ua' ? 'ДОДАТИ АДРЕСУ' : 'ДОБАВИТЬ АДРЕС'}
                             </Button>
@@ -562,11 +623,16 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, onAdd }:
                                     variant="red" 
                                     className={s.confirmBtn}
                                     onClick={handleMapConfirm}
-                                    disabled={!mapMarker || !parsedAddress?.street}
+                                    disabled={!mapMarker || !parsedAddress?.street || !!radiusError}
                                 >
                                     {dict.confirmBtn}
                                 </Button>
                             </div>
+                            {radiusError && (
+                                <div className={s.errorWarning}>
+                                    {radiusError}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
