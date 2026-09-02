@@ -125,6 +125,9 @@ async function initAuth(dispatch: ReturnType<typeof useAppDispatch>) {
 
     } catch (err) {
         console.warn('[AuthInitializer] Unexpected error during auth init:', err);
+        Sentry.captureException(err, {
+            tags: { category: 'auth', action: 'init_auth' },
+        });
         // Ensure we clear any stale rehydrated state
         dispatch(loginAsGuest());
         dispatch(setInitialized(true));
@@ -171,10 +174,16 @@ async function startGuestSession(dispatch: ReturnType<typeof useAppDispatch>) {
                 await selectLocalityApi(selectedCity.id, undefined, result.accessToken);
             } catch (cityErr) {
                 console.warn('[AuthInitializer] Failed to sync selected city to new guest session:', cityErr);
+                Sentry.captureException(cityErr, {
+                    tags: { category: 'auth', action: 'sync_locality_guest' },
+                });
             }
         }
     } catch (err) {
         console.warn('[AuthInitializer] Guest auth failed:', err);
+        Sentry.captureException(err, {
+            tags: { category: 'auth', action: 'guest_auth' },
+        });
         dispatch(loginAsGuest());
         dispatch(setInitialized(true));
     }

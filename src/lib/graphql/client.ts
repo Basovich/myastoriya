@@ -210,6 +210,13 @@ export async function gqlRequest<T>(
                                 return freshToken;
                             } catch (refreshErr) {
                                 console.error('[GQL Interceptor] Automatic token refresh failed:', refreshErr);
+                                if (!isServer) {
+                                    void import('@sentry/nextjs').then((Sentry) => {
+                                        Sentry.captureException(refreshErr, {
+                                            tags: { category: 'auth', action: 'auto_token_refresh' },
+                                        });
+                                    }).catch(() => {});
+                                }
                                 return null;
                             } finally {
                                 activeRefreshPromise = null;
@@ -228,6 +235,13 @@ export async function gqlRequest<T>(
                     }
                 } catch (refreshErr) {
                     console.error('[GQL Interceptor] Error waiting for token refresh:', refreshErr);
+                    if (!isServer) {
+                        void import('@sentry/nextjs').then((Sentry) => {
+                            Sentry.captureException(refreshErr, {
+                                tags: { category: 'auth', action: 'token_refresh_wait' },
+                            });
+                        }).catch(() => {});
+                    }
                 }
             }
         }

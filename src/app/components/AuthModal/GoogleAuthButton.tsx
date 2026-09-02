@@ -9,6 +9,7 @@ import { socialAuthApi, authAsGuestApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies, clearAuthCookies } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
 import { GraphQLError } from '@/lib/graphql/client';
+import * as Sentry from '@sentry/nextjs';
 import s from './GoogleAuthButton.module.scss';
 
 interface GoogleAuthButtonProps {
@@ -96,6 +97,9 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
                 }
             } catch (error) {
                 console.error('Backend Google Auth Error:', error);
+                Sentry.captureException(error, {
+                    tags: { category: 'auth', action: 'google_auth' },
+                });
                 if (error instanceof GraphQLError) {
                     // Відома помилка з бекенду — показуємо повідомлення
                     setError('Помилка авторизації через Google. Спробуйте пізніше або оберіть інший спосіб входу.');
@@ -108,6 +112,9 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
         },
         onError: (error) => {
             console.error('Google Login Failed:', error);
+            Sentry.captureException(error, {
+                tags: { category: 'auth', action: 'google_oauth_popup_error' },
+            });
             setError('Не вдалося відкрити вікно Google. Перевірте налаштування браузера.');
             setIsLoading(false);
         },

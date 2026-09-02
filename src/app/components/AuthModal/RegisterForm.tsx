@@ -11,6 +11,7 @@ import { setAuthCookies } from '@/app/actions/authActions';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
 import { GraphQLError } from '@/lib/graphql/client';
+import * as Sentry from '@sentry/nextjs';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 import Button from '@/app/components/ui/Button/Button';
@@ -137,6 +138,9 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
                 );
                 onSuccess();
             } catch (err) {
+                Sentry.captureException(err, {
+                    tags: { category: 'auth', action: 'register' },
+                });
                 let errorMessage = 'Помилка реєстрації';
 
                 if (err instanceof GraphQLError && err.errors.length > 0) {
@@ -220,6 +224,9 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
             setSmsCode('');
             startCountdown();
         } catch (err) {
+            Sentry.captureException(err, {
+                tags: { category: 'auth', action: 'send_sms' },
+            });
             const msg = err instanceof Error ? err.message : 'Помилка відправки SMS';
             setSmsError(msg);
         } finally {
@@ -247,6 +254,9 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
             setSmsCode('');
             formik.setFieldTouched('phone', true, true);
         } catch (err) {
+            Sentry.captureException(err, {
+                tags: { category: 'auth', action: 'verify_sms' },
+            });
             const msg = err instanceof Error ? err.message : 'Невірний код. Спробуйте ще раз.';
             setSmsError(msg);
             setSmsCode('');

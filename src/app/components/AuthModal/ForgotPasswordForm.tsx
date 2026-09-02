@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import { sendSmsApi, smsVerifyApi } from '@/lib/graphql/queries/auth';
+import * as Sentry from '@sentry/nextjs';
 import s from './AuthModal.module.scss';
 import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
@@ -114,6 +115,9 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
             setSmsCode('');
             startCountdown();
         } catch (err) {
+            Sentry.captureException(err, {
+                tags: { category: 'auth', action: 'forgot_password_send_sms' },
+            });
             const msg = err instanceof Error ? err.message : 'Помилка відправки SMS';
             setSmsError(msg);
         } finally {
@@ -138,6 +142,9 @@ export default function ForgotPasswordForm({ onVerified, onBack }: ForgotPasswor
             // Immediately proceed — pass phone + actionToken to parent
             onVerified(phone, result.token);
         } catch (err) {
+            Sentry.captureException(err, {
+                tags: { category: 'auth', action: 'forgot_password_verify_sms' },
+            });
             const msg = err instanceof Error ? err.message : 'Невірний код. Спробуйте ще раз.';
             setSmsError(msg);
             setSmsCode('');

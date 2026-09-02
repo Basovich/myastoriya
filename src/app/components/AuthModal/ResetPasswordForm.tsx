@@ -7,6 +7,7 @@ import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
 import { resetPasswordApi, loginApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies } from '@/app/actions/authActions';
+import * as Sentry from '@sentry/nextjs';
 import s from './AuthModal.module.scss';
 import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
@@ -59,6 +60,9 @@ export default function ResetPasswordForm({ phone, actionToken, onSuccess, onBac
                 );
                 onSuccess();
             } catch (err) {
+                Sentry.captureException(err, {
+                    tags: { category: 'auth', action: 'reset_password' },
+                });
                 const msg = err instanceof Error ? err.message : 'Помилка скидання паролю';
                 setStatus(msg);
             }

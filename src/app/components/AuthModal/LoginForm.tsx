@@ -9,6 +9,7 @@ import { loginApi, checkUserPhoneApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies } from '@/app/actions/authActions';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import { GraphQLError } from '@/lib/graphql/client';
+import * as Sentry from '@sentry/nextjs';
 import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 import Button from '@/app/components/ui/Button/Button';
@@ -93,6 +94,9 @@ export default function LoginForm({ onSwitchToRegister, onForgotPassword, onInco
                         return;
                     }
                 }
+                Sentry.captureException(err, {
+                    tags: { category: 'auth', action: 'login' },
+                });
                 const errorDict = authErrors[lang as keyof typeof authErrors] || authErrors.ua;
                 const errorMessage = err instanceof Error ? err.message : errorDict.generic;
                 setStatus(errorMessage);

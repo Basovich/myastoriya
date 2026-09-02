@@ -12,6 +12,7 @@ import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalConte
 import PersonalPageHeader from '@/app/components/Personal/Shared/PersonalPageHeader';
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
 import { useLogout } from '@/hooks/useLogout';
+import * as Sentry from '@sentry/nextjs';
 import s from './ChangePassword.module.scss';
 
 const changePasswordDict = {
@@ -98,6 +99,9 @@ export default function ChangePasswordPage() {
             });
         } catch (error) {
             console.error('Change password error:', error);
+            Sentry.captureException(error, {
+                tags: { category: 'auth', action: 'change_password' },
+            });
             setSubmitStatus({
                 type: 'error',
                 message: dict.error

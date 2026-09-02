@@ -56,6 +56,8 @@ export async function getRefreshToken(): Promise<string | null> {
  * If successful, updates cookies and returns the new access token.
  * Returns null if refresh token is missing or refresh fails.
  */
+import * as Sentry from '@sentry/nextjs';
+
 export async function tryRefreshTokenAction(): Promise<string | null> {
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get(REFRESH_TOKEN_KEY)?.value;
@@ -73,6 +75,11 @@ export async function tryRefreshTokenAction(): Promise<string | null> {
         if (isAuthError) {
             cookieStore.delete(ACCESS_TOKEN_KEY);
             cookieStore.delete(REFRESH_TOKEN_KEY);
+        } else {
+            // Log unexpected refresh token failures to Sentry
+            Sentry.captureException(err, {
+                tags: { category: 'auth', action: 'refresh_token_action' },
+            });
         }
         return null;
     }
@@ -83,9 +90,16 @@ export async function tryRefreshTokenAction(): Promise<string | null> {
  * Returns the new guest access token.
  */
 export async function initializeGuestSessionAction(deviceId: string): Promise<string> {
-    const result = await authAsGuestApi(deviceId);
-    await setAuthCookies(result.accessToken, result.refreshToken);
-    return result.accessToken;
+    try {
+        const result = await authAsGuestApi(deviceId);
+        await setAuthCookies(result.accessToken, result.refreshToken);
+        return result.accessToken;
+    } catch (err) {
+        Sentry.captureException(err, {
+            tags: { category: 'auth', action: 'initialize_guest_session_action' },
+        });
+        throw err;
+    }
 }
 
 /**
