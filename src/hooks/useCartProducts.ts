@@ -173,7 +173,6 @@ function calculateUnitPrice(price: number, weightStr: string, unitStr: string | 
 
 export function useCartProducts() {
     const cartItems = useAppSelector(state => state.cart.items);
-    const { isInitialized } = useAppSelector(state => state.auth);
     const dispatch = useAppDispatch();
     const [cacheVersion, setCacheVersion] = useState(0);
     const params = useParams();
@@ -190,7 +189,6 @@ export function useCartProducts() {
     }, []);
 
     useEffect(() => {
-        if (!isInitialized) return;
         if (globalSpecialsCache === null && !pendingSpecialsRequest) {
             const fallbackTimer = setTimeout(() => {
                 if (globalSpecialsCache === null) {
@@ -213,10 +211,9 @@ export function useCartProducts() {
                     emitCacheUpdate();
                 });
         }
-    }, [isInitialized]);
+    }, []);
 
     useEffect(() => {
-        if (!isInitialized) return;
         if (cartItems.length === 0) {
             return;
         }
@@ -284,10 +281,9 @@ export function useCartProducts() {
                 });
                 emitCacheUpdate();
             });
-    }, [cartItems, isInitialized, dispatch]);
+    }, [cartItems, dispatch]);
 
     useEffect(() => {
-        if (!isInitialized) return;
         if (cartItems.length === 0) return;
 
         const categoryIds = cartItems
@@ -318,7 +314,7 @@ export function useCartProducts() {
                 console.error('[useCartProducts] Failed to fetch category bundles:', err);
                 categoryIds.forEach(id => pendingCategoryRequests.delete(id));
             });
-    }, [cartItems, isInitialized, cacheVersion, lang]);
+    }, [cartItems, cacheVersion, lang]);
 
     const populatedItems = useMemo(() => {
         // Reference cacheVersion to re-evaluate when cache updates
@@ -656,10 +652,11 @@ export function useCartProducts() {
         return catId > 0 && globalCategoryCache[catId] === undefined;
     });
 
-    const hookLoading = !isInitialized
-        || globalSpecialsCache === null
+    const hookLoading = cartItems.length > 0 && (
+        (globalSpecialsCache === null && pendingSpecialsRequest !== null)
         || someItemUndefined
-        || someCategoryUndefined;
+        || someCategoryUndefined
+    );
 
     const suggestedProducts = useMemo(() => {
         if (hookLoading) return [];
