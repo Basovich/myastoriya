@@ -21,6 +21,7 @@ import PromoBlock from '../components/PromoBlock/Index';
 import { useRouter, useParams } from 'next/navigation';
 import CartModal from '@/app/components/CartModal/CartModal';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
+import * as Sentry from '@sentry/nextjs';
 
 function normalizeTo38Phone(phoneStr?: string | null): string {
     if (!phoneStr) return '';
@@ -290,6 +291,9 @@ export default function Step1() {
                 });
             }, 1000);
         } catch (err) {
+            Sentry.captureException(err, {
+                tags: { category: 'checkout', action: 'send_sms' },
+            });
             const msg = err instanceof Error ? err.message : 'Помилка відправки SMS';
             setSmsError(msg);
         } finally {
@@ -314,6 +318,9 @@ export default function Step1() {
             setCountdown(0);
             if (timerRef.current) clearInterval(timerRef.current);
         } catch (err) {
+            Sentry.captureException(err, {
+                tags: { category: 'checkout', action: 'verify_sms' },
+            });
             const msg = err instanceof Error ? err.message : 'Невірний код. Спробуйте ще раз.';
             setSmsError(msg);
             handleChange('smsCode', '');
@@ -387,6 +394,9 @@ export default function Step1() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
             console.error('Error updating checkout user data:', err);
+            Sentry.captureException(err, {
+                tags: { category: 'checkout', action: 'submit_step1' },
+            });
             let msg = 'Помилка оновлення даних користувача';
             if (err instanceof GraphQLError && err.errors.length > 0) {
                 const firstError = err.errors[0];

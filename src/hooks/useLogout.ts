@@ -10,12 +10,6 @@ export function useLogout(lang: Locale | string = 'ua') {
     const { token: storeToken } = useAppSelector((state) => state.auth);
 
     return async () => {
-        Sentry.addBreadcrumb({
-            category: 'auth',
-            message: 'User initiated logout',
-            level: 'info',
-        });
-
         try {
             const token = storeToken || await getAccessToken();
             if (token) {

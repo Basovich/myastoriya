@@ -231,13 +231,6 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
 
     const handleRepeatOrder = async () => {
         if (!order) return;
-        Sentry.addBreadcrumb({
-            category: 'cart',
-            message: `Repeat order initiated from details page for order ${order.orderNo || order.id}`,
-            level: 'info',
-            data: { orderId: order.id, orderNo: order.orderNo },
-        });
-
         try {
             const token = await getAccessToken();
             if (!token) return;

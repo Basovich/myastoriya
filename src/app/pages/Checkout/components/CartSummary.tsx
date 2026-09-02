@@ -14,7 +14,6 @@ import Spinner from '@/app/components/ui/Spinner/Spinner';
 import { useParams } from 'next/navigation';
 import { toggleUseBonusesAsync } from '@/store/slices/cartSlice';
 import clsx from 'clsx';
-import * as Sentry from '@sentry/nextjs';
 
 
 const getModifierIconUrl = (name?: string | null): string | null => {
@@ -113,19 +112,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                     </svg>
                     Ваш кошик
                 </div>
-                <button
-                    className={s.editCartBtn}
-                    aria-label="Редагувати кошик"
-                    onClick={() => {
-                        Sentry.addBreadcrumb({
-                            category: 'cart',
-                            message: 'Checkout: Edit cart button clicked',
-                            level: 'info',
-                        });
-                        onEditCart();
-                    }}
-                    type="button"
-                >
+                <button className={s.editCartBtn} aria-label="Редагувати кошик" onClick={onEditCart} type="button">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M9.8 1.4L12.6 4.2L4.2 12.6H1.4V9.8L9.8 1.4Z" stroke="black" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>

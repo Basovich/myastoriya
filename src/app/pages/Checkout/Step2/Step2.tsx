@@ -25,6 +25,7 @@ import Image from 'next/image';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { getAccessToken } from '@/app/actions/authActions';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
+import * as Sentry from '@sentry/nextjs';
 import { 
     getLocalitiesApi, 
     getDeliveriesApi, 
@@ -835,7 +836,7 @@ export default function Step2() {
             setValidationError('Будь ласка, оберіть бажаний час доставки');
             return;
         }
-        
+
         setIsSubmitting(true);
         
         try {
@@ -868,6 +869,9 @@ export default function Step2() {
                             finalPickupPointId = parseInt(pickupPoint.id, 10);
                         } catch (err) {
                             console.error('Failed to save pickup point for user:', err);
+                            Sentry.captureException(err, {
+                                tags: { category: 'checkout', action: 'add_pickup_point' },
+                            });
                         }
                     } else if (isShop && selectedShopId) {
                         finalPickupPointId = parseInt(selectedShopId, 10);
@@ -908,9 +912,11 @@ export default function Step2() {
             url.searchParams.set('step', '3');
             window.history.pushState({}, '', url.toString());
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        } catch (e) {
-            console.error('Failed to proceed to step 3:', e);
-            setValidationError('Сталася помилка при збереженні вибору доставки. Спробуйте ще раз.');
+        } catch (err) {
+            console.error('Error submitting step 2:', err);
+            Sentry.captureException(err, {
+                tags: { category: 'checkout', action: 'submit_step2' },
+            });
         } finally {
             setIsSubmitting(false);
         }

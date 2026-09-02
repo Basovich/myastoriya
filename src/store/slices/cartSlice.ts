@@ -428,12 +428,6 @@ export const syncCartOnAuthAsync = createAsyncThunk(
             return false;
         }
 
-        Sentry.addBreadcrumb({
-            category: 'cart',
-            message: 'Syncing local cart with backend on auth',
-            level: 'info',
-        });
-
         const doSync = async (): Promise<boolean> => {
             try {
                 const localItems = (getState() as RootState).cart.items;
@@ -529,11 +523,6 @@ const cartSlice = createSlice({
             }
         },
         clearCart: (state) => {
-            Sentry.addBreadcrumb({
-                category: 'cart',
-                message: 'Cart cleared',
-                level: 'info',
-            });
             state.items = [];
             state.useBonuses = false;
             state.total = 0;

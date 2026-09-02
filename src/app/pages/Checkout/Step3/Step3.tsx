@@ -38,6 +38,7 @@ import {
     type UserBankCard 
 } from '@/lib/graphql';
 import ReselectDeliveryTimeModal from '@/app/components/ReselectDeliveryTimeModal/ReselectDeliveryTimeModal';
+import * as Sentry from '@sentry/nextjs';
 
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -686,6 +687,10 @@ export default function Step3({ lang }: Step3Props) {
             }
         } catch (e: unknown) {
             console.error('Failed to create order', e);
+            Sentry.captureException(e, {
+                tags: { category: 'checkout', action: 'create_order' },
+                extra: { paymentMethod, comment, personsCount },
+            });
 
             const isDeliveryTimeError = e instanceof GraphQLError && e.errors.some(err => {
                 const msgLower = (err.message || '').toLowerCase();

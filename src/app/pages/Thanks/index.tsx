@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import s from "./Thanks.module.scss";
 import { type Locale } from "@/i18n/config";

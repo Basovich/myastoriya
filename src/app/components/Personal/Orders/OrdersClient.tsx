@@ -306,13 +306,6 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
     };
 
     const handleRepeatOrder = async (order: Order) => {
-        Sentry.addBreadcrumb({
-            category: 'cart',
-            message: `Repeat order initiated for order ${order.orderNo || order.id}`,
-            level: 'info',
-            data: { orderId: order.id, orderNo: order.orderNo },
-        });
-
         try {
             const items = order.items;
             if (!items || items.length === 0) return;

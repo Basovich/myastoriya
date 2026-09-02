@@ -21,7 +21,6 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import Button from "@/app/components/ui/Button/Button";
 import { useIsHydrated } from '@/hooks/useIsHydrated';
-import * as Sentry from '@sentry/nextjs';
 
 const getModifierIconUrl = (name?: string | null): string | null => {
     if (!name) return null;
@@ -89,11 +88,6 @@ export default function CartModal({ isOpen, onClose, isCheckoutMode = false }: C
     useEffect(() => {
         if (isOpen) {
             disableScroll();
-            Sentry.addBreadcrumb({
-                category: 'cart',
-                message: 'Cart modal opened',
-                level: 'info',
-            });
             if (isInitialized && removedItems.length === 0) {
                 void dispatch(fetchCartAsync());
             }

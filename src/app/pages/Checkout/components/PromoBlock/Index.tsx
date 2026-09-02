@@ -29,12 +29,6 @@ export default function PromoBlock({ onApply, isApplied }: PromoBlockProps) {
             return;
         }
 
-        Sentry.addBreadcrumb({
-            category: 'cart',
-            message: `Applying promo code: ${code.trim()}`,
-            level: 'info',
-        });
-
         setIsLoading(true);
         try {
             const lang = locale === 'ru' ? 'ru' : 'ua';
