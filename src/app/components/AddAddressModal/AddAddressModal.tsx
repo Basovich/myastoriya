@@ -123,6 +123,7 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, is500mDe
     });
 
     const [view, setView] = useState<'form' | 'map'>('form');
+    const [radiusError, setRadiusError] = useState<string | null>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
     // Form state
@@ -156,6 +157,7 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, is500mDe
         if (isOpen) {
             setCity(initialCity?.name ?? 'м. Київ');
             setCityId(initialCity?.id ?? 2581);
+            setRadiusError(null);
             if (!initialCity) {
                 setMapCenter(DEFAULT_CENTER);
             }
@@ -168,8 +170,6 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, is500mDe
             return () => enableScroll();
         }
     }, [isOpen, disableScroll, enableScroll]);
-
-    const [radiusError, setRadiusError] = useState<string | null>(null);
 
     const checkAddressRadius = useCallback((lat: number, lng: number): boolean => {
         if (!is500mDelivery || !shops || shops.length === 0) {
@@ -199,7 +199,7 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, is500mDe
     // Check radius when street and house are selected in form view
     useEffect(() => {
         if (!isOpen || !is500mDelivery || !street || !house || !isLoaded) {
-            if (!is500mDelivery) setRadiusError(null);
+            setRadiusError(null);
             return;
         }
 
@@ -220,6 +220,7 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, is500mDe
 
     const handleClose = () => {
         onClose();
+        setRadiusError(null);
         setTimeout(() => {
             setView('form');
             setCity('м. Київ');
