@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 import clsx from "clsx";
 import s from "./SearchBar.module.scss";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -51,12 +52,14 @@ export default function SearchBar() {
         const value = e.target.value;
         setQuery(value);
         setHasError(false);
+        if (value.trim().length < 3) {
+            setResults([]);
+        }
     };
 
     // Debounced search
     useEffect(() => {
         if (query.trim().length < 3) {
-            setResults([]);
             return;
         }
 
@@ -121,7 +124,12 @@ export default function SearchBar() {
                                         router.push(getLocalizedHref(productUrl, lang));
                                     }}>
                                         <div className={s.resultImage}>
-                                            <img src={resolveProductImageUrl(product) || "/images/product-placeholder.svg"} alt={product.name} />
+                                            <Image 
+                                                src={resolveProductImageUrl(product) || "/images/product-placeholder.svg"} 
+                                                alt={product.name} 
+                                                fill 
+                                                style={{ objectFit: "cover" }} 
+                                            />
                                         </div>
                                         <div className={s.resultInfo}>
                                             <div className={s.resultName}>{product.name}</div>

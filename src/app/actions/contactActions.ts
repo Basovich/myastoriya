@@ -22,6 +22,7 @@ export async function submitContactFormAction(
   }
 
   try {
+    console.log('Contact form submission:', { name, phone, message });
     return {
       success: true,
       message: 'Ваше повідомлення успішно надіслано!',
