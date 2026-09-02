@@ -21,7 +21,7 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
     const fullName = user ? `${user.surname || ''} ${user.name || ''} ${user.middleName || ''}`.trim() : 'Гість';
     const displayName = fullName || user?.email || 'Користувач';
 
-    const avatarUrl = resolveAvatarUrl(user?.avatar);
+    const avatarSrc = resolveAvatarUrl(user?.avatar) || '/icons/icon-profile.svg';
 
     const handleEditClick = () => {
         if (!user) return;
@@ -53,7 +53,8 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
             if (!token) {
                 const err = new Error('Unauthorized');
                 Sentry.captureException(err, { tags: { category: 'profile', action: 'update_avatar_unauthorized' } });
-                throw err;
+                alert('Помилка при завантаженні фото: Неавторизовано');
+                return;
             }
 
             const updatedUser = await updateUserAvatarApi(file, token);
@@ -76,22 +77,16 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
     };
 
     return (
-        <div className={s.userInfoCard}>
+        <div className={s.wrapper}>
             <div className={s.avatarWrapper}>
-                <div 
-                    className={clsx(s.avatar, isUploading && s.loading)}
-                    onClick={handleEditClick}
-                    role="button"
-                    tabIndex={0}
-                    aria-label="Змінити фото"
-                >
+                <div className={clsx(s.avatar, isUploading && s.avatarUploading)}>
                     <Image 
-                        src={avatarUrl} 
-                        alt="User Avatar" 
-                        width={88} 
-                        height={88}
-                        className={s.avatarImage}
-                        unoptimized={!!user?.avatar}
+                        src={avatarSrc} 
+                        alt={fullName} 
+                        fill
+                        sizes="92px"
+                        style={{ objectFit: 'cover' }}
+                        priority
                     />
                 </div>
                 {user && (
@@ -101,7 +96,7 @@ export default function UserInfoCard({ user }: UserInfoCardProps) {
                         onClick={handleEditClick}
                         disabled={isUploading}
                     >
-                        <img src="/icons/icon-plus.svg" alt="" />
+                        <Image src="/icons/icon-plus.svg" alt="" width={16} height={16} />
                     </button>
                 )}
             </div>

@@ -100,7 +100,8 @@ export default function CompleteSocialProfileForm({ googleProfile, onSuccess, on
                 if (!token) {
                     const err = new Error('Unauthorized');
                     Sentry.captureException(err, { tags: { category: 'auth', action: 'complete_social_profile_unauthorized' } });
-                    throw err;
+                    setStatus('Помилка авторизації');
+                    return;
                 }
 
                 const updatedUser = await updateUserDataApi({

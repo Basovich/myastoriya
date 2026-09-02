@@ -629,13 +629,14 @@ export default function Step3({ lang }: Step3Props) {
                     const tokenizationData = paymentMethodData?.tokenizationData as Record<string, unknown> | undefined;
                     const tokenData = tokenizationData?.token;
 
-                    await paymentResponse.complete('success');
-                    if (!tokenData) {
-                        const err = new Error(lang === 'ua' ? 'Не вдалося отримати токен Google Pay' : 'Не удалось получить токен Google Pay');
-                        Sentry.captureException(err, { tags: { category: 'checkout', action: 'gpay_empty_token' } });
-                        throw err;
+                    if (tokenData) {
+                        await paymentResponse.complete('success');
+                        return typeof tokenData === 'string' ? tokenData : JSON.stringify(tokenData);
                     }
-                    return typeof tokenData === 'string' ? tokenData : JSON.stringify(tokenData);
+                    await paymentResponse.complete('fail');
+                    const noTokenErr = new Error(lang === 'ua' ? 'Не вдалося отримати токен Google Pay' : 'Не удалось получить токен Google Pay');
+                    Sentry.captureException(noTokenErr, { tags: { category: 'checkout', action: 'gpay_empty_token' } });
+                    return Promise.reject(noTokenErr);
                 } catch (e: unknown) {
                     const err = e as { name?: string; message?: string };
                     if (err && (err.name === 'AbortError' || err.message?.includes('cancel') || err.message?.includes('user closed'))) {
