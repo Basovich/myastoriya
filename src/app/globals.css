@@ -221,3 +221,20 @@ html::-webkit-scrollbar-thumb:hover {
     scrollbar-color: auto;
   }
 }
+
+/* ===== Non-JavaScript Graceful Degradation ===== */
+@media (scripting: none) {
+  /* Prevent fixed loaders from blocking non-JS views */
+  [class*="loaderWrapper"],
+  [class*="preloader"] {
+    display: none !important;
+  }
+
+  /* Ensure hidden/animated elements remain visible without JS execution */
+  .fade-enter,
+  [data-no-js-visible="true"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+}

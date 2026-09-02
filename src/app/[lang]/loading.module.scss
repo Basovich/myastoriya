@@ -38,3 +38,10 @@
         opacity: 0.8;
     }
 }
+
+@media (scripting: none) {
+    .loaderWrapper {
+        display: none !important;
+    }
+}
+

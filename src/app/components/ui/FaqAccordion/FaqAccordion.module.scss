@@ -74,6 +74,11 @@
 
 .faqAnswerWrap {
     overflow: hidden;
+
+    @media (scripting: none) {
+        height: auto !important;
+        overflow: visible !important;
+    }
 }
 
 .faqAnswerInner {
