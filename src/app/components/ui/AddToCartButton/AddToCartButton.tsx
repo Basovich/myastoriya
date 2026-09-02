@@ -10,6 +10,7 @@ import { addToCartAsync } from "@/store/slices/cartSlice";
 import CartModal from "@/app/components/CartModal/CartModal";
 import DonenessModal from "@/app/components/ui/DonenessModal/DonenessModal";
 import { useParams } from "next/navigation";
+import * as Sentry from '@sentry/nextjs';
 
 interface AddToCartButtonProps {
     productId: string | number;
@@ -62,6 +63,10 @@ export default function AddToCartButton({
                 setIsCartModalOpen(true);
             } catch (err) {
                 console.error("[AddToCartButton] Failed to add to cart:", err);
+                Sentry.captureException(err, {
+                    tags: { category: 'cart', action: 'add_to_cart_ui' },
+                    extra: { productId },
+                });
             } finally {
                 setIsLoading(false);
             }
@@ -69,14 +74,22 @@ export default function AddToCartButton({
     };
 
     const handleConfirmDoneness = async (costVariantId: number) => {
-        await dispatch(
-            addToCartAsync({
-                id: String(productId),
-                quantity: 1,
-                costVariantId,
-            })
-        ).unwrap();
-        setIsCartModalOpen(true);
+        try {
+            await dispatch(
+                addToCartAsync({
+                    id: String(productId),
+                    quantity: 1,
+                    costVariantId,
+                })
+            ).unwrap();
+            setIsCartModalOpen(true);
+        } catch (err) {
+            console.error("[AddToCartButton] Failed to add cost variant to cart:", err);
+            Sentry.captureException(err, {
+                tags: { category: 'cart', action: 'add_to_cart_doneness_ui' },
+                extra: { productId, costVariantId },
+            });
+        }
     };
 
     return (

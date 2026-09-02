@@ -30,6 +30,7 @@ import {
     RelatedProductGroup
 } from '@/lib/graphql';
 import { ModifierGroup } from '@/lib/graphql/queries/products';
+import * as Sentry from '@sentry/nextjs';
 import s from './OrderDetailsClient.module.scss';
 
 const detailsDict = {
@@ -230,6 +231,13 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
 
     const handleRepeatOrder = async () => {
         if (!order) return;
+        Sentry.addBreadcrumb({
+            category: 'cart',
+            message: `Repeat order initiated from details page for order ${order.orderNo || order.id}`,
+            level: 'info',
+            data: { orderId: order.id, orderNo: order.orderNo },
+        });
+
         try {
             const token = await getAccessToken();
             if (!token) return;
@@ -240,6 +248,10 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
             }
         } catch (error) {
             console.error('Failed to repeat order:', error);
+            Sentry.captureException(error, {
+                tags: { category: 'cart', action: 'repeat_order_details' },
+                extra: { orderId: order.id, orderNo: order.orderNo },
+            });
         }
     };
 

@@ -120,6 +120,11 @@ const mergeCartItems = (currentItems: CartItem[], backendItems: CartItem[]): Car
 export const fetchCartAsync = createAsyncThunk(
     'cart/fetch',
     async (params: { deliveryId?: number; localityId?: number; paymentId?: number } | void, { getState, dispatch, rejectWithValue }) => {
+        Sentry.addBreadcrumb({
+            category: 'cart',
+            message: 'Fetching cart',
+            level: 'info',
+        });
         try {
             const state = getState() as RootState;
             const useBonuses = state.cart.useBonuses;
@@ -152,7 +157,9 @@ export const fetchCartAsync = createAsyncThunk(
             return { items: newItems, hasUnavailableProducts };
         } catch (error: unknown) {
             console.error('[Cart] Failed to fetch cart from backend:', error);
-            Sentry.captureException(error);
+            Sentry.captureException(error, {
+                tags: { category: 'cart', action: 'fetch_cart' },
+            });
             return rejectWithValue('Failed to fetch cart');
         }
     }
@@ -219,6 +226,11 @@ export const fetchAndSetRemovedItemsAsync = createAsyncThunk(
 export const toggleUseBonusesAsync = createAsyncThunk(
     'cart/toggleUseBonuses',
     async (useBonuses: boolean, { getState, dispatch, rejectWithValue }) => {
+        Sentry.addBreadcrumb({
+            category: 'cart',
+            message: `Toggling useBonuses to ${useBonuses}`,
+            level: 'info',
+        });
         try {
             const state = getState() as RootState;
             dispatch(setUseBonuses(useBonuses));
@@ -229,7 +241,9 @@ export const toggleUseBonusesAsync = createAsyncThunk(
             return mapCartItems(response, state.cart.productDetails);
         } catch (error: unknown) {
             console.error('[Cart] Failed to toggle useBonuses:', error);
-            Sentry.captureException(error);
+            Sentry.captureException(error, {
+                tags: { category: 'cart', action: 'toggle_use_bonuses' },
+            });
             return rejectWithValue('Failed to toggle useBonuses');
         }
     }
@@ -247,6 +261,12 @@ export const addToCartAsync = createAsyncThunk(
         },
         { getState, dispatch, rejectWithValue }
     ) => {
+        Sentry.addBreadcrumb({
+            category: 'cart',
+            message: `Adding product ${payload.id} (qty: ${payload.quantity}) to cart`,
+            level: 'info',
+            data: { id: payload.id, quantity: payload.quantity, costVariantId: payload.costVariantId, modifierIds: payload.modifierIds },
+        });
         try {
             const state = getState() as RootState;
             const useBonuses = state.cart.useBonuses;
@@ -300,7 +320,10 @@ export const addToCartAsync = createAsyncThunk(
             return mapCartItems(response, (getState() as RootState).cart.productDetails);
         } catch (error: unknown) {
             console.error('[Cart] Failed to add or update product in backend cart:', error);
-            Sentry.captureException(error, { extra: { payload } });
+            Sentry.captureException(error, {
+                tags: { category: 'cart', action: 'add_to_cart' },
+                extra: { payload },
+            });
             return rejectWithValue('Failed to add product to cart');
         }
     }
@@ -312,6 +335,12 @@ export const updateQuantityAsync = createAsyncThunk(
         payload: { id: string; rowId?: string; quantity: number },
         { getState, dispatch, rejectWithValue }
     ) => {
+        Sentry.addBreadcrumb({
+            category: 'cart',
+            message: `Updating cart item ${payload.id} quantity to ${payload.quantity}`,
+            level: 'info',
+            data: { id: payload.id, rowId: payload.rowId, quantity: payload.quantity },
+        });
         try {
             const state = getState() as RootState;
             const useBonuses = state.cart.useBonuses;
@@ -334,6 +363,10 @@ export const updateQuantityAsync = createAsyncThunk(
             }
         } catch (error: unknown) {
             console.error('[Cart] Failed to update cart item quantity:', error);
+            Sentry.captureException(error, {
+                tags: { category: 'cart', action: 'update_quantity' },
+                extra: { payload },
+            });
             void dispatch(fetchCartAsync());
             return rejectWithValue('Failed to update quantity');
         }
@@ -346,6 +379,12 @@ export const removeFromCartAsync = createAsyncThunk(
         payload: { id: string; rowId?: string },
         { getState, dispatch, rejectWithValue }
     ) => {
+        Sentry.addBreadcrumb({
+            category: 'cart',
+            message: `Removing product ${payload.id} from cart`,
+            level: 'info',
+            data: { id: payload.id, rowId: payload.rowId },
+        });
         try {
             const state = getState() as RootState;
             const useBonuses = state.cart.useBonuses;
@@ -365,6 +404,10 @@ export const removeFromCartAsync = createAsyncThunk(
             }
         } catch (error: unknown) {
             console.error('[Cart] Failed to remove cart item from backend:', error);
+            Sentry.captureException(error, {
+                tags: { category: 'cart', action: 'remove_from_cart' },
+                extra: { payload },
+            });
             void dispatch(fetchCartAsync());
             return rejectWithValue('Failed to remove from cart');
         }
@@ -384,6 +427,12 @@ export const syncCartOnAuthAsync = createAsyncThunk(
         if (syncCartPromise) {
             return false;
         }
+
+        Sentry.addBreadcrumb({
+            category: 'cart',
+            message: 'Syncing local cart with backend on auth',
+            level: 'info',
+        });
 
         const doSync = async (): Promise<boolean> => {
             try {
@@ -411,6 +460,10 @@ export const syncCartOnAuthAsync = createAsyncThunk(
                                 });
                             } catch (error) {
                                 console.warn(`[Cart Sync] Failed to add product ${item.id}:`, error instanceof Error ? error.message : error);
+                                Sentry.captureException(error, {
+                                    tags: { category: 'cart', action: 'sync_item_failed' },
+                                    extra: { item },
+                                });
                                 return null;
                             }
                         })
@@ -422,6 +475,9 @@ export const syncCartOnAuthAsync = createAsyncThunk(
                 return true;
             } catch (error) {
                 console.warn('[Cart] Failed to sync cart on auth:', error instanceof Error ? error.message : error);
+                Sentry.captureException(error, {
+                    tags: { category: 'cart', action: 'sync_cart_on_auth' },
+                });
                 throw error;
             }
         };
@@ -473,6 +529,11 @@ const cartSlice = createSlice({
             }
         },
         clearCart: (state) => {
+            Sentry.addBreadcrumb({
+                category: 'cart',
+                message: 'Cart cleared',
+                level: 'info',
+            });
             state.items = [];
             state.useBonuses = false;
             state.total = 0;

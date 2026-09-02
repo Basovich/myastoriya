@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import s from './PromoBlock.module.scss';
 import clsx from 'clsx';
 import { applyPromoCodeApi } from '@/lib/graphql/queries/cart';
+import * as Sentry from '@sentry/nextjs';
 
 interface PromoBlockProps {
     onApply: (code: string, discount: number) => void;
@@ -28,6 +29,12 @@ export default function PromoBlock({ onApply, isApplied }: PromoBlockProps) {
             return;
         }
 
+        Sentry.addBreadcrumb({
+            category: 'cart',
+            message: `Applying promo code: ${code.trim()}`,
+            level: 'info',
+        });
+
         setIsLoading(true);
         try {
             const lang = locale === 'ru' ? 'ru' : 'ua';
@@ -42,6 +49,10 @@ export default function PromoBlock({ onApply, isApplied }: PromoBlockProps) {
                 setError(lang === 'ru' ? 'Не удалось применить промокод' : 'Не вдалося застосувати промокод');
             }
         } catch (err) {
+            Sentry.captureException(err, {
+                tags: { category: 'cart', action: 'apply_promo_code' },
+                extra: { code: code.trim() },
+            });
             const msg = err instanceof Error ? err.message : 'Помилка зв\'язку з сервером';
             setError(msg);
         } finally {

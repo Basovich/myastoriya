@@ -19,6 +19,7 @@ import Spinner from '@/app/components/ui/Spinner/Spinner';
 import PersonalReviewModal from '@/app/components/Personal/Reviews/PersonalReviewModal/PersonalReviewModal';
 import { addToCartAsync, fetchCartAsync, setCartModalOpen } from '@/store/slices/cartSlice';
 import UnavailableProductsModal, { UnavailableProduct } from './UnavailableProductsModal/UnavailableProductsModal';
+import * as Sentry from '@sentry/nextjs';
 
 import {
     getOrdersApi,
@@ -305,6 +306,13 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
     };
 
     const handleRepeatOrder = async (order: Order) => {
+        Sentry.addBreadcrumb({
+            category: 'cart',
+            message: `Repeat order initiated for order ${order.orderNo || order.id}`,
+            level: 'info',
+            data: { orderId: order.id, orderNo: order.orderNo },
+        });
+
         try {
             const items = order.items;
             if (!items || items.length === 0) return;
@@ -344,6 +352,10 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
             }
         } catch (error) {
             console.error('Failed to repeat order:', error);
+            Sentry.captureException(error, {
+                tags: { category: 'cart', action: 'repeat_order_list' },
+                extra: { orderId: order.id, orderNo: order.orderNo },
+            });
             void dispatch(fetchCartAsync());
         }
     };
