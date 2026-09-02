@@ -690,13 +690,13 @@ export default function Step2() {
         return undefined;
     }, [deliveries, deliveryMethod]);
 
-    const isCourier = activeDelivery?.type === 'courier';
-    const isNP = activeDelivery?.driver === 'nova-poshta-postal';
-    const isShop = activeDelivery?.driver === 'shop';
-    const isShopCourierOrPickup = activeDelivery && (activeDelivery.driver === 'courier' || activeDelivery.driver === 'shop');
-    const showDeliveryTimeBlock = Boolean(isShopCourierOrPickup && activeDelivery?.showDeliveryTime);
-    const elapsedForFree = activeDelivery?.elapsedForFree || 0;
-    const deliveryPrice = activeDelivery ? (activeDelivery.deliveryCost ?? 0) : undefined;
+    const isCourier = selectedDelivery?.type === 'courier';
+    const isNP = selectedDelivery?.driver === 'nova-poshta-postal';
+    const isShop = selectedDelivery?.driver === 'shop';
+    const isShopCourierOrPickup = selectedDelivery && (selectedDelivery.driver === 'courier' || selectedDelivery.driver === 'shop');
+    const showDeliveryTimeBlock = Boolean(isShopCourierOrPickup && selectedDelivery?.showDeliveryTime);
+    const elapsedForFree = selectedDelivery?.elapsedForFree || 0;
+    const deliveryPrice = selectedDelivery ? (selectedDelivery.deliveryCost ?? 0) : undefined;
 
     const isNextDisabled = isSubmitting || !deliveryMethod || !!selectedDelivery?.disabled;
 
@@ -1152,7 +1152,7 @@ export default function Step2() {
                                         </span>
                                     </label>
                                     
-                                    {(hydrated && isSelected && !method.disabled && isMethodCourier) && (
+                                    {(hydrated && isSelected && isMethodCourier) && (
                                         <div className={s.nestedAddressRow}>
                                             <AddressRow 
                                                 addresses={addresses}
@@ -1163,7 +1163,7 @@ export default function Step2() {
                                         </div>
                                     )}
 
-                                    {(hydrated && isSelected && !method.disabled && isMethodShop) && (
+                                    {(hydrated && isSelected && isMethodShop) && (
                                         <div className={s.nestedAddressRow}>
                                             <PickupPointRow
                                                 points={pickupPoints}
@@ -1176,8 +1176,7 @@ export default function Step2() {
                                         </div>
                                     )}
 
-
-                                    {(hydrated && isSelected && !method.disabled && isMethodNP) && (
+                                    {(hydrated && isSelected && isMethodNP) && (
                                         <div className={s.nestedAddressRow}>
                                             <NpPickupPointRow
                                                 points={npPickupPoints}
