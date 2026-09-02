@@ -120,7 +120,6 @@ function AddNpPickupPointCard({ onClick, lang }: { onClick: () => void; lang: 'u
 export default function NpPickupPointRow({
     points,
     selectedNPRef,
-    cityName,
     onSelect,
     onAddClick,
     lang,
