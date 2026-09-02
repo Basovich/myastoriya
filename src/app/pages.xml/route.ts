@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { formatDate, buildUrlSetXml, SitemapUrlEntry } from "@/utils/sitemap-helpers";
+import { getSitemapBaseUrl, formatDate, buildUrlSetXml, SitemapUrlEntry } from "@/utils/sitemap-helpers";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
+        const baseUrl = await getSitemapBaseUrl(req);
         const today = formatDate();
 
         const staticPaths = [
@@ -30,7 +31,7 @@ export async function GET() {
             lastmod: today,
         }));
 
-        const xml = buildUrlSetXml(entries);
+        const xml = buildUrlSetXml(entries, baseUrl);
 
         return new NextResponse(xml, {
             headers: {

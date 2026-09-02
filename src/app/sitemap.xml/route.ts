@@ -3,8 +3,8 @@ import { getSitemapBaseUrl, formatDate, buildSitemapIndexXml } from "@/utils/sit
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-    const baseUrl = getSitemapBaseUrl();
+export async function GET(req: Request) {
+    const baseUrl = await getSitemapBaseUrl(req);
     const today = formatDate();
 
     const sitemaps = [

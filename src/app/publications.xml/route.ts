@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { formatDate, buildUrlSetXml, SitemapUrlEntry } from "@/utils/sitemap-helpers";
+import { getSitemapBaseUrl, formatDate, buildUrlSetXml, SitemapUrlEntry } from "@/utils/sitemap-helpers";
 import { getBlogsApi, BlogPost } from "@/lib/graphql";
 import { getBlogPostHref } from "@/utils/blog-url";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
+        const baseUrl = await getSitemapBaseUrl(req);
         const posts: BlogPost[] = [];
         let page = 1;
         let hasMore = true;
@@ -35,7 +36,7 @@ export async function GET() {
             }
         }
 
-        const xml = buildUrlSetXml(entries);
+        const xml = buildUrlSetXml(entries, baseUrl);
 
         return new NextResponse(xml, {
             headers: {

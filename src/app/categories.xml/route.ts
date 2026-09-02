@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { formatDate, buildUrlSetXml, SitemapUrlEntry } from "@/utils/sitemap-helpers";
+import { getSitemapBaseUrl, formatDate, buildUrlSetXml, SitemapUrlEntry } from "@/utils/sitemap-helpers";
 import { getCatalogTreeApi, ProductCategory } from "@/lib/graphql";
 
 export const dynamic = "force-dynamic";
@@ -18,8 +18,9 @@ function collectCategories(categories: ProductCategory[]): ProductCategory[] {
     return list;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
     try {
+        const baseUrl = await getSitemapBaseUrl(req);
         const catalogTree = await getCatalogTreeApi("ua", 768).catch(() => [] as ProductCategory[]);
         const allCategories = collectCategories(catalogTree);
 
@@ -38,7 +39,7 @@ export async function GET() {
             }
         }
 
-        const xml = buildUrlSetXml(entries);
+        const xml = buildUrlSetXml(entries, baseUrl);
 
         return new NextResponse(xml, {
             headers: {

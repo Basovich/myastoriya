@@ -1,9 +1,42 @@
+import { headers } from "next/headers";
 import { siteData } from "@/config/site";
 
-export function getSitemapBaseUrl(): string {
-    const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL
-        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
-    return fallbackUrl.replace(/\/+$/, "");
+export async function getSitemapBaseUrl(req?: Request): Promise<string> {
+    // 1. Explicit env variable override (if configured)
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+        return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/+$/, "");
+    }
+
+    // 2. Dynamic detection from incoming HTTP request headers
+    try {
+        let host: string | null = null;
+        let proto = "https";
+
+        if (req) {
+            host = req.headers.get("x-forwarded-host") || req.headers.get("host");
+            proto = req.headers.get("x-forwarded-proto") || "https";
+        } else {
+            const h = await headers();
+            host = h.get("x-forwarded-host") || h.get("host");
+            proto = h.get("x-forwarded-proto") || "https";
+        }
+
+        if (host) {
+            if (host.includes("localhost") || host.includes("127.0.0.1")) {
+                proto = "http";
+            }
+            return `${proto}://${host}`.replace(/\/+$/, "");
+        }
+    } catch {
+        // Fallback if headers context unavailable
+    }
+
+    // 3. Fallback to production domain from env or site config
+    const fallback = process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : siteData.url || "https://myastoriya.vercel.app";
+
+    return fallback.replace(/\/+$/, "");
 }
 
 export function formatDate(dateInput?: string | Date | null): string {
@@ -37,7 +70,7 @@ export function buildSitemapIndexXml(items: SitemapIndexItem[]): string {
         )
         .join("\n");
 
-    return `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemaps}\n</sitemapindex>`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemaps}\n</sitemapindex>`;
 }
 
 export interface SitemapUrlEntry {
@@ -47,8 +80,8 @@ export interface SitemapUrlEntry {
     lastmod: string;
 }
 
-export function buildUrlSetXml(entries: SitemapUrlEntry[]): string {
-    const baseUrl = getSitemapBaseUrl();
+export function buildUrlSetXml(entries: SitemapUrlEntry[], baseUrl?: string): string {
+    const domain = (baseUrl || "https://myastoriya.vercel.app").replace(/\/+$/, "");
 
     const urls = entries
         .flatMap((entry) => {
@@ -61,11 +94,11 @@ export function buildUrlSetXml(entries: SitemapUrlEntry[]): string {
             let ruUrl: string;
 
             if (!cleanRel) {
-                ukUrl = `${baseUrl}/`;
-                ruUrl = `${baseUrl}/ru/`;
+                ukUrl = `${domain}/`;
+                ruUrl = `${domain}/ru/`;
             } else {
-                ukUrl = `${baseUrl}/ua/${cleanRel}/`;
-                ruUrl = `${baseUrl}/ru/${cleanRel}/`;
+                ukUrl = `${domain}/ua/${cleanRel}/`;
+                ruUrl = `${domain}/ru/${cleanRel}/`;
             }
 
             const ukNode = `  <url>
