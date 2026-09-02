@@ -17,6 +17,7 @@ import {
     markUserPickupPointAsDefaultApi,
     UserPickupPoint,
     getShopsApi,
+    getWarehousesApi,
     Shop,
     Warehouse,
 } from '@/lib/graphql';
@@ -89,6 +90,7 @@ function NpLogoSmall() {
 export default function PickupClient({ user, lang }: PickupClientProps) {
     const [points, setPoints] = useState<UserPickupPoint[]>([]);
     const [shops, setShops] = useState<Shop[]>([]);
+    const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isNPModalOpen, setIsNPModalOpen] = useState(false);
@@ -117,6 +119,14 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
                     console.error('Failed to fetch shops for mapping:', err);
                 }
 
+                // Load Nova Poshta warehouses for mapping
+                try {
+                    const whRes = await getWarehousesApi(selectedCity?.id, undefined, 100, 1, lang);
+                    if (whRes?.data) setWarehouses(whRes.data);
+                } catch (err) {
+                    console.error('Failed to fetch warehouses for mapping:', err);
+                }
+
                 // Load ALL pickup points (brand_store + nova_poshta)
                 const token = await getAccessToken();
                 if (token) {
@@ -132,7 +142,7 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
         };
 
         fetchPoints();
-    }, [lang]);
+    }, [lang, selectedCity?.id]);
 
     // ── Set as default ────────────────────────────────────────────────────────
 
@@ -290,22 +300,57 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
                     <div className={s.grid}>
                         {points.map((point) => {
                             const isNP = point.type === 'nova_poshta';
+                            const safePointName = point.name || '';
 
-                            // Address label for brand_store
-                            const addressLabel = (() => {
-                                if (isNP) return point.name;
-                                const matched = shops.find(sh => sh.name === point.name || sh.siteName === point.name);
-                                if (matched?.siteAddress) return matched.siteAddress;
-                                const parenMatch = point.name.match(/^(.*?)\((.*?)\)$/);
-                                if (parenMatch) return parenMatch[2].trim();
-                                const commaIdx = point.name.indexOf(',');
-                                if (commaIdx !== -1) return point.name.slice(commaIdx + 1).trim();
-                                return point.name;
+                            const storeName = (() => {
+                                const matched = shops.find(sh => sh.name === safePointName || sh.siteName === safePointName);
+                                if (matched?.siteName) return matched.siteName;
+                                if (matched?.name) return matched.name;
+                                const parenMatch = safePointName.match(/^(.*?)\((.*?)\)$/);
+                                if (parenMatch) return parenMatch[1].trim();
+                                return safePointName;
                             })();
 
-                            const scheduleText = point.schedule && point.schedule.length > 0
-                                ? point.schedule.map(sc => `${sc.days}: ${sc.workTime}`).join(', ')
-                                : '';
+                            // Address label for brand_store / nova_poshta
+                            const addressLabel = (() => {
+                                if (isNP) {
+                                    const matchedWh = warehouses.find(w => w.ref === safePointName || w.ref === point.id || w.name === safePointName);
+                                    const cityName = selectedCity?.name 
+                                        ? (selectedCity.name.toLowerCase().startsWith('м.') ? selectedCity.name : `м. ${selectedCity.name}`) 
+                                        : '';
+                                    
+                                    let whText = matchedWh?.name || safePointName;
+                                    if (!whText || /^[0-9a-fA-F-]{36}$/.test(whText)) {
+                                        whText = lang === 'ua' ? 'Відділення Нової Пошти' : 'Отделение Новой Почты';
+                                    }
+
+                                    if (cityName && !whText.toLowerCase().includes(cityName.toLowerCase().replace('м.', '').trim())) {
+                                        return `${cityName}, ${whText}`;
+                                    }
+                                    return whText;
+                                }
+
+                                const matched = shops.find(sh => sh.name === safePointName || sh.siteName === safePointName);
+                                if (matched?.siteAddress) return matched.siteAddress;
+                                const parenMatch = safePointName.match(/^(.*?)\((.*?)\)$/);
+                                if (parenMatch) return parenMatch[2].trim();
+                                const commaIdx = safePointName.indexOf(',');
+                                if (commaIdx !== -1) return safePointName.slice(commaIdx + 1).trim();
+                                return safePointName;
+                            })();
+
+                            const scheduleItems = (() => {
+                                if (point.schedule && point.schedule.length > 0) {
+                                    return point.schedule;
+                                }
+                                if (isNP) {
+                                    const matchedWh = warehouses.find(w => w.ref === safePointName || w.ref === point.id || w.name === safePointName);
+                                    if (matchedWh?.schedule && matchedWh.schedule.length > 0) {
+                                        return matchedWh.schedule;
+                                    }
+                                }
+                                return [];
+                            })();
 
                             return (
                                 <div
@@ -323,7 +368,7 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
                                                 </>
                                             ) : (
                                                 <>
-                                                    <span className={s.storeName}>{dict.storeName}</span>
+                                                    <span className={s.storeName}>{storeName}</span>
                                                     <div className={s.storeLogo}>
                                                         <Image
                                                             src="/icons/logo-red.svg"
@@ -348,8 +393,14 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
 
                                     <div className={s.cardBody}>
                                         <p className={s.addressText}>{addressLabel}</p>
-                                        {scheduleText && (
-                                            <p className={s.hoursText}>{scheduleText}</p>
+                                        {scheduleItems.length > 0 && (
+                                            <div className={s.hoursBlock}>
+                                                {scheduleItems.map((sc, idx) => (
+                                                    <p key={idx} className={s.hoursText}>
+                                                        {sc.days}: {sc.workTime}
+                                                    </p>
+                                                ))}
+                                            </div>
                                         )}
                                     </div>
 

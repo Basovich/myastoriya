@@ -5,6 +5,40 @@ import clsx from 'clsx';
 import s from '../PickupPointRow/PickupPointRow.module.scss';
 import { UserPickupPoint } from '@/lib/graphql';
 
+export function parseNovaPoshtaDetails(pointName?: string | null, selectedCityName?: string) {
+    const safeName = pointName || '';
+    if (!safeName) {
+        let city = selectedCityName || '';
+        if (city && !city.toLowerCase().startsWith('м.')) {
+            city = `м. ${city}`;
+        }
+        return { city, dept: '', address: '', rawName: '' };
+    }
+
+    let dept = '';
+    const deptMatch = safeName.match(/((?:Відділення|Поштомат|Отделение|Почтомат)\s*(?:№\s*\d+|\d+))/i);
+    if (deptMatch) {
+        dept = deptMatch[1].trim();
+    }
+
+    let city = '';
+    const cityMatch = safeName.match(/(?:м\.|смт|селище|село|г\.)\s*([А-Яа-яІіЇїЄєA-Za-z\-]+)/i);
+    if (cityMatch && cityMatch[1]) {
+        city = `м. ${cityMatch[1].trim()}`;
+    } else if (selectedCityName) {
+        city = selectedCityName.toLowerCase().startsWith('м.') ? selectedCityName : `м. ${selectedCityName}`;
+    }
+
+    let address = safeName;
+    if (safeName.includes(':')) {
+        address = safeName.split(':').slice(1).join(':').trim();
+    } else if (dept) {
+        address = safeName.replace(dept, '').replace(/^,\s*/, '').trim();
+    }
+
+    return { city, dept, address, rawName: safeName };
+}
+
 interface NpPickupPointRowProps {
     points: UserPickupPoint[];
     selectedNPRef: string;
@@ -24,7 +58,7 @@ function NpPickupPointCard({
     onSelect: () => void;
     lang: 'ua' | 'ru';
 }) {
-    const title = lang === 'ua' ? 'Нова Пошта' : 'Новая Почта';
+    const brandTitle = lang === 'ua' ? 'Нова Пошта' : 'Новая Почта';
 
     return (
         <div 
@@ -36,7 +70,7 @@ function NpPickupPointCard({
         >
             <div className={s.cardHeader}>
                 <div className={s.headerLeft}>
-                    <span className={s.cardTitle}>{title}</span>
+                    <span className={s.cardTitle}>{brandTitle}</span>
                 </div>
                 <div className={s.storeLogo}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -86,6 +120,7 @@ function AddNpPickupPointCard({ onClick, lang }: { onClick: () => void; lang: 'u
 export default function NpPickupPointRow({
     points,
     selectedNPRef,
+    cityName,
     onSelect,
     onAddClick,
     lang,

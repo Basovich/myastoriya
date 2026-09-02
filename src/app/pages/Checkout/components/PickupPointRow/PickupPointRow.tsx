@@ -20,33 +20,39 @@ function PickupPointCard({
     shops,
     isSelected,
     onSelect,
-    lang
 }: {
     point: UserPickupPoint;
     shops: Shop[];
     isSelected: boolean;
     onSelect: (shopId: string) => void;
-    lang: 'ua' | 'ru';
 }) {
     const matchedShop = shops.find(s => s.name === point.name || s.siteName === point.name);
     
+    const safePointName = point.name || '';
+
     const displayAddress = (() => {
         if (matchedShop?.siteAddress) return matchedShop.siteAddress;
         
-        const parenMatch = point.name.match(/^(.*?)\((.*?)\)$/);
+        const parenMatch = safePointName.match(/^(.*?)\((.*?)\)$/);
         if (parenMatch) return parenMatch[2].trim();
         
-        const commaIndex = point.name.indexOf(',');
-        if (commaIndex !== -1) return point.name.slice(commaIndex + 1).trim();
+        const commaIndex = safePointName.indexOf(',');
+        if (commaIndex !== -1) return safePointName.slice(commaIndex + 1).trim();
         
-        return point.name;
+        return safePointName;
     })();
 
     const shopSchedule = (matchedShop?.schedule && matchedShop.schedule.length > 0) 
         ? matchedShop.schedule 
         : point.schedule;
 
-    const title = lang === 'ua' ? "Заклад М'ясторія" : "Заведение М'ясторія";
+    const title = (() => {
+        if (matchedShop?.siteName) return matchedShop.siteName;
+        if (matchedShop?.name) return matchedShop.name;
+        const parenMatch = safePointName.match(/^(.*?)\((.*?)\)$/);
+        if (parenMatch) return parenMatch[1].trim();
+        return safePointName;
+    })();
 
     const handleCardClick = () => {
         if (matchedShop) {
@@ -129,7 +135,6 @@ export default function PickupPointRow({
                         shops={shops}
                         isSelected={isSelected}
                         onSelect={onSelect}
-                        lang={lang}
                     />
                 );
             })}
