@@ -199,8 +199,10 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, is500mDe
     // Check radius when street and house are selected in form view
     useEffect(() => {
         if (!isOpen || !is500mDelivery || !street || !house || !isLoaded) {
-            setRadiusError(null);
-            return;
+            const resetTimer = setTimeout(() => {
+                setRadiusError(null);
+            }, 0);
+            return () => clearTimeout(resetTimer);
         }
 
         const geocoder = new window.google.maps.Geocoder();
