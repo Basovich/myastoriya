@@ -7,7 +7,7 @@ import Button from '@/app/components/ui/Button/Button';
 import ProductGallery from './ProductGallery/index';
 import ProductTabs from './ProductTabs/index';
 import ProductModifications from './ProductModifications/index';
-import DonenessSelector from './DonenessSelector/index';
+// import DonenessSelector from './DonenessSelector/index';
 import ProductReviews from './ProductReviews/index';
 import RelatedProducts from './RelatedProducts/index';
 import QuantitySelector from '@/app/components/ui/QuantitySelector/QuantitySelector';

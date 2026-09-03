@@ -301,6 +301,15 @@ a.actionBtn {
             height: 12px;
         }
     }
+
+    @media (any-hover: hover) {
+        &:hover {
+            path {
+                fill: #fff;
+                stroke: none;
+            }
+        }
+    }
 }
 
 .infoCard {

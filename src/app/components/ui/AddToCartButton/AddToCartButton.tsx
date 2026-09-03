@@ -25,7 +25,7 @@ export default function AddToCartButton({
     className, 
     variant = "icon",
     text = "В КОШИК",
-    hasCostVariants = false
+    hasCostVariants: _hasCostVariants = false
 }: AddToCartButtonProps) {
     const dispatch = useAppDispatch();
     const { lang } = useParams();
