@@ -241,9 +241,24 @@ export default function PickupClient({ user, lang }: PickupClientProps) {
                 const newPoint = await addUserPickupPointApi('nova_poshta', warehouse.ref, token, lang);
                 // New point automatically becomes default
                 await markUserPickupPointAsDefaultApi(parseInt(newPoint.id, 10), token, lang);
+
+                // Add warehouse to local warehouses state for instant mapping
+                setWarehouses(prev => {
+                    if (prev.some(w => w.ref === warehouse.ref)) return prev;
+                    return [...prev, warehouse];
+                });
+
+                const isNameRef = !newPoint.name || /^[0-9a-fA-F-]{36}$/.test(newPoint.name);
+                const enrichedPoint: UserPickupPoint = {
+                    ...newPoint,
+                    name: isNameRef ? warehouse.name : newPoint.name,
+                    schedule: (newPoint.schedule && newPoint.schedule.length > 0) ? newPoint.schedule : warehouse.schedule,
+                    isDefault: true,
+                };
+
                 setPoints(prev => [
                     ...prev.map(p => ({ ...p, isDefault: false })),
-                    { ...newPoint, isDefault: true },
+                    enrichedPoint,
                 ]);
             }
         } catch (error: unknown) {
