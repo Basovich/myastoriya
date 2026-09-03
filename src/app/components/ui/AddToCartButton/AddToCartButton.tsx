@@ -49,27 +49,23 @@ export default function AddToCartButton({
             return;
         }
 
-        if (hasCostVariants) {
-            setIsDonenessModalOpen(true);
-        } else {
-            try {
-                setIsLoading(true);
-                await dispatch(
-                    addToCartAsync({
-                        id: String(productId),
-                        quantity: 1,
-                    })
-                ).unwrap();
-                setIsCartModalOpen(true);
-            } catch (err) {
-                console.error("[AddToCartButton] Failed to add to cart:", err);
-                Sentry.captureException(err, {
-                    tags: { category: 'cart', action: 'add_to_cart_ui' },
-                    extra: { productId },
-                });
-            } finally {
-                setIsLoading(false);
-            }
+        try {
+            setIsLoading(true);
+            await dispatch(
+                addToCartAsync({
+                    id: String(productId),
+                    quantity: 1,
+                })
+            ).unwrap();
+            setIsCartModalOpen(true);
+        } catch (err) {
+            console.error("[AddToCartButton] Failed to add to cart:", err);
+            Sentry.captureException(err, {
+                tags: { category: 'cart', action: 'add_to_cart_ui' },
+                extra: { productId },
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 
