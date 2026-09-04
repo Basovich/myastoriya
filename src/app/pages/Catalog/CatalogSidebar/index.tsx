@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable react-hooks/set-state-in-effect */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, Fragment } from 'react';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
 import s from './FilterSidebar.module.scss';
 import FilterGroup from '@/app/components/ui/FilterGroup/FilterGroup';
@@ -313,73 +313,73 @@ export default function CatalogSidebar({
 
     const selectedCount = countActiveFilterValues(pendingFilters);
 
+    const renderToggleCard = () => {
+        if (!hasMixedRawProduction) return null;
+        const currentMeatType = searchParams.get('filter_meat_type') ?? searchParams.get('rawProduction');
+        const isRawPath = pathname.includes('steyki-siri') || pathname.includes('siri') || pathname.includes('syry');
+        const isRawActive = currentMeatType === 'raw' || currentMeatType === 'true' || (currentMeatType === null && isRawPath);
+        const isCookedActive = !isRawActive;
+
+        const handleToggle = (targetType: 'raw' | 'cooked') => {
+            let targetUrl: string;
+
+            if (targetType === 'raw') {
+                if (pathname.includes('steyki-na-grili')) {
+                    targetUrl = pathname.replace('steyki-na-grili', 'steyki-siri');
+                } else if (pathname.includes('steyki-na-grile')) {
+                    targetUrl = pathname.replace('steyki-na-grile', 'steyki-siri');
+                } else {
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.set('filter_meat_type', 'raw');
+                    params.set('page', '1');
+                    targetUrl = `${pathname}?${params.toString()}`;
+                }
+            } else {
+                if (pathname.includes('steyki-siri')) {
+                    targetUrl = pathname.replace('steyki-siri', 'steyki-na-grili');
+                } else {
+                    const params = new URLSearchParams(searchParams.toString());
+                    params.set('filter_meat_type', 'cooked');
+                    params.set('page', '1');
+                    targetUrl = `${pathname}?${params.toString()}`;
+                }
+            }
+
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('catalog-loading-start'));
+            }
+            router.push(targetUrl, { scroll: false });
+        };
+
+        return (
+            <div className={s.toggleCard}>
+                <button
+                    type="button"
+                    className={clsx(
+                        s.typeBtn,
+                        isRawActive ? s.typeBtnActive : s.typeBtnOutline
+                    )}
+                    onClick={() => handleToggle('raw')}
+                >
+                    {texts.rawFirst}
+                </button>
+                <button
+                    type="button"
+                    className={clsx(
+                        s.typeBtn,
+                        isCookedActive ? s.typeBtnActive : s.typeBtnOutline
+                    )}
+                    onClick={() => handleToggle('cooked')}
+                >
+                    {texts.cookedFirst}
+                </button>
+            </div>
+        );
+    };
+
     return (
         <div className={s.sidebar} ref={sidebarRef}>
-
-
-            {/* Блок 2: Перемикачі "СПОЧАТКУ СИРЕ" / "СПОЧАТКУ ГОТОВЕ" (картка) - тільки якщо у категорії hasMixedRawProduction === true */}
-            {hasMixedRawProduction && (() => {
-                const currentMeatType = searchParams.get('filter_meat_type') ?? searchParams.get('rawProduction');
-                const isRawPath = pathname.includes('steyki-siri') || pathname.includes('siri') || pathname.includes('syry');
-                const isRawActive = currentMeatType === 'raw' || currentMeatType === 'true' || (currentMeatType === null && isRawPath);
-                const isCookedActive = !isRawActive;
-
-                const handleToggle = (targetType: 'raw' | 'cooked') => {
-                    let targetUrl: string;
-
-                    if (targetType === 'raw') {
-                        if (pathname.includes('steyki-na-grili')) {
-                            targetUrl = pathname.replace('steyki-na-grili', 'steyki-siri');
-                        } else if (pathname.includes('steyki-na-grile')) {
-                            targetUrl = pathname.replace('steyki-na-grile', 'steyki-siri');
-                        } else {
-                            const params = new URLSearchParams(searchParams.toString());
-                            params.set('filter_meat_type', 'raw');
-                            params.set('page', '1');
-                            targetUrl = `${pathname}?${params.toString()}`;
-                        }
-                    } else {
-                        if (pathname.includes('steyki-siri')) {
-                            targetUrl = pathname.replace('steyki-siri', 'steyki-na-grili');
-                        } else {
-                            const params = new URLSearchParams(searchParams.toString());
-                            params.set('filter_meat_type', 'cooked');
-                            params.set('page', '1');
-                            targetUrl = `${pathname}?${params.toString()}`;
-                        }
-                    }
-
-                    if (typeof window !== 'undefined') {
-                        window.dispatchEvent(new CustomEvent('catalog-loading-start'));
-                    }
-                    router.push(targetUrl, { scroll: false });
-                };
-
-                return (
-                    <div className={s.toggleCard}>
-                        <button
-                            type="button"
-                            className={clsx(
-                                s.typeBtn,
-                                isRawActive ? s.typeBtnActive : s.typeBtnOutline
-                            )}
-                            onClick={() => handleToggle('raw')}
-                        >
-                            {texts.rawFirst}
-                        </button>
-                        <button
-                            type="button"
-                            className={clsx(
-                                s.typeBtn,
-                                isCookedActive ? s.typeBtnActive : s.typeBtnOutline
-                            )}
-                            onClick={() => handleToggle('cooked')}
-                        >
-                            {texts.cookedFirst}
-                        </button>
-                    </div>
-                );
-            })()}
+            {renderToggleCard()}
 
             {categoryId && (
                 <CategorySwitcher
@@ -391,7 +391,6 @@ export default function CatalogSidebar({
             )}
 
             <div className={s.filtersWrapper}>
-
                 {/* Динамічні блоки фільтрів з API */}
                 {isLoadingFilters ? (
                     <Spinner centered={true} />

@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTransition, animated, config } from '@react-spring/web';
 import s from './FilterModal.module.scss';
 import FilterSidebar from '@/app/pages/Catalog/CatalogSidebar';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
+import useScrollLock from '@/hooks/useScrollLock';
 
 interface FilterModalProps {
     isOpen: boolean;
@@ -21,8 +23,14 @@ interface FilterModalProps {
 }
 
 export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, categoryId, sortOptions, filterLabel = "Фільтр", clearLabel = "Очистити", filterBlocks, activeFilters, hasMixedRawProduction }: FilterModalProps) {
+    const [mounted, setMounted] = useState(false);
     const [clearTrigger, setClearTrigger] = useState(0);
     const [isModified, setIsModified] = useState(false);
+    const { disableScroll, enableScroll } = useScrollLock();
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleClearAll = () => {
         setClearTrigger((prev: number) => prev + 1);
@@ -31,17 +39,13 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, c
         }
     };
 
-    // Prevent body scroll when open
+    // Prevent body scroll when open using project scroll lock hook
     useEffect(() => {
         if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
+            disableScroll();
+            return () => enableScroll();
         }
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [isOpen]);
+    }, [isOpen, disableScroll, enableScroll]);
 
     // Transition for the overlay (fade) and drawer (slide up)
     const transitions = useTransition(isOpen, {
@@ -51,7 +55,9 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, c
         config: { ...config.stiff, clamp: true }
     });
 
-    return transitions((style, item) => item ? (
+    if (!mounted) return null;
+
+    const modalContent = transitions((style, item) => item ? (
         <animated.div 
             className={s.overlay} 
             onClick={onClose} 
@@ -105,4 +111,6 @@ export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, c
             </animated.div>
         </animated.div>
     ) : null);
+
+    return createPortal(modalContent, document.body);
 }

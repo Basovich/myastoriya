@@ -26,12 +26,15 @@
 
 .toggleCard {
     width: 100%;
-    background: #FFFFFF;
-    border-radius: 16px;
-    padding: 12px;
-    box-shadow: 0 4px 60px rgba(0, 0, 0, 0.05);
     display: flex;
     gap: 8px;
+
+    @media (min-width: 1280px) {
+        background: #FFFFFF;
+        padding: 12px;
+        border-radius: 16px;
+        box-shadow: 0 4px 60px rgba(0, 0, 0, 0.05);
+    }
 }
 
 .typeBtn {
@@ -80,7 +83,7 @@
     }
 }
 
-.applyBtn {
+button.applyBtn {
     width: 100%;
     height: 48px;
     background: #E3051B;
