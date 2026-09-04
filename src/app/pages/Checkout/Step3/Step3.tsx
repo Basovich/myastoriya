@@ -863,12 +863,19 @@ export default function Step3({ lang }: Step3Props) {
                                         {isSelected && method.showChangeField && (
                                             <div className={s.changeSection}>
                                                 <input
-                                                    type="number"
+                                                    type="text"
+                                                    inputMode="numeric"
+                                                    pattern="[1-9][0-9]*"
                                                     placeholder={lang === 'ru' ? 'Сдача с какой суммы?' : 'Решта з якої суми?'}
                                                     value={changeAmount}
-                                                    onChange={e => setChangeAmount(e.target.value)}
+                                                    onChange={e => {
+                                                        let val = e.target.value.replace(/\D/g, '');
+                                                        if (val.startsWith('0')) {
+                                                            val = val.replace(/^0+/, '');
+                                                        }
+                                                        setChangeAmount(val);
+                                                    }}
                                                     className={s.changeInput}
-                                                    min={0}
                                                 />
                                             </div>
                                         )}
