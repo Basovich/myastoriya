@@ -98,8 +98,8 @@ export default function CatalogProductsClient({
         try {
             const nextPage = currentPage + 1;
             const currentSearchParams = new URLSearchParams(window.location.search);
-            const isCookedPath = typeof window !== 'undefined' && (window.location.pathname.includes('gril') || window.location.pathname.includes('grile'));
-            const rawProduction = parseRawProductionParam(currentSearchParams) ?? (hasMixedRawProduction ? !isCookedPath : undefined);
+            const isRawPath = typeof window !== 'undefined' && (window.location.pathname.includes('siri') || window.location.pathname.includes('syry'));
+            const rawProduction = parseRawProductionParam(currentSearchParams) ?? (hasMixedRawProduction ? isRawPath : undefined);
             const newProductsRes = await getProductsApi({
                 categoryId,
                 limit: 12,
@@ -142,8 +142,8 @@ export default function CatalogProductsClient({
 
         try {
             const currentSearchParams = new URLSearchParams(window.location.search);
-            const isCookedPath = typeof window !== 'undefined' && (window.location.pathname.includes('gril') || window.location.pathname.includes('grile'));
-            const rawProduction = parseRawProductionParam(currentSearchParams) ?? (hasMixedRawProduction ? !isCookedPath : undefined);
+            const isRawPath = typeof window !== 'undefined' && (window.location.pathname.includes('siri') || window.location.pathname.includes('syry'));
+            const rawProduction = parseRawProductionParam(currentSearchParams) ?? (hasMixedRawProduction ? isRawPath : undefined);
             const newProductsRes = await getProductsApi({
                 categoryId,
                 limit: 12,

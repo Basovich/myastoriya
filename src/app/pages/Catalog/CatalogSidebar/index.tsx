@@ -320,7 +320,8 @@ export default function CatalogSidebar({
             {/* Блок 2: Перемикачі "СПОЧАТКУ СИРЕ" / "СПОЧАТКУ ГОТОВЕ" (картка) - тільки якщо у категорії hasMixedRawProduction === true */}
             {hasMixedRawProduction && (() => {
                 const currentMeatType = searchParams.get('filter_meat_type') ?? searchParams.get('rawProduction');
-                const isRawActive = currentMeatType === 'raw' || currentMeatType === 'true' || (currentMeatType === null && !pathname.includes('steyki-na-grili') && !pathname.includes('steyki-na-grile'));
+                const isRawPath = pathname.includes('steyki-siri') || pathname.includes('siri') || pathname.includes('syry');
+                const isRawActive = currentMeatType === 'raw' || currentMeatType === 'true' || (currentMeatType === null && isRawPath);
                 const isCookedActive = !isRawActive;
 
                 const handleToggle = (targetType: 'raw' | 'cooked') => {

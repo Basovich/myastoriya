@@ -161,10 +161,10 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
         const categoryDetails = await getCategoryByIdApi(categoryId, lang, token ?? undefined).catch(() => null);
         const hasMixedRawProduction = Boolean(categoryDetails?.hasMixedRawProduction);
 
-        const isCookedPath = slug.some(s => s.includes('gril') || s.includes('grile') || s.includes('gotov'));
+        const isRawPath = slug.some(s => s.includes('siri') || s.includes('syry'));
         const rawProduction = rawParam !== undefined
             ? rawParam
-            : (hasMixedRawProduction ? !isCookedPath : undefined);
+            : (hasMixedRawProduction ? isRawPath : undefined);
 
         const [productsResponse, popularProducts] = await Promise.all([
             getProductsApi(
