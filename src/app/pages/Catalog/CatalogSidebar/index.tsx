@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable react-hooks/set-state-in-effect */
 
-import { useState, useCallback, useEffect, useRef, Fragment } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams, useRouter, usePathname, useSearchParams } from 'next/navigation';
 import s from './FilterSidebar.module.scss';
 import FilterGroup from '@/app/components/ui/FilterGroup/FilterGroup';

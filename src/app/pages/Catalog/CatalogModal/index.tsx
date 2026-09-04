@@ -6,6 +6,7 @@ import { useTransition, animated, config } from '@react-spring/web';
 import s from './FilterModal.module.scss';
 import FilterSidebar from '@/app/pages/Catalog/CatalogSidebar';
 import type { FilterBlock, FilterStateInput } from '@/lib/graphql';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 import useScrollLock from '@/hooks/useScrollLock';
 
 interface FilterModalProps {
@@ -23,14 +24,10 @@ interface FilterModalProps {
 }
 
 export default function  CatalogModal({ isOpen, onClose, sortBy, onSortChange, categoryId, sortOptions, filterLabel = "Фільтр", clearLabel = "Очистити", filterBlocks, activeFilters, hasMixedRawProduction }: FilterModalProps) {
-    const [mounted, setMounted] = useState(false);
+    const mounted = useIsHydrated();
     const [clearTrigger, setClearTrigger] = useState(0);
     const [isModified, setIsModified] = useState(false);
     const { disableScroll, enableScroll } = useScrollLock();
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     const handleClearAll = () => {
         setClearTrigger((prev: number) => prev + 1);
