@@ -1269,7 +1269,7 @@ export default function Step2() {
                             );
                         })}
                     </div>
-                    {selectedDelivery?.disabled && selectedDelivery?.needForAvailable && (
+                    {selectedDelivery?.disabled && selectedDelivery?.needForAvailable ? (
                         <div className={s.minOrderWarning}>
                             <span className={s.minOrderWarningText}>
                                 {lang === 'ua' 
@@ -1278,16 +1278,16 @@ export default function Step2() {
                                 }
                             </span>
                         </div>
+                    ) : (
+                        hydrated && elapsedForFree > 0 && (
+                            <div className={s.freeDeliveryBlock}>
+                                <div className={s.freeDeliveryText}>
+                                    Для безкоштовної доставки не вистачає <span>{elapsedForFree} <span className={s.currency}>₴</span></span>
+                                </div>
+                            </div>
+                        )
                     )}
                 </div>
-
-                {hydrated && elapsedForFree > 0 && (
-                    <div className={s.freeDeliveryBlock}>
-                        <div className={s.freeDeliveryText}>
-                            Для безкоштовної доставки не вистачає <span>{elapsedForFree} <span className={s.currency}>₴</span></span>
-                        </div>
-                    </div>
-                )}
 
                 {hydrated && showDeliveryTimeBlock && (
                     <div className={s.formSection}>
