@@ -137,7 +137,7 @@ export default function Step3({ lang }: Step3Props) {
     }, [promoCode]);
 
     const dispatch = useAppDispatch();
-    const { user, isAuthenticated, isGuest } = useAppSelector(state => state.auth);
+    const { user, isAuthenticated, isGuest, token: storeToken } = useAppSelector(state => state.auth);
 
     // Restore saved step 3 parameters from localStorage
     useEffect(() => {
@@ -471,8 +471,12 @@ export default function Step3({ lang }: Step3Props) {
             }
         };
 
+        const isGuestUser = !isAuthenticated || isGuest;
+        let cookieToken: string | null = null;
+
         try {
-            const token = await getAccessToken();
+            cookieToken = await getAccessToken();
+            const activeToken = cookieToken || storeToken || undefined;
 
             let userData: CheckoutUserData;
             const localityId = savedDeliveryData?.selectedCity?.id;
@@ -547,8 +551,6 @@ export default function Step3({ lang }: Step3Props) {
                 },
             };
 
-            const isGuestUser = !isAuthenticated || isGuest;
-
             const res = await createOrderApi(
                 {
                     userData,
@@ -562,7 +564,7 @@ export default function Step3({ lang }: Step3Props) {
                     registerMe: isGuestUser ? true : undefined,
                     returnPath: '/checkout?step=3',
                 },
-                token || '',
+                activeToken,
                 lang
             );
 
@@ -658,7 +660,7 @@ export default function Step3({ lang }: Step3Props) {
                     orderIdNum,
                     tokenStr,
                     browserInfo,
-                    token || '',
+                    activeToken,
                     lang
                 );
 
@@ -700,7 +702,16 @@ export default function Step3({ lang }: Step3Props) {
             console.error('Failed to create order', e);
             Sentry.captureException(e, {
                 tags: { category: 'checkout', action: 'create_order' },
-                extra: { paymentMethod, comment, personsCount },
+                extra: { 
+                    paymentMethod, 
+                    comment, 
+                    personsCount,
+                    hasCookieToken: Boolean(cookieToken),
+                    hasStoreToken: Boolean(storeToken),
+                    localityId: savedDeliveryData?.selectedCity?.id,
+                    deliveryId: deliveryParams?.deliveryId,
+                    isGuestUser,
+                },
             });
 
             const isDeliveryTimeError = e instanceof GraphQLError && e.errors.some(err => {

@@ -355,7 +355,7 @@ export async function createOrderApi(
         password?: string;
         returnPath?: string;
     },
-    token: string,
+    token?: string,
     lang?: string,
 ): Promise<CreateOrderResponse> {
     const finalVariables = {
@@ -366,7 +366,7 @@ export async function createOrderApi(
     const data = await gqlRequest<{ createOrder: CreateOrderResponse }>(
         CREATE_ORDER_MUTATION,
         finalVariables,
-        { token, lang },
+        { token: token || undefined, lang },
     );
     return data.createOrder;
 }
@@ -421,7 +421,7 @@ export async function orderGooglePayApi(
     orderId: number,
     payToken: string,
     browserInfo: { screenWidth: number; screenHeight: number },
-    authToken: string,
+    authToken?: string,
     lang?: string,
 ): Promise<FinishPayResponse> {
     const data = await gqlRequest<{ orderGooglePay: FinishPayResponse }>(
@@ -433,7 +433,7 @@ export async function orderGooglePayApi(
             platform: 'web',
             returnPath: '/checkout?step=3',
         },
-        { token: authToken, lang },
+        { token: authToken || undefined, lang },
     );
     return data.orderGooglePay;
 }
@@ -442,7 +442,7 @@ export async function orderApplePayApi(
     orderId: number,
     payToken: string,
     browserInfo: { screenWidth: number; screenHeight: number },
-    authToken: string,
+    authToken?: string,
     lang?: string,
 ): Promise<FinishPayResponse> {
     const data = await gqlRequest<{ orderApplePay: FinishPayResponse }>(
@@ -454,7 +454,7 @@ export async function orderApplePayApi(
             platform: 'web',
             returnPath: '/checkout?step=3',
         },
-        { token: authToken, lang },
+        { token: authToken || undefined, lang },
     );
     return data.orderApplePay;
 }
