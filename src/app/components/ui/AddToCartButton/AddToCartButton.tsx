@@ -9,8 +9,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCartAsync } from "@/store/slices/cartSlice";
 import CartModal from "@/app/components/CartModal/CartModal";
 // TODO: розкоментувати, коли повернемо вибір просмажки (авто-підбір costVariantId)
-// import { getProductCostVariantsApi, getDefaultCostVariant } from "@/lib/graphql";
-// TODO: розкоментувати DonenessModal та useParams для повернення модалки вибору просмажки
+import { getProductCostVariantsApi, getDefaultCostVariant } from "@/lib/graphql";
+// TODO: розкоментувати DonenessModal та useParams для відновлення інтерактивної модалки вибору просмажки
 // import DonenessModal from "@/app/components/ui/DonenessModal/DonenessModal";
 // import { useParams } from "next/navigation";
 import * as Sentry from '@sentry/nextjs';
@@ -31,12 +31,12 @@ export default function AddToCartButton({
     hasCostVariants = false
 }: AddToCartButtonProps) {
     const dispatch = useAppDispatch();
-    // TODO: розкоментувати для повернення модалки вибору просмажки
+    // TODO: розкоментувати для відновлення інтерактивної модалки вибору просмажки
     // const { lang } = useParams();
     // const currentLang = typeof lang === 'string' ? (lang === 'ru' ? 'ru' : 'ua') : 'ua';
     
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-    // TODO: розкоментувати для повернення модалки вибору просмажки
+    // TODO: розкоментувати для відновлення інтерактивної модалки вибору просмажки
     // const [isDonenessModalOpen, setIsDonenessModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const hydrated = useIsHydrated();
@@ -57,25 +57,21 @@ export default function AddToCartButton({
         try {
             setIsLoading(true);
 
-            // TODO: розкоментувати блок нижче, коли повернемо авто-підбір просмажки.
-            // Логіка: якщо товар має варіанти прожарки — завантажуємо їх і беремо
-            // найбільш просмажений (well-done) або дефолтний, щоб не показувати модалку.
-            // Для відкату: розкоментувати цей блок і рядок з costVariantId у dispatch нижче,
-            // а також розкоментувати імпорт getProductCostVariantsApi/getDefaultCostVariant вгорі.
-            //
-            // let costVariantId: number | undefined;
-            // if (hasCostVariants) {
-            //     const variants = await getProductCostVariantsApi(productId);
-            //     const selected = getDefaultCostVariant(variants);
-            //     costVariantId = selected ? Number(selected.id) : undefined;
-            // }
+            // Якщо товар має варіанти прожарки — автоматично беремо дефолтну/найбільшу просмажку,
+            // оскільки модальне вікно вибору тимчасово приховано, а бекенд вимагає costVariantId.
+            // Для повернення модального вікна вибору: закоментувати цей блок і розкоментувати `setIsDonenessModalOpen(true)`.
+            let costVariantId: number | undefined;
+            if (hasCostVariants) {
+                const variants = await getProductCostVariantsApi(productId);
+                const selected = getDefaultCostVariant(variants);
+                costVariantId = selected ? Number(selected.id) : undefined;
+            }
 
             await dispatch(
                 addToCartAsync({
                     id: String(productId),
                     quantity: 1,
-                    // TODO: розкоментувати рядок нижче разом з блоком вище:
-                    // ...(costVariantId !== undefined ? { costVariantId } : {}),
+                    ...(costVariantId !== undefined ? { costVariantId } : {}),
                 })
             ).unwrap();
             setIsCartModalOpen(true);
