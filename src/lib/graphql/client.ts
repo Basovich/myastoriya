@@ -197,15 +197,31 @@ export async function gqlRequest<T>(
                                     }
                                     store.dispatch(setToken(freshToken));
 
-                                    // Sync active locality to the new token session
-                                    const selectedCity = store.getState().locality.selectedCity;
-                                    if (selectedCity?.id) {
-                                        try {
-                                            await selectLocalityApi(selectedCity.id, undefined, freshToken);
-                                        } catch (cityErr) {
-                                            console.warn('[GQL Interceptor] Failed to sync locality to refreshed token:', cityErr);
-                                        }
-                                    }
+                                     // Sync active locality to the new token session
+                                     let cityIdToSync = store.getState().locality.selectedCity?.id;
+                                     if (!cityIdToSync && typeof window !== 'undefined') {
+                                         try {
+                                             const saved = localStorage.getItem('mya_selected_city');
+                                             if (saved) {
+                                                 cityIdToSync = JSON.parse(saved)?.id;
+                                             }
+                                         } catch {}
+                                     }
+                                     if (cityIdToSync) {
+                                          try {
+                                              await selectLocalityApi(cityIdToSync, undefined, freshToken);
+                                          } catch (cityErr) {
+                                              console.warn('[GQL Interceptor] Failed to sync locality to refreshed token:', cityErr);
+                                              if (!isServer) {
+                                                  void import('@sentry/nextjs').then((Sentry) => {
+                                                      Sentry.captureException(cityErr, {
+                                                          tags: { category: 'locality', action: 'interceptor_sync_city_failed' },
+                                                          extra: { cityIdToSync },
+                                                      });
+                                                  }).catch(() => {});
+                                              }
+                                          }
+                                     }
                                 }
                                 return freshToken;
                             } catch (refreshErr) {

@@ -22,6 +22,7 @@ import {
 import { selectLocalityAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
 import { persistor } from '@/store';
+import * as Sentry from '@sentry/nextjs';
 import s from './CitySelector.module.scss';
 import loaderStyles from '@/app/[lang]/loading.module.scss';
 import clsx from 'clsx';
@@ -112,6 +113,11 @@ export default function CitySelector({
         dispatch(setPromptVisible(false));
         // Clear any stale city list that may have been persisted before the blacklist fix
         dispatch(setAllCities([]));
+
+        // Restore prompt interaction status from localStorage so prompt doesn't show up again
+        if (localStorage.getItem('mya_city_confirmed') === 'true') {
+            dispatch(setPromptInteractionDone(true));
+        }
     }, [dispatch, hydrated]);
 
     // 2. Initial city detection logic (Centralized in Global UI instance)
@@ -161,6 +167,9 @@ export default function CitySelector({
                 }
             } catch (error) {
                 console.warn('[CitySelector] Detection failed:', error);
+                Sentry.captureException(error, {
+                    tags: { category: 'locality', action: 'detect_city_failed' },
+                });
                 const fallbackTitle = lang === 'ua' ? 'м. Київ' : 'г. Киев';
                 const fallback = { id: 2581, name: fallbackTitle };
                 dispatch(setSelectedCity(fallback));
@@ -286,6 +295,11 @@ export default function CitySelector({
         dispatch(setPromptInteractionDone(true));
         dispatch(setManualSelectionOpen(false));
 
+        try {
+            localStorage.setItem('mya_selected_city', JSON.stringify(city));
+            localStorage.setItem('mya_city_confirmed', 'true');
+        } catch {}
+
         // Sync with server via Server Action
         try {
             const deviceId = getOrCreateDeviceId();
@@ -295,6 +309,10 @@ export default function CitySelector({
             window.location.reload();
         } catch (error) {
             console.warn('[CitySelector] Failed to sync city with server:', error);
+            Sentry.captureException(error, {
+                tags: { category: 'locality', action: 'select_city_failed' },
+                extra: { cityId: city.id, cityName: city.name },
+            });
             await persistor.flush();
             window.location.reload();
         }
@@ -307,6 +325,13 @@ export default function CitySelector({
         dispatch(setPromptVisible(false));
         dispatch(setPromptInteractionDone(true));
         
+        try {
+            if (selectedCity) {
+                localStorage.setItem('mya_selected_city', JSON.stringify(selectedCity));
+            }
+            localStorage.setItem('mya_city_confirmed', 'true');
+        } catch {}
+
         // Sync detected city with server
         if (selectedCity) {
             try {
@@ -317,6 +342,10 @@ export default function CitySelector({
                 window.location.reload();
             } catch (error) {
                 console.warn('[CitySelector] Failed to sync confirmed city with server:', error);
+                Sentry.captureException(error, {
+                    tags: { category: 'locality', action: 'confirm_city_yes_failed' },
+                    extra: { cityId: selectedCity.id, cityName: selectedCity.name },
+                });
                 await persistor.flush();
                 window.location.reload();
             }
@@ -327,6 +356,9 @@ export default function CitySelector({
         dispatch(setPromptVisible(false));
         dispatch(setPromptInteractionDone(true));
         dispatch(setManualSelectionOpen(true));
+        try {
+            localStorage.setItem('mya_city_confirmed', 'true');
+        } catch {}
     };
 
     const toggleDropdown = (e?: React.MouseEvent) => {
@@ -338,6 +370,9 @@ export default function CitySelector({
         if (isPromptVisible) {
             dispatch(setPromptVisible(false));
             dispatch(setPromptInteractionDone(true));
+            try {
+                localStorage.setItem('mya_city_confirmed', 'true');
+            } catch {}
         }
     };
 
