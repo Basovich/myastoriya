@@ -8,8 +8,11 @@ import s from "./AddToCartButton.module.scss";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addToCartAsync } from "@/store/slices/cartSlice";
 import CartModal from "@/app/components/CartModal/CartModal";
-import DonenessModal from "@/app/components/ui/DonenessModal/DonenessModal";
-import { useParams } from "next/navigation";
+// TODO: розкоментувати, коли повернемо вибір просмажки (авто-підбір costVariantId)
+// import { getProductCostVariantsApi, getDefaultCostVariant } from "@/lib/graphql";
+// TODO: розкоментувати DonenessModal та useParams для повернення модалки вибору просмажки
+// import DonenessModal from "@/app/components/ui/DonenessModal/DonenessModal";
+// import { useParams } from "next/navigation";
 import * as Sentry from '@sentry/nextjs';
 
 interface AddToCartButtonProps {
@@ -25,14 +28,16 @@ export default function AddToCartButton({
     className, 
     variant = "icon",
     text = "В КОШИК",
-    hasCostVariants: _hasCostVariants = false
+    hasCostVariants = false
 }: AddToCartButtonProps) {
     const dispatch = useAppDispatch();
-    const { lang } = useParams();
-    const currentLang = typeof lang === 'string' ? (lang === 'ru' ? 'ru' : 'ua') : 'ua';
+    // TODO: розкоментувати для повернення модалки вибору просмажки
+    // const { lang } = useParams();
+    // const currentLang = typeof lang === 'string' ? (lang === 'ru' ? 'ru' : 'ua') : 'ua';
     
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-    const [isDonenessModalOpen, setIsDonenessModalOpen] = useState(false);
+    // TODO: розкоментувати для повернення модалки вибору просмажки
+    // const [isDonenessModalOpen, setIsDonenessModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const hydrated = useIsHydrated();
 
@@ -51,10 +56,26 @@ export default function AddToCartButton({
 
         try {
             setIsLoading(true);
+
+            // TODO: розкоментувати блок нижче, коли повернемо авто-підбір просмажки.
+            // Логіка: якщо товар має варіанти прожарки — завантажуємо їх і беремо
+            // найбільш просмажений (well-done) або дефолтний, щоб не показувати модалку.
+            // Для відкату: розкоментувати цей блок і рядок з costVariantId у dispatch нижче,
+            // а також розкоментувати імпорт getProductCostVariantsApi/getDefaultCostVariant вгорі.
+            //
+            // let costVariantId: number | undefined;
+            // if (hasCostVariants) {
+            //     const variants = await getProductCostVariantsApi(productId);
+            //     const selected = getDefaultCostVariant(variants);
+            //     costVariantId = selected ? Number(selected.id) : undefined;
+            // }
+
             await dispatch(
                 addToCartAsync({
                     id: String(productId),
                     quantity: 1,
+                    // TODO: розкоментувати рядок нижче разом з блоком вище:
+                    // ...(costVariantId !== undefined ? { costVariantId } : {}),
                 })
             ).unwrap();
             setIsCartModalOpen(true);
@@ -69,24 +90,29 @@ export default function AddToCartButton({
         }
     };
 
-    const handleConfirmDoneness = async (costVariantId: number) => {
-        try {
-            await dispatch(
-                addToCartAsync({
-                    id: String(productId),
-                    quantity: 1,
-                    costVariantId,
-                })
-            ).unwrap();
-            setIsCartModalOpen(true);
-        } catch (err) {
-            console.error("[AddToCartButton] Failed to add cost variant to cart:", err);
-            Sentry.captureException(err, {
-                tags: { category: 'cart', action: 'add_to_cart_doneness_ui' },
-                extra: { productId, costVariantId },
-            });
-        }
-    };
+    // TODO: розкоментувати handleConfirmDoneness для повернення модалки вибору просмажки.
+    // Також розкоментувати: DonenessModal/useParams імпорти вгорі, isDonenessModalOpen стан,
+    // блок `if (hasCostVariants) { setIsDonenessModalOpen(true); return; }` у handleClick,
+    // та JSX <DonenessModal /> внизу.
+    //
+    // const handleConfirmDoneness = async (costVariantId: number) => {
+    //     try {
+    //         await dispatch(
+    //             addToCartAsync({
+    //                 id: String(productId),
+    //                 quantity: 1,
+    //                 costVariantId,
+    //             })
+    //         ).unwrap();
+    //         setIsCartModalOpen(true);
+    //     } catch (err) {
+    //         console.error("[AddToCartButton] Failed to add cost variant to cart:", err);
+    //         Sentry.captureException(err, {
+    //             tags: { category: 'cart', action: 'add_to_cart_doneness_ui' },
+    //             extra: { productId, costVariantId },
+    //         });
+    //     }
+    // };
 
     return (
         <>
@@ -145,13 +171,14 @@ export default function AddToCartButton({
                 )}
             </button>
 
-            <DonenessModal
+            {/* TODO: розкоментувати <DonenessModal> для повернення модалки вибору просмажки */}
+            {/* <DonenessModal
                 isOpen={isDonenessModalOpen}
                 onClose={() => setIsDonenessModalOpen(false)}
                 productId={productId}
                 lang={currentLang}
                 onConfirm={handleConfirmDoneness}
-            />
+            /> */}
             <CartModal isOpen={isCartModalOpen} onClose={() => setIsCartModalOpen(false)} />
         </>
     );
