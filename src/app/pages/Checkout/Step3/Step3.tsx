@@ -24,6 +24,7 @@ import {
     getPaymentsApi, 
     createOrderApi, 
     orderGooglePayApi,
+    orderApplePayApi,
     FinishPayResponse,
     Payment, 
     CheckoutUserData, 
@@ -580,22 +581,33 @@ export default function Step3({ lang }: Step3Props) {
                     apiVersion: 2,
                     apiVersionMinor: 0,
                     merchantInfo: {
-                        merchantName: "М'ясторія",
+                        merchantId: 'BCR2DN4TVCDI5TRI',
+                        merchantName: 'Myastoriya',
                     },
                     allowedPaymentMethods: [{
                         type: 'CARD',
                         parameters: {
                             allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
-                            allowedCardNetworks: ['MASTERCARD', 'VISA'],
+                            allowedCardNetworks: ['VISA', 'MASTERCARD'],
+                            billingAddressRequired: true,
+                            billingAddressParameters: {
+                                phoneNumberRequired: true,
+                            },
                         },
                         tokenizationSpecification: {
                             type: 'PAYMENT_GATEWAY',
                             parameters: {
                                 gateway: 'easypay',
-                                gatewayMerchantId: 'MIASTORIIA-GA',
+                                gatewayMerchantId: 'BCR2DN4TVCDI5TRI',
                             },
                         },
                     }],
+                    transactionInfo: {
+                        countryCode: 'UA',
+                        currencyCode: currency || 'UAH',
+                        totalPriceStatus: 'FINAL',
+                        totalPrice: String(totalAmount),
+                    },
                 };
 
                 const methodData: PaymentMethodData[] = [{
@@ -605,7 +617,7 @@ export default function Step3({ lang }: Step3Props) {
 
                 const details: PaymentDetailsInit = {
                     total: {
-                        label: "М'ясторія",
+                        label: 'Myastoriya',
                         amount: {
                             currency: currency || 'UAH',
                             value: String(totalAmount),
@@ -651,6 +663,74 @@ export default function Step3({ lang }: Step3Props) {
                 }
             };
 
+            const requestApplePayToken = async (totalAmount: number, currency: string): Promise<string> => {
+                if (typeof window === 'undefined' || !('PaymentRequest' in window)) {
+                    const err = new Error(lang === 'ua' ? 'Apple Pay не підтримується цим браузером' : 'Apple Pay не поддерживается этим браузером');
+                    Sentry.captureException(err, { tags: { category: 'checkout', action: 'apay_support' } });
+                    throw err;
+                }
+
+                const applePayMethodData: PaymentMethodData[] = [{
+                    supportedMethods: 'https://apple.com/apple-pay',
+                    data: {
+                        version: 3,
+                        merchantIdentifier: 'merchant.ua.myastoriya.shop',
+                        displayName: 'Myastoriya',
+                        countryCode: 'UA',
+                        currencyCode: currency || 'UAH',
+                        supportedNetworks: ['visa', 'masterCard', 'amex', 'discover', 'vPay', 'maestro'],
+                        merchantCapabilities: ['supports3DS', 'supportsCredit', 'supportsDebit'],
+                    },
+                }];
+
+                const details: PaymentDetailsInit = {
+                    total: {
+                        label: 'Myastoriya',
+                        amount: {
+                            currency: currency || 'UAH',
+                            value: String(totalAmount),
+                        },
+                    },
+                };
+
+                const request = new PaymentRequest(applePayMethodData, details);
+
+                try {
+                    const canPay = await request.canMakePayment();
+                    if (!canPay) {
+                        console.warn('Apple Pay canMakePayment returned false');
+                    }
+                } catch (e) {
+                    console.warn('Apple Pay canMakePayment check failed', e);
+                }
+
+                try {
+                    const paymentResponse = await request.show();
+                    const detailsObj = paymentResponse.details as Record<string, unknown> | undefined;
+                    const paymentMethodData = detailsObj?.paymentMethodData as Record<string, unknown> | undefined;
+                    const tokenizationData = paymentMethodData?.tokenizationData as Record<string, unknown> | undefined;
+                    const tokenData = tokenizationData?.token || detailsObj?.token || detailsObj;
+
+                    if (tokenData) {
+                        await paymentResponse.complete('success');
+                        return typeof tokenData === 'string' ? tokenData : JSON.stringify(tokenData);
+                    }
+                    await paymentResponse.complete('fail');
+                    const noTokenErr = new Error(lang === 'ua' ? 'Не вдалося отримати токен Apple Pay' : 'Не удалось получить токен Apple Pay');
+                    Sentry.captureException(noTokenErr, { tags: { category: 'checkout', action: 'apay_empty_token' } });
+                    return Promise.reject(noTokenErr);
+                } catch (e: unknown) {
+                    const err = e as { name?: string; message?: string };
+                    if (err && (err.name === 'AbortError' || err.message?.includes('cancel') || err.message?.includes('user closed'))) {
+                        const cancelErr = new Error('USER_CANCELLED');
+                        cancelErr.name = 'USER_CANCELLED';
+                        throw cancelErr;
+                    }
+                    Sentry.captureException(e, { tags: { category: 'checkout', action: 'apay_show' } });
+                    throw e;
+                }
+            };
+
             const processFinishPay = async (orderIdNum: number, tokenStr: string) => {
                 const browserInfo = {
                     screenWidth: typeof window !== 'undefined' ? window.innerWidth : 1920,
@@ -672,10 +752,36 @@ export default function Step3({ lang }: Step3Props) {
                 }
             };
 
+            const processFinishApplePay = async (orderIdNum: number, tokenStr: string) => {
+                const browserInfo = {
+                    screenWidth: typeof window !== 'undefined' ? window.innerWidth : 1920,
+                    screenHeight: typeof window !== 'undefined' ? window.innerHeight : 1080,
+                };
+                const finishRes: FinishPayResponse = await orderApplePayApi(
+                    orderIdNum,
+                    tokenStr,
+                    browserInfo,
+                    activeToken,
+                    lang
+                );
+
+                if (finishRes.action === 'redirect_to_url' && finishRes.url) {
+                    dispatch(clearCart());
+                    window.location.href = finishRes.url;
+                } else {
+                    handleFinishAndRedirect(String(orderIdNum), finishRes.successUrl);
+                }
+            };
+
             if (res.action === 'online_payment' && (res.driver === 'google-pay' || res.driver === 'apple-pay')) {
                 try {
-                    const gpayToken = await requestGooglePayToken(res.total, res.currencyCode || 'UAH');
-                    await processFinishPay(Number(res.orderId), gpayToken);
+                    if (res.driver === 'apple-pay') {
+                        const applePayToken = await requestApplePayToken(res.total, res.currencyCode || 'UAH');
+                        await processFinishApplePay(Number(res.orderId), applePayToken);
+                    } else {
+                        const gpayToken = await requestGooglePayToken(res.total, res.currencyCode || 'UAH');
+                        await processFinishPay(Number(res.orderId), gpayToken);
+                    }
                 } catch (payErr: unknown) {
                     const err = payErr as { name?: string; message?: string };
                     if (err?.name === 'USER_CANCELLED' || err?.message === 'USER_CANCELLED') {
@@ -685,7 +791,7 @@ export default function Step3({ lang }: Step3Props) {
                         return;
                     }
                     Sentry.captureException(payErr, {
-                        tags: { category: 'checkout', action: 'google_pay_payment' },
+                        tags: { category: 'checkout', action: 'online_payment' },
                     });
                     const msg = payErr instanceof Error ? payErr.message : (lang === 'ru' ? 'Ошибка при оплате заказа. Попробуйте еще раз.' : 'Помилка при оплаті замовлення. Спробуйте ще раз.');
                     setSubmitError(msg);
