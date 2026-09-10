@@ -7,7 +7,7 @@ import Button from '@/app/components/ui/Button/Button';
 import ProductGallery from './ProductGallery/index';
 import ProductTabs from './ProductTabs/index';
 import ProductModifications from './ProductModifications/index';
-// import DonenessSelector from './DonenessSelector/index';
+import DonenessSelector from './DonenessSelector/index';
 import ProductReviews from './ProductReviews/index';
 import RelatedProducts from './RelatedProducts/index';
 import QuantitySelector from '@/app/components/ui/QuantitySelector/QuantitySelector';
@@ -448,8 +448,8 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         ) : null}
                     </div>
 
-                    {/* Doneness / cost variants selector - temporarily hidden */}
-                    {/* {product.hasCostVariants && variants.length > 0 && (
+                    {/* Doneness / cost variants selector */}
+                    {product.hasCostVariants && variants.length > 0 && (
                         <DonenessSelector
                             value={selectedCostVariantId}
                             onChange={setSelectedCostVariantId}
@@ -457,7 +457,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                             lang={lang}
                             noBorder={(!product.modifierGroups || product.modifierGroups.length === 0) && (!product.relatedProductGroups || product.relatedProductGroups.length === 0)}
                         />
-                    )} */}
+                    )}
 
                     {/* Related product groups (Додаткові товари) — виводяться над модифікаторами */}
                     {product.relatedProductGroups?.map((group) => (
