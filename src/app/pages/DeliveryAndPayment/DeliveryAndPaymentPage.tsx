@@ -13,7 +13,6 @@ import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import { Shop } from '@/lib/graphql/queries/shops';
 import { OrderingInfoBlock } from '@/lib/graphql/index';
 import Button from "@/app/components/ui/Button/Button";
-import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
 import { parseShopData } from '@/lib/utils/shops';
 
 interface DeliveryAndPaymentPageProps {
@@ -32,7 +31,6 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
         { label: deliveryPage.breadcrumbs.home, href: "/" },
         { label: deliveryPage.breadcrumbs.delivery }
     ];
-    const langPrefix = lang === 'ua' ? '' : `/${lang}`;
 
     return (
         <>

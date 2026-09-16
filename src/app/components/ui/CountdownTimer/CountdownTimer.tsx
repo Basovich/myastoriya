@@ -52,17 +52,15 @@ export default function CountdownTimer({
     labelMinutes,
     labelSeconds,
 }: CountdownTimerProps) {
-    const parsed = parseDate(targetDate);
     // null on server — prevents hydration mismatch (Date.now() differs between SSR and client)
     const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
     useEffect(() => {
-        // Set initial value on mount (client only)
-        setTimeLeft(getTimeLeft(parsed));
-
-        const id = setInterval(() => {
-            setTimeLeft(getTimeLeft(parsed));
-        }, 1000);
+        const parsedDate = parseDate(targetDate);
+        const update = () => setTimeLeft(getTimeLeft(parsedDate));
+        
+        update();
+        const id = setInterval(update, 1000);
         return () => clearInterval(id);
     }, [targetDate]);
 

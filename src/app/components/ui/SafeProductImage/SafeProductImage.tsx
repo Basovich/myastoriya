@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image, { ImageProps } from 'next/image';
 
 const DEFAULT_FALLBACK = '/images/product-placeholder.svg';
@@ -25,24 +25,22 @@ export default function SafeProductImage({
     ...props
 }: SafeProductImageProps) {
     const resolvedSrc = getSafeProductImageUrl(src, fallbackSrc);
-    const [imgSrc, setImgSrc] = useState<string>(resolvedSrc);
     const [hasError, setHasError] = useState(false);
+    const [prevSrc, setPrevSrc] = useState(src);
 
-    useEffect(() => {
-        const nextSrc = getSafeProductImageUrl(src, fallbackSrc);
-        setImgSrc(nextSrc);
+    if (src !== prevSrc) {
+        setPrevSrc(src);
         setHasError(false);
-    }, [src, fallbackSrc]);
+    }
 
     return (
         <Image
             {...props}
-            src={hasError ? fallbackSrc : imgSrc}
+            src={hasError ? fallbackSrc : resolvedSrc}
             alt={alt || 'Product'}
             onError={() => {
                 if (!hasError) {
                     setHasError(true);
-                    setImgSrc(fallbackSrc);
                 }
             }}
         />

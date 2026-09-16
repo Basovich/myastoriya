@@ -7,7 +7,7 @@ import { DeliveryPageDict, OurStoresPageDict } from '@/i18n/types';
 import Search from '@/app/components/ui/Search/Search';
 import { Locale } from '@/i18n/config';
 import StoreMiniCard from '@/app/pages/DeliveryAndPayment/components/StoreMiniCard/StoreMiniCard';
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_OPTIONS } from '@/lib/constants';
+import { DARK_MAP_STYLE, GOOGLE_MAPS_LOADER_OPTIONS } from '@/lib/constants';
 import { cleanAddressText } from '@/lib/utils/address';
 import { useAutocompleteCleaner } from '@/hooks/useAutocompleteCleaner';
 
@@ -69,8 +69,7 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
         Math.sin(dLon / 2) * Math.sin(dLon / 2)
     ;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c; // Distance in km
-    return d;
+    return R * c; // Distance in km
 }
 
 export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar }: DeliveryZonesProps) {
@@ -175,12 +174,10 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
         }
     }, [map, filteredStores]);
 
-    // Close InfoWindow if the selected store is filtered out
-    useEffect(() => {
-        if (selectedStore && !filteredStores.some(s => s.id === selectedStore.id)) {
-            setSelectedStore(null);
-        }
-    }, [filteredStores, selectedStore]);
+    // Derived state: clear selectedStore if it gets filtered out
+    const activeSelectedStore = selectedStore && filteredStores.some(s => s.id === selectedStore.id)
+        ? selectedStore
+        : null;
 
 
 
@@ -217,9 +214,9 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                             />
                         )}
 
-                        {selectedStore && (
+                        {activeSelectedStore && (
                             <InfoWindow
-                                position={{ lat: selectedStore.lat, lng: selectedStore.lng }}
+                                position={{ lat: activeSelectedStore.lat, lng: activeSelectedStore.lng }}
                                 onCloseClick={() => setSelectedStore(null)}
                                 options={{
                                     pixelOffset: new window.google.maps.Size(0, -30)
@@ -227,7 +224,7 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                             >
                                 <div className={s.infoWindowContainer}>
                                     <StoreCard
-                                        store={selectedStore}
+                                        store={activeSelectedStore}
                                         dict={storeDict}
                                         variant="map"
                                         onClose={() => setSelectedStore(null)}

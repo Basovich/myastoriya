@@ -96,7 +96,7 @@ export default function ComplexDiscounts({ dict, lang, specials }: ComplexDiscou
                     }}
                     className={s.swiper}
                 >
-                    {itemsToRender.map((discount: any, idx: number) => (
+                    {itemsToRender.map((discount, idx) => (
                         <SwiperSlide key={`${discount.id}-${idx}`} className={s.slide}>
                             <AppLink href={`/complex-discounts/${discount.slug || discount.id}`} className={s.cardLink}>
                                 <div className={s.card}>

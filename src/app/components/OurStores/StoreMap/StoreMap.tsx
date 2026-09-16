@@ -3,7 +3,7 @@ import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-map
 import s from "./StoreMap.module.scss";
 import { type Store } from "../StoreCard/StoreCard";
 import StoreCard from "../StoreCard/StoreCard";
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_OPTIONS } from "@/lib/constants";
+import { DARK_MAP_STYLE, GOOGLE_MAPS_LOADER_OPTIONS } from "@/lib/constants";
 
 const containerStyle = {
     width: "100%",

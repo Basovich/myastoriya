@@ -8,7 +8,7 @@ import s from './AddNovaPoshtaModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import Search from '@/app/components/ui/Search/Search';
 import Button from '@/app/components/ui/Button/Button';
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_OPTIONS } from '@/lib/constants';
+import { DARK_MAP_STYLE, GOOGLE_MAPS_LOADER_OPTIONS } from '@/lib/constants';
 import { getWarehousesApi, Warehouse } from '@/lib/graphql';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 

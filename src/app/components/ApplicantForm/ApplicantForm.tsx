@@ -149,11 +149,12 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                 } else {
                     setSubmitError(result.message || 'Не вдалося відправити заявку. Спробуйте ще раз.');
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error('Error submitting career application:', error);
                 let errMsg = 'Сталася помилка при відправці заявки. Будь ласка, спробуйте пізніше.';
-                if (error?.errors && Array.isArray(error.errors) && error.errors.length > 0) {
-                    const firstErr = error.errors[0];
+                const errObj = error as { errors?: Array<{ message?: string; extensions?: { validation?: Record<string, string[]> } }> };
+                if (errObj?.errors && Array.isArray(errObj.errors) && errObj.errors.length > 0) {
+                    const firstErr = errObj.errors[0];
                     const valErrors = firstErr?.extensions?.validation;
                     if (valErrors && typeof valErrors === 'object') {
                         const firstKey = Object.keys(valErrors)[0];

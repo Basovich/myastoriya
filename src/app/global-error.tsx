@@ -17,7 +17,7 @@ export default function GlobalError({
     <html>
       <body>
         {/* This is the default Next.js error component, but it doesn't allow omitting the statusCode property. */}
-        <Error statusCode={undefined as any} />
+        <Error statusCode={undefined as unknown as number} />
       </body>
     </html>
   );

@@ -22,7 +22,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     const [view, setView] = useState<ModalView>('login');
     const [forgotPhone, setForgotPhone] = useState('');
     const [forgotActionToken, setForgotActionToken] = useState('');
-    const [pendingSocialProfile, setPendingSocialProfile] = useState<any>(null);
+    const [pendingSocialProfile, setPendingSocialProfile] = useState<unknown>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
     useEffect(() => {

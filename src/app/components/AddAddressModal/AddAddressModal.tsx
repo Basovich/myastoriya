@@ -10,7 +10,7 @@ import { getLocalitiesApi, getStreetsApi } from '@/lib/graphql';
 import InputField from '@/app/components/ui/InputField';
 import Button from '@/app/components/ui/Button/Button';
 import Search from '@/app/components/ui/Search/Search';
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_OPTIONS } from '@/lib/constants';
+import { DARK_MAP_STYLE, GOOGLE_MAPS_LOADER_OPTIONS } from '@/lib/constants';
 import { useParams } from 'next/navigation';
 import { Locale } from '@/i18n/config';
 import { cleanAddressText } from '@/lib/utils/address';

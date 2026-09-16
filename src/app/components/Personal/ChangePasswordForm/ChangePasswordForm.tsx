@@ -57,7 +57,7 @@ export default function ChangePasswordForm({ user, dict, onSubmit, submitStatus 
         formik.setFieldTouched(field, false);
     };
 
-    const handleBlur = (e: React.FocusEvent<any>) => {
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         const { name } = e.target;
         setFocusedFields(prev => ({ ...prev, [name]: false }));
         formik.handleBlur(e);
