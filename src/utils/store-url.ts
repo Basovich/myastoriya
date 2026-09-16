@@ -25,7 +25,8 @@ export function resolveStoreBackendSlug(slug: string): string {
 /**
  * Legacy store redirect check (no-op since exact admin slugs are used).
  */
-export function getLegacyStoreRedirectSlug(_slug: string): string | null {
+export function getLegacyStoreRedirectSlug(slug?: string): string | null {
+    if (slug) return null;
     return null;
 }
 
