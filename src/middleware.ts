@@ -42,6 +42,16 @@ export function middleware(request: NextRequest) {
         );
     }
 
+    // 3. SEO 301 Permanent Redirect for legacy /catalog/:slug category paths to /category/:slug/
+    const catalogMatch = pathname.match(/^(?:\/(ua|ru))?\/catalog\/(.+)$/);
+    if (catalogMatch) {
+        const langPrefix = catalogMatch[1] || 'ua';
+        const subPath = catalogMatch[2];
+        const targetPath = `/${langPrefix}/category/${subPath}`;
+        const normalizedTarget = targetPath.endsWith('/') ? targetPath : `${targetPath}/`;
+        return NextResponse.redirect(new URL(`${normalizedTarget}${search}`, request.url), 301);
+    }
+
     // If path does not start with /ua/ or /ru/ (and is not root /), redirect default locale to /ua/... per SEO specs
     const hasLocalePrefix = locales.some(locale => pathname.startsWith(`/${locale}/`));
     if (!hasLocalePrefix && pathname !== '/') {
@@ -51,7 +61,7 @@ export function middleware(request: NextRequest) {
         );
     }
 
-    // 3. Redirect /personal/ to /personal/profile/
+    // 4. Redirect /personal/ to /personal/profile/
     if (pathname === '/personal/') {
         return NextResponse.redirect(new URL('/personal/profile/', request.url), 301);
     }

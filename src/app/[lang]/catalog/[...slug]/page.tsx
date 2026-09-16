@@ -82,7 +82,7 @@ export default async function DynamicCatalogPage({ params }: DynamicCatalogPageP
     );
 
     if (categoryEntry) {
-        redirect(getLocalizedHref(`/category/${categoryEntry.node.slug}`, lang as Locale));
+        redirect(getLocalizedHref(`/category/${categoryEntry.node.slug}/`, lang as Locale));
     }
 
     // Check if it exists in global tree (hidden for this city → redirect to catalog root)
@@ -93,7 +93,7 @@ export default async function DynamicCatalogPage({ params }: DynamicCatalogPageP
     );
 
     if (globalCategoryEntry) {
-        redirect(getLocalizedHref('/catalog', lang as Locale));
+        redirect(getLocalizedHref('/catalog/', lang as Locale));
     }
 
     notFound();

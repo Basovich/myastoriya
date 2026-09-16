@@ -66,7 +66,7 @@ export function buildCategoryIndex(
  *   Level 3 (has parent + gParent) → /catalog/{slug}
  */
 export function getCategoryHref(node: ProductCategory): string {
-    return `/category/${node.slug}`;
+    return `/category/${node.slug}/`;
 }
 
 // ---------------------------------------------------------------------------
@@ -76,7 +76,7 @@ export function getCategoryHref(node: ProductCategory): string {
 /**
  * Builds breadcrumb items for a category or product page based on its categoryId.
  * Uses the shallowest occurrence of the category in the tree index.
- * Note: Hrefs use flat /category/{slug} structure, while breadcrumbs hierarchy preserves category depth.
+ * Note: Hrefs use flat /category/{slug}/ structure, while breadcrumbs hierarchy preserves category depth.
  */
 export function buildCategoryBreadcrumbs(
     categoryId: number | string | null | undefined,
@@ -91,23 +91,23 @@ export function buildCategoryBreadcrumbs(
     const { node, parent, grandParent, level } = entry;
 
     if (level === 1) {
-        return [...base, { label: node.name, href: `/category/${node.slug}` }];
+        return [...base, { label: node.name, href: `/category/${node.slug}/` }];
     }
 
     if (level === 2 && parent) {
         return [
             ...base,
-            { label: parent.name, href: `/category/${parent.slug}` },
-            { label: node.name, href: `/category/${node.slug}` },
+            { label: parent.name, href: `/category/${parent.slug}/` },
+            { label: node.name, href: `/category/${node.slug}/` },
         ];
     }
 
     if (level === 3 && parent && grandParent) {
         return [
             ...base,
-            { label: grandParent.name, href: `/category/${grandParent.slug}` },
-            { label: parent.name, href: `/category/${parent.slug}` },
-            { label: node.name, href: `/category/${node.slug}` },
+            { label: grandParent.name, href: `/category/${grandParent.slug}/` },
+            { label: parent.name, href: `/category/${parent.slug}/` },
+            { label: node.name, href: `/category/${node.slug}/` },
         ];
     }
 

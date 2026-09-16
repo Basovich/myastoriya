@@ -93,9 +93,9 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
 
     const lastSegment = slug[slug.length - 1];
 
-    // If multi-segment URL accessed (e.g. /category/parent/child), redirect 301 to single-level flat URL (/category/child)
+    // If multi-segment URL accessed (e.g. /category/parent/child), redirect 301 to single-level flat URL (/category/child/)
     if (slug.length > 1) {
-        redirect(`/${lang}/category/${lastSegment}`);
+        redirect(`/${lang}/category/${lastSegment}/`);
     }
 
     // 1. Fetch current catalog tree (locality-aware)
@@ -116,7 +116,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
             e => normalizeSlug(e.node.slug) === targetNorm
         );
         if (categoryEntry) {
-            redirect(`/${lang}/category/${categoryEntry.node.slug}`);
+            redirect(`/${lang}/category/${categoryEntry.node.slug}/`);
         }
     }
 
@@ -132,7 +132,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
         if (altEntry) {
             categoryEntry = categoryIndex.get(altEntry.node.id);
             if (categoryEntry) {
-                redirect(`/${lang}/category/${categoryEntry.node.slug}`);
+                redirect(`/${lang}/category/${categoryEntry.node.slug}/`);
             }
         }
     }
@@ -146,7 +146,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
             e => e.node.slug === lastSegment || normalizeSlug(e.node.slug) === targetNorm
         );
         if (categoryEntry && categoryEntry.node.slug !== lastSegment) {
-            redirect(`/${lang}/category/${categoryEntry.node.slug}`);
+            redirect(`/${lang}/category/${categoryEntry.node.slug}/`);
         }
     }
 
@@ -186,13 +186,16 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
 
         const hasActiveFilters = activeFilters.length > 0 || !!sort || rawParam !== undefined;
         if (shouldRedirectForLocality(productsResponse.data.length, page, hasActiveFilters)) {
-            let redirectUrl = `/${lang}/catalog`;
+            let redirectUrl = `/${lang}/catalog/`;
             if (categoryEntry.parent) {
                 const parentEntry = categoryIndex.get(String(categoryEntry.parent.id));
                 if (parentEntry) {
                     const parentHref = getCategoryHref(parentEntry.node);
                     redirectUrl = `/${lang}${parentHref}`;
                 }
+            }
+            if (!redirectUrl.endsWith('/')) {
+                redirectUrl += '/';
             }
             
             redirect(redirectUrl);
