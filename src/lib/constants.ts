@@ -2,6 +2,17 @@ export const GOOGLE_MAPS_API_KEY = 'AIzaSyAcXuCdMzuth_BLGQ0L0foYuE_VeKtJ_Wo';
 export const GOOGLE_MAPS_LIBRARIES: ("places" | "drawing" | "geometry" | "visualization")[] = ['places'];
 export const GOOGLE_CLIENT_ID = '419476524211-jcrd74jd0qfdla91g81dntgfm1e212sp.apps.googleusercontent.com';
 
+const initialLang = typeof window !== 'undefined'
+    ? (window.location.pathname.startsWith('/ru') ? 'ru' : 'uk')
+    : 'uk';
+
+export const GOOGLE_MAPS_LOADER_OPTIONS = {
+    id: 'google-map-script',
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    libraries: GOOGLE_MAPS_LIBRARIES,
+    language: initialLang,
+} as const;
+
 export const DARK_MAP_STYLE = [
     { "featureType": "all", "elementType": "geometry", "stylers": [{ "color": "#1d2c4d" }] },
     { "featureType": "all", "elementType": "labels.text.fill", "stylers": [{ "color": "#8ec3b9" }] },

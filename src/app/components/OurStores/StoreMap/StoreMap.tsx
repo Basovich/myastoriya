@@ -3,10 +3,7 @@ import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-map
 import s from "./StoreMap.module.scss";
 import { type Store } from "../StoreCard/StoreCard";
 import StoreCard from "../StoreCard/StoreCard";
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from "@/lib/constants";
-
-// Dark map style
-
+import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_OPTIONS } from "@/lib/constants";
 
 const containerStyle = {
     width: "100%",
@@ -33,23 +30,8 @@ interface StoreMapProps {
     };
 }
 
-// Google Maps loader options must be a stable module-level constant.
-// useJsApiLoader is a singleton — calling it with different options (e.g. a
-// different `language` after a locale switch) throws a runtime error.
-// We read the locale from the URL once at module initialisation time.
-const initialLang = typeof window !== 'undefined'
-    ? (window.location.pathname.startsWith('/ru') ? 'ru' : 'uk')
-    : 'uk';
-
-const MAPS_LOADER_OPTIONS = {
-    id: 'google-map-script',
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-    libraries: GOOGLE_MAPS_LIBRARIES,
-    language: initialLang,
-} as const;
-
 export default function StoreMap({ stores, dict }: StoreMapProps) {
-    const { isLoaded } = useJsApiLoader(MAPS_LOADER_OPTIONS);
+    const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
     const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 

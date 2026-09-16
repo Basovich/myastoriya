@@ -10,6 +10,7 @@ import {
 import { buildCategoryIndex } from '@/utils/category-url';
 import { getHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
 import { getAccessToken } from '@/app/actions/authActions';
+import { getLocalizedHref } from '@/utils/i18n-helpers';
 
 interface DynamicCatalogPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
@@ -70,10 +71,9 @@ export default async function DynamicCatalogPage({ params }: DynamicCatalogPageP
     }
 
     const lastSegment = slug[slug.length - 1];
-    const langPrefix = lang === 'ua' ? '' : `/${lang}`;
 
     // Fetch current catalog tree (locality-aware)
-    const catalogTree = await getCatalogTreeApi(lang, 768, token ?? undefined).catch(() => [] as ProductCategory[]);
+    const catalogTree = await getCatalogTreeApi(lang as Locale, 768, token ?? undefined).catch(() => [] as ProductCategory[]);
     const categoryIndex = buildCategoryIndex(catalogTree);
 
     // Check if the last segment is a category in the current locality tree → redirect to /category/
@@ -82,18 +82,18 @@ export default async function DynamicCatalogPage({ params }: DynamicCatalogPageP
     );
 
     if (categoryEntry) {
-        redirect(`${langPrefix}/category/${categoryEntry.node.slug}`);
+        redirect(getLocalizedHref(`/category/${categoryEntry.node.slug}`, lang as Locale));
     }
 
     // Check if it exists in global tree (hidden for this city → redirect to catalog root)
-    const globalTree = await getCatalogTreeApi(lang, 768, undefined).catch(() => [] as ProductCategory[]);
+    const globalTree = await getCatalogTreeApi(lang as Locale, 768, undefined).catch(() => [] as ProductCategory[]);
     const globalIndex = buildCategoryIndex(globalTree);
     const globalCategoryEntry = Array.from(globalIndex.values()).find(
         e => e.node.slug === lastSegment
     );
 
     if (globalCategoryEntry) {
-        redirect(`${langPrefix}/catalog`);
+        redirect(getLocalizedHref('/catalog', lang as Locale));
     }
 
     notFound();

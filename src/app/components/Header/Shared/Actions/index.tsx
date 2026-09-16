@@ -11,6 +11,9 @@ import AuthButton from '@/app/components/Header/Shared/AuthButton';
 import AuthModal from '@/app/components/AuthModal';
 import CartModal from '@/app/components/CartModal/CartModal';
 
+import { getLocalizedHref } from '@/utils/i18n-helpers';
+import { Locale } from '@/i18n/config';
+
 function Actions() {
     const dispatch = useAppDispatch();
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -19,7 +22,7 @@ function Actions() {
     const router = useRouter();
     const params = useParams();
     const pathname = usePathname();
-    const lang = params?.lang as string || 'ua';
+    const lang = (params?.lang as Locale) || 'ua';
     const isCheckoutPage = pathname?.includes('/checkout');
 
     const cartItems = useAppSelector((state) => state.cart.items);
@@ -33,8 +36,7 @@ function Actions() {
 
     const handleFavoritesClick = () => {
         if (isReallyLoggedIn) {
-            const prefix = lang === 'ua' ? '' : `/${lang}`;
-            router.push(`${prefix}/personal/favorites/`);
+            router.push(getLocalizedHref('/personal/favorites/', lang));
         } else {
             setIsAuthModalOpen(true);
         }
@@ -71,8 +73,7 @@ function Actions() {
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}
                 onSuccess={() => {
-                    const prefix = lang === 'ua' ? '' : `/${lang}`;
-                    router.push(`${prefix}/personal/favorites/`);
+                    router.push(getLocalizedHref('/personal/favorites/', lang));
                 }}
             />
             <CartModal

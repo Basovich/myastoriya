@@ -1,12 +1,12 @@
 import React from 'react';
 import s from './StoreMiniCard.module.scss';
-import Link from 'next/link';
 import clsx from 'clsx';
 import { Store } from '@/app/components/OurStores/StoreCard/StoreCard';
 import GeocodedAddressClient from '@/app/components/ui/GeocodedAddress/GeocodedAddressClient';
 import { useParams } from 'next/navigation';
 import { Locale } from '@/i18n/config';
 import { getStoreHref } from '@/utils/store-url';
+import AppLink from '@/app/components/ui/AppLink/AppLink';
 
 const LOCALIZED_TEXTS = {
     ua: {
@@ -54,7 +54,7 @@ export default function StoreMiniCard({ store, isPromo = false }: StoreMiniCardP
     if (!store) return null;
 
     return (
-        <Link href={getStoreHref(store)} className={s.card}>
+        <AppLink href={getStoreHref(store, lang)} className={s.card}>
             <div className={s.header}>
                 <div className={s.titleGroup}>
                     <h4 className={s.name}>{store.name}</h4>
@@ -104,6 +104,6 @@ export default function StoreMiniCard({ store, isPromo = false }: StoreMiniCardP
                     </div>
                 </div>
             </div>
-        </Link>
+        </AppLink>
     );
 }

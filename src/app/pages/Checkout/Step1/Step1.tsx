@@ -11,7 +11,7 @@ import { fetchCartAsync } from '@/store/slices/cartSlice';
 import { getAccessToken } from '@/app/actions/authActions';
 import { sendSmsApi, smsVerifyApi, updateCheckoutUserDataApi } from '@/lib/graphql/queries/auth';
 import clsx from 'clsx';
-import Link from 'next/link';
+import AppLink from '@/app/components/ui/AppLink/AppLink';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import AuthModal from '@/app/components/AuthModal';
 import Checkbox from '@/app/components/ui/Checkbox/Checkbox';
@@ -566,14 +566,14 @@ export default function Step1() {
                                 }}
                             >
                                 Я згоден з{' '}
-                                <Link
+                                <AppLink
                                     href="/oferta"
                                     className={s.inlineLink}
                                     target="_blank"
                                     onClick={e => e.stopPropagation()}
                                 >
                                     угодою користувача
-                                </Link>
+                                </AppLink>
                             </Checkbox>
                             {touched.agreed && errors.agreed && (
                                 <span className={clsx(s.fieldError, s.agreeError)}>{errors.agreed}</span>

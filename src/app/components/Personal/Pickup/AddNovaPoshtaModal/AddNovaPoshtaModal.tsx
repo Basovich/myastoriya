@@ -8,7 +8,7 @@ import s from './AddNovaPoshtaModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import Search from '@/app/components/ui/Search/Search';
 import Button from '@/app/components/ui/Button/Button';
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
+import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_OPTIONS } from '@/lib/constants';
 import { getWarehousesApi, Warehouse } from '@/lib/graphql';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 
@@ -79,12 +79,7 @@ export default function AddNovaPoshtaModal({
 }: AddNovaPoshtaModalProps) {
     const t = dict[lang] ?? dict.ua;
 
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries: GOOGLE_MAPS_LIBRARIES,
-        language: lang === 'ua' ? 'uk' : 'ru',
-    });
+    const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
     const [view, setView] = useState<'list' | 'map'>('map');
     const [searchQuery, setSearchQuery] = useState('');

@@ -27,7 +27,7 @@ export default function PersonalLayoutClient({ children, lang: paramsLang }: Per
     const dict: typeof personalDict.ua = (personalDict[lang] || personalDict.ua) as typeof personalDict.ua;
 
     const breadcrumbItems = [
-        { label: lang === 'ua' ? 'Головна' : 'Главная', href: `/${lang === 'ua' ? '' : 'ru'}` },
+        { label: lang === 'ua' ? 'Головна' : 'Главная', href: '/' },
         { label: dict.title, href: '#' }
     ];
 

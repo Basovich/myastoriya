@@ -50,7 +50,7 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
                     <SectionHeader title={deliveryPage.zones.title} classNameWrapper={s.sectionHeader} />
                     <div className={s.tabs}>
                         <Button
-                            href={`${langPrefix}/delivery`}
+                            href="/delivery"
                             variant={!isMeatBar ? "black" : "outline-black"}
                             active={!isMeatBar}
                             className={s.tab}
@@ -58,7 +58,7 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
                             {deliveryPage.zones.tabs.restaurants}
                         </Button>
                         <Button
-                            href={`${langPrefix}/delivery-meat-bar`}
+                            href="/delivery-meat-bar"
                             variant={isMeatBar ? "black" : "outline-black"}
                             active={isMeatBar}
                             className={s.tab}

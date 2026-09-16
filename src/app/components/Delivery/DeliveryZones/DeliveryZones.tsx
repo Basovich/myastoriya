@@ -7,7 +7,7 @@ import { DeliveryPageDict, OurStoresPageDict } from '@/i18n/types';
 import Search from '@/app/components/ui/Search/Search';
 import { Locale } from '@/i18n/config';
 import StoreMiniCard from '@/app/pages/DeliveryAndPayment/components/StoreMiniCard/StoreMiniCard';
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
+import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_OPTIONS } from '@/lib/constants';
 import { cleanAddressText } from '@/lib/utils/address';
 import { useAutocompleteCleaner } from '@/hooks/useAutocompleteCleaner';
 
@@ -76,12 +76,7 @@ function getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon
 export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar }: DeliveryZonesProps) {
     const texts = LOCALIZED_TEXTS[lang] || LOCALIZED_TEXTS.ua;
     useAutocompleteCleaner();
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries: GOOGLE_MAPS_LIBRARIES,
-        language: typeof window !== 'undefined' ? (lang === 'ua' ? 'uk' : 'ru') : 'uk'
-    });
+    const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
     const activeTab = isMeatBar ? 'meatbar' : 'restaurants';
     const [searchQuery, setSearchQuery] = useState('');

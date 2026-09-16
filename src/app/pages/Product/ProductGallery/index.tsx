@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
+import AppLink from '@/app/components/ui/AppLink/AppLink';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
@@ -81,9 +81,9 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
                             {discount && <span className={styles.discountBadge}>{discount}</span>}
                             {!discount && badge && <span className={styles.discountBadge}>{badge}</span>}
                             {promoTitle && (
-                                <Link href={promoUrl || "/actions"} className={styles.promoText}>
+                                <AppLink href={promoUrl || "/actions"} className={styles.promoText}>
                                     {promoTitle}
-                                </Link>
+                                </AppLink>
                             )}
                         </div>
                     )}

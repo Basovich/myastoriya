@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
+import { getLocalizedHref } from '@/utils/i18n-helpers';
 import { getHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import {
@@ -134,19 +135,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
     if (!product) {
         // Product exists but is not available in this city → redirect to catalog
-        const globalProduct = await getProductByIdApi(productId, lang, undefined, true).catch(() => null);
+        const globalProduct = await getProductByIdApi(productId, lang as Locale, undefined, true).catch(() => null);
         if (globalProduct) {
-            const langPrefix = lang === 'ua' ? '' : `/${lang}`;
-
             const localEntry = globalProduct.categoryId
                 ? categoryIndex.get(String(globalProduct.categoryId))
                 : undefined;
 
             if (localEntry) {
-                redirect(`${langPrefix}${getCategoryHref(localEntry.node)}`);
+                redirect(getLocalizedHref(getCategoryHref(localEntry.node), lang as Locale));
             }
 
-            redirect(`${langPrefix}/catalog`);
+            redirect(getLocalizedHref('/catalog', lang as Locale));
         }
 
         notFound();
@@ -154,17 +153,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
     // 4. If product is not available for this city, redirect to nearest available category
     if (!product.available) {
-        const langPrefix = lang === 'ua' ? '' : `/${lang}`;
-
         const localEntry = product.categoryId
             ? categoryIndex.get(String(product.categoryId))
             : undefined;
 
         if (localEntry) {
-            redirect(`${langPrefix}${getCategoryHref(localEntry.node)}`);
+            redirect(getLocalizedHref(getCategoryHref(localEntry.node), lang as Locale));
         }
 
-        redirect(`${langPrefix}/catalog`);
+        redirect(getLocalizedHref('/catalog', lang as Locale));
     }
 
     // 5. Fetch non-critical product page data

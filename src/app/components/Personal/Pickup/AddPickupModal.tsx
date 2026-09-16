@@ -8,7 +8,7 @@ import s from './AddPickupModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
 import Search from '@/app/components/ui/Search/Search';
 import Button from '@/app/components/ui/Button/Button';
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
+import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_OPTIONS } from '@/lib/constants';
 import { getShopsApi } from '@/lib/graphql';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
 
@@ -69,12 +69,7 @@ const dict = {
 };
 
 export default function AddPickupModal({ isOpen, onClose, onAdd, lang, existingShopIds }: AddPickupModalProps) {
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries: GOOGLE_MAPS_LIBRARIES,
-        language: typeof window !== 'undefined' ? (lang === 'ua' ? 'uk' : 'ru') : 'uk'
-    });
+    const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
     const [stores, setStores] = useState<Store[]>([]);
     const [isLoadingStores, setIsLoadingStores] = useState(false);

@@ -10,7 +10,7 @@ import { getLocalitiesApi, getStreetsApi } from '@/lib/graphql';
 import InputField from '@/app/components/ui/InputField';
 import Button from '@/app/components/ui/Button/Button';
 import Search from '@/app/components/ui/Search/Search';
-import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES } from '@/lib/constants';
+import { GOOGLE_MAPS_API_KEY, DARK_MAP_STYLE, GOOGLE_MAPS_LIBRARIES, GOOGLE_MAPS_LOADER_OPTIONS } from '@/lib/constants';
 import { useParams } from 'next/navigation';
 import { Locale } from '@/i18n/config';
 import { cleanAddressText } from '@/lib/utils/address';
@@ -115,12 +115,7 @@ export default function AddAddressModal({ isOpen, onClose, initialCity, is500mDe
     const dict = modalDict[lang === 'ru' ? 'ru' : 'ua'];
     useAutocompleteCleaner();
 
-    const { isLoaded } = useJsApiLoader({
-        id: 'google-map-script',
-        googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries: GOOGLE_MAPS_LIBRARIES,
-        language: typeof window !== 'undefined' ? (lang === 'ua' ? 'uk' : 'ru') : 'uk'
-    });
+    const { isLoaded } = useJsApiLoader(GOOGLE_MAPS_LOADER_OPTIONS);
 
     const [view, setView] = useState<'form' | 'map'>('form');
     const [radiusError, setRadiusError] = useState<string | null>(null);

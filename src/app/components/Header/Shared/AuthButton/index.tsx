@@ -8,13 +8,15 @@ import clsx from 'clsx';
 import s from './AuthButton.module.scss';
 import AuthModal from '@/app/components/AuthModal';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
+import { getLocalizedHref } from '@/utils/i18n-helpers';
+import { Locale } from '@/i18n/config';
 
 function AuthButton() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const router = useRouter();
     const params = useParams();
     const pathname = usePathname();
-    const lang = params?.lang as string || 'ua';
+    const lang = (params?.lang as Locale) || 'ua';
 
     const { isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
     const hydrated = useIsHydrated();
@@ -25,8 +27,7 @@ function AuthButton() {
 
     const handleAuthClick = () => {
         if (isReallyLoggedIn) {
-            const prefix = lang === 'ua' ? '' : `/${lang}`;
-            router.push(`${prefix}/personal/profile/`);
+            router.push(getLocalizedHref('/personal/profile/', lang));
         } else {
             setIsModalOpen(true);
         }
@@ -56,8 +57,7 @@ function AuthButton() {
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={() => {
                     if (isHomePage) {
-                        const prefix = lang === 'ua' ? '' : `/${lang}`;
-                        router.push(`${prefix}/personal/profile/`);
+                        router.push(getLocalizedHref('/personal/profile/', lang));
                     }
                 }}
             />

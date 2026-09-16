@@ -110,11 +110,15 @@ export function getLegacyStoreRedirectSlug(slug: string): string | null {
     return null;
 }
 
+import { getLocalizedHref } from './i18n-helpers';
+import { Locale } from '@/i18n/config';
+
 /**
  * Builds the canonical relative URL for a store page.
- * e.g. /our-stores/myastoriya-na-oboloni
+ * e.g. /ua/our-stores/myastoriya-na-oboloni
  */
-export function getStoreHref(store: StoreSlugTarget): string {
+export function getStoreHref(store: StoreSlugTarget, lang?: Locale): string {
     const seoSlug = getStoreSeoSlug(store);
-    return `/our-stores/${seoSlug}`;
+    const rawPath = `/our-stores/${seoSlug}`;
+    return lang ? getLocalizedHref(rawPath, lang) : rawPath;
 }
