@@ -15,6 +15,7 @@ import { type Special } from "@/lib/graphql";
 
 interface DiscountItem {
     id: number;
+    slug?: string | null;
     title: string;
     image: string;
     dateRange: string;

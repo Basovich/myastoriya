@@ -164,7 +164,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                     } else if (firstErr?.message) {
                         errMsg = firstErr.message;
                     }
-                } else if (error?.message) {
+                } else if (error instanceof Error && error.message) {
                     errMsg = error.message;
                 }
                 setSubmitError(errMsg);

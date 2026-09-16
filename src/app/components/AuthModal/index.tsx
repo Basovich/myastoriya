@@ -18,11 +18,19 @@ interface AuthModalProps {
 
 type ModalView = 'login' | 'register' | 'forgot-password' | 'reset-password' | 'complete-social';
 
+interface SocialProfile {
+    name?: string;
+    surname?: string;
+    phone?: string;
+    email?: string;
+    gender?: string;
+}
+
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     const [view, setView] = useState<ModalView>('login');
     const [forgotPhone, setForgotPhone] = useState('');
     const [forgotActionToken, setForgotActionToken] = useState('');
-    const [pendingSocialProfile, setPendingSocialProfile] = useState<unknown>(null);
+    const [pendingSocialProfile, setPendingSocialProfile] = useState<SocialProfile | null>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
     useEffect(() => {
@@ -62,7 +70,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                         onSwitchToRegister={() => setView('register')}
                         onForgotPassword={() => setView('forgot-password')}
                         onIncompleteProfile={(profile) => {
-                            setPendingSocialProfile(profile);
+                            setPendingSocialProfile(profile as SocialProfile);
                             setView('complete-social');
                         }}
                         onSuccess={handleSuccess}
@@ -72,7 +80,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     <RegisterForm
                         onSwitchToLogin={() => setView('login')}
                         onIncompleteProfile={(profile) => {
-                            setPendingSocialProfile(profile);
+                            setPendingSocialProfile(profile as SocialProfile);
                             setView('complete-social');
                         }}
                         onSuccess={handleSuccess}
@@ -98,7 +106,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 )}
                 {view === 'complete-social' && (
                     <CompleteSocialProfileForm
-                        googleProfile={pendingSocialProfile}
+                        googleProfile={pendingSocialProfile || {}}
                         onSuccess={handleSuccess}
                         onBack={() => setView('login')}
                     />

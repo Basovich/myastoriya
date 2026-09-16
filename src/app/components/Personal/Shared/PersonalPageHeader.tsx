@@ -3,7 +3,7 @@
 import React from 'react';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import Button from '@/app/components/ui/Button/Button';
-import PersonalNav from '../PersonalNav/PersonalNav';
+import PersonalNav, { PersonalNavProps } from '../PersonalNav/PersonalNav';
 import { AuthUser } from '@/store/slices/authSlice';
 import s from '@/app/[lang]/personal/PersonalLayout.module.scss';
 import clsx from 'clsx';
@@ -13,7 +13,7 @@ interface PersonalPageHeaderProps {
     logoutLabel: string;
     onLogout: () => void;
     user: AuthUser | null;
-    navDict: Record<string, unknown>;
+    navDict: PersonalNavProps['dict'];
     isDark?: boolean;
     withDots?: boolean;
 }
