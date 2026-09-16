@@ -26,7 +26,7 @@ interface ChangePasswordFormProps {
     submitStatus?: { type: 'success' | 'error'; message: string } | null;
 }
 
-export default function ChangePasswordForm({ user, dict, onSubmit, submitStatus }: ChangePasswordFormProps) {
+export default function ChangePasswordForm({ dict, onSubmit, submitStatus }: ChangePasswordFormProps) {
     const [focusedFields, setFocusedFields] = React.useState<Record<string, boolean>>({});
 
     const validationSchema = Yup.object().shape({

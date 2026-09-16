@@ -30,7 +30,7 @@ interface ComplexDiscountsProps {
     specials?: Special[];
 }
 
-export default function ComplexDiscounts({ dict, lang, specials }: ComplexDiscountsProps) {
+export default function ComplexDiscounts({ dict, specials }: ComplexDiscountsProps) {
     const [prevEl, setPrevEl] = useState<HTMLButtonElement | null>(null);
     const [nextEl, setNextEl] = useState<HTMLButtonElement | null>(null);
 

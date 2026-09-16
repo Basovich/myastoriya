@@ -11,7 +11,7 @@ import DeliveryZones from '@/app/components/Delivery/DeliveryZones/DeliveryZones
 import PolicySections from '@/app/components/Delivery/PolicySections/PolicySections';
 import SectionHeader from '@/app/components/ui/SectionHeader/SectionHeader';
 import { Shop } from '@/lib/graphql/queries/shops';
-import { OrderingInfoBlock } from '@/lib/graphql/index';
+import { OrderingInfoBlock } from '@/lib/graphql';
 import Button from "@/app/components/ui/Button/Button";
 import { parseShopData } from '@/lib/utils/shops';
 
