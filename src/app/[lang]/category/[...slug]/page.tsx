@@ -259,7 +259,3 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
 }
 
 export const dynamic = 'force-dynamic';
-
-export async function generateStaticParams() {
-    return [];
-}

@@ -100,7 +100,3 @@ export default async function DynamicCatalogPage({ params }: DynamicCatalogPageP
 }
 
 export const dynamic = 'force-dynamic';
-
-export async function generateStaticParams() {
-    return [];
-}

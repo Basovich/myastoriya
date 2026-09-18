@@ -24,7 +24,7 @@ import { getOrCreateDeviceId } from '@/lib/utils/auth';
 import { persistor } from '@/store';
 import * as Sentry from '@sentry/nextjs';
 import s from './CitySelector.module.scss';
-import loaderStyles from '@/app/[lang]/loading.module.scss';
+import loaderStyles from '@/app/components/PageLoader/PageLoader.module.scss';
 import clsx from 'clsx';
 import Image from 'next/image';
 

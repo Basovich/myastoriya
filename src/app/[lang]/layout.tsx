@@ -128,6 +128,7 @@ import Header from "@/app/components/Header/HeaderClient";
 import Footer from "@/app/components/Footer/FooterClient";
 import { getAccessToken } from "@/app/actions/authActions";
 import { CategoryProvider } from "@/hooks/useCategoryTree";
+import NavigationProgress from "@/app/components/NavigationProgress/NavigationProgress";
 
 import StatusModals from "@/app/components/StatusModals/StatusModals";
 
@@ -173,6 +174,7 @@ export default async function RootLayout({
       <body>
         <ReduxProvider>
           <CategoryProvider initialCategories={catalogTree}>
+            <NavigationProgress />
             {!isMenuPage && <AuthInitializer />}
             {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
             {children}

@@ -1,86 +1,100 @@
-import Image from "next/image";
-import Link from "next/link";
+import { Suspense } from "react";
+import { headers } from "next/headers";
+import localFont from "next/font/local";
+import "./globals.css";
+import { getDictionary } from "@/i18n/get-dictionary";
+import { getCatalogTreeApi, type ProductCategory } from "@/lib/graphql/queries/products";
+import { getSocialLinksApi, type SocialLink } from "@/lib/graphql/queries/settings";
+import { getAccessToken } from "@/app/actions/authActions";
+import ReduxProvider from "@/store/ReduxProvider";
+import { CategoryProvider } from "@/hooks/useCategoryTree";
+import Header from "@/app/components/Header/HeaderClient";
+import Footer from "@/app/components/Footer/FooterClient";
+import AuthInitializer from "@/app/components/AuthInitializer/AuthInitializerClient";
+import StatusModals from "@/app/components/StatusModals/StatusModals";
+import NotFoundBlock from "@/app/components/NotFoundBlock/NotFoundBlock";
+import { type Locale } from "@/i18n/config";
+import clsx from "clsx";
 
-export default function GlobalNotFound() {
+const houschka = localFont({
+    src: [
+        {
+            path: "../fonts/HouschkaRounded-Bold.woff2",
+            weight: "700",
+            style: "normal",
+        },
+        {
+            path: "../fonts/HouschkaRounded-ExtraBold.woff2",
+            weight: "800",
+            style: "normal",
+        },
+    ],
+    variable: "--font-houschka",
+});
+
+const helios = localFont({
+    src: [
+        {
+            path: "../fonts/Helios-Regular.woff2",
+            weight: "400",
+            style: "normal",
+        },
+        {
+            path: "../fonts/Helios-Bold.woff2",
+            weight: "700",
+            style: "normal",
+        },
+    ],
+    variable: "--font-helios",
+});
+
+export default async function GlobalNotFound() {
+    let lang: Locale = "ua";
+    try {
+        const headersList = await headers();
+        const pathname = headersList.get("x-pathname") || "";
+        if (pathname.startsWith("/ru/") || pathname === "/ru") {
+            lang = "ru";
+        }
+    } catch {
+        // Fallback to default locale
+    }
+
+    let catalogTree: ProductCategory[] = [];
+    let socialLinks: SocialLink[] = [];
+    try {
+        const token = await getAccessToken();
+        const [tree, links] = await Promise.all([
+            getCatalogTreeApi(lang, 768, token ?? undefined).catch(() => [] as ProductCategory[]),
+            getSocialLinksApi().catch(() => [] as SocialLink[]),
+        ]);
+        catalogTree = tree;
+        socialLinks = links;
+    } catch {
+        // Fallback to empty arrays
+    }
+
+    const dict = await getDictionary(lang);
+
     return (
-        <html lang="uk">
-            <head>
-                <meta charSet="utf-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <title>404 — Сторінку не знайдено</title>
-                <style>{`
-                    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-                    body {
-                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                        background: #F5F5F5;
-                        color: #000;
-                        min-height: 100vh;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-                    .wrapper {
-                        text-align: center;
-                        padding: 40px 24px;
-                        max-width: 600px;
-                    }
-                    .img-wrap {
-                        margin-bottom: 32px;
-                    }
-                    .img-wrap img {
-                        max-width: 100%;
-                        height: auto;
-                    }
-                    h1 {
-                        font-size: 28px;
-                        font-weight: 700;
-                        letter-spacing: 0.05em;
-                        text-transform: uppercase;
-                        margin-bottom: 16px;
-                        color: #000;
-                    }
-                    p {
-                        font-size: 15px;
-                        color: #666;
-                        margin-bottom: 8px;
-                    }
-                    a.btn {
-                        display: inline-block;
-                        margin-top: 28px;
-                        background: #E30613;
-                        color: #fff;
-                        text-decoration: none;
-                        padding: 14px 32px;
-                        border-radius: 4px;
-                        font-size: 14px;
-                        font-weight: 700;
-                        letter-spacing: 0.1em;
-                        text-transform: uppercase;
-                        transition: background 0.2s;
-                    }
-                    a.btn:hover {
-                        background: #FF1A2A;
-                    }
-                `}</style>
-            </head>
+        <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
             <body>
-                <div className="wrapper">
-                    <div className="img-wrap">
-                        <Image
-                            src="/images/404.webp"
-                            alt="404"
-                            width={544}
-                            height={348}
-                            priority
-                        />
-                    </div>
-                    <h1>Сторінку не знайдено</h1>
-                    <p>Такої сторінки ми не маємо, зате є багато акційних пропозицій.</p>
-                    <p>Знайти їх можна на домашній сторінці.</p>
-                    <Link href="/" className="btn">
-                        Повернутися на головну
-                    </Link>
-                </div>
+                <ReduxProvider>
+                    <CategoryProvider initialCategories={catalogTree}>
+                        {/* Suspense is required because Header, StatusModals use useSearchParams() */}
+                        <Suspense fallback={null}>
+                            <AuthInitializer />
+                            <Header lang={lang} initialCategories={catalogTree} />
+                        </Suspense>
+                        <main>
+                            <NotFoundBlock dict={dict} />
+                        </main>
+                        <Footer lang={lang} initialSocialLinks={socialLinks} />
+                        <Suspense fallback={null}>
+                            <StatusModals lang={lang} />
+                        </Suspense>
+                    </CategoryProvider>
+                </ReduxProvider>
             </body>
         </html>
     );
