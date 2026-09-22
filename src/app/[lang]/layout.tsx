@@ -171,7 +171,7 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
-      <head>
+      <body>
         <noscript>
           <style>{`
             /* Non-JavaScript Graceful Degradation (SEO & Accessibility) */
@@ -218,8 +218,6 @@ export default async function RootLayout({
             }
           `}</style>
         </noscript>
-      </head>
-      <body>
         <ReduxProvider>
           <CategoryProvider initialCategories={catalogTree}>
             <NavigationProgress />
