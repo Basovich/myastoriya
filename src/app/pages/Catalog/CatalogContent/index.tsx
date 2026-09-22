@@ -50,6 +50,7 @@ interface CatalogContentProps {
     faq?: FaqQuestion[] | null;
     isSubcategory?: boolean;
     hasMixedRawProduction?: boolean;
+    initialTotalItems?: number;
 }
 
 export default async function CatalogContent({
@@ -71,6 +72,7 @@ export default async function CatalogContent({
     faq,
     isSubcategory,
     hasMixedRawProduction,
+    initialTotalItems,
 }: CatalogContentProps) {
     const sortLabel = lang === 'ua' ? 'Сортувати:' : 'Сортировать:';
     const filterLabel = lang === 'ua' ? 'Фільтр' : 'Фильтр';
@@ -207,6 +209,7 @@ export default async function CatalogContent({
                             sort={currentSort}
                             activeFilters={activeFilters}
                             hasMixedRawProduction={hasMixedRawProduction}
+                            initialTotalItems={initialTotalItems}
                         />
                     </div>
                 </div>

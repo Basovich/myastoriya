@@ -46,6 +46,7 @@ export default function Pagination({
     };
 
     const handlePageClick = (e: React.MouseEvent<HTMLAnchorElement>, page: number) => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         if (onPageChange) {
             e.preventDefault();
             onPageChange(page);
@@ -96,6 +97,7 @@ export default function Pagination({
             ) : (
                 <Link
                     href={buildUrl(prevPage)}
+                    scroll={false}
                     className={s.pageNavBtn}
                     onClick={(e) => handlePageClick(e, prevPage)}
                     aria-label="Попередня сторінка"
@@ -130,6 +132,7 @@ export default function Pagination({
                     <Link
                         key={pageNum}
                         href={buildUrl(pageNum)}
+                        scroll={false}
                         className={clsx(s.pageBtn, isActive && s.pageBtnActive)}
                         onClick={(e) => handlePageClick(e, pageNum)}
                         aria-label={`Сторінка ${pageNum}`}
@@ -164,6 +167,7 @@ export default function Pagination({
             ) : (
                 <Link
                     href={buildUrl(nextPage)}
+                    scroll={false}
                     className={clsx(s.pageNavBtn, s.pageNavNextBtn)}
                     onClick={(e) => handlePageClick(e, nextPage)}
                     aria-label="Наступна сторінка"

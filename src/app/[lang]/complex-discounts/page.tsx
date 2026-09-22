@@ -5,12 +5,17 @@ import { getAccessToken } from "@/app/actions/authActions";
 // This is the index page for Complex Discounts: /[lang]/complex-discounts
 export default async function ComplexDiscountsPage({
     params,
+    searchParams,
 }: {
     params: Promise<{ lang: "ua" | "ru" }>;
+    searchParams: Promise<{ page?: string }>;
 }) {
     const { lang } = await params;
+    const { page: pageQuery } = await searchParams;
+    const page = Math.max(1, parseInt(pageQuery || "1", 10));
+
     const token = await getAccessToken();
-    const specialsResponse = await getSpecialsApi(12, 1, lang, token ?? undefined);
+    const specialsResponse = await getSpecialsApi(12, page, lang, token ?? undefined);
 
     const activeSpecials = (specialsResponse?.data || []).filter(special => {
         if (!special.products || special.products.length < 2) return false;
@@ -35,13 +40,17 @@ export default async function ComplexDiscountsPage({
         };
     });
 
+    const totalPages = specialsResponse?.has_more_pages ? page + 1 : page;
+
     return (
         <main>
             <ActionsGrid
                 initialItems={initialItems}
                 lang={lang}
                 pageType="complex-discounts"
-                initialHasMore={specialsResponse.has_more_pages}
+                initialHasMore={specialsResponse?.has_more_pages}
+                initialPage={page}
+                totalPages={totalPages}
             />
         </main>
     );

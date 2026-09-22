@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import clsx from "clsx";
 import s from "./ActionsGrid.module.scss";
 import Button from "../ui/Button/Button";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import Tabs from "../ui/Tabs/Tabs";
 import AppLink from "../ui/AppLink/AppLink";
 import HeroBanner from "../ui/HeroBanner/HeroBanner";
+import Pagination from "../ui/Pagination/Pagination";
 import { type Sale, getSalesApi, getSpecialsApi, getProductsApi } from "@/lib/graphql";
 import { useAppSelector } from "@/store/hooks";
 
@@ -98,14 +100,35 @@ interface ActionsGridProps {
     lang: string;
     pageType: 'promotions' | 'complex-discounts';
     initialHasMore?: boolean;
+    initialPage?: number;
+    totalPages?: number;
 }
 
-export default function ActionsGrid({ initialItems, lang, pageType, initialHasMore }: ActionsGridProps) {
+export default function ActionsGrid({ initialItems, lang, pageType, initialHasMore, initialPage = 1, totalPages = 1 }: ActionsGridProps) {
     const texts = LOCALIZED_TEXTS[lang === 'ru' ? 'ru' : 'ua'][pageType];
     const [items, setItems] = useState<ActionItem[]>(initialItems);
     const [hasMore, setHasMore] = useState(initialHasMore ?? true);
     const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(initialPage);
+
+    // Official React pattern for synchronizing state with updated props on route change
+    const [prevInitialItems, setPrevInitialItems] = useState(initialItems);
+    const [prevInitialPage, setPrevInitialPage] = useState(initialPage);
+    const [prevInitialHasMore, setPrevInitialHasMore] = useState(initialHasMore);
+
+    if (
+        initialItems !== prevInitialItems ||
+        initialPage !== prevInitialPage ||
+        initialHasMore !== prevInitialHasMore
+    ) {
+        setItems(initialItems);
+        setPage(initialPage);
+        setHasMore(initialHasMore ?? true);
+        setPrevInitialItems(initialItems);
+        setPrevInitialPage(initialPage);
+        setPrevInitialHasMore(initialHasMore);
+    }
+
     const token = useAppSelector((state) => state.auth.token) ?? undefined;
 
     const loadMore = async () => {
@@ -313,6 +336,16 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
                         </svg>
                         )}
                     </Button>
+                </div>
+            )}
+
+            {totalPages > 1 && (
+                <div className={clsx(s.paginationRow, (!hasMore || items.length === 0) && s.noShowMore)}>
+                    <Pagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        baseUrl={pageType === 'promotions' ? `/${lang}/actions` : `/${lang}/complex-discounts`}
+                    />
                 </div>
             )}
         </section>

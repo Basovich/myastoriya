@@ -10,6 +10,7 @@ import {
     getPopularProductsApi,
     getCategoryByIdApi,
     getFaqQuestionsApi,
+    getProductsFilterApi,
     resolveCategoryImageUrl,
     ProductCategory,
     Product,
@@ -166,7 +167,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
             ? rawParam
             : (hasMixedRawProduction ? isRawPath : undefined);
 
-        const [productsResponse, popularProducts] = await Promise.all([
+        const [productsResponse, popularProducts, filterData] = await Promise.all([
             getProductsApi(
                 { categoryId, limit: 12, page, sort, filter: activeFilters, rawProduction },
                 lang,
@@ -181,8 +182,11 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
                 } as ProductsResponse;
             }),
             getPopularProductsApi(undefined, 12, lang, token ?? undefined).catch(() => [] as Product[]),
+            getProductsFilterApi(categoryId, lang, activeFilters).catch(() => null),
         ]);
         productsResponse.current_page = page;
+
+        const initialTotalItems = filterData?.productsCount || undefined;
 
         const hasActiveFilters = activeFilters.length > 0 || !!sort || rawParam !== undefined;
         if (shouldRedirectForLocality(productsResponse.data.length, page, hasActiveFilters)) {
@@ -239,6 +243,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
                     faq={faq}
                     isSubcategory={categoryEntry.level > 1}
                     hasMixedRawProduction={Boolean(categoryDetails?.hasMixedRawProduction)}
+                    initialTotalItems={initialTotalItems}
                 />
             </main>
         );

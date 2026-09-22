@@ -225,7 +225,7 @@
     margin-top: 40px;
 
     @media (min-width: 1280px) {
-        margin-top: 80px;
+        margin-top: 60px;
     }
 
     .loadMoreBtn {
@@ -249,6 +249,26 @@
                     stroke: #fff !important;
                 }
             }
+        }
+    }
+}
+
+.paginationRow {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+    margin-bottom: 20px;
+
+    @media (min-width: 1280px) {
+        margin-top: 24px;
+        margin-bottom: 30px;
+    }
+
+    &.noShowMore {
+        margin-top: 40px;
+
+        @media (min-width: 1280px) {
+            margin-top: 60px;
         }
     }
 }

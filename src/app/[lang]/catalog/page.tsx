@@ -1,7 +1,7 @@
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
-import { getCatalogTreeApi, getProductsApi, ProductsResponse, ProductCategory } from '@/lib/graphql';
+import { getCatalogTreeApi, getProductsApi, getProductsFilterApi, ProductsResponse, ProductCategory } from '@/lib/graphql';
 import { getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import { parseRawProductionParam } from '@/utils/filter-params';
@@ -66,9 +66,10 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
         current_page: page,
         has_more_pages: false,
     };
+    let initialTotalItems: number | undefined = undefined;
 
     try {
-        const [tree, products] = await Promise.all([
+        const [tree, products, filterData] = await Promise.all([
             getCatalogTreeApi(lang, 768, token ?? undefined).catch((err) => {
                 console.error("[CatalogPage] Failed to fetch catalog tree:", err);
                 return [] as ProductCategory[];
@@ -77,10 +78,14 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
                 console.error("[CatalogPage] Failed to fetch products:", err);
                 return null;
             }),
+            getProductsFilterApi(768, lang).catch(() => null),
         ]);
         catalogTree = tree;
         if (products) {
             productsResponse = products;
+        }
+        if (filterData?.productsCount) {
+            initialTotalItems = filterData.productsCount;
         }
     } catch (err) {
         console.error("[CatalogPage] Parallel fetch failed:", err);
@@ -115,6 +120,7 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
                 sortBy={sort}
                 bannerUrl="/images/catalog/category-desktop.webp"
                 mobileImage="/images/catalog/category-mobile.webp"
+                initialTotalItems={initialTotalItems}
             />
         </main>
     );

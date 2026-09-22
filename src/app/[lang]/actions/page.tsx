@@ -6,12 +6,17 @@ import { getAccessToken } from "@/app/actions/authActions";
 // This is the index page for Actions: /[lang]/actions
 export default async function ActionsPage({
     params,
+    searchParams,
 }: {
     params: Promise<{ lang: "ua" | "ru" }>;
+    searchParams: Promise<{ page?: string }>;
 }) {
     const { lang } = await params;
+    const { page: pageQuery } = await searchParams;
+    const page = Math.max(1, parseInt(pageQuery || "1", 10));
+
     const token = await getAccessToken();
-    const salesResponse = await getSalesApi(12, 1, lang, token ?? undefined);
+    const salesResponse = await getSalesApi(12, page, lang, token ?? undefined);
 
     const activeSalesChecks = await Promise.all(
         (salesResponse?.data || []).map(async (sale) => {
@@ -39,13 +44,17 @@ export default async function ActionsPage({
         date: sale.expiresAt ? new Date(sale.expiresAt).toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'uk-UA') : ""
     }));
 
+    const totalPages = salesResponse?.has_more_pages ? page + 1 : page;
+
     return (
         <main>
             <ActionsGrid
                 initialItems={initialItems}
                 lang={lang}
                 pageType="promotions"
-                initialHasMore={salesResponse.has_more_pages}
+                initialHasMore={salesResponse?.has_more_pages}
+                initialPage={page}
+                totalPages={totalPages}
             />
         </main>
     );

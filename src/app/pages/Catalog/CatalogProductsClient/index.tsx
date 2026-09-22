@@ -23,6 +23,7 @@ interface CatalogProductsClientProps {
     sort?: string;
     activeFilters?: FilterStateInput[];
     hasMixedRawProduction?: boolean;
+    initialTotalItems?: number;
 }
 
 export default function CatalogProductsClient({
@@ -33,6 +34,7 @@ export default function CatalogProductsClient({
     sort,
     activeFilters,
     hasMixedRawProduction,
+    initialTotalItems,
 }: CatalogProductsClientProps) {
     const [products, setProducts] = useState<Product[]>(initialProducts.data);
     const [currentPage, setCurrentPage] = useState(initialProducts.current_page);
@@ -40,7 +42,10 @@ export default function CatalogProductsClient({
     const [isLoading, setIsLoading] = useState(false);
     const [isNavigating, setIsNavigating] = useState(false);
     const [isPaginating, setIsPaginating] = useState(false);
-    const [totalItems, setTotalItems] = useState(0);
+    const fallbackTotal = initialProducts.has_more_pages
+        ? Math.max((initialProducts.current_page + 1) * 12, initialProducts.data.length + 1)
+        : initialProducts.data.length;
+    const [totalItems, setTotalItems] = useState(initialTotalItems ?? fallbackTotal);
     const token = useAppSelector((state) => state.auth.token) ?? undefined;
 
     useEffect(() => {
