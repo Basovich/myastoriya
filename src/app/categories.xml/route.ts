@@ -1,13 +1,19 @@
 import { NextResponse } from "next/server";
-import { getSitemapBaseUrl, formatDate, buildUrlSetXml, SitemapUrlEntry } from "@/utils/sitemap-helpers";
+import { getSitemapBaseUrl, formatDate, buildPairedUrlSetXml, PairedSitemapEntry } from "@/utils/sitemap-helpers";
 import { getCatalogTreeApi, ProductCategory } from "@/lib/graphql";
 
 export const dynamic = "force-dynamic";
 
-function collectCategories(categories: ProductCategory[]): ProductCategory[] {
-    const list: ProductCategory[] = [];
+interface CategoryWithDates extends ProductCategory {
+    updatedAt?: string | null;
+}
+
+function collectCategories(categories: ProductCategory[]): Map<string, ProductCategory> {
+    const map = new Map<string, ProductCategory>();
     const traverse = (item: ProductCategory) => {
-        list.push(item);
+        if (item.id && item.slug) {
+            map.set(String(item.id), item);
+        }
         for (const child of item.children ?? []) {
             traverse(child);
         }
@@ -15,41 +21,56 @@ function collectCategories(categories: ProductCategory[]): ProductCategory[] {
     for (const cat of categories) {
         traverse(cat);
     }
-    return list;
+    return map;
 }
 
 export async function GET(req: Request) {
     try {
         const baseUrl = await getSitemapBaseUrl(req);
-        const catalogTree = await getCatalogTreeApi("ua", 768).catch(() => [] as ProductCategory[]);
-        const allCategories = collectCategories(catalogTree);
+        const [treeUa, treeRu] = await Promise.all([
+            getCatalogTreeApi("ua", 768).catch(() => [] as ProductCategory[]),
+            getCatalogTreeApi("ru", 768).catch(() => [] as ProductCategory[]),
+        ]);
 
-        // Deduplicate by slug
-        const seenSlugs = new Set<string>();
-        const entries: SitemapUrlEntry[] = [];
+        const uaMap = collectCategories(treeUa);
+        const ruMap = collectCategories(treeRu);
+        const allIds = new Set([...uaMap.keys(), ...ruMap.keys()]);
+
+        const entries: PairedSitemapEntry[] = [];
+        const seenIds = new Set<string>();
         const today = formatDate();
 
-        for (const cat of allCategories) {
-            if (cat.slug && !seenSlugs.has(cat.slug)) {
-                seenSlugs.add(cat.slug);
+        for (const id of allIds) {
+            const uaCat = uaMap.get(id);
+            const ruCat = ruMap.get(id);
+            const cat = uaCat || ruCat;
+            if (!cat) continue;
+
+            const uaSlug = uaCat?.slug || ruCat?.slug;
+            const ruSlug = ruCat?.slug || uaCat?.slug;
+
+            if (uaSlug && ruSlug && !seenIds.has(id)) {
+                seenIds.add(id);
+                const categoryDates = cat as CategoryWithDates;
                 entries.push({
-                    relativePath: `/category/${cat.slug}/`,
-                    lastmod: today,
+                    ukPath: `/category/${uaSlug}/`,
+                    ruPath: `/category/${ruSlug}/`,
+                    lastmod: formatDate(categoryDates.updatedAt || today),
                 });
             }
         }
 
-        const xml = buildUrlSetXml(entries, baseUrl);
+        const xml = buildPairedUrlSetXml(entries, baseUrl);
 
         return new NextResponse(xml, {
             headers: {
                 "Content-Type": "application/xml; charset=utf-8",
-                "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+                "Cache-Control": "public, max-age=600, s-maxage=3600",
             },
         });
     } catch (error) {
         console.error("[categories.xml] Error generating categories sitemap:", error);
-        return new NextResponse(buildUrlSetXml([]), {
+        return new NextResponse(buildPairedUrlSetXml([]), {
             headers: { "Content-Type": "application/xml; charset=utf-8" },
         });
     }

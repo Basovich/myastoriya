@@ -80,26 +80,38 @@ export interface SitemapUrlEntry {
     lastmod: string;
 }
 
-export function buildUrlSetXml(entries: SitemapUrlEntry[], baseUrl?: string): string {
+export interface PairedSitemapEntry {
+    ukPath: string;
+    ruPath?: string | null;
+    lastmod: string;
+}
+
+function normalizePath(rawPath: string, targetLocale: 'uk' | 'ru'): string {
+    const clean = rawPath
+        .replace(/^\/(?:ua|ru)(?=\/|$)/, '')
+        .replace(/^\/+/, '')
+        .replace(/\/+$/, '');
+
+    if (!clean) {
+        return targetLocale === 'uk' ? '/' : '/ru/';
+    }
+
+    const prefix = targetLocale === 'uk' ? '/ua/' : '/ru/';
+    return `${prefix}${clean}/`;
+}
+
+export function buildPairedUrlSetXml(entries: PairedSitemapEntry[], baseUrl?: string): string {
     const domain = (baseUrl || "https://myastoriya.vercel.app").replace(/\/+$/, "");
 
     const urls = entries
         .flatMap((entry) => {
-            const cleanRel = entry.relativePath
-                .replace(/^\/(?:ua|ru)(?=\/|$)/, "")
-                .replace(/^\/+/, "")
-                .replace(/\/+$/, "");
+            const ukRel = normalizePath(entry.ukPath, 'uk');
+            const ruRel = entry.ruPath
+                ? normalizePath(entry.ruPath, 'ru')
+                : normalizePath(entry.ukPath, 'ru');
 
-            let ukUrl: string;
-            let ruUrl: string;
-
-            if (!cleanRel) {
-                ukUrl = `${domain}/`;
-                ruUrl = `${domain}/ru/`;
-            } else {
-                ukUrl = `${domain}/ua/${cleanRel}/`;
-                ruUrl = `${domain}/ru/${cleanRel}/`;
-            }
+            const ukUrl = `${domain}${ukRel}`;
+            const ruUrl = `${domain}${ruRel}`;
 
             const ukNode = `  <url>
     <loc>${escapeXml(ukUrl)}</loc>
@@ -120,4 +132,13 @@ export function buildUrlSetXml(entries: SitemapUrlEntry[], baseUrl?: string): st
         .join("\n");
 
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>`;
+}
+
+export function buildUrlSetXml(entries: SitemapUrlEntry[], baseUrl?: string): string {
+    const paired: PairedSitemapEntry[] = entries.map((e) => ({
+        ukPath: e.relativePath,
+        ruPath: e.relativePath,
+        lastmod: e.lastmod,
+    }));
+    return buildPairedUrlSetXml(paired, baseUrl);
 }
