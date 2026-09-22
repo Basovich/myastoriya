@@ -170,7 +170,7 @@ export async function getWarehousesApi(
 export async function addUserPickupPointApi(
     type: string,
     key: string,
-    token: string,
+    token?: string,
     lang?: string
 ): Promise<UserPickupPoint> {
     const data = await gqlRequest<{ addUserPickupPoint: UserPickupPoint }>(

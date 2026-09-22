@@ -13,6 +13,10 @@ export const GOOGLE_MAPS_LOADER_OPTIONS = {
     language: initialLang,
 } as const;
 
+export const GOOGLE_PAY_MERCHANT_ID = 'BCR2DN4TVCDI5TRI';
+export const GOOGLE_PAY_GATEWAY = 'easypay';
+export const GOOGLE_PAY_GATEWAY_MERCHANT_ID = 'BCR2DN4TVCDI5TRI';
+
 export const DARK_MAP_STYLE = [
     { "featureType": "all", "elementType": "geometry", "stylers": [{ "color": "#1d2c4d" }] },
     { "featureType": "all", "elementType": "labels.text.fill", "stylers": [{ "color": "#8ec3b9" }] },

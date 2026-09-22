@@ -134,7 +134,7 @@ export async function getOrdersApi(
 
 export async function repeatOrderApi(
     orderId: string,
-    token: string,
+    token?: string,
     lang?: string,
 ): Promise<boolean> {
     const data = await gqlRequest<{ repeatOrder: boolean }>(

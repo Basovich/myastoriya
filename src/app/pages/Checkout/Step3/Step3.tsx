@@ -25,12 +25,18 @@ import {
     createOrderApi, 
     orderGooglePayApi,
     orderApplePayApi,
+    repeatOrderApi,
     FinishPayResponse,
     Payment, 
     CheckoutUserData, 
     CheckoutDeliveryData, 
     CheckoutPaymentData 
 } from '@/lib/graphql/queries/orders';
+import {
+    GOOGLE_PAY_MERCHANT_ID,
+    GOOGLE_PAY_GATEWAY,
+    GOOGLE_PAY_GATEWAY_MERCHANT_ID,
+} from '@/lib/constants';
 import { GraphQLError } from '@/lib/graphql/client';
 import { 
     getUserBankCardsApi, 
@@ -511,13 +517,20 @@ export default function Step3({ lang }: Step3Props) {
                 };
             }
 
+            const userPickupPointId = (deliveryParams.userPickupPointId && Number(deliveryParams.userPickupPointId) > 0)
+                ? Number(deliveryParams.userPickupPointId)
+                : null;
+
+            const userAddressId = (deliveryParams.userAddressId && Number(deliveryParams.userAddressId) > 0)
+                ? Number(deliveryParams.userAddressId)
+                : null;
+
             const deliveryData: CheckoutDeliveryData = {
                 deliveryId: deliveryParams.deliveryId,
-                // These values are already numbers (stored as parseInt in Step2)
-                userAddressId: deliveryParams.userAddressId ?? null,
+                userAddressId,
                 desiredDeliveryDate: deliveryParams.desiredDeliveryDate || null,
                 desiredDeliveryTime: deliveryParams.desiredDeliveryTime || null,
-                userPickupPointId: deliveryParams.userPickupPointId ?? null,
+                userPickupPointId,
             };
 
             let finalPaymentMethodId = paymentMethod;
@@ -576,12 +589,17 @@ export default function Step3({ lang }: Step3Props) {
                     throw err;
                 }
 
+                const isProductionHost = typeof window !== 'undefined' && 
+                    (window.location.hostname === 'myastoriya.com.ua' || window.location.hostname === 'www.myastoriya.com.ua');
+
+                const gpayEnvironment = isProductionHost ? 'PRODUCTION' : 'TEST';
+
                 const paymentDataData = {
-                    environment: 'PRODUCTION',
+                    environment: gpayEnvironment,
                     apiVersion: 2,
                     apiVersionMinor: 0,
                     merchantInfo: {
-                        merchantId: 'BCR2DN4TVCDI5TRI',
+                        merchantId: GOOGLE_PAY_MERCHANT_ID,
                         merchantName: 'Myastoriya',
                     },
                     allowedPaymentMethods: [{
@@ -597,8 +615,8 @@ export default function Step3({ lang }: Step3Props) {
                         tokenizationSpecification: {
                             type: 'PAYMENT_GATEWAY',
                             parameters: {
-                                gateway: 'easypay',
-                                gatewayMerchantId: 'BCR2DN4TVCDI5TRI',
+                                gateway: GOOGLE_PAY_GATEWAY,
+                                gatewayMerchantId: GOOGLE_PAY_GATEWAY_MERCHANT_ID,
                             },
                         },
                     }],
@@ -784,16 +802,45 @@ export default function Step3({ lang }: Step3Props) {
                     }
                 } catch (payErr: unknown) {
                     const err = payErr as { name?: string; message?: string };
+
+                    // Restore cart from created order so cart is not empty and user can pick another payment method
+                    try {
+                        await repeatOrderApi(String(res.orderId), activeToken, lang);
+                        await dispatch(fetchCartAsync());
+                    } catch (restoreErr) {
+                        console.error('Failed to restore cart after payment error:', restoreErr);
+                    }
+
+                    setIsSubmitting(false);
+
                     if (err?.name === 'USER_CANCELLED' || err?.message === 'USER_CANCELLED') {
                         setSubmitError(lang === 'ua' 
-                            ? 'Оплату скасовано. Ви можете спробувати оплатити ще раз.' 
-                            : 'Оплата отменена. Вы можете попробовать оплатить еще раз.');
+                            ? 'Оплату скасовано. Ви можете спробувати оплатити ще раз або обрати інший спосіб оплати.' 
+                            : 'Оплата отменена. Вы можете попробовать оплатить еще раз или выбрать другой способ оплаты.');
                         return;
                     }
+
                     Sentry.captureException(payErr, {
                         tags: { category: 'checkout', action: 'online_payment' },
                     });
-                    const msg = payErr instanceof Error ? payErr.message : (lang === 'ru' ? 'Ошибка при оплате заказа. Попробуйте еще раз.' : 'Помилка при оплаті замовлення. Спробуйте ще раз.');
+
+                    const isInternalOrBackendErr = !err?.message || 
+                        err.message.includes('Internal server error') || 
+                        err.message.includes('An unknown error occurred') ||
+                        err.message.includes('code 55') ||
+                        err.message.includes('55');
+
+                    const isGpayErr = err?.message?.includes('OR_BIBED_11') || err?.message?.includes('Google Pay');
+                    const msg = isGpayErr
+                        ? (lang === 'ru' 
+                            ? 'Не удалось инициализировать Google Pay. Пожалуйста, выберите другой способ оплаты (картой или при получении).' 
+                            : 'Не вдалося ініціалізувати Google Pay. Будь ласка, оберіть інший спосіб оплати (карткою або при отриманні).')
+                        : isInternalOrBackendErr
+                        ? (lang === 'ru'
+                            ? 'Не удалось провести оплату через Google Pay / Apple Pay. Корзина восстановлена — пожалуйста, выберите другой способ оплаты или попробуйте еще раз.'
+                            : 'Не вдалося провести оплату через Google Pay / Apple Pay. Кошик відновлено — будь ласка, оберіть інший спосіб оплати або спробуйте ще раз.')
+                        : (payErr instanceof Error ? payErr.message : (lang === 'ru' ? 'Ошибка при оплате заказа. Попробуйте еще раз.' : 'Помилка при оплаті замовлення. Спробуйте ще раз.'));
+
                     setSubmitError(msg);
                     return;
                 }

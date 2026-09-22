@@ -847,12 +847,26 @@ export default function Step2() {
                 let key = '';
                 
                 if (isShop) {
-                    key = selectedShopId;
+                    const existingPoint = [...userPickupPoints, ...guestPickupPoints].find(p => {
+                        const matchedShop = shops.find(s => s.name === p.name || s.siteName === p.name);
+                        return matchedShop && matchedShop.id.toString() === selectedShopId;
+                    });
+
+                    if (existingPoint) {
+                        const numericId = parseInt(existingPoint.id, 10);
+                        if (!isNaN(numericId) && !existingPoint.id.startsWith('guest') && !existingPoint.id.startsWith('restored')) {
+                            finalPickupPointId = numericId;
+                        }
+                    }
+
+                    if (!finalPickupPointId) {
+                        key = selectedShopId;
+                    }
                 } else {
                     const selectedPoint = npPickupPoints.find(p => p.name === selectedNPRef || p.id === selectedNPRef);
                     if (selectedPoint) {
                         const numericId = parseInt(selectedPoint.id, 10);
-                        if (!isNaN(numericId) && !selectedPoint.id.startsWith('guest')) {
+                        if (!isNaN(numericId) && !selectedPoint.id.startsWith('guest') && !selectedPoint.id.startsWith('restored')) {
                             finalPickupPointId = numericId;
                         } else {
                             key = selectedPoint.name || selectedNPRef;
@@ -863,18 +877,19 @@ export default function Step2() {
                 }
                 
                 if (key && !finalPickupPointId) {
-                    if (token) {
-                        try {
-                            const pickupPoint = await addUserPickupPointApi(type, key, token, lang);
-                            finalPickupPointId = parseInt(pickupPoint.id, 10);
-                        } catch (err) {
-                            console.error('Failed to save pickup point for user:', err);
-                            Sentry.captureException(err, {
-                                tags: { category: 'checkout', action: 'add_pickup_point' },
-                            });
+                    try {
+                        const pickupPoint = await addUserPickupPointApi(type, key, token ?? undefined, lang);
+                        if (pickupPoint?.id) {
+                            const numericId = parseInt(pickupPoint.id, 10);
+                            if (!isNaN(numericId)) {
+                                finalPickupPointId = numericId;
+                            }
                         }
-                    } else if (isShop && selectedShopId) {
-                        finalPickupPointId = parseInt(selectedShopId, 10);
+                    } catch (err) {
+                        console.error('Failed to save pickup point:', err);
+                        Sentry.captureException(err, {
+                            tags: { category: 'checkout', action: 'add_pickup_point' },
+                        });
                     }
                 }
             }
