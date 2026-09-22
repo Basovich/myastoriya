@@ -45,7 +45,7 @@ div.reviewsSlider {
         padding-right: calc((100% - 1300px) / 2);
     }
 
-    :global(.swiper-slide) {
+    :global(.swiper-initialized) :global(.swiper-slide) {
         transition: opacity 0.3s;
 
         @media (min-width: 1280px) {
@@ -53,9 +53,9 @@ div.reviewsSlider {
         }
     }
 
-    :global(.swiper-slide-active),
-    :global(.swiper-slide-prev),
-    :global(.swiper-slide-next) {
+    :global(.swiper-initialized) :global(.swiper-slide-active),
+    :global(.swiper-initialized) :global(.swiper-slide-prev),
+    :global(.swiper-initialized) :global(.swiper-slide-next) {
         @media (min-width: 1280px) {
             opacity: 1;
         }

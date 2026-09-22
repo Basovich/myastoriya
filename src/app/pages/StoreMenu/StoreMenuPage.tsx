@@ -115,7 +115,7 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, initialMenu =
 
     const displayedCategories = isClient 
         ? foodCategories.slice(0, visibleCategoriesCount) 
-        : foodCategories.slice(0, 2);
+        : foodCategories;
 
     return (
         <>

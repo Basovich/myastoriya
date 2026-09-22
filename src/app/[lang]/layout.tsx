@@ -171,6 +171,54 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
+      <head>
+        <noscript>
+          <style>{`
+            /* Non-JavaScript Graceful Degradation (SEO & Accessibility) */
+            [class*="loaderWrapper"],
+            [class*="PageLoader"],
+            [class*="preloader"] {
+              display: none !important;
+            }
+
+            .swiper-slide {
+              opacity: 1 !important;
+              visibility: visible !important;
+              transform: none !important;
+              pointer-events: auto !important;
+            }
+
+            .swiper-wrapper {
+              display: flex !important;
+              flex-wrap: wrap !important;
+              gap: 16px !important;
+              transform: none !important;
+            }
+
+            .swiper-slide {
+              width: auto !important;
+              max-width: 100% !important;
+            }
+
+            #hero .swiper-wrapper {
+              display: block !important;
+            }
+
+            #hero .swiper-slide {
+              width: 100% !important;
+            }
+
+            #hero .swiper-slide:not(:first-child) {
+              display: none !important;
+            }
+
+            [class*="faqAnswerWrap"] {
+              height: auto !important;
+              overflow: visible !important;
+            }
+          `}</style>
+        </noscript>
+      </head>
       <body>
         <ReduxProvider>
           <CategoryProvider initialCategories={catalogTree}>
