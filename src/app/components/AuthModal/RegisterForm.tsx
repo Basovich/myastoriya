@@ -6,7 +6,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAppDispatch } from '@/store/hooks';
 import { login } from '@/store/slices/authSlice';
-import { sendSmsApi, smsVerifyApi, registrationApi, checkUserPhoneApi } from '@/lib/graphql/queries/auth';
+import { authCodeRequestApi, authByCodeApi, checkUserPhoneApi } from '@/lib/graphql/queries/auth';
 import { setAuthCookies } from '@/app/actions/authActions';
 import { usePhoneMask } from '@/hooks/usePhoneMask';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
@@ -16,11 +16,7 @@ import s from './AuthModal.module.scss';
 import GoogleAuthButton from './GoogleAuthButton';
 import Button from '@/app/components/ui/Button/Button';
 import InputField from '@/app/components/ui/InputField';
-import clsx from 'clsx';
-
 import { PHONE_REGEX } from '@/lib/utils/phone';
-
-const COUNTDOWN_SECONDS = 60;
 
 interface RegisterFormProps {
     onSwitchToLogin: () => void;
@@ -31,27 +27,15 @@ interface RegisterFormProps {
 export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onSuccess }: RegisterFormProps) {
     const dispatch = useAppDispatch();
     const params = useParams();
-    const locale = (params?.lang as string) || 'ua';
+    const lang = (params?.lang as string) || 'ua';
 
-    // Track verified phones and their SMS tokens in this session
-    const verifiedPhonesRef = useRef<Map<string, string>>(new Map());
-
-    const [phoneVerified, setPhoneVerified] = useState(false);
-    const phoneVerifiedRef = useRef(false);
-
-    // Current SMS token from sendSMS mutation
-    const [smsToken, setSmsToken] = useState('');
-
-    // Verified actionToken from smsVerify mutation
-    const [actionToken, setActionToken] = useState('');
-
-    // SMS UI state
-    const [smsRequested, setSmsRequested] = useState(false);
+    const [authChallengeToken, setAuthChallengeToken] = useState('');
     const [smsCode, setSmsCode] = useState('');
-    const [smsError, setSmsError] = useState('');
-    const [smsSending, setSmsSending] = useState(false);
-    const [smsVerifying, setSmsVerifying] = useState(false);
+    const [codeSent, setCodeSent] = useState(false);
+    const [isSendingCode, setIsSendingCode] = useState(false);
     const [countdown, setCountdown] = useState(0);
+    const [statusError, setStatusError] = useState('');
+    const [statusInfo, setStatusInfo] = useState('');
 
     const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -62,16 +46,14 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
         }
     }, []);
 
-    const startCountdown = useCallback(() => {
+    const startCountdown = useCallback((seconds: number) => {
         stopCountdown();
-        setCountdown(COUNTDOWN_SECONDS);
+        const startSec = seconds > 0 ? seconds : 60;
+        setCountdown(startSec);
         countdownRef.current = setInterval(() => {
             setCountdown((prev) => {
                 if (prev <= 1) {
                     stopCountdown();
-                    setSmsRequested(false);
-                    setSmsCode('');
-                    setSmsError('');
                     return 0;
                 }
                 return prev - 1;
@@ -84,43 +66,35 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
     }, [stopCountdown]);
 
     const registerSchema = Yup.object({
-        name: Yup.string().required('Обов\'язкове поле').min(2, 'Мінімум 2 символи'),
-        surname: Yup.string().required('Обов\'язкове поле').min(2, 'Мінімум 2 символи'),
+        name: Yup.string()
+            .required(lang === 'ua' ? 'Обов\'язкове поле' : 'Обязательное поле')
+            .min(2, lang === 'ua' ? 'Мінімум 2 символи' : 'Минимум 2 символа'),
         phone: Yup.string()
-            .required('Обов\'язкове поле')
-            .matches(PHONE_REGEX, 'Введіть повний номер: +38 (0XX) XXX XX XX')
-            .test('phone-verified', 'Підтвердіть номер телефону через SMS', () => {
-                return phoneVerifiedRef.current;
-            }),
-        password: Yup.string().required('Обов\'язкове поле').min(6, 'Мінімум 6 символів'),
-        confirmPassword: Yup.string()
-            .required('Обов\'язкове поле')
-            .oneOf([Yup.ref('password')], 'Паролі не збігаються'),
+            .required(lang === 'ua' ? 'Обов\'язкове поле' : 'Обязательное поле')
+            .matches(/^380\d{9}$/, lang === 'ua' ? 'Введіть повний номер: +38 (0XX) XXX XX XX' : 'Введите полный номер: +38 (0XX) XXX XX XX'),
     });
 
     const formik = useFormik({
         initialValues: {
             name: '',
-            surname: '',
             phone: '',
-            password: '',
-            confirmPassword: '',
         },
         validationSchema: registerSchema,
-        onSubmit: async (values, { setStatus }) => {
+        onSubmit: async (values, { setSubmitting }) => {
+            if (!codeSent || smsCode.trim().length < 4) return;
+            setStatusError('');
+            setStatusInfo('');
+
             try {
                 const deviceId = getOrCreateDeviceId();
-                const result = await registrationApi(
-                    {
-                        name: values.name,
-                        surname: values.surname,
-                        phone: values.phone,
-                        password: values.password,
-                        actionToken,
-                        deviceId,
-                    },
-                    locale,
-                );
+                const result = await authByCodeApi({
+                    token: authChallengeToken,
+                    code: parseInt(smsCode.trim(), 10),
+                    name: values.name,
+                    surname: values.name,
+                    deviceId,
+                }, lang);
+
                 await setAuthCookies(result.accessToken, result.refreshToken);
                 dispatch(
                     login({
@@ -137,146 +111,159 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
                     }),
                 );
                 onSuccess();
-            } catch (err) {
-                Sentry.captureException(err, {
-                    tags: { category: 'auth', action: 'register' },
-                });
-                let errorMessage = 'Помилка реєстрації';
+            } catch (err: unknown) {
+                Sentry.captureException(err, { tags: { category: 'auth', action: 'authByCode_register' } });
+                let msg = lang === 'ua' ? 'Помилка реєстрації' : 'Ошибка регистрации';
 
                 if (err instanceof GraphQLError && err.errors.length > 0) {
-                    const firstError = err.errors[0];
-                    const errorCode = firstError.extensions?.error_code;
+                    const firstErr = err.errors[0];
+                    const errorCode = firstErr.extensions?.error_code;
 
-                    if (errorCode === 25) {
-                        errorMessage = locale === 'ua'
-                            ? 'Користувач з таким номером телефону вже зареєстрований'
-                            : 'Пользователь с таким номером телефона уже зарегистрирован';
-                    } else {
-                        errorMessage = err.message;
+                    switch (errorCode) {
+                        case 200:
+                        case '200':
+                            msg = lang === 'ua' ? 'Не вдалося відправити код. Спробуйте пізніше' : 'Не удалось отправить код. Попробуйте позже';
+                            break;
+                        case 201:
+                        case '201':
+                            msg = lang === 'ua' ? 'Код вже надіслано' : 'Код уже отправлен';
+                            break;
+                        case 202:
+                        case '202':
+                            msg = lang === 'ua' ? 'Вичерпано ліміт відправок на цей номер' : 'Исчерпан лимит отправок на этот номер';
+                            break;
+                        case 203:
+                        case '203':
+                        case 204:
+                        case '204':
+                        case 206:
+                        case '206':
+                            msg = lang === 'ua' ? 'Термін дії коду закінчився. Запросіть код повторно' : 'Срок действия кода истек. Запросите код заново';
+                            setCodeSent(false);
+                            setSmsCode('');
+                            break;
+                        case 205:
+                        case '205':
+                            msg = lang === 'ua' ? 'Невірний код. Спробуйте ще раз' : 'Неверный код. Попробуйте еще раз';
+                            break;
+                        case 208:
+                        case '208':
+                            msg = lang === 'ua' ? 'Акаунт з цим номером заблоковано. Зверніться до підтримки' : 'Аккаунт с этим номером заблокирован. Обратитесь в поддержку';
+                            break;
+                        default:
+                            if (firstErr.message && firstErr.message !== 'Internal server error') {
+                                msg = firstErr.message;
+                            }
                     }
-                } else if (err instanceof Error) {
-                    errorMessage = err.message;
+                } else if (err instanceof Error && err.message !== 'Internal server error') {
+                    msg = err.message;
                 }
 
-                setStatus(errorMessage);
+                setStatusError(msg);
+            } finally {
+                setSubmitting(false);
             }
         },
     });
 
-    useEffect(() => {
-        phoneVerifiedRef.current = phoneVerified;
-    }, [phoneVerified]);
+    const handleSendCode = async () => {
+        if (!PHONE_REGEX.test(formik.values.phone) || isSendingCode || countdown > 0) return;
+        setStatusError('');
+        setStatusInfo('');
+        setIsSendingCode(true);
 
-    const currentPhone = formik.values.phone;
-    const phoneComplete = PHONE_REGEX.test(currentPhone);
+        const registeredMsg = lang === 'ua'
+            ? 'Цей номер уже зареєстрований. Будь ласка, увійдіть'
+            : 'Этот номер уже зарегистрирован. Пожалуйста, войдите';
 
-    const handlePhoneRawChange = useCallback(
-        (raw: string) => {
-            formik.setFieldValue('phone', raw);
-            const newPhoneComplete = PHONE_REGEX.test(raw);
-
-            if (newPhoneComplete && verifiedPhonesRef.current.has(raw)) {
-                const savedActionToken = verifiedPhonesRef.current.get(raw)!;
-                setPhoneVerified(true);
-                phoneVerifiedRef.current = true;
-                setActionToken(savedActionToken);
-            } else {
-                setPhoneVerified(false);
-                phoneVerifiedRef.current = false;
-                setActionToken('');
-                setSmsRequested(false);
-                setSmsCode('');
-                setSmsError('');
-                setCountdown(0);
-                stopCountdown();
-            }
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [stopCountdown],
-    );
-
-    const { formatted: phoneFormatted, handleChange: handlePhoneChange, handleFocus: handlePhoneFocus } = usePhoneMask(
-        formik.values.phone,
-        handlePhoneRawChange,
-    );
-
-    const handleSendSms = async () => {
-        setSmsError('');
-        setSmsSending(true);
         try {
-            // Early check if user already exists
-            const exists = await checkUserPhoneApi(currentPhone, locale);
-            if (exists) {
-                const msg = locale === 'ua' 
-                    ? 'Цей номер уже зареєстрований. Будь ласка, увійдіть' 
-                    : 'Этот номер уже зарегистрирован. Пожалуйста, войдите';
-                formik.setFieldError('phone', msg);
+            // First check if user is already registered
+            const isRegistered = await checkUserPhoneApi(formik.values.phone, lang);
+            if (isRegistered) {
+                formik.setFieldError('phone', registeredMsg);
+                formik.setFieldTouched('phone', true, false);
+                setCodeSent(false);
                 return;
             }
 
-            const result = await sendSmsApi(currentPhone, locale);
-            setSmsToken(result.token);
-            // In developer mode the code is returned — show in console
-            if (result.code) {
-                console.info('[SMS DEV] Code:', result.code);
+            const challenge = await authCodeRequestApi(formik.values.phone, lang);
+
+            if (challenge.isRegistered) {
+                formik.setFieldError('phone', registeredMsg);
+                formik.setFieldTouched('phone', true, false);
+                setCodeSent(false);
+                return;
             }
-            setSmsRequested(true);
-            setSmsCode('');
-            startCountdown();
-        } catch (err) {
-            Sentry.captureException(err, {
-                tags: { category: 'auth', action: 'send_sms' },
-            });
-            const msg = err instanceof Error ? err.message : 'Помилка відправки SMS';
-            setSmsError(msg);
+
+            setAuthChallengeToken(challenge.token);
+            setCodeSent(true);
+
+            if (challenge.code) {
+                console.info('[SMS DEV] Code:', challenge.code);
+            }
+
+            startCountdown(challenge.resendAfter || 60);
+            setStatusInfo(lang === 'ua' ? 'Код надіслано' : 'Код отправлен');
+        } catch (err: unknown) {
+            Sentry.captureException(err, { tags: { category: 'auth', action: 'authCodeRequest_register' } });
+            let msg = lang === 'ua' ? 'Помилка відправки коду' : 'Ошибка отправки кода';
+
+            if (err instanceof GraphQLError && err.errors.length > 0) {
+                const firstErr = err.errors[0];
+                const errorCode = firstErr.extensions?.error_code;
+
+                switch (errorCode) {
+                    case 200:
+                    case '200':
+                        msg = lang === 'ua' ? 'Не вдалося відправити код. Спробуйте пізніше' : 'Не удалось отправить код. Попробуйте позже';
+                        break;
+                    case 201:
+                    case '201':
+                        msg = lang === 'ua' ? 'Код вже надіслано' : 'Код уже отправлен';
+                        break;
+                    case 202:
+                    case '202':
+                        msg = lang === 'ua' ? 'Вичерпано ліміт відправок на цей номер' : 'Исчерпан лимит отправок на этот номер';
+                        break;
+                    case 208:
+                    case '208':
+                        msg = lang === 'ua' ? 'Акаунт з цим номером заблоковано. Зверніться до підтримки' : 'Аккаунт с этим номером заблокирован. Обратитесь в поддержку';
+                        break;
+                    default:
+                        if (firstErr.message && firstErr.message !== 'Internal server error') {
+                            msg = firstErr.message;
+                        }
+                }
+            } else if (err instanceof Error && err.message !== 'Internal server error') {
+                msg = err.message;
+            }
+
+            setStatusError(msg);
         } finally {
-            setSmsSending(false);
+            setIsSendingCode(false);
         }
     };
 
-    const handleVerifySms = async () => {
-        if (!smsCode.trim()) {
-            setSmsError('Введіть код з SMS');
-            return;
-        }
-        setSmsError('');
-        setSmsVerifying(true);
-        try {
-            const result = await smsVerifyApi(smsToken, smsCode.trim(), locale);
-            const verifiedActionToken = result.token;
-            verifiedPhonesRef.current.set(currentPhone, verifiedActionToken);
-            setActionToken(verifiedActionToken);
-            setPhoneVerified(true);
-            phoneVerifiedRef.current = true;
+    const { formatted: phoneFormatted, handleChange: handlePhoneChange, handleFocus: handlePhoneFocus } = usePhoneMask(
+        formik.values.phone,
+        (raw) => {
+            formik.setFieldValue('phone', raw);
+            formik.setFieldError('phone', undefined);
+            setCodeSent(false);
+            setSmsCode('');
+            setStatusError('');
+            setStatusInfo('');
             stopCountdown();
-            setCountdown(0);
-            setSmsRequested(false);
-            setSmsCode('');
-            formik.setFieldTouched('phone', true, true);
-        } catch (err) {
-            Sentry.captureException(err, {
-                tags: { category: 'auth', action: 'verify_sms' },
-            });
-            const msg = err instanceof Error ? err.message : 'Невірний код. Спробуйте ще раз.';
-            setSmsError(msg);
-            setSmsCode('');
-        } finally {
-            setSmsVerifying(false);
-        }
-    };
+        },
+    );
 
-    const handleSmsCodeChange = (value: string) => {
-        const cleaned = value.replace(/\D/g, '').slice(0, 6);
-        setSmsCode(cleaned);
-        if (smsError) setSmsError('');
-    };
+    const isPhoneValid = PHONE_REGEX.test(formik.values.phone);
+    const isSubmitDisabled = formik.isSubmitting || !formik.values.name.trim() || !codeSent || smsCode.trim().length < 4;
 
     return (
         <>
-            <h2 className={s.title}>Реєстрація в кабінеті</h2>
+            <h2 className={s.title}>{lang === 'ua' ? 'РЕЄСТРАЦІЯ В КАБІНЕТІ' : 'РЕГИСТРАЦИЯ В КАБИНЕТЕ'}</h2>
             <form className={s.form} onSubmit={formik.handleSubmit} noValidate autoComplete="off">
-
-                {/* Name */}
                 <InputField
                     id="reg-name"
                     type="text"
@@ -287,7 +274,7 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
                         e.currentTarget.removeAttribute('readonly');
                         formik.setFieldTouched('name', false);
                     }}
-                    label="Ім'я"
+                    label={lang === 'ua' ? 'Ім\'я' : 'Имя'}
                     required
                     value={formik.values.name}
                     onChange={formik.handleChange}
@@ -296,189 +283,94 @@ export default function RegisterForm({ onSwitchToLogin, onIncompleteProfile, onS
                     touched={formik.touched.name}
                 />
 
-                {/* Surname */}
                 <InputField
-                    id="reg-surname"
-                    type="text"
-                    name="surname"
+                    id="reg-phone"
+                    type="tel"
+                    name="phone"
                     autoComplete="off"
                     readOnly
                     onFocus={(e) => {
                         e.currentTarget.removeAttribute('readonly');
-                        formik.setFieldTouched('surname', false);
+                        formik.setFieldTouched('phone', false);
+                        handlePhoneFocus();
                     }}
-                    label="Прізвище"
+                    label={lang === 'ua' ? 'Телефон' : 'Телефон'}
                     required
-                    value={formik.values.surname}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.errors.surname}
-                    touched={formik.touched.surname}
+                    value={phoneFormatted}
+                    onChange={handlePhoneChange}
+                    onBlur={() => formik.setFieldTouched('phone', true)}
+                    error={formik.errors.phone}
+                    touched={formik.touched.phone}
                     className={s.inputFieldWrapper}
                 />
 
-                {/* Phone */}
-                <div className={s.field}>
-                    <InputField
-                        id="reg-phone"
-                        type="tel"
-                        name="phone"
-                        autoComplete="off"
-                        readOnly
-                        onFocus={(e) => {
-                            e.currentTarget.removeAttribute('readonly');
-                            formik.setFieldTouched('phone', false);
-                            handlePhoneFocus();
-                        }}
-                        className={clsx(phoneVerified && s.inputVerified, s.inputFieldWrapper)}
-                        label="Телефон"
-                        required
-                        value={phoneFormatted}
-                        onChange={handlePhoneChange}
-                        onBlur={async () => {
-                            formik.setFieldTouched('phone', true);
-                            if (PHONE_REGEX.test(formik.values.phone)) {
-                                try {
-                                    const exists = await checkUserPhoneApi(formik.values.phone, locale);
-                                    if (exists) {
-                                        const msg = locale === 'ua' 
-                                            ? 'Цей номер уже зареєстрований. Будь ласка, увійдіть' 
-                                            : 'Этот номер уже зарегистрирован. Пожалуйста, войдите';
-                                        formik.setFieldError('phone', msg);
-                                    }
-                                } catch (e) {
-                                    console.error('Phone check error:', e);
-                                }
-                            }
-                        }}
-                        error={
-                            !phoneVerified && formik.errors.phone
-                                ? formik.errors.phone === 'Підтвердіть номер телефону через SMS' && formik.submitCount === 0
-                                    ? undefined
-                                    : formik.errors.phone
-                                : undefined
-                        }
-                        touched={formik.touched.phone}
-                    />
+                {isPhoneValid && (
+                    <div className={s.smsBlock}>
+                        <div className={s.smsInputRow}>
+                            <input
+                                type="text"
+                                className={s.smsInput}
+                                placeholder={lang === 'ua' ? 'Введіть код з СМС' : 'Введите код из СМС'}
+                                value={smsCode}
+                                onChange={(e) => {
+                                    setSmsCode(e.target.value.replace(/\D/g, '').slice(0, 6));
+                                    if (statusError) setStatusError('');
+                                }}
+                                maxLength={6}
+                            />
+                            <button
+                                type="button"
+                                className={s.smsSendBtn}
+                                onClick={handleSendCode}
+                                disabled={isSendingCode || countdown > 0}
+                            >
+                                {isSendingCode
+                                    ? (lang === 'ua' ? 'Надсилання...' : 'Отправка...')
+                                    : (lang === 'ua' ? 'Отримати смс' : 'Получить смс')}
+                            </button>
+                        </div>
 
-                    {phoneVerified && (
-                        <span className={s.verifiedBadge}>
-                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-                                <circle cx="6.5" cy="6.5" r="6.5" fill="#2a9d5c" />
-                                <path d="M3.5 6.5L5.5 8.5L9.5 4.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            Номер підтверджено
-                        </span>
-                    )}
-
-                    {phoneComplete && !phoneVerified && (
-                        <div className={s.smsBlock}>
-                            {countdown > 0 && (
-                                <p className={s.timerText}>
-                                    Відправити код повторно можна буде через:{' '}
-                                    <span className={s.timerCount}>{countdown}</span>
-                                </p>
-                            )}
-
-                            <div className={s.smsInputRow}>
-                                <input
-                                    id="sms-code"
-                                    type="text"
-                                    inputMode="numeric"
-                                    className={s.smsInput}
-                                    placeholder="Введіть код з СМС"
-                                    value={smsCode}
-                                    onChange={(e) => handleSmsCodeChange(e.target.value)}
-                                    disabled={!smsRequested}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            if (smsRequested) handleVerifySms();
-                                        }
-                                    }}
-                                />
+                        {countdown > 0 ? (
+                            <div className={s.timerText} style={{ marginTop: '8px' }}>
+                                {lang === 'ua' ? 'Відправити код повторно можна буде через: ' : 'Отправить код повторно можно будет через: '}
+                                <span className={s.timerCount}>{countdown}</span>
+                            </div>
+                        ) : (
+                            codeSent && (
                                 <button
                                     type="button"
-                                    className={s.smsSendBtn}
-                                    disabled={smsSending || smsVerifying}
-                                    onClick={smsRequested ? handleVerifySms : handleSendSms}
+                                    className={s.forgotLink}
+                                    onClick={handleSendCode}
+                                    style={{ alignSelf: 'center', marginTop: '8px' }}
                                 >
-                                    {smsSending
-                                        ? 'Надсилання...'
-                                        : smsVerifying
-                                            ? 'Перевірка...'
-                                            : smsRequested
-                                                ? 'Підтвердити'
-                                                : 'Отримати смс'}
+                                    {lang === 'ua' ? 'Відправити код повторно' : 'Отправить код повторно'}
                                 </button>
-                            </div>
+                            )
+                        )}
+                    </div>
+                )}
 
-                            {smsError && <span className={s.fieldError}>{smsError}</span>}
-                        </div>
-                    )}
-                </div>
-
-                {/* Password */}
-                <InputField
-                    id="reg-password"
-                    type="password"
-                    name="password"
-                    autoComplete="off"
-                    readOnly
-                    onFocus={(e) => {
-                        e.currentTarget.removeAttribute('readonly');
-                        formik.setFieldTouched('password', false);
-                    }}
-                    label="Пароль"
-                    required
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.errors.password}
-                    touched={formik.touched.password}
-                    className={s.inputFieldWrapper}
-                />
-
-                {/* Confirm password */}
-                <InputField
-                    id="reg-confirm-password"
-                    type="password"
-                    name="confirmPassword"
-                    autoComplete="off"
-                    readOnly
-                    onFocus={(e) => {
-                        e.currentTarget.removeAttribute('readonly');
-                        formik.setFieldTouched('confirmPassword', false);
-                    }}
-                    label="Повторити пароль"
-                    required
-                    value={formik.values.confirmPassword}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.errors.confirmPassword}
-                    touched={formik.touched.confirmPassword}
-                    className={s.inputFieldWrapper}
-                />
-
-                {formik.status && <div className={s.error}>{formik.status}</div>}
+                {statusInfo && <div className={s.info} style={{ marginTop: '8px', fontSize: '12px', color: '#2a9d5c', textAlign: 'center' }}>{statusInfo}</div>}
+                {statusError && <div className={s.error} style={{ marginTop: '8px' }}>{statusError}</div>}
 
                 <Button
                     type="submit"
                     className={s.submitBtn}
-                    disabled={formik.isSubmitting}
+                    disabled={isSubmitDisabled}
                     variant="red"
                 >
-                    {formik.isSubmitting ? 'Зачекайте...' : 'ЗАРЕЄСТРУВАТИСЬ'}
+                    {formik.isSubmitting ? (lang === 'ua' ? 'Зачекайте...' : 'Подождите...') : (lang === 'ua' ? 'ЗАРЕЄСТРУВАТИСЬ' : 'ЗАРЕГИСТРИРОВАТЬСЯ')}
                 </Button>
 
                 <div className={s.switchText}>
                     <button type="button" className={s.switchLink} onClick={onSwitchToLogin}>
-                        Вхід
+                        {lang === 'ua' ? 'Вхід' : 'Вход'}
                     </button>
                 </div>
 
+                <div className={s.divider}>{lang === 'ua' ? 'або' : 'или'}</div>
+
                 <GoogleAuthButton
-                    text="РЕЄСТРАЦІЯ ЧЕРЕЗ GOOGLE"
                     onSuccess={(user) => {
                         dispatch(login({ ...user, token: user.token }));
                         onSuccess();

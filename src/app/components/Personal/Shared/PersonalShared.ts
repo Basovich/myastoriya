@@ -11,7 +11,6 @@ export const personalDict = {
       deliveryAddresses: "Адреси доставки",
       bankCards: "Банківські картки",
       pickupPoints: "Точки самовивозу",
-      changePassword: "Зміна паролю",
       logout: "Вийти"
     }
   },
@@ -27,7 +26,6 @@ export const personalDict = {
       deliveryAddresses: "Адреса доставки",
       bankCards: "Банковские карты",
       pickupPoints: "Точки самовывоза",
-      changePassword: "Смена пароля",
       logout: "Выйти"
     }
   }

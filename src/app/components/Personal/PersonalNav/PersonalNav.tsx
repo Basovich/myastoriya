@@ -25,7 +25,7 @@ export interface PersonalNavProps {
         deliveryAddresses: string;
         bankCards: string;
         pickupPoints: string;
-        changePassword: string;
+        changePassword?: string;
         logout: string;
     };
     onLogout?: () => void | Promise<void>;
@@ -65,7 +65,6 @@ const PersonalNav: React.FC<PersonalNavProps> = ({ dict, user, isMobileOnly, isD
         { href: `/personal/addresses`, label: dict.deliveryAddresses, icon: 'addresses' },
         { href: `/personal/cards`, label: dict.bankCards, icon: 'cards' },
         { href: `/personal/pickup`, label: dict.pickupPoints, icon: 'pickup' },
-        { href: `/personal/change-password`, label: dict.changePassword, icon: 'password' },
     ];
 
     const activeItem = menuItems.find(item => pathname.includes(item.href)) || menuItems[0];

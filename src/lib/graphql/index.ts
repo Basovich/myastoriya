@@ -14,6 +14,8 @@ export {
     logoutApi,
     checkUserPhoneApi,
     getMeApi,
+    authCodeRequestApi,
+    authByCodeApi,
 } from './queries/auth';
 export type {
     BackendUser,
@@ -24,6 +26,8 @@ export type {
     LoginInput,
     RegisterInput,
     AuthPayload,
+    AuthChallenge,
+    AuthByCodeInput,
 } from './queries/auth';
 
 // Re-export products

@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
-import ForgotPasswordForm from './ForgotPasswordForm';
-import ResetPasswordForm from './ResetPasswordForm';
 import CompleteSocialProfileForm from './CompleteSocialProfileForm';
 import s from './AuthModal.module.scss';
 import useScrollLock from '@/hooks/useScrollLock';
@@ -16,7 +14,7 @@ interface AuthModalProps {
     onSuccess?: () => void;
 }
 
-type ModalView = 'login' | 'register' | 'forgot-password' | 'reset-password' | 'complete-social';
+type ModalView = 'login' | 'register' | 'complete-social';
 
 interface SocialProfile {
     name?: string;
@@ -28,8 +26,6 @@ interface SocialProfile {
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     const [view, setView] = useState<ModalView>('login');
-    const [forgotPhone, setForgotPhone] = useState('');
-    const [forgotActionToken, setForgotActionToken] = useState('');
     const [pendingSocialProfile, setPendingSocialProfile] = useState<SocialProfile | null>(null);
     const { disableScroll, enableScroll } = useScrollLock();
 
@@ -68,7 +64,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 {view === 'login' && (
                     <LoginForm
                         onSwitchToRegister={() => setView('register')}
-                        onForgotPassword={() => setView('forgot-password')}
                         onIncompleteProfile={(profile) => {
                             setPendingSocialProfile(profile as SocialProfile);
                             setView('complete-social');
@@ -84,24 +79,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                             setView('complete-social');
                         }}
                         onSuccess={handleSuccess}
-                    />
-                )}
-                {view === 'forgot-password' && (
-                    <ForgotPasswordForm
-                        onVerified={(phone, actionToken) => {
-                            setForgotPhone(phone);
-                            setForgotActionToken(actionToken);
-                            setView('reset-password');
-                        }}
-                        onBack={() => setView('login')}
-                    />
-                )}
-                {view === 'reset-password' && (
-                    <ResetPasswordForm
-                        phone={forgotPhone}
-                        actionToken={forgotActionToken}
-                        onSuccess={handleSuccess}
-                        onBack={() => setView('forgot-password')}
                     />
                 )}
                 {view === 'complete-social' && (

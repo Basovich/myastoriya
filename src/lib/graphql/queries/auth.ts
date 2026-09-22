@@ -42,6 +42,23 @@ export interface ActionTokenResponse {
     token: string;
 }
 
+export interface AuthChallenge {
+    token: string;
+    isRegistered: boolean;
+    expiresIn: number;
+    resendAfter: number;
+    code?: string | null;
+}
+
+export interface AuthByCodeInput {
+    token: string;
+    code: number;
+    name?: string;
+    surname?: string;
+    email?: string;
+    deviceId?: string;
+}
+
 // Legacy exports kept for backwards compat
 export interface LoginInput {
     phone: string;
@@ -67,6 +84,59 @@ export interface AuthPayload {
 // ---------------------------------------------------------------------------
 // Mutations / Queries
 // ---------------------------------------------------------------------------
+
+const AUTH_CODE_REQUEST_MUTATION = /* GraphQL */ `
+    mutation AuthCodeRequest($phone: String!) {
+        authCodeRequest(phone: $phone) {
+            token
+            isRegistered
+            expiresIn
+            resendAfter
+            code
+        }
+    }
+`;
+
+const AUTH_BY_CODE_MUTATION = /* GraphQL */ `
+    mutation AuthByCode(
+        $token: String!
+        $code: Int!
+        $name: String
+        $surname: String
+        $email: String
+        $deviceId: String
+    ) {
+        authByCode(
+            token: $token
+            code: $code
+            name: $name
+            surname: $surname
+            email: $email
+            deviceId: $deviceId
+        ) {
+            tokenType
+            expiresIn
+            accessToken
+            refreshToken
+            user {
+                id
+                name
+                surname
+                patronymic
+                phone
+                email
+                birthday
+                sex
+                avatar {
+                    size1x
+                    size2x
+                    size3x
+                }
+                bonuses
+            }
+        }
+    }
+`;
 
 const SEND_SMS_MUTATION = /* GraphQL */ `
     mutation SendSMS($phone: String!) {
@@ -592,3 +662,29 @@ export async function updateCheckoutUserDataApi(
     );
     return data.updateCheckoutUserData;
 }
+
+export async function authCodeRequestApi(
+    phone: string,
+    lang?: string,
+): Promise<AuthChallenge> {
+    const data = await gqlRequest<{ authCodeRequest: AuthChallenge }>(
+        AUTH_CODE_REQUEST_MUTATION,
+        { phone: formatPhone(phone) },
+        { lang },
+    );
+    return data.authCodeRequest;
+}
+
+export async function authByCodeApi(
+    input: AuthByCodeInput,
+    lang?: string,
+    token?: string,
+): Promise<LoggedInUser> {
+    const data = await gqlRequest<{ authByCode: LoggedInUser }>(
+        AUTH_BY_CODE_MUTATION,
+        { ...input },
+        { lang, token },
+    );
+    return data.authByCode;
+}
+
