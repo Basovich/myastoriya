@@ -12,6 +12,7 @@ export async function GET(req: Request) {
         { loc: `${baseUrl}/products.xml`, lastmod: today },
         { loc: `${baseUrl}/publications.xml`, lastmod: today },
         { loc: `${baseUrl}/actions.xml`, lastmod: today },
+        { loc: `${baseUrl}/complex-discounts.xml`, lastmod: today },
         { loc: `${baseUrl}/stores.xml`, lastmod: today },
         { loc: `${baseUrl}/pages.xml`, lastmod: today },
     ];

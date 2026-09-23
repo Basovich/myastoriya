@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSitemapBaseUrl, formatDate, buildPairedUrlSetXml, PairedSitemapEntry } from "@/utils/sitemap-helpers";
-import { getSalesApi, getSpecialsApi, getProductsApi, Sale, Special } from "@/lib/graphql";
+import { getSalesApi, getProductsApi, Sale } from "@/lib/graphql";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,7 @@ export async function GET(req: Request) {
         const entries: PairedSitemapEntry[] = [];
         const seenIds = new Set<string>();
 
-        // 1. Fetch Promotions / Sales for both languages
+        // Fetch Promotions / Sales for both languages
         const [salesResUa, salesResRu] = await Promise.all([
             getSalesApi(100, 1, "ua").catch(() => null),
             getSalesApi(100, 1, "ru").catch(() => null),
@@ -58,49 +58,6 @@ export async function GET(req: Request) {
                     ukPath: `/actions/${uaSlug}/`,
                     ruPath: `/actions/${ruSlug}/`,
                     lastmod: formatDate(sale.expiresAt),
-                });
-            }
-        }
-
-        // 2. Fetch Complex Discounts / Specials for both languages
-        const [specialsResUa, specialsResRu] = await Promise.all([
-            getSpecialsApi(100, 1, "ua").catch(() => null),
-            getSpecialsApi(100, 1, "ru").catch(() => null),
-        ]);
-
-        const ruSpecialsMap = new Map<string, Special>();
-        for (const special of specialsResRu?.data ?? []) {
-            ruSpecialsMap.set(String(special.id), special);
-        }
-
-        const uaSpecialsMap = new Map<string, Special>();
-        for (const special of specialsResUa?.data ?? []) {
-            uaSpecialsMap.set(String(special.id), special);
-        }
-
-        const allSpecialIds = new Set([...uaSpecialsMap.keys(), ...ruSpecialsMap.keys()]);
-
-        for (const id of allSpecialIds) {
-            const uaSpecial = uaSpecialsMap.get(id);
-            const ruSpecial = ruSpecialsMap.get(id);
-            const special = uaSpecial || ruSpecial;
-            if (!special) continue;
-
-            // Filter active specials (must have >= 2 products and all available)
-            const products = special.products || [];
-            if (products.length < 2 || !products.every((p) => Boolean(p.available))) {
-                continue;
-            }
-
-            const uaSlug = uaSpecial?.slug || uaSpecial?.id || ruSpecial?.slug || ruSpecial?.id;
-            const ruSlug = ruSpecial?.slug || ruSpecial?.id || uaSpecial?.slug || uaSpecial?.id;
-
-            if (uaSlug && ruSlug && !seenIds.has(`special-${id}`)) {
-                seenIds.add(`special-${id}`);
-                entries.push({
-                    ukPath: `/complex-discounts/${uaSlug}/`,
-                    ruPath: `/complex-discounts/${ruSlug}/`,
-                    lastmod: formatDate(special.expiresAt),
                 });
             }
         }

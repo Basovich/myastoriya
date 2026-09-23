@@ -343,7 +343,14 @@ async function performRequest<T>(
     if (!text) {
         throw new Error("Empty response body from GraphQL API");
     }
-    const json: GqlResponse<T> = JSON.parse(text);
+    let json: GqlResponse<T>;
+    try {
+        json = JSON.parse(text);
+    } catch (parseErr) {
+        const errObj = new Error(`Invalid JSON response from GraphQL API: ${parseErr instanceof Error ? parseErr.message : String(parseErr)}`);
+        (errObj as Record<string, unknown>)._rawText = text;
+        throw errObj;
+    }
 
     if (json.errors?.length) {
         const error = json.errors[0];

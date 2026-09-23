@@ -14,8 +14,8 @@ export async function GET(req: Request) {
         const today = formatDate();
 
         const [shopsResUa, shopsResRu] = await Promise.all([
-            getShopsApi({ limit: 100, page: 1, onlyCompanyStores: false }, "ua").catch(() => null),
-            getShopsApi({ limit: 100, page: 1, onlyCompanyStores: false }, "ru").catch(() => null),
+            getShopsApi({ limit: 100, page: 1 }, "ua").catch(() => null),
+            getShopsApi({ limit: 100, page: 1 }, "ru").catch(() => null),
         ]);
 
         const uaShopsMap = new Map<string, Shop>();
