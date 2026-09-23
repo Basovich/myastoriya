@@ -1,28 +1,86 @@
-import ActionDetail from "../../../components/ActionDetail/ActionDetail";
-import { getSalesApi, getProductsApi, type Product } from "@/lib/graphql";
-import { notFound } from "next/navigation";
-import { getAccessToken } from "@/app/actions/authActions";
+import type { Metadata } from 'next';
+import { headers } from 'next/headers';
+import { notFound, redirect } from 'next/navigation';
+import ActionDetail from '../../../components/ActionDetail/ActionDetail';
+import {
+    getSalesApi,
+    getProductsApi,
+    findSaleIdBySlug,
+    getSaleSlugsById,
+    type Product,
+} from '@/lib/graphql';
+import { getAccessToken } from '@/app/actions/authActions';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
 
-// This is the dynamic stub page for individual actions: /[lang]/actions/[slug]
-export default async function ActionDetailPage({
-    params,
-}: {
-    params: Promise<{ lang: "ua" | "ru"; slug: string }>;
-}) {
+interface ActionDetailPageProps {
+    params: Promise<{ lang: 'ua' | 'ru'; slug: string }>;
+}
+
+export async function generateMetadata({ params }: ActionDetailPageProps): Promise<Metadata> {
+    const { lang, slug } = await params;
+    const headersList = await headers();
+    const dynamicBaseUrl = getDynamicBaseUrl(headersList);
+
+    const saleId = await findSaleIdBySlug(slug, lang);
+    if (!saleId) return {};
+
+    const [saleSlugs, salesResponse] = await Promise.all([
+        getSaleSlugsById(saleId),
+        getSalesApi(100, 1, lang).catch(() => null),
+    ]);
+
+    const sale = salesResponse?.data.find((s) => String(s.id) === String(saleId));
+    if (!sale) return {};
+
+    const title = sale.title || sale.name;
+    const description = sale.description
+        ? sale.description.replace(/<[^>]*>/g, '').trim().slice(0, 160)
+        : title;
+
+    const alternates = getExplicitHreflangAlternates(
+        {
+            uk: `/actions/${saleSlugs.uk}/`,
+            ru: `/actions/${saleSlugs.ru}/`,
+        },
+        lang,
+        dynamicBaseUrl,
+    );
+
+    return {
+        title,
+        description,
+        alternates: {
+            canonical: alternates.canonical,
+            languages: alternates.languages,
+        },
+        openGraph: {
+            title,
+            description,
+        },
+    };
+}
+
+export default async function ActionDetailPage({ params }: ActionDetailPageProps) {
     const { lang, slug } = await params;
     const token = await getAccessToken();
 
-    // Fetch full list of sales to find by slug or numeric id.
-    // sale(id) query crashes on the backend (500), so we use the list endpoint.
-    const salesResponse = await getSalesApi(100, 1, lang, token ?? undefined);
+    // 1. Resolve sale ID by slug (with fallback across languages)
+    const saleId = await findSaleIdBySlug(slug, lang);
+    if (!saleId) {
+        return notFound();
+    }
 
-    const isNumericId = /^\d+$/.test(slug);
-    const sale = isNumericId
-        ? salesResponse.data.find((s) => s.id === slug)
-        : salesResponse.data.find((s) => s.slug === slug);
+    // 2. Fetch full list of sales to get sale details for current lang
+    const salesResponse = await getSalesApi(100, 1, lang, token ?? undefined);
+    const sale = salesResponse.data.find((s) => String(s.id) === String(saleId));
 
     if (!sale) {
         return notFound();
+    }
+
+    // 3. If requested slug is an old/transliterated slug, redirect to current localized slug
+    if (sale.slug && slug !== sale.slug && !/^\d+$/.test(slug)) {
+        redirect(`/${lang}/actions/${sale.slug}`);
     }
 
     let productsResponse = { data: [] as Product[], has_more_pages: false };
@@ -53,3 +111,4 @@ export default async function ActionDetailPage({
         </main>
     );
 }
+

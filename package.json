@@ -6,7 +6,8 @@
     "dev": "next dev --webpack",
     "build": "SENTRY_ENVIRONMENT=build SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING=1 next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:hreflang": "node scripts/check-hreflang.mjs"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.8.1",

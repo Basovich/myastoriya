@@ -155,16 +155,45 @@ export async function getSaleApi(id: string, lang?: string): Promise<Sale | null
 }
 
 /**
- * Resolves a sale slug to its ID by scanning the list of sales.
+ * Resolves a sale slug to its ID by scanning the list of sales (with fallback to other language if slug is transliterated/old).
  */
 export async function findSaleIdBySlug(slug: string, lang?: string): Promise<string | null> {
     try {
-        // Fetch a large number of sales to find the matching slug
         const response = await getSalesApi(100, 1, lang);
-        const sale = response.data.find(s => s.slug === slug);
+        let sale = response.data.find(s => s.slug === slug);
+        if (sale) return sale.id;
+
+        // Fallback to alternate language
+        const altLang = lang === 'ru' ? 'ua' : 'ru';
+        const altResponse = await getSalesApi(100, 1, altLang);
+        sale = altResponse.data.find(s => s.slug === slug);
         return sale ? sale.id : null;
     } catch (error) {
         console.error(`[Sale] Failed to resolve slug: ${slug}`, error);
         return null;
     }
 }
+
+/**
+ * Resolves localized slugs for a sale ID across both languages (uk and ru).
+ */
+export async function getSaleSlugsById(id: string): Promise<{ uk: string; ru: string }> {
+    try {
+        const [uaRes, ruRes] = await Promise.all([
+            getSalesApi(100, 1, 'ua').catch(() => null),
+            getSalesApi(100, 1, 'ru').catch(() => null),
+        ]);
+
+        const uaSale = uaRes?.data.find(s => String(s.id) === String(id));
+        const ruSale = ruRes?.data.find(s => String(s.id) === String(id));
+
+        const ukSlug = uaSale?.slug || ruSale?.slug || id;
+        const ruSlug = ruSale?.slug || uaSale?.slug || id;
+
+        return { uk: ukSlug, ru: ruSlug };
+    } catch (error) {
+        console.error(`[Sale] Failed to fetch sale slugs for ID: ${id}`, error);
+        return { uk: id, ru: id };
+    }
+}
+

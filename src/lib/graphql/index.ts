@@ -42,6 +42,7 @@ export {
     getBoughtTogetherProductsApi,
     addProductToAvailabilityTrackerApi,
     findProductIdBySlug,
+    getProductSlugsById,
     getCategoriesApi,
     resolveProductImageUrl,
     getProductBadge,
@@ -120,6 +121,7 @@ export {
     getSalesApi,
     getSaleApi,
     findSaleIdBySlug,
+    getSaleSlugsById,
 } from './queries/pages/home/sales';
 export type { Sale, SaleImages, SalesResponse } from './queries/pages/home/sales';
 

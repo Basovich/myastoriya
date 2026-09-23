@@ -223,16 +223,58 @@ export async function getSpecialApi(id: string | number, lang?: string, token?: 
 }
 
 /**
- * Resolves a special slug to its ID by scanning the list of specials.
+ * Resolves a special slug to its ID by scanning the list of specials (with fallback to other language if slug is transliterated/old).
  */
 export async function findSpecialIdBySlug(slug: string, lang?: string, token?: string): Promise<string | null> {
     try {
-        // Fetch a large number of specials to find the matching slug
         const response = await getSpecialsApi(100, 1, lang, token);
-        const special = response.data.find(s => s.slug === slug);
-        return special ? special.id : null;
+        let special = response.data.find(s => s.slug === slug);
+        if (special) return special.id;
+
+        // Fallback to alternate language
+        const altLang = lang === 'ru' ? 'ua' : 'ru';
+        const altResponse = await getSpecialsApi(100, 1, altLang, token);
+        special = altResponse.data.find(s => s.slug === slug);
+        if (special) return special.id;
+
+        // Fallback without token if token was provided
+        if (token) {
+            const pubResponse = await getSpecialsApi(100, 1, lang, undefined);
+            special = pubResponse.data.find(s => s.slug === slug);
+            if (special) return special.id;
+
+            const altPubResponse = await getSpecialsApi(100, 1, altLang, undefined);
+            special = altPubResponse.data.find(s => s.slug === slug);
+            if (special) return special.id;
+        }
+
+        return null;
     } catch (error) {
         console.warn(`[Special] Failed to resolve slug: ${slug}`, error);
         return null;
     }
 }
+
+/**
+ * Resolves localized slugs for a special ID across both languages (uk and ru).
+ */
+export async function getSpecialSlugsById(id: string | number, token?: string): Promise<{ uk: string; ru: string }> {
+    try {
+        const [uaRes, ruRes] = await Promise.all([
+            getSpecialsApi(100, 1, 'ua', token).catch(() => null),
+            getSpecialsApi(100, 1, 'ru', token).catch(() => null),
+        ]);
+
+        const uaSpecial = uaRes?.data.find(s => String(s.id) === String(id));
+        const ruSpecial = ruRes?.data.find(s => String(s.id) === String(id));
+
+        const ukSlug = uaSpecial?.slug || ruSpecial?.slug || String(id);
+        const ruSlug = ruSpecial?.slug || uaSpecial?.slug || String(id);
+
+        return { uk: ukSlug, ru: ruSlug };
+    } catch (error) {
+        console.warn(`[Special] Failed to fetch special slugs for ID: ${id}`, error);
+        return { uk: String(id), ru: String(id) };
+    }
+}
+

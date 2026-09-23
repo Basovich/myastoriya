@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import { getLocalizedHref } from '@/utils/i18n-helpers';
-import { getHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import {
     getCatalogTreeApi,
@@ -12,6 +12,7 @@ import {
     getPopularProductsApi,
     getProductByIdApi,
     findProductIdBySlug,
+    getProductSlugsById,
     getBlogsApi,
     getSpecialsByProductApi,
     getBoughtTogetherProductsApi,
@@ -40,7 +41,10 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     const productId = await findProductIdBySlug(slug, lang as Locale).catch(() => null);
     if (!productId) return {};
 
-    const product = await getProductByIdApi(productId, lang as Locale).catch(() => null);
+    const [product, productSlugs] = await Promise.all([
+        getProductByIdApi(productId, lang as Locale).catch(() => null),
+        getProductSlugsById(productId),
+    ]);
     if (!product) return {};
 
     const productName = product.name;
@@ -52,7 +56,14 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         ? rawDescription.slice(0, 160)
         : `Купити ${productName} за найкращою ціною з доставкою від М'ясторія.`;
 
-    const alternates = getHreflangAlternates(`/product/${slug}/`, lang, dynamicBaseUrl);
+    const alternates = getExplicitHreflangAlternates(
+        {
+            uk: `/product/${productSlugs.uk}/`,
+            ru: `/product/${productSlugs.ru}/`,
+        },
+        lang,
+        dynamicBaseUrl,
+    );
 
     return {
         title: productName,
@@ -150,6 +161,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         notFound();
     }
+
+    // Redirect to official current localized slug if requested slug was old/transliterated
+    if (product.slug && slug !== product.slug && !/^\d+$/.test(slug)) {
+        redirect(`/${lang}/product/${product.slug}`);
+    }
+
 
     // 4. If product is not available for this city, redirect to nearest available category
     if (!product.available) {

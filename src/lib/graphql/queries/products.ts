@@ -1150,11 +1150,48 @@ export async function findProductIdBySlug(
 
         const found = data.products.data.find((p) => p.slug === slug);
         if (found) return found.id;
-        if (!data.products.has_more_pages) return null;
+        if (!data.products.has_more_pages) break;
+    }
+
+    // Fallback: search alternate language if slug is transliterated/old
+    const altLang = lang === 'ru' ? 'ua' : 'ru';
+    for (let page = 1; page <= maxPages; page++) {
+        const data = await gqlRequest<{
+            products: { has_more_pages: boolean; data: Array<{ id: string; slug?: string }> };
+        }>(
+            SLUG_SCAN_QUERY,
+            { limit, page },
+            { next: { revalidate: 3600 }, lang: altLang },
+        );
+
+        const found = data.products.data.find((p) => p.slug === slug);
+        if (found) return found.id;
+        if (!data.products.has_more_pages) break;
     }
 
     return null;
 }
+
+/**
+ * Resolves localized slugs for a product ID across both languages (uk and ru).
+ */
+export async function getProductSlugsById(id: string): Promise<{ uk: string; ru: string }> {
+    try {
+        const [uaProd, ruProd] = await Promise.all([
+            getProductByIdApi(id, 'ua').catch(() => null),
+            getProductByIdApi(id, 'ru').catch(() => null),
+        ]);
+
+        const ukSlug = uaProd?.slug || ruProd?.slug || id;
+        const ruSlug = ruProd?.slug || uaProd?.slug || id;
+
+        return { uk: ukSlug, ru: ruSlug };
+    } catch (error) {
+        console.error(`[Product] Failed to fetch product slugs for ID: ${id}`, error);
+        return { uk: id, ru: id };
+    }
+}
+
 
 export async function getCategoriesApi(lang?: string): Promise<ProductCategory[]> {
     const data = await gqlRequest<{ categories: ProductCategory[] }>(
