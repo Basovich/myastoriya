@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import ComplexDiscountDetail from '../../../components/ComplexDiscountDetail/ComplexDiscountDetail';
 import { findSpecialIdBySlug, getSpecialApi, getSpecialSlugsById } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getComplexDiscountSeoData } from '@/utils/seo';
 
 interface ComboDetailProps {
     params: Promise<{ lang: 'ua' | 'ru'; slug: string }>;
@@ -25,10 +25,9 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
 
     if (!special) return {};
 
-    const title = special.title;
-    const description = special.description
-        ? special.description.replace(/<[^>]*>/g, '').trim().slice(0, 160)
-        : title;
+    const discountTitle = special.title || special.name;
+    const seoData = getComplexDiscountSeoData(discountTitle, special.description || special.text, lang);
+    const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
 
     const alternates = getExplicitHreflangAlternates(
         {
@@ -40,15 +39,20 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
     );
 
     return {
-        title,
-        description,
+        title: titleConfig,
+        description: seoData.description,
         alternates: {
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
         openGraph: {
-            title,
-            description,
+            title: discountTitle,
+            description: seoData.description,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: discountTitle,
+            description: seoData.description,
         },
     };
 }

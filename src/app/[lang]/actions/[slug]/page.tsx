@@ -10,7 +10,7 @@ import {
     type Product,
 } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getActionSeoData } from '@/utils/seo';
 
 interface ActionDetailPageProps {
     params: Promise<{ lang: 'ua' | 'ru'; slug: string }>;
@@ -32,10 +32,9 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
     const sale = salesResponse?.data.find((s) => String(s.id) === String(saleId));
     if (!sale) return {};
 
-    const title = sale.title || sale.name;
-    const description = sale.description
-        ? sale.description.replace(/<[^>]*>/g, '').trim().slice(0, 160)
-        : title;
+    const actionTitle = sale.title || sale.name;
+    const seoData = getActionSeoData(actionTitle, sale.description || sale.text, lang);
+    const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
 
     const alternates = getExplicitHreflangAlternates(
         {
@@ -47,15 +46,20 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
     );
 
     return {
-        title,
-        description,
+        title: titleConfig,
+        description: seoData.description,
         alternates: {
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
         openGraph: {
-            title,
-            description,
+            title: actionTitle,
+            description: seoData.description,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: actionTitle,
+            description: seoData.description,
         },
     };
 }

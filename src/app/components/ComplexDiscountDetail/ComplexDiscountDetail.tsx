@@ -154,7 +154,7 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
 
                 {/* White content card */}
                 <div className={s.card}>
-                    <h1 className={s.title}>{title.toUpperCase()}</h1>
+                    <h1 className={s.title}>{title}</h1>
                     <p className={s.description}>
                         {description}
                     </p>

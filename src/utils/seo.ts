@@ -233,4 +233,77 @@ export function getBlogSeoData(
     return { title, description: cleanDescription };
 }
 
+export interface ActionSeoData {
+    title: string;
+    description: string;
+}
+
+/**
+ * Generates SEO Title and Description for promotion/action pages according to SEO requirements.
+ */
+export function getActionSeoData(
+    actionName: string,
+    actionText?: string | null,
+    lang: string = 'ua'
+): ActionSeoData {
+    const isRu = lang === 'ru';
+    const cleanTitle = actionName.trim();
+
+    let cleanDescription = '';
+    if (actionText) {
+        cleanDescription = actionText
+            .replace(/<[^>]*>/g, '')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 155)
+            .trim();
+    }
+
+    if (isRu) {
+        const title = `${cleanTitle} | Мястория`;
+        return { title, description: cleanDescription };
+    }
+
+    const title = cleanTitle;
+    return { title, description: cleanDescription };
+}
+
+export interface ComplexDiscountSeoData {
+    title: string;
+    description: string;
+}
+
+/**
+ * Generates SEO Title and Description for complex discount pages according to SEO requirements.
+ */
+export function getComplexDiscountSeoData(
+    discountName: string,
+    discountText?: string | null,
+    lang: string = 'ua'
+): ComplexDiscountSeoData {
+    const isRu = lang === 'ru';
+    const cleanTitle = discountName.trim();
+
+    let cleanDescription = '';
+    if (discountText) {
+        cleanDescription = discountText
+            .replace(/<[^>]*>/g, '')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 155)
+            .trim();
+    }
+
+    if (isRu) {
+        const title = `${cleanTitle} | Мястория`;
+        return { title, description: cleanDescription };
+    }
+
+    const title = cleanTitle;
+    return { title, description: cleanDescription };
+}
+
+
 
