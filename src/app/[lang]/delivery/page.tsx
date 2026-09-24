@@ -2,7 +2,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import DeliveryAndPaymentPage from "@/app/pages/DeliveryAndPayment/DeliveryAndPaymentPage";
 import { getShopsApi } from "@/lib/graphql/queries/shops";
-import { getPolicyBlocksApi, getDeliveryBlocksApi } from "@/lib/graphql/index";
+import { getPolicyBlocksApi, getDeliveryBlocksApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
