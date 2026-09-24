@@ -168,4 +168,32 @@ export function getProductSeoData(
     return { title, description };
 }
 
+export interface StoreSeoData {
+    title: string;
+    description: string;
+}
+
+/**
+ * Generates SEO Title and Description for store pages according to SEO requirements.
+ */
+export function getStoreSeoData(
+    storeName: string,
+    address: string,
+    lang: string = 'ua'
+): StoreSeoData {
+    const isRu = lang === 'ru';
+    const cleanName = storeName.trim();
+    const cleanAddress = address.trim();
+
+    if (isRu) {
+        const title = `${cleanName}: ${cleanAddress} | Мястория`;
+        const description = `${cleanName} по адресу ${cleanAddress}. Посмотрите актуальное меню, график работы, контакты и другую информацию о заведении.`;
+        return { title, description };
+    }
+
+    const title = `${cleanName}: ${cleanAddress}`;
+    const description = `${cleanName} за адресою ${cleanAddress}. Перегляньте актуальне меню, графік роботи, контакти та іншу інформацію про заклад.`;
+
+    return { title, description };
+}
 
