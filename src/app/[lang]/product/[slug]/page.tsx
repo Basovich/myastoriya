@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import { getLocalizedHref } from '@/utils/i18n-helpers';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import {
     getCatalogTreeApi,
@@ -49,12 +49,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
     const productName = product.name;
     const productImage = resolveProductImageUrl(product);
-    const rawDescription = product.text
-        ? product.text.replace(/<[^>]*>/g, '').trim()
-        : '';
-    const description = rawDescription
-        ? rawDescription.slice(0, 160)
-        : `Купити ${productName} за найкращою ціною з доставкою від М'ясторія.`;
+    const seoData = getProductSeoData(productName, product.cost, lang);
+    const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
 
     const alternates = getExplicitHreflangAlternates(
         {
@@ -66,21 +62,21 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     );
 
     return {
-        title: productName,
-        description,
+        title: titleConfig,
+        description: seoData.description,
         alternates: {
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
         openGraph: {
             title: productName,
-            description,
+            description: seoData.description,
             images: productImage ? [{ url: productImage, alt: productName }] : undefined,
         },
         twitter: {
             card: 'summary_large_image',
             title: productName,
-            description,
+            description: seoData.description,
             images: productImage ? [productImage] : undefined,
         },
     };

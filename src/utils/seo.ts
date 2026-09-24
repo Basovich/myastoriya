@@ -136,4 +136,36 @@ export function getCategorySeoData(
     return { title, description };
 }
 
+export interface ProductSeoData {
+    title: string;
+    description: string;
+}
+
+/**
+ * Generates SEO Title and Description for product pages according to SEO requirements.
+ */
+export function getProductSeoData(
+    productName: string,
+    price?: number | null,
+    lang: string = 'ua'
+): ProductSeoData {
+    const isRu = lang === 'ru';
+    const cleanName = productName.trim();
+
+    if (isRu) {
+        const title = `${cleanName} | Мястория`;
+        const description = price && price > 0
+            ? `${cleanName} в интернет-магазине «Мястория» ✅ Цена ${Math.round(price)} грн ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`
+            : `${cleanName} в интернет-магазине «Мястория» ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`;
+        return { title, description };
+    }
+
+    const title = cleanName;
+    const description = price && price > 0
+        ? `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Ціна ${Math.round(price)} грн ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`
+        : `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`;
+
+    return { title, description };
+}
+
 
