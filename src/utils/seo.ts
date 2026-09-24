@@ -498,6 +498,28 @@ export function getStaticPageSeoData(pageKey: string, lang: string = 'ua'): Stat
     };
 }
 
+export interface DefaultSeoData {
+    h1: string;
+    title: string;
+    description: string;
+}
+
+/**
+ * Generates default SEO Title, Description, and H1 for technical or unconfigured pages.
+ */
+export function getDefaultSeoData(pageTitle: string, lang: string = 'ua'): DefaultSeoData {
+    const isRu = lang === 'ru';
+    const cleanTitle = pageTitle.trim();
+    const siteBrand = isRu ? 'Мястория' : "М'ясторія";
+    const title = `${cleanTitle} | ${siteBrand}`;
+
+    return {
+        h1: cleanTitle,
+        title,
+        description: "",
+    };
+}
+
 
 
 
