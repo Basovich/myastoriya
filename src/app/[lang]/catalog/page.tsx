@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { getAccessToken } from '@/app/actions/authActions';
 
-import { getHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getStaticPageSeoData } from '@/utils/seo';
 
 interface CatalogPageProps {
     params: Promise<{ lang: string }>;
@@ -20,27 +20,28 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
     const { lang } = await params;
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-    const dict = await getDictionary(lang as Locale);
-    const title = dict.catalog?.pageTitle ?? 'Каталог';
-    const description = `${title} — свіже м'ясо, стейки, бургери та напівфабрикати від М'ясторія.`;
+    const seo = getStaticPageSeoData('catalog', lang);
     const alternates = getHreflangAlternates('/catalog/', lang, dynamicBaseUrl);
+
+    const isRu = lang === 'ru';
+    const title = isRu ? { absolute: seo.title } : seo.h1;
 
     return {
         title,
-        description,
+        description: seo.description,
         alternates: {
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
         openGraph: {
-            title,
-            description,
-            images: [{ url: '/images/og-image.jpg', alt: title }],
+            title: seo.title,
+            description: seo.description,
+            images: [{ url: '/images/og-image.jpg', alt: seo.h1 }],
         },
         twitter: {
             card: 'summary_large_image',
-            title,
-            description,
+            title: seo.title,
+            description: seo.description,
             images: ['/images/og-image.jpg'],
         },
     };
@@ -92,7 +93,7 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
     }
     productsResponse.current_page = page;
 
-    const pageTitle = dict.catalog?.pageTitle ?? 'Каталог';
+    const pageTitle = getStaticPageSeoData('catalog', lang).h1;
 
     // Категорії першого рівня для CategoryCircles
     const subcategoryItems = catalogTree.map(cat => ({

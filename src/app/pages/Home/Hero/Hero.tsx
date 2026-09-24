@@ -70,7 +70,7 @@ export default function Hero({ slides, lang }: HeroProps) {
                         <div className={s.contentOverlay}>
                             <div className={s.content}>
                                 <AppLink href={href}>
-                                    <h1 className={s.title}>{slide.name}</h1>
+                                    <h2 className={s.title}>{slide.name}</h2>
                                 </AppLink>
                                 <Button href={href} variant="outline" className={s.ctaButton}>
                                     <span className={s.ctaButtonInner}>{btnText}</span>

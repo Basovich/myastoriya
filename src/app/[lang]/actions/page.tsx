@@ -1,7 +1,32 @@
+import type { Metadata } from "next";
 import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSalesApi } from "@/lib/graphql/queries/pages/home/sales";
 import { getProductsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
+import { getStaticPageSeoData } from "@/utils/seo";
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ lang: "ua" | "ru" }>;
+}): Promise<Metadata> {
+    const { lang } = await params;
+    const seo = getStaticPageSeoData('actions', lang);
+
+    return {
+        title: lang === 'ru' ? { absolute: seo.title } : seo.h1,
+        description: seo.description,
+        openGraph: {
+            title: seo.h1,
+            description: seo.description,
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: seo.h1,
+            description: seo.description,
+        },
+    };
+}
 
 // This is the index page for Actions: /[lang]/actions
 export default async function ActionsPage({

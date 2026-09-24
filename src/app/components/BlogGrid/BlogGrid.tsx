@@ -145,7 +145,7 @@ export default function BlogGrid({
         <section className={s.section}>
             <div className={s.container}>
                 <HeroBanner
-                    title={dict.title}
+                    title={activeCategory ? (activeCategory === 'recipe' ? (lang === 'ru' ? 'Рецепты' : 'Рецепти') : (lang === 'ru' ? 'Статьи' : 'Статті')) : dict.title}
                     image="/images/promotions/blog-banner.png"
                 />
 

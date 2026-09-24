@@ -5,16 +5,58 @@ import BlogGrid from "@/app/components/BlogGrid/BlogGrid";
 import { getBlogsApi, getBlogTypesApi, getBlogBySlugApi } from "@/lib/graphql/queries/blog";
 import { mapUrlCategoryToApiTypeSlug, getBlogCategorySegment } from "@/utils/blog-url";
 import { getAccessToken } from "@/app/actions/authActions";
+import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
 
 export const dynamic = "force-dynamic";
+
+interface BlogCategoryPageProps {
+    params: Promise<{ lang: Locale; category: string }>;
+    searchParams: Promise<{ page?: string }>;
+}
+
+export async function generateMetadata({ params }: BlogCategoryPageProps): Promise<Metadata> {
+    const { lang, category } = await params;
+    const headersList = await headers();
+    const dynamicBaseUrl = getDynamicBaseUrl(headersList);
+
+    const pageKey = category === "recipe" ? "blog-recipe" : category === "article" ? "blog-article" : undefined;
+    if (!pageKey) {
+        return {};
+    }
+
+    const seo = getStaticPageSeoData(pageKey, lang);
+    const alternates = getHreflangAlternates(`/blog/${category}/`, lang, dynamicBaseUrl);
+
+    const isRu = lang === "ru";
+    const title = isRu ? { absolute: seo.title } : seo.h1;
+
+    return {
+        title,
+        description: seo.description,
+        alternates: {
+            canonical: alternates.canonical,
+            languages: alternates.languages,
+        },
+        openGraph: {
+            title: seo.title,
+            description: seo.description,
+            images: [{ url: "/images/og-image.jpg", alt: seo.h1 }],
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: seo.title,
+            description: seo.description,
+            images: ["/images/og-image.jpg"],
+        },
+    };
+}
 
 export default async function BlogCategoryPage({
     params,
     searchParams,
-}: {
-    params: Promise<{ lang: Locale; category: string }>;
-    searchParams: Promise<{ page?: string }>;
-}) {
+}: BlogCategoryPageProps) {
     const { lang, category } = await params;
     const { page: pageQuery } = await searchParams;
     const page = Math.max(1, parseInt(pageQuery || "1", 10));

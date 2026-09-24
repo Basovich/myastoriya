@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import HomePage from "@/app/pages/Home";
@@ -8,6 +9,30 @@ import { getReviewsApi } from "@/lib/graphql/queries/pages/home/reviews";
 import { getProductsApi, getSalesApi, getSpecialsApi, getCatalogTreeApi, getShowcasesApi } from "@/lib/graphql";
 import { buildCategoryIndex, getCategoryHref } from "@/utils/category-url";
 import { getAccessToken } from "@/app/actions/authActions";
+import { getStaticPageSeoData } from "@/utils/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const seo = getStaticPageSeoData('home', lang);
+
+  return {
+    title: { absolute: seo.title },
+    description: seo.description,
+    openGraph: {
+      title: seo.h1,
+      description: seo.description,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.h1,
+      description: seo.description,
+    },
+  };
+}
 
 export default async function Home({
   params,
