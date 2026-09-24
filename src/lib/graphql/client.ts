@@ -348,7 +348,7 @@ async function performRequest<T>(
         json = JSON.parse(text);
     } catch (parseErr) {
         const errObj = new Error(`Invalid JSON response from GraphQL API: ${parseErr instanceof Error ? parseErr.message : String(parseErr)}`);
-        (errObj as Record<string, unknown>)._rawText = text;
+        Object.assign(errObj, { _rawText: text });
         throw errObj;
     }
 
