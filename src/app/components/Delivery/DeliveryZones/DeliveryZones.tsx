@@ -16,21 +16,21 @@ const LOCALIZED_TEXTS = {
         loadingMap: "Завантаження карти...",
         freeCheckLabel: "А мені безкоштовно по Києву?",
         freeTitle: "Доставка безкоштовна!",
-        freeText: "Ваша адреса знаходиться в межах 3 км від найближчого закладу",
+        freeText: "Ваша адреса знаходиться в межах 500 м від найближчого закладу",
         distance: "відстань",
         km: "км",
         paidTitle: "Доставка платна.",
-        paidText: "Ваша адреса знаходиться за межами 3 км від найближчого закладу",
+        paidText: "Ваша адреса знаходиться за межами 500 м від найближчого закладу",
     },
     ru: {
         loadingMap: "Загрузка карты...",
         freeCheckLabel: "А мне бесплатно по Киеву?",
         freeTitle: "Доставка бесплатная!",
-        freeText: "Ваш адрес находится в пределах 3 км от ближайшего заведения",
+        freeText: "Ваш адрес находится в пределах 500 м от ближайшего заведения",
         distance: "расстояние",
         km: "км",
         paidTitle: "Доставка платная.",
-        paidText: "Ваш адрес находится за пределами 3 км от ближайшего заведения",
+        paidText: "Ваш адрес находится за пределами 500 м от ближайшего заведения",
     }
 };
 
@@ -116,7 +116,7 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
             }
         }
 
-        const isFree = minDistance <= 3.0;
+        const isFree = minDistance <= 0.5;
         setCheckResult({ isFree, closestStoreName: closestStore.name, distanceKm: minDistance });
 
         setUserMarker({ lat, lng });

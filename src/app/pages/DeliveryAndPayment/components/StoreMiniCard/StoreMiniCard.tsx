@@ -10,11 +10,11 @@ import AppLink from '@/app/components/ui/AppLink/AppLink';
 
 const LOCALIZED_TEXTS = {
     ua: {
-        promoTitle: "ДО 3 КМ БЕЗКОШТОВНА ДОСТАВКА",
+        promoTitle: "ДО 500 М БЕЗКОШТОВНА ДОСТАВКА",
         promoSub: "від магазину-ресторану"
     },
     ru: {
-        promoTitle: "ДО 3 КМ БЕСПЛАТНАЯ ДОСТАВКА",
+        promoTitle: "ДО 500 М БЕСПЛАТНАЯ ДОСТАВКА",
         promoSub: "от магазина-ресторана"
     }
 };
