@@ -104,3 +104,36 @@ export function getExplicitHreflangAlternates(
     };
 }
 
+export interface CategorySeoData {
+    title: string;
+    description: string;
+}
+
+/**
+ * Generates SEO Title and Description for product category pages according to SEO requirements.
+ */
+export function getCategorySeoData(
+    categoryName: string,
+    minPrice?: number | null,
+    lang: string = 'ua'
+): CategorySeoData {
+    const isRu = lang === 'ru';
+    const cleanName = categoryName.trim();
+
+    if (isRu) {
+        const title = `${cleanName} – купить с доставкой по Киеву и Украине`;
+        const description = minPrice && minPrice > 0
+            ? `${cleanName} в интернет-магазине «Мястория» ✅ Цены от ${Math.round(minPrice)} грн ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`
+            : `${cleanName} в интернет-магазине «Мястория» ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`;
+        return { title, description };
+    }
+
+    const title = `${cleanName} – купити з доставкою по Києву та Україні`;
+    const description = minPrice && minPrice > 0
+        ? `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Ціни від ${Math.round(minPrice)} грн ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`
+        : `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`;
+
+    return { title, description };
+}
+
+

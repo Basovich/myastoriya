@@ -19,7 +19,7 @@ import {
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams, parseRawProductionParam } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData } from '@/utils/seo';
 
 interface DynamicCategoryPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
@@ -52,27 +52,52 @@ export async function generateMetadata({ params }: DynamicCategoryPageProps): Pr
     }
 
     if (categoryEntry) {
+        const categoryId = parseInt(categoryEntry.node.id);
         const categoryName = categoryEntry.node.name;
         const categoryImage = resolveCategoryImageUrl(categoryEntry.node);
-        const description = `${categoryName} — замовляйте з доставкою від М'ясторія.`;
+        const token = await getAccessToken();
+
+        const [filterData, productsResponse] = await Promise.all([
+            getProductsFilterApi(categoryId, lang, undefined).catch(() => null),
+            getProductsApi({ categoryId, limit: 24 }, lang, token ?? undefined).catch(() => null),
+        ]);
+
+        let minPrice: number | null = null;
+        if (filterData?.blocks) {
+            const priceBlock = filterData.blocks.find(b => b.type === 'range' || b.key === 'price');
+            if (priceBlock && typeof priceBlock.min === 'number' && priceBlock.min > 0) {
+                minPrice = priceBlock.min;
+            }
+        }
+
+        if (!minPrice && productsResponse?.data && productsResponse.data.length > 0) {
+            const validCosts = productsResponse.data
+                .map(p => p.cost)
+                .filter((c): c is number => typeof c === 'number' && c > 0);
+            if (validCosts.length > 0) {
+                minPrice = Math.min(...validCosts);
+            }
+        }
+
+        const { title, description } = getCategorySeoData(categoryName, minPrice, lang);
 
         const alternates = getHreflangAlternates(`/category/${slug.join('/')}/`, lang, dynamicBaseUrl);
 
         return {
-            title: categoryName,
+            title,
             description,
             alternates: {
                 canonical: alternates.canonical,
                 languages: alternates.languages,
             },
             openGraph: {
-                title: categoryName,
+                title,
                 description,
                 images: categoryImage ? [{ url: categoryImage, alt: categoryName }] : undefined,
             },
             twitter: {
                 card: 'summary_large_image',
-                title: categoryName,
+                title,
                 description,
                 images: categoryImage ? [categoryImage] : undefined,
             },

@@ -103,7 +103,7 @@ export default async function CatalogContent({
         ...(categoryName ? [{ label: categoryName }] : []),
     ];
 
-    const pageTitle = categoryName ? categoryName.toUpperCase() : '';
+    const pageTitle = categoryName || '';
 
     // Prepare related slider data
     const relatedProducts = recommendedProducts && recommendedProducts.length > 0
