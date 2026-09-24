@@ -91,10 +91,10 @@ export function buildFilterParams(
 ): URLSearchParams {
     const params = new URLSearchParams(existing.toString());
 
-    // Видаляємо старі filter_ параметри
+    // Видаляємо старі filter_ параметри (крім filter_meat_type)
     const keysToDelete: string[] = [];
     params.forEach((_, key) => {
-        if (key.startsWith(PARAM_PREFIX)) {
+        if (key.startsWith(PARAM_PREFIX) && key !== 'filter_meat_type') {
             keysToDelete.push(key);
         }
     });
@@ -128,7 +128,7 @@ export function clearFilterParams(existing: URLSearchParams): URLSearchParams {
     const params = new URLSearchParams(existing.toString());
     const keysToDelete: string[] = [];
     params.forEach((_, key) => {
-        if (key.startsWith(PARAM_PREFIX)) {
+        if (key.startsWith(PARAM_PREFIX) && key !== 'filter_meat_type') {
             keysToDelete.push(key);
         }
     });
