@@ -197,3 +197,40 @@ export function getStoreSeoData(
     return { title, description };
 }
 
+export interface BlogSeoData {
+    title: string;
+    description: string;
+}
+
+/**
+ * Generates SEO Title and Description for blog publication pages according to SEO requirements.
+ */
+export function getBlogSeoData(
+    postName: string,
+    postText?: string | null,
+    lang: string = 'ua'
+): BlogSeoData {
+    const isRu = lang === 'ru';
+    const cleanTitle = postName.trim();
+
+    let cleanDescription = '';
+    if (postText) {
+        cleanDescription = postText
+            .replace(/<[^>]*>/g, '')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 155)
+            .trim();
+    }
+
+    if (isRu) {
+        const title = `${cleanTitle} | Мястория`;
+        return { title, description: cleanDescription };
+    }
+
+    const title = cleanTitle;
+    return { title, description: cleanDescription };
+}
+
+
