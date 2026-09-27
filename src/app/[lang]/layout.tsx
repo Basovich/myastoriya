@@ -62,7 +62,7 @@ export async function generateMetadata({
       default: siteData.seo.title,
       template: `%s | ${siteBrand}`,
     },
-    description: "",
+    description: siteData.seo.description,
     keywords: siteData.seo.keywords,
     authors: [{ name: siteData.name }],
     creator: siteData.name,

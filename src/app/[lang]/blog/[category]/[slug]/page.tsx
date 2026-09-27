@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import BlogPostPage from "@/app/pages/BlogPost";
@@ -7,14 +8,16 @@ import { getBlogBySlugApi, resolveBlogImageUrl } from "@/lib/graphql";
 import NotFoundBlock from "@/app/components/NotFoundBlock/NotFoundBlock";
 import { getAccessToken } from "@/app/actions/authActions";
 import { getBlogCategorySegment } from "@/utils/blog-url";
-import { getBlogSeoData } from "@/utils/seo";
+import { getBlogSeoData, getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
 }: {
     params: Promise<{ lang: Locale; category: string; slug: string }>;
 }): Promise<Metadata> {
-    const { lang, slug } = await params;
+    const { lang, slug, category } = await params;
+    const headersList = await headers();
+    const dynamicBaseUrl = getDynamicBaseUrl(headersList);
     const token = await getAccessToken();
     const post = await getBlogBySlugApi(slug, lang, token ?? undefined).catch(() => null);
     if (!post) return {};
@@ -23,10 +26,15 @@ export async function generateMetadata({
     const seoData = getBlogSeoData(postTitle, post.text, lang);
     const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
     const imageUrl = resolveBlogImageUrl(post.image);
+    const alternates = getHreflangAlternates(`/blog/${category}/${slug}/`, lang, dynamicBaseUrl);
 
     return {
         title: titleConfig,
         description: seoData.description,
+        alternates: {
+            canonical: alternates.canonical,
+            languages: alternates.languages,
+        },
         openGraph: {
             title: postTitle,
             description: seoData.description,

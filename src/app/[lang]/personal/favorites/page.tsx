@@ -3,6 +3,7 @@ import FavoritesClient from '@/app/components/Personal/Favorites/FavoritesClient
 
 export const metadata = {
     title: 'Список бажань',
+    robots: { index: false, follow: false },
 };
 
 export default async function FavoritesPage({

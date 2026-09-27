@@ -28,13 +28,13 @@ export async function generateMetadata({ params }: ContactsPageProps): Promise<M
       languages: alternates.languages,
     },
     openGraph: {
-      title: seo.title,
+      title: seo.h1,
       description: seo.description,
       images: [{ url: "/images/og-image.jpg", alt: seo.h1 }],
     },
     twitter: {
       card: "summary_large_image",
-      title: seo.title,
+      title: seo.h1,
       description: seo.description,
       images: ["/images/og-image.jpg"],
     },

@@ -3,6 +3,7 @@ import ShoppingListCreateClient from "@/app/components/Personal/ShoppingList/Cre
 
 export const metadata = {
     title: 'Створення списку покупок',
+    robots: { index: false, follow: false },
 };
 
 export default async function ShoppingListCreatePage({

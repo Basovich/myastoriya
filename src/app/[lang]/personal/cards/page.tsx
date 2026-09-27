@@ -4,7 +4,8 @@ import { getAccessToken } from '@/app/actions/authActions';
 import CardsClient from '@/app/components/Personal/Cards/CardsClient';
 
 export const metadata: Metadata = {
-  title: 'Банківські картки | М\'ясторія',
+  title: 'Банківські картки',
+  robots: { index: false, follow: false },
 };
 
 export default async function BankCardsPage(props: { params: Promise<{ lang: string }> }) {
