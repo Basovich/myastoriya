@@ -11,8 +11,6 @@ interface ShopWithDates extends Shop {
 export async function GET(req: Request) {
     try {
         const baseUrl = await getSitemapBaseUrl(req);
-        const today = formatDate();
-
         const [shopsResUa, shopsResRu] = await Promise.all([
             getShopsApi({ limit: 100, page: 1 }, "ua").catch(() => null),
             getShopsApi({ limit: 100, page: 1 }, "ru").catch(() => null),
@@ -47,7 +45,7 @@ export async function GET(req: Request) {
                 entries.push({
                     ukPath: `/our-stores/${uaSlug}/`,
                     ruPath: `/our-stores/${ruSlug}/`,
-                    lastmod: formatDate(shopDates.updatedAt || today),
+                    lastmod: formatDate(shopDates.updatedAt),
                 });
             }
         }

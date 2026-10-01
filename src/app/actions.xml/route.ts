@@ -57,7 +57,7 @@ export async function GET(req: Request) {
                 entries.push({
                     ukPath: `/actions/${uaSlug}/`,
                     ruPath: `/actions/${ruSlug}/`,
-                    lastmod: formatDate(sale.expiresAt),
+                    lastmod: formatDate(sale.publishedAt),
                 });
             }
         }

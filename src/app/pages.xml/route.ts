@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
-import { getSitemapBaseUrl, formatDate, buildPairedUrlSetXml, PairedSitemapEntry } from "@/utils/sitemap-helpers";
+import { getSitemapBaseUrl, buildPairedUrlSetXml, PairedSitemapEntry } from "@/utils/sitemap-helpers";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
     try {
         const baseUrl = await getSitemapBaseUrl(req);
-        const today = formatDate();
-
         const staticPaths = [
             "/",
             "/catalog/",
@@ -29,7 +27,7 @@ export async function GET(req: Request) {
         const entries: PairedSitemapEntry[] = staticPaths.map((path) => ({
             ukPath: path,
             ruPath: path,
-            lastmod: today,
+            // lastmod відсутній — статичні сторінки не мають API з датами зміни
         }));
 
         const xml = buildPairedUrlSetXml(entries, baseUrl);

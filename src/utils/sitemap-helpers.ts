@@ -39,10 +39,10 @@ export async function getSitemapBaseUrl(req?: Request): Promise<string> {
     return fallback.replace(/\/+$/, "");
 }
 
-export function formatDate(dateInput?: string | Date | null): string {
-    if (!dateInput) return new Date().toISOString().split("T")[0];
+export function formatDate(dateInput?: string | Date | null): string | null {
+    if (!dateInput) return null;
     const date = new Date(dateInput);
-    if (isNaN(date.getTime())) return new Date().toISOString().split("T")[0];
+    if (isNaN(date.getTime())) return null;
     return date.toISOString().split("T")[0];
 }
 
@@ -57,17 +57,15 @@ export function escapeXml(str: string): string {
 
 export interface SitemapIndexItem {
     loc: string;
-    lastmod: string;
+    lastmod?: string | null;
 }
 
 export function buildSitemapIndexXml(items: SitemapIndexItem[]): string {
     const sitemaps = items
-        .map(
-            (item) => `  <sitemap>
-    <loc>${escapeXml(item.loc)}</loc>
-    <lastmod>${item.lastmod}</lastmod>
-  </sitemap>`
-        )
+        .map((item) => {
+            const lastmodTag = item.lastmod ? `\n    <lastmod>${item.lastmod}</lastmod>` : "";
+            return `  <sitemap>\n    <loc>${escapeXml(item.loc)}</loc>${lastmodTag}\n  </sitemap>`;
+        })
         .join("\n");
 
     return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemaps}\n</sitemapindex>`;
@@ -83,7 +81,7 @@ export interface SitemapUrlEntry {
 export interface PairedSitemapEntry {
     ukPath: string;
     ruPath?: string | null;
-    lastmod: string;
+    lastmod?: string | null;
 }
 
 function normalizePath(rawPath: string, targetLocale: 'uk' | 'ru'): string {
@@ -113,19 +111,11 @@ export function buildPairedUrlSetXml(entries: PairedSitemapEntry[], baseUrl?: st
             const ukUrl = `${domain}${ukRel}`;
             const ruUrl = `${domain}${ruRel}`;
 
-            const ukNode = `  <url>
-    <loc>${escapeXml(ukUrl)}</loc>
-    <xhtml:link rel="alternate" hreflang="uk" href="${escapeXml(ukUrl)}" />
-    <xhtml:link rel="alternate" hreflang="ru" href="${escapeXml(ruUrl)}" />
-    <lastmod>${entry.lastmod}</lastmod>
-  </url>`;
+            const lastmodTag = entry.lastmod ? `\n    <lastmod>${entry.lastmod}</lastmod>` : "";
 
-            const ruNode = `  <url>
-    <loc>${escapeXml(ruUrl)}</loc>
-    <xhtml:link rel="alternate" hreflang="uk" href="${escapeXml(ukUrl)}" />
-    <xhtml:link rel="alternate" hreflang="ru" href="${escapeXml(ruUrl)}" />
-    <lastmod>${entry.lastmod}</lastmod>
-  </url>`;
+            const ukNode = `  <url>\n    <loc>${escapeXml(ukUrl)}</loc>\n    <xhtml:link rel="alternate" hreflang="uk" href="${escapeXml(ukUrl)}" />\n    <xhtml:link rel="alternate" hreflang="ru" href="${escapeXml(ruUrl)}" />${lastmodTag}\n  </url>`;
+
+            const ruNode = `  <url>\n    <loc>${escapeXml(ruUrl)}</loc>\n    <xhtml:link rel="alternate" hreflang="uk" href="${escapeXml(ukUrl)}" />\n    <xhtml:link rel="alternate" hreflang="ru" href="${escapeXml(ruUrl)}" />${lastmodTag}\n  </url>`;
 
             return [ukNode, ruNode];
         })

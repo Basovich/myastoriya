@@ -48,7 +48,7 @@ export async function GET(req: Request) {
                 entries.push({
                     ukPath: `/complex-discounts/${uaSlug}/`,
                     ruPath: `/complex-discounts/${ruSlug}/`,
-                    lastmod: formatDate(special.expiresAt),
+                    lastmod: formatDate(special.publishedAt),
                 });
             }
         }

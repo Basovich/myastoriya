@@ -38,8 +38,6 @@ export async function GET(req: Request) {
 
         const entries: PairedSitemapEntry[] = [];
         const seenIds = new Set<string>();
-        const today = formatDate();
-
         for (const id of allIds) {
             const uaCat = uaMap.get(id);
             const ruCat = ruMap.get(id);
@@ -55,7 +53,7 @@ export async function GET(req: Request) {
                 entries.push({
                     ukPath: `/category/${uaSlug}/`,
                     ruPath: `/category/${ruSlug}/`,
-                    lastmod: formatDate(categoryDates.updatedAt || today),
+                    lastmod: formatDate(categoryDates.updatedAt),
                 });
             }
         }
