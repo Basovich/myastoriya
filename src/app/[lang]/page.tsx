@@ -9,7 +9,7 @@ import { getReviewsApi } from "@/lib/graphql/queries/pages/home/reviews";
 import { getProductsApi, getSalesApi, getSpecialsApi, getCatalogTreeApi, getShowcasesApi } from "@/lib/graphql";
 import { buildCategoryIndex, getCategoryHref } from "@/utils/category-url";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData } from "@/utils/seo";
+import { getStaticPageSeoData, fetchSeoMetadataByUrl } from "@/utils/seo";
 
 export async function generateMetadata({
   params,
@@ -17,18 +17,23 @@ export async function generateMetadata({
   params: Promise<{ lang: Locale }>;
 }): Promise<Metadata> {
   const { lang } = await params;
-  const seo = getStaticPageSeoData('home', lang);
+  const fallbackSeo = getStaticPageSeoData('home', lang);
+  const relativeUrl = `/${lang}/`;
+  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
 
   return {
     title: { absolute: seo.title },
     description: seo.description,
+    keywords: seo.keywords || undefined,
+    robots: seo.noindex ? { index: false } : undefined,
+    alternates: seo.canonical ? { canonical: seo.canonical } : undefined,
     openGraph: {
-      title: seo.h1,
+      title: seo.h1 || seo.title,
       description: seo.description,
     },
     twitter: {
       card: "summary_large_image",
-      title: seo.h1,
+      title: seo.h1 || seo.title,
       description: seo.description,
     },
   };

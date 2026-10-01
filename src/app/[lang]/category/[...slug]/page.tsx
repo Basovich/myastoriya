@@ -19,7 +19,7 @@ import {
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams, parseRawProductionParam } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl } from '@/utils/seo';
 
 interface DynamicCategoryPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
@@ -79,26 +79,34 @@ export async function generateMetadata({ params }: DynamicCategoryPageProps): Pr
             }
         }
 
-        const { title, description } = getCategorySeoData(categoryName, minPrice, lang);
+        const fallbackSeo = getCategorySeoData(categoryName, minPrice, lang);
+        const relativeUrl = `/${lang}/category/${slug.join('/')}/`;
+        const seoData = await fetchSeoMetadataByUrl(relativeUrl, lang, {
+            title: fallbackSeo.title,
+            description: fallbackSeo.description,
+            h1: categoryName,
+        });
 
         const alternates = getHreflangAlternates(`/category/${slug.join('/')}/`, lang, dynamicBaseUrl);
 
         return {
-            title,
-            description,
+            title: seoData.title,
+            description: seoData.description,
+            keywords: seoData.keywords || undefined,
+            robots: seoData.noindex ? { index: false } : undefined,
             alternates: {
-                canonical: alternates.canonical,
+                canonical: seoData.canonical || alternates.canonical,
                 languages: alternates.languages,
             },
             openGraph: {
-                title,
-                description,
+                title: seoData.title,
+                description: seoData.description,
                 images: categoryImage ? [{ url: categoryImage, alt: categoryName }] : undefined,
             },
             twitter: {
                 card: 'summary_large_image',
-                title,
-                description,
+                title: seoData.title,
+                description: seoData.description,
                 images: categoryImage ? [categoryImage] : undefined,
             },
         };

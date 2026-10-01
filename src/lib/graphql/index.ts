@@ -233,6 +233,6 @@ export type {
     ShopCustomMenuCategory,
     ShopCustomMenuProduct,
     ShopCustomMenuResponse,
-} from './queries/pages/restaurantMenu';
-
-
+} from './queries/pages/restaurantMenu';// Re-export SEO
+export { SEO_BY_URL_QUERY, getSeoByUrlApi } from './queries/seo';
+export type { PageSeo, SeoByUrlResponse } from './queries/seo';

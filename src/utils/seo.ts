@@ -1,4 +1,5 @@
 import { siteData } from "@/config/site";
+import { getSeoByUrlApi } from "@/lib/graphql";
 
 export interface HreflangAlternates {
     canonical: string;
@@ -517,6 +518,43 @@ export function getDefaultSeoData(pageTitle: string, lang: string = 'ua'): Defau
         h1: cleanTitle,
         title,
         description: "",
+    };
+}
+
+export interface ResolvedSeoData {
+    title: string;
+    description: string;
+    h1: string;
+    keywords?: string | null;
+    canonical?: string | null;
+    noindex?: boolean | null;
+}
+
+/**
+ * Fetches SEO metadata by URL from backend API (seoByUrl).
+ * Falls back to provided static/generated fallback data if API returns null/empty.
+ */
+export async function fetchSeoMetadataByUrl(
+    url: string,
+    lang: string = 'ua',
+    fallback: ResolvedSeoData
+): Promise<ResolvedSeoData> {
+    const apiSeo = await getSeoByUrlApi(url, lang);
+    if (!apiSeo || (!apiSeo.title && !apiSeo.description)) {
+        return fallback;
+    }
+
+    const title = apiSeo.title?.trim() || fallback.title;
+    const description = apiSeo.description?.trim() || fallback.description;
+    const h1 = apiSeo.h1?.trim() || fallback.h1;
+
+    return {
+        title,
+        description,
+        h1,
+        keywords: apiSeo.keywords ?? fallback.keywords,
+        canonical: apiSeo.canonical ?? fallback.canonical,
+        noindex: apiSeo.noindex ?? fallback.noindex,
     };
 }
 

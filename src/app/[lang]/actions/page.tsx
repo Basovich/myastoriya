@@ -4,7 +4,7 @@ import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSalesApi } from "@/lib/graphql/queries/pages/home/sales";
 import { getProductsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
@@ -14,24 +14,28 @@ export async function generateMetadata({
     const { lang } = await params;
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-    const seo = getStaticPageSeoData('actions', lang);
+    const fallbackSeo = getStaticPageSeoData('actions', lang);
+    const relativeUrl = `/${lang}/actions/`;
+    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
     const alternates = getHreflangAlternates('/actions/', lang, dynamicBaseUrl);
 
     return {
-        title: lang === 'ru' ? { absolute: seo.title } : seo.h1,
+        title: lang === 'ru' ? { absolute: seo.title } : seo.title,
         description: seo.description,
+        keywords: seo.keywords || undefined,
+        robots: seo.noindex ? { index: false } : undefined,
         alternates: {
-            canonical: alternates.canonical,
+            canonical: seo.canonical || alternates.canonical,
             languages: alternates.languages,
         },
         openGraph: {
-            title: seo.h1,
+            title: seo.title,
             description: seo.description,
-            images: [{ url: '/images/og-image.jpg', alt: seo.h1 }],
+            images: [{ url: '/images/og-image.jpg', alt: seo.title }],
         },
         twitter: {
             card: "summary_large_image",
-            title: seo.h1,
+            title: seo.title,
             description: seo.description,
             images: ['/images/og-image.jpg'],
         },

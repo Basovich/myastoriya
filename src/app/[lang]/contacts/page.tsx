@@ -4,7 +4,7 @@ import ContactsPage from "@/app/pages/Contacts";
 import { getContactsCategoriesApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl } from "@/utils/seo";
 
 interface ContactsPageProps {
   params: Promise<{ lang: Locale }>;
@@ -14,27 +14,31 @@ export async function generateMetadata({ params }: ContactsPageProps): Promise<M
   const { lang } = await params;
   const headersList = await headers();
   const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-  const seo = getStaticPageSeoData("contacts", lang);
+  const fallbackSeo = getStaticPageSeoData("contacts", lang);
+  const relativeUrl = `/${lang}/contacts/`;
+  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
   const alternates = getHreflangAlternates("/contacts/", lang, dynamicBaseUrl);
 
   const isRu = lang === "ru";
-  const title = isRu ? { absolute: seo.title } : seo.h1;
+  const title = isRu ? { absolute: seo.title } : seo.title;
 
   return {
     title,
     description: seo.description,
+    keywords: seo.keywords || undefined,
+    robots: seo.noindex ? { index: false } : undefined,
     alternates: {
-      canonical: alternates.canonical,
+      canonical: seo.canonical || alternates.canonical,
       languages: alternates.languages,
     },
     openGraph: {
-      title: seo.h1,
+      title: seo.title,
       description: seo.description,
-      images: [{ url: "/images/og-image.jpg", alt: seo.h1 }],
+      images: [{ url: "/images/og-image.jpg", alt: seo.title }],
     },
     twitter: {
       card: "summary_large_image",
-      title: seo.h1,
+      title: seo.title,
       description: seo.description,
       images: ["/images/og-image.jpg"],
     },
