@@ -67,7 +67,6 @@ export default function Products({ dict, showcases, initialProducts, initialHasM
     const swiperRef = useRef<SwiperType | null>(null);
 
     const currentShowcaseId = showcases[activeTab]?.id;
-    const currentProducts = productsMap[currentShowcaseId] || [];
     const currentHasMore = hasMoreMap[currentShowcaseId] ?? false;
     const currentLoading = loadingMap[currentShowcaseId] ?? false;
     const currentPage = pageMap[currentShowcaseId] ?? 1;

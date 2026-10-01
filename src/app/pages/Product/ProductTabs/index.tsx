@@ -230,7 +230,6 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                 <div className={activeTab !== 'description' ? styles.tabHidden : undefined}>
                     <div
                         className={styles.description}
-                        // eslint-disable-next-line react/no-danger
                         dangerouslySetInnerHTML={{ __html: description }}
                     />
                 </div>
