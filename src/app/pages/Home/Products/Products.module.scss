@@ -219,6 +219,11 @@
         pointer-events: none;
     }
 
+    // Клас для приховування неактивних вітрин (контент залишається в HTML для SEO)
+    &.tabHidden {
+        display: none;
+    }
+
     @media (min-width: 768px) {
         padding: 0 40px;
     }

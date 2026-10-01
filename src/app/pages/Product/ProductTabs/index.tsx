@@ -226,79 +226,90 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                 </Swiper>
             </div>
             <div className={styles.tabContent}>
-                {activeTab === 'description' && (
+                {/* Опис — завжди в HTML, прихований CSS якщо не активний */}
+                <div className={activeTab !== 'description' ? styles.tabHidden : undefined}>
                     <div
                         className={styles.description}
                         // eslint-disable-next-line react/no-danger
                         dangerouslySetInnerHTML={{ __html: description }}
                     />
-                )}
-                {activeTab === 'characteristics' && generalSpecs.length > 0 && (
-                    <div className={styles.characteristics}>
-                        <div className={styles.nutritionGroup}>
-                            <p className={styles.nutritionTitle}>Характеристики товару</p>
-                            <div className={styles.nutritionList}>
-                                {generalSpecs.map(([key, value]) => (
-                                    <div key={key} className={styles.nutritionRow}>
-                                        <span className={styles.nutritionKey}>{key}</span>
-                                        <span className={styles.nutritionValue}>{value}</span>
-                                    </div>
-                                ))}
+                </div>
+
+                {/* Характеристики — завжди в HTML */}
+                {generalSpecs.length > 0 && (
+                    <div className={activeTab !== 'characteristics' ? styles.tabHidden : undefined}>
+                        <div className={styles.characteristics}>
+                            <div className={styles.nutritionGroup}>
+                                <p className={styles.nutritionTitle}>Характеристики товару</p>
+                                <div className={styles.nutritionList}>
+                                    {generalSpecs.map(([key, value]) => (
+                                        <div key={key} className={styles.nutritionRow}>
+                                            <span className={styles.nutritionKey}>{key}</span>
+                                            <span className={styles.nutritionValue}>{value}</span>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
-                {activeTab === 'allergens' && hasNutritionOrAllergens && (
-                    <div className={styles.allergens}>
-                        {apiNutrition100g.length > 0 && (
-                            <div className={styles.nutritionGroup}>
-                                <p className={styles.nutritionTitle}>Калорійність (на 100 г продукту)</p>
-                                <div className={styles.nutritionList}>
-                                    {apiNutrition100g.map((item) => (
-                                        <div key={item.key} className={styles.nutritionRow}>
-                                            <span className={styles.nutritionKey}>{item.key}</span>
-                                            <span className={styles.nutritionValue}>{item.value}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
 
-                        {apiNutritionPortion.length > 0 && (
-                            <div className={styles.nutritionGroup}>
-                                <p className={styles.nutritionTitle}>Калорійність (на 1 порцію)</p>
-                                <div className={styles.nutritionList}>
-                                    {apiNutritionPortion.map((item) => (
-                                        <div key={item.key} className={styles.nutritionRow}>
-                                            <span className={styles.nutritionKey}>{item.key}</span>
-                                            <span className={styles.nutritionValue}>{item.value}</span>
-                                        </div>
-                                    ))}
+                {/* Алергени / Калорійність — завжди в HTML */}
+                {hasNutritionOrAllergens && (
+                    <div className={activeTab !== 'allergens' ? styles.tabHidden : undefined}>
+                        <div className={styles.allergens}>
+                            {apiNutrition100g.length > 0 && (
+                                <div className={styles.nutritionGroup}>
+                                    <p className={styles.nutritionTitle}>Калорійність (на 100 г продукту)</p>
+                                    <div className={styles.nutritionList}>
+                                        {apiNutrition100g.map((item) => (
+                                            <div key={item.key} className={styles.nutritionRow}>
+                                                <span className={styles.nutritionKey}>{item.key}</span>
+                                                <span className={styles.nutritionValue}>{item.value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {apiAllergens.length > 0 && (
-                            <div className={styles.nutritionGroup}>
-                                <p className={styles.nutritionTitle}>Алергени</p>
-                                <div className={styles.nutritionList}>
-                                    {apiAllergens.map((item) => (
-                                        <div key={item.key} className={styles.nutritionRow}>
-                                            <span className={styles.nutritionKey}>{item.key}</span>
-                                            <span className={styles.nutritionValue}>{item.value}</span>
-                                        </div>
-                                    ))}
+                            {apiNutritionPortion.length > 0 && (
+                                <div className={styles.nutritionGroup}>
+                                    <p className={styles.nutritionTitle}>Калорійність (на 1 порцію)</p>
+                                    <div className={styles.nutritionList}>
+                                        {apiNutritionPortion.map((item) => (
+                                            <div key={item.key} className={styles.nutritionRow}>
+                                                <span className={styles.nutritionKey}>{item.key}</span>
+                                                <span className={styles.nutritionValue}>{item.value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+
+                            {apiAllergens.length > 0 && (
+                                <div className={styles.nutritionGroup}>
+                                    <p className={styles.nutritionTitle}>Алергени</p>
+                                    <div className={styles.nutritionList}>
+                                        {apiAllergens.map((item) => (
+                                            <div key={item.key} className={styles.nutritionRow}>
+                                                <span className={styles.nutritionKey}>{item.key}</span>
+                                                <span className={styles.nutritionValue}>{item.value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
-                {activeTab === 'delivery' && (
+
+                {/* Доставка — завжди в HTML */}
+                <div className={activeTab !== 'delivery' ? styles.tabHidden : undefined}>
                     <div className={styles.delivery}>
                         <p className={styles.nutritionTitle}>СПОСОБИ ДОСТАВКИ</p>
                         <DeliveryAccordion items={deliveryItems} />
                     </div>
-                )}
+                </div>
             </div>
 
             <VideoModal 

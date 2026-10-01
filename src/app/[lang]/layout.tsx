@@ -134,6 +134,7 @@ import { CategoryProvider } from "@/hooks/useCategoryTree";
 import NavigationProgress from "@/app/components/NavigationProgress/NavigationProgress";
 
 import StatusModals from "@/app/components/StatusModals/StatusModals";
+import CatalogMenuSsrLinks from "@/app/components/Header/DesktopHeader/MainBar/CatalogMenu/CatalogMenuSsrLinks";
 
 export default async function RootLayout({
   children,
@@ -193,22 +194,38 @@ export default async function RootLayout({
 
             .swiper-wrapper {
               display: flex !important;
-              flex-wrap: wrap !important;
+              flex-wrap: nowrap !important;
+              overflow-x: auto !important;
               gap: 16px !important;
               transform: none !important;
+              width: auto !important;
             }
 
             .swiper-slide {
               width: auto !important;
-              max-width: 100% !important;
+              max-width: 320px !important;
+              min-width: 200px !important;
+              flex-shrink: 0 !important;
+            }
+
+            .swiper-pagination,
+            .swiper-button-next,
+            .swiper-button-prev,
+            [class*="navArrow"],
+            [class*="prevBtn"],
+            [class*="nextBtn"] {
+              display: none !important;
             }
 
             #hero .swiper-wrapper {
               display: block !important;
+              overflow: hidden !important;
             }
 
             #hero .swiper-slide {
               width: 100% !important;
+              min-width: unset !important;
+              max-width: unset !important;
             }
 
             #hero .swiper-slide:not(:first-child) {
@@ -226,6 +243,10 @@ export default async function RootLayout({
             <NavigationProgress />
             {!isMenuPage && <AuthInitializer />}
             {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
+            {/* SSR-посилання категорій каталогу для SEO-павуків (приховані візуально) */}
+            {!isMenuPage && catalogTree.length > 0 && (
+                <CatalogMenuSsrLinks categories={catalogTree} lang={lang as Locale} />
+            )}
             {children}
             {!isMenuPage && <Footer lang={lang as Locale} initialSocialLinks={socialLinks} />}
             <StatusModals lang={lang as Locale} />

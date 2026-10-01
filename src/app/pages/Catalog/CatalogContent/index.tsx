@@ -5,6 +5,7 @@ import CategoryCircles, { type CategoryCircleItem } from '@/app/components/Categ
 import Image from 'next/image';
 
 import CatalogSidebarWrapperClient from '@/app/pages/Catalog/CatalogSidebar/CatalogSidebarWrapperClient';
+import CatalogFiltersSsrList from '@/app/pages/Catalog/CatalogSidebar/CatalogFiltersSsrList';
 import ProductCard from '../../../components/ui/ProductCard/ProductCard';
 import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
 import clsx from 'clsx';
@@ -189,6 +190,8 @@ export default async function CatalogContent({
                     <div className={s.contentLayout}>
                         {!hideSidebar && (
                             <aside className={s.sidebar}>
+                                {/* SSR-список фільтрів для SEO-павуків (прихований візуально) */}
+                                <CatalogFiltersSsrList filterBlocks={filterBlocks} />
                                 <CatalogSidebarWrapperClient
                                     sortBy={currentSort}
                                     sortOptions={sortOptions}

@@ -136,6 +136,10 @@ interface ProductReviewsProps {
     isAuthenticated?: boolean;
     onAuthRequired?: () => void;
     onVideoReviewRequired?: () => void;
+    /** Перші відгуки, предзавантажені при SSR — відображаються в HTML без JS. */
+    initialReviews?: ProductReview[];
+    /** Чи є додаткові відгуки після SSR-сторінки. */
+    initialReviewsHasMore?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -147,14 +151,17 @@ const PAGE_SIZE = 5;
 const ProductReviews: React.FC<ProductReviewsProps> = ({
     productId,
     productName,
+    initialReviews,
+    initialReviewsHasMore = false,
 }) => {
     // const [activeTab, setActiveTab] = useState<'text' | 'video'>('text');
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-    const [reviews, setReviews] = useState<ProductReview[]>([]);
-    const [totalCount, setTotalCount] = useState(0);
-    const [hasMore, setHasMore] = useState(false);
+    const [reviews, setReviews] = useState<ProductReview[]>(initialReviews ?? []);
+    const [totalCount, setTotalCount] = useState(initialReviews?.length ?? 0);
+    const [hasMore, setHasMore] = useState(initialReviewsHasMore);
     const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState(true);
+    // Якщо є SSR-дані — не показуємо спінер при першому рендері
+    const [loading, setLoading] = useState(!initialReviews);
 
     const loadReviews = useCallback(async (nextPage: number, append: boolean) => {
         setLoading(true);
@@ -175,6 +182,8 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
     }, [productId]);
 
     useEffect(() => {
+        // Якщо є SSR-дані — не завантажуємо повторно при першому рендері
+        if (initialReviews) return;
         void loadReviews(1, false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [productId]);

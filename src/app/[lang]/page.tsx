@@ -83,6 +83,20 @@ export default async function Home({
     salesProductsChecksPromise
   ]);
 
+  // SSR prefetch усіх вітрин паралельно — для відображення в HTML без JS
+  const allShowcaseProductsResponses = await Promise.all(
+    filteredShowcases.map((showcase) =>
+      getProductsApi({ showcaseId: parseInt(showcase.id), limit: 8 }, lang, token ?? undefined)
+        .catch(() => ({ data: [] as typeof initialProductsResponse.data, per_page: 8, current_page: 1, has_more_pages: false }))
+    )
+  );
+  const allShowcaseProducts: Record<string, typeof initialProductsResponse.data> = {};
+  const allShowcaseHasMore: Record<string, boolean> = {};
+  filteredShowcases.forEach((showcase, i) => {
+    allShowcaseProducts[showcase.id] = allShowcaseProductsResponses[i]?.data ?? [];
+    allShowcaseHasMore[showcase.id] = allShowcaseProductsResponses[i]?.has_more_pages ?? false;
+  });
+
   const activeSales = salesProductsChecks
       .filter(item => item.hasProducts)
       .map(item => item.sale);
@@ -109,6 +123,8 @@ export default async function Home({
           sales={activeSales}
           specials={activeSpecials}
           showcases={filteredShowcases}
+          allShowcaseProducts={allShowcaseProducts}
+          allShowcaseHasMore={allShowcaseHasMore}
       />
   );
 }

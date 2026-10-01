@@ -24,6 +24,10 @@ interface HomePageProps {
   sales: Sale[];
   specials: Special[];
   showcases: Showcase[];
+  /** SSR-дані товарів для всіх вітрин (ключ — showcase.id). */
+  allShowcaseProducts?: Record<string, Product[]>;
+  /** SSR-дані hasMore для всіх вітрин. */
+  allShowcaseHasMore?: Record<string, boolean>;
 }
 
 export default function HomePage({ 
@@ -39,6 +43,8 @@ export default function HomePage({
     sales,
     specials,
     showcases,
+    allShowcaseProducts,
+    allShowcaseHasMore,
 }: HomePageProps) {
     const h1Text = lang === 'ru' 
         ? "Мястория — сеть мясных магазинов-ресторанов"
@@ -49,7 +55,7 @@ export default function HomePage({
             <h1 className="visually-hidden">{h1Text}</h1>
             <Hero slides={slides} lang={lang} />
             <Categories lang={lang} popularCategories={popularCategories} categoryHrefs={categoryHrefs} />
-            <Products dict={dict.home.products} showcases={showcases} initialProducts={initialProducts} initialHasMore={initialHasMore} />
+            <Products dict={dict.home.products} showcases={showcases} initialProducts={initialProducts} initialHasMore={initialHasMore} allShowcaseProducts={allShowcaseProducts} allShowcaseHasMore={allShowcaseHasMore} />
             {sales && sales.length > 0 && (
                 <Actions dict={dict.home.actions} lang={lang} sales={sales} />
             )}

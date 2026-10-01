@@ -920,6 +920,11 @@ div.quantitySelector {
     max-width: 900px;
 }
 
+// Клас для приховування неактивних табів (контент залишається в HTML для SEO)
+.tabHidden {
+    display: none;
+}
+
 .description {
     line-height: 1.8;
     color: var(--color-text-primary);

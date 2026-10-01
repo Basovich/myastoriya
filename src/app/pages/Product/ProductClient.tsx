@@ -96,6 +96,10 @@ interface ProductClientProps {
     /** Pre-built breadcrumbs from server component (uses real category tree). */
     breadcrumbs?: BreadcrumbItem[];
     deliveryBlocks: OrderingInfoBlock[];
+    /** Перші відгуки, завантажені при SSR (для відображення в HTML без JS). */
+    initialReviews?: import('@/lib/graphql/queries/reviews').ProductReview[];
+    /** Чи є додаткові відгуки після першої сторінки. */
+    initialReviewsHasMore?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -113,6 +117,8 @@ const ProductClient: React.FC<ProductClientProps> = ({
     dict,
     breadcrumbs: breadcrumbsProp,
     deliveryBlocks,
+    initialReviews,
+    initialReviewsHasMore,
 }) => {
     const dispatch = useAppDispatch();
     const { isAuthenticated, isInitialized } = useAppSelector((state: RootState) => state.auth);
@@ -367,6 +373,8 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         isAuthenticated={isAuthenticated}
                         onAuthRequired={() => setIsAuthModalOpen(true)}
                         onVideoReviewRequired={() => setIsVideoReviewModalOpen(true)}
+                        initialReviews={initialReviews}
+                        initialReviewsHasMore={initialReviewsHasMore}
                     />
                 </div>
 

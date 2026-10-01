@@ -195,3 +195,29 @@ export async function updateProductReviewApi(
     );
     return data.updateProductReview;
 }
+
+/**
+ * Серверний запит першої сторінки публічних відгуків до товару (без токена).
+ * Використовується для SSR prefetch — щоб відгуки були в HTML при відключеному JS.
+ */
+export async function getProductReviewsSsr(
+    productId: number,
+    limit = 5,
+    lang?: string,
+): Promise<ProductReviewSimplePagination> {
+    try {
+        const data = await gqlRequest<{ productReviews: ProductReviewSimplePagination }>(
+            PRODUCT_REVIEWS_QUERY,
+            { productId, limit, page: 1 },
+            { next: { revalidate: 300 }, lang },
+        );
+        const result = data.productReviews ?? { data: [], per_page: limit, current_page: 1, has_more_pages: false };
+        // Повертаємо тільки опубліковані відгуки
+        return {
+            ...result,
+            data: result.data.filter((r) => r.published),
+        };
+    } catch {
+        return { data: [], per_page: limit, current_page: 1, has_more_pages: false };
+    }
+}

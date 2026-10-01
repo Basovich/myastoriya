@@ -26,6 +26,7 @@ import {
     ProductsResponse,
     Sale,
 } from '@/lib/graphql';
+import { getProductReviewsSsr, ProductReview } from '@/lib/graphql/queries/reviews';
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref } from '@/utils/category-url';
 import { getAccessToken } from '@/app/actions/authActions';
 
@@ -178,7 +179,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     }
 
     // 5. Fetch non-critical product page data
-    const [blogsResponse, deliveryBlocks, salesResponse] = await Promise.all([
+    const [blogsResponse, deliveryBlocks, salesResponse, initialReviewsData] = await Promise.all([
         safeCall<{ data: BlogPost[] }>(
             () => getBlogsApi({ limit: 3 }, lang),
             { data: [] },
@@ -190,6 +191,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
         safeCall<{ data: Sale[] }>(
             () => getSalesApi(50, 1, lang, token ?? undefined),
             { data: [] },
+        ),
+        // SSR prefetch перших відгуків — для відображення в HTML без JS
+        safeCall(
+            () => getProductReviewsSsr(numericId, 5, lang),
+            { data: [] as ProductReview[], per_page: 5, current_page: 1, has_more_pages: false },
         ),
     ]);
 
@@ -273,6 +279,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
             dict={dict}
             breadcrumbs={breadcrumbs}
             deliveryBlocks={deliveryBlocks}
+            initialReviews={initialReviewsData?.data ?? []}
+            initialReviewsHasMore={initialReviewsData?.has_more_pages ?? false}
         />
     );
 }
