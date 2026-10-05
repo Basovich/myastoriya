@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import s from './DeliveryAndPaymentPage.module.scss';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
@@ -24,7 +24,20 @@ interface DeliveryAndPaymentPageProps {
     deliveryBlocks: OrderingInfoBlock[];
 }
 
-export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMeatBar = false, policyBlocks, deliveryBlocks }: DeliveryAndPaymentPageProps) {
+export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMeatBar: initialIsMeatBar = false, policyBlocks, deliveryBlocks }: DeliveryAndPaymentPageProps) {
+    const [activeTab, setActiveTab] = useState<'restaurants' | 'meatbar'>(() => {
+        if (initialIsMeatBar) return 'meatbar';
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const tabParam = params.get('tab');
+            if (tabParam === 'meatbar' || tabParam === 'meat-bar') {
+                return 'meatbar';
+            }
+        }
+        return 'restaurants';
+    });
+
+    const isMeatBar = activeTab === 'meatbar';
     const stores = initialShops.map(parseShopData);
     const { deliveryPage, ourStoresPage } = dict.home;
     const breadcrumbs = [
@@ -48,7 +61,8 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
                     <SectionHeader title={deliveryPage.zones.title} classNameWrapper={s.sectionHeader} />
                     <div className={s.tabs}>
                         <Button
-                            href="/delivery"
+                            type="button"
+                            onClick={() => setActiveTab('restaurants')}
                             variant={!isMeatBar ? "black" : "outline-black"}
                             active={!isMeatBar}
                             className={s.tab}
@@ -56,7 +70,8 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
                             {deliveryPage.zones.tabs.restaurants}
                         </Button>
                         <Button
-                            href="/delivery-meat-bar"
+                            type="button"
+                            onClick={() => setActiveTab('meatbar')}
                             variant={isMeatBar ? "black" : "outline-black"}
                             active={isMeatBar}
                             className={s.tab}

@@ -16,7 +16,6 @@ export async function GET(req: Request) {
             "/complex-discounts/",
             "/our-stores/",
             "/delivery/",
-            "/delivery-meat-bar/",
             "/contacts/",
             "/privacy-policy/",
             "/oferta/",

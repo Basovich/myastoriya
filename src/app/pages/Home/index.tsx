@@ -46,13 +46,8 @@ export default function HomePage({
     allShowcaseProducts,
     allShowcaseHasMore,
 }: HomePageProps) {
-    const h1Text = lang === 'ru' 
-        ? "Мястория — сеть мясных магазинов-ресторанов"
-        : "М'ясторія — мережа м’ясних магазинів-ресторанів";
-
     return (
         <main>
-            <h1 className="visually-hidden">{h1Text}</h1>
             <Hero slides={slides} lang={lang} />
             <Categories lang={lang} popularCategories={popularCategories} categoryHrefs={categoryHrefs} />
             <Products dict={dict.home.products} showcases={showcases} initialProducts={initialProducts} initialHasMore={initialHasMore} allShowcaseProducts={allShowcaseProducts} allShowcaseHasMore={allShowcaseHasMore} />
