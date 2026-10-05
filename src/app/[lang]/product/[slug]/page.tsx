@@ -72,8 +72,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     return {
         title: titleConfig,
         description: seoData.description,
-        keywords: seoData.keywords || undefined,
-        robots: seoData.noindex ? { index: false } : undefined,
+        ...(seoData.keywords && { keywords: seoData.keywords }),
+        ...(seoData.noindex ? { robots: { index: false, follow: false } } : {}),
         alternates: {
             canonical: seoData.canonical || alternates.canonical,
             languages: alternates.languages,

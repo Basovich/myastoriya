@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  htmlLimitedBots: /.*/,
   experimental: {
     // Limit concurrency to 2 to avoid overwhelming the dev-api during build
     cpus: 2,

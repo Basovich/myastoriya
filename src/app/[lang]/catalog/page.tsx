@@ -31,8 +31,8 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
     return {
         title,
         description: seo.description,
-        keywords: seo.keywords || undefined,
-        robots: seo.noindex ? { index: false } : undefined,
+        ...(seo.keywords && { keywords: seo.keywords }),
+        ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
         alternates: {
             canonical: seo.canonical || alternates.canonical,
             languages: alternates.languages,

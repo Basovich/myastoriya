@@ -9,7 +9,8 @@ import { getReviewsApi } from "@/lib/graphql/queries/pages/home/reviews";
 import { getProductsApi, getSalesApi, getSpecialsApi, getCatalogTreeApi, getShowcasesApi } from "@/lib/graphql";
 import { buildCategoryIndex, getCategoryHref } from "@/utils/category-url";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData, fetchSeoMetadataByUrl } from "@/utils/seo";
+import { headers } from "next/headers";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl } from "@/utils/seo";
 
 export async function generateMetadata({
   params,
@@ -17,16 +18,22 @@ export async function generateMetadata({
   params: Promise<{ lang: Locale }>;
 }): Promise<Metadata> {
   const { lang } = await params;
+  const headersList = await headers();
+  const dynamicBaseUrl = getDynamicBaseUrl(headersList);
   const fallbackSeo = getStaticPageSeoData('home', lang);
   const relativeUrl = `/${lang}/`;
   const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
+  const alternates = getHreflangAlternates('/', lang, dynamicBaseUrl);
 
   return {
     title: { absolute: seo.title },
     description: seo.description,
-    keywords: seo.keywords || undefined,
-    robots: seo.noindex ? { index: false } : undefined,
-    alternates: seo.canonical ? { canonical: seo.canonical } : undefined,
+    ...(seo.keywords && { keywords: seo.keywords }),
+    ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
+    alternates: {
+      canonical: seo.canonical || alternates.canonical,
+      languages: alternates.languages,
+    },
     openGraph: {
       title: seo.h1 || seo.title,
       description: seo.description,
