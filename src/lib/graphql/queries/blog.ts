@@ -294,13 +294,14 @@ export async function getBlogsApi(filter?: BlogsFilter, lang?: string): Promise<
     return data.blogs;
 }
 
-export async function getBlogBySlugApi(slug: string, lang?: string, token?: string): Promise<BlogPost | null> {
+export async function getBlogBySlugApi(slug: string, lang?: string, token?: string, silent: boolean = false): Promise<BlogPost | null> {
     const data = await gqlRequest<{ blog: BlogPost | null }>(
         BLOG_BY_SLUG_QUERY,
         { slug },
         { 
             lang, 
             token,
+            silent,
             ...(token ? { cache: 'no-store' } : { next: { revalidate: 60 } })
         },
     );
