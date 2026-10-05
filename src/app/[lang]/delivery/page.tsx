@@ -6,6 +6,7 @@ import { getPolicyBlocksApi, getDeliveryBlocksApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl } from "@/utils/seo";
+import * as Sentry from "@sentry/nextjs";
 
 interface DeliveryPageProps {
   params: Promise<{ lang: Locale }>;
@@ -49,27 +50,32 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
 export default async function DeliveryAndPayment({
   params,
 }: DeliveryPageProps) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+  
+  let shopsResponse;
+  let policyBlocks;
+  let deliveryBlocks;
+
   try {
-    const { lang } = await params;
-    const dict = await getDictionary(lang);
-    
-    const [shopsResponse, policyBlocks, deliveryBlocks] = await Promise.all([
+    [shopsResponse, policyBlocks, deliveryBlocks] = await Promise.all([
       getShopsApi({ limit: 100 }, lang),
       getPolicyBlocksApi(lang),
       getDeliveryBlocksApi(lang)
     ]);
-
-    return (
-        <DeliveryAndPaymentPage 
-          lang={lang} 
-          dict={dict} 
-          initialShops={shopsResponse.shops.data} 
-          policyBlocks={policyBlocks}
-          deliveryBlocks={deliveryBlocks}
-        />
-    );
   } catch (err) {
-    console.error("[DeliveryAndPayment] Error rendering page:", err);
+    Sentry.captureException(err);
+    console.error("[DeliveryAndPayment] Error fetching delivery data:", err);
     throw err;
   }
+
+  return (
+      <DeliveryAndPaymentPage 
+        lang={lang} 
+        dict={dict} 
+        initialShops={shopsResponse.shops.data} 
+        policyBlocks={policyBlocks}
+        deliveryBlocks={deliveryBlocks}
+      />
+  );
 }
