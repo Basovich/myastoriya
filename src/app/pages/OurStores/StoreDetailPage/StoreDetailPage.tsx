@@ -107,7 +107,9 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
         <>
             <main className={s.storeDetailPage}>
                 <div className={s.container}>
-                    <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} useH1ForCurrent />
+                    <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
+
+                    <h1 className={s.pageTitle}>{brandName}</h1>
 
                     <section className={s.mainSection}>
                         {/* Gallery — client island for Swiper + zoom */}
