@@ -34,7 +34,14 @@ export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPag
     const [activeFilter, setActiveFilter] = useState<StoreType>("restaurant");
     const [searchQuery, setSearchQuery] = useState("");
     const [localSearchQuery, setLocalSearchQuery] = useState("");
-    const [viewMode, setViewMode] = useState<ViewMode>("map");
+    const [viewMode, setViewMode] = useState<ViewMode>(() => {
+        if (typeof window !== "undefined") {
+            const params = new URLSearchParams(window.location.search);
+            const viewParam = params.get("view");
+            if (viewParam === "map") return "map";
+        }
+        return "list";
+    });
     const [visibleCount, setVisibleCount] = useState(STORES_PER_PAGE);
 
     const stores = useMemo(() => initialShops.map(parseShopData), [initialShops]);
