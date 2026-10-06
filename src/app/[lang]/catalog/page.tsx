@@ -9,42 +9,50 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { getAccessToken } from '@/app/actions/authActions';
 
-import { getHreflangAlternates, getDynamicBaseUrl, getStaticPageSeoData, fetchSeoMetadataByUrl } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getStaticPageSeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage } from '@/utils/seo';
 
 interface CatalogPageProps {
     params: Promise<{ lang: string }>;
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export async function generateMetadata({ params }: CatalogPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: CatalogPageProps): Promise<Metadata> {
     const { lang } = await params;
+    const resolvedSearchParams = await searchParams;
+    const pageNum = parsePageNum(resolvedSearchParams?.page);
+
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
     const fallbackSeo = getStaticPageSeoData('catalog', lang);
     const relativeUrl = `/${lang}/catalog/`;
     const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
-    const alternates = getHreflangAlternates('/catalog/', lang, dynamicBaseUrl);
+    const alternates = getHreflangAlternates('/catalog/', lang, dynamicBaseUrl, pageNum);
 
     const isRu = lang === 'ru';
-    const title = isRu ? { absolute: seo.title } : seo.title;
+    const rawTitle = seo.title;
+    const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
+    const title = isRu ? { absolute: formattedTitleStr } : formattedTitleStr;
+
+    const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);
+    const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
 
     return {
         title,
         description: seo.description,
         ...(seo.keywords && { keywords: seo.keywords }),
-        ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
+        ...(pageRobots && { robots: pageRobots }),
         alternates: {
-            canonical: seo.canonical || alternates.canonical,
+            canonical: pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical),
             languages: alternates.languages,
         },
         openGraph: {
-            title: seo.title,
+            title: formattedTitleStr,
             description: seo.description,
-            images: [{ url: '/images/og-image.jpg', alt: seo.title }],
+            images: [{ url: '/images/og-image.jpg', alt: formattedTitleStr }],
         },
         twitter: {
             card: 'summary_large_image',
-            title: seo.title,
+            title: formattedTitleStr,
             description: seo.description,
             images: ['/images/og-image.jpg'],
         },

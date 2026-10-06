@@ -7,7 +7,7 @@ import { mapUrlCategoryToApiTypeSlug, getBlogCategorySegment } from "@/utils/blo
 import { getAccessToken } from "@/app/actions/authActions";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage } from "@/utils/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -16,8 +16,11 @@ interface BlogCategoryPageProps {
     searchParams: Promise<{ page?: string }>;
 }
 
-export async function generateMetadata({ params }: BlogCategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: BlogCategoryPageProps): Promise<Metadata> {
     const { lang, category } = await params;
+    const resolvedSearchParams = await searchParams;
+    const pageNum = parsePageNum(resolvedSearchParams?.page);
+
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
@@ -27,26 +30,31 @@ export async function generateMetadata({ params }: BlogCategoryPageProps): Promi
     }
 
     const seo = getStaticPageSeoData(pageKey, lang);
-    const alternates = getHreflangAlternates(`/blog/${category}/`, lang, dynamicBaseUrl);
+    const alternates = getHreflangAlternates(`/blog/${category}/`, lang, dynamicBaseUrl, pageNum);
 
     const isRu = lang === "ru";
-    const title = isRu ? { absolute: seo.title } : seo.h1;
+    const rawTitle = isRu ? seo.title : seo.h1;
+    const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
+    const title = isRu ? { absolute: formattedTitleStr } : formattedTitleStr;
+
+    const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
 
     return {
         title,
         description: seo.description,
+        ...(pageRobots && { robots: pageRobots }),
         alternates: {
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
         openGraph: {
-            title: seo.h1,
+            title: formattedTitleStr,
             description: seo.description,
-            images: [{ url: "/images/og-image.jpg", alt: seo.h1 }],
+            images: [{ url: "/images/og-image.jpg", alt: formattedTitleStr }],
         },
         twitter: {
             card: "summary_large_image",
-            title: seo.h1,
+            title: formattedTitleStr,
             description: seo.description,
             images: ["/images/og-image.jpg"],
         },

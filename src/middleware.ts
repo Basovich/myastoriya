@@ -28,6 +28,13 @@ export function middleware(request: NextRequest) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-pathname', pathname);
 
+    // 1.5. SEO 301 Permanent Redirect for ?page=1 to main URL without page parameter
+    if (request.nextUrl.searchParams.get('page') === '1') {
+        const redirectUrl = new URL(request.url);
+        redirectUrl.searchParams.delete('page');
+        return NextResponse.redirect(redirectUrl, 301);
+    }
+
     // 2. SEO Locale & Trailing slash handling
     // Home page for default locale (UA) MUST be / (without /ua prefix)
     if (pathname === '/ua' || pathname === '/ua/') {

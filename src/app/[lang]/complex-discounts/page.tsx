@@ -3,34 +3,46 @@ import { headers } from "next/headers";
 import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSpecialsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
+    searchParams,
 }: {
     params: Promise<{ lang: "ua" | "ru" }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }): Promise<Metadata> {
     const { lang } = await params;
+    const resolvedSearchParams = await searchParams;
+    const pageNum = parsePageNum(resolvedSearchParams?.page);
+
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
     const seo = getStaticPageSeoData('complex-discounts', lang);
-    const alternates = getHreflangAlternates('/complex-discounts/', lang, dynamicBaseUrl);
+    const alternates = getHreflangAlternates('/complex-discounts/', lang, dynamicBaseUrl, pageNum);
+
+    const rawTitle = lang === 'ru' ? seo.title : seo.h1;
+    const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
+    const title = lang === 'ru' ? { absolute: formattedTitleStr } : formattedTitleStr;
+
+    const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
 
     return {
-        title: lang === 'ru' ? { absolute: seo.title } : seo.h1,
+        title,
         description: seo.description,
+        ...(pageRobots && { robots: pageRobots }),
         alternates: {
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
         openGraph: {
-            title: seo.h1,
+            title: formattedTitleStr,
             description: seo.description,
-            images: [{ url: '/images/og-image.jpg', alt: seo.h1 }],
+            images: [{ url: '/images/og-image.jpg', alt: formattedTitleStr }],
         },
         twitter: {
             card: "summary_large_image",
-            title: seo.h1,
+            title: formattedTitleStr,
             description: seo.description,
             images: ['/images/og-image.jpg'],
         },

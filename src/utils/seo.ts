@@ -23,10 +23,46 @@ export function getDynamicBaseUrl(headersList?: Headers): string | undefined {
  * @param currentLang The current page language ('ua', 'ru', 'uk', etc.)
  * @param overrideBaseUrl Optional dynamic base URL (e.g. from request headers 'https://domain.com')
  */
+/**
+ * Safely parses page number from searchParams value or string.
+ * Returns valid page integer >= 1.
+ */
+export function parsePageNum(pageValue?: string | string[] | number | null): number {
+    if (!pageValue) return 1;
+    const val = Array.isArray(pageValue) ? pageValue[0] : pageValue;
+    const parsed = typeof val === "number" ? val : parseInt(String(val), 10);
+    return !isNaN(parsed) && parsed > 0 ? parsed : 1;
+}
+
+/**
+ * Appends page number to SEO title for pagination pages (page >= 2).
+ * Example (UA): "Стейки – купити з доставкою... — сторінка 2"
+ * Example (RU): "Стейки – купить с доставкой... — страница 2"
+ */
+export function formatTitleWithPage(
+    title: string,
+    pageNum?: number,
+    lang: string = "ua"
+): string {
+    const p = parsePageNum(pageNum);
+    if (p <= 1) return title;
+    const isRu = lang === "ru";
+    const suffix = isRu ? ` — страница ${p}` : ` — сторінка ${p}`;
+    return `${title}${suffix}`;
+}
+
+/**
+ * Generates hreflang alternate links and canonical link for SEO.
+ * @param pathname The request pathname (e.g., '/ua/contacts/' or '/contacts' or '/ru/our-stores/')
+ * @param currentLang The current page language ('ua', 'ru', 'uk', etc.)
+ * @param overrideBaseUrl Optional dynamic base URL (e.g. from request headers 'https://domain.com')
+ * @param pageNum Optional page number for pagination (e.g. 2)
+ */
 export function getHreflangAlternates(
     pathname: string = "/",
     currentLang: string = "ua",
-    overrideBaseUrl?: string
+    overrideBaseUrl?: string,
+    pageNum?: number
 ): HreflangAlternates {
     const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL 
         || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
@@ -43,17 +79,20 @@ export function getHreflangAlternates(
         .replace(/^\/+/, "")
         .replace(/\/+$/, "");
 
+    const p = parsePageNum(pageNum);
+    const pageSuffix = p > 1 ? `?page=${p}` : "";
+
     let ukUrl: string;
     let ruUrl: string;
 
     if (!relativePath) {
         // Homepage
-        ukUrl = `${baseUrl}/`;
-        ruUrl = `${baseUrl}/ru/`;
+        ukUrl = `${baseUrl}/${pageSuffix}`;
+        ruUrl = `${baseUrl}/ru/${pageSuffix}`;
     } else {
         // Any subpage
-        ukUrl = `${baseUrl}/ua/${relativePath}/`;
-        ruUrl = `${baseUrl}/ru/${relativePath}/`;
+        ukUrl = `${baseUrl}/ua/${relativePath}/${pageSuffix}`;
+        ruUrl = `${baseUrl}/ru/${relativePath}/${pageSuffix}`;
     }
 
     const normalizedLang = currentLang === "ru" ? "ru" : "uk";

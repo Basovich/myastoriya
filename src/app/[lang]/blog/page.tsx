@@ -4,7 +4,7 @@ import BlogGrid from "@/app/components/BlogGrid/BlogGrid";
 import { getBlogsApi, getBlogTypesApi, type BlogsPagination } from "@/lib/graphql/queries/blog";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage } from "@/utils/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -13,31 +13,39 @@ interface BlogPageProps {
     searchParams: Promise<{ page?: string }>;
 }
 
-export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: BlogPageProps): Promise<Metadata> {
     const { lang } = await params;
+    const resolvedSearchParams = await searchParams;
+    const pageNum = parsePageNum(resolvedSearchParams?.page);
+
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
     const seo = getStaticPageSeoData("blog", lang);
-    const alternates = getHreflangAlternates("/blog/", lang, dynamicBaseUrl);
+    const alternates = getHreflangAlternates("/blog/", lang, dynamicBaseUrl, pageNum);
 
     const isRu = lang === "ru";
-    const title = isRu ? { absolute: seo.title } : seo.h1;
+    const rawTitle = isRu ? seo.title : seo.h1;
+    const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
+    const title = isRu ? { absolute: formattedTitleStr } : formattedTitleStr;
+
+    const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
 
     return {
         title,
         description: seo.description,
+        ...(pageRobots && { robots: pageRobots }),
         alternates: {
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
         openGraph: {
-            title: seo.h1,
+            title: formattedTitleStr,
             description: seo.description,
-            images: [{ url: "/images/og-image.jpg", alt: seo.h1 }],
+            images: [{ url: "/images/og-image.jpg", alt: formattedTitleStr }],
         },
         twitter: {
             card: "summary_large_image",
-            title: seo.h1,
+            title: formattedTitleStr,
             description: seo.description,
             images: ["/images/og-image.jpg"],
         },

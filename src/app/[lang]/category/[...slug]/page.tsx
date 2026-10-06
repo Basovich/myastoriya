@@ -19,16 +19,19 @@ import {
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams, parseRawProductionParam } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage } from '@/utils/seo';
 
 interface DynamicCategoryPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export async function generateMetadata({ params }: DynamicCategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: DynamicCategoryPageProps): Promise<Metadata> {
     const { lang, slug } = await params;
     if (!slug || slug.length === 0) return {};
+
+    const resolvedSearchParams = await searchParams;
+    const pageNum = parsePageNum(resolvedSearchParams?.page);
 
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
@@ -87,25 +90,28 @@ export async function generateMetadata({ params }: DynamicCategoryPageProps): Pr
             h1: categoryName,
         });
 
-        const alternates = getHreflangAlternates(`/category/${slug.join('/')}/`, lang, dynamicBaseUrl);
+        const alternates = getHreflangAlternates(`/category/${slug.join('/')}/`, lang, dynamicBaseUrl, pageNum);
+        const finalTitle = formatTitleWithPage(seoData.title, pageNum, lang);
+        const isPageNoindex = pageNum > 1 || Boolean(seoData.noindex);
+        const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
 
         return {
-            title: seoData.title,
+            title: finalTitle,
             description: seoData.description,
             ...(seoData.keywords && { keywords: seoData.keywords }),
-            ...(seoData.noindex ? { robots: { index: false, follow: false } } : {}),
+            ...(pageRobots && { robots: pageRobots }),
             alternates: {
-                canonical: seoData.canonical || alternates.canonical,
+                canonical: pageNum > 1 ? alternates.canonical : (seoData.canonical || alternates.canonical),
                 languages: alternates.languages,
             },
             openGraph: {
-                title: seoData.title,
+                title: finalTitle,
                 description: seoData.description,
                 images: categoryImage ? [{ url: categoryImage, alt: categoryName }] : undefined,
             },
             twitter: {
                 card: 'summary_large_image',
-                title: seoData.title,
+                title: finalTitle,
                 description: seoData.description,
                 images: categoryImage ? [categoryImage] : undefined,
             },
