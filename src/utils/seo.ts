@@ -1,6 +1,5 @@
 import { siteData } from "@/config/site";
 import { getSeoByUrlApi } from "@/lib/graphql";
-import { cache } from "react";
 
 const requestJsonLdMap = new Map<string, object[]>();
 
@@ -67,7 +66,8 @@ export function getSiteName(lang: string = "ua"): string {
  * If titleStr already ends with site brand (| М'ясторія or | Мястория), uses absolute object to prevent Next.js layout template duplication.
  * Otherwise returns string so Next.js applies layout template (%s | М'ясторія).
  */
-export function formatTitleConfig(titleStr: string | undefined | null, lang: string = 'ua'): { absolute: string } | string {
+export function formatTitleConfig(titleStr: string | undefined | null, _lang?: string): { absolute: string } | string {
+    void _lang;
     if (!titleStr) return '';
     const cleanTitle = titleStr.trim();
     if (/\|\s*(М'ясторія|Мястория|Myastoriya)/i.test(cleanTitle)) {
