@@ -7,7 +7,7 @@ import { mapUrlCategoryToApiTypeSlug, getBlogCategorySegment } from "@/utils/blo
 import { getAccessToken } from "@/app/actions/authActions";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata } from "@/utils/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -47,11 +47,13 @@ export async function generateMetadata({ params, searchParams }: BlogCategoryPag
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
-        openGraph: {
+        openGraph: buildOpenGraphMetadata({
             title: formattedTitleStr,
             description: seo.description,
-            images: [{ url: "/images/og-image.jpg", alt: formattedTitleStr }],
-        },
+            canonicalUrl: alternates.canonical,
+            lang,
+            type: "website",
+        }),
         twitter: {
             card: "summary_large_image",
             title: formattedTitleStr,

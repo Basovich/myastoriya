@@ -5,7 +5,7 @@ import { getShopsApi } from "@/lib/graphql/queries/shops";
 import { getPolicyBlocksApi, getDeliveryBlocksApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata } from "@/utils/seo";
 import * as Sentry from "@sentry/nextjs";
 
 interface DeliveryPageProps {
@@ -20,6 +20,7 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
   const relativeUrl = `/${lang}/delivery/`;
   const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
   const alternates = getHreflangAlternates("/delivery/", lang, dynamicBaseUrl);
+  const canonicalUrl = seo.canonical || alternates.canonical;
 
   const isRu = lang === "ru";
   const title = isRu ? { absolute: seo.title } : seo.title;
@@ -29,14 +30,16 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     alternates: {
-      canonical: seo.canonical || alternates.canonical,
+      canonical: canonicalUrl,
       languages: alternates.languages,
     },
-    openGraph: {
+    openGraph: buildOpenGraphMetadata({
       title: seo.title,
       description: seo.description,
-      images: [{ url: "/images/og-image.jpg", alt: seo.title }],
-    },
+      canonicalUrl,
+      lang,
+      type: "website",
+    }),
     twitter: {
       card: "summary_large_image",
       title: seo.title,

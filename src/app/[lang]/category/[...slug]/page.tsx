@@ -19,7 +19,7 @@ import {
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams, parseRawProductionParam } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata } from '@/utils/seo';
 
 interface DynamicCategoryPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
@@ -92,6 +92,7 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
 
         const alternates = getHreflangAlternates(`/category/${slug.join('/')}/`, lang, dynamicBaseUrl, pageNum);
         const finalTitle = formatTitleWithPage(seoData.title, pageNum, lang);
+        const canonicalUrl = pageNum > 1 ? alternates.canonical : (seoData.canonical || alternates.canonical);
         const isPageNoindex = pageNum > 1 || Boolean(seoData.noindex);
         const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
 
@@ -100,14 +101,17 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
             description: seoData.description,
             ...(pageRobots && { robots: pageRobots }),
             alternates: {
-                canonical: pageNum > 1 ? alternates.canonical : (seoData.canonical || alternates.canonical),
+                canonical: canonicalUrl,
                 languages: alternates.languages,
             },
-            openGraph: {
+            openGraph: buildOpenGraphMetadata({
                 title: finalTitle,
                 description: seoData.description,
-                images: categoryImage ? [{ url: categoryImage, alt: categoryName }] : undefined,
-            },
+                canonicalUrl,
+                lang,
+                image: categoryImage,
+                type: 'website',
+            }),
             twitter: {
                 card: 'summary_large_image',
                 title: finalTitle,

@@ -4,7 +4,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import OurStoresPage from "@/app/pages/OurStores";
 import { getShopsApi } from "@/lib/graphql/queries/shops";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata } from "@/utils/seo";
 
 export async function generateMetadata({
   params,
@@ -18,20 +18,23 @@ export async function generateMetadata({
   const relativeUrl = `/${lang}/our-stores/`;
   const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
   const alternates = getHreflangAlternates('/our-stores/', lang, dynamicBaseUrl);
+  const canonicalUrl = seo.canonical || alternates.canonical;
 
   return {
     title: lang === 'ru' ? { absolute: seo.title } : seo.title,
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     alternates: {
-      canonical: seo.canonical || alternates.canonical,
+      canonical: canonicalUrl,
       languages: alternates.languages,
     },
-    openGraph: {
+    openGraph: buildOpenGraphMetadata({
       title: seo.title,
       description: seo.description,
-      images: [{ url: '/images/og-image.jpg', alt: seo.title }],
-    },
+      canonicalUrl,
+      lang,
+      type: "website",
+    }),
     twitter: {
       card: "summary_large_image",
       title: seo.title,

@@ -4,7 +4,7 @@ import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSalesApi } from "@/lib/graphql/queries/pages/home/sales";
 import { getProductsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
@@ -28,6 +28,7 @@ export async function generateMetadata({
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
     const title = lang === 'ru' ? { absolute: formattedTitleStr } : formattedTitleStr;
 
+    const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
     const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);
     const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
 
@@ -36,14 +37,16 @@ export async function generateMetadata({
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
         alternates: {
-            canonical: pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical),
+            canonical: canonicalUrl,
             languages: alternates.languages,
         },
-        openGraph: {
+        openGraph: buildOpenGraphMetadata({
             title: formattedTitleStr,
             description: seo.description,
-            images: [{ url: '/images/og-image.jpg', alt: formattedTitleStr }],
-        },
+            canonicalUrl,
+            lang,
+            type: "website",
+        }),
         twitter: {
             card: "summary_large_image",
             title: formattedTitleStr,

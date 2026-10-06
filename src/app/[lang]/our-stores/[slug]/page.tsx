@@ -5,7 +5,8 @@ import { Locale } from "@/i18n/config";
 import StoreDetailPage from "@/app/pages/OurStores/StoreDetailPage/StoreDetailPage";
 import { getShopBySlugApi, type Shop } from "@/lib/graphql/queries/shops";
 import { resolveStoreBackendSlug, getLegacyStoreRedirectSlug } from "@/utils/store-url";
-import { getStoreSeoData } from "@/utils/seo";
+import { headers } from "next/headers";
+import { getStoreSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
@@ -13,6 +14,8 @@ export async function generateMetadata({
     params: Promise<{ lang: Locale; slug: string }>;
 }): Promise<Metadata> {
     const { lang, slug } = await params;
+    const headersList = await headers();
+    const dynamicBaseUrl = getDynamicBaseUrl(headersList);
     const backendSlug = resolveStoreBackendSlug(slug);
 
     let shop: Shop | null = null;
@@ -31,18 +34,29 @@ export async function generateMetadata({
 
     const seoData = getStoreSeoData(brandName, address, lang);
     const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
+    const alternates = getHreflangAlternates(`/our-stores/${slug}/`, lang, dynamicBaseUrl);
+    const shopImage = shop.image?.size1x || shop.images?.[0]?.url?.size1x;
 
     return {
         title: titleConfig,
         description: seoData.description,
-        openGraph: {
+        alternates: {
+            canonical: alternates.canonical,
+            languages: alternates.languages,
+        },
+        openGraph: buildOpenGraphMetadata({
             title: seoData.title,
             description: seoData.description,
-        },
+            canonicalUrl: alternates.canonical,
+            lang,
+            image: shopImage,
+            type: 'website',
+        }),
         twitter: {
             card: "summary_large_image",
             title: seoData.title,
             description: seoData.description,
+            images: shopImage ? [shopImage] : undefined,
         },
     };
 }

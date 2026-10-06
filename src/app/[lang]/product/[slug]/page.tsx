@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import { getLocalizedHref } from '@/utils/i18n-helpers';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData, fetchSeoMetadataByUrl } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData, fetchSeoMetadataByUrl, buildOpenGraphMetadata } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import {
     getCatalogTreeApi,
@@ -68,20 +68,24 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         lang,
         dynamicBaseUrl,
     );
+    const canonicalUrl = seoData.canonical || alternates.canonical;
 
     return {
         title: titleConfig,
         description: seoData.description,
         ...(seoData.noindex ? { robots: { index: false, follow: false } } : {}),
         alternates: {
-            canonical: seoData.canonical || alternates.canonical,
+            canonical: canonicalUrl,
             languages: alternates.languages,
         },
-        openGraph: {
+        openGraph: buildOpenGraphMetadata({
             title: seoData.title,
             description: seoData.description,
-            images: productImage ? [{ url: productImage, alt: productName }] : undefined,
-        },
+            canonicalUrl,
+            lang,
+            image: productImage,
+            type: 'product',
+        }),
         twitter: {
             card: 'summary_large_image',
             title: seoData.title,

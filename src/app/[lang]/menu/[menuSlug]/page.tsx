@@ -6,7 +6,7 @@ import { getStoreFullMenuApi } from "@/lib/graphql/queries/pages/restaurantMenu"
 import { getApiSlugFromMenu } from "@/config/menuSlugMap";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -62,10 +62,13 @@ export async function generateMetadata({ params }: MenuPageProps): Promise<Metad
                 canonical: alternates.canonical,
                 languages: alternates.languages,
             },
-            openGraph: {
+            openGraph: buildOpenGraphMetadata({
                 title,
                 description,
-            },
+                canonicalUrl: alternates.canonical,
+                lang,
+                type: 'website',
+            }),
             twitter: {
                 card: "summary_large_image",
                 title,

@@ -10,7 +10,7 @@ import {
     type Product,
 } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getActionSeoData } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getActionSeoData, buildOpenGraphMetadata } from '@/utils/seo';
 
 interface ActionDetailPageProps {
     params: Promise<{ lang: 'ua' | 'ru'; slug: string }>;
@@ -44,6 +44,9 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
         lang,
         dynamicBaseUrl,
     );
+    const actionImage = typeof sale.banner === 'string'
+        ? sale.banner
+        : sale.banner?.size2x || sale.banner?.size1x || (typeof sale.image === 'string' ? sale.image : sale.image?.size2x || sale.image?.size1x);
 
     return {
         title: titleConfig,
@@ -52,14 +55,19 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
-        openGraph: {
+        openGraph: buildOpenGraphMetadata({
             title: actionTitle,
             description: seoData.description,
-        },
+            canonicalUrl: alternates.canonical,
+            lang,
+            image: actionImage,
+            type: 'website',
+        }),
         twitter: {
             card: 'summary_large_image',
             title: actionTitle,
             description: seoData.description,
+            images: actionImage ? [actionImage] : undefined,
         },
     };
 }

@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { getAccessToken } from '@/app/actions/authActions';
 
-import { getHreflangAlternates, getDynamicBaseUrl, getStaticPageSeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getStaticPageSeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata } from '@/utils/seo';
 
 interface CatalogPageProps {
     params: Promise<{ lang: string }>;
@@ -33,6 +33,7 @@ export async function generateMetadata({ params, searchParams }: CatalogPageProp
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
     const title = isRu ? { absolute: formattedTitleStr } : formattedTitleStr;
 
+    const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
     const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);
     const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
 
@@ -41,14 +42,16 @@ export async function generateMetadata({ params, searchParams }: CatalogPageProp
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
         alternates: {
-            canonical: pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical),
+            canonical: canonicalUrl,
             languages: alternates.languages,
         },
-        openGraph: {
+        openGraph: buildOpenGraphMetadata({
             title: formattedTitleStr,
             description: seo.description,
-            images: [{ url: '/images/og-image.jpg', alt: formattedTitleStr }],
-        },
+            canonicalUrl,
+            lang,
+            type: 'website',
+        }),
         twitter: {
             card: 'summary_large_image',
             title: formattedTitleStr,

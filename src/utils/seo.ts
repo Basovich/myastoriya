@@ -18,6 +18,64 @@ export function getDynamicBaseUrl(headersList?: Headers): string | undefined {
 }
 
 /**
+ * Returns localized site name for og:site_name tag.
+ */
+export function getSiteName(lang: string = "ua"): string {
+    const l = lang.toLowerCase();
+    if (l === "ru") return "Мястория";
+    if (l === "en") return "Myastoriya";
+    return "М'ясторія";
+}
+
+export interface OpenGraphOptions {
+    title: string;
+    description: string;
+    canonicalUrl: string;
+    lang?: string;
+    image?: string | null;
+    type?: "website" | "article" | "product";
+}
+
+/**
+ * Builds standard Open Graph metadata object for Next.js Metadata API.
+ */
+export function buildOpenGraphMetadata({
+    title,
+    description,
+    canonicalUrl,
+    lang = "ua",
+    image,
+    type = "website",
+}: OpenGraphOptions) {
+    const siteName = getSiteName(lang);
+    const fallbackImage = siteData.seo.ogImage || "/images/og-image.jpg";
+    const imageUrl = image || fallbackImage;
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL 
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
+
+    const fullImageUrl = imageUrl.startsWith("http") 
+        ? imageUrl 
+        : `${baseUrl.replace(/\/+$/, "")}/${imageUrl.replace(/^\/+/, "")}`;
+
+    const locale = lang === "ru" ? "ru_RU" : (lang === "en" ? "en_US" : "uk_UA");
+
+    return {
+        title,
+        description,
+        url: canonicalUrl,
+        siteName,
+        locale,
+        type: type as "website",
+        images: [
+            {
+                url: fullImageUrl,
+                alt: title,
+            },
+        ],
+    };
+}
+
+/**
  * Generates hreflang alternate links and canonical link for SEO.
  * @param pathname The request pathname (e.g., '/ua/contacts/' or '/contacts' or '/ru/our-stores/')
  * @param currentLang The current page language ('ua', 'ru', 'uk', etc.)

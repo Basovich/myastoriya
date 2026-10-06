@@ -40,7 +40,7 @@ const helios = localFont({
   variable: "--font-helios",
 });
 
-import { getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
 
 export async function generateMetadata({
   params,
@@ -68,22 +68,14 @@ export async function generateMetadata({
       canonical: alternates.canonical,
       languages: alternates.languages,
     },
-    openGraph: {
-      type: "website",
-      locale: lang === "ru" ? "ru_RU" : "uk_UA",
-      url: alternates.canonical,
-      siteName: siteData.name,
+    openGraph: buildOpenGraphMetadata({
       title: siteData.seo.title,
       description: siteData.seo.description,
-      images: [
-        {
-          url: siteData.seo.ogImage,
-          width: 1200,
-          height: 630,
-          alt: siteData.name,
-        },
-      ],
-    },
+      canonicalUrl: alternates.canonical,
+      lang,
+      image: siteData.seo.ogImage,
+      type: "website",
+    }),
     twitter: {
       card: "summary_large_image",
       title: siteData.seo.title,

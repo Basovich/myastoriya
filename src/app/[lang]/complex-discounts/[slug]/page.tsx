@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import ComplexDiscountDetail from '../../../components/ComplexDiscountDetail/ComplexDiscountDetail';
 import { findSpecialIdBySlug, getSpecialApi, getSpecialSlugsById } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getComplexDiscountSeoData } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getComplexDiscountSeoData, buildOpenGraphMetadata } from '@/utils/seo';
 
 interface ComboDetailProps {
     params: Promise<{ lang: 'ua' | 'ru'; slug: string }>;
@@ -37,6 +37,9 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
         lang,
         dynamicBaseUrl,
     );
+    const discountImage = typeof special.image === 'string'
+        ? special.image
+        : special.image?.size2x || special.image?.size1x || (typeof special.banner === 'string' ? special.banner : special.banner?.size2x || special.banner?.size1x);
 
     return {
         title: titleConfig,
@@ -45,14 +48,19 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
-        openGraph: {
+        openGraph: buildOpenGraphMetadata({
             title: discountTitle,
             description: seoData.description,
-        },
+            canonicalUrl: alternates.canonical,
+            lang,
+            image: discountImage,
+            type: 'website',
+        }),
         twitter: {
             card: 'summary_large_image',
             title: discountTitle,
             description: seoData.description,
+            images: discountImage ? [discountImage] : undefined,
         },
     };
 }

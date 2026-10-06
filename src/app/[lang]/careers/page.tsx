@@ -4,7 +4,7 @@ import CareersPage from "@/app/pages/Careers";
 import { getCareerApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
 
 interface CareersPageProps {
   params: Promise<{ lang: Locale }>;
@@ -27,11 +27,13 @@ export async function generateMetadata({ params }: CareersPageProps): Promise<Me
       canonical: alternates.canonical,
       languages: alternates.languages,
     },
-    openGraph: {
-      title: seo.h1,
+    openGraph: buildOpenGraphMetadata({
+      title: seo.title,
       description: seo.description,
-      images: [{ url: "/images/og-image.jpg", alt: seo.h1 }],
-    },
+      canonicalUrl: alternates.canonical,
+      lang,
+      type: "website",
+    }),
     twitter: {
       card: "summary_large_image",
       title: seo.h1,

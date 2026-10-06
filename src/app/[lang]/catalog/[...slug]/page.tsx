@@ -8,7 +8,7 @@ import {
     ProductCategory,
 } from '@/lib/graphql';
 import { buildCategoryIndex } from '@/utils/category-url';
-import { getHreflangAlternates, getDynamicBaseUrl } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from '@/utils/seo';
 import { getAccessToken } from '@/app/actions/authActions';
 import { getLocalizedHref } from '@/utils/i18n-helpers';
 
@@ -45,11 +45,14 @@ export async function generateMetadata({ params }: DynamicCatalogPageProps): Pro
                 canonical: alternates.canonical,
                 languages: alternates.languages,
             },
-            openGraph: {
+            openGraph: buildOpenGraphMetadata({
                 title: categoryName,
                 description,
-                images: categoryImage ? [{ url: categoryImage, alt: categoryName }] : undefined,
-            },
+                canonicalUrl: alternates.canonical,
+                lang,
+                image: categoryImage,
+                type: 'website',
+            }),
             twitter: {
                 card: 'summary_large_image',
                 title: categoryName,

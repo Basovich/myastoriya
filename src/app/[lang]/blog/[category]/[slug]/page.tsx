@@ -7,7 +7,7 @@ import BlogPostPage from "@/app/pages/BlogPost";
 import { getBlogBySlugApi, resolveBlogImageUrl } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
 import { getBlogCategorySegment } from "@/utils/blog-url";
-import { getBlogSeoData, getHreflangAlternates, getDynamicBaseUrl } from "@/utils/seo";
+import { getBlogSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
@@ -34,11 +34,14 @@ export async function generateMetadata({
             canonical: alternates.canonical,
             languages: alternates.languages,
         },
-        openGraph: {
+        openGraph: buildOpenGraphMetadata({
             title: postTitle,
             description: seoData.description,
-            images: imageUrl ? [{ url: imageUrl, alt: postTitle }] : undefined,
-        },
+            canonicalUrl: alternates.canonical,
+            lang,
+            image: imageUrl,
+            type: 'article',
+        }),
         twitter: {
             card: "summary_large_image",
             title: postTitle,
