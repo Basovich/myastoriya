@@ -173,6 +173,7 @@ export default async function RootLayout({
   return (
     <html lang={htmlLang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <head>
+        <title>М'ясторія</title>
         <BreadcrumbHeadScript />
       </head>
       <body>
