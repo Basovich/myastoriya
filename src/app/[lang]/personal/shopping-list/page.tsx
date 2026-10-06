@@ -3,7 +3,7 @@ import ShoppingListClient from "@/app/components/Personal/ShoppingList/ShoppingL
 
 export const metadata = {
     title: 'Список покупок',
-    robots: { index: false, follow: false },
+    robots: { index: false, follow: true },
 };
 
 export default async function ShoppingListPage({

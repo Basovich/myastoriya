@@ -3,7 +3,7 @@ import OrdersClient from '@/app/components/Personal/Orders/OrdersClient';
 
 export const metadata = {
     title: 'Історія замовлень',
-    robots: { index: false, follow: false },
+    robots: { index: false, follow: true },
 };
 
 export default async function OrdersPage({

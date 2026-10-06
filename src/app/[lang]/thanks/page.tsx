@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: ThanksProps): Promise<Metadat
         description: seo.description,
         robots: {
             index: false,
-            follow: false,
+            follow: true,
         },
         alternates: {
             canonical: alternates.canonical,

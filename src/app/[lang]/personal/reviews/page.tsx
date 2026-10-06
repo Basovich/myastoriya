@@ -3,7 +3,7 @@ import ReviewsClient from "@/app/components/Personal/Reviews/ReviewsClient";
 
 export const metadata = {
     title: 'Мої відгуки',
-    robots: { index: false, follow: false },
+    robots: { index: false, follow: true },
 };
 
 export default async function ReviewsPage({

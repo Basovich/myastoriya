@@ -1,7 +1,15 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import PersonalLayoutClient from '@/app/components/Personal/PersonalLayoutClient/PersonalLayoutClient';
+import type { Metadata } from 'next';
 import { Locale } from '@/i18n/config';
+
+export const metadata: Metadata = {
+    robots: {
+        index: false,
+        follow: true,
+    },
+};
 
 export default async function PersonalLayout({
     children,

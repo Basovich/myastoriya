@@ -5,7 +5,7 @@ import CardsClient from '@/app/components/Personal/Cards/CardsClient';
 
 export const metadata: Metadata = {
   title: 'Банківські картки',
-  robots: { index: false, follow: false },
+  robots: { index: false, follow: true },
 };
 
 export default async function BankCardsPage(props: { params: Promise<{ lang: string }> }) {

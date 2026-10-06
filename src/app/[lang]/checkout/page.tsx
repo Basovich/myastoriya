@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: CheckoutProps): Promise<Metad
         description: seo.description,
         robots: {
             index: false,
-            follow: false,
+            follow: true,
         },
         alternates: {
             canonical: alternates.canonical,

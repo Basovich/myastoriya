@@ -24,6 +24,10 @@ export async function generateMetadata({ params }: ApplyProps): Promise<Metadata
   return {
     title,
     description: seo.description,
+    robots: {
+      index: false,
+      follow: true,
+    },
     alternates: {
       canonical: alternates.canonical,
       languages: alternates.languages,

@@ -23,6 +23,10 @@ export async function generateMetadata({ params }: SearchPageProps): Promise<Met
     return {
         title,
         description: seo.description,
+        robots: {
+            index: false,
+            follow: true,
+        },
         alternates: {
             canonical: alternates.canonical,
             languages: alternates.languages,
