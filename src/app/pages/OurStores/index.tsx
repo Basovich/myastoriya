@@ -14,7 +14,6 @@ import StoreViewToggle from "@/app/components/OurStores/StoreViewToggle/StoreVie
 
 import StoreList from "@/app/components/OurStores/StoreList/StoreList";
 import StoreMap from "@/app/components/OurStores/StoreMap/StoreMap";
-import { Store } from "@/app/components/OurStores/StoreCard/StoreCard";
 import { parseShopData } from "@/lib/utils/shops";
 
 interface OurStoresPageProps {
@@ -29,7 +28,7 @@ export type ViewMode = "list" | "map";
 const STORES_PER_PAGE = 10;
 
 
-export default function OurStoresPage({ dict, lang, initialShops }: OurStoresPageProps) {
+export default function OurStoresPage({ dict, initialShops }: OurStoresPageProps) {
     const { ourStoresPage } = dict.home;
     const [activeFilter, setActiveFilter] = useState<StoreType>("restaurant");
     const [searchQuery, setSearchQuery] = useState("");
