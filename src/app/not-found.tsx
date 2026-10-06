@@ -75,9 +75,10 @@ export default async function GlobalNotFound() {
     }
 
     const dict = await getDictionary(lang);
+    const htmlLang = lang === 'ua' ? 'uk' : lang;
 
     return (
-        <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
+        <html lang={htmlLang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
             <body>
                 <ReduxProvider>
                     <CategoryProvider initialCategories={catalogTree}>

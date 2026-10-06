@@ -173,8 +173,10 @@ export default async function RootLayout({
     }
   }
 
+  const htmlLang = lang === 'ua' ? 'uk' : lang;
+
   return (
-    <html lang={lang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
+    <html lang={htmlLang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <body>
         <noscript>
           <style>{`
