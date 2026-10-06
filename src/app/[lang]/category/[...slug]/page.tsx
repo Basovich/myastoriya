@@ -98,7 +98,6 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
         return {
             title: finalTitle,
             description: seoData.description,
-            ...(seoData.keywords && { keywords: seoData.keywords }),
             ...(pageRobots && { robots: pageRobots }),
             alternates: {
                 canonical: pageNum > 1 ? alternates.canonical : (seoData.canonical || alternates.canonical),

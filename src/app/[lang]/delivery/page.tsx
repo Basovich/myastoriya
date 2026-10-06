@@ -27,7 +27,6 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
   return {
     title,
     description: seo.description,
-    ...(seo.keywords && { keywords: seo.keywords }),
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     alternates: {
       canonical: seo.canonical || alternates.canonical,

@@ -34,7 +34,6 @@ export async function generateMetadata({
     return {
         title,
         description: seo.description,
-        ...(seo.keywords && { keywords: seo.keywords }),
         ...(pageRobots && { robots: pageRobots }),
         alternates: {
             canonical: pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical),

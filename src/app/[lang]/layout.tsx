@@ -63,9 +63,6 @@ export async function generateMetadata({
       template: `%s | ${siteBrand}`,
     },
     description: siteData.seo.description,
-    keywords: siteData.seo.keywords,
-    authors: [{ name: siteData.name }],
-    creator: siteData.name,
     metadataBase: new URL(siteData.url),
     alternates: {
       canonical: alternates.canonical,
@@ -110,13 +107,6 @@ export async function generateMetadata({
     robots: {
       index: true,
       follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-      },
     },
   };
 }
