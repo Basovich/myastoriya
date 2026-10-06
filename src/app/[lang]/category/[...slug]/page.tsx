@@ -23,7 +23,7 @@ import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoM
 
 interface DynamicCategoryPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ params, searchParams }: DynamicCategoryPageProps): Promise<Metadata> {

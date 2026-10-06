@@ -10,7 +10,7 @@ export async function generateMetadata({
     searchParams,
 }: {
     params: Promise<{ lang: "ua" | "ru" }>;
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<Metadata> {
     const { lang } = await params;
     const resolvedSearchParams = await searchParams;

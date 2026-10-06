@@ -13,7 +13,7 @@ import { getHreflangAlternates, getDynamicBaseUrl, getStaticPageSeoData, fetchSe
 
 interface CatalogPageProps {
     params: Promise<{ lang: string }>;
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ params, searchParams }: CatalogPageProps): Promise<Metadata> {
