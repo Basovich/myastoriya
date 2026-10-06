@@ -23,7 +23,7 @@ export async function generateMetadata({
 
     const postTitle = post.h1 || post.name;
     const seoData = getBlogSeoData(postTitle, post.text, lang);
-    const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
+    const titleConfig = { absolute: seoData.title };
     const imageUrl = resolveBlogImageUrl(post.image);
     const alternates = getHreflangAlternates(`/blog/${category}/${slug}/`, lang, dynamicBaseUrl);
 

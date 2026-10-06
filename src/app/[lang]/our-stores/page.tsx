@@ -29,7 +29,7 @@ export async function generateMetadata({
   setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
-    title: isRu ? { absolute: seo.title } : seo.title,
+    title: { absolute: seo.title },
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     alternates: {

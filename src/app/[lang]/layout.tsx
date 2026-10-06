@@ -40,18 +40,23 @@ const helios = localFont({
   variable: "--font-helios",
 });
 
-import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, getRequestBreadcrumbJsonLd } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, getRequestJsonLdScripts } from "@/utils/seo";
 
-function BreadcrumbHeadScript() {
-  const jsonLd = getRequestBreadcrumbJsonLd().current;
-  if (!jsonLd) return null;
+function JsonLdHeadScripts({ pathname }: { pathname: string }) {
+  const scripts = getRequestJsonLdScripts(pathname);
+  if (!scripts || !scripts.length) return null;
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
-      }}
-    />
+    <>
+      {scripts.map((jsonLd, idx) => (
+        <script
+          key={idx}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+          }}
+        />
+      ))}
+    </>
   );
 }
 
@@ -173,8 +178,7 @@ export default async function RootLayout({
   return (
     <html lang={htmlLang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <head>
-        <title>М'ясторія</title>
-        <BreadcrumbHeadScript />
+        <JsonLdHeadScripts pathname={pathname} />
       </head>
       <body>
         <noscript>

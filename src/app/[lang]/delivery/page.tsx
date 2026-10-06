@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
   const canonicalUrl = seo.canonical || alternates.canonical;
 
   const isRu = lang === "ru";
-  const title = isRu ? { absolute: seo.title } : seo.title;
+  const title = { absolute: seo.title };
 
   const breadcrumbs = [
     { label: isRu ? "Главная" : "Головна", href: "/" },

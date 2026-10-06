@@ -4,7 +4,7 @@ import ContactsPage from "@/app/pages/Contacts";
 import { getContactsCategoriesApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from "@/utils/seo";
 
 interface ContactsPageProps {
   params: Promise<{ lang: Locale }>;
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: ContactsPageProps): Promise<M
   const canonicalUrl = seo.canonical || alternates.canonical;
 
   const isRu = lang === "ru";
-  const title = isRu ? { absolute: seo.title } : seo.title;
+  const title = formatTitleConfig(seo.title, lang);
 
   const breadcrumbs = [
     { label: isRu ? 'Главная' : 'Головна', href: '/' },

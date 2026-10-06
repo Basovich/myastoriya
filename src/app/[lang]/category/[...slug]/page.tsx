@@ -19,7 +19,7 @@ import {
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams, parseRawProductionParam } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from '@/utils/seo';
 
 interface DynamicCategoryPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
@@ -104,7 +104,7 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
         setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
         return {
-            title: finalTitle,
+            title: formatTitleConfig(finalTitle, lang),
             description: seoData.description,
             ...(pageRobots && { robots: pageRobots }),
             alternates: {

@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import { getLocalizedHref } from '@/utils/i18n-helpers';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, generateProductJsonLd, setRequestProductJsonLd, formatTitleConfig } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import {
     getCatalogTreeApi,
@@ -39,15 +39,20 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
+    const token = await getAccessToken();
     const productId = await findProductIdBySlug(slug, lang as Locale).catch(() => null);
     if (!productId) return {};
 
-    const [product, productSlugs, catalogTree] = await Promise.all([
-        getProductByIdApi(productId, lang as Locale).catch(() => null),
-        getProductSlugsById(productId),
-        getCatalogTreeApi(lang as Locale, 768, undefined).catch(() => [] as ProductCategory[]),
-    ]);
+    let product = await getProductByIdApi(productId, lang as Locale, token ?? undefined, true).catch(() => null);
+    if (!product) {
+        product = await getProductByIdApi(productId, lang as Locale, undefined, true).catch(() => null);
+    }
     if (!product) return {};
+
+    const [productSlugs, catalogTree] = await Promise.all([
+        getProductSlugsById(productId).catch(() => ({ uk: slug, ru: slug })),
+        getCatalogTreeApi(lang as Locale, 768, token ?? undefined).catch(() => [] as ProductCategory[]),
+    ]);
 
     const productName = product.name;
     const productImage = resolveProductImageUrl(product);
@@ -57,9 +62,9 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         title: fallbackSeo.title,
         description: fallbackSeo.description,
         h1: productName,
-    });
+    }).catch(() => fallbackSeo);
 
-    const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
+    const titleConfig = formatTitleConfig(seoData.title, lang);
 
     const alternates = getExplicitHreflangAlternates(
         {
@@ -69,18 +74,44 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         lang,
         dynamicBaseUrl,
     );
-    const canonicalUrl = seoData.canonical || alternates.canonical;
+    const canonicalUrl = ('canonical' in seoData && seoData.canonical) || alternates.canonical;
 
     const categoryIndex = buildCategoryIndex(catalogTree);
     const breadcrumbs = buildCategoryBreadcrumbs(product.categoryId, categoryIndex);
     breadcrumbs.push({ label: product.name });
     const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
-    setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
+    setRequestBreadcrumbJsonLd(breadcrumbJsonLd, relativeUrl);
+
+    let ratingData: { ratingValue?: number; ratingCount?: number } | undefined = undefined;
+    try {
+        const numericId = parseInt(productId, 10);
+        if (!isNaN(numericId)) {
+            const reviewsData = await getProductReviewsSsr(numericId, 5, lang as Locale);
+            const ratingCount = reviewsData?.data?.length ?? 0;
+            const ratingSum = reviewsData?.data?.reduce((acc, r) => acc + (r.rating || 0), 0) ?? 0;
+            const ratingValue = ratingCount > 0 ? ratingSum / ratingCount : (product.rating ?? undefined);
+            if (ratingValue && ratingCount > 0) {
+                ratingData = { ratingValue, ratingCount };
+            }
+        }
+    } catch {
+        // Non-critical rating fetch error
+    }
+
+    const productJsonLd = generateProductJsonLd({
+        product,
+        lang,
+        canonicalUrl,
+        dynamicBaseUrl,
+        imageUrl: productImage,
+        ratingData,
+    });
+    setRequestProductJsonLd(productJsonLd, relativeUrl);
 
     return {
         title: titleConfig,
         description: seoData.description,
-        ...(seoData.noindex ? { robots: { index: false, follow: false } } : {}),
+        ...('noindex' in seoData && seoData.noindex ? { robots: { index: false, follow: false } } : {}),
         alternates: {
             canonical: canonicalUrl,
             languages: alternates.languages,
@@ -91,7 +122,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
             canonicalUrl,
             lang,
             image: productImage,
-            type: 'product',
+            type: 'website',
         }),
         twitter: {
             card: 'summary_large_image',
@@ -286,21 +317,57 @@ export default async function ProductPage({ params }: ProductPageProps) {
     const breadcrumbs = buildCategoryBreadcrumbs(product.categoryId, categoryIndex);
     breadcrumbs.push({ label: product.name });
 
+    const headersList = await headers();
+    const dynamicBaseUrl = getDynamicBaseUrl(headersList);
+    const canonicalUrl = `${dynamicBaseUrl}/${lang}/product/${product.slug || slug}/`;
+
+    let ratingData: { ratingValue?: number; ratingCount?: number } | undefined = undefined;
+    const ratingCount = initialReviewsData?.data?.length ?? 0;
+    const ratingSum = initialReviewsData?.data?.reduce((acc: number, r: ProductReview) => acc + (r.rating || 0), 0) ?? 0;
+    const ratingValue = ratingCount > 0 ? ratingSum / ratingCount : (product.rating ?? undefined);
+    if (ratingValue && ratingCount > 0) {
+        ratingData = { ratingValue, ratingCount };
+    }
+
+    const productJsonLd = generateProductJsonLd({
+        product,
+        lang,
+        canonicalUrl,
+        dynamicBaseUrl,
+        imageUrl: resolveProductImageUrl(product),
+        ratingData,
+    });
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
+
     return (
-        <ProductClient
-            product={product}
-            costVariants={[]}
-            publications={blogsResponse.data}
-            relatedProducts={finalRelatedProducts}
-            popularProducts={popularProducts}
-            categoryProducts={categoryProductsResponse.data}
-            lang={lang as Locale}
-            dict={dict}
-            breadcrumbs={breadcrumbs}
-            deliveryBlocks={deliveryBlocks}
-            initialReviews={initialReviewsData?.data ?? []}
-            initialReviewsHasMore={initialReviewsData?.has_more_pages ?? false}
-        />
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c'),
+                }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(productJsonLd).replace(/</g, '\\u003c'),
+                }}
+            />
+            <ProductClient
+                product={product}
+                costVariants={[]}
+                publications={blogsResponse.data}
+                relatedProducts={finalRelatedProducts}
+                popularProducts={popularProducts}
+                categoryProducts={categoryProductsResponse.data}
+                lang={lang as Locale}
+                dict={dict}
+                breadcrumbs={breadcrumbs}
+                deliveryBlocks={deliveryBlocks}
+                initialReviews={initialReviewsData?.data ?? []}
+                initialReviewsHasMore={initialReviewsData?.has_more_pages ?? false}
+            />
+        </>
     );
 }
 

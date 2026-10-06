@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
 
     const actionTitle = sale.title || sale.name;
     const seoData = getActionSeoData(actionTitle, sale.description || sale.text, lang);
-    const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
+    const titleConfig = { absolute: seoData.title };
 
     const alternates = getExplicitHreflangAlternates(
         {

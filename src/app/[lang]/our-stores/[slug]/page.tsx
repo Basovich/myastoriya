@@ -33,7 +33,7 @@ export async function generateMetadata({
     const address = shop.siteAddress || (match ? match[2].trim() : (shop.name || ''));
 
     const seoData = getStoreSeoData(brandName, address, lang);
-    const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
+    const titleConfig = { absolute: seoData.title };
     const alternates = getHreflangAlternates(`/our-stores/${slug}/`, lang, dynamicBaseUrl);
     const shopImage = shop.image?.size1x || shop.images?.[0]?.url?.size1x;
 

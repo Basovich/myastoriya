@@ -31,7 +31,7 @@ export async function generateMetadata({ params, searchParams }: CatalogPageProp
     const isRu = lang === 'ru';
     const rawTitle = seo.title;
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
-    const title = isRu ? { absolute: formattedTitleStr } : formattedTitleStr;
+    const title = { absolute: formattedTitleStr };
 
     const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
     const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);

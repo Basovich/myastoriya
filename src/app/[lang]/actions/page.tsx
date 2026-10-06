@@ -4,7 +4,7 @@ import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSalesApi } from "@/lib/graphql/queries/pages/home/sales";
 import { getProductsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
@@ -26,7 +26,7 @@ export async function generateMetadata({
 
     const rawTitle = seo.title;
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
-    const title = lang === 'ru' ? { absolute: formattedTitleStr } : formattedTitleStr;
+    const title = formatTitleConfig(formattedTitleStr, lang);
 
     const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
     const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);

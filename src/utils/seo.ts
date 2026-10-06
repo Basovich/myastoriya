@@ -2,12 +2,38 @@ import { siteData } from "@/config/site";
 import { getSeoByUrlApi } from "@/lib/graphql";
 import { cache } from "react";
 
-export const getRequestBreadcrumbJsonLd = cache(() => {
-    return { current: null as object | null };
-});
+const requestJsonLdMap = new Map<string, object[]>();
 
-export function setRequestBreadcrumbJsonLd(data: object) {
-    getRequestBreadcrumbJsonLd().current = data;
+export function addRequestJsonLdScript(pathname: string, data: object) {
+    if (!pathname) return;
+    const cleanPath = pathname.trim().replace(/\/+$/, '') || '/';
+    let list = requestJsonLdMap.get(cleanPath);
+    if (!list) {
+        list = [];
+        requestJsonLdMap.set(cleanPath, list);
+        setTimeout(() => {
+            requestJsonLdMap.delete(cleanPath);
+        }, 5000);
+    }
+    list.push(data);
+}
+
+export function setRequestBreadcrumbJsonLd(data: object, pathname?: string) {
+    if (pathname) {
+        addRequestJsonLdScript(pathname, data);
+    }
+}
+
+export function setRequestProductJsonLd(data: object, pathname?: string) {
+    if (pathname) {
+        addRequestJsonLdScript(pathname, data);
+    }
+}
+
+export function getRequestJsonLdScripts(pathname?: string): object[] {
+    if (!pathname) return [];
+    const cleanPath = pathname.trim().replace(/\/+$/, '') || '/';
+    return requestJsonLdMap.get(cleanPath) || [];
 }
 
 export interface HreflangAlternates {
@@ -34,6 +60,20 @@ export function getSiteName(lang: string = "ua"): string {
     if (l === "ru") return "Мястория";
     if (l === "en") return "Myastoriya";
     return "М'ясторія";
+}
+
+/**
+ * Safely formats Next.js title metadata.
+ * If titleStr already ends with site brand (| М'ясторія or | Мястория), uses absolute object to prevent Next.js layout template duplication.
+ * Otherwise returns string so Next.js applies layout template (%s | М'ясторія).
+ */
+export function formatTitleConfig(titleStr: string | undefined | null, lang: string = 'ua'): { absolute: string } | string {
+    if (!titleStr) return '';
+    const cleanTitle = titleStr.trim();
+    if (/\|\s*(М'ясторія|Мястория|Myastoriya)/i.test(cleanTitle)) {
+        return { absolute: cleanTitle };
+    }
+    return cleanTitle;
 }
 
 export interface OpenGraphOptions {
@@ -142,6 +182,94 @@ export function generateBreadcrumbJsonLd(
         "@type": "BreadcrumbList",
         "itemListElement": itemListElement,
     };
+}
+
+export interface ProductJsonLdParams {
+    product: {
+        id: string | number;
+        name: string;
+        text?: string | null;
+        cost: number;
+        available?: number | boolean | null;
+        images?: Array<{ url?: { main2x?: string | null; grid2x?: string | null; grid1x?: string | null; main1x?: string | null } | null }> | null;
+        image?: { url?: { main2x?: string | null; grid2x?: string | null; grid1x?: string | null; main1x?: string | null } | null } | null;
+    };
+    lang?: string;
+    canonicalUrl: string;
+    dynamicBaseUrl?: string;
+    imageUrl?: string | null;
+    ratingData?: {
+        ratingValue?: number | null;
+        ratingCount?: number | null;
+    };
+}
+
+/**
+ * Generates Schema.org Product JSON-LD object.
+ */
+export function generateProductJsonLd({
+    product,
+    lang = "ua",
+    canonicalUrl,
+    dynamicBaseUrl,
+    imageUrl,
+    ratingData,
+}: ProductJsonLdParams) {
+    const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL 
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
+    const baseUrl = (dynamicBaseUrl || fallbackUrl).replace(/\/+$/, "");
+
+    let resolvedImage = imageUrl;
+    if (!resolvedImage) {
+        const entry = product.images?.[0] ?? product.image ?? null;
+        resolvedImage = entry?.url?.main2x || entry?.url?.grid2x || entry?.url?.grid1x || entry?.url?.main1x || null;
+    }
+    const fullImageUrl = resolvedImage
+        ? (resolvedImage.startsWith("http") ? resolvedImage : `${baseUrl}/${resolvedImage.replace(/^\/+/, "")}`)
+        : `${baseUrl}/images/og-image.jpg`;
+
+    const rawDescription = product.text || "";
+    const cleanDescription = rawDescription.replace(/<[^>]*>/g, "").trim() || product.name;
+
+    const isAvailable = typeof product.available === "boolean"
+        ? product.available
+        : (product.available === 1 || product.available === null || product.available === undefined);
+    const availability = isAvailable
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock";
+
+    const brandName = lang.toLowerCase() === "ru" ? "Мястория" : "М'ясторія";
+
+    const schema: Record<string, unknown> = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product.name,
+        "image": [fullImageUrl],
+        "description": cleanDescription,
+        "sku": String(product.id),
+        "brand": {
+            "@type": "Brand",
+            "name": brandName,
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": canonicalUrl,
+            "price": product.cost,
+            "priceCurrency": "UAH",
+            "availability": availability,
+        },
+    };
+
+    if (ratingData && ratingData.ratingValue && ratingData.ratingCount && ratingData.ratingCount > 0) {
+        schema.aggregateRating = {
+            "@type": "AggregateRating",
+            "ratingValue": Number(ratingData.ratingValue.toFixed(1)),
+            "ratingCount": ratingData.ratingCount,
+            "bestRating": 5,
+        };
+    }
+
+    return schema;
 }
 
 /**

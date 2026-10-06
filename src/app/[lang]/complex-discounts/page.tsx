@@ -21,9 +21,9 @@ export async function generateMetadata({
     const seo = getStaticPageSeoData('complex-discounts', lang);
     const alternates = getHreflangAlternates('/complex-discounts/', lang, dynamicBaseUrl, pageNum);
 
-    const rawTitle = lang === 'ru' ? seo.title : seo.h1;
+    const rawTitle = seo.title;
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
-    const title = lang === 'ru' ? { absolute: formattedTitleStr } : formattedTitleStr;
+    const title = { absolute: formattedTitleStr };
 
     const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
 

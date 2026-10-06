@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
 
     const discountTitle = special.title;
     const seoData = getComplexDiscountSeoData(discountTitle, special.description, lang);
-    const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
+    const titleConfig = { absolute: seoData.title };
 
     const alternates = getExplicitHreflangAlternates(
         {
