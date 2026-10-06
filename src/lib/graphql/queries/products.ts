@@ -150,6 +150,8 @@ export interface RelatedProductGroup {
 export interface Product {
     id: string;
     slug?: string;
+    updatedAt?: string | null;
+    createdAt?: string | null;
     categoryId?: number;
     siteId?: number | null;
     productType?: string | null;
@@ -339,6 +341,7 @@ const PRODUCTS_QUERY = /* GraphQL */ `
             data {
                 id
                 slug
+                updatedAt
                 categoryId
                 name
                 cost

@@ -4,11 +4,6 @@ import { getProductsApi, Product } from "@/lib/graphql";
 
 export const dynamic = "force-dynamic";
 
-interface ProductWithDates extends Product {
-    updatedAt?: string | null;
-    createdAt?: string | null;
-}
-
 export async function GET(req: Request) {
     try {
         const baseUrl = await getSitemapBaseUrl(req);
@@ -67,11 +62,10 @@ export async function GET(req: Request) {
 
             if (uaSlug && ruSlug && !seenIds.has(id)) {
                 seenIds.add(id);
-                const prodDates = prod as ProductWithDates;
                 entries.push({
                     ukPath: `/product/${uaSlug}/`,
                     ruPath: `/product/${ruSlug}/`,
-                    lastmod: formatDate(prodDates.updatedAt || prodDates.createdAt || null),
+                    lastmod: formatDate(prod.updatedAt || prod.createdAt || null),
                 });
             }
         }
