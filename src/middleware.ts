@@ -35,6 +35,17 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(redirectUrl, 301);
     }
 
+    // 1.6. SEO 301 Permanent Redirect for English pages (/en/*) to Ukrainian version (/ua/* or /), EXCEPT restaurant menu pages (/en/menu/*)
+    if (pathname === '/en' || pathname === '/en/' || pathname.startsWith('/en/')) {
+        if (!pathname.startsWith('/en/menu/') && pathname !== '/en/menu') {
+            if (pathname === '/en' || pathname === '/en/') {
+                return NextResponse.redirect(new URL(`/${search}`, request.url), 301);
+            }
+            const targetPath = pathname.replace(/^\/en/, '/ua');
+            return NextResponse.redirect(new URL(`${targetPath}${search}`, request.url), 301);
+        }
+    }
+
     // 2. SEO Locale & Trailing slash handling
     // Home page for default locale (UA) MUST be / (without /ua prefix)
     if (pathname === '/ua' || pathname === '/ua/') {
