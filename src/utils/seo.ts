@@ -1,5 +1,14 @@
 import { siteData } from "@/config/site";
 import { getSeoByUrlApi } from "@/lib/graphql";
+import { cache } from "react";
+
+export const getRequestBreadcrumbJsonLd = cache(() => {
+    return { current: null as object | null };
+});
+
+export function setRequestBreadcrumbJsonLd(data: object) {
+    getRequestBreadcrumbJsonLd().current = data;
+}
 
 export interface HreflangAlternates {
     canonical: string;
@@ -72,6 +81,66 @@ export function buildOpenGraphMetadata({
                 alt: title,
             },
         ],
+    };
+}
+
+export interface BreadcrumbJsonLdItem {
+    label: string;
+    href?: string;
+}
+
+/**
+ * Generates Schema.org BreadcrumbList JSON-LD object.
+ */
+export function generateBreadcrumbJsonLd(
+    items: BreadcrumbJsonLdItem[],
+    lang: string = "ua",
+    canonicalUrl?: string,
+    overrideBaseUrl?: string
+) {
+    const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL 
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
+    const baseUrl = (overrideBaseUrl || fallbackUrl).replace(/\/+$/, "");
+
+    const normalizedLang = lang.toLowerCase() === "ru" ? "ru" : "uk";
+
+    const itemListElement = items.map((item, index) => {
+        let absoluteUrl: string;
+
+        if (item.href) {
+            const cleanHref = item.href.split("?")[0];
+            if (cleanHref.startsWith("http")) {
+                absoluteUrl = cleanHref;
+            } else {
+                const relativePath = cleanHref
+                    .replace(/^\/(?:ua|ru|en)(?=\/|$)/, "")
+                    .replace(/^\/+/, "")
+                    .replace(/\/+$/, "");
+
+                if (!relativePath) {
+                    absoluteUrl = normalizedLang === "ru" ? `${baseUrl}/ru/` : `${baseUrl}/`;
+                } else {
+                    absoluteUrl = normalizedLang === "ru" ? `${baseUrl}/ru/${relativePath}/` : `${baseUrl}/ua/${relativePath}/`;
+                }
+            }
+        } else if (index === items.length - 1 && canonicalUrl) {
+            absoluteUrl = canonicalUrl;
+        } else {
+            absoluteUrl = `${baseUrl}/`;
+        }
+
+        return {
+            "@type": "ListItem",
+            "position": index + 1,
+            "name": item.label,
+            "item": absoluteUrl,
+        };
+    });
+
+    return {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": itemListElement,
     };
 }
 

@@ -4,7 +4,7 @@ import CareersPage from "@/app/pages/Careers";
 import { getCareerApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 interface CareersPageProps {
   params: Promise<{ lang: Locale }>;
@@ -19,6 +19,13 @@ export async function generateMetadata({ params }: CareersPageProps): Promise<Me
 
   const isRu = lang === "ru";
   const title = isRu ? { absolute: seo.title } : seo.h1;
+
+  const breadcrumbs = [
+    { label: isRu ? "Главная" : "Головна", href: "/" },
+    { label: isRu ? "Карьера" : "Кар'єра" }
+  ];
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+  setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
     title,
@@ -50,7 +57,5 @@ export default async function Careers({
   const dict = await getDictionary(lang);
   const careerData = await getCareerApi(lang);
 
-  return (
-      <CareersPage lang={lang} dict={dict} careerData={careerData} />
-  );
+  return <CareersPage lang={lang} dict={dict} careerData={careerData} />;
 }

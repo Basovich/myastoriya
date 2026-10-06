@@ -4,7 +4,7 @@ import BlogGrid from "@/app/components/BlogGrid/BlogGrid";
 import { getBlogsApi, getBlogTypesApi, type BlogsPagination } from "@/lib/graphql/queries/blog";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +29,13 @@ export async function generateMetadata({ params, searchParams }: BlogPageProps):
     const title = isRu ? { absolute: formattedTitleStr } : formattedTitleStr;
 
     const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
+
+    const breadcrumbs = [
+        { label: isRu ? "Главная" : "Головна", href: "/" },
+        { label: isRu ? "Блог" : "Блог" }
+    ];
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
         title,

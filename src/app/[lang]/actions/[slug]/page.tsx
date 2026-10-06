@@ -10,7 +10,7 @@ import {
     type Product,
 } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getActionSeoData, buildOpenGraphMetadata } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getActionSeoData, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
 
 interface ActionDetailPageProps {
     params: Promise<{ lang: 'ua' | 'ru'; slug: string }>;
@@ -47,6 +47,15 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
     const actionImage = typeof sale.banner === 'string'
         ? sale.banner
         : sale.banner?.size2x || sale.banner?.size1x || (typeof sale.image === 'string' ? sale.image : sale.image?.size2x || sale.image?.size1x);
+
+    const isRu = lang === 'ru';
+    const breadcrumbs = [
+        { label: isRu ? 'Главная' : 'Головна', href: '/' },
+        { label: isRu ? 'Акции' : 'Акції', href: '/actions' },
+        { label: sale.name }
+    ];
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
         title: titleConfig,

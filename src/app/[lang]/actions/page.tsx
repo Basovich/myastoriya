@@ -4,7 +4,7 @@ import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSalesApi } from "@/lib/graphql/queries/pages/home/sales";
 import { getProductsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
@@ -31,6 +31,14 @@ export async function generateMetadata({
     const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
     const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);
     const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
+
+    const isRu = lang === "ru";
+    const breadcrumbs = [
+        { label: isRu ? "Главная" : "Головна", href: "/" },
+        { label: isRu ? "Акции" : "Акції" }
+    ];
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
+    setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
         title,

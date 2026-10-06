@@ -5,7 +5,7 @@ import { getShopsApi } from "@/lib/graphql/queries/shops";
 import { getPolicyBlocksApi, getDeliveryBlocksApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 import * as Sentry from "@sentry/nextjs";
 
 interface DeliveryPageProps {
@@ -24,6 +24,13 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
 
   const isRu = lang === "ru";
   const title = isRu ? { absolute: seo.title } : seo.title;
+
+  const breadcrumbs = [
+    { label: isRu ? "Главная" : "Головна", href: "/" },
+    { label: isRu ? "Оплата и доставка" : "Оплата і доставка" }
+  ];
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
+  setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
     title,
@@ -72,12 +79,12 @@ export default async function DeliveryAndPayment({
   }
 
   return (
-      <DeliveryAndPaymentPage 
-        lang={lang} 
-        dict={dict} 
-        initialShops={shopsResponse.shops.data} 
-        policyBlocks={policyBlocks}
-        deliveryBlocks={deliveryBlocks}
-      />
+    <DeliveryAndPaymentPage 
+      lang={lang} 
+      dict={dict} 
+      initialShops={shopsResponse.shops.data} 
+      policyBlocks={policyBlocks}
+      deliveryBlocks={deliveryBlocks}
+    />
   );
 }

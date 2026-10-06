@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSpecialsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
@@ -26,6 +26,14 @@ export async function generateMetadata({
     const title = lang === 'ru' ? { absolute: formattedTitleStr } : formattedTitleStr;
 
     const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
+
+    const isRu = lang === "ru";
+    const breadcrumbs = [
+        { label: isRu ? "Главная" : "Головна", href: "/" },
+        { label: isRu ? "Комплексные скидки" : "Комплексні знижки" }
+    ];
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
         title,

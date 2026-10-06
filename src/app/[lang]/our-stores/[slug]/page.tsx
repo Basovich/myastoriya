@@ -6,7 +6,7 @@ import StoreDetailPage from "@/app/pages/OurStores/StoreDetailPage/StoreDetailPa
 import { getShopBySlugApi, type Shop } from "@/lib/graphql/queries/shops";
 import { resolveStoreBackendSlug, getLegacyStoreRedirectSlug } from "@/utils/store-url";
 import { headers } from "next/headers";
-import { getStoreSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getStoreSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
@@ -36,6 +36,15 @@ export async function generateMetadata({
     const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
     const alternates = getHreflangAlternates(`/our-stores/${slug}/`, lang, dynamicBaseUrl);
     const shopImage = shop.image?.size1x || shop.images?.[0]?.url?.size1x;
+
+    const isRu = lang === 'ru';
+    const breadcrumbs = [
+        { label: isRu ? 'Главная' : 'Головна', href: '/' },
+        { label: isRu ? 'Наши заведения' : 'Наші заклади', href: '/our-stores' },
+        { label: shop.siteName || shop.name }
+    ];
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
         title: titleConfig,

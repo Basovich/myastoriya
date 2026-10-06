@@ -2,7 +2,7 @@ import Search from "@/app/pages/Search";
 import { Locale } from "@/i18n/config";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getDefaultSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getDefaultSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 interface SearchPageProps {
     params: Promise<{ lang: Locale }>;
@@ -19,6 +19,13 @@ export async function generateMetadata({ params }: SearchPageProps): Promise<Met
 
     const isRu = lang === "ru";
     const title = isRu ? { absolute: seo.title } : seo.h1;
+
+    const breadcrumbs = [
+        { label: isRu ? "Главная" : "Головна", href: "/" },
+        { label: isRu ? "Поиск" : "Пошук" }
+    ];
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
         title,
@@ -47,8 +54,6 @@ export async function generateMetadata({ params }: SearchPageProps): Promise<Met
     };
 }
 
-export default function SearchPage() {
-    return (
-        <Search />
-    );
+export default async function SearchPage() {
+    return <Search />;
 }

@@ -3,7 +3,7 @@ import { Locale } from "@/i18n/config";
 import ApplicantFormPage from "@/app/pages/ApplicantFormPage";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getDefaultSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getDefaultSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 interface ApplyProps {
   params: Promise<{ lang: Locale }>;
@@ -20,6 +20,14 @@ export async function generateMetadata({ params }: ApplyProps): Promise<Metadata
 
   const isRu = lang === "ru";
   const title = isRu ? { absolute: seo.title } : seo.h1;
+
+  const breadcrumbs = [
+    { label: isRu ? "Главная" : "Головна", href: "/" },
+    { label: isRu ? "Карьера" : "Кар'єра", href: "/careers" },
+    { label: isRu ? "Подать заявку" : "Подати заявку" }
+  ];
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+  setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
     title,
@@ -54,7 +62,5 @@ export default async function Apply({
   const { lang } = await params;
   const dict = await getDictionary(lang);
 
-  return (
-      <ApplicantFormPage lang={lang} dict={dict} />
-  );
+  return <ApplicantFormPage lang={lang} dict={dict} />;
 }

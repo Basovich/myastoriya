@@ -40,7 +40,20 @@ const helios = localFont({
   variable: "--font-helios",
 });
 
-import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, getRequestBreadcrumbJsonLd } from "@/utils/seo";
+
+function BreadcrumbHeadScript() {
+  const jsonLd = getRequestBreadcrumbJsonLd().current;
+  if (!jsonLd) return null;
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+      }}
+    />
+  );
+}
 
 export async function generateMetadata({
   params,
@@ -159,6 +172,9 @@ export default async function RootLayout({
 
   return (
     <html lang={htmlLang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
+      <head>
+        <BreadcrumbHeadScript />
+      </head>
       <body>
         <noscript>
           <style>{`

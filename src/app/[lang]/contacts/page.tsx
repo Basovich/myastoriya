@@ -4,7 +4,7 @@ import ContactsPage from "@/app/pages/Contacts";
 import { getContactsCategoriesApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 interface ContactsPageProps {
   params: Promise<{ lang: Locale }>;
@@ -22,6 +22,13 @@ export async function generateMetadata({ params }: ContactsPageProps): Promise<M
 
   const isRu = lang === "ru";
   const title = isRu ? { absolute: seo.title } : seo.title;
+
+  const breadcrumbs = [
+    { label: isRu ? 'Главная' : 'Головна', href: '/' },
+    { label: isRu ? 'Контакты' : 'Контакти' }
+  ];
+  const jsonLdData = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
+  setRequestBreadcrumbJsonLd(jsonLdData);
 
   return {
     title,
@@ -54,14 +61,14 @@ export default async function Contacts({
   const dict = await getDictionary(lang);
   
   // Fetch contact categories and nested contacts from API
-  const response = await getContactsCategoriesApi(lang);
+  const response = await getContactsCategoriesApi(lang).catch(() => ({ contactCategories: [] }));
   const categories = response?.contactCategories || [];
 
   return (
-      <ContactsPage 
-        lang={lang} 
-        dict={dict} 
-        categories={categories} 
-      />
+    <ContactsPage 
+      lang={lang} 
+      dict={dict} 
+      categories={categories} 
+    />
   );
 }

@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import { getLocalizedHref } from '@/utils/i18n-helpers';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData, fetchSeoMetadataByUrl, buildOpenGraphMetadata } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import {
     getCatalogTreeApi,
@@ -42,9 +42,10 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     const productId = await findProductIdBySlug(slug, lang as Locale).catch(() => null);
     if (!productId) return {};
 
-    const [product, productSlugs] = await Promise.all([
+    const [product, productSlugs, catalogTree] = await Promise.all([
         getProductByIdApi(productId, lang as Locale).catch(() => null),
         getProductSlugsById(productId),
+        getCatalogTreeApi(lang as Locale, 768, undefined).catch(() => [] as ProductCategory[]),
     ]);
     if (!product) return {};
 
@@ -69,6 +70,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         dynamicBaseUrl,
     );
     const canonicalUrl = seoData.canonical || alternates.canonical;
+
+    const categoryIndex = buildCategoryIndex(catalogTree);
+    const breadcrumbs = buildCategoryBreadcrumbs(product.categoryId, categoryIndex);
+    breadcrumbs.push({ label: product.name });
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
+    setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
         title: titleConfig,

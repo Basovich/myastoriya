@@ -4,7 +4,7 @@ import { getPrivacyPolicyApi } from "@/lib/graphql";
 import { PolicyPageContentItem } from "@/i18n/types";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 interface PrivacyPolicyPageProps {
   params: Promise<{ lang: Locale }>;
@@ -19,6 +19,19 @@ export async function generateMetadata({ params }: PrivacyPolicyPageProps): Prom
 
   const isRu = lang === "ru";
   const title = isRu ? { absolute: seo.title } : seo.h1;
+
+  const labels: Record<string, { home: string; privacy: string }> = {
+    ua: { home: "Головна", privacy: "Політика конфіденційності" },
+    ru: { home: "Главная", privacy: "Политика конфиденциальности" }
+  };
+  const currentLabels = labels[lang] || labels.ua;
+
+  const breadcrumbs = [
+    { label: currentLabels.home, href: "/" },
+    { label: currentLabels.privacy }
+  ];
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+  setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
     title,

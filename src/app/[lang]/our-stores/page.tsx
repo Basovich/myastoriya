@@ -4,7 +4,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import OurStoresPage from "@/app/pages/OurStores";
 import { getShopsApi } from "@/lib/graphql/queries/shops";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 export async function generateMetadata({
   params,
@@ -20,8 +20,16 @@ export async function generateMetadata({
   const alternates = getHreflangAlternates('/our-stores/', lang, dynamicBaseUrl);
   const canonicalUrl = seo.canonical || alternates.canonical;
 
+  const isRu = lang === 'ru';
+  const breadcrumbs = [
+    { label: isRu ? 'Главная' : 'Головна', href: '/' },
+    { label: isRu ? 'Наши заведения' : 'Наші заклади' }
+  ];
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
+  setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
+
   return {
-    title: lang === 'ru' ? { absolute: seo.title } : seo.title,
+    title: isRu ? { absolute: seo.title } : seo.title,
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     alternates: {
@@ -54,6 +62,6 @@ export default async function OurStores({
   const shopsResponse = await getShopsApi({ limit: 100 }, lang);
 
   return (
-      <OurStoresPage lang={lang} dict={dict} initialShops={shopsResponse.shops.data} />
+    <OurStoresPage lang={lang} dict={dict} initialShops={shopsResponse.shops.data} />
   );
 }

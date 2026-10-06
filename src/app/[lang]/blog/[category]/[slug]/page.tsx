@@ -7,7 +7,7 @@ import BlogPostPage from "@/app/pages/BlogPost";
 import { getBlogBySlugApi, resolveBlogImageUrl } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
 import { getBlogCategorySegment } from "@/utils/blog-url";
-import { getBlogSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getBlogSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 
 export async function generateMetadata({
     params,
@@ -26,6 +26,20 @@ export async function generateMetadata({
     const titleConfig = lang === 'ru' ? { absolute: seoData.title } : seoData.title;
     const imageUrl = resolveBlogImageUrl(post.image);
     const alternates = getHreflangAlternates(`/blog/${category}/${slug}/`, lang, dynamicBaseUrl);
+
+    const canonicalCategory = getBlogCategorySegment(post);
+    const categoryLabel = canonicalCategory === 'recipe'
+        ? (lang === 'ru' ? 'Рецепты' : 'Рецепти')
+        : (lang === 'ru' ? 'Статьи' : 'Статті');
+
+    const breadcrumbs = [
+        { label: lang === 'ru' ? 'Главная' : 'Головна', href: '/' },
+        { label: lang === 'ru' ? 'Блог' : 'Блог', href: '/blog' },
+        { label: categoryLabel, href: `/blog/${canonicalCategory}` },
+        { label: post.name },
+    ];
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
         title: titleConfig,

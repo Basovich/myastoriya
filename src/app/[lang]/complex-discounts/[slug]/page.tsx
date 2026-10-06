@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import ComplexDiscountDetail from '../../../components/ComplexDiscountDetail/ComplexDiscountDetail';
 import { findSpecialIdBySlug, getSpecialApi, getSpecialSlugsById } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getComplexDiscountSeoData, buildOpenGraphMetadata } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getComplexDiscountSeoData, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
 
 interface ComboDetailProps {
     params: Promise<{ lang: 'ua' | 'ru'; slug: string }>;
@@ -40,6 +40,15 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
     const discountImage = typeof special.image === 'string'
         ? special.image
         : special.image?.size2x || special.image?.size1x || (typeof special.banner === 'string' ? special.banner : special.banner?.size2x || special.banner?.size1x);
+
+    const isRu = lang === 'ru';
+    const breadcrumbs = [
+        { label: isRu ? 'Главная' : 'Головна', href: '/' },
+        { label: isRu ? 'Комплексные скидки' : 'Комплексні знижки', href: '/complex-discounts' },
+        { label: discountTitle },
+    ];
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
         title: titleConfig,

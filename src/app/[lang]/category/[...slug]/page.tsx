@@ -19,7 +19,7 @@ import {
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams, parseRawProductionParam } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
 
 interface DynamicCategoryPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
@@ -95,6 +95,13 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
         const canonicalUrl = pageNum > 1 ? alternates.canonical : (seoData.canonical || alternates.canonical);
         const isPageNoindex = pageNum > 1 || Boolean(seoData.noindex);
         const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
+
+        const breadcrumbItems = buildCategoryBreadcrumbs(categoryEntry.node.id, categoryIndex);
+        if (breadcrumbItems.length > 1) {
+            breadcrumbItems[breadcrumbItems.length - 1] = { label: categoryName };
+        }
+        const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbItems, lang, canonicalUrl, dynamicBaseUrl);
+        setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
         return {
             title: finalTitle,
