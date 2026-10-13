@@ -128,9 +128,13 @@
 
 .headerRow {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   width: 100%;
+
+  @media (min-width: 768px) {
+    align-items: flex-end;
+  }
 }
 
 .itemNameWrapper {
@@ -184,13 +188,13 @@
 }
 
 .leader {
-  flex: 1 1 auto;
-  min-width: 24px;
-  border-bottom: 1px dotted #B0B0B0;
-  height: 1px;
-  margin: 0 8px 4px 8px;
+  width: 40px;
 
-  @media (min-width: 1024px) {
+  @media (min-width: 768px) {
+    flex: 1 1 auto;
+    min-width: 24px;
+    border-bottom: 1px dotted #B0B0B0;
+    height: 1px;
     margin-bottom: 5px;
   }
 }
