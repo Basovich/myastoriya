@@ -87,59 +87,6 @@ export const getRestaurantMenuApi = async (
   );
 };
 
-export interface ShopCustomMenuProduct {
-  id: string;
-  name: string;
-  volume: string | null;
-  price: number;
-}
-
-export interface ShopCustomMenuCategory {
-  id: string;
-  name: string;
-  subtitle: string | null;
-  volume: string | null;
-  products: ShopCustomMenuProduct[];
-}
-
-export interface ShopCustomMenuResponse {
-  shopCustomMenu: ShopCustomMenuCategory[];
-}
-
-export const SHOP_CUSTOM_MENU_QUERY = `
-  query ShopCustomMenu($shopSlug: String, $shopId: Int) {
-    shopCustomMenu(shopSlug: $shopSlug, shopId: $shopId) {
-      id
-      name
-      subtitle
-      volume
-      products {
-        id
-        name
-        volume
-        price
-      }
-    }
-  }
-`;
-
-export const getShopCustomMenuApi = async (
-  shopIdentifier: string | number | { shopSlug?: string; shopId?: number },
-  lang: string = "ua"
-): Promise<ShopCustomMenuResponse> => {
-  const variables = typeof shopIdentifier === "object"
-    ? shopIdentifier
-    : typeof shopIdentifier === "string"
-      ? { shopSlug: shopIdentifier }
-      : { shopId: shopIdentifier };
-
-  return await gqlRequest<ShopCustomMenuResponse>(
-    SHOP_CUSTOM_MENU_QUERY,
-    variables,
-    { lang, next: { revalidate: 300 } }
-  );
-};
-
 export interface ElectronicMenuProduct {
   id: string;
   name: string;
@@ -153,6 +100,7 @@ export interface ElectronicMenuCategory {
   subtitle: string | null;
   volume: string | null;
   products: ElectronicMenuProduct[];
+  children?: ElectronicMenuCategory[];
 }
 
 export interface StoreFullMenuResponse {
@@ -161,7 +109,6 @@ export interface StoreFullMenuResponse {
     id: string;
     electronicMenu: ElectronicMenuCategory[] | null;
   } | null;
-  shopCustomMenu: ShopCustomMenuCategory[] | null;
 }
 
 export const STORE_FULL_MENU_QUERY = `
@@ -201,18 +148,18 @@ export const STORE_FULL_MENU_QUERY = `
           volume
           price
         }
-      }
-    }
-    shopCustomMenu(shopSlug: $shopSlug) {
-      id
-      name
-      subtitle
-      volume
-      products {
-        id
-        name
-        volume
-        price
+        children {
+          id
+          name
+          subtitle
+          volume
+          products {
+            id
+            name
+            volume
+            price
+          }
+        }
       }
     }
   }
@@ -228,5 +175,6 @@ export const getStoreFullMenuApi = async (
     { lang, next: { revalidate: 300 } }
   );
 };
+
 
 

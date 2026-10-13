@@ -34,14 +34,19 @@
   margin-bottom: 20px;
 }
 
+.headerWrapContainer {
+  margin-bottom: 30px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 32px;
+  align-items: start;
   
   @media (min-width: 1024px) {
     grid-template-columns: 1fr 1fr;
-    gap: 80px;
+    gap: 40px 80px;
   }
 }
 
@@ -50,10 +55,40 @@
   flex-direction: column;
 }
 
+.categorySubheader {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.04em;
+}
+
+.subTitle {
+  color: var(--color-text-primary);
+}
+
+.subVolume {
+  color: var(--color-text-primary);
+}
+
+.subText {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.subheaderSlash {
+  color: var(--color-accent);
+  font-weight: 900;
+}
+
 .list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .item {
@@ -69,73 +104,34 @@
   width: 100%;
 }
 
-.leader {
-  flex: 1 1 auto;
-  border-bottom: 1px dotted #cccccc;
-  height: 1px;
-  margin-bottom: 4px;
-}
-
-.description {
-  font-size: 12px;
-  color: #777777;
-  margin: 4px 0 0 0;
-}
-
-.headerWrapContainer {
-  margin-bottom: 30px;
-}
-
-.categorySubheader {
-  font-size: 14px;
-  font-weight: 800;
-  color: #000000;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  letter-spacing: 0.05em;
-}
-
-.subheaderSlash {
-  color: #E30613;
-  font-weight: 900;
-}
-
-.subText {
-  color: #000000;
-}
-
 .itemNameWrapper {
   display: flex;
   align-items: baseline;
   flex: 0 1 auto;
   min-width: 0;
+  flex-wrap: wrap;
+  gap: 2px;
 }
 
 .itemName {
   font-size: 14px;
   font-weight: 800;
-  color: #000000;
+  color: var(--color-text-primary);
   text-transform: uppercase;
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 0 1 auto;
+  line-height: 1.3;
 }
 
 .slash {
-  color: #E30613;
-  margin: 0 6px;
+  color: var(--color-accent);
+  margin: 0 4px;
   font-weight: 800;
   font-size: 14px;
   flex: 0 0 auto;
 }
 
 .productVolume {
-  color: #555555;
+  color: var(--color-text-secondary);
   font-weight: 500;
   font-size: 13px;
   text-transform: none;
@@ -143,10 +139,18 @@
   white-space: nowrap;
 }
 
+.leader {
+  flex: 1 1 auto;
+  min-width: 16px;
+  border-bottom: 1px dotted var(--color-text-muted);
+  height: 1px;
+  margin-bottom: 4px;
+}
+
 .price {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
-  color: #000000;
+  color: var(--color-text-primary);
   white-space: nowrap;
   flex: 0 0 auto;
 }

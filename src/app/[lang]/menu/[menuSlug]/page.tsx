@@ -105,12 +105,11 @@ export default async function MenuPage({
 
         const fullMenuData = await getStoreFullMenuApi(apiSlug, lang).catch((error) => {
             console.error("Failed to fetch full store menu:", error);
-            return { restaurantMenu: [], shop: null, shopCustomMenu: [] };
+            return { restaurantMenu: [], shop: null };
         });
 
         const initialMenu = fullMenuData?.restaurantMenu || [];
         const electronicMenu = fullMenuData?.shop?.electronicMenu || [];
-        const initialCustomMenu = fullMenuData?.shopCustomMenu || [];
 
         const alternates = getHreflangAlternates(`/menu/${menuSlug}/`, lang, getDynamicBaseUrl(await headers()));
 
@@ -123,7 +122,6 @@ export default async function MenuPage({
                     dict={dict}
                     initialMenu={initialMenu}
                     electronicMenu={electronicMenu}
-                    initialCustomMenu={initialCustomMenu}
                 />
             </>
         );

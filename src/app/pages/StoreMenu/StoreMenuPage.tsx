@@ -12,7 +12,7 @@ import StoreMenuHero from '@/app/components/StoreMenu/StoreMenuHero/StoreMenuHer
 import PromotionsSlider from '@/app/components/StoreMenu/PromotionsSlider/PromotionsSlider';
 import StoreMenuTabular from '@/app/components/StoreMenu/StoreMenuTabular/StoreMenuTabular';
 import { Shop } from '@/lib/graphql/queries/shops';
-import { RestaurantMenuCategory, ShopCustomMenuCategory, ElectronicMenuCategory } from '@/lib/graphql/queries/pages/restaurantMenu';
+import { RestaurantMenuCategory, ElectronicMenuCategory } from '@/lib/graphql/queries/pages/restaurantMenu';
 import clsx from "clsx";
 
 interface StoreMenuPageProps {
@@ -21,7 +21,6 @@ interface StoreMenuPageProps {
     dict: Dictionary;
     initialMenu?: RestaurantMenuCategory[];
     electronicMenu?: ElectronicMenuCategory[];
-    initialCustomMenu?: ShopCustomMenuCategory[];
 }
 
 const getCategoryImage = (cat: RestaurantMenuCategory): string => {
@@ -49,29 +48,9 @@ const getCategoryImage = (cat: RestaurantMenuCategory): string => {
     return "/images/cat-restaurant.png";
 };
 
-const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, initialMenu = [], electronicMenu = [], initialCustomMenu = [] }) => {
-    const mappedElectronicCategories: RestaurantMenuCategory[] = (electronicMenu || []).map(cat => ({
-        id: `electronic-${cat.id}`,
-        name: cat.name,
-        products: (cat.products || []).map(p => ({
-            id: p.id,
-            name: p.name,
-            cost: p.price,
-            oldCost: 0,
-            available: 1,
-            portionSize: p.volume || null,
-            text: cat.subtitle ? `${cat.subtitle}${cat.volume ? ` (${cat.volume})` : ''}` : (cat.volume || null),
-            images: null,
-            modifierGroups: [],
-            unit: null,
-            multiplier: null,
-        }))
-    }));
-
-    const combinedMenu = [...initialMenu, ...mappedElectronicCategories];
-
+const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, initialMenu = [], electronicMenu = [] }) => {
     // Filter out products that are not available (available === 0)
-    const foodCategories = combinedMenu
+    const foodCategories = (initialMenu || [])
         .map(cat => ({
             ...cat,
             products: cat.products.filter(p => p.available > 0)
@@ -171,8 +150,8 @@ const StoreMenuPage: React.FC<StoreMenuPageProps> = ({ shop, lang, initialMenu =
                 </div>
 
                 {/* Tabular menu section for wines and drinks */}
-                {isClient && visibleCategoriesCount === foodCategories.length && (
-                    <StoreMenuTabular customMenu={initialCustomMenu} />
+                {(!isClient || visibleCategoriesCount === foodCategories.length) && (
+                    <StoreMenuTabular electronicMenu={electronicMenu} />
                 )}
             </main>
         </>

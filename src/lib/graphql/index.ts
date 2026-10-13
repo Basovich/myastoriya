@@ -223,16 +223,17 @@ export type {
 } from './queries/pages/loyalty';
 
 // Re-export restaurant menu
-export { getRestaurantMenuApi, getShopCustomMenuApi } from './queries/pages/restaurantMenu';
+export { getRestaurantMenuApi, getStoreFullMenuApi } from './queries/pages/restaurantMenu';
 export type {
     RestaurantProduct,
     RestaurantMenuCategory,
     RestaurantMenuResponse,
     ModifierGroup,
     Modifier,
-    ShopCustomMenuCategory,
-    ShopCustomMenuProduct,
-    ShopCustomMenuResponse,
-} from './queries/pages/restaurantMenu';// Re-export SEO
+    ElectronicMenuCategory,
+    ElectronicMenuProduct,
+    StoreFullMenuResponse,
+} from './queries/pages/restaurantMenu';
+// Re-export SEO
 export { SEO_BY_URL_QUERY, getSeoByUrlApi } from './queries/seo';
 export type { PageSeo, SeoByUrlResponse } from './queries/seo';
