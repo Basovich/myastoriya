@@ -30,11 +30,13 @@ export async function generateMetadata({ params }: MenuPageProps): Promise<Metad
         if (!shopResponse?.shop) {
             shopResponse = await getShopBySlugApi(`myastoriya-${menuSlug}`, lang).catch(() => null);
         }
-        const shopName = shopResponse?.shop?.name || "";
+        const shop = shopResponse?.shop;
 
-        if (!shopName) {
+        if (!shop || !shop.isCompanyStore) {
             return {};
         }
+
+        const shopName = shop.name || "";
 
         const alternates = getHreflangAlternates(`/menu/${menuSlug}/`, lang, dynamicBaseUrl);
 
@@ -97,7 +99,7 @@ export default async function MenuPage({
         }
         const shop = shopResponse?.shop;
 
-        if (!shop) {
+        if (!shop || !shop.isCompanyStore) {
             notFound();
         }
 
