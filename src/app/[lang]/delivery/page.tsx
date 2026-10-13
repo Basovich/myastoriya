@@ -6,6 +6,7 @@ import { getPolicyBlocksApi, getDeliveryBlocksApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 import * as Sentry from "@sentry/nextjs";
 
 interface DeliveryPageProps {
@@ -36,10 +37,6 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
     title,
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
-    alternates: {
-      canonical: canonicalUrl,
-      languages: alternates.languages,
-    },
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
       description: seo.description,
@@ -61,6 +58,8 @@ export default async function DeliveryAndPayment({
 }: DeliveryPageProps) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
+  const alternates = getHreflangAlternates("/delivery/", lang, getDynamicBaseUrl(await headers()));
+  const seo = await fetchSeoMetadataByUrl(`/${lang}/delivery/`, lang, getStaticPageSeoData("delivery", lang));
   
   let shopsResponse;
   let policyBlocks;
@@ -79,12 +78,15 @@ export default async function DeliveryAndPayment({
   }
 
   return (
-    <DeliveryAndPaymentPage 
-      lang={lang} 
-      dict={dict} 
-      initialShops={shopsResponse.shops.data} 
-      policyBlocks={policyBlocks}
-      deliveryBlocks={deliveryBlocks}
-    />
+    <>
+      <HreflangLinks canonical={seo.canonical || alternates.canonical} languages={alternates.languages} />
+      <DeliveryAndPaymentPage 
+        lang={lang} 
+        dict={dict} 
+        initialShops={shopsResponse.shops.data} 
+        policyBlocks={policyBlocks}
+        deliveryBlocks={deliveryBlocks}
+      />
+    </>
   );
 }

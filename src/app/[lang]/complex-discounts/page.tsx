@@ -4,6 +4,7 @@ import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSpecialsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
 import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
     params,
@@ -39,10 +40,6 @@ export async function generateMetadata({
         title,
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
-        alternates: {
-            canonical: alternates.canonical,
-            languages: alternates.languages,
-        },
         openGraph: buildOpenGraphMetadata({
             title: formattedTitleStr,
             description: seo.description,
@@ -98,9 +95,11 @@ export default async function ComplexDiscountsPage({
     });
 
     const totalPages = specialsResponse?.has_more_pages ? page + 1 : page;
+    const alternates = getHreflangAlternates('/complex-discounts/', lang, getDynamicBaseUrl(await headers()), page);
 
     return (
         <main>
+            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
             <ActionsGrid
                 initialItems={initialItems}
                 lang={lang}

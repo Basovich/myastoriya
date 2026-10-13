@@ -5,6 +5,7 @@ import { getContactsCategoriesApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 interface ContactsPageProps {
   params: Promise<{ lang: Locale }>;
@@ -34,10 +35,6 @@ export async function generateMetadata({ params }: ContactsPageProps): Promise<M
     title,
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
-    alternates: {
-      canonical: canonicalUrl,
-      languages: alternates.languages,
-    },
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
       description: seo.description,
@@ -59,16 +56,21 @@ export default async function Contacts({
 }: ContactsPageProps) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
+  const alternates = getHreflangAlternates("/contacts/", lang, getDynamicBaseUrl(await headers()));
+  const seo = await fetchSeoMetadataByUrl(`/${lang}/contacts/`, lang, getStaticPageSeoData("contacts", lang));
   
   // Fetch contact categories and nested contacts from API
   const response = await getContactsCategoriesApi(lang).catch(() => ({ contactCategories: [] }));
   const categories = response?.contactCategories || [];
 
   return (
-    <ContactsPage 
-      lang={lang} 
-      dict={dict} 
-      categories={categories} 
-    />
+    <>
+      <HreflangLinks canonical={seo.canonical || alternates.canonical} languages={alternates.languages} />
+      <ContactsPage 
+        lang={lang} 
+        dict={dict} 
+        categories={categories} 
+      />
+    </>
   );
 }

@@ -3,6 +3,7 @@ import { Locale } from "@/i18n/config";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getDefaultSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 interface SearchPageProps {
     params: Promise<{ lang: Locale }>;
@@ -34,10 +35,6 @@ export async function generateMetadata({ params }: SearchPageProps): Promise<Met
             index: false,
             follow: true,
         },
-        alternates: {
-            canonical: alternates.canonical,
-            languages: alternates.languages,
-        },
         openGraph: buildOpenGraphMetadata({
             title: seo.title,
             description: seo.description,
@@ -54,6 +51,14 @@ export async function generateMetadata({ params }: SearchPageProps): Promise<Met
     };
 }
 
-export default async function SearchPage() {
-    return <Search />;
+export default async function SearchPage({ params }: SearchPageProps) {
+    const { lang } = await params;
+    const alternates = getHreflangAlternates("/search/", lang, getDynamicBaseUrl(await headers()));
+
+    return (
+        <>
+            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+            <Search />
+        </>
+    );
 }

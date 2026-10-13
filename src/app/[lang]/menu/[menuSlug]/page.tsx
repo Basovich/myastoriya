@@ -7,6 +7,7 @@ import { getApiSlugFromMenu } from "@/config/menuSlugMap";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -57,10 +58,6 @@ export async function generateMetadata({ params }: MenuPageProps): Promise<Metad
             robots: {
                 index: false,
                 follow: false,
-            },
-            alternates: {
-                canonical: alternates.canonical,
-                languages: alternates.languages,
             },
             openGraph: buildOpenGraphMetadata({
                 title,
@@ -113,15 +110,20 @@ export default async function MenuPage({
         const electronicMenu = fullMenuData?.shop?.electronicMenu || [];
         const initialCustomMenu = fullMenuData?.shopCustomMenu || [];
 
+        const alternates = getHreflangAlternates(`/menu/${menuSlug}/`, lang, getDynamicBaseUrl(await headers()));
+
         return (
-            <StoreMenuPage
-                shop={shop}
-                lang={lang}
-                dict={dict}
-                initialMenu={initialMenu}
-                electronicMenu={electronicMenu}
-                initialCustomMenu={initialCustomMenu}
-            />
+            <>
+                <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+                <StoreMenuPage
+                    shop={shop}
+                    lang={lang}
+                    dict={dict}
+                    initialMenu={initialMenu}
+                    electronicMenu={electronicMenu}
+                    initialCustomMenu={initialCustomMenu}
+                />
+            </>
         );
     } catch (error) {
         console.error("Failed to fetch shop for menu:", error);

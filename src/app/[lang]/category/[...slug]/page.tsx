@@ -19,7 +19,8 @@ import {
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams, parseRawProductionParam } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig, resolvePageHreflangLinks } from '@/utils/seo';
+import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
 interface DynamicCategoryPageProps {
     params: Promise<{ lang: string; slug: string[] }>;
@@ -107,10 +108,6 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
             title: formatTitleConfig(finalTitle, lang),
             description: seoData.description,
             ...(pageRobots && { robots: pageRobots }),
-            alternates: {
-                canonical: canonicalUrl,
-                languages: alternates.languages,
-            },
             openGraph: buildOpenGraphMetadata({
                 title: finalTitle,
                 description: seoData.description,
@@ -273,8 +270,17 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
             href: getCategoryHref(sub),
         }));
 
+        const hreflangLinks = await resolvePageHreflangLinks(
+            `/category/${slug.join('/')}/`,
+            lang,
+            { title: '', description: '', h1: '' },
+            getDynamicBaseUrl(await headers()),
+            parsePageNum(resolvedSearchParams?.page),
+        );
+
         return (
             <main>
+                <HreflangLinks canonical={hreflangLinks.canonical} languages={hreflangLinks.languages} />
                 <CatalogContent
                     lang={lang as Locale}
                     dict={dict}

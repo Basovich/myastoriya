@@ -9,7 +9,8 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { getAccessToken } from '@/app/actions/authActions';
 
-import { getHreflangAlternates, getDynamicBaseUrl, getStaticPageSeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, getStaticPageSeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, resolvePageHreflangLinks } from '@/utils/seo';
+import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
 interface CatalogPageProps {
     params: Promise<{ lang: string }>;
@@ -48,10 +49,6 @@ export async function generateMetadata({ params, searchParams }: CatalogPageProp
         title,
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
-        alternates: {
-            canonical: canonicalUrl,
-            languages: alternates.languages,
-        },
         openGraph: buildOpenGraphMetadata({
             title: formattedTitleStr,
             description: seo.description,
@@ -128,8 +125,11 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
         { label: pageTitle },
     ];
 
+    const hreflangLinks = await resolvePageHreflangLinks('/catalog/', lang, getStaticPageSeoData('catalog', lang), getDynamicBaseUrl(await headers()), parsePageNum(resolvedSearchParams?.page));
+
     return (
         <main>
+            <HreflangLinks canonical={hreflangLinks.canonical} languages={hreflangLinks.languages} />
             <CatalogContent
                 lang={lang as Locale}
                 dict={dict}

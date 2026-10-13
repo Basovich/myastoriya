@@ -5,6 +5,7 @@ import { PolicyPageContentItem } from "@/i18n/types";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 interface PrivacyPolicyPageProps {
   params: Promise<{ lang: Locale }>;
@@ -36,10 +37,6 @@ export async function generateMetadata({ params }: PrivacyPolicyPageProps): Prom
   return {
     title,
     description: seo.description,
-    alternates: {
-      canonical: alternates.canonical,
-      languages: alternates.languages,
-    },
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
       description: seo.description,
@@ -79,11 +76,16 @@ export default async function Privacy({
     ? [{ type: 'html', value: webContent }]
     : [];
 
+  const alternates = getHreflangAlternates("/privacy-policy/", lang, getDynamicBaseUrl(await headers()));
+
   return (
-    <PolicyPage 
-      lang={lang} 
-      breadcrumbs={breadcrumbs}
-      content={content}
-    />
+    <>
+      <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+      <PolicyPage 
+        lang={lang} 
+        breadcrumbs={breadcrumbs}
+        content={content}
+      />
+    </>
   );
 }

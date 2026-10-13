@@ -11,6 +11,7 @@ import {
 } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
 import { getExplicitHreflangAlternates, getDynamicBaseUrl, getActionSeoData, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
+import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
 interface ActionDetailPageProps {
     params: Promise<{ lang: 'ua' | 'ru'; slug: string }>;
@@ -60,10 +61,6 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
     return {
         title: titleConfig,
         description: seoData.description,
-        alternates: {
-            canonical: alternates.canonical,
-            languages: alternates.languages,
-        },
         openGraph: buildOpenGraphMetadata({
             title: actionTitle,
             description: seoData.description,
@@ -120,8 +117,16 @@ export default async function ActionDetailPage({ params }: ActionDetailPageProps
         return notFound();
     }
 
+    const saleSlugs = await getSaleSlugsById(saleId);
+    const alternates = getExplicitHreflangAlternates(
+        { uk: `/actions/${saleSlugs.uk}/`, ru: `/actions/${saleSlugs.ru}/` },
+        lang,
+        getDynamicBaseUrl(await headers()),
+    );
+
     return (
         <main>
+            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
             <ActionDetail
                 lang={lang}
                 id={slug}

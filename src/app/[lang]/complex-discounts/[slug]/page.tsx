@@ -5,6 +5,7 @@ import ComplexDiscountDetail from '../../../components/ComplexDiscountDetail/Com
 import { findSpecialIdBySlug, getSpecialApi, getSpecialSlugsById } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
 import { getExplicitHreflangAlternates, getDynamicBaseUrl, getComplexDiscountSeoData, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
+import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
 interface ComboDetailProps {
     params: Promise<{ lang: 'ua' | 'ru'; slug: string }>;
@@ -53,10 +54,6 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
     return {
         title: titleConfig,
         description: seoData.description,
-        alternates: {
-            canonical: alternates.canonical,
-            languages: alternates.languages,
-        },
         openGraph: buildOpenGraphMetadata({
             title: discountTitle,
             description: seoData.description,
@@ -133,8 +130,16 @@ export default async function ComboDetail({ params }: ComboDetailProps) {
         redirect(`/${lang}/complex-discounts`);
     }
 
+    const specialSlugs = await getSpecialSlugsById(String(special.id ?? finalId));
+    const alternates = getExplicitHreflangAlternates(
+        { uk: `/complex-discounts/${specialSlugs.uk}/`, ru: `/complex-discounts/${specialSlugs.ru}/` },
+        lang,
+        getDynamicBaseUrl(await headers()),
+    );
+
     return (
         <main>
+            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
             <ComplexDiscountDetail lang={lang} initialData={special} />
         </main>
     );

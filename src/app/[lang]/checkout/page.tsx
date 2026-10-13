@@ -3,6 +3,7 @@ import CheckoutPage from "@/app/pages/Checkout/CheckoutPage";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getDefaultSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 interface CheckoutProps {
     params: Promise<{ lang: Locale }>;
@@ -27,10 +28,6 @@ export async function generateMetadata({ params }: CheckoutProps): Promise<Metad
             index: false,
             follow: true,
         },
-        alternates: {
-            canonical: alternates.canonical,
-            languages: alternates.languages,
-        },
         openGraph: buildOpenGraphMetadata({
             title: seo.title,
             description: seo.description,
@@ -52,5 +49,12 @@ export default async function Checkout({
 }: CheckoutProps) {
     const { lang } = await params;
 
-    return <CheckoutPage lang={lang} />;
+    const alternates = getHreflangAlternates("/checkout/", lang, getDynamicBaseUrl(await headers()));
+
+    return (
+        <>
+            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+            <CheckoutPage lang={lang} />
+        </>
+    );
 }

@@ -3,6 +3,7 @@ import ThanksPage from "@/app/pages/Thanks";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getDefaultSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 interface ThanksProps {
     params: Promise<{ lang: Locale }>;
@@ -27,10 +28,6 @@ export async function generateMetadata({ params }: ThanksProps): Promise<Metadat
         robots: {
             index: false,
             follow: true,
-        },
-        alternates: {
-            canonical: alternates.canonical,
-            languages: alternates.languages,
         },
         openGraph: buildOpenGraphMetadata({
             title: seo.title,
@@ -57,11 +54,16 @@ export default async function Thanks({
 
     const isOnlinePayment = isOnline === 'true' || payment === 'online' || Boolean(status);
 
+    const alternates = getHreflangAlternates("/thanks/", lang, getDynamicBaseUrl(await headers()));
+
     return (
-        <ThanksPage 
-            lang={lang} 
-            orderId={typeof orderId === 'string' ? orderId : undefined}
-            isOnline={isOnlinePayment}
-        />
+        <>
+            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+            <ThanksPage 
+                lang={lang} 
+                orderId={typeof orderId === 'string' ? orderId : undefined}
+                isOnline={isOnlinePayment}
+            />
+        </>
     );
 }

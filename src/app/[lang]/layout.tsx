@@ -82,10 +82,6 @@ export async function generateMetadata({
     },
     description: siteData.seo.description,
     metadataBase: new URL(siteData.url),
-    alternates: {
-      canonical: alternates.canonical,
-      languages: alternates.languages,
-    },
     openGraph: buildOpenGraphMetadata({
       title: siteData.seo.title,
       description: siteData.seo.description,

@@ -5,6 +5,7 @@ import { getCareerApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 interface CareersPageProps {
   params: Promise<{ lang: Locale }>;
@@ -30,10 +31,6 @@ export async function generateMetadata({ params }: CareersPageProps): Promise<Me
   return {
     title,
     description: seo.description,
-    alternates: {
-      canonical: alternates.canonical,
-      languages: alternates.languages,
-    },
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
       description: seo.description,
@@ -57,5 +54,12 @@ export default async function Careers({
   const dict = await getDictionary(lang);
   const careerData = await getCareerApi(lang);
 
-  return <CareersPage lang={lang} dict={dict} careerData={careerData} />;
+  const alternates = getHreflangAlternates("/careers/", lang, getDynamicBaseUrl(await headers()));
+
+  return (
+    <>
+      <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+      <CareersPage lang={lang} dict={dict} careerData={careerData} />
+    </>
+  );
 }

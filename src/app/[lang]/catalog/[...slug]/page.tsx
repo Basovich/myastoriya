@@ -41,10 +41,6 @@ export async function generateMetadata({ params }: DynamicCatalogPageProps): Pro
         return {
             title: categoryName,
             description,
-            alternates: {
-                canonical: alternates.canonical,
-                languages: alternates.languages,
-            },
             openGraph: buildOpenGraphMetadata({
                 title: categoryName,
                 description,

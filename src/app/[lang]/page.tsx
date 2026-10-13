@@ -11,6 +11,7 @@ import { buildCategoryIndex, getCategoryHref } from "@/utils/category-url";
 import { getAccessToken } from "@/app/actions/authActions";
 import { headers } from "next/headers";
 import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
   params,
@@ -30,10 +31,6 @@ export async function generateMetadata({
     title: { absolute: seo.title },
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
-    alternates: {
-      canonical: canonicalUrl,
-      languages: alternates.languages,
-    },
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
       description: seo.description,
@@ -56,6 +53,10 @@ export default async function Home({
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
+  const headersList = await headers();
+  const alternates = getHreflangAlternates('/', lang, getDynamicBaseUrl(headersList));
+  const seo = await fetchSeoMetadataByUrl(`/${lang}/`, lang, getStaticPageSeoData('home', lang));
+  const canonicalUrl = seo.canonical || alternates.canonical;
 
   const token = await getAccessToken();
 
@@ -125,6 +126,8 @@ export default async function Home({
   });
 
   return (
+    <>
+      <HreflangLinks canonical={canonicalUrl} languages={alternates.languages} />
       <HomePage
           lang={lang}
           dict={dict}
@@ -141,5 +144,6 @@ export default async function Home({
           allShowcaseProducts={allShowcaseProducts}
           allShowcaseHasMore={allShowcaseHasMore}
       />
+    </>
   );
 }

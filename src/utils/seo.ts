@@ -1,5 +1,9 @@
+import { cache } from "react";
 import { siteData } from "@/config/site";
 import { getSeoByUrlApi } from "@/lib/graphql";
+
+// Dedupes seoByUrl within a single request (generateMetadata + page render both need it)
+const getSeoByUrlCached = cache((url: string, lang: string) => getSeoByUrlApi(url, lang));
 
 const requestJsonLdMap = new Map<string, object[]>();
 
@@ -396,6 +400,27 @@ export function getExplicitHreflangAlternates(
             uk: ukUrl,
             ru: ruUrl,
         },
+    };
+}
+
+/**
+ * Resolves canonical + hreflang links for a static page rendered via <HreflangLinks />.
+ * Canonical from seoByUrl (API) takes priority, except pagination pages (page >= 2).
+ * @param path Relative path without locale, e.g. '/contacts/'
+ */
+export async function resolvePageHreflangLinks(
+    path: string,
+    lang: string,
+    fallbackSeo: ResolvedSeoData,
+    dynamicBaseUrl?: string,
+    pageNum?: number
+): Promise<HreflangAlternates> {
+    const alternates = getHreflangAlternates(path, lang, dynamicBaseUrl, pageNum);
+    if (parsePageNum(pageNum) > 1) return alternates;
+    const seo = await fetchSeoMetadataByUrl(`/${lang}${path}`, lang, fallbackSeo);
+    return {
+        canonical: seo.canonical || alternates.canonical,
+        languages: alternates.languages,
     };
 }
 
@@ -833,7 +858,7 @@ export async function fetchSeoMetadataByUrl(
     lang: string = 'ua',
     fallback: ResolvedSeoData
 ): Promise<ResolvedSeoData> {
-    const apiSeo = await getSeoByUrlApi(url, lang);
+    const apiSeo = await getSeoByUrlCached(url, lang);
     if (!apiSeo || (!apiSeo.title && !apiSeo.description)) {
         return fallback;
     }

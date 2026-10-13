@@ -7,6 +7,7 @@ import { getShopBySlugApi, type Shop } from "@/lib/graphql/queries/shops";
 import { resolveStoreBackendSlug, getLegacyStoreRedirectSlug } from "@/utils/store-url";
 import { headers } from "next/headers";
 import { getStoreSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
     params,
@@ -49,10 +50,6 @@ export async function generateMetadata({
     return {
         title: titleConfig,
         description: seoData.description,
-        alternates: {
-            canonical: alternates.canonical,
-            languages: alternates.languages,
-        },
         openGraph: buildOpenGraphMetadata({
             title: seoData.title,
             description: seoData.description,
@@ -100,12 +97,17 @@ export default async function StorePage({
         notFound();
     }
 
+    const alternates = getHreflangAlternates(`/our-stores/${slug}/`, lang, getDynamicBaseUrl(await headers()));
+
     return (
-        <StoreDetailPage 
-            shop={shop} 
-            lang={lang} 
-            dict={dict} 
-        />
+        <>
+            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+            <StoreDetailPage 
+                shop={shop} 
+                lang={lang} 
+                dict={dict} 
+            />
+        </>
     );
 }
 

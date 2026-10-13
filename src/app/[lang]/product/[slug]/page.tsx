@@ -6,6 +6,7 @@ import { Locale } from '@/i18n/config';
 import { getLocalizedHref } from '@/utils/i18n-helpers';
 import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, generateProductJsonLd, setRequestProductJsonLd, formatTitleConfig } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
+import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 import {
     getCatalogTreeApi,
     getProductsApi,
@@ -112,10 +113,6 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         title: titleConfig,
         description: seoData.description,
         ...('noindex' in seoData && seoData.noindex ? { robots: { index: false, follow: false } } : {}),
-        alternates: {
-            canonical: canonicalUrl,
-            languages: alternates.languages,
-        },
         openGraph: buildOpenGraphMetadata({
             title: seoData.title,
             description: seoData.description,
@@ -339,8 +336,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
     });
     const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
 
+    const productSlugs = await getProductSlugsById(productId).catch(() => ({ uk: slug, ru: slug }));
+    const alternates = getExplicitHreflangAlternates(
+        { uk: `/product/${productSlugs.uk}/`, ru: `/product/${productSlugs.ru}/` },
+        lang,
+        dynamicBaseUrl,
+    );
+    const fallbackSeo = getProductSeoData(product.name, product.cost, lang);
+    const seoData = await fetchSeoMetadataByUrl(`/${lang}/product/${slug}/`, lang, {
+        title: fallbackSeo.title,
+        description: fallbackSeo.description,
+        h1: product.name,
+    }).catch(() => null);
+    const hreflangCanonical = seoData?.canonical || alternates.canonical;
+
     return (
         <>
+            <HreflangLinks canonical={hreflangCanonical} languages={alternates.languages} />
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{

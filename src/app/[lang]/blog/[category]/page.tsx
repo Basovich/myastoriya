@@ -8,6 +8,7 @@ import { getAccessToken } from "@/app/actions/authActions";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export const dynamic = "force-dynamic";
 
@@ -52,10 +53,6 @@ export async function generateMetadata({ params, searchParams }: BlogCategoryPag
         title,
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
-        alternates: {
-            canonical: alternates.canonical,
-            languages: alternates.languages,
-        },
         openGraph: buildOpenGraphMetadata({
             title: formattedTitleStr,
             description: seo.description,
@@ -100,9 +97,11 @@ export default async function BlogCategoryPage({
         ]);
 
         const calculatedTotalPages = blogsResult.last_page || 1;
+        const alternates = getHreflangAlternates(`/blog/${category}/`, lang, getDynamicBaseUrl(await headers()), page);
 
         return (
             <main>
+                <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
                 <BlogGrid
                     dict={dict.home.blogPage}
                     initialItems={blogsResult.data}

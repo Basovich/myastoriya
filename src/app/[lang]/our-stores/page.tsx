@@ -5,6 +5,7 @@ import { Locale } from "@/i18n/config";
 import OurStoresPage from "@/app/pages/OurStores";
 import { getShopsApi } from "@/lib/graphql/queries/shops";
 import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
   params,
@@ -32,10 +33,6 @@ export async function generateMetadata({
     title: { absolute: seo.title },
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
-    alternates: {
-      canonical: canonicalUrl,
-      languages: alternates.languages,
-    },
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
       description: seo.description,
@@ -60,8 +57,13 @@ export default async function OurStores({
   const { lang } = await params;
   const dict = await getDictionary(lang);
   const shopsResponse = await getShopsApi({ limit: 100 }, lang);
+  const alternates = getHreflangAlternates('/our-stores/', lang, getDynamicBaseUrl(await headers()));
+  const seo = await fetchSeoMetadataByUrl(`/${lang}/our-stores/`, lang, getStaticPageSeoData('our-stores', lang));
 
   return (
-    <OurStoresPage lang={lang} dict={dict} initialShops={shopsResponse.shops.data} />
+    <>
+      <HreflangLinks canonical={seo.canonical || alternates.canonical} languages={alternates.languages} />
+      <OurStoresPage lang={lang} dict={dict} initialShops={shopsResponse.shops.data} />
+    </>
   );
 }

@@ -8,6 +8,7 @@ import { getBlogBySlugApi, resolveBlogImageUrl } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
 import { getBlogCategorySegment } from "@/utils/blog-url";
 import { getBlogSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
     params,
@@ -44,10 +45,6 @@ export async function generateMetadata({
     return {
         title: titleConfig,
         description: seoData.description,
-        alternates: {
-            canonical: alternates.canonical,
-            languages: alternates.languages,
-        },
         openGraph: buildOpenGraphMetadata({
             title: postTitle,
             description: seoData.description,
@@ -116,7 +113,12 @@ export default async function BlogSinglePostPage({
         relatedBlogs: validRelatedBlogs,
     };
 
+    const alternates = getHreflangAlternates(`/blog/${category}/${slug}/`, lang, getDynamicBaseUrl(await headers()));
+
     return (
-        <BlogPostPage dict={dict} post={cleanedPost} lang={lang} />
+        <>
+            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+            <BlogPostPage dict={dict} post={cleanedPost} lang={lang} />
+        </>
     );
 }

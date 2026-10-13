@@ -4,6 +4,7 @@ import ApplicantFormPage from "@/app/pages/ApplicantFormPage";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getDefaultSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 interface ApplyProps {
   params: Promise<{ lang: Locale }>;
@@ -36,10 +37,6 @@ export async function generateMetadata({ params }: ApplyProps): Promise<Metadata
       index: false,
       follow: true,
     },
-    alternates: {
-      canonical: alternates.canonical,
-      languages: alternates.languages,
-    },
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
       description: seo.description,
@@ -62,5 +59,12 @@ export default async function Apply({
   const { lang } = await params;
   const dict = await getDictionary(lang);
 
-  return <ApplicantFormPage lang={lang} dict={dict} />;
+  const alternates = getHreflangAlternates("/careers/apply/", lang, getDynamicBaseUrl(await headers()));
+
+  return (
+    <>
+      <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+      <ApplicantFormPage lang={lang} dict={dict} />
+    </>
+  );
 }
