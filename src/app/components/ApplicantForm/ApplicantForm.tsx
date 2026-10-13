@@ -85,12 +85,30 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
         ];
     }, [positions, dict]);
 
+    const KYIV_LOCALITY_ID = '2581';
+
+    const districtOptions = React.useMemo(() => {
+        const d = dict.options.districts;
+        return [
+            { label: d?.golosiivskyi || 'Голосіївський', value: 'Голосіївський' },
+            { label: d?.darnytskyi || 'Дарницький', value: 'Дарницький' },
+            { label: d?.desnianskyi || 'Деснянський', value: 'Деснянський' },
+            { label: d?.dniprovskyi || 'Дніпровський', value: 'Дніпровський' },
+            { label: d?.obolonskyi || 'Оболонський', value: 'Оболонський' },
+            { label: d?.pecherskyi || 'Печерський', value: 'Печерський' },
+            { label: d?.podilskyi || 'Подільський', value: 'Подільський' },
+            { label: d?.sviatoshynskyi || 'Святошинський', value: 'Святошинський' },
+            { label: d?.solomianskyi || "Солом'янський", value: "Солом'янський" },
+            { label: d?.shevchenkivskyi || 'Шевченківський', value: 'Шевченківський' },
+        ];
+    }, [dict]);
+
     const locationOptions = React.useMemo(() => {
         if (localities.length > 0) {
             return localities.map(loc => ({ label: loc.name, value: String(loc.id) }));
         }
         return [
-            { label: dict.options.kyiv || 'м. Київ', value: '2581' },
+            { label: dict.options.kyiv || 'м. Київ', value: KYIV_LOCALITY_ID },
         ];
     }, [localities, dict]);
 
@@ -103,6 +121,16 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
         desiredPosition: Yup.string().required(dict.errors.required),
         hasExperience: Yup.string().required(dict.errors.required),
         location: Yup.string().required(dict.errors.required),
+        district: Yup.string().when('location', {
+            is: (locVal: string) => {
+                if (!locVal) return false;
+                if (locVal === KYIV_LOCALITY_ID) return true;
+                const loc = localities.find(l => String(l.id) === locVal);
+                return loc ? loc.name.toLowerCase().includes('київ') : false;
+            },
+            then: (schema) => schema.required(dict.errors.required),
+            otherwise: (schema) => schema.notRequired(),
+        }),
         additionalInfo: Yup.string(),
         consent: Yup.boolean().oneOf([true], dict.errors.required),
     });
@@ -115,6 +143,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
             desiredPosition: '',
             hasExperience: '',
             location: '',
+            district: '',
             additionalInfo: '',
             consent: false,
         },
@@ -129,6 +158,10 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                 const parsedLocalityId = parseInt(values.location, 10);
                 const isNumericLocId = !isNaN(parsedLocalityId);
 
+                const isKyiv = values.location === KYIV_LOCALITY_ID || (
+                    localities.find(l => String(l.id) === values.location)?.name.toLowerCase().includes('київ') ?? false
+                );
+
                 const result = await submitCareerApplicationApi({
                     fullName: values.fullName,
                     dob: values.dob,
@@ -136,6 +169,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                     desiredPosition: matchedPosition ? matchedPosition.name : values.desiredPosition,
                     careerPositionId: isNumericPosId ? parsedPositionId : undefined,
                     localityId: isNumericLocId ? parsedLocalityId : undefined,
+                    district: isKyiv ? (values.district || undefined) : undefined,
                     hasExperience: values.hasExperience === 'yes',
                     experience: values.hasExperience === 'yes',
                     additionalInfo: values.additionalInfo || undefined,
@@ -175,6 +209,24 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
     });
 
     const currentLocation = formik.values.location;
+
+    const isKyivSelected = React.useMemo(() => {
+        if (!currentLocation) return false;
+        if (currentLocation === KYIV_LOCALITY_ID) return true;
+        const loc = localities.find(l => String(l.id) === currentLocation);
+        return loc ? loc.name.toLowerCase().includes('київ') : false;
+    }, [currentLocation, localities]);
+
+    const handleLocationChange = (val: string) => {
+        formik.setFieldValue('location', val);
+        const isKyiv = val === KYIV_LOCALITY_ID || (
+            localities.find(l => String(l.id) === val)?.name.toLowerCase().includes('київ') ?? false
+        );
+        if (!isKyiv) {
+            formik.setFieldValue('district', '');
+            formik.setFieldTouched('district', false);
+        }
+    };
 
     useEffect(() => {
         const fetchPositions = async () => {
@@ -314,7 +366,7 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                     <CustomSelect
                         value={formik.values.location}
                         options={locationOptions}
-                        onChange={(val) => formik.setFieldValue('location', val)}
+                        onChange={handleLocationChange}
                         onBlur={() => formik.setFieldTouched('location', true)}
                         placeholder={dict.options.chooseVariant}
                         error={Boolean(formik.touched.location && formik.errors.location)}
@@ -323,6 +375,24 @@ export default function ApplicantForm({ dict }: ApplicantFormProps) {
                         <span className={clsx(s.fieldError, s.fieldErrorSelect)}>{formik.errors.location}</span>
                     )}
                 </div>
+
+                {/* District (Only displayed if Kyiv is selected) */}
+                {isKyivSelected && (
+                    <div className={s.groupField}>
+                        <h3 className={s.groupTitle}>{dict.district}</h3>
+                        <CustomSelect
+                            value={formik.values.district}
+                            options={districtOptions}
+                            onChange={(val) => formik.setFieldValue('district', val)}
+                            onBlur={() => formik.setFieldTouched('district', true)}
+                            placeholder={dict.options.chooseDistrict || dict.options.chooseVariant}
+                            error={Boolean(formik.touched.district && formik.errors.district)}
+                        />
+                        {formik.touched.district && formik.errors.district && (
+                            <span className={clsx(s.fieldError, s.fieldErrorSelect)}>{formik.errors.district}</span>
+                        )}
+                    </div>
+                )}
 
                 {/* Additional Info */}
                 <TextareaField

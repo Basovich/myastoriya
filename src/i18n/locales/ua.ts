@@ -491,17 +491,31 @@ export const ua =
                 "desiredPosition": "Бажана посада:",
                 "hasExperience": "Чи маєте досвід роботи на бажаній посаді?",
                 "location": "Оберіть місце роботи:",
+                "district": "Оберіть район:",
                 "additionalInfo": "Додаткова інформація:",
                 "consent": "Я надаю згоду на обробку своїх персональних даних",
                 "submitText": "Відправити",
                 "options": {
                     "chooseVariant": "Обрати варіант",
+                    "chooseDistrict": "Обрати район",
                     "yes": "Так",
                     "no": "Ні",
                     "kyiv": "Київ",
                     "manager": "Менеджер",
                     "cook": "Кухар",
-                    "cashier": "Касир"
+                    "cashier": "Касир",
+                    "districts": {
+                        "golosiivskyi": "Голосіївський",
+                        "darnytskyi": "Дарницький",
+                        "desnianskyi": "Деснянський",
+                        "dniprovskyi": "Дніпровський",
+                        "obolonskyi": "Оболонський",
+                        "pecherskyi": "Печерський",
+                        "podilskyi": "Подільський",
+                        "sviatoshynskyi": "Святошинський",
+                        "solomianskyi": "Солом'янський",
+                        "shevchenkivskyi": "Шевченківський"
+                    }
                 },
                 "errors": {
                     "required": "Обов'язкове поле",

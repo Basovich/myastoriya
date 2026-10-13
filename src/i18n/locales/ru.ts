@@ -491,17 +491,31 @@ export const ru =
                 "desiredPosition": "Желаемая должность:",
                 "hasExperience": "Есть ли опыт работы на желаемой должности?",
                 "location": "Выберите место работы:",
+                "district": "Выберите район:",
                 "additionalInfo": "Дополнительная информация:",
                 "consent": "Я даю согласие на обработку своих персональных данных",
                 "submitText": "Отправить",
                 "options": {
                     "chooseVariant": "Выбрать вариант",
+                    "chooseDistrict": "Выбрать район",
                     "yes": "Да",
                     "no": "Нет",
                     "kyiv": "Киев",
                     "manager": "Менеджер",
                     "cook": "Повар",
-                    "cashier": "Кассир"
+                    "cashier": "Кассир",
+                    "districts": {
+                        "golosiivskyi": "Голосеевский",
+                        "darnytskyi": "Дарницкий",
+                        "desnianskyi": "Деснянский",
+                        "dniprovskyi": "Днепровский",
+                        "obolonskyi": "Оболонский",
+                        "pecherskyi": "Печерский",
+                        "podilskyi": "Подольский",
+                        "sviatoshynskyi": "Святошинский",
+                        "solomianskyi": "Соломенский",
+                        "shevchenkivskyi": "Шевченковский"
+                    }
                 },
                 "errors": {
                     "required": "Обязательное поле",

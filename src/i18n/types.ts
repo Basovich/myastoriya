@@ -186,17 +186,31 @@ export interface ApplicantFormPageDict {
     desiredPosition: string;
     hasExperience: string;
     location: string;
+    district: string;
     additionalInfo: string;
     consent: string;
     submitText: string;
     options: {
       chooseVariant: string;
+      chooseDistrict: string;
       yes: string;
       no: string;
       kyiv: string;
       manager: string;
       cook: string;
       cashier: string;
+      districts: {
+        golosiivskyi: string;
+        darnytskyi: string;
+        desnianskyi: string;
+        dniprovskyi: string;
+        obolonskyi: string;
+        pecherskyi: string;
+        podilskyi: string;
+        sviatoshynskyi: string;
+        solomianskyi: string;
+        shevchenkivskyi: string;
+      };
     };
     errors: {
       required: string;
