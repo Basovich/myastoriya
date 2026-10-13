@@ -52,8 +52,9 @@ export default function StoreMenuTabular({ electronicMenu = [] }: StoreMenuTabul
     if (validCategories.length === 0) return null;
 
     return (
-        <div className={s.container}>
-            {validCategories.map((category) => {
+        <div className={s.wrapper}>
+            <div className={s.container}>
+                {validCategories.map((category) => {
                 const hasChildren = Boolean(
                     category.children && category.children.some(c => c.products && c.products.length > 0)
                 );
@@ -167,6 +168,7 @@ export default function StoreMenuTabular({ electronicMenu = [] }: StoreMenuTabul
                     </section>
                 );
             })}
+            </div>
         </div>
     );
 }
