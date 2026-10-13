@@ -407,6 +407,10 @@ export function getExplicitHreflangAlternates(
  * Resolves canonical + hreflang links for a static page rendered via <HreflangLinks />.
  * Canonical from seoByUrl (API) takes priority, except pagination pages (page >= 2).
  * @param path Relative path without locale, e.g. '/contacts/'
+ * @param lang Current page language ('ua', 'ru', etc.)
+ * @param fallbackSeo Fallback SEO data if API returns empty metadata
+ * @param dynamicBaseUrl Optional dynamic base URL from request headers
+ * @param pageNum Optional pagination page number
  */
 export async function resolvePageHreflangLinks(
     path: string,
