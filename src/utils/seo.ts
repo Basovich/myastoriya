@@ -22,6 +22,8 @@ export function addRequestJsonLdScript(pathname: string, data: object) {
 }
 
 export function setRequestBreadcrumbJsonLd(_data: object, _pathname?: string) {
+    void _data;
+    void _pathname;
     // BreadcrumbList JSON-LD is rendered universally by Breadcrumbs component.
 }
 

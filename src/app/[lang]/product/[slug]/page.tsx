@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import { getLocalizedHref } from '@/utils/i18n-helpers';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, generateProductJsonLd, setRequestProductJsonLd, formatTitleConfig } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateProductJsonLd, setRequestProductJsonLd, formatTitleConfig } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 import {
@@ -50,10 +50,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     }
     if (!product) return {};
 
-    const [productSlugs, catalogTree] = await Promise.all([
-        getProductSlugsById(productId).catch(() => ({ uk: slug, ru: slug })),
-        getCatalogTreeApi(lang as Locale, 768, token ?? undefined).catch(() => [] as ProductCategory[]),
-    ]);
+    const productSlugs = await getProductSlugsById(productId).catch(() => ({ uk: slug, ru: slug }));
 
     const productName = product.name;
     const productImage = resolveProductImageUrl(product);
@@ -76,8 +73,6 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         dynamicBaseUrl,
     );
     const canonicalUrl = ('canonical' in seoData && seoData.canonical) || alternates.canonical;
-
-    const categoryIndex = buildCategoryIndex(catalogTree);
 
     let ratingData: { ratingValue?: number; ratingCount?: number } | undefined = undefined;
     try {
