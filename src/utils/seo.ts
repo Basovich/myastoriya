@@ -21,10 +21,8 @@ export function addRequestJsonLdScript(pathname: string, data: object) {
     list.push(data);
 }
 
-export function setRequestBreadcrumbJsonLd(data: object, pathname?: string) {
-    if (pathname) {
-        addRequestJsonLdScript(pathname, data);
-    }
+export function setRequestBreadcrumbJsonLd(_data: object, _pathname?: string) {
+    // BreadcrumbList JSON-LD is rendered universally by Breadcrumbs component.
 }
 
 export function setRequestProductJsonLd(data: object, pathname?: string) {
@@ -134,6 +132,53 @@ export interface BreadcrumbJsonLdItem {
 }
 
 /**
+ * Resolves an absolute URL for a breadcrumb item according to site locale routing.
+ */
+export function toAbsoluteBreadcrumbUrl(
+    href: string | undefined,
+    isLast: boolean,
+    canonicalOrCurrentUrl?: string,
+    lang: string = "ua",
+    overrideBaseUrl?: string
+): string {
+    const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL 
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
+    const baseUrl = (overrideBaseUrl || fallbackUrl).replace(/\/+$/, "");
+    const isRu = lang.toLowerCase() === "ru";
+
+    if (href) {
+        const cleanHref = href.split(/[?#]/)[0];
+        if (cleanHref.startsWith("http://") || cleanHref.startsWith("https://")) {
+            return cleanHref;
+        }
+
+        const relativePath = cleanHref
+            .replace(/^\/(?:ua|ru|en)(?=\/|$)/, "")
+            .replace(/^\/+/, "")
+            .replace(/\/+$/, "");
+
+        if (!relativePath) {
+            return isRu ? `${baseUrl}/ru/` : `${baseUrl}/`;
+        }
+
+        return isRu ? `${baseUrl}/ru/${relativePath}/` : `${baseUrl}/ua/${relativePath}/`;
+    }
+
+    if (isLast && canonicalOrCurrentUrl) {
+        if (canonicalOrCurrentUrl.startsWith("http://") || canonicalOrCurrentUrl.startsWith("https://")) {
+            return canonicalOrCurrentUrl;
+        }
+        let cleanPath = canonicalOrCurrentUrl.split(/[?#]/)[0] || "/";
+        if (cleanPath !== "/" && !cleanPath.endsWith("/")) {
+            cleanPath = `${cleanPath}/`;
+        }
+        return `${baseUrl}${cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`}`;
+    }
+
+    return isRu ? `${baseUrl}/ru/` : `${baseUrl}/`;
+}
+
+/**
  * Generates Schema.org BreadcrumbList JSON-LD object.
  */
 export function generateBreadcrumbJsonLd(
@@ -146,37 +191,14 @@ export function generateBreadcrumbJsonLd(
         || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
     const baseUrl = (overrideBaseUrl || fallbackUrl).replace(/\/+$/, "");
 
-    const normalizedLang = lang.toLowerCase() === "ru" ? "ru" : "uk";
-
     const itemListElement = items.map((item, index) => {
-        let absoluteUrl: string;
-
-        if (item.href) {
-            const cleanHref = item.href.split("?")[0];
-            if (cleanHref.startsWith("http")) {
-                absoluteUrl = cleanHref;
-            } else {
-                const relativePath = cleanHref
-                    .replace(/^\/(?:ua|ru|en)(?=\/|$)/, "")
-                    .replace(/^\/+/, "")
-                    .replace(/\/+$/, "");
-
-                if (!relativePath) {
-                    absoluteUrl = normalizedLang === "ru" ? `${baseUrl}/ru/` : `${baseUrl}/`;
-                } else {
-                    absoluteUrl = normalizedLang === "ru" ? `${baseUrl}/ru/${relativePath}/` : `${baseUrl}/ua/${relativePath}/`;
-                }
-            }
-        } else if (index === items.length - 1 && canonicalUrl) {
-            absoluteUrl = canonicalUrl;
-        } else {
-            absoluteUrl = `${baseUrl}/`;
-        }
+        const isLast = index === items.length - 1;
+        const absoluteUrl = toAbsoluteBreadcrumbUrl(item.href, isLast, canonicalUrl, lang, baseUrl);
 
         return {
             "@type": "ListItem",
             "position": index + 1,
-            "name": item.label,
+            "name": item.label.trim(),
             "item": absoluteUrl,
         };
     });

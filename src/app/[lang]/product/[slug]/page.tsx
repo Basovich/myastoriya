@@ -78,10 +78,6 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     const canonicalUrl = ('canonical' in seoData && seoData.canonical) || alternates.canonical;
 
     const categoryIndex = buildCategoryIndex(catalogTree);
-    const breadcrumbs = buildCategoryBreadcrumbs(product.categoryId, categoryIndex);
-    breadcrumbs.push({ label: product.name });
-    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
-    setRequestBreadcrumbJsonLd(breadcrumbJsonLd, relativeUrl);
 
     let ratingData: { ratingValue?: number; ratingCount?: number } | undefined = undefined;
     try {
@@ -334,7 +330,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
         imageUrl: resolveProductImageUrl(product),
         ratingData,
     });
-    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
 
     const productSlugs = await getProductSlugsById(productId).catch(() => ({ uk: slug, ru: slug }));
     const alternates = getExplicitHreflangAlternates(
@@ -353,12 +348,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
     return (
         <>
             <HreflangLinks canonical={hreflangCanonical} languages={alternates.languages} />
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c'),
-                }}
-            />
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
