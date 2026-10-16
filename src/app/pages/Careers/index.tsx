@@ -43,7 +43,7 @@ export default function CareersPage({ dict, careerData, h1 }: CareersPageProps) 
                     {careerData?.text ? (
                         <div
                             className={s.text}
-                            dangerouslySetInnerHTML={{ __html: careerData.text.replace(/<h1(\s|>)/gi, '<h2$1').replace(/<\/h1>/gi, '</h2>') }}
+                            dangerouslySetInnerHTML={{ __html: careerData.text.replace(/<h1([\s>])/gi, '<h2$1').replace(/<\/h1>/gi, '</h2>') }}
                         />
                     ) : (
                         <p className={s.text}>{careersPage.about.text}</p>

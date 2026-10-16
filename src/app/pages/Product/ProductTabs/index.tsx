@@ -202,7 +202,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
     const sanitizedDescription = useMemo(() => {
         if (!description) return '';
         return description
-            .replace(/<h1(\s|>)/gi, '<h2$1')
+            .replace(/<h1([\s>])/gi, '<h2$1')
             .replace(/<\/h1>/gi, '</h2>');
     }, [description]);
 

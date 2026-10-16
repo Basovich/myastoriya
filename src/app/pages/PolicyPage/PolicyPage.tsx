@@ -14,7 +14,7 @@ interface PolicyPageProps {
 export default function PolicyPage({ breadcrumbs, content, h1 }: PolicyPageProps) {
     const renderTextWithLinks = (text: string) => {
         if (typeof text !== 'string') return text;
-        const parts = text.split(/(\[\[.*?\]\])/g);
+        const parts = text.split(/(\[\[.*?]])/g);
         return parts.map((part, index) => {
             if (part.startsWith('[[') && part.endsWith(']]')) {
                 const inner = part.slice(2, -2);
@@ -61,7 +61,7 @@ export default function PolicyPage({ breadcrumbs, content, h1 }: PolicyPageProps
                             {item.type === 'html' && typeof item.value === 'string' && (
                                 <div 
                                     className={s.htmlContent} 
-                                    dangerouslySetInnerHTML={{ __html: item.value.replace(/<h1(\s|>)/gi, '<h2$1').replace(/<\/h1>/gi, '</h2>') }} 
+                                    dangerouslySetInnerHTML={{ __html: item.value.replace(/<h1([\s>])/gi, '<h2$1').replace(/<\/h1>/gi, '</h2>') }} 
                                 />
                             )}
                         </React.Fragment>
