@@ -55,12 +55,14 @@ const LOCALIZED_TEXTS = {
 interface ComplexDiscountDetailProps {
     lang: string;
     initialData: Special;
+    h1?: string;
 }
 
-export default function ComplexDiscountDetail({ lang, initialData }: ComplexDiscountDetailProps) {
+export default function ComplexDiscountDetail({ lang, initialData, h1 }: ComplexDiscountDetailProps) {
     const item = initialData;
     
     const title = item?.title ?? '';
+    const heading = h1 || title;
     const endDate = item?.expiresAt ?? '';
     const discountPercent = item?.amount ? `-${item.amount}%` : '0%';
     const description = item?.description ?? '';
@@ -154,7 +156,7 @@ export default function ComplexDiscountDetail({ lang, initialData }: ComplexDisc
 
                 {/* White content card */}
                 <div className={s.card}>
-                    <h1 className={s.title}>{title}</h1>
+                    <h1 className={s.title}>{heading}</h1>
                     <p className={s.description}>
                         {description}
                     </p>

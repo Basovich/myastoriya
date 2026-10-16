@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSpecialsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
@@ -24,7 +24,7 @@ export async function generateMetadata({
 
     const rawTitle = seo.title;
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
-    const title = { absolute: formattedTitleStr };
+    const title = formatTitleConfig(formattedTitleStr, lang);
 
     const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
 
@@ -41,7 +41,7 @@ export async function generateMetadata({
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
         openGraph: buildOpenGraphMetadata({
-            title: formattedTitleStr,
+            title: title.absolute,
             description: seo.description,
             canonicalUrl: alternates.canonical,
             lang,
@@ -49,7 +49,7 @@ export async function generateMetadata({
         }),
         twitter: {
             card: "summary_large_image",
-            title: formattedTitleStr,
+            title: title.absolute,
             description: seo.description,
             images: ['/images/og-image.jpg'],
         },

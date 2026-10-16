@@ -7,7 +7,16 @@ import BlogPostPage from "@/app/pages/BlogPost";
 import { getBlogBySlugApi, resolveBlogImageUrl } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
 import { getBlogCategorySegment } from "@/utils/blog-url";
-import { getBlogSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import {
+    getBlogSeoData,
+    getHreflangAlternates,
+    getDynamicBaseUrl,
+    buildOpenGraphMetadata,
+    generateBreadcrumbJsonLd,
+    setRequestBreadcrumbJsonLd,
+    fetchSeoMetadataByUrl,
+    formatTitleConfig,
+} from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
@@ -23,12 +32,19 @@ export async function generateMetadata({
     if (!post) return {};
 
     const postTitle = post.h1 || post.name;
-    const seoData = getBlogSeoData(postTitle, post.text, lang);
-    const titleConfig = { absolute: seoData.title };
+    const fallbackSeoData = getBlogSeoData(postTitle, post.text, lang);
+    const canonicalCategory = getBlogCategorySegment(post);
+    const relativeUrl = `/blog/${canonicalCategory}/${slug}/`;
+    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, {
+        title: fallbackSeoData.title,
+        description: fallbackSeoData.description,
+        h1: postTitle,
+    });
+
     const imageUrl = resolveBlogImageUrl(post.image);
     const alternates = getHreflangAlternates(`/blog/${category}/${slug}/`, lang, dynamicBaseUrl);
+    const canonicalUrl = seo.canonical || alternates.canonical;
 
-    const canonicalCategory = getBlogCategorySegment(post);
     const categoryLabel = canonicalCategory === 'recipe'
         ? (lang === 'ru' ? 'Рецепты' : 'Рецепти')
         : (lang === 'ru' ? 'Статьи' : 'Статті');
@@ -39,24 +55,27 @@ export async function generateMetadata({
         { label: categoryLabel, href: `/blog/${canonicalCategory}` },
         { label: post.name },
     ];
-    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
+
+    const titleConfig = formatTitleConfig(seo.title, lang);
 
     return {
         title: titleConfig,
-        description: seoData.description,
+        description: seo.description,
+        robots: seo.noindex ? { index: false, follow: false } : undefined,
         openGraph: buildOpenGraphMetadata({
-            title: postTitle,
-            description: seoData.description,
-            canonicalUrl: alternates.canonical,
+            title: titleConfig.absolute,
+            description: seo.description,
+            canonicalUrl,
             lang,
             image: imageUrl,
             type: 'article',
         }),
         twitter: {
             card: "summary_large_image",
-            title: postTitle,
-            description: seoData.description,
+            title: titleConfig.absolute,
+            description: seo.description,
             images: imageUrl ? [imageUrl] : undefined,
         },
     };
@@ -107,17 +126,30 @@ export default async function BlogSinglePostPage({
         validRelatedBlogs = checkedRelated.filter((r): r is typeof validRelatedBlogs[number] => r !== null);
     }
 
+    const postTitle = post.h1 || post.name;
+    const fallbackSeoData = getBlogSeoData(postTitle, post.text, lang);
+    const relativeUrl = `/blog/${canonicalCategory}/${slug}/`;
+    const [seo, headersList] = await Promise.all([
+        fetchSeoMetadataByUrl(relativeUrl, lang, {
+            title: fallbackSeoData.title,
+            description: fallbackSeoData.description,
+            h1: postTitle,
+        }),
+        headers(),
+    ]);
+
     const cleanedPost = {
         ...post,
+        h1: seo.h1 || post.h1 || post.name,
         recipes: validRecipes,
         relatedBlogs: validRelatedBlogs,
     };
 
-    const alternates = getHreflangAlternates(`/blog/${category}/${slug}/`, lang, getDynamicBaseUrl(await headers()));
+    const alternates = getHreflangAlternates(`/blog/${category}/${slug}/`, lang, getDynamicBaseUrl(headersList));
 
     return (
         <>
-            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+            <HreflangLinks canonical={seo.canonical || alternates.canonical} languages={alternates.languages} />
             <BlogPostPage dict={dict} post={cleanedPost} lang={lang} />
         </>
     );

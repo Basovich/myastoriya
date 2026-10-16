@@ -319,12 +319,21 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
             )}
 
 
-            <div className={s.storesList}>
+            <div className={`${s.storesList} ${activeTab === 'restaurants' ? '' : s.tabHidden}`}>
                 {/* Promo card is always first */}
                 <StoreMiniCard isPromo={true} />
 
-                {filteredStores.map(store => (
-                    <StoreMiniCard key={store.id} store={store} />
+                {stores.filter(store => store.type !== 'meatbar').map(store => (
+                    <StoreMiniCard key={`rest-${store.id}`} store={store} />
+                ))}
+            </div>
+
+            <div className={`${s.storesList} ${activeTab === 'meatbar' ? '' : s.tabHidden}`}>
+                {/* Promo card is always first */}
+                <StoreMiniCard isPromo={true} />
+
+                {stores.filter(store => store.type === 'meatbar').map(store => (
+                    <StoreMiniCard key={`meat-${store.id}`} store={store} />
                 ))}
             </div>
         </section>

@@ -44,6 +44,12 @@ export async function GET(req: Request) {
             const cat = uaCat || ruCat;
             if (!cat) continue;
 
+            const isUaEmpty = uaCat ? (uaCat.productsCount === 0 && (!uaCat.children || uaCat.children.length === 0)) : true;
+            const isRuEmpty = ruCat ? (ruCat.productsCount === 0 && (!ruCat.children || ruCat.children.length === 0)) : true;
+            if (isUaEmpty && isRuEmpty) {
+                continue;
+            }
+
             const uaSlug = uaCat?.slug || ruCat?.slug;
             const ruSlug = ruCat?.slug || uaCat?.slug;
 

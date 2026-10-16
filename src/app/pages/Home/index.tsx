@@ -6,7 +6,6 @@ import AppPromo from "@/app/pages/Home/AppPromo/AppPromo";
 import ComplexDiscounts from "@/app/pages/Home/ComplexDiscounts/ComplexDiscounts";
 import Publications from "@/app/components/Publications";
 import Reviews from "@/app/pages/Home/Reviews/Reviews";
-import SeoText from "@/app/pages/Home/SeoText/SeoText";
 import { Locale } from "@/i18n/config";
 import { Dictionary } from "@/i18n/types";
 import type { BlogPost, Slide, PopularCategory, HomeReview, Product, Showcase, Sale, Special } from "@/lib/graphql";
@@ -60,7 +59,6 @@ export default function HomePage({
             )}
             <Publications dict={dict.home.publications} posts={publications} lang={lang} />
             <Reviews dict={dict.home.reviews} reviews={reviews} />
-            <SeoText dict={dict.home.seo} />
         </main>
     );
 }

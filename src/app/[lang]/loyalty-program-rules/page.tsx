@@ -18,9 +18,6 @@ export async function generateMetadata({ params }: LoyaltyProgramRulesProps): Pr
   const seo = getStaticPageSeoData("loyalty-program-rules", lang);
   const alternates = getHreflangAlternates("/loyalty-program-rules/", lang, dynamicBaseUrl);
 
-  const isRu = lang === "ru";
-  const title = isRu ? { absolute: seo.title } : seo.h1;
-
   const labels: Record<string, { home: string; loyalty: string }> = {
     ua: { home: "Головна", loyalty: "Правила програми лояльності" },
     ru: { home: "Главная", loyalty: "Правила программы лояльности" }
@@ -35,7 +32,7 @@ export async function generateMetadata({ params }: LoyaltyProgramRulesProps): Pr
   setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
-    title,
+    title: { absolute: seo.title },
     description: seo.description,
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
@@ -46,7 +43,7 @@ export async function generateMetadata({ params }: LoyaltyProgramRulesProps): Pr
     }),
     twitter: {
       card: "summary_large_image",
-      title: seo.h1,
+      title: seo.title,
       description: seo.description,
       images: ["/images/og-image.jpg"],
     },
@@ -60,6 +57,7 @@ export default async function LoyaltyProgramRules({
   
   const apiData = await getTermsOfUseApi();
   const webContent = apiData?.webText;
+  const seo = getStaticPageSeoData("loyalty-program-rules", lang);
 
   const labels: Record<string, { home: string; loyalty: string }> = {
     ua: { home: "Головна", loyalty: "Правила програми лояльності" },
@@ -85,6 +83,7 @@ export default async function LoyaltyProgramRules({
         lang={lang} 
         breadcrumbs={breadcrumbs}
         content={content}
+        h1={seo.h1}
       />
     </>
   );

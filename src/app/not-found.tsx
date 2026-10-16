@@ -79,6 +79,10 @@ export default async function GlobalNotFound() {
 
     return (
         <html lang={htmlLang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
+            <head>
+                <title>{lang === 'ru' ? 'Страница не найдена | Мястория' : "Сторінку не знайдено | М'ясторія"}</title>
+                <meta name="robots" content="noindex, nofollow" />
+            </head>
             <body>
                 <ReduxProvider>
                     <CategoryProvider initialCategories={catalogTree}>

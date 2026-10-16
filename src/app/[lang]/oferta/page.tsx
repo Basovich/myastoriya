@@ -18,9 +18,6 @@ export async function generateMetadata({ params }: OfertaPageProps): Promise<Met
   const seo = getStaticPageSeoData("oferta", lang);
   const alternates = getHreflangAlternates("/oferta/", lang, dynamicBaseUrl);
 
-  const isRu = lang === "ru";
-  const title = isRu ? { absolute: seo.title } : seo.h1;
-
   const labels: Record<string, { home: string; oferta: string }> = {
     ua: { home: "Головна", oferta: "Публічна оферта" },
     ru: { home: "Главная", oferta: "Публичная оферта" }
@@ -35,7 +32,7 @@ export async function generateMetadata({ params }: OfertaPageProps): Promise<Met
   setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
-    title,
+    title: { absolute: seo.title },
     description: seo.description,
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
@@ -46,7 +43,7 @@ export async function generateMetadata({ params }: OfertaPageProps): Promise<Met
     }),
     twitter: {
       card: "summary_large_image",
-      title: seo.h1,
+      title: seo.title,
       description: seo.description,
       images: ["/images/og-image.jpg"],
     },
@@ -60,6 +57,7 @@ export default async function OfertaPage({
   
   const apiData = await getContractOfferApi();
   const webContent = apiData?.webText;
+  const seo = getStaticPageSeoData("oferta", lang);
 
   const labels: Record<string, { home: string; oferta: string }> = {
     ua: { home: "Головна", oferta: "Публічна оферта" },
@@ -85,6 +83,7 @@ export default async function OfertaPage({
         lang={lang} 
         breadcrumbs={breadcrumbs}
         content={content}
+        h1={seo.h1}
       />
     </>
   );

@@ -81,6 +81,7 @@ interface ActionDetailProps {
     sale: Sale;
     initialProducts?: Product[];
     initialHasMore?: boolean;
+    h1?: string;
 }
 
 export default function ActionDetail({
@@ -89,8 +90,9 @@ export default function ActionDetail({
     sale,
     initialProducts = [],
     initialHasMore = false,
+    h1,
 }: ActionDetailProps) {
-    const title = sale.title || sale.name;
+    const title = h1 || sale.title || sale.name;
 
     // Format expiry date
     let endDate = '';
@@ -113,7 +115,7 @@ export default function ActionDetail({
                 : currentLoc['complex-discounts'].breadcrumbs.complexDiscounts,
             href: pageType === 'promotions' ? '/actions' : '/complex-discounts',
         },
-        { label: title },
+        { label: sale.name },
     ];
 
     const countdown = currentLoc[pageType].countdown;

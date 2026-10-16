@@ -10,7 +10,16 @@ import {
     type Product,
 } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getActionSeoData, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
+import {
+    getExplicitHreflangAlternates,
+    getDynamicBaseUrl,
+    getActionSeoData,
+    buildOpenGraphMetadata,
+    generateBreadcrumbJsonLd,
+    setRequestBreadcrumbJsonLd,
+    fetchSeoMetadataByUrl,
+    formatTitleConfig,
+} from '@/utils/seo';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
 interface ActionDetailPageProps {
@@ -34,8 +43,13 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
     if (!sale) return {};
 
     const actionTitle = sale.title || sale.name;
-    const seoData = getActionSeoData(actionTitle, sale.description || sale.text, lang);
-    const titleConfig = { absolute: seoData.title };
+    const fallbackSeoData = getActionSeoData(actionTitle, sale.description || sale.text, lang);
+    const relativeUrl = `/${lang}/actions/${slug}/`;
+    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, {
+        title: fallbackSeoData.title,
+        description: fallbackSeoData.description,
+        h1: actionTitle,
+    });
 
     const alternates = getExplicitHreflangAlternates(
         {
@@ -45,6 +59,8 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
         lang,
         dynamicBaseUrl,
     );
+    const canonicalUrl = seo.canonical || alternates.canonical;
+
     const actionImage = typeof sale.banner === 'string'
         ? sale.banner
         : sale.banner?.size2x || sale.banner?.size1x || (typeof sale.image === 'string' ? sale.image : sale.image?.size2x || sale.image?.size1x);
@@ -55,24 +71,27 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
         { label: isRu ? 'Акции' : 'Акції', href: '/actions' },
         { label: sale.name }
     ];
-    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
+
+    const titleConfig = formatTitleConfig(seo.title, lang);
 
     return {
         title: titleConfig,
-        description: seoData.description,
+        description: seo.description,
+        robots: seo.noindex ? { index: false, follow: false } : undefined,
         openGraph: buildOpenGraphMetadata({
-            title: actionTitle,
-            description: seoData.description,
-            canonicalUrl: alternates.canonical,
+            title: titleConfig.absolute,
+            description: seo.description,
+            canonicalUrl,
             lang,
             image: actionImage,
-            type: 'website',
+            type: 'article',
         }),
         twitter: {
             card: 'summary_large_image',
-            title: actionTitle,
-            description: seoData.description,
+            title: titleConfig.absolute,
+            description: seo.description,
             images: actionImage ? [actionImage] : undefined,
         },
     };
@@ -117,7 +136,18 @@ export default async function ActionDetailPage({ params }: ActionDetailPageProps
         return notFound();
     }
 
-    const saleSlugs = await getSaleSlugsById(saleId);
+    const relativeUrl = `/${lang}/actions/${slug}/`;
+    const actionTitle = sale.title || sale.name;
+    const fallbackSeoData = getActionSeoData(actionTitle, sale.description || sale.text, lang);
+    const [seo, saleSlugs] = await Promise.all([
+        fetchSeoMetadataByUrl(relativeUrl, lang, {
+            title: fallbackSeoData.title,
+            description: fallbackSeoData.description,
+            h1: actionTitle,
+        }),
+        getSaleSlugsById(saleId),
+    ]);
+
     const alternates = getExplicitHreflangAlternates(
         { uk: `/actions/${saleSlugs.uk}/`, ru: `/actions/${saleSlugs.ru}/` },
         lang,
@@ -126,13 +156,14 @@ export default async function ActionDetailPage({ params }: ActionDetailPageProps
 
     return (
         <main>
-            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+            <HreflangLinks canonical={seo.canonical || alternates.canonical} languages={alternates.languages} />
             <ActionDetail
                 lang={lang}
                 id={slug}
                 sale={sale}
                 initialProducts={productsResponse.data}
                 initialHasMore={productsResponse.has_more_pages}
+                h1={seo.h1 || undefined}
             />
         </main>
     );

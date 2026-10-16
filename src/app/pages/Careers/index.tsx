@@ -10,9 +10,10 @@ interface CareersPageProps {
     dict: Dictionary;
     lang: Locale;
     careerData?: Career | null;
+    h1?: string;
 }
 
-export default function CareersPage({ dict, lang, careerData }: CareersPageProps) {
+export default function CareersPage({ dict, careerData, h1 }: CareersPageProps) {
     const careersPage = dict.home.careersPage;
 
     return (
@@ -27,7 +28,9 @@ export default function CareersPage({ dict, lang, careerData }: CareersPageProps
                 />
                 <section className={s.container}>
                     <h1 className={s.title}>
-                        {careerData?.title ? (
+                        {h1 ? (
+                            h1
+                        ) : careerData?.title ? (
                             <span dangerouslySetInnerHTML={{ __html: careerData.title }} />
                         ) : (
                             <>
@@ -40,7 +43,7 @@ export default function CareersPage({ dict, lang, careerData }: CareersPageProps
                     {careerData?.text ? (
                         <div
                             className={s.text}
-                            dangerouslySetInnerHTML={{ __html: careerData.text }}
+                            dangerouslySetInnerHTML={{ __html: careerData.text.replace(/<h1(\s|>)/gi, '<h2$1').replace(/<\/h1>/gi, '</h2>') }}
                         />
                     ) : (
                         <p className={s.text}>{careersPage.about.text}</p>

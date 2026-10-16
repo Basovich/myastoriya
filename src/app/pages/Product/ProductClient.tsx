@@ -93,6 +93,7 @@ interface ProductClientProps {
     categoryProducts?: Product[];
     lang: Locale;
     dict: Dictionary;
+    h1?: string;
     /** Pre-built breadcrumbs from server component (uses real category tree). */
     breadcrumbs?: BreadcrumbItem[];
     deliveryBlocks: OrderingInfoBlock[];
@@ -115,6 +116,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
     categoryProducts = [],
     lang,
     dict,
+    h1,
     breadcrumbs: breadcrumbsProp,
     deliveryBlocks,
     initialReviews,
@@ -385,7 +387,7 @@ const ProductClient: React.FC<ProductClientProps> = ({
                         </svg>
                         <span>{availabilityLabel}</span>
                     </div>
-                    <h1 className={s.title}>{product.name}</h1>
+                    <h1 className={s.title}>{h1 || product.name}</h1>
                     <div className={s.priceSection}>
                         <div className={s.priceWrapper}>
                             <span className={clsx(s.price, activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost && s.newPrice)}>

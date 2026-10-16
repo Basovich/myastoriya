@@ -54,13 +54,22 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
     const productName = product.name;
     const productImage = resolveProductImageUrl(product);
-    const fallbackSeo = getProductSeoData(productName, product.cost, lang);
+    const effectivePrice = product.purchaseCost ?? product.cost;
+    const fallbackSeo = getProductSeoData(productName, effectivePrice, lang);
     const relativeUrl = `/${lang}/product/${slug}/`;
     const seoData = await fetchSeoMetadataByUrl(relativeUrl, lang, {
         title: fallbackSeo.title,
         description: fallbackSeo.description,
         h1: productName,
     }).catch(() => fallbackSeo);
+
+    let finalDescription = seoData.description;
+    if (finalDescription) {
+        if (effectivePrice) {
+            finalDescription = finalDescription.replace(/(Ціна|Цена)\s+\d+[\s\d]*(?:\s*грн\.?)+/gi, `$1 ${Math.round(effectivePrice)} грн`);
+        }
+        finalDescription = finalDescription.replace(/(?:\s+грн\.?){2,}/gi, ' грн').trim();
+    }
 
     const titleConfig = formatTitleConfig(seoData.title, lang);
 
@@ -102,20 +111,20 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
     return {
         title: titleConfig,
-        description: seoData.description,
+        description: finalDescription,
         ...('noindex' in seoData && seoData.noindex ? { robots: { index: false, follow: false } } : {}),
         openGraph: buildOpenGraphMetadata({
-            title: seoData.title,
-            description: seoData.description,
+            title: titleConfig.absolute,
+            description: finalDescription,
             canonicalUrl,
             lang,
             image: productImage,
-            type: 'website',
+            type: 'product',
         }),
         twitter: {
             card: 'summary_large_image',
-            title: seoData.title,
-            description: seoData.description,
+            title: titleConfig.absolute,
+            description: finalDescription,
             images: productImage ? [productImage] : undefined,
         },
     };
@@ -332,7 +341,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
         lang,
         dynamicBaseUrl,
     );
-    const fallbackSeo = getProductSeoData(product.name, product.cost, lang);
+    const effectivePrice = product.purchaseCost ?? product.cost;
+    const fallbackSeo = getProductSeoData(product.name, effectivePrice, lang);
     const seoData = await fetchSeoMetadataByUrl(`/${lang}/product/${slug}/`, lang, {
         title: fallbackSeo.title,
         description: fallbackSeo.description,
@@ -358,6 +368,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 categoryProducts={categoryProductsResponse.data}
                 lang={lang as Locale}
                 dict={dict}
+                h1={seoData?.h1 || product.name}
                 breadcrumbs={breadcrumbs}
                 deliveryBlocks={deliveryBlocks}
                 initialReviews={initialReviewsData?.data ?? []}

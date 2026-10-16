@@ -45,9 +45,10 @@ function CheckoutContent({ lang }: CheckoutPageProps) {
         prevAuthRef.current = { isAuthenticated, isGuest };
     }, [isAuthenticated, isGuest, isInitialized, currentStep]);
 
+    const isRu = lang === 'ru';
     const breadcrumbs = [
-        { label: 'Головна', href: '/' },
-        { label: 'Оформлення замовлення' },
+        { label: isRu ? 'Главная' : 'Головна', href: '/' },
+        { label: isRu ? 'Оформление заказа' : 'Оформлення замовлення' },
     ];
 
     return (
@@ -56,7 +57,7 @@ function CheckoutContent({ lang }: CheckoutPageProps) {
                 <div className={s.container}>
                     <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
                     <div className={s.pageHeader}>
-                        <h1 className={s.pageTitle}>ОФОРМЛЕННЯ ЗАМОВЛЕННЯ</h1>
+                        <h1 className={s.pageTitle}>{isRu ? 'ОФОРМЛЕНИЕ ЗАКАЗА' : 'ОФОРМЛЕННЯ ЗАМОВЛЕННЯ'}</h1>
                         <div className={s.stepDots}>
                             <span className={s.dot} />
                             <span className={s.dot} />

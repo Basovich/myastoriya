@@ -19,7 +19,6 @@ export async function generateMetadata({ params }: CareersPageProps): Promise<Me
   const alternates = getHreflangAlternates("/careers/", lang, dynamicBaseUrl);
 
   const isRu = lang === "ru";
-  const title = isRu ? { absolute: seo.title } : seo.h1;
 
   const breadcrumbs = [
     { label: isRu ? "Главная" : "Головна", href: "/" },
@@ -29,7 +28,7 @@ export async function generateMetadata({ params }: CareersPageProps): Promise<Me
   setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
-    title,
+    title: { absolute: seo.title },
     description: seo.description,
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
@@ -40,7 +39,7 @@ export async function generateMetadata({ params }: CareersPageProps): Promise<Me
     }),
     twitter: {
       card: "summary_large_image",
-      title: seo.h1,
+      title: seo.title,
       description: seo.description,
       images: ["/images/og-image.jpg"],
     },
@@ -53,13 +52,14 @@ export default async function Careers({
   const { lang } = await params;
   const dict = await getDictionary(lang);
   const careerData = await getCareerApi(lang);
+  const seo = getStaticPageSeoData("careers", lang);
 
   const alternates = getHreflangAlternates("/careers/", lang, getDynamicBaseUrl(await headers()));
 
   return (
     <>
       <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
-      <CareersPage lang={lang} dict={dict} careerData={careerData} />
+      <CareersPage lang={lang} dict={dict} careerData={careerData} h1={seo.h1} />
     </>
   );
 }

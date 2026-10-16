@@ -20,6 +20,7 @@ interface OurStoresPageProps {
     dict: Dictionary;
     lang: Locale;
     initialShops: Shop[];
+    h1?: string;
 }
 
 export type StoreType = "all" | "restaurant" | "meatbar";
@@ -28,7 +29,7 @@ export type ViewMode = "list" | "map";
 const STORES_PER_PAGE = 10;
 
 
-export default function OurStoresPage({ dict, initialShops }: OurStoresPageProps) {
+export default function OurStoresPage({ dict, initialShops, h1 }: OurStoresPageProps) {
     const { ourStoresPage } = dict.home;
     const [activeFilter, setActiveFilter] = useState<StoreType>("restaurant");
     const [searchQuery, setSearchQuery] = useState("");
@@ -78,7 +79,7 @@ export default function OurStoresPage({ dict, initialShops }: OurStoresPageProps
                 <div className={s.topSection}>
                     <HeroBanner
                         prefix=""
-                        title={ourStoresPage.title}
+                        title={h1 || ourStoresPage.title}
                         className={s.heroBanner}
                         image="/images/store/herobanner.png"
                     />
@@ -124,6 +125,14 @@ export default function OurStoresPage({ dict, initialShops }: OurStoresPageProps
                             {viewMode === "list" ? (
                                 <>
                                     <StoreList stores={visibleStores} dict={ourStoresPage.storeCard} />
+                                    {!searchQuery && activeFilter !== "all" && (
+                                        <div className={s.tabHidden} aria-hidden="true">
+                                            <StoreList
+                                                stores={stores.filter(store => activeFilter === "restaurant" ? store.type === "meatbar" : store.type !== "meatbar")}
+                                                dict={ourStoresPage.storeCard}
+                                            />
+                                        </div>
+                                    )}
                                     {visibleCount < filteredStores.length && (
                                         <div className={s.loadMoreWrapper}>
                                             <Button 

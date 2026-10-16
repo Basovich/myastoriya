@@ -7,7 +7,7 @@ import { mapUrlCategoryToApiTypeSlug, getBlogCategorySegment } from "@/utils/blo
 import { getAccessToken } from "@/app/actions/authActions";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +36,7 @@ export async function generateMetadata({ params, searchParams }: BlogCategoryPag
     const isRu = lang === "ru";
     const rawTitle = isRu ? seo.title : seo.h1;
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
-    const title = isRu ? { absolute: formattedTitleStr } : formattedTitleStr;
+    const titleConfig = formatTitleConfig(formattedTitleStr, lang);
 
     const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
 
@@ -50,11 +50,11 @@ export async function generateMetadata({ params, searchParams }: BlogCategoryPag
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
-        title,
+        title: titleConfig,
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
         openGraph: buildOpenGraphMetadata({
-            title: formattedTitleStr,
+            title: titleConfig.absolute,
             description: seo.description,
             canonicalUrl: alternates.canonical,
             lang,
@@ -62,7 +62,7 @@ export async function generateMetadata({ params, searchParams }: BlogCategoryPag
         }),
         twitter: {
             card: "summary_large_image",
-            title: formattedTitleStr,
+            title: titleConfig.absolute,
             description: seo.description,
             images: ["/images/og-image.jpg"],
         },
@@ -119,7 +119,7 @@ export default async function BlogCategoryPage({
 
     // Otherwise, check if category is an old single post slug (/blog/[slug])
     const token = await getAccessToken();
-    const legacyPost = await getBlogBySlugApi(category, lang, token ?? undefined);
+    const legacyPost = await getBlogBySlugApi(category, lang, token ?? undefined).catch(() => null);
     if (legacyPost) {
         const canonicalCategory = getBlogCategorySegment(legacyPost);
         redirect(`/${lang}/blog/${canonicalCategory}/${legacyPost.slug}`);

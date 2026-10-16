@@ -25,23 +25,21 @@ export default function Hero({ slides, lang }: HeroProps) {
     const btnText = lang === 'ua' ? 'Дізнатися більше' : 'Узнать больше';
 
     // Helper to generate correct link from linkTo or slide.slug
-    const getLink = (linkTo: Slide['linkTo'], slideSlug?: string | null) => {
+    const getLink = (linkTo: Slide['linkTo']) => {
         // Priority 1: Direct URL from linkTo
         if (linkTo?.url) return linkTo.url;
 
         // Priority 2: Structured linkTo type + identifier
         if (linkTo && linkTo.type) {
-            const identifier = linkTo.slug || linkTo.id || slideSlug;
+            const identifier = linkTo.slug || linkTo.id;
             if (identifier) {
-                if (linkTo.type === "product") return `/catalog/${identifier}`;
-                if (linkTo.type === "category") return `/catalog/${identifier}`;
+                if (linkTo.type === "product") return `/product/${identifier}`;
+                if (linkTo.type === "category") return `/category/${identifier}`;
                 if (linkTo.type === "page") return `/${identifier}`;
+                if (linkTo.type === "sale" || linkTo.type === "action") return `/actions/${identifier}`;
                 return `/actions/${identifier}`;
             }
         }
-
-        // Priority 3: Root-level slide.slug
-        if (slideSlug) return `/actions/${slideSlug}`;
 
         return "/actions";
     };
@@ -49,7 +47,7 @@ export default function Hero({ slides, lang }: HeroProps) {
     if (slides.length === 1) {
         const slide = slides[0];
         const imageUrl = slide.imageWeb?.desktop || slide.image?.size3x || slide.image?.size2x || '';
-        const href = getLink(slide.linkTo, slide.slug);
+        const href = getLink(slide.linkTo);
 
         return (
             <section className={s.hero} id="hero">
@@ -108,7 +106,7 @@ export default function Hero({ slides, lang }: HeroProps) {
             >
                 {slides.map((slide, index) => {
                     const imageUrl = slide.imageWeb?.desktop || slide.image?.size3x || slide.image?.size2x || '';
-                    const slideHref = getLink(slide.linkTo, slide.slug);
+                    const slideHref = getLink(slide.linkTo);
 
                     return (
                         <SwiperSlide key={slide.id || index}>

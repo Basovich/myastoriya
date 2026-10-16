@@ -28,12 +28,22 @@ export function getMenuSlug(apiSlug: string): string {
     return RESTAURANT_MENU_SLUG_MAP[apiSlug] ?? apiSlug;
 }
 
-/**
- * Отримати API slug за menu URL slug (для запиту при рендері сторінки меню).
- * Для мітбарів — повертає menu slug без змін (вони однакові).
- */
 export function getApiSlugFromMenu(menuSlug: string): string {
     return MENU_SLUG_TO_SHOP_SLUG[menuSlug] ?? menuSlug;
+}
+
+export const RESTAURANT_ENGLISH_NAMES: Record<string, string> = {
+    'obolon': 'Myastoriya on Obolon',
+    'poznyaki': 'Myastoriya on Poznyaki',
+    'teremky': 'Myastoriya on Teremky',
+    'myastoriya-obolon': 'Myastoriya on Obolon',
+    'myastoriya-pozniaky': 'Myastoriya on Poznyaki',
+    'myastoriya-teremky': 'Myastoriya on Teremky',
+};
+
+export function getRestaurantEnglishName(slug: string, fallbackName: string): string {
+    const cleanFallback = fallbackName.replace(/\s*\(.*?\)\s*$/, '').trim();
+    return RESTAURANT_ENGLISH_NAMES[slug] ?? cleanFallback;
 }
 
 

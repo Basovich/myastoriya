@@ -63,7 +63,7 @@ export default async function OurStores({
   return (
     <>
       <HreflangLinks canonical={seo.canonical || alternates.canonical} languages={alternates.languages} />
-      <OurStoresPage lang={lang} dict={dict} initialShops={shopsResponse.shops.data} />
+      <OurStoresPage lang={lang} dict={dict} initialShops={shopsResponse.shops.data} h1={seo.h1} />
     </>
   );
 }

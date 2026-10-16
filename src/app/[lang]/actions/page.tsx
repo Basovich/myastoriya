@@ -46,7 +46,7 @@ export async function generateMetadata({
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
         openGraph: buildOpenGraphMetadata({
-            title: formattedTitleStr,
+            title: title.absolute,
             description: seo.description,
             canonicalUrl,
             lang,
@@ -54,7 +54,7 @@ export async function generateMetadata({
         }),
         twitter: {
             card: "summary_large_image",
-            title: formattedTitleStr,
+            title: title.absolute,
             description: seo.description,
             images: ['/images/og-image.jpg'],
         },

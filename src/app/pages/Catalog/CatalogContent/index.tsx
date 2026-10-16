@@ -28,6 +28,7 @@ interface CatalogContentProps {
     initialProducts: ProductsResponse;
     categoryId?: number;
     categoryName?: string;
+    h1?: string;
     /** Pre-built breadcrumb items. Built by the page server component. */
     breadcrumbItems?: BreadcrumbItem[];
     /** Subcategories of the current category for CategoryCircles. Omit to hide the block. */
@@ -59,6 +60,7 @@ export default async function CatalogContent({
     initialProducts,
     categoryId,
     categoryName,
+    h1,
     breadcrumbItems: breadcrumbItemsProp,
     subcategoryItems,
     view = 'list',
@@ -104,7 +106,7 @@ export default async function CatalogContent({
         ...(categoryName ? [{ label: categoryName }] : []),
     ];
 
-    const pageTitle = categoryName || '';
+    const pageTitle = h1 || categoryName || '';
 
     // Prepare related slider data
     const relatedProducts = recommendedProducts && recommendedProducts.length > 0

@@ -4,7 +4,16 @@ import { notFound, redirect } from 'next/navigation';
 import ComplexDiscountDetail from '../../../components/ComplexDiscountDetail/ComplexDiscountDetail';
 import { findSpecialIdBySlug, getSpecialApi, getSpecialSlugsById } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getComplexDiscountSeoData, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from '@/utils/seo';
+import {
+    getExplicitHreflangAlternates,
+    getDynamicBaseUrl,
+    getComplexDiscountSeoData,
+    buildOpenGraphMetadata,
+    generateBreadcrumbJsonLd,
+    setRequestBreadcrumbJsonLd,
+    fetchSeoMetadataByUrl,
+    formatTitleConfig,
+} from '@/utils/seo';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
 interface ComboDetailProps {
@@ -27,8 +36,13 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
     if (!special) return {};
 
     const discountTitle = special.title;
-    const seoData = getComplexDiscountSeoData(discountTitle, special.description, lang);
-    const titleConfig = { absolute: seoData.title };
+    const fallbackSeoData = getComplexDiscountSeoData(discountTitle, special.description, lang);
+    const relativeUrl = `/${lang}/complex-discounts/${slug}/`;
+    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, {
+        title: fallbackSeoData.title,
+        description: fallbackSeoData.description,
+        h1: discountTitle,
+    });
 
     const alternates = getExplicitHreflangAlternates(
         {
@@ -38,6 +52,8 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
         lang,
         dynamicBaseUrl,
     );
+    const canonicalUrl = seo.canonical || alternates.canonical;
+
     const discountImage = typeof special.image === 'string'
         ? special.image
         : special.image?.size2x || special.image?.size1x || (typeof special.banner === 'string' ? special.banner : special.banner?.size2x || special.banner?.size1x);
@@ -48,24 +64,27 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
         { label: isRu ? 'Комплексные скидки' : 'Комплексні знижки', href: '/complex-discounts' },
         { label: discountTitle },
     ];
-    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
+
+    const titleConfig = formatTitleConfig(seo.title, lang);
 
     return {
         title: titleConfig,
-        description: seoData.description,
+        description: seo.description,
+        robots: seo.noindex ? { index: false, follow: false } : undefined,
         openGraph: buildOpenGraphMetadata({
-            title: discountTitle,
-            description: seoData.description,
-            canonicalUrl: alternates.canonical,
+            title: titleConfig.absolute,
+            description: seo.description,
+            canonicalUrl,
             lang,
             image: discountImage,
-            type: 'website',
+            type: 'article',
         }),
         twitter: {
             card: 'summary_large_image',
-            title: discountTitle,
-            description: seoData.description,
+            title: titleConfig.absolute,
+            description: seo.description,
             images: discountImage ? [discountImage] : undefined,
         },
     };
@@ -130,7 +149,18 @@ export default async function ComboDetail({ params }: ComboDetailProps) {
         redirect(`/${lang}/complex-discounts`);
     }
 
-    const specialSlugs = await getSpecialSlugsById(String(special.id ?? finalId));
+    const relativeUrl = `/${lang}/complex-discounts/${slug}/`;
+    const discountTitle = special.title;
+    const fallbackSeoData = getComplexDiscountSeoData(discountTitle, special.description, lang);
+    const [seo, specialSlugs] = await Promise.all([
+        fetchSeoMetadataByUrl(relativeUrl, lang, {
+            title: fallbackSeoData.title,
+            description: fallbackSeoData.description,
+            h1: discountTitle,
+        }),
+        getSpecialSlugsById(String(special.id ?? finalId)),
+    ]);
+
     const alternates = getExplicitHreflangAlternates(
         { uk: `/complex-discounts/${specialSlugs.uk}/`, ru: `/complex-discounts/${specialSlugs.ru}/` },
         lang,
@@ -139,8 +169,8 @@ export default async function ComboDetail({ params }: ComboDetailProps) {
 
     return (
         <main>
-            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
-            <ComplexDiscountDetail lang={lang} initialData={special} />
+            <HreflangLinks canonical={seo.canonical || alternates.canonical} languages={alternates.languages} />
+            <ComplexDiscountDetail lang={lang} initialData={special} h1={seo.h1 || undefined} />
         </main>
     );
 }

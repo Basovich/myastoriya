@@ -104,12 +104,14 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
         const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbItems, lang, canonicalUrl, dynamicBaseUrl);
         setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
+        const titleConfig = formatTitleConfig(finalTitle, lang);
+
         return {
-            title: formatTitleConfig(finalTitle, lang),
+            title: titleConfig,
             description: seoData.description,
             ...(pageRobots && { robots: pageRobots }),
             openGraph: buildOpenGraphMetadata({
-                title: finalTitle,
+                title: titleConfig.absolute,
                 description: seoData.description,
                 canonicalUrl,
                 lang,
@@ -118,7 +120,7 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
             }),
             twitter: {
                 card: 'summary_large_image',
-                title: finalTitle,
+                title: titleConfig.absolute,
                 description: seoData.description,
                 images: categoryImage ? [categoryImage] : undefined,
             },
@@ -270,13 +272,21 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
             href: getCategoryHref(sub),
         }));
 
-        const hreflangLinks = await resolvePageHreflangLinks(
-            `/category/${slug.join('/')}/`,
-            lang,
-            { title: '', description: '', h1: '' },
-            getDynamicBaseUrl(await headers()),
-            parsePageNum(resolvedSearchParams?.page),
-        );
+        const relativeUrl = `/${lang}/category/${slug.join('/')}/`;
+        const [seoData, hreflangLinks] = await Promise.all([
+            fetchSeoMetadataByUrl(relativeUrl, lang, {
+                title: '',
+                description: '',
+                h1: currentCategoryName,
+            }),
+            resolvePageHreflangLinks(
+                `/category/${slug.join('/')}/`,
+                lang,
+                { title: '', description: '', h1: '' },
+                getDynamicBaseUrl(await headers()),
+                parsePageNum(resolvedSearchParams?.page),
+            ),
+        ]);
 
         return (
             <main>
@@ -287,6 +297,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
                     initialProducts={productsResponse}
                     categoryId={categoryId}
                     categoryName={currentCategoryName}
+                    h1={seoData.h1 || currentCategoryName}
                     breadcrumbItems={breadcrumbItems}
                     subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                     view={view}

@@ -19,8 +19,6 @@ export async function generateMetadata({ params }: SearchPageProps): Promise<Met
     const alternates = getHreflangAlternates("/search/", lang, dynamicBaseUrl);
 
     const isRu = lang === "ru";
-    const title = isRu ? { absolute: seo.title } : seo.h1;
-
     const breadcrumbs = [
         { label: isRu ? "Главная" : "Головна", href: "/" },
         { label: isRu ? "Поиск" : "Пошук" }
@@ -29,7 +27,7 @@ export async function generateMetadata({ params }: SearchPageProps): Promise<Met
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
-        title,
+        title: { absolute: seo.title },
         description: seo.description,
         robots: {
             index: false,
@@ -44,7 +42,7 @@ export async function generateMetadata({ params }: SearchPageProps): Promise<Met
         }),
         twitter: {
             card: "summary_large_image",
-            title: seo.h1,
+            title: seo.title,
             description: seo.description,
             images: ["/images/og-image.jpg"],
         },

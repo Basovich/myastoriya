@@ -4,7 +4,7 @@ import BlogGrid from "@/app/components/BlogGrid/BlogGrid";
 import { getBlogsApi, getBlogTypesApi, type BlogsPagination } from "@/lib/graphql/queries/blog";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +27,7 @@ export async function generateMetadata({ params, searchParams }: BlogPageProps):
     const isRu = lang === "ru";
     const rawTitle = isRu ? seo.title : seo.h1;
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
-    const title = isRu ? { absolute: formattedTitleStr } : formattedTitleStr;
+    const titleConfig = formatTitleConfig(formattedTitleStr, lang);
 
     const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
 
@@ -39,11 +39,11 @@ export async function generateMetadata({ params, searchParams }: BlogPageProps):
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
-        title,
+        title: titleConfig,
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
         openGraph: buildOpenGraphMetadata({
-            title: formattedTitleStr,
+            title: titleConfig.absolute,
             description: seo.description,
             canonicalUrl: alternates.canonical,
             lang,
@@ -51,7 +51,7 @@ export async function generateMetadata({ params, searchParams }: BlogPageProps):
         }),
         twitter: {
             card: "summary_large_image",
-            title: formattedTitleStr,
+            title: titleConfig.absolute,
             description: seo.description,
             images: ["/images/og-image.jpg"],
         },

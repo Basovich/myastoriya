@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import clsx from 'clsx';
 import styles from '../Product.module.scss';
 import Image from "next/image";
@@ -199,6 +199,13 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
         };
     });
 
+    const sanitizedDescription = useMemo(() => {
+        if (!description) return '';
+        return description
+            .replace(/<h1(\s|>)/gi, '<h2$1')
+            .replace(/<\/h1>/gi, '</h2>');
+    }, [description]);
+
     return (
         <div className={styles.tabsWrapper}>
             <div className={styles.tabsHeader}>
@@ -230,7 +237,7 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
                 <div className={activeTab !== 'description' ? styles.tabHidden : undefined}>
                     <div
                         className={styles.description}
-                        dangerouslySetInnerHTML={{ __html: description }}
+                        dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
                     />
                 </div>
 

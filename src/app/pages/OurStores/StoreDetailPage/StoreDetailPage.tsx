@@ -43,6 +43,7 @@ interface StoreDetailPageProps {
     shop: Shop;
     lang: Locale;
     dict: Dictionary;
+    h1?: string;
 }
 
 function createGoogleMapsLink(lat: number | null | undefined, lng: number | null | undefined, address: string): string {
@@ -73,13 +74,14 @@ function groupSchedule(schedule: Shop["schedule"]) {
     });
 }
 
-const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) => {
+const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict, h1 }) => {
     const { ourStoresPage } = dict.home;
     const texts = LOCALIZED_TEXTS[lang] || LOCALIZED_TEXTS.ua;
 
     const match = shop.name.match(/^(.*?)\((.*?)\)$/);
     const brandName = shop.siteName || (match ? match[1].trim() : shop.name);
     const address = shop.siteAddress || (match ? match[2].trim() : (shop.name || ''));
+    const heading = h1 || brandName;
 
     const breadcrumbs = [
         { label: ourStoresPage.breadcrumbs.home, href: '/' },
@@ -109,7 +111,7 @@ const StoreDetailPage: React.FC<StoreDetailPageProps> = ({ shop, lang, dict }) =
                 <div className={s.container}>
                     <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
 
-                    <h1 className={s.pageTitle}>{brandName}</h1>
+                    <h1 className={s.pageTitle}>{heading}</h1>
 
                     <section className={s.mainSection}>
                         {/* Gallery — client island for Swiper + zoom */}

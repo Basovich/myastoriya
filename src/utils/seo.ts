@@ -66,18 +66,55 @@ export function getSiteName(lang: string = "ua"): string {
 }
 
 /**
- * Safely formats Next.js title metadata.
- * If titleStr already ends with site brand (| М'ясторія or | Мястория), uses absolute object to prevent Next.js layout template duplication.
- * Otherwise returns string so Next.js applies layout template (%s | М'ясторія).
+ * Decodes common HTML entities to their literal character equivalents.
  */
-export function formatTitleConfig(titleStr: string | undefined | null, _lang?: string): { absolute: string } | string {
-    void _lang;
-    if (!titleStr) return '';
-    const cleanTitle = titleStr.trim();
-    if (/\|\s*(М'ясторія|Мястория|Myastoriya)/i.test(cleanTitle)) {
-        return { absolute: cleanTitle };
+export function decodeHtmlEntities(text: string): string {
+    if (!text) return '';
+    return text
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/&mdash;/gi, '—')
+        .replace(/&ndash;/gi, '–')
+        .replace(/&laquo;/gi, '«')
+        .replace(/&raquo;/gi, '»')
+        .replace(/&quot;/gi, '"')
+        .replace(/&#39;|&apos;/gi, "'")
+        .replace(/&amp;/gi, '&')
+        .replace(/&hellip;/gi, '...')
+        .replace(/&lt;/gi, '<')
+        .replace(/&gt;/gi, '>')
+        .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)));
+}
+
+/**
+ * Safely formats Next.js title metadata.
+ * Strips any trailing brand suffixes (including duplicate or cross-language ones like "| Мясторія", "| Мʼясторія", "| М'ясторія", "| Мястория", etc.)
+ * and ensures a single, correctly localized brand suffix is applied as an absolute title object.
+ */
+export function formatTitleConfig(titleStr: string | undefined | null, lang: string = 'ua'): { absolute: string } {
+    if (!titleStr) return { absolute: '' };
+    let cleanTitle = titleStr.trim();
+    const isRu = lang.toLowerCase() === 'ru';
+    const siteBrand = isRu ? 'Мястория' : "М'ясторія";
+
+    // Clean up any trailing brand suffixes (including duplicate or cross-language ones)
+    const brandRegex = /\s*\|\s*(?:М['ʼ’]?ястор(?:ія|ия)|Myastoriya)\s*$/i;
+    while (brandRegex.test(cleanTitle)) {
+        cleanTitle = cleanTitle.replace(brandRegex, '').trim();
     }
-    return cleanTitle;
+
+    if (!cleanTitle) {
+        return { absolute: siteBrand };
+    }
+
+    return { absolute: `${cleanTitle} | ${siteBrand}` };
+}
+
+export function getBaseSiteUrl(overrideBaseUrl?: string): string {
+    const configured = overrideBaseUrl
+        || process.env.NEXT_PUBLIC_SITE_URL
+        || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null)
+        || siteData.url;
+    return configured.replace(/\/+$/, "");
 }
 
 export interface OpenGraphOptions {
@@ -103,8 +140,7 @@ export function buildOpenGraphMetadata({
     const siteName = getSiteName(lang);
     const fallbackImage = siteData.seo.ogImage || "/images/og-image.jpg";
     const imageUrl = image || fallbackImage;
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL 
-        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
+    const baseUrl = getBaseSiteUrl();
 
     const fullImageUrl = imageUrl.startsWith("http") 
         ? imageUrl 
@@ -143,9 +179,7 @@ export function toAbsoluteBreadcrumbUrl(
     lang: string = "ua",
     overrideBaseUrl?: string
 ): string {
-    const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL 
-        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
-    const baseUrl = (overrideBaseUrl || fallbackUrl).replace(/\/+$/, "");
+    const baseUrl = getBaseSiteUrl(overrideBaseUrl);
     const isRu = lang.toLowerCase() === "ru";
 
     if (href) {
@@ -189,9 +223,7 @@ export function generateBreadcrumbJsonLd(
     canonicalUrl?: string,
     overrideBaseUrl?: string
 ) {
-    const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL 
-        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
-    const baseUrl = (overrideBaseUrl || fallbackUrl).replace(/\/+$/, "");
+    const baseUrl = getBaseSiteUrl(overrideBaseUrl);
 
     const itemListElement = items.map((item, index) => {
         const isLast = index === items.length - 1;
@@ -218,6 +250,7 @@ export interface ProductJsonLdParams {
         name: string;
         text?: string | null;
         cost: number;
+        purchaseCost?: number | null;
         available?: number | boolean | null;
         images?: Array<{ url?: { main2x?: string | null; grid2x?: string | null; grid1x?: string | null; main1x?: string | null } | null }> | null;
         image?: { url?: { main2x?: string | null; grid2x?: string | null; grid1x?: string | null; main1x?: string | null } | null } | null;
@@ -243,9 +276,7 @@ export function generateProductJsonLd({
     imageUrl,
     ratingData,
 }: ProductJsonLdParams) {
-    const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL 
-        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
-    const baseUrl = (dynamicBaseUrl || fallbackUrl).replace(/\/+$/, "");
+    const baseUrl = getBaseSiteUrl(dynamicBaseUrl);
 
     let resolvedImage = imageUrl;
     if (!resolvedImage) {
@@ -267,6 +298,9 @@ export function generateProductJsonLd({
         : "https://schema.org/OutOfStock";
 
     const brandName = lang.toLowerCase() === "ru" ? "Мястория" : "М'ясторія";
+    const effectivePrice = (typeof product.purchaseCost === 'number' && product.purchaseCost > 0)
+        ? product.purchaseCost
+        : product.cost;
 
     const schema: Record<string, unknown> = {
         "@context": "https://schema.org",
@@ -282,7 +316,7 @@ export function generateProductJsonLd({
         "offers": {
             "@type": "Offer",
             "url": canonicalUrl,
-            "price": product.cost,
+            "price": effectivePrice,
             "priceCurrency": "UAH",
             "availability": availability,
         },
@@ -301,12 +335,6 @@ export function generateProductJsonLd({
 }
 
 /**
- * Generates hreflang alternate links and canonical link for SEO.
- * @param pathname The request pathname (e.g., '/ua/contacts/' or '/contacts' or '/ru/our-stores/')
- * @param currentLang The current page language ('ua', 'ru', 'uk', etc.)
- * @param overrideBaseUrl Optional dynamic base URL (e.g. from request headers 'https://domain.com')
- */
-/**
  * Safely parses page number from searchParams value or string.
  * Returns valid page integer >= 1.
  */
@@ -319,8 +347,8 @@ export function parsePageNum(pageValue?: string | string[] | number | null): num
 
 /**
  * Appends page number to SEO title for pagination pages (page >= 2).
- * Example (UA): "Стейки – купити з доставкою... — сторінка 2"
- * Example (RU): "Стейки – купить с доставкой... — страница 2"
+ * Example (UA): "Стейки – купити з доставкою... — сторінка 2 | М'ясторія"
+ * Example (RU): "Стейки – купить с доставкой... — страница 2 | Мястория"
  */
 export function formatTitleWithPage(
     title: string,
@@ -328,10 +356,12 @@ export function formatTitleWithPage(
     lang: string = "ua"
 ): string {
     const p = parsePageNum(pageNum);
-    if (p <= 1) return title;
+    const siteBrand = getSiteName(lang);
+    const cleanTitle = title.replace(/\s*\|\s*(?:М['ʼ’]?ястор(?:ія|ия)|Myastoriya)\s*$/i, "").trim();
+    if (p <= 1) return `${cleanTitle} | ${siteBrand}`;
     const isRu = lang === "ru";
     const suffix = isRu ? ` — страница ${p}` : ` — сторінка ${p}`;
-    return `${title}${suffix}`;
+    return `${cleanTitle}${suffix} | ${siteBrand}`;
 }
 
 /**
@@ -347,10 +377,7 @@ export function getHreflangAlternates(
     overrideBaseUrl?: string,
     pageNum?: number
 ): HreflangAlternates {
-    const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL 
-        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
-
-    const baseUrl = (overrideBaseUrl || fallbackUrl).replace(/\/+$/, "");
+    const baseUrl = getBaseSiteUrl(overrideBaseUrl);
 
     // 1. Remove query string if included in pathname
     const cleanPathname = pathname.split("?")[0];
@@ -401,10 +428,7 @@ export function getExplicitHreflangAlternates(
     currentLang: string = "ua",
     overrideBaseUrl?: string
 ): HreflangAlternates {
-    const fallbackUrl = process.env.NEXT_PUBLIC_SITE_URL 
-        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteData.url);
-
-    const baseUrl = (overrideBaseUrl || fallbackUrl).replace(/\/+$/, "");
+    const baseUrl = getBaseSiteUrl(overrideBaseUrl);
 
     const formatUrl = (path: string, lang: 'uk' | 'ru') => {
         const cleanPath = path.split("?")[0].replace(/^\/(?:ua|ru|en)(?=\/|$)/, "").replace(/^\/+/, "").replace(/\/+$/, "");
@@ -467,17 +491,18 @@ export function getCategorySeoData(
 ): CategorySeoData {
     const isRu = lang === 'ru';
     const cleanName = categoryName.trim();
+    const hasValidPrice = typeof minPrice === 'number' && !isNaN(minPrice) && minPrice > 0;
 
     if (isRu) {
-        const title = `${cleanName} – купить с доставкой по Киеву и Украине`;
-        const description = minPrice && minPrice > 0
+        const title = `${cleanName} – купить с доставкой по Киеву и Украине | Мястория`;
+        const description = hasValidPrice
             ? `${cleanName} в интернет-магазине «Мястория» ✅ Цены от ${Math.round(minPrice)} грн ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`
             : `${cleanName} в интернет-магазине «Мястория» ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`;
         return { title, description };
     }
 
-    const title = `${cleanName} – купити з доставкою по Києву та Україні`;
-    const description = minPrice && minPrice > 0
+    const title = `${cleanName} – купити з доставкою по Києву та Україні | М'ясторія`;
+    const description = hasValidPrice
         ? `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Ціни від ${Math.round(minPrice)} грн ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`
         : `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`;
 
@@ -499,17 +524,18 @@ export function getProductSeoData(
 ): ProductSeoData {
     const isRu = lang === 'ru';
     const cleanName = productName.trim();
+    const hasValidPrice = typeof price === 'number' && !isNaN(price) && price > 0;
 
     if (isRu) {
         const title = `${cleanName} | Мястория`;
-        const description = price && price > 0
+        const description = hasValidPrice
             ? `${cleanName} в интернет-магазине «Мястория» ✅ Цена ${Math.round(price)} грн ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`
             : `${cleanName} в интернет-магазине «Мястория» ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`;
         return { title, description };
     }
 
-    const title = cleanName;
-    const description = price && price > 0
+    const title = `${cleanName} | М'ясторія`;
+    const description = hasValidPrice
         ? `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Ціна ${Math.round(price)} грн ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`
         : `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`;
 
@@ -539,7 +565,7 @@ export function getStoreSeoData(
         return { title, description };
     }
 
-    const title = `${cleanName}: ${cleanAddress}`;
+    const title = `${cleanName}: ${cleanAddress} | М'ясторія`;
     const description = `${cleanName} за адресою ${cleanAddress}. Перегляньте актуальне меню, графік роботи, контакти та іншу інформацію про заклад.`;
 
     return { title, description };
@@ -564,8 +590,10 @@ export function getBlogSeoData(
     let cleanDescription = '';
     if (postText) {
         cleanDescription = postText
-            .replace(/<[^>]*>/g, '')
-            .replace(/&nbsp;/g, ' ')
+            .replace(/<style[\s\S]*?<\/style>/gi, '')
+            .replace(/<script[\s\S]*?<\/script>/gi, '')
+            .replace(/<[^>]*>/g, ' ');
+        cleanDescription = decodeHtmlEntities(cleanDescription)
             .replace(/\s+/g, ' ')
             .trim()
             .slice(0, 155)
@@ -577,7 +605,7 @@ export function getBlogSeoData(
         return { title, description: cleanDescription };
     }
 
-    const title = cleanTitle;
+    const title = `${cleanTitle} | М'ясторія`;
     return { title, description: cleanDescription };
 }
 
@@ -600,8 +628,10 @@ export function getActionSeoData(
     let cleanDescription = '';
     if (actionText) {
         cleanDescription = actionText
-            .replace(/<[^>]*>/g, '')
-            .replace(/&nbsp;/g, ' ')
+            .replace(/<style[\s\S]*?<\/style>/gi, '')
+            .replace(/<script[\s\S]*?<\/script>/gi, '')
+            .replace(/<[^>]*>/g, ' ');
+        cleanDescription = decodeHtmlEntities(cleanDescription)
             .replace(/\s+/g, ' ')
             .trim()
             .slice(0, 155)
@@ -613,7 +643,7 @@ export function getActionSeoData(
         return { title, description: cleanDescription };
     }
 
-    const title = cleanTitle;
+    const title = `${cleanTitle} | М'ясторія`;
     return { title, description: cleanDescription };
 }
 
@@ -636,8 +666,10 @@ export function getComplexDiscountSeoData(
     let cleanDescription = '';
     if (discountText) {
         cleanDescription = discountText
-            .replace(/<[^>]*>/g, '')
-            .replace(/&nbsp;/g, ' ')
+            .replace(/<style[\s\S]*?<\/style>/gi, '')
+            .replace(/<script[\s\S]*?<\/script>/gi, '')
+            .replace(/<[^>]*>/g, ' ');
+        cleanDescription = decodeHtmlEntities(cleanDescription)
             .replace(/\s+/g, ' ')
             .trim()
             .slice(0, 155)
@@ -649,7 +681,7 @@ export function getComplexDiscountSeoData(
         return { title, description: cleanDescription };
     }
 
-    const title = cleanTitle;
+    const title = `${cleanTitle} | М'ясторія`;
     return { title, description: cleanDescription };
 }
 
@@ -887,13 +919,17 @@ export async function fetchSeoMetadataByUrl(
     fallback: ResolvedSeoData
 ): Promise<ResolvedSeoData> {
     const apiSeo = await getSeoByUrlCached(url, lang);
-    if (!apiSeo || (!apiSeo.title && !apiSeo.description)) {
+    if (!apiSeo || (!apiSeo.title && !apiSeo.description && !apiSeo.h1)) {
         return fallback;
     }
 
     const title = apiSeo.title?.trim() || fallback.title;
-    const description = apiSeo.description?.trim() || fallback.description;
+    let description = apiSeo.description?.trim() || fallback.description;
     const h1 = apiSeo.h1?.trim() || fallback.h1;
+
+    if (description) {
+        description = description.replace(/(?:\s+грн\.?){2,}/gi, ' грн').trim();
+    }
 
     return {
         title,

@@ -112,9 +112,10 @@ export default function SearchContent() {
         fetchData();
     }, [query, lang]);
 
+    const isRu = lang === "ru";
     const breadcrumbItems = [
-        { label: "Головна", href: "/" },
-        { label: "Результат" }
+        { label: isRu ? "Главная" : "Головна", href: "/" },
+        { label: isRu ? "Результат" : "Результат" }
     ];
 
     const categoryCircleItems = (() => {
@@ -136,23 +137,26 @@ export default function SearchContent() {
         return items;
     })();
 
+    const heroPrefix = query ? (isRu ? "ТЕКСТ ПОИСКА:" : "ТЕКСТ ПОШУКУ:") : "";
+    const heroTitle = query || (isRu ? "Поиск по сайту" : "Пошук по сайту");
+
     return (
         <div className={s.container}>
             <div className={s.topSection}>
                 <HeroBanner
-                    prefix="ТЕКСТ ПОШУКУ:"
-                    title={query}
+                    prefix={heroPrefix}
+                    title={heroTitle}
                     className={s.heroBanner}
                 />
                 <div className={s.contentWrapper}>
                     <Breadcrumbs items={breadcrumbItems} className={s.breadcrumbs} />
                     {categories.length > 0 && (
                         <CategoryCircles 
-                            title='РЕЗУЛЬТАТ ПОШУКУ ПО КАТЕГОРІЯМ' 
+                            title={isRu ? 'РЕЗУЛЬТАТ ПОИСКА ПО КАТЕГОРИЯМ' : 'РЕЗУЛЬТАТ ПОШУКУ ПО КАТЕГОРІЯМ'} 
                             categories={categoryCircleItems}
                         />
                     )}
-                    <SectionHeader title="РЕЗУЛЬТАТ ПОШУКУ ТОВАРІВ" classNameWrapper={s.sectionTitle} />
+                    <SectionHeader title={isRu ? "РЕЗУЛЬТАТ ПОИСКА ТОВАРОВ" : "РЕЗУЛЬТАТ ПОШУКУ ТОВАРІВ"} classNameWrapper={s.sectionTitle} />
                 </div>
             </div>
             <div className={s.productsSection}>
@@ -167,7 +171,7 @@ export default function SearchContent() {
                 <div className={s.productsInner}>
                     <div className={s.resultsGrid}>
                         {isLoading ? (
-                             <div className={s.loading}>Завантаження...</div>
+                             <div className={s.loading}>{isRu ? "Загрузка..." : "Завантаження..."}</div>
                         ) : products.length > 0 ? (
                             products.map((product) => {
                                 const weight = getProductWeight(product);
@@ -196,7 +200,7 @@ export default function SearchContent() {
                                 );
                             })
                         ) : (
-                            <div className={s.noResults}>Товарів не знайдено</div>
+                            <div className={s.noResults}>{isRu ? "Товаров не найдено" : "Товарів не знайдено"}</div>
                         )}
                     </div>
                 </div>

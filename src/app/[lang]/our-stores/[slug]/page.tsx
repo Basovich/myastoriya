@@ -6,7 +6,16 @@ import StoreDetailPage from "@/app/pages/OurStores/StoreDetailPage/StoreDetailPa
 import { getShopBySlugApi, type Shop } from "@/lib/graphql/queries/shops";
 import { resolveStoreBackendSlug, getLegacyStoreRedirectSlug } from "@/utils/store-url";
 import { headers } from "next/headers";
-import { getStoreSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import {
+    getStoreSeoData,
+    getHreflangAlternates,
+    getDynamicBaseUrl,
+    buildOpenGraphMetadata,
+    generateBreadcrumbJsonLd,
+    setRequestBreadcrumbJsonLd,
+    fetchSeoMetadataByUrl,
+    formatTitleConfig,
+} from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
@@ -33,9 +42,16 @@ export async function generateMetadata({
     const brandName = shop.siteName || (match ? match[1].trim() : shop.name);
     const address = shop.siteAddress || (match ? match[2].trim() : (shop.name || ''));
 
-    const seoData = getStoreSeoData(brandName, address, lang);
-    const titleConfig = { absolute: seoData.title };
-    const alternates = getHreflangAlternates(`/our-stores/${slug}/`, lang, dynamicBaseUrl);
+    const fallbackSeoData = getStoreSeoData(brandName, address, lang);
+    const relativeUrl = `/our-stores/${slug}/`;
+    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, {
+        title: fallbackSeoData.title,
+        description: fallbackSeoData.description,
+        h1: brandName,
+    });
+
+    const alternates = getHreflangAlternates(relativeUrl, lang, dynamicBaseUrl);
+    const canonicalUrl = seo.canonical || alternates.canonical;
     const shopImage = shop.image?.size1x || shop.images?.[0]?.url?.size1x;
 
     const isRu = lang === 'ru';
@@ -44,24 +60,25 @@ export async function generateMetadata({
         { label: isRu ? 'Наши заведения' : 'Наші заклади', href: '/our-stores' },
         { label: shop.siteName || shop.name }
     ];
-    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
-        title: titleConfig,
-        description: seoData.description,
+        title: formatTitleConfig(seo.title, lang),
+        description: seo.description,
+        robots: seo.noindex ? { index: false, follow: false } : undefined,
         openGraph: buildOpenGraphMetadata({
-            title: seoData.title,
-            description: seoData.description,
-            canonicalUrl: alternates.canonical,
+            title: seo.title,
+            description: seo.description,
+            canonicalUrl,
             lang,
             image: shopImage,
             type: 'website',
         }),
         twitter: {
             card: "summary_large_image",
-            title: seoData.title,
-            description: seoData.description,
+            title: seo.title,
+            description: seo.description,
             images: shopImage ? [shopImage] : undefined,
         },
     };
@@ -97,15 +114,30 @@ export default async function StorePage({
         notFound();
     }
 
-    const alternates = getHreflangAlternates(`/our-stores/${slug}/`, lang, getDynamicBaseUrl(await headers()));
+    const match = shop.name.match(/^(.*?)\((.*?)\)$/);
+    const brandName = shop.siteName || (match ? match[1].trim() : shop.name);
+    const address = shop.siteAddress || (match ? match[2].trim() : (shop.name || ''));
+    const fallbackSeoData = getStoreSeoData(brandName, address, lang);
+    const relativeUrl = `/our-stores/${slug}/`;
+    const [seo, headersList] = await Promise.all([
+        fetchSeoMetadataByUrl(relativeUrl, lang, {
+            title: fallbackSeoData.title,
+            description: fallbackSeoData.description,
+            h1: brandName,
+        }),
+        headers(),
+    ]);
+
+    const alternates = getHreflangAlternates(relativeUrl, lang, getDynamicBaseUrl(headersList));
 
     return (
         <>
-            <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+            <HreflangLinks canonical={seo.canonical || alternates.canonical} languages={alternates.languages} />
             <StoreDetailPage 
                 shop={shop} 
                 lang={lang} 
                 dict={dict} 
+                h1={seo.h1 || undefined}
             />
         </>
     );

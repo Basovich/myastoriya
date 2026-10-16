@@ -15,23 +15,24 @@ export async function generateMetadata({ params }: ApplyProps): Promise<Metadata
   const headersList = await headers();
   const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
-  const pageTitle = lang === "ru" ? "Подать заявку" : "Подати заявку";
+  const pageTitle = lang === "ru" ? "Форма для соискателей" : "Форма для претендентів";
+  const brandSuffix = lang === "ru" ? "Мястория" : "М'ясторія";
+  const title = `${pageTitle} | ${brandSuffix}`;
   const seo = getDefaultSeoData(pageTitle, lang);
   const alternates = getHreflangAlternates("/careers/apply/", lang, dynamicBaseUrl);
 
   const isRu = lang === "ru";
-  const title = isRu ? { absolute: seo.title } : seo.h1;
 
   const breadcrumbs = [
     { label: isRu ? "Главная" : "Головна", href: "/" },
     { label: isRu ? "Карьера" : "Кар'єра", href: "/careers" },
-    { label: isRu ? "Подать заявку" : "Подати заявку" }
+    { label: pageTitle }
   ];
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
   setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
-    title,
+    title: { absolute: title },
     description: seo.description,
     robots: {
       index: false,

@@ -8,9 +8,10 @@ interface PolicyPageProps {
     breadcrumbs: { label: string; href?: string }[];
     content: PolicyPageContentItem[];
     lang: Locale;
+    h1?: string;
 }
 
-export default function PolicyPage({ breadcrumbs, content, lang }: PolicyPageProps) {
+export default function PolicyPage({ breadcrumbs, content, h1 }: PolicyPageProps) {
     const renderTextWithLinks = (text: string) => {
         if (typeof text !== 'string') return text;
         const parts = text.split(/(\[\[.*?\]\])/g);
@@ -38,17 +39,12 @@ export default function PolicyPage({ breadcrumbs, content, lang }: PolicyPagePro
         <>
             <main className={s.main}>
                 <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
+                <h1 className={s.title}>{h1 || breadcrumbs[breadcrumbs.length - 1]?.label}</h1>
                 <div className={s.content}>
                     {content.map((item, index) => (
                         <React.Fragment key={index}>
                             {item.type === 'header' && typeof item.value === 'string' && (
-                                <h1 className={s.sectionHeader}>{item.value}</h1>
-                            )}
-                            {item.type === 'header' && typeof item.value === 'string' && (
                                 <h2 className={s.sectionHeader}>{item.value}</h2>
-                            )}
-                            {item.type === 'header' && typeof item.value === 'string' && (
-                                <h3 className={s.sectionHeader}>{item.value}</h3>
                             )}
                             {item.type === 'text' && typeof item.value === 'string' && (
                                 <p className={s.paragraph}>{renderTextWithLinks(item.value)}</p>
@@ -65,7 +61,7 @@ export default function PolicyPage({ breadcrumbs, content, lang }: PolicyPagePro
                             {item.type === 'html' && typeof item.value === 'string' && (
                                 <div 
                                     className={s.htmlContent} 
-                                    dangerouslySetInnerHTML={{ __html: item.value }} 
+                                    dangerouslySetInnerHTML={{ __html: item.value.replace(/<h1(\s|>)/gi, '<h2$1').replace(/<\/h1>/gi, '</h2>') }} 
                                 />
                             )}
                         </React.Fragment>

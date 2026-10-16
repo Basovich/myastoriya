@@ -18,9 +18,6 @@ export async function generateMetadata({ params }: PrivacyPolicyPageProps): Prom
   const seo = getStaticPageSeoData("privacy-policy", lang);
   const alternates = getHreflangAlternates("/privacy-policy/", lang, dynamicBaseUrl);
 
-  const isRu = lang === "ru";
-  const title = isRu ? { absolute: seo.title } : seo.h1;
-
   const labels: Record<string, { home: string; privacy: string }> = {
     ua: { home: "Головна", privacy: "Політика конфіденційності" },
     ru: { home: "Главная", privacy: "Политика конфиденциальности" }
@@ -35,7 +32,7 @@ export async function generateMetadata({ params }: PrivacyPolicyPageProps): Prom
   setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
-    title,
+    title: { absolute: seo.title },
     description: seo.description,
     openGraph: buildOpenGraphMetadata({
       title: seo.title,
@@ -46,7 +43,7 @@ export async function generateMetadata({ params }: PrivacyPolicyPageProps): Prom
     }),
     twitter: {
       card: "summary_large_image",
-      title: seo.h1,
+      title: seo.title,
       description: seo.description,
       images: ["/images/og-image.jpg"],
     },
@@ -60,6 +57,7 @@ export default async function Privacy({
   
   const apiData = await getPrivacyPolicyApi();
   const webContent = apiData?.webText;
+  const seo = getStaticPageSeoData("privacy-policy", lang);
 
   const labels: Record<string, { home: string; privacy: string }> = {
     ua: { home: "Головна", privacy: "Політика конфіденційності" },
@@ -85,6 +83,7 @@ export default async function Privacy({
         lang={lang} 
         breadcrumbs={breadcrumbs}
         content={content}
+        h1={seo.h1}
       />
     </>
   );
