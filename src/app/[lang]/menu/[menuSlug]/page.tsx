@@ -3,7 +3,7 @@ import { Locale } from "@/i18n/config";
 import StoreMenuPage from "@/app/pages/StoreMenu/StoreMenuPage";
 import { getShopBySlugApi } from "@/lib/graphql/queries/shops";
 import { getStoreFullMenuApi } from "@/lib/graphql/queries/pages/restaurantMenu";
-import { getApiSlugFromMenu, getRestaurantEnglishName, RESTAURANT_MENU_SLUG_MAP } from "@/config/menuSlugMap";
+import { getApiSlugFromMenu, RESTAURANT_MENU_SLUG_MAP } from "@/config/menuSlugMap";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
@@ -36,26 +36,21 @@ export async function generateMetadata({ params }: MenuPageProps): Promise<Metad
             return {};
         }
 
-        const rawShopName = lang === "en"
-            ? getRestaurantEnglishName(menuSlug, shop.name || "")
-            : (shop.name || "");
-        const cleanShopName = rawShopName.replace(/\s*\(.*?\)\s*$/, '').trim();
-
+        const shopName = shop.siteName || shop.name || "";
         const alternates = getHreflangAlternates(`/menu/${menuSlug}/`, lang, dynamicBaseUrl);
 
-        const siteBrand = lang === "en" ? "Myastoriya" : (lang === "ru" ? "Мястория" : "М'ясторія");
         let title: string;
         let description: string;
 
         if (lang === "en") {
-            title = `Menu ${cleanShopName} | ${siteBrand}`;
-            description = `Explore the menu of ${cleanShopName}. Grilled steaks, appetizers, main courses, desserts and more.`;
+            title = `Menu ${shopName}`;
+            description = `Explore the menu of ${shopName}. Grilled steaks, appetizers, main courses, desserts and more.`;
         } else if (lang === "ru") {
-            title = `Меню ${cleanShopName} | ${siteBrand}`;
-            description = `Ознакомьтесь с меню ${cleanShopName}. Стейки на гриле, закуски, основные блюда, десерты и другие позиции.`;
+            title = `Меню ${shopName}`;
+            description = `Ознакомьтесь с меню ${shopName}. Стейки на гриле, закуски, основные блюда, десерты и другие позиции.`;
         } else {
-            title = `Меню ${cleanShopName} | ${siteBrand}`;
-            description = `Ознайомтеся з меню ${cleanShopName}. Стейки на грилі, закуски, основні страви, десерти та інші позиції.`;
+            title = `Меню ${shopName}`;
+            description = `Ознайомтеся з меню ${shopName}. Стейки на грилі, закуски, основні страви, десерти та інші позиції.`;
         }
 
         return {
