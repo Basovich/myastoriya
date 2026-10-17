@@ -7,12 +7,10 @@ import { getAccessToken } from '@/app/actions/authActions';
 import {
     getExplicitHreflangAlternates,
     getDynamicBaseUrl,
-    getComplexDiscountSeoData,
     buildOpenGraphMetadata,
     generateBreadcrumbJsonLd,
     setRequestBreadcrumbJsonLd,
     fetchSeoMetadataByUrl,
-    formatTitleConfig,
 } from '@/utils/seo';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
@@ -36,13 +34,11 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
     if (!special) return {};
 
     const discountTitle = special.title;
-    const fallbackSeoData = getComplexDiscountSeoData(discountTitle, special.description, lang);
     const relativeUrl = `/${lang}/complex-discounts/${slug}/`;
     const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, {
-        title: fallbackSeoData.title,
-        description: fallbackSeoData.description,
         h1: discountTitle,
     });
+    const finalTitle = seo.title || discountTitle;
 
     const alternates = getExplicitHreflangAlternates(
         {
@@ -67,14 +63,12 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
     const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
-    const titleConfig = formatTitleConfig(seo.title, lang);
-
     return {
-        title: titleConfig,
+        title: finalTitle,
         description: seo.description,
         robots: seo.noindex ? { index: false, follow: false } : undefined,
         openGraph: buildOpenGraphMetadata({
-            title: titleConfig.absolute,
+            title: finalTitle,
             description: seo.description,
             canonicalUrl,
             lang,
@@ -83,7 +77,7 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
         }),
         twitter: {
             card: 'summary_large_image',
-            title: titleConfig.absolute,
+            title: finalTitle,
             description: seo.description,
             images: discountImage ? [discountImage] : undefined,
         },
@@ -151,11 +145,8 @@ export default async function ComboDetail({ params }: ComboDetailProps) {
 
     const relativeUrl = `/${lang}/complex-discounts/${slug}/`;
     const discountTitle = special.title;
-    const fallbackSeoData = getComplexDiscountSeoData(discountTitle, special.description, lang);
     const [seo, specialSlugs] = await Promise.all([
         fetchSeoMetadataByUrl(relativeUrl, lang, {
-            title: fallbackSeoData.title,
-            description: fallbackSeoData.description,
             h1: discountTitle,
         }),
         getSpecialSlugsById(String(special.id ?? finalId)),

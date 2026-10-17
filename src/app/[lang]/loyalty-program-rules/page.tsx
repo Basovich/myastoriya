@@ -4,7 +4,7 @@ import { getTermsOfUseApi } from "@/lib/graphql";
 import { PolicyPageContentItem } from "@/i18n/types";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 interface LoyaltyProgramRulesProps {
@@ -15,35 +15,39 @@ export async function generateMetadata({ params }: LoyaltyProgramRulesProps): Pr
   const { lang } = await params;
   const headersList = await headers();
   const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-  const seo = getStaticPageSeoData("loyalty-program-rules", lang);
+  const relativeUrl = `/${lang}/loyalty-program-rules/`;
+  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
   const alternates = getHreflangAlternates("/loyalty-program-rules/", lang, dynamicBaseUrl);
+  const canonicalUrl = seo.canonical || alternates.canonical;
 
   const labels: Record<string, { home: string; loyalty: string }> = {
     ua: { home: "Головна", loyalty: "Правила програми лояльності" },
     ru: { home: "Главная", loyalty: "Правила программы лояльности" }
   };
   const currentLabels = labels[lang] || labels.ua;
+  const finalTitle = seo.title || currentLabels.loyalty;
 
   const breadcrumbs = [
     { label: currentLabels.home, href: "/" },
     { label: currentLabels.loyalty }
   ];
-  const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
   setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
-    title: { absolute: seo.title },
+    title: finalTitle,
     description: seo.description,
+    ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     openGraph: buildOpenGraphMetadata({
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
-      canonicalUrl: alternates.canonical,
+      canonicalUrl,
       lang,
       type: "website",
     }),
     twitter: {
       card: "summary_large_image",
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
       images: ["/images/og-image.jpg"],
     },
@@ -57,7 +61,7 @@ export default async function LoyaltyProgramRules({
   
   const apiData = await getTermsOfUseApi();
   const webContent = apiData?.webText;
-  const seo = getStaticPageSeoData("loyalty-program-rules", lang);
+  const seo = await fetchSeoMetadataByUrl(`/${lang}/loyalty-program-rules/`, lang);
 
   const labels: Record<string, { home: string; loyalty: string }> = {
     ua: { home: "Головна", loyalty: "Правила програми лояльності" },
@@ -75,10 +79,11 @@ export default async function LoyaltyProgramRules({
     : [];
 
   const alternates = getHreflangAlternates("/loyalty-program-rules/", lang, getDynamicBaseUrl(await headers()));
+  const canonicalUrl = seo.canonical || alternates.canonical;
 
   return (
     <>
-      <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+      <HreflangLinks canonical={canonicalUrl} languages={alternates.languages} />
       <PolicyPage 
         lang={lang} 
         breadcrumbs={breadcrumbs}

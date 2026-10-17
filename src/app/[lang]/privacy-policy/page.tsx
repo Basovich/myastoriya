@@ -4,7 +4,7 @@ import { getPrivacyPolicyApi } from "@/lib/graphql";
 import { PolicyPageContentItem } from "@/i18n/types";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 interface PrivacyPolicyPageProps {
@@ -15,35 +15,39 @@ export async function generateMetadata({ params }: PrivacyPolicyPageProps): Prom
   const { lang } = await params;
   const headersList = await headers();
   const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-  const seo = getStaticPageSeoData("privacy-policy", lang);
+  const relativeUrl = `/${lang}/privacy-policy/`;
+  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
   const alternates = getHreflangAlternates("/privacy-policy/", lang, dynamicBaseUrl);
+  const canonicalUrl = seo.canonical || alternates.canonical;
 
   const labels: Record<string, { home: string; privacy: string }> = {
     ua: { home: "Головна", privacy: "Політика конфіденційності" },
     ru: { home: "Главная", privacy: "Политика конфиденциальности" }
   };
   const currentLabels = labels[lang] || labels.ua;
+  const finalTitle = seo.title || currentLabels.privacy;
 
   const breadcrumbs = [
     { label: currentLabels.home, href: "/" },
     { label: currentLabels.privacy }
   ];
-  const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
   setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
-    title: { absolute: seo.title },
+    title: finalTitle,
     description: seo.description,
+    ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     openGraph: buildOpenGraphMetadata({
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
-      canonicalUrl: alternates.canonical,
+      canonicalUrl,
       lang,
       type: "website",
     }),
     twitter: {
       card: "summary_large_image",
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
       images: ["/images/og-image.jpg"],
     },
@@ -57,7 +61,7 @@ export default async function Privacy({
   
   const apiData = await getPrivacyPolicyApi();
   const webContent = apiData?.webText;
-  const seo = getStaticPageSeoData("privacy-policy", lang);
+  const seo = await fetchSeoMetadataByUrl(`/${lang}/privacy-policy/`, lang);
 
   const labels: Record<string, { home: string; privacy: string }> = {
     ua: { home: "Головна", privacy: "Політика конфіденційності" },
@@ -75,10 +79,11 @@ export default async function Privacy({
     : [];
 
   const alternates = getHreflangAlternates("/privacy-policy/", lang, getDynamicBaseUrl(await headers()));
+  const canonicalUrl = seo.canonical || alternates.canonical;
 
   return (
     <>
-      <HreflangLinks canonical={alternates.canonical} languages={alternates.languages} />
+      <HreflangLinks canonical={canonicalUrl} languages={alternates.languages} />
       <PolicyPage 
         lang={lang} 
         breadcrumbs={breadcrumbs}

@@ -72,13 +72,11 @@ export async function generateMetadata({
 
   const alternates = getHreflangAlternates(pathname, lang, dynamicBaseUrl);
 
-  const isRu = lang === "ru";
-  const siteBrand = isRu ? "Мястория" : "М'ясторія";
 
   return {
     title: {
       default: siteData.seo.title,
-      template: `%s | ${siteBrand}`,
+      template: "%s",
     },
     description: siteData.seo.description,
     metadataBase: new URL(siteData.url),

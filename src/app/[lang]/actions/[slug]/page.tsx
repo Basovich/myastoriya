@@ -13,12 +13,10 @@ import { getAccessToken } from '@/app/actions/authActions';
 import {
     getExplicitHreflangAlternates,
     getDynamicBaseUrl,
-    getActionSeoData,
     buildOpenGraphMetadata,
     generateBreadcrumbJsonLd,
     setRequestBreadcrumbJsonLd,
     fetchSeoMetadataByUrl,
-    formatTitleConfig,
 } from '@/utils/seo';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
@@ -43,13 +41,11 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
     if (!sale) return {};
 
     const actionTitle = sale.title || sale.name;
-    const fallbackSeoData = getActionSeoData(actionTitle, sale.description || sale.text, lang);
     const relativeUrl = `/${lang}/actions/${slug}/`;
     const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, {
-        title: fallbackSeoData.title,
-        description: fallbackSeoData.description,
         h1: actionTitle,
     });
+    const finalTitle = seo.title || actionTitle;
 
     const alternates = getExplicitHreflangAlternates(
         {
@@ -74,14 +70,12 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
     const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
-    const titleConfig = formatTitleConfig(seo.title, lang);
-
     return {
-        title: titleConfig,
+        title: finalTitle,
         description: seo.description,
         robots: seo.noindex ? { index: false, follow: false } : undefined,
         openGraph: buildOpenGraphMetadata({
-            title: titleConfig.absolute,
+            title: finalTitle,
             description: seo.description,
             canonicalUrl,
             lang,
@@ -90,7 +84,7 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
         }),
         twitter: {
             card: 'summary_large_image',
-            title: titleConfig.absolute,
+            title: finalTitle,
             description: seo.description,
             images: actionImage ? [actionImage] : undefined,
         },
@@ -133,11 +127,8 @@ export default async function ActionDetailPage({ params }: ActionDetailPageProps
 
     const relativeUrl = `/${lang}/actions/${slug}/`;
     const actionTitle = sale.title || sale.name;
-    const fallbackSeoData = getActionSeoData(actionTitle, sale.description || sale.text, lang);
     const [seo, saleSlugs] = await Promise.all([
         fetchSeoMetadataByUrl(relativeUrl, lang, {
-            title: fallbackSeoData.title,
-            description: fallbackSeoData.description,
             h1: actionTitle,
         }),
         getSaleSlugsById(saleId),

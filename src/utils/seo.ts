@@ -85,29 +85,7 @@ export function decodeHtmlEntities(text: string): string {
         .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)));
 }
 
-/**
- * Safely formats Next.js title metadata.
- * Strips any trailing brand suffixes (including duplicate or cross-language ones like "| Мясторія", "| Мʼясторія", "| М'ясторія", "| Мястория", etc.)
- * and ensures a single, correctly localized brand suffix is applied as an absolute title object.
- */
-export function formatTitleConfig(titleStr: string | undefined | null, lang: string = 'ua'): { absolute: string } {
-    if (!titleStr) return { absolute: '' };
-    let cleanTitle = titleStr.trim();
-    const isRu = lang.toLowerCase() === 'ru';
-    const siteBrand = isRu ? 'Мястория' : "М'ясторія";
 
-    // Clean up any trailing brand suffixes (including duplicate or cross-language ones)
-    const brandRegex = /\s*\|\s*(?:М['ʼ’]?ястор(?:ія|ия)|Myastoriya)\s*$/i;
-    while (brandRegex.test(cleanTitle)) {
-        cleanTitle = cleanTitle.replace(brandRegex, '').trim();
-    }
-
-    if (!cleanTitle) {
-        return { absolute: siteBrand };
-    }
-
-    return { absolute: `${cleanTitle} | ${siteBrand}` };
-}
 
 export function getBaseSiteUrl(overrideBaseUrl?: string): string {
     const configured = overrideBaseUrl
@@ -347,8 +325,8 @@ export function parsePageNum(pageValue?: string | string[] | number | null): num
 
 /**
  * Appends page number to SEO title for pagination pages (page >= 2).
- * Example (UA): "Стейки – купити з доставкою... — сторінка 2 | М'ясторія"
- * Example (RU): "Стейки – купить с доставкой... — страница 2 | Мястория"
+ * Example (UA): "Стейки – купити з доставкою... | М'ясторія — сторінка 2"
+ * Example (RU): "Стейки – купить с доставкой... | Мястория — страница 2"
  */
 export function formatTitleWithPage(
     title: string,
@@ -356,12 +334,10 @@ export function formatTitleWithPage(
     lang: string = "ua"
 ): string {
     const p = parsePageNum(pageNum);
-    const siteBrand = getSiteName(lang);
-    const cleanTitle = title.replace(/\s*\|\s*(?:М['ʼ’]?ястор(?:ія|ия)|Myastoriya)\s*$/i, "").trim();
-    if (p <= 1) return `${cleanTitle} | ${siteBrand}`;
+    if (p <= 1 || !title) return title || "";
     const isRu = lang === "ru";
     const suffix = isRu ? ` — страница ${p}` : ` — сторінка ${p}`;
-    return `${cleanTitle}${suffix} | ${siteBrand}`;
+    return `${title.trim()}${suffix}`;
 }
 
 /**
@@ -463,7 +439,7 @@ export function getExplicitHreflangAlternates(
 export async function resolvePageHreflangLinks(
     path: string,
     lang: string,
-    fallbackSeo: ResolvedSeoData,
+    fallbackSeo?: Partial<ResolvedSeoData>,
     dynamicBaseUrl?: string,
     pageNum?: number
 ): Promise<HreflangAlternates> {
@@ -473,408 +449,6 @@ export async function resolvePageHreflangLinks(
     return {
         canonical: seo.canonical || alternates.canonical,
         languages: alternates.languages,
-    };
-}
-
-export interface CategorySeoData {
-    title: string;
-    description: string;
-}
-
-/**
- * Generates SEO Title and Description for product category pages according to SEO requirements.
- */
-export function getCategorySeoData(
-    categoryName: string,
-    minPrice?: number | null,
-    lang: string = 'ua'
-): CategorySeoData {
-    const isRu = lang === 'ru';
-    const cleanName = categoryName.trim();
-    const hasValidPrice = typeof minPrice === 'number' && !isNaN(minPrice) && minPrice > 0;
-
-    if (isRu) {
-        const title = `${cleanName} – купить с доставкой по Киеву и Украине | Мястория`;
-        const description = hasValidPrice
-            ? `${cleanName} в интернет-магазине «Мястория» ✅ Цены от ${Math.round(minPrice)} грн ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`
-            : `${cleanName} в интернет-магазине «Мястория» ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`;
-        return { title, description };
-    }
-
-    const title = `${cleanName} – купити з доставкою по Києву та Україні | М'ясторія`;
-    const description = hasValidPrice
-        ? `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Ціни від ${Math.round(minPrice)} грн ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`
-        : `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`;
-
-    return { title, description };
-}
-
-export interface ProductSeoData {
-    title: string;
-    description: string;
-}
-
-/**
- * Generates SEO Title and Description for product pages according to SEO requirements.
- */
-export function getProductSeoData(
-    productName: string,
-    price?: number | null,
-    lang: string = 'ua'
-): ProductSeoData {
-    const isRu = lang === 'ru';
-    const cleanName = productName.trim();
-    const hasValidPrice = typeof price === 'number' && !isNaN(price) && price > 0;
-
-    if (isRu) {
-        const title = `${cleanName} | Мястория`;
-        const description = hasValidPrice
-            ? `${cleanName} в интернет-магазине «Мястория» ✅ Цена ${Math.round(price)} грн ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`
-            : `${cleanName} в интернет-магазине «Мястория» ✅ Свежая и качественная продукция ✅ Заказ онлайн ✅ Доставка по Киеву и Украине`;
-        return { title, description };
-    }
-
-    const title = `${cleanName} | М'ясторія`;
-    const description = hasValidPrice
-        ? `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Ціна ${Math.round(price)} грн ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`
-        : `${cleanName} в інтернет-магазині «Мʼясторія» ✅ Свіжа та якісна продукція ✅ Замовлення онлайн ✅ Доставка по Києву та Україні`;
-
-    return { title, description };
-}
-
-export interface StoreSeoData {
-    title: string;
-    description: string;
-}
-
-/**
- * Generates SEO Title and Description for store pages according to SEO requirements.
- */
-export function getStoreSeoData(
-    storeName: string,
-    address: string,
-    lang: string = 'ua'
-): StoreSeoData {
-    const isRu = lang === 'ru';
-    const cleanName = storeName.trim();
-    const cleanAddress = address.trim();
-
-    if (isRu) {
-        const title = `${cleanName}: ${cleanAddress} | Мястория`;
-        const description = `${cleanName} по адресу ${cleanAddress}. Посмотрите актуальное меню, график работы, контакты и другую информацию о заведении.`;
-        return { title, description };
-    }
-
-    const title = `${cleanName}: ${cleanAddress} | М'ясторія`;
-    const description = `${cleanName} за адресою ${cleanAddress}. Перегляньте актуальне меню, графік роботи, контакти та іншу інформацію про заклад.`;
-
-    return { title, description };
-}
-
-export interface BlogSeoData {
-    title: string;
-    description: string;
-}
-
-/**
- * Generates SEO Title and Description for blog publication pages according to SEO requirements.
- */
-export function getBlogSeoData(
-    postName: string,
-    postText?: string | null,
-    lang: string = 'ua'
-): BlogSeoData {
-    const isRu = lang === 'ru';
-    const cleanTitle = postName.trim();
-
-    let cleanDescription = '';
-    if (postText) {
-        cleanDescription = postText
-            .replace(/<style[\s\S]*?<\/style>/gi, '')
-            .replace(/<script[\s\S]*?<\/script>/gi, '')
-            .replace(/<[^>]*>/g, ' ');
-        cleanDescription = decodeHtmlEntities(cleanDescription)
-            .replace(/\s+/g, ' ')
-            .trim()
-            .slice(0, 155)
-            .trim();
-    }
-
-    if (isRu) {
-        const title = `${cleanTitle} | Мястория`;
-        return { title, description: cleanDescription };
-    }
-
-    const title = `${cleanTitle} | М'ясторія`;
-    return { title, description: cleanDescription };
-}
-
-export interface ActionSeoData {
-    title: string;
-    description: string;
-}
-
-/**
- * Generates SEO Title and Description for promotion/action pages according to SEO requirements.
- */
-export function getActionSeoData(
-    actionName: string,
-    actionText?: string | null,
-    lang: string = 'ua'
-): ActionSeoData {
-    const isRu = lang === 'ru';
-    const cleanTitle = actionName.trim();
-
-    let cleanDescription = '';
-    if (actionText) {
-        cleanDescription = actionText
-            .replace(/<style[\s\S]*?<\/style>/gi, '')
-            .replace(/<script[\s\S]*?<\/script>/gi, '')
-            .replace(/<[^>]*>/g, ' ');
-        cleanDescription = decodeHtmlEntities(cleanDescription)
-            .replace(/\s+/g, ' ')
-            .trim()
-            .slice(0, 155)
-            .trim();
-    }
-
-    if (isRu) {
-        const title = `${cleanTitle} | Мястория`;
-        return { title, description: cleanDescription };
-    }
-
-    const title = `${cleanTitle} | М'ясторія`;
-    return { title, description: cleanDescription };
-}
-
-export interface ComplexDiscountSeoData {
-    title: string;
-    description: string;
-}
-
-/**
- * Generates SEO Title and Description for complex discount pages according to SEO requirements.
- */
-export function getComplexDiscountSeoData(
-    discountName: string,
-    discountText?: string | null,
-    lang: string = 'ua'
-): ComplexDiscountSeoData {
-    const isRu = lang === 'ru';
-    const cleanTitle = discountName.trim();
-
-    let cleanDescription = '';
-    if (discountText) {
-        cleanDescription = discountText
-            .replace(/<style[\s\S]*?<\/style>/gi, '')
-            .replace(/<script[\s\S]*?<\/script>/gi, '')
-            .replace(/<[^>]*>/g, ' ');
-        cleanDescription = decodeHtmlEntities(cleanDescription)
-            .replace(/\s+/g, ' ')
-            .trim()
-            .slice(0, 155)
-            .trim();
-    }
-
-    if (isRu) {
-        const title = `${cleanTitle} | Мястория`;
-        return { title, description: cleanDescription };
-    }
-
-    const title = `${cleanTitle} | М'ясторія`;
-    return { title, description: cleanDescription };
-}
-
-export interface StaticPageSeoData {
-    h1: string;
-    title: string;
-    description: string;
-}
-
-const STATIC_PAGES_SEO: Record<string, { ua: StaticPageSeoData; ru: StaticPageSeoData }> = {
-    home: {
-        ua: {
-            h1: "М'ясторія — мережа м’ясних магазинів-ресторанів",
-            title: "М'ясторія — мережа м’ясних магазинів-ресторанів",
-            description: "Магазини-ресторани «М'ясторія» – справжнього м'яса територія! ✅ Стейки, свіже м'ясо та готові страви ✅ Власне виробництво ✅ Замовлення онлайн з доставкою",
-        },
-        ru: {
-            h1: "Мястория — сеть мясных магазинов-ресторанов",
-            title: "Мястория — сеть мясных магазинов-ресторанов",
-            description: "Магазины-рестораны «Мястория» – настоящего мяса территория! ✅ Стейки, свежее мясо и готовые блюда ✅ Собственное производство ✅ Заказ онлайн с доставкой",
-        },
-    },
-    "our-stores": {
-        ua: {
-            h1: "Заклади «М'ясторія»",
-            title: "Заклади «М'ясторія»: адреси та графік роботи | М'ясторія",
-            description: "Заклади «М'ясторія» у Києві та інших містах ✅ Адреси та графік роботи ✅ Актуальне меню ресторанів ✅ Телефони та контактна інформація",
-        },
-        ru: {
-            h1: "Заведения «Мястория»",
-            title: "Заведения «Мястория»: адреса и график работы | Мястория",
-            description: "Заведения «Мястория» в Киеве и других городах ✅ Адреса и график работы ✅ Актуальное меню ресторанов ✅ Телефоны и контактная информация",
-        },
-    },
-    actions: {
-        ua: {
-            h1: "Акції",
-            title: "Акції | М'ясторія",
-            description: "Акції та спеціальні пропозиції в «М'ясторія» ✅ Знижки на м'ясо, стейки та готові страви ✅ Умови участі в акціях ✅ Терміни дії пропозицій",
-        },
-        ru: {
-            h1: "Акции",
-            title: "Акции | Мястория",
-            description: "Акции и специальные предложения в «Мястория» ✅ Скидки на мясо, стейки и готовые блюда ✅ Условия участия в акциях ✅ Сроки действия предложений",
-        },
-    },
-    "complex-discounts": {
-        ua: {
-            h1: "Комплексні знижки",
-            title: "Комплексні знижки | М'ясторія",
-            description: "Комплексні знижки в «М'ясторія» ✅ Спеціальні ціни на товари при купівлі разом ✅ Вигідніше, ніж купувати окремо ✅ Економія на замовленні",
-        },
-        ru: {
-            h1: "Комплексные скидки",
-            title: "Комплексные скидки | Мястория",
-            description: "Комплексные скидки в «Мястория» ✅ Специальные цены на товары при покупке вместе ✅ Выгоднее, чем покупать отдельно ✅ Экономия на заказе",
-        },
-    },
-    blog: {
-        ua: {
-            h1: "Блог",
-            title: "Блог | М'ясторія",
-            description: "Блог «М'ясторія» про м'ясо, стейки та їх приготування ✅ Корисні статті та поради ✅ Новини та події компанії ✅ Рецепти різноманітних страв",
-        },
-        ru: {
-            h1: "Блог",
-            title: "Блог | Мястория",
-            description: "Блог «Мястория» о мясе, стейках и их приготовлении ✅ Полезные статьи и советы ✅ Новости и события компании ✅ Рецепты разнообразных блюд",
-        },
-    },
-    "blog-article": {
-        ua: {
-            h1: "Статті",
-            title: "Статті | М'ясторія",
-            description: "Статті від «М'ясторія» про м'ясо та стейки ✅ Корисні поради та рекомендації ✅ Вибір і зберігання продуктів ✅ Особливості приготування",
-        },
-        ru: {
-            h1: "Статьи",
-            title: "Статьи | Мястория",
-            description: "Статьи от «Мястория» о мясе и стейках ✅ Полезные советы и рекомендации ✅ Выбор и хранение продуктов ✅ Особенности приготовления",
-        },
-    },
-    "blog-recipe": {
-        ua: {
-            h1: "Рецепти",
-            title: "Рецепти | М'ясторія",
-            description: "Рецепти від «М'ясторія» для приготування вдома ✅ М'ясні та інші смачні страви ✅ Списки необхідних інгредієнтів ✅ Покрокове приготування",
-        },
-        ru: {
-            h1: "Рецепты",
-            title: "Рецепты | Мястория",
-            description: "Рецепты от «Мястория» для приготовления дома ✅ Мясные и другие вкусные блюда ✅ Списки необходимых ингредиентов ✅ Пошаговое приготовление",
-        },
-    },
-    delivery: {
-        ua: {
-            h1: "Доставка та оплата",
-            title: "Доставка та оплата | М'ясторія",
-            description: "Оплата та доставка з «М'ясторія» ✅ Доступні способи оплати замовлень ✅ Вартість, зони та умови доставки ✅ Терміни та умови повернення",
-        },
-        ru: {
-            h1: "Доставка и оплата",
-            title: "Доставка и оплата | Мястория",
-            description: "Оплата и доставка из «Мястория» ✅ Доступные способы оплаты заказов ✅ Стоимость, зоны и условия доставки ✅ Сроки и условия возврата",
-        },
-    },
-    contacts: {
-        ua: {
-            h1: "Контакти",
-            title: "Контакти | М'ясторія",
-            description: "Контакти мережі «М'ясторія» ✅ Адреса та телефон головного офісу ✅ Форма зворотного зв'язку ✅ Адреси, телефони та графік роботи закладів",
-        },
-        ru: {
-            h1: "Контакты",
-            title: "Контакты | Мястория",
-            description: "Контакты сети «Мястория» ✅ Адрес и телефон главного офиса ✅ Форма обратной связи ✅ Адреса, телефоны и график работы заведений",
-        },
-    },
-    careers: {
-        ua: {
-            h1: "Кар'єра в «М'ясторія» — ми чекаємо на тебе!",
-            title: "Кар'єра в «М'ясторія»: актуальні вакансії | М'ясторія",
-            description: "Кар'єра в «М'ясторія» — ми чекаємо на тебе! ✅ Можливості професійного зростання ✅ Комфортні умови праці ✅ Дружня атмосфера в колективі",
-        },
-        ru: {
-            h1: "Карьера в «Мястория» — мы ждем тебя!",
-            title: "Карьера в «Мястория»: актуальные вакансии | Мястория",
-            description: "Карьера в «Мястория» — мы ждем тебя! ✅ Возможности профессионального роста ✅ Комфортные условия труда ✅ Дружеская атмосфера в коллективе",
-        },
-    },
-    catalog: {
-        ua: {
-            h1: "Каталог продукції",
-            title: "Каталог продукції | М'ясторія",
-            description: "Каталог продукції в інтернет-магазині «М'ясторія» ✅ Стейки, свіже м'ясо та готові страви ✅ Продукція власного виробництва ✅ Онлайн-замовлення з доставкою",
-        },
-        ru: {
-            h1: "Каталог продукции",
-            title: "Каталог продукции | Мястория",
-            description: "Каталог продукции в интернет-магазине «Мястория» ✅ Стейки, свежее мясо и готовые блюда ✅ Продукция собственного производства ✅ Онлайн-заказ с доставкой",
-        },
-    },
-    "loyalty-program-rules": {
-        ua: {
-            h1: "Правила програми лояльності",
-            title: "Правила програми лояльності | М'ясторія",
-            description: "Правила програми лояльності «М'ясторія»: умови участі, порядок нарахування та використання бонусів, отримання знижок та інша інформація.",
-        },
-        ru: {
-            h1: "Правила программы лояльности",
-            title: "Правила программы лояльности | Мястория",
-            description: "Правила программы лояльности «Мястория»: условия участия, порядок начисления и использования бонусов, получения скидок и другая информация.",
-        },
-    },
-    oferta: {
-        ua: {
-            h1: "Публічний договір (оферта)",
-            title: "Публічний договір (оферта) | М'ясторія",
-            description: "Публічний договір (оферта) «М'ясторія»: порядок оформлення замовлень, умови оплати й доставки, відповідальність та інші положення договору.",
-        },
-        ru: {
-            h1: "Публичный договор (оферта)",
-            title: "Публичный договор (оферта) | Мястория",
-            description: "Публичный договор (оферта) «Мястория»: порядок оформления заказов, условия оплаты и доставки, ответственность и другие положения договора.",
-        },
-    },
-    "privacy-policy": {
-        ua: {
-            h1: "Правила використання та політика конфіденційності",
-            title: "Правила використання та політика конфіденційності | М'ясторія",
-            description: "Правила використання сайту та політика конфіденційності «М'ясторія»: умови користування сайтом, обробки, зберігання та захисту персональних даних.",
-        },
-        ru: {
-            h1: "Правила использования и политика конфиденциальности",
-            title: "Правила использования и политика конфиденциальности | Мястория",
-            description: "Правила использования сайта и политика конфиденциальности «Мястория»: условия использования сайта, обработки, хранения и защиты персональных данных.",
-        },
-    },
-};
-
-/**
- * Generates SEO Title, Description, and H1 for main static/listing pages according to SEO requirements.
- */
-export function getStaticPageSeoData(pageKey: string, lang: string = 'ua'): StaticPageSeoData {
-    const isRu = lang === 'ru';
-    const pageObj = STATIC_PAGES_SEO[pageKey];
-    if (pageObj) {
-        return isRu ? pageObj.ru : pageObj.ua;
-    }
-    return {
-        h1: '',
-        title: '',
-        description: '',
     };
 }
 
@@ -911,21 +485,17 @@ export interface ResolvedSeoData {
 
 /**
  * Fetches SEO metadata by URL from backend API (seoByUrl).
- * Falls back to provided static/generated fallback data if API returns null/empty.
+ * Falls back to provided fallback data if API returns null/empty.
  */
 export async function fetchSeoMetadataByUrl(
     url: string,
     lang: string = 'ua',
-    fallback: ResolvedSeoData
+    fallback?: Partial<ResolvedSeoData>
 ): Promise<ResolvedSeoData> {
     const apiSeo = await getSeoByUrlCached(url, lang);
-    if (!apiSeo || (!apiSeo.title && !apiSeo.description && !apiSeo.h1)) {
-        return fallback;
-    }
-
-    const title = apiSeo.title?.trim() || fallback.title;
-    let description = apiSeo.description?.trim() || fallback.description;
-    const h1 = apiSeo.h1?.trim() || fallback.h1;
+    const title = apiSeo?.title?.trim() || fallback?.title || "";
+    let description = apiSeo?.description?.trim() || fallback?.description || "";
+    const h1 = apiSeo?.h1?.trim() || fallback?.h1 || "";
 
     if (description) {
         description = description.replace(/(?:\s+грн\.?){2,}/gi, ' грн').trim();
@@ -935,11 +505,12 @@ export async function fetchSeoMetadataByUrl(
         title,
         description,
         h1,
-        keywords: apiSeo.keywords ?? fallback.keywords,
-        canonical: apiSeo.canonical ?? fallback.canonical,
-        noindex: apiSeo.noindex ?? fallback.noindex,
+        keywords: apiSeo?.keywords ?? fallback?.keywords ?? null,
+        canonical: apiSeo?.canonical ?? fallback?.canonical ?? null,
+        noindex: apiSeo?.noindex ?? fallback?.noindex ?? null,
     };
 }
+
 
 
 

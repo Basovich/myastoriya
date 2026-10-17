@@ -10,7 +10,7 @@ import { getProductsApi, getSalesApi, getSpecialsApi, getCatalogTreeApi, getShow
 import { buildCategoryIndex, getCategoryHref } from "@/utils/category-url";
 import { getAccessToken } from "@/app/actions/authActions";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
@@ -21,18 +21,18 @@ export async function generateMetadata({
   const { lang } = await params;
   const headersList = await headers();
   const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-  const fallbackSeo = getStaticPageSeoData('home', lang);
   const relativeUrl = `/${lang}/`;
-  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
+  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
   const alternates = getHreflangAlternates('/', lang, dynamicBaseUrl);
   const canonicalUrl = seo.canonical || alternates.canonical;
+  const finalTitle = seo.title || (lang === 'ru' ? 'Мястория' : "М'ясторія");
 
   return {
-    title: { absolute: seo.title },
+    title: finalTitle,
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     openGraph: buildOpenGraphMetadata({
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
       canonicalUrl,
       lang,
@@ -40,7 +40,7 @@ export async function generateMetadata({
     }),
     twitter: {
       card: "summary_large_image",
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
     },
   };
@@ -55,7 +55,7 @@ export default async function Home({
   const dict = await getDictionary(lang);
   const headersList = await headers();
   const alternates = getHreflangAlternates('/', lang, getDynamicBaseUrl(headersList));
-  const seo = await fetchSeoMetadataByUrl(`/${lang}/`, lang, getStaticPageSeoData('home', lang));
+  const seo = await fetchSeoMetadataByUrl(`/${lang}/`, lang);
   const canonicalUrl = seo.canonical || alternates.canonical;
 
   const token = await getAccessToken();

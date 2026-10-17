@@ -19,7 +19,7 @@ import {
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams, parseRawProductionParam } from '@/utils/filter-params';
 import { getAccessToken } from '@/app/actions/authActions';
-import { getHreflangAlternates, getDynamicBaseUrl, getCategorySeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig, resolvePageHreflangLinks } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, resolvePageHreflangLinks } from '@/utils/seo';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
 interface DynamicCategoryPageProps {
@@ -56,43 +56,16 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
     }
 
     if (categoryEntry) {
-        const categoryId = parseInt(categoryEntry.node.id);
         const categoryName = categoryEntry.node.name;
         const categoryImage = resolveCategoryImageUrl(categoryEntry.node);
-        const token = await getAccessToken();
 
-        const [filterData, productsResponse] = await Promise.all([
-            getProductsFilterApi(categoryId, lang, undefined).catch(() => null),
-            getProductsApi({ categoryId, limit: 24 }, lang, token ?? undefined).catch(() => null),
-        ]);
-
-        let minPrice: number | null = null;
-        if (filterData?.blocks) {
-            const priceBlock = filterData.blocks.find(b => b.type === 'range' || b.key === 'price');
-            if (priceBlock && typeof priceBlock.min === 'number' && priceBlock.min > 0) {
-                minPrice = priceBlock.min;
-            }
-        }
-
-        if (!minPrice && productsResponse?.data && productsResponse.data.length > 0) {
-            const validCosts = productsResponse.data
-                .map(p => p.cost)
-                .filter((c): c is number => typeof c === 'number' && c > 0);
-            if (validCosts.length > 0) {
-                minPrice = Math.min(...validCosts);
-            }
-        }
-
-        const fallbackSeo = getCategorySeoData(categoryName, minPrice, lang);
         const relativeUrl = `/${lang}/category/${slug.join('/')}/`;
         const seoData = await fetchSeoMetadataByUrl(relativeUrl, lang, {
-            title: fallbackSeo.title,
-            description: fallbackSeo.description,
             h1: categoryName,
         });
 
         const alternates = getHreflangAlternates(`/category/${slug.join('/')}/`, lang, dynamicBaseUrl, pageNum);
-        const finalTitle = formatTitleWithPage(seoData.title, pageNum, lang);
+        const finalTitle = formatTitleWithPage(seoData.title || categoryName, pageNum, lang);
         const canonicalUrl = pageNum > 1 ? alternates.canonical : (seoData.canonical || alternates.canonical);
         const isPageNoindex = pageNum > 1 || Boolean(seoData.noindex);
         const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
@@ -104,14 +77,12 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
         const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbItems, lang, canonicalUrl, dynamicBaseUrl);
         setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
-        const titleConfig = formatTitleConfig(finalTitle, lang);
-
         return {
-            title: titleConfig,
+            title: finalTitle,
             description: seoData.description,
             ...(pageRobots && { robots: pageRobots }),
             openGraph: buildOpenGraphMetadata({
-                title: titleConfig.absolute,
+                title: finalTitle,
                 description: seoData.description,
                 canonicalUrl,
                 lang,
@@ -120,7 +91,7 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
             }),
             twitter: {
                 card: 'summary_large_image',
-                title: titleConfig.absolute,
+                title: finalTitle,
                 description: seoData.description,
                 images: categoryImage ? [categoryImage] : undefined,
             },

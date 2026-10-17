@@ -5,7 +5,7 @@ import { getShopsApi } from "@/lib/graphql/queries/shops";
 import { getPolicyBlocksApi, getDeliveryBlocksApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 import * as Sentry from "@sentry/nextjs";
 
@@ -17,14 +17,14 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
   const { lang } = await params;
   const headersList = await headers();
   const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-  const fallbackSeo = getStaticPageSeoData("delivery", lang);
   const relativeUrl = `/${lang}/delivery/`;
-  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
+  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
   const alternates = getHreflangAlternates("/delivery/", lang, dynamicBaseUrl);
   const canonicalUrl = seo.canonical || alternates.canonical;
 
   const isRu = lang === "ru";
-  const title = { absolute: seo.title };
+  const defaultTitle = isRu ? "Оплата и доставка" : "Оплата і доставка";
+  const finalTitle = seo.title || defaultTitle;
 
   const breadcrumbs = [
     { label: isRu ? "Главная" : "Головна", href: "/" },
@@ -34,11 +34,11 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
   setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
-    title,
+    title: finalTitle,
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     openGraph: buildOpenGraphMetadata({
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
       canonicalUrl,
       lang,
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
     }),
     twitter: {
       card: "summary_large_image",
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
       images: ["/images/og-image.jpg"],
     },
@@ -59,7 +59,7 @@ export default async function DeliveryAndPayment({
   const { lang } = await params;
   const dict = await getDictionary(lang);
   const alternates = getHreflangAlternates("/delivery/", lang, getDynamicBaseUrl(await headers()));
-  const seo = await fetchSeoMetadataByUrl(`/${lang}/delivery/`, lang, getStaticPageSeoData("delivery", lang));
+  const seo = await fetchSeoMetadataByUrl(`/${lang}/delivery/`, lang);
   
   let shopsResponse;
   let policyBlocks;

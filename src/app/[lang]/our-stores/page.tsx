@@ -4,7 +4,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import OurStoresPage from "@/app/pages/OurStores";
 import { getShopsApi } from "@/lib/graphql/queries/shops";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
@@ -15,13 +15,14 @@ export async function generateMetadata({
   const { lang } = await params;
   const headersList = await headers();
   const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-  const fallbackSeo = getStaticPageSeoData('our-stores', lang);
   const relativeUrl = `/${lang}/our-stores/`;
-  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
+  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
   const alternates = getHreflangAlternates('/our-stores/', lang, dynamicBaseUrl);
   const canonicalUrl = seo.canonical || alternates.canonical;
 
   const isRu = lang === 'ru';
+  const finalTitle = seo.title || (isRu ? 'Наши заведения' : 'Наші заклади');
+
   const breadcrumbs = [
     { label: isRu ? 'Главная' : 'Головна', href: '/' },
     { label: isRu ? 'Наши заведения' : 'Наші заклади' }
@@ -30,11 +31,11 @@ export async function generateMetadata({
   setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
   return {
-    title: { absolute: seo.title },
+    title: finalTitle,
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     openGraph: buildOpenGraphMetadata({
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
       canonicalUrl,
       lang,
@@ -42,7 +43,7 @@ export async function generateMetadata({
     }),
     twitter: {
       card: "summary_large_image",
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
       images: ['/images/og-image.jpg'],
     },
@@ -58,7 +59,7 @@ export default async function OurStores({
   const dict = await getDictionary(lang);
   const shopsResponse = await getShopsApi({ limit: 100 }, lang);
   const alternates = getHreflangAlternates('/our-stores/', lang, getDynamicBaseUrl(await headers()));
-  const seo = await fetchSeoMetadataByUrl(`/${lang}/our-stores/`, lang, getStaticPageSeoData('our-stores', lang));
+  const seo = await fetchSeoMetadataByUrl(`/${lang}/our-stores/`, lang);
 
   return (
     <>

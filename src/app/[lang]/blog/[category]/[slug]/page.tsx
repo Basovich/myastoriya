@@ -8,14 +8,12 @@ import { getBlogBySlugApi, resolveBlogImageUrl } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
 import { getBlogCategorySegment } from "@/utils/blog-url";
 import {
-    getBlogSeoData,
     getHreflangAlternates,
     getDynamicBaseUrl,
     buildOpenGraphMetadata,
     generateBreadcrumbJsonLd,
     setRequestBreadcrumbJsonLd,
     fetchSeoMetadataByUrl,
-    formatTitleConfig,
 } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
@@ -32,14 +30,12 @@ export async function generateMetadata({
     if (!post) return {};
 
     const postTitle = post.h1 || post.name;
-    const fallbackSeoData = getBlogSeoData(postTitle, post.text, lang);
     const canonicalCategory = getBlogCategorySegment(post);
     const relativeUrl = `/blog/${canonicalCategory}/${slug}/`;
     const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, {
-        title: fallbackSeoData.title,
-        description: fallbackSeoData.description,
         h1: postTitle,
     });
+    const finalTitle = seo.title || postTitle;
 
     const imageUrl = resolveBlogImageUrl(post.image);
     const alternates = getHreflangAlternates(`/blog/${category}/${slug}/`, lang, dynamicBaseUrl);
@@ -58,14 +54,12 @@ export async function generateMetadata({
     const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
-    const titleConfig = formatTitleConfig(seo.title, lang);
-
     return {
-        title: titleConfig,
+        title: finalTitle,
         description: seo.description,
         robots: seo.noindex ? { index: false, follow: false } : undefined,
         openGraph: buildOpenGraphMetadata({
-            title: titleConfig.absolute,
+            title: finalTitle,
             description: seo.description,
             canonicalUrl,
             lang,
@@ -74,7 +68,7 @@ export async function generateMetadata({
         }),
         twitter: {
             card: "summary_large_image",
-            title: titleConfig.absolute,
+            title: finalTitle,
             description: seo.description,
             images: imageUrl ? [imageUrl] : undefined,
         },
@@ -127,12 +121,9 @@ export default async function BlogSinglePostPage({
     }
 
     const postTitle = post.h1 || post.name;
-    const fallbackSeoData = getBlogSeoData(postTitle, post.text, lang);
     const relativeUrl = `/blog/${canonicalCategory}/${slug}/`;
     const [seo, headersList] = await Promise.all([
         fetchSeoMetadataByUrl(relativeUrl, lang, {
-            title: fallbackSeoData.title,
-            description: fallbackSeoData.description,
             h1: postTitle,
         }),
         headers(),

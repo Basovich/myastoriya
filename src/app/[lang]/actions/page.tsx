@@ -4,7 +4,7 @@ import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSalesApi } from "@/lib/graphql/queries/pages/home/sales";
 import { getProductsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig, resolvePageHreflangLinks } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, resolvePageHreflangLinks } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
@@ -20,14 +20,12 @@ export async function generateMetadata({
 
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-    const fallbackSeo = getStaticPageSeoData('actions', lang);
     const relativeUrl = `/${lang}/actions/`;
-    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
+    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
     const alternates = getHreflangAlternates('/actions/', lang, dynamicBaseUrl, pageNum);
 
-    const rawTitle = seo.title;
+    const rawTitle = seo.title || (lang === 'ru' ? 'Акции' : 'Акції');
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
-    const title = formatTitleConfig(formattedTitleStr, lang);
 
     const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
     const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);
@@ -42,11 +40,11 @@ export async function generateMetadata({
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
-        title,
+        title: formattedTitleStr,
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
         openGraph: buildOpenGraphMetadata({
-            title: title.absolute,
+            title: formattedTitleStr,
             description: seo.description,
             canonicalUrl,
             lang,
@@ -54,7 +52,7 @@ export async function generateMetadata({
         }),
         twitter: {
             card: "summary_large_image",
-            title: title.absolute,
+            title: formattedTitleStr,
             description: seo.description,
             images: ['/images/og-image.jpg'],
         },
@@ -104,7 +102,7 @@ export default async function ActionsPage({
 
     const totalPages = salesResponse?.has_more_pages ? page + 1 : page;
 
-    const hreflangLinks = await resolvePageHreflangLinks('/actions/', lang, getStaticPageSeoData('actions', lang), getDynamicBaseUrl(await headers()), page);
+    const hreflangLinks = await resolvePageHreflangLinks('/actions/', lang, undefined, getDynamicBaseUrl(await headers()), page);
 
     return (
         <main>

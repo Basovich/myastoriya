@@ -7,7 +7,7 @@ import { mapUrlCategoryToApiTypeSlug, getBlogCategorySegment } from "@/utils/blo
 import { getAccessToken } from "@/app/actions/authActions";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export const dynamic = "force-dynamic";
@@ -25,44 +25,41 @@ export async function generateMetadata({ params, searchParams }: BlogCategoryPag
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
-    const pageKey = category === "recipe" ? "blog-recipe" : category === "article" ? "blog-article" : undefined;
-    if (!pageKey) {
-        return {};
-    }
-
-    const seo = getStaticPageSeoData(pageKey, lang);
+    const isRu = lang === "ru";
+    const categoryName = category === "recipe" ? (isRu ? "Рецепты" : "Рецепти") : (isRu ? "Статьи" : "Статті");
+    const relativeUrl = `/${lang}/blog/${category}/`;
+    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
     const alternates = getHreflangAlternates(`/blog/${category}/`, lang, dynamicBaseUrl, pageNum);
 
-    const isRu = lang === "ru";
-    const rawTitle = isRu ? seo.title : seo.h1;
+    const rawTitle = seo.title || categoryName;
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
-    const titleConfig = formatTitleConfig(formattedTitleStr, lang);
 
-    const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
+    const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
+    const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);
+    const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
 
-    const categoryName = category === "recipe" ? (isRu ? "Рецепты" : "Рецепти") : (isRu ? "Статьи" : "Статті");
     const breadcrumbs = [
         { label: isRu ? "Главная" : "Головна", href: "/" },
         { label: isRu ? "Блог" : "Блог", href: "/blog" },
         { label: categoryName }
     ];
-    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
-        title: titleConfig,
+        title: formattedTitleStr,
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
         openGraph: buildOpenGraphMetadata({
-            title: titleConfig.absolute,
+            title: formattedTitleStr,
             description: seo.description,
-            canonicalUrl: alternates.canonical,
+            canonicalUrl,
             lang,
             type: "website",
         }),
         twitter: {
             card: "summary_large_image",
-            title: titleConfig.absolute,
+            title: formattedTitleStr,
             description: seo.description,
             images: ["/images/og-image.jpg"],
         },

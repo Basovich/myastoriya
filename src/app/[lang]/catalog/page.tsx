@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { getAccessToken } from '@/app/actions/authActions';
 
-import { getHreflangAlternates, getDynamicBaseUrl, getStaticPageSeoData, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, resolvePageHreflangLinks } from '@/utils/seo';
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, resolvePageHreflangLinks } from '@/utils/seo';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
 interface CatalogPageProps {
@@ -24,15 +24,14 @@ export async function generateMetadata({ params, searchParams }: CatalogPageProp
 
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-    const fallbackSeo = getStaticPageSeoData('catalog', lang);
     const relativeUrl = `/${lang}/catalog/`;
-    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
+    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
     const alternates = getHreflangAlternates('/catalog/', lang, dynamicBaseUrl, pageNum);
 
     const isRu = lang === 'ru';
-    const rawTitle = seo.title;
+    const fallbackTitle = isRu ? 'Каталог продукции' : 'Каталог продукції';
+    const rawTitle = seo.title || fallbackTitle;
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
-    const title = { absolute: formattedTitleStr };
 
     const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
     const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);
@@ -40,13 +39,13 @@ export async function generateMetadata({ params, searchParams }: CatalogPageProp
 
     const breadcrumbItems = [
         { label: isRu ? 'Главная' : 'Головна', href: '/' },
-        { label: fallbackSeo.h1 },
+        { label: seo.h1 || fallbackTitle },
     ];
     const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbItems, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
-        title,
+        title: formattedTitleStr,
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
         openGraph: buildOpenGraphMetadata({
@@ -111,7 +110,7 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
     }
     productsResponse.current_page = page;
 
-    const pageTitle = getStaticPageSeoData('catalog', lang).h1;
+    const pageTitle = lang === 'ru' ? 'Каталог продукции' : 'Каталог продукції';
 
     // Категорії першого рівня для CategoryCircles
     const subcategoryItems = catalogTree.map(cat => ({
@@ -125,7 +124,7 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
         { label: pageTitle },
     ];
 
-    const hreflangLinks = await resolvePageHreflangLinks('/catalog/', lang, getStaticPageSeoData('catalog', lang), getDynamicBaseUrl(await headers()), parsePageNum(resolvedSearchParams?.page));
+    const hreflangLinks = await resolvePageHreflangLinks('/catalog/', lang, undefined, getDynamicBaseUrl(await headers()), parsePageNum(resolvedSearchParams?.page));
 
     return (
         <main>

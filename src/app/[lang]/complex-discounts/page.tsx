@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import ActionsGrid from "../../components/ActionsGrid/ActionsGrid";
 import { getSpecialsApi } from "@/lib/graphql";
 import { getAccessToken } from "@/app/actions/authActions";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 export async function generateMetadata({
@@ -19,37 +19,40 @@ export async function generateMetadata({
 
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-    const seo = getStaticPageSeoData('complex-discounts', lang);
+    const relativeUrl = `/${lang}/complex-discounts/`;
+    const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
     const alternates = getHreflangAlternates('/complex-discounts/', lang, dynamicBaseUrl, pageNum);
 
-    const rawTitle = seo.title;
+    const defaultTitle = lang === "ru" ? "Комплексные скидки" : "Комплексні знижки";
+    const rawTitle = seo.title || defaultTitle;
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
-    const title = formatTitleConfig(formattedTitleStr, lang);
 
-    const pageRobots = pageNum > 1 ? { index: false, follow: true } : undefined;
+    const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
+    const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);
+    const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
 
     const isRu = lang === "ru";
     const breadcrumbs = [
         { label: isRu ? "Главная" : "Головна", href: "/" },
         { label: isRu ? "Комплексные скидки" : "Комплексні знижки" }
     ];
-    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
+    const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
 
     return {
-        title,
+        title: formattedTitleStr,
         description: seo.description,
         ...(pageRobots && { robots: pageRobots }),
         openGraph: buildOpenGraphMetadata({
-            title: title.absolute,
+            title: formattedTitleStr,
             description: seo.description,
-            canonicalUrl: alternates.canonical,
+            canonicalUrl,
             lang,
             type: "website",
         }),
         twitter: {
             card: "summary_large_image",
-            title: title.absolute,
+            title: formattedTitleStr,
             description: seo.description,
             images: ['/images/og-image.jpg'],
         },

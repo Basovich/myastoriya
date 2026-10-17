@@ -4,7 +4,7 @@ import ContactsPage from "@/app/pages/Contacts";
 import { getContactsCategoriesApi } from "@/lib/graphql";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { getStaticPageSeoData, getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, formatTitleConfig } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
 
 interface ContactsPageProps {
@@ -15,14 +15,13 @@ export async function generateMetadata({ params }: ContactsPageProps): Promise<M
   const { lang } = await params;
   const headersList = await headers();
   const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-  const fallbackSeo = getStaticPageSeoData("contacts", lang);
   const relativeUrl = `/${lang}/contacts/`;
-  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang, fallbackSeo);
+  const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
   const alternates = getHreflangAlternates("/contacts/", lang, dynamicBaseUrl);
   const canonicalUrl = seo.canonical || alternates.canonical;
 
   const isRu = lang === "ru";
-  const title = formatTitleConfig(seo.title, lang);
+  const finalTitle = seo.title || (isRu ? 'Контакты' : 'Контакти');
 
   const breadcrumbs = [
     { label: isRu ? 'Главная' : 'Головна', href: '/' },
@@ -32,11 +31,11 @@ export async function generateMetadata({ params }: ContactsPageProps): Promise<M
   setRequestBreadcrumbJsonLd(jsonLdData);
 
   return {
-    title,
+    title: finalTitle,
     description: seo.description,
     ...(seo.noindex ? { robots: { index: false, follow: false } } : {}),
     openGraph: buildOpenGraphMetadata({
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
       canonicalUrl,
       lang,
@@ -44,7 +43,7 @@ export async function generateMetadata({ params }: ContactsPageProps): Promise<M
     }),
     twitter: {
       card: "summary_large_image",
-      title: seo.title,
+      title: finalTitle,
       description: seo.description,
       images: ["/images/og-image.jpg"],
     },
@@ -57,7 +56,7 @@ export default async function Contacts({
   const { lang } = await params;
   const dict = await getDictionary(lang);
   const alternates = getHreflangAlternates("/contacts/", lang, getDynamicBaseUrl(await headers()));
-  const seo = await fetchSeoMetadataByUrl(`/${lang}/contacts/`, lang, getStaticPageSeoData("contacts", lang));
+  const seo = await fetchSeoMetadataByUrl(`/${lang}/contacts/`, lang);
   
   // Fetch contact categories and nested contacts from API
   const response = await getContactsCategoriesApi(lang).catch(() => ({ contactCategories: [] }));

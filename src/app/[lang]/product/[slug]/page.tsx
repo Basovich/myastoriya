@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import { getLocalizedHref } from '@/utils/i18n-helpers';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, getProductSeoData, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateProductJsonLd, setRequestProductJsonLd, formatTitleConfig } from '@/utils/seo';
+import { getExplicitHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateProductJsonLd, setRequestProductJsonLd } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 import {
@@ -55,14 +55,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     const productName = product.name;
     const productImage = resolveProductImageUrl(product);
     const effectivePrice = product.purchaseCost ?? product.cost;
-    const fallbackSeo = getProductSeoData(productName, effectivePrice, lang);
     const relativeUrl = `/${lang}/product/${slug}/`;
     const seoData = await fetchSeoMetadataByUrl(relativeUrl, lang, {
-        title: fallbackSeo.title,
-        description: fallbackSeo.description,
         h1: productName,
-    }).catch(() => fallbackSeo);
+    });
 
+    const finalTitle = seoData.title || productName;
     let finalDescription = seoData.description;
     if (finalDescription) {
         if (effectivePrice) {
@@ -70,8 +68,6 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         }
         finalDescription = finalDescription.replace(/(?:\s+грн\.?){2,}/gi, ' грн').trim();
     }
-
-    const titleConfig = formatTitleConfig(seoData.title, lang);
 
     const alternates = getExplicitHreflangAlternates(
         {
@@ -81,7 +77,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         lang,
         dynamicBaseUrl,
     );
-    const canonicalUrl = ('canonical' in seoData && seoData.canonical) || alternates.canonical;
+    const canonicalUrl = seoData.canonical || alternates.canonical;
 
     let ratingData: { ratingValue?: number; ratingCount?: number } | undefined = undefined;
     try {
@@ -110,20 +106,20 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     setRequestProductJsonLd(productJsonLd, relativeUrl);
 
     return {
-        title: titleConfig,
+        title: finalTitle,
         description: finalDescription,
-        ...('noindex' in seoData && seoData.noindex ? { robots: { index: false, follow: false } } : {}),
+        ...(seoData.noindex ? { robots: { index: false, follow: false } } : {}),
         openGraph: buildOpenGraphMetadata({
-            title: titleConfig.absolute,
+            title: finalTitle,
             description: finalDescription,
             canonicalUrl,
             lang,
             image: productImage,
-            type: 'product',
+            type: 'website',
         }),
         twitter: {
             card: 'summary_large_image',
-            title: titleConfig.absolute,
+            title: finalTitle,
             description: finalDescription,
             images: productImage ? [productImage] : undefined,
         },
@@ -316,7 +312,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
-    const canonicalUrl = `${dynamicBaseUrl}/${lang}/product/${product.slug || slug}/`;
 
     let ratingData: { ratingValue?: number; ratingCount?: number } | undefined = undefined;
     const ratingCount = initialReviewsData?.data?.length ?? 0;
@@ -326,29 +321,25 @@ export default async function ProductPage({ params }: ProductPageProps) {
         ratingData = { ratingValue, ratingCount };
     }
 
-    const productJsonLd = generateProductJsonLd({
-        product,
-        lang,
-        canonicalUrl,
-        dynamicBaseUrl,
-        imageUrl: resolveProductImageUrl(product),
-        ratingData,
-    });
-
     const productSlugs = await getProductSlugsById(productId).catch(() => ({ uk: slug, ru: slug }));
     const alternates = getExplicitHreflangAlternates(
         { uk: `/product/${productSlugs.uk}/`, ru: `/product/${productSlugs.ru}/` },
         lang,
         dynamicBaseUrl,
     );
-    const effectivePrice = product.purchaseCost ?? product.cost;
-    const fallbackSeo = getProductSeoData(product.name, effectivePrice, lang);
     const seoData = await fetchSeoMetadataByUrl(`/${lang}/product/${slug}/`, lang, {
-        title: fallbackSeo.title,
-        description: fallbackSeo.description,
         h1: product.name,
     }).catch(() => null);
     const hreflangCanonical = seoData?.canonical || alternates.canonical;
+
+    const productJsonLd = generateProductJsonLd({
+        product,
+        lang,
+        canonicalUrl: hreflangCanonical,
+        dynamicBaseUrl,
+        imageUrl: resolveProductImageUrl(product),
+        ratingData,
+    });
 
     return (
         <>
