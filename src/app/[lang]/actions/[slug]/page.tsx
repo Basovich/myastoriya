@@ -131,11 +131,6 @@ export default async function ActionDetailPage({ params }: ActionDetailPageProps
         console.warn(`[ActionDetailPage] Failed to fetch products for sale ${sale.id}:`, err);
     }
 
-    // Hide the promotion itself if all products are unavailable in the selected city
-    if (productsResponse.data.length === 0) {
-        return notFound();
-    }
-
     const relativeUrl = `/${lang}/actions/${slug}/`;
     const actionTitle = sale.title || sale.name;
     const fallbackSeoData = getActionSeoData(actionTitle, sale.description || sale.text, lang);
