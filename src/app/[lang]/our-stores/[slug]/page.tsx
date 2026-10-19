@@ -128,7 +128,7 @@ export default async function StorePage({
                 shop={shop} 
                 lang={lang} 
                 dict={dict} 
-                h1={seo.h1 || undefined}
+                h1={shop.siteName || brandName}
             />
         </>
     );
