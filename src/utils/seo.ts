@@ -281,7 +281,7 @@ export function generateProductJsonLd({
         : `${baseUrl}/images/og-image.jpg`;
 
     const rawDescription = product.text || "";
-    const cleanDescription = rawDescription.replace(/<[^>]*>/g, "").trim() || product.name;
+    const cleanDescription = decodeHtmlEntities(rawDescription.replace(/<[^>]*>/g, "").trim()) || product.name;
 
     const isAvailable = typeof product.available === "boolean"
         ? product.available
