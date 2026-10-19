@@ -1,35 +1,42 @@
-import type { Metadata } from 'next';
-import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
-import { getDictionary } from '@/i18n/get-dictionary';
-import { Locale } from '@/i18n/config';
-import { getLocalizedHref } from '@/utils/i18n-helpers';
-import { getExplicitHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, buildOpenGraphMetadata, generateProductJsonLd, setRequestProductJsonLd } from '@/utils/seo';
+import type {Metadata} from 'next';
+import {headers} from 'next/headers';
+import {notFound, redirect} from 'next/navigation';
+import {getDictionary} from '@/i18n/get-dictionary';
+import {Locale} from '@/i18n/config';
+import {getLocalizedHref} from '@/utils/i18n-helpers';
+import {
+    buildOpenGraphMetadata,
+    fetchSeoMetadataByUrl,
+    generateProductJsonLd,
+    getDynamicBaseUrl,
+    getExplicitHreflangAlternates,
+    setRequestProductJsonLd
+} from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 import {
+    BlogPost,
+    findProductIdBySlug,
+    getBlogsApi,
+    getBoughtTogetherProductsApi,
     getCatalogTreeApi,
-    getProductsApi,
+    getDeliveryBlocksApi,
     getPopularProductsApi,
     getProductByIdApi,
-    findProductIdBySlug,
+    getProductsApi,
     getProductSlugsById,
-    getBlogsApi,
-    getSpecialsByProductApi,
-    getBoughtTogetherProductsApi,
-    getDeliveryBlocksApi,
     getSalesApi,
-    resolveProductImageUrl,
-    ProductCategory,
-    Product,
-    BlogPost,
+    getSpecialsByProductApi,
     OrderingInfoBlock,
+    Product,
+    ProductCategory,
     ProductsResponse,
+    resolveProductImageUrl,
     Sale,
 } from '@/lib/graphql';
-import { getProductReviewsSsr, ProductReview } from '@/lib/graphql/queries/reviews';
-import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref } from '@/utils/category-url';
-import { getAccessToken } from '@/app/actions/authActions';
+import {getProductReviewsSsr, ProductReview} from '@/lib/graphql/queries/reviews';
+import {buildCategoryBreadcrumbs, buildCategoryIndex, getCategoryHref} from '@/utils/category-url';
+import {getAccessToken} from '@/app/actions/authActions';
 
 interface ProductPageProps {
     params: Promise<{ lang: string; slug: string }>;
@@ -140,8 +147,7 @@ async function safeCall<T>(
 ): Promise<T> {
     for (let attempt = 0; attempt <= retries; attempt++) {
         try {
-            const result = await fn();
-            return result;
+            return await fn();
         } catch (err) {
             if (attempt < retries) {
                 const delay = 1000 * (attempt + 1);
