@@ -140,7 +140,8 @@ async function safeCall<T>(
 ): Promise<T> {
     for (let attempt = 0; attempt <= retries; attempt++) {
         try {
-            return await fn();
+            const result = await fn();
+            return result;
         } catch (err) {
             if (attempt < retries) {
                 const delay = 1000 * (attempt + 1);
