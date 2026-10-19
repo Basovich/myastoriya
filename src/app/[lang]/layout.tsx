@@ -79,7 +79,7 @@ export async function generateMetadata({
       template: "%s",
     },
     description: siteData.seo.description,
-    metadataBase: new URL(siteData.url),
+    metadataBase: new URL(dynamicBaseUrl || siteData.url),
     openGraph: buildOpenGraphMetadata({
       title: siteData.seo.title,
       description: siteData.seo.description,
@@ -87,6 +87,7 @@ export async function generateMetadata({
       lang,
       image: siteData.seo.ogImage,
       type: "website",
+      dynamicBaseUrl,
     }),
     twitter: {
       card: "summary_large_image",

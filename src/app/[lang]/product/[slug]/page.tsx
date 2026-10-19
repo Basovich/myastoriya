@@ -115,8 +115,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
             canonicalUrl,
             lang,
             image: productImage,
-            type: 'website',
+            type: 'product',
+            dynamicBaseUrl,
         }),
+        other: {
+            'og:type': 'product',
+        },
         twitter: {
             card: 'summary_large_image',
             title: finalTitle,
@@ -343,6 +347,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
     return (
         <>
+            <meta property="og:type" content="product" />
             <HreflangLinks canonical={hreflangCanonical} languages={alternates.languages} />
             <script
                 type="application/ld+json"

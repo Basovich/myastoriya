@@ -102,6 +102,7 @@ export interface OpenGraphOptions {
     lang?: string;
     image?: string | null;
     type?: "website" | "article" | "product";
+    dynamicBaseUrl?: string;
 }
 
 /**
@@ -114,11 +115,25 @@ export function buildOpenGraphMetadata({
     lang = "ua",
     image,
     type = "website",
+    dynamicBaseUrl,
 }: OpenGraphOptions) {
     const siteName = getSiteName(lang);
     const fallbackImage = siteData.seo.ogImage || "/images/og-image.jpg";
     const imageUrl = image || fallbackImage;
-    const baseUrl = getBaseSiteUrl();
+
+    // Resolve base URL dynamically from dynamicBaseUrl or from canonicalUrl's origin,
+    // avoiding hardcoded domain mismatches or missing env variables
+    let baseUrl = dynamicBaseUrl;
+    if (!baseUrl && canonicalUrl && (canonicalUrl.startsWith("http://") || canonicalUrl.startsWith("https://"))) {
+        try {
+            baseUrl = new URL(canonicalUrl).origin;
+        } catch {
+            // fallback
+        }
+    }
+    if (!baseUrl) {
+        baseUrl = getBaseSiteUrl();
+    }
 
     const fullImageUrl = imageUrl.startsWith("http") 
         ? imageUrl 
@@ -132,7 +147,7 @@ export function buildOpenGraphMetadata({
         url: canonicalUrl,
         siteName,
         locale,
-        type: type as "website",
+        ...(type && type !== "product" ? { type: type as "website" | "article" } : {}),
         images: [
             {
                 url: fullImageUrl,
