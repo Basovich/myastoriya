@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: LoyaltyProgramRulesProps): Pr
     ru: { home: "Главная", loyalty: "Правила программы лояльности" }
   };
   const currentLabels = labels[lang] || labels.ua;
-  const finalTitle = seo.title || currentLabels.loyalty;
+  const finalTitle = seo.title || "";
 
   const breadcrumbs = [
     { label: currentLabels.home, href: "/" },

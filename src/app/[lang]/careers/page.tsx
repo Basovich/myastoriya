@@ -22,9 +22,7 @@ export async function generateMetadata({ params }: CareersPageProps): Promise<Me
   const alternates = getHreflangAlternates("/careers/", lang, dynamicBaseUrl);
   const canonicalUrl = seo.canonical || alternates.canonical;
 
-  const isRu = lang === "ru";
-  const defaultTitle = isRu ? "Карьера в «Мястория»" : "Кар'єра в «М'ясторія»";
-  const finalTitle = seo.title || defaultTitle;
+  const finalTitle = seo.title || "";
 
   const breadcrumbs = [
     { label: isRu ? "Главная" : "Головна", href: "/" },

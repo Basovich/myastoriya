@@ -39,7 +39,7 @@ export default function PolicyPage({ breadcrumbs, content, h1 }: PolicyPageProps
         <>
             <main className={s.main}>
                 <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
-                <h1 className={s.title}>{h1 || breadcrumbs[breadcrumbs.length - 1]?.label}</h1>
+                {h1 && <h1 className={s.title}>{h1}</h1>}
                 <div className={s.content}>
                     {content.map((item, index) => (
                         <React.Fragment key={index}>

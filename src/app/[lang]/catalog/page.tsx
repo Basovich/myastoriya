@@ -28,9 +28,7 @@ export async function generateMetadata({ params, searchParams }: CatalogPageProp
     const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
     const alternates = getHreflangAlternates('/catalog/', lang, dynamicBaseUrl, pageNum);
 
-    const isRu = lang === 'ru';
-    const fallbackTitle = isRu ? 'Каталог продукции' : 'Каталог продукції';
-    const rawTitle = seo.title || fallbackTitle;
+    const rawTitle = seo.title || "";
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
 
     const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
@@ -39,7 +37,7 @@ export async function generateMetadata({ params, searchParams }: CatalogPageProp
 
     const breadcrumbItems = [
         { label: isRu ? 'Главная' : 'Головна', href: '/' },
-        { label: seo.h1 || fallbackTitle },
+        ...(seo.h1 ? [{ label: seo.h1 }] : []),
     ];
     const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbItems, lang, canonicalUrl, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);
@@ -110,7 +108,12 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
     }
     productsResponse.current_page = page;
 
-    const pageTitle = lang === 'ru' ? 'Каталог продукции' : 'Каталог продукції';
+    const [hreflangLinks, seo] = await Promise.all([
+        resolvePageHreflangLinks('/catalog/', lang, undefined, getDynamicBaseUrl(await headers()), parsePageNum(resolvedSearchParams?.page)),
+        fetchSeoMetadataByUrl(`/${lang}/catalog/`, lang),
+    ]);
+
+    const pageTitle = seo.h1 || '';
 
     // Категорії першого рівня для CategoryCircles
     const subcategoryItems = catalogTree.map(cat => ({
@@ -121,10 +124,8 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
 
     const breadcrumbItems = [
         { label: lang === 'ru' ? 'Главная' : 'Головна', href: '/' },
-        { label: pageTitle },
+        ...(pageTitle ? [{ label: pageTitle }] : []),
     ];
-
-    const hreflangLinks = await resolvePageHreflangLinks('/catalog/', lang, undefined, getDynamicBaseUrl(await headers()), parsePageNum(resolvedSearchParams?.page));
 
     return (
         <main>
@@ -134,7 +135,8 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
                 dict={dict}
                 initialProducts={productsResponse}
                 categoryId={768}
-                categoryName={pageTitle}
+                categoryName={pageTitle || undefined}
+                h1={seo.h1 || undefined}
                 breadcrumbItems={breadcrumbItems}
                 subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                 view={view}

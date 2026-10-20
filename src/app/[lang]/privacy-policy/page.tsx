@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PrivacyPolicyPageProps): Prom
     ru: { home: "Главная", privacy: "Политика конфиденциальности" }
   };
   const currentLabels = labels[lang] || labels.ua;
-  const finalTitle = seo.title || currentLabels.privacy;
+  const finalTitle = seo.title || "";
 
   const breadcrumbs = [
     { label: currentLabels.home, href: "/" },

@@ -24,7 +24,7 @@ export async function generateMetadata({
     const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
     const alternates = getHreflangAlternates('/actions/', lang, dynamicBaseUrl, pageNum);
 
-    const rawTitle = seo.title || (lang === 'ru' ? 'Акции' : 'Акції');
+    const rawTitle = seo.title || "";
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
 
     const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
@@ -102,7 +102,10 @@ export default async function ActionsPage({
 
     const totalPages = salesResponse?.has_more_pages ? page + 1 : page;
 
-    const hreflangLinks = await resolvePageHreflangLinks('/actions/', lang, undefined, getDynamicBaseUrl(await headers()), page);
+    const [hreflangLinks, seo] = await Promise.all([
+        resolvePageHreflangLinks('/actions/', lang, undefined, getDynamicBaseUrl(await headers()), page),
+        fetchSeoMetadataByUrl(`/${lang}/actions/`, lang),
+    ]);
 
     return (
         <main>
@@ -114,6 +117,7 @@ export default async function ActionsPage({
                 initialHasMore={salesResponse?.has_more_pages}
                 initialPage={page}
                 totalPages={totalPages}
+                h1={seo.h1 || undefined}
             />
         </main>
     );

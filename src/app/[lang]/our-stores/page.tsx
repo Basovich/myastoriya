@@ -20,8 +20,7 @@ export async function generateMetadata({
   const alternates = getHreflangAlternates('/our-stores/', lang, dynamicBaseUrl);
   const canonicalUrl = seo.canonical || alternates.canonical;
 
-  const isRu = lang === 'ru';
-  const finalTitle = seo.title || (isRu ? 'Наши заведения' : 'Наші заклади');
+  const finalTitle = seo.title || "";
 
   const breadcrumbs = [
     { label: isRu ? 'Главная' : 'Головна', href: '/' },

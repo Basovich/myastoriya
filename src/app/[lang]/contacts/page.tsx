@@ -20,8 +20,7 @@ export async function generateMetadata({ params }: ContactsPageProps): Promise<M
   const alternates = getHreflangAlternates("/contacts/", lang, dynamicBaseUrl);
   const canonicalUrl = seo.canonical || alternates.canonical;
 
-  const isRu = lang === "ru";
-  const finalTitle = seo.title || (isRu ? 'Контакты' : 'Контакти');
+  const finalTitle = seo.title || "";
 
   const breadcrumbs = [
     { label: isRu ? 'Главная' : 'Головна', href: '/' },
@@ -69,6 +68,7 @@ export default async function Contacts({
         lang={lang} 
         dict={dict} 
         categories={categories} 
+        h1={seo.h1 || undefined}
       />
     </>
   );

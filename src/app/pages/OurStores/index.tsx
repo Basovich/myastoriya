@@ -79,7 +79,7 @@ export default function OurStoresPage({ dict, initialShops, h1 }: OurStoresPageP
                 <div className={s.topSection}>
                     <HeroBanner
                         prefix=""
-                        title={h1 || ourStoresPage.title}
+                        title={h1 || undefined}
                         className={s.heroBanner}
                         image="/images/store/herobanner.png"
                     />

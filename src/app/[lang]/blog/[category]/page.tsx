@@ -31,7 +31,7 @@ export async function generateMetadata({ params, searchParams }: BlogCategoryPag
     const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
     const alternates = getHreflangAlternates(`/blog/${category}/`, lang, dynamicBaseUrl, pageNum);
 
-    const rawTitle = seo.title || categoryName;
+    const rawTitle = seo.title || "";
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
 
     const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
@@ -88,9 +88,10 @@ export default async function BlogCategoryPage({
     if (apiTypeSlug) {
         const dict = await getDictionary(lang);
 
-        const [blogsResult, blogTypes] = await Promise.all([
+        const [blogsResult, blogTypes, seo] = await Promise.all([
             getBlogsApi({ page, typeSlug: apiTypeSlug }, lang),
             getBlogTypesApi(lang),
+            fetchSeoMetadataByUrl(`/${lang}/blog/${category}/`, lang),
         ]);
 
         const calculatedTotalPages = blogsResult.last_page || 1;
@@ -109,6 +110,7 @@ export default async function BlogCategoryPage({
                     activeCategory={category as 'recipe' | 'article'}
                     activeTypeSlug={apiTypeSlug}
                     initialPage={page}
+                    h1={seo.h1 || undefined}
                 />
             </main>
         );

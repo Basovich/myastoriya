@@ -27,19 +27,7 @@ export default function CareersPage({ dict, careerData, h1 }: CareersPageProps) 
                     className={s.breadcrumbsContainer}
                 />
                 <section className={s.container}>
-                    <h1 className={s.title}>
-                        {h1 ? (
-                            h1
-                        ) : careerData?.title ? (
-                            <span dangerouslySetInnerHTML={{ __html: careerData.title }} />
-                        ) : (
-                            <>
-                                {careersPage.hero.title}
-                                <br/>
-                                {careersPage.hero.subtitle}
-                            </>
-                        )}
-                    </h1>
+                    {h1 && <h1 className={s.title}>{h1}</h1>}
                     {careerData?.text ? (
                         <div
                             className={s.text}

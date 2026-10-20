@@ -102,9 +102,10 @@ interface ActionsGridProps {
     initialHasMore?: boolean;
     initialPage?: number;
     totalPages?: number;
+    h1?: string | null;
 }
 
-export default function ActionsGrid({ initialItems, lang, pageType, initialHasMore, initialPage = 1, totalPages = 1 }: ActionsGridProps) {
+export default function ActionsGrid({ initialItems, lang, pageType, initialHasMore, initialPage = 1, totalPages = 1, h1 }: ActionsGridProps) {
     const texts = LOCALIZED_TEXTS[lang === 'ru' ? 'ru' : 'ua'][pageType];
     const [items, setItems] = useState<ActionItem[]>(initialItems);
     const [hasMore, setHasMore] = useState(initialHasMore ?? true);
@@ -250,7 +251,7 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
     return (
         <section className={s.section}>
             <HeroBanner
-                title={texts.title}
+                title={h1 || undefined}
                 image={`/images/promotions/${pageType}-banner.png`}
             />
 

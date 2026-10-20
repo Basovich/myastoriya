@@ -25,8 +25,7 @@ export async function generateMetadata({ params, searchParams }: BlogPageProps):
     const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
     const alternates = getHreflangAlternates("/blog/", lang, dynamicBaseUrl, pageNum);
 
-    const isRu = lang === "ru";
-    const rawTitle = seo.title || (isRu ? "Блог" : "Блог");
+    const rawTitle = seo.title || "";
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
 
     const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
@@ -90,7 +89,10 @@ export default async function BlogPage({
         }),
     ]);
 
-    const alternates = getHreflangAlternates("/blog/", lang, getDynamicBaseUrl(await headers()), page);
+    const [alternates, seo] = await Promise.all([
+        getHreflangAlternates("/blog/", lang, getDynamicBaseUrl(await headers()), page),
+        fetchSeoMetadataByUrl(`/${lang}/blog/`, lang),
+    ]);
 
     return (
         <main>
@@ -103,6 +105,7 @@ export default async function BlogPage({
                 blogTypes={blogTypes ?? []}
                 lang={lang}
                 initialPage={page}
+                h1={seo.h1 || undefined}
             />
         </main>
     );

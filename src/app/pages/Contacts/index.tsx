@@ -11,9 +11,10 @@ interface ContactsPageProps {
     dict: Dictionary;
     lang: Locale;
     categories: ContactCategory[];
+    h1?: string | null;
 }
 
-export default function ContactsPage({ dict, lang, categories }: ContactsPageProps) {
+export default function ContactsPage({ dict, lang, categories, h1 }: ContactsPageProps) {
     const { contactsPage } = dict.home;
 
     const breadcrumbs = [
@@ -25,7 +26,7 @@ export default function ContactsPage({ dict, lang, categories }: ContactsPagePro
         <>
             <main className={s.main}>
                 <HeroBanner
-                    title={contactsPage.title}
+                    title={h1 || undefined}
                     image="/images/contacts/contacts_hero.png"
                 />
                 <Breadcrumbs items={breadcrumbs} className={s.breadcrumbsContainer} />

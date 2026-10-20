@@ -37,6 +37,7 @@ interface BlogGridProps {
     activeTypeSlug?: string;
     activeCategory?: 'recipe' | 'article';
     initialPage?: number;
+    h1?: string | null;
 }
 
 export default function BlogGrid({
@@ -48,6 +49,7 @@ export default function BlogGrid({
     activeTypeSlug,
     activeCategory,
     initialPage = 1,
+    h1,
 }: BlogGridProps) {
     const [items, setItems] = useState<BlogPost[]>(initialItems ?? []);
     const [hasMore, setHasMore] = useState(initialHasMore);
@@ -145,7 +147,7 @@ export default function BlogGrid({
         <section className={s.section}>
             <div className={s.container}>
                 <HeroBanner
-                    title={activeCategory ? (activeCategory === 'recipe' ? (lang === 'ru' ? 'Рецепты' : 'Рецепти') : (lang === 'ru' ? 'Статьи' : 'Статті')) : dict.title}
+                    title={h1 || undefined}
                     image="/images/promotions/blog-banner.png"
                 />
 

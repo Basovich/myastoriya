@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: OfertaPageProps): Promise<Met
     ru: { home: "Главная", oferta: "Публичная оферта" }
   };
   const currentLabels = labels[lang] || labels.ua;
-  const finalTitle = seo.title || currentLabels.oferta;
+  const finalTitle = seo.title || "";
 
   const breadcrumbs = [
     { label: currentLabels.home, href: "/" },

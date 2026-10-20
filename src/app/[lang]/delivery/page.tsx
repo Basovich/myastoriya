@@ -22,9 +22,7 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
   const alternates = getHreflangAlternates("/delivery/", lang, dynamicBaseUrl);
   const canonicalUrl = seo.canonical || alternates.canonical;
 
-  const isRu = lang === "ru";
-  const defaultTitle = isRu ? "Оплата и доставка" : "Оплата і доставка";
-  const finalTitle = seo.title || defaultTitle;
+  const finalTitle = seo.title || "";
 
   const breadcrumbs = [
     { label: isRu ? "Главная" : "Головна", href: "/" },
@@ -86,6 +84,7 @@ export default async function DeliveryAndPayment({
         initialShops={shopsResponse.shops.data} 
         policyBlocks={policyBlocks}
         deliveryBlocks={deliveryBlocks}
+        h1={seo.h1 || undefined}
       />
     </>
   );

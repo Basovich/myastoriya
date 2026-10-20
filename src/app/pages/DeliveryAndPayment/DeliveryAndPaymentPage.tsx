@@ -22,9 +22,10 @@ interface DeliveryAndPaymentPageProps {
     isMeatBar?: boolean;
     policyBlocks: OrderingInfoBlock[];
     deliveryBlocks: OrderingInfoBlock[];
+    h1?: string | null;
 }
 
-export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMeatBar: initialIsMeatBar = false, policyBlocks, deliveryBlocks }: DeliveryAndPaymentPageProps) {
+export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMeatBar: initialIsMeatBar = false, policyBlocks, deliveryBlocks, h1 }: DeliveryAndPaymentPageProps) {
     const [activeTab, setActiveTab] = useState<'restaurants' | 'meatbar'>(() => {
         if (initialIsMeatBar) return 'meatbar';
         if (typeof window !== 'undefined') {
@@ -50,7 +51,7 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
             <main className={s.main}>
                 <div className={s.container}>
                     <HeroBanner 
-                        title={deliveryPage.title}
+                        title={h1 || undefined}
                         image="/images/delivery/delivery.png"
                         className={s.hero}
                     />

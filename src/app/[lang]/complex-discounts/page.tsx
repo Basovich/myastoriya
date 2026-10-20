@@ -23,8 +23,7 @@ export async function generateMetadata({
     const seo = await fetchSeoMetadataByUrl(relativeUrl, lang);
     const alternates = getHreflangAlternates('/complex-discounts/', lang, dynamicBaseUrl, pageNum);
 
-    const defaultTitle = lang === "ru" ? "Комплексные скидки" : "Комплексні знижки";
-    const rawTitle = seo.title || defaultTitle;
+    const rawTitle = seo.title || "";
     const formattedTitleStr = formatTitleWithPage(rawTitle, pageNum, lang);
 
     const canonicalUrl = pageNum > 1 ? alternates.canonical : (seo.canonical || alternates.canonical);
@@ -98,7 +97,10 @@ export default async function ComplexDiscountsPage({
     });
 
     const totalPages = specialsResponse?.has_more_pages ? page + 1 : page;
-    const alternates = getHreflangAlternates('/complex-discounts/', lang, getDynamicBaseUrl(await headers()), page);
+    const [alternates, seo] = await Promise.all([
+        getHreflangAlternates('/complex-discounts/', lang, getDynamicBaseUrl(await headers()), page),
+        fetchSeoMetadataByUrl(`/${lang}/complex-discounts/`, lang),
+    ]);
 
     return (
         <main>
@@ -110,6 +112,7 @@ export default async function ComplexDiscountsPage({
                 initialHasMore={specialsResponse?.has_more_pages}
                 initialPage={page}
                 totalPages={totalPages}
+                h1={seo.h1 || undefined}
             />
         </main>
     );
