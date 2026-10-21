@@ -176,11 +176,12 @@ export default async function RootLayout({
     <html lang={htmlLang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
       <head>
         <JsonLdHeadScripts pathname={pathname} />
-      </head>
-      <body>
         <noscript>
           <style>{`
             /* Non-JavaScript Graceful Degradation (SEO & Accessibility) */
+            html body [class*="loaderWrapper"],
+            html body [class*="PageLoader"],
+            html body [class*="preloader"],
             [class*="loaderWrapper"],
             [class*="PageLoader"],
             [class*="preloader"] {
@@ -234,12 +235,50 @@ export default async function RootLayout({
               display: none !important;
             }
 
+            /* Product Gallery Main Image without JS */
+            html body [class*="galleryWrapper"] .swiper-wrapper,
+            html body [class*="mainSliderWrapper"] .swiper-wrapper {
+              display: block !important;
+              width: 100% !important;
+              height: 100% !important;
+              overflow: hidden !important;
+            }
+
+            html body [class*="galleryWrapper"] .swiper-slide,
+            html body [class*="mainSliderWrapper"] .swiper-slide {
+              width: 100% !important;
+              min-width: 100% !important;
+              max-width: 100% !important;
+              height: 100% !important;
+            }
+
+            html body [class*="galleryWrapper"] .swiper-slide:not(:first-child),
+            html body [class*="mainSliderWrapper"] .swiper-slide:not(:first-child) {
+              display: none !important;
+            }
+
+            /* Tabs contents without JS */
+            html body [class*="tabHidden"],
+            [class*="tabHidden"] {
+              display: block !important;
+            }
+
+            /* Delivery Zones Stores Lists without JS (both restaurants and meat bar) */
+            html body div[class*="DeliveryZones_storesList"],
+            html body div[class*="DeliveryZones_storesList"][class*="tabHidden"],
+            html body div[class*="storesList"][class*="tabHidden"],
+            [class*="DeliveryZones_storesList"][class*="tabHidden"] {
+              display: grid !important;
+            }
+
             [class*="faqAnswerWrap"] {
               height: auto !important;
               overflow: visible !important;
             }
           `}</style>
         </noscript>
+      </head>
+      <body>
         <ReduxProvider>
           <BaseUrlProvider baseUrl={dynamicBaseUrl}>
             <CategoryProvider initialCategories={catalogTree}>

@@ -1,7 +1,7 @@
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
-import { getCatalogTreeApi, getProductsApi, getProductsFilterApi, ProductsResponse, ProductCategory } from '@/lib/graphql';
+import { getCatalogTreeApi, getProductsApi, getProductsFilterApi, ProductsResponse, ProductCategory, FilterBlock } from '@/lib/graphql';
 import { getCategoryHref } from '@/utils/category-url';
 import { resolveCategoryImageUrl } from '@/lib/graphql/queries/products';
 import { parseRawProductionParam } from '@/utils/filter-params';
@@ -84,6 +84,7 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
         has_more_pages: false,
     };
     let initialTotalItems: number | undefined = undefined;
+    let filterBlocks: FilterBlock[] = [];
 
     try {
         const [tree, products, filterData] = await Promise.all([
@@ -103,6 +104,9 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
         }
         if (filterData?.productsCount) {
             initialTotalItems = filterData.productsCount;
+        }
+        if (filterData?.blocks) {
+            filterBlocks = filterData.blocks;
         }
     } catch (err) {
         console.error("[CatalogPage] Parallel fetch failed:", err);
@@ -142,6 +146,7 @@ export default async function CatalogPage({ params, searchParams }: CatalogPageP
                 subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                 view={view}
                 sortBy={sort}
+                filterBlocks={filterBlocks}
                 bannerUrl="/images/catalog/category-desktop.webp"
                 mobileImage="/images/catalog/category-mobile.webp"
                 initialTotalItems={initialTotalItems}

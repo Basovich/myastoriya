@@ -149,9 +149,17 @@ export default function CatalogSidebar({
 
     const isOnlyPriceRange = renderedBlocks.length === 1 && isRangeBlock(renderedBlocks[0]);
 
+    const isInitialMountRef = useRef(true);
+
     useEffect(() => {
         if (!categoryId) {
             return;
+        }
+        if (isInitialMountRef.current) {
+            isInitialMountRef.current = false;
+            if (filterBlocks && filterBlocks.length > 0) {
+                return;
+            }
         }
         setIsLoadingFilters(true);
         const langParam = routeParams?.lang === 'ru' ? 'ru' : 'ua';
@@ -163,7 +171,7 @@ export default function CatalogSidebar({
             })
             .catch(() => { /* залишаємо dynamicBlocks порожніми */ })
             .finally(() => setIsLoadingFilters(false));
-    }, [categoryId, routeParams?.lang]);
+    }, [categoryId, routeParams?.lang, filterBlocks]);
 
     // Синхронізуємо з props при скиданні через key={clearTrigger}
     useEffect(() => {

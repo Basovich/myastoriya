@@ -328,6 +328,10 @@ export default function DeliveryZones({ stores, dict, storeDict, lang, isMeatBar
                 ))}
             </div>
 
+            <noscript>
+                <h3 className={s.noscriptSectionTitle}>{dict.zones.tabs.meatbar}</h3>
+            </noscript>
+
             <div className={`${s.storesList} ${activeTab === 'meatbar' ? '' : s.tabHidden}`}>
                 {/* Promo card is always first */}
                 <StoreMiniCard isPromo={true} />

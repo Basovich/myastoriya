@@ -226,4 +226,19 @@
   display: none !important;
 }
 
+@media (scripting: none) {
+  .storesList.tabHidden {
+    display: grid !important;
+  }
+}
+
+.noscriptSectionTitle {
+  font-family: var(--font-unbounded), sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 32px 0 16px;
+  color: #000;
+}
+
 

@@ -274,6 +274,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
                     view={view}
                     sortBy={resolvedSearchParams.sort as string || undefined}
                     popularProducts={popularProducts}
+                    filterBlocks={filterData?.blocks ?? []}
                     activeFilters={activeFilters}
                     recommendedProducts={categoryDetails?.recommendedProducts}
                     bannerUrl={categoryDetails?.banner?.size1x}

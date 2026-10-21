@@ -226,6 +226,7 @@ html::-webkit-scrollbar-thumb:hover {
 @media (scripting: none) {
   /* Prevent fixed loaders from blocking non-JS views */
   [class*="loaderWrapper"],
+  [class*="PageLoader"],
   [class*="preloader"] {
     display: none !important;
   }
@@ -236,5 +237,39 @@ html::-webkit-scrollbar-thumb:hover {
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
+  }
+
+  /* Reveal all tabs without JavaScript */
+  [class*="tabHidden"] {
+    display: block !important;
+  }
+
+  /* Delivery zones stores lists */
+  div[class*="DeliveryZones_storesList"],
+  div[class*="DeliveryZones_storesList"][class*="tabHidden"],
+  div[class*="storesList"][class*="tabHidden"] {
+    display: grid !important;
+  }
+
+  /* Product Gallery Main Image without JS */
+  [class*="galleryWrapper"] .swiper-wrapper,
+  [class*="mainSliderWrapper"] .swiper-wrapper {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  [class*="galleryWrapper"] .swiper-slide,
+  [class*="mainSliderWrapper"] .swiper-slide {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+  }
+
+  [class*="galleryWrapper"] .swiper-slide:not(:first-child),
+  [class*="mainSliderWrapper"] .swiper-slide:not(:first-child) {
+    display: none !important;
   }
 }
