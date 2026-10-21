@@ -18,11 +18,8 @@ export async function generateMetadata({ params }: CheckoutProps): Promise<Metad
     const seo = getDefaultSeoData(pageTitle, lang);
     const alternates = getHreflangAlternates("/checkout/", lang, dynamicBaseUrl);
 
-    const isRu = lang === "ru";
-    const title = isRu ? { absolute: seo.title } : seo.h1;
-
     return {
-        title,
+        title: { absolute: seo.title },
         description: seo.description,
         robots: {
             index: false,
@@ -37,7 +34,7 @@ export async function generateMetadata({ params }: CheckoutProps): Promise<Metad
         }),
         twitter: {
             card: "summary_large_image",
-            title: seo.h1,
+            title: seo.title,
             description: seo.description,
             images: ["/images/og-image.jpg"],
         },
