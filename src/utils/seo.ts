@@ -286,7 +286,7 @@ export function resolveProductBrand(
         if (brandSpec && brandSpec.values && brandSpec.values.length > 0) {
             const val = brandSpec.values[0]?.trim();
             if (val) {
-                if (/^м(?:'|`|ʼ)ястор(?:і|и)я$/i.test(val)) {
+                if (/^м['`ʼ]ястор[іи]я$/i.test(val)) {
                     return defaultBrand;
                 }
                 return val;
@@ -295,7 +295,7 @@ export function resolveProductBrand(
     }
 
     // 2. Check if product name explicitly mentions Myastoriya
-    if (/м(?:'|`|ʼ)ястор(?:і|и)я/i.test(product.name)) {
+    if (/м['`ʼ]ястор[іи]я/i.test(product.name)) {
         return defaultBrand;
     }
 
