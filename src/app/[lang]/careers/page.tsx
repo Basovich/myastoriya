@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: CareersPageProps): Promise<Me
 
   const finalTitle = seo.title || "";
 
+  const isRu = lang === "ru";
   const breadcrumbs = [
     { label: isRu ? "Главная" : "Головна", href: "/" },
     { label: isRu ? "Карьера" : "Кар'єра" }

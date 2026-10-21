@@ -32,6 +32,7 @@ export async function generateMetadata({ params, searchParams }: BlogPageProps):
     const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);
     const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
 
+    const isRu = lang === "ru";
     const breadcrumbs = [
         { label: isRu ? "Главная" : "Головна", href: "/" },
         { label: isRu ? "Блог" : "Блог" }

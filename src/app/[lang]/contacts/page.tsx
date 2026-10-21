@@ -22,6 +22,7 @@ export async function generateMetadata({ params }: ContactsPageProps): Promise<M
 
   const finalTitle = seo.title || "";
 
+  const isRu = lang === "ru";
   const breadcrumbs = [
     { label: isRu ? 'Главная' : 'Головна', href: '/' },
     { label: isRu ? 'Контакты' : 'Контакти' }

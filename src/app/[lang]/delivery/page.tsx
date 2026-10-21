@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: DeliveryPageProps): Promise<M
 
   const finalTitle = seo.title || "";
 
+  const isRu = lang === "ru";
   const breadcrumbs = [
     { label: isRu ? "Главная" : "Головна", href: "/" },
     { label: isRu ? "Оплата и доставка" : "Оплата і доставка" }

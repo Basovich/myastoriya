@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata } from "@/utils/seo";
 import HreflangLinks from "@/app/components/HreflangLinks/HreflangLinks";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +37,8 @@ export async function generateMetadata({ params }: MenuPageProps): Promise<Metad
         }
 
         const shopName = shop.siteName || shop.name || "";
-        const alternates = getHreflangAlternates(`/menu/${menuSlug}/`, lang, dynamicBaseUrl);
+        const canonicalSlug = RESTAURANT_MENU_SLUG_MAP[menuSlug] || menuSlug;
+        const alternates = getHreflangAlternates(`/menu/${canonicalSlug}/`, lang, dynamicBaseUrl);
 
         let title: string;
         let description: string;
@@ -82,12 +83,6 @@ export default async function MenuPage({
     params,
 }: MenuPageProps) {
     const { lang, menuSlug } = await params;
-
-    const canonicalMenuSlug = RESTAURANT_MENU_SLUG_MAP[menuSlug];
-    if (canonicalMenuSlug && canonicalMenuSlug !== menuSlug) {
-        permanentRedirect(`/${lang}/menu/${canonicalMenuSlug}/`);
-    }
-
     const dict = await getDictionary(lang as Locale);
 
     try {
@@ -116,7 +111,8 @@ export default async function MenuPage({
         const initialMenu = fullMenuData?.restaurantMenu || [];
         const electronicMenu = fullMenuData?.shop?.electronicMenu || [];
 
-        const alternates = getHreflangAlternates(`/menu/${menuSlug}/`, lang, getDynamicBaseUrl(await headers()));
+        const canonicalSlug = RESTAURANT_MENU_SLUG_MAP[menuSlug] || menuSlug;
+        const alternates = getHreflangAlternates(`/menu/${canonicalSlug}/`, lang, getDynamicBaseUrl(await headers()));
 
         return (
             <>

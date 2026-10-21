@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import clsx from 'clsx';
+import { RESTAURANT_MENU_SLUG_MAP } from '@/config/menuSlugMap';
 
 interface StoreMenuHeroProps {
     lang: string;
@@ -13,6 +14,7 @@ interface StoreMenuHeroProps {
 const StoreMenuHero: React.FC<StoreMenuHeroProps> = ({ lang, logoSrc = '/images/logo-white.svg' }) => {
     const params = useParams();
     const menuSlug = (params?.menuSlug as string) || '';
+    const canonicalSlug = RESTAURANT_MENU_SLUG_MAP[menuSlug] || menuSlug;
     const currentLang = (params?.lang as string) || lang || 'ua';
 
     return (
@@ -29,17 +31,17 @@ const StoreMenuHero: React.FC<StoreMenuHeroProps> = ({ lang, logoSrc = '/images/
                 <div className={s.logoWrapper}>
                     <Image src={logoSrc} alt="Logo" width={280} height={93} className={s.logo} />
                 </div>
-                {menuSlug && (
+                {canonicalSlug && (
                     <div className={s.flags}>
                         <Link 
-                            href={`/ua/menu/${menuSlug}`}
+                            href={`/ua/menu/${canonicalSlug}`}
                             className={clsx(s.flagLink, currentLang === 'ua' && s.activeFlag)}
                             aria-label="Українська версія меню"
                         >
                             <Image src="/icons/flags/flag_ua.webp" alt="UA" width={32} height={20} />
                         </Link>
                         <Link 
-                            href={`/en/menu/${menuSlug}`}
+                            href={`/en/menu/${canonicalSlug}`}
                             className={clsx(s.flagLink, currentLang === 'en' && s.activeFlag)}
                             aria-label="English menu version"
                         >

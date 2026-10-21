@@ -35,6 +35,7 @@ export async function generateMetadata({ params, searchParams }: CatalogPageProp
     const isPageNoindex = pageNum > 1 || Boolean(seo.noindex);
     const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
 
+    const isRu = lang === 'ru';
     const breadcrumbItems = [
         { label: isRu ? 'Главная' : 'Головна', href: '/' },
         ...(seo.h1 ? [{ label: seo.h1 }] : []),
