@@ -81,8 +81,10 @@ export function getCategoryHref(node: ProductCategory): string {
 export function buildCategoryBreadcrumbs(
     categoryId: number | string | null | undefined,
     categoryIndex: Map<string, CategoryIndexEntry>,
+    lang: string = 'ua',
 ): BreadcrumbItem[] {
-    const base: BreadcrumbItem[] = [{ label: 'Головна', href: '/' }];
+    const isRu = lang === 'ru';
+    const base: BreadcrumbItem[] = [{ label: isRu ? 'Главная' : 'Головна', href: '/' }];
     if (!categoryId) return base;
 
     const entry = categoryIndex.get(String(categoryId));

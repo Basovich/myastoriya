@@ -130,6 +130,7 @@ import NavigationProgress from "@/app/components/NavigationProgress/NavigationPr
 
 import StatusModals from "@/app/components/StatusModals/StatusModals";
 import CatalogMenuSsrLinks from "@/app/components/Header/DesktopHeader/MainBar/CatalogMenu/CatalogMenuSsrLinks";
+import { BaseUrlProvider } from "@/hooks/useBaseUrl";
 
 export default async function RootLayout({
   children,
@@ -143,6 +144,7 @@ export default async function RootLayout({
   // Отримуємо x-pathname із заголовків запиту
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "";
+  const dynamicBaseUrl = getDynamicBaseUrl(headersList);
   const isMenuPage = /^\/(?:[a-z]{2}\/)?menu(?:\/.*)?$/.test(pathname);
 
   let catalogTree: ProductCategory[] = [];
@@ -239,18 +241,20 @@ export default async function RootLayout({
           `}</style>
         </noscript>
         <ReduxProvider>
-          <CategoryProvider initialCategories={catalogTree}>
-            <NavigationProgress />
-            {!isMenuPage && <AuthInitializer />}
-            {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
-            {/* SSR-посилання категорій каталогу для SEO-павуків (приховані візуально) */}
-            {!isMenuPage && catalogTree.length > 0 && (
-                <CatalogMenuSsrLinks categories={catalogTree} lang={lang as Locale} />
-            )}
-            {children}
-            {!isMenuPage && <Footer lang={lang as Locale} initialSocialLinks={socialLinks} />}
-            <StatusModals lang={lang as Locale} />
-          </CategoryProvider>
+          <BaseUrlProvider baseUrl={dynamicBaseUrl}>
+            <CategoryProvider initialCategories={catalogTree}>
+              <NavigationProgress />
+              {!isMenuPage && <AuthInitializer />}
+              {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
+              {/* SSR-посилання категорій каталогу для SEO-павуків (приховані візуально) */}
+              {!isMenuPage && catalogTree.length > 0 && (
+                  <CatalogMenuSsrLinks categories={catalogTree} lang={lang as Locale} />
+              )}
+              {children}
+              {!isMenuPage && <Footer lang={lang as Locale} initialSocialLinks={socialLinks} />}
+              <StatusModals lang={lang as Locale} />
+            </CategoryProvider>
+          </BaseUrlProvider>
         </ReduxProvider>
       </body>
     </html>

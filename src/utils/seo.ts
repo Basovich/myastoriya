@@ -88,11 +88,11 @@ export function decodeHtmlEntities(text: string): string {
 
 
 export function getBaseSiteUrl(overrideBaseUrl?: string): string {
-    const configured = overrideBaseUrl
-        || process.env.NEXT_PUBLIC_SITE_URL
-        || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null)
-        || siteData.url;
-    return configured.replace(/\/+$/, "");
+    if (overrideBaseUrl) return overrideBaseUrl.replace(/\/+$/, "");
+    if (typeof window !== "undefined" && window.location?.origin) {
+        return window.location.origin.replace(/\/+$/, "");
+    }
+    return siteData.url.replace(/\/+$/, "");
 }
 
 export interface OpenGraphOptions {
@@ -178,6 +178,9 @@ export function toAbsoluteBreadcrumbUrl(
     if (href) {
         const cleanHref = href.split(/[?#]/)[0];
         if (cleanHref.startsWith("http://") || cleanHref.startsWith("https://")) {
+            if (baseUrl && !baseUrl.includes("myastoriya.com.ua") && cleanHref.includes("myastoriya.com.ua")) {
+                return cleanHref.replace(/^https?:\/\/[^\/]+/, baseUrl);
+            }
             return cleanHref;
         }
 
@@ -195,6 +198,9 @@ export function toAbsoluteBreadcrumbUrl(
 
     if (isLast && canonicalOrCurrentUrl) {
         if (canonicalOrCurrentUrl.startsWith("http://") || canonicalOrCurrentUrl.startsWith("https://")) {
+            if (baseUrl && !baseUrl.includes("myastoriya.com.ua") && canonicalOrCurrentUrl.includes("myastoriya.com.ua")) {
+                return canonicalOrCurrentUrl.replace(/^https?:\/\/[^\/]+/, baseUrl);
+            }
             return canonicalOrCurrentUrl;
         }
         let cleanPath = canonicalOrCurrentUrl.split(/[?#]/)[0] || "/";

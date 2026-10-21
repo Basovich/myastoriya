@@ -6,6 +6,7 @@ import Image from "next/image";
 import AppLink from "../AppLink/AppLink";
 import s from "./Breadcrumbs.module.scss";
 import { generateBreadcrumbJsonLd } from "@/utils/seo";
+import { useBaseUrl } from "@/hooks/useBaseUrl";
 
 export interface BreadcrumbItem {
     label: string;
@@ -16,19 +17,25 @@ export interface BreadcrumbsProps {
     items: BreadcrumbItem[];
     className?: string;
     canonicalUrl?: string;
+    baseUrl?: string;
 }
 
-export default function Breadcrumbs({ items, className, canonicalUrl }: BreadcrumbsProps) {
+export default function Breadcrumbs({ items, className, canonicalUrl, baseUrl: customBaseUrl }: BreadcrumbsProps) {
     const pathname = usePathname();
     const params = useParams();
     const lang = (params?.lang as string) || (pathname?.startsWith("/ru") ? "ru" : "ua");
+    const contextBaseUrl = useBaseUrl();
 
     if (!items || items.length === 0) {
         return null;
     }
 
+    const effectiveBaseUrl = customBaseUrl
+        || contextBaseUrl
+        || (typeof window !== "undefined" && window.location?.origin ? window.location.origin : undefined);
+
     const currentPath = pathname ? (pathname === "/" || pathname.endsWith("/") ? pathname : `${pathname}/`) : "/";
-    const jsonLd = generateBreadcrumbJsonLd(items, lang, canonicalUrl || currentPath);
+    const jsonLd = generateBreadcrumbJsonLd(items, lang, canonicalUrl || currentPath, effectiveBaseUrl);
 
     return (
         <>

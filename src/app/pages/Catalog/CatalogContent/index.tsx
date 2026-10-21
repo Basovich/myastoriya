@@ -101,8 +101,9 @@ export default async function CatalogContent({
 
     const currentSort = sortBy || sortOptions[0];
     const products = initialProducts.data;
+    const isRu = lang === 'ru';
     const breadcrumbItems = breadcrumbItemsProp ?? [
-        { label: 'Головна', href: '/' },
+        { label: isRu ? 'Главная' : 'Головна', href: '/' },
         ...(categoryName ? [{ label: categoryName }] : []),
     ];
 

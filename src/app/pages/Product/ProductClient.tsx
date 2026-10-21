@@ -295,8 +295,9 @@ const ProductClient: React.FC<ProductClientProps> = ({
     const hasDiscount = activePurchaseOldCost && activePurchaseOldCost > activePurchaseCost;
     const { label: availabilityLabel, inStock } = getAvailabilityLabel(product.available);
 
+    const isRu = lang === 'ru';
     const breadcrumbs: BreadcrumbItem[] = breadcrumbsProp ?? [
-        { label: 'Головна', href: '/' },
+        { label: isRu ? 'Главная' : 'Головна', href: '/' },
         { label: product.name },
     ];
 

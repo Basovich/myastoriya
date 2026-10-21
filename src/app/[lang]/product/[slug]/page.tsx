@@ -315,7 +315,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     }
 
     // 7. Build breadcrumbs based on category hierarchy (independent of URL structure)
-    const breadcrumbs = buildCategoryBreadcrumbs(product.categoryId, categoryIndex);
+    const breadcrumbs = buildCategoryBreadcrumbs(product.categoryId, categoryIndex, lang);
     breadcrumbs.push({ label: product.name });
 
     const headersList = await headers();

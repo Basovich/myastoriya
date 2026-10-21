@@ -70,7 +70,7 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
         const isPageNoindex = pageNum > 1 || Boolean(seoData.noindex);
         const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
 
-        const breadcrumbItems = buildCategoryBreadcrumbs(categoryEntry.node.id, categoryIndex);
+        const breadcrumbItems = buildCategoryBreadcrumbs(categoryEntry.node.id, categoryIndex, lang);
         if (breadcrumbItems.length > 1) {
             breadcrumbItems[breadcrumbItems.length - 1] = { label: categoryName };
         }
@@ -232,7 +232,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
 
         const currentCategoryName = categoryDetails?.name || categoryEntry.node.name;
 
-        const breadcrumbItems = buildCategoryBreadcrumbs(categoryEntry.node.id, categoryIndex);
+        const breadcrumbItems = buildCategoryBreadcrumbs(categoryEntry.node.id, categoryIndex, lang);
         if (breadcrumbItems.length > 1) {
             breadcrumbItems[breadcrumbItems.length - 1] = { label: currentCategoryName };
         }
