@@ -26,7 +26,7 @@ export default function ContactsPage({ dict, lang, categories, h1 }: ContactsPag
         <>
             <main className={s.main}>
                 <HeroBanner
-                    title={h1 || undefined}
+                    title={h1 || contactsPage.title}
                     image="/images/contacts/contacts_hero.png"
                 />
                 <Breadcrumbs items={breadcrumbs} className={s.breadcrumbsContainer} />

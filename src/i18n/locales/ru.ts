@@ -423,7 +423,7 @@ export const ru =
             "hideBtn": "СКРЫТЬ"
         },
         "actionsPage": {
-            "title": "АКЦИИ",
+            "title": "Акции",
             "breadcrumbs": {
                 "home": "Главная",
                 "promotions": "Акции"
@@ -435,7 +435,7 @@ export const ru =
             "showBtn": "ПОКАЗАТЬ ЕЩЕ"
         },
         "complexDiscountsPage": {
-            "title": "КОМПЛЕКСНЫЕ СКИДКИ",
+            "title": "Комплексные скидки",
             "breadcrumbs": {
                 "home": "Главная",
                 "complexDiscounts": "Комплексные скидки"
@@ -524,7 +524,7 @@ export const ru =
             }
         },
         "contactsPage": {
-            "title": "КОНТАКТЫ",
+            "title": "Контакты",
             "breadcrumbs": {
                 "home": "Главная",
                 "contacts": "Контакты"
@@ -552,7 +552,7 @@ export const ru =
             "recommendedProductsTitle": "Товары для рецепта"
         },
         "notFoundPage": {
-            "title": "СТРАНИЦА НЕ НАЙДЕНА",
+            "title": "Страница не найдена",
             "text": "Такой страницы у нас нет, зато есть много акционных предложений.",
             "subtext": "Найти их можно на домашней странице.",
             "button": "ВЕРНУТЬСЯ НА ГЛАВНУЮ",
@@ -562,7 +562,7 @@ export const ru =
             }
         },
         "ourStoresPage": {
-            "title": "ЗАВЕДЕНИЯ МЯСТОРИЯ",
+            "title": "Заведения «Мястория»",
             "breadcrumbs": {
                 "home": "Главная",
                 "stores": "Заведения"
@@ -593,7 +593,7 @@ export const ru =
             "loadMore": "ПОКАЗАТЬ ЕЩЕ"
         },
         "deliveryPage": {
-            "title": "ДОСТАВКА И ОПЛАТА",
+            "title": "Доставка и оплата",
             "breadcrumbs": {
                 "home": "Главная",
                 "delivery": "Доставка и Оплата"

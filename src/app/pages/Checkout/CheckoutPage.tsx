@@ -57,7 +57,7 @@ function CheckoutContent({ lang }: CheckoutPageProps) {
                 <div className={s.container}>
                     <Breadcrumbs items={breadcrumbs} className={s.breadcrumbs} />
                     <div className={s.pageHeader}>
-                        <h1 className={s.pageTitle}>{isRu ? 'ОФОРМЛЕНИЕ ЗАКАЗА' : 'ОФОРМЛЕННЯ ЗАМОВЛЕННЯ'}</h1>
+                        <h1 className={s.pageTitle}>{isRu ? 'Оформление заказа' : 'Оформлення замовлення'}</h1>
                         <div className={s.stepDots}>
                             <span className={s.dot} />
                             <span className={s.dot} />

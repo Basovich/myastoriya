@@ -51,7 +51,7 @@ export default function DeliveryAndPaymentPage({ dict, lang, initialShops, isMea
             <main className={s.main}>
                 <div className={s.container}>
                     <HeroBanner 
-                        title={h1 || undefined}
+                        title={h1 || deliveryPage.title}
                         image="/images/delivery/delivery.png"
                         className={s.hero}
                     />

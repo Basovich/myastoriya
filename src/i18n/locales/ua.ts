@@ -423,7 +423,7 @@ export const ua =
             "hideBtn": "СКРИТИ"
         },
         "actionsPage": {
-            "title": "АКЦІЇ",
+            "title": "Акції",
             "breadcrumbs": {
                 "home": "Головна",
                 "promotions": "Акції"
@@ -435,7 +435,7 @@ export const ua =
             "showBtn": "ПОКАЗАТИ ЩЕ"
         },
         "complexDiscountsPage": {
-            "title": "КОМПЛЕКСНІ ЗНИЖКИ",
+            "title": "Комплексні знижки",
             "breadcrumbs": {
                 "home": "Головна",
                 "complexDiscounts": "Комплексні знижки"
@@ -524,7 +524,7 @@ export const ua =
             }
         },
         "contactsPage": {
-            "title": "КОНТАКТИ",
+            "title": "Контакти",
             "breadcrumbs": {
                 "home": "Головна",
                 "contacts": "Контакти"
@@ -552,7 +552,7 @@ export const ua =
             "recommendedProductsTitle": "Товари для рецепта"
         },
         "notFoundPage": {
-            "title": "СТОРІНКУ НЕ ЗНАЙДЕНО",
+            "title": "Сторінку не знайдено",
             "text": "Такої сторінки ми не маємо, зате є багато акційних пропозицій.",
             "subtext": "Знайти їх можна на домашній сторінці.",
             "button": "ПОВЕРНУТИСЯ НА ГОЛОВНУ",
@@ -562,7 +562,7 @@ export const ua =
             }
         },
         "ourStoresPage": {
-            "title": "ЗАКЛАДИ М'ЯСТОРІЇ",
+            "title": "Заклади «М'ясторія»",
             "breadcrumbs": {
                 "home": "Головна",
                 "stores": "Заклади"
@@ -593,7 +593,7 @@ export const ua =
             "loadMore": "ПОКАЗАТИ ЩЕ"
         },
         "deliveryPage": {
-            "title": "ДОСТАВКА ТА ОПЛАТА",
+            "title": "Доставка та оплата",
             "breadcrumbs": {
                 "home": "Головна",
                 "delivery": "Доставка та Оплата"

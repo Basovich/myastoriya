@@ -31,14 +31,14 @@ interface ActionItem {
 const LOCALIZED_TEXTS = {
     ua: {
         promotions: {
-            title: "АКЦІЇ",
+            title: "Акції",
             breadcrumbs: {
                 home: "Головна",
                 promotions: "Акції"
             },
             tabs: {
-                promotions: "АКЦІЇ",
-                complexDiscounts: "КОМПЛЕКСНІ ЗНИЖКИ"
+                promotions: "Акції",
+                complexDiscounts: "Комплексні знижки"
             },
             showBtn: "ПОКАЗАТИ ЩЕ",
             loading: "Завантаження...",
@@ -46,14 +46,14 @@ const LOCALIZED_TEXTS = {
             noItems: "Акції відсутні"
         },
         "complex-discounts": {
-            title: "КОМПЛЕКСНІ ЗНИЖКИ",
+            title: "Комплексні знижки",
             breadcrumbs: {
                 home: "Головна",
                 complexDiscounts: "Комплексні знижки"
             },
             tabs: {
-                promotions: "АКЦІЇ",
-                complexDiscounts: "КОМПЛЕКСНІ ЗНИЖКИ"
+                promotions: "Акції",
+                complexDiscounts: "Комплексні знижки"
             },
             showBtn: "ПОКАЗАТИ ЩЕ",
             loading: "Завантаження...",
@@ -63,14 +63,14 @@ const LOCALIZED_TEXTS = {
     },
     ru: {
         promotions: {
-            title: "АКЦИИ",
+            title: "Акции",
             breadcrumbs: {
                 home: "Главная",
                 promotions: "Акции"
             },
             tabs: {
-                promotions: "АКЦИИ",
-                complexDiscounts: "КОМПЛЕКСНЫЕ СКИДКИ"
+                promotions: "Акции",
+                complexDiscounts: "Комплексные скидки"
             },
             showBtn: "ПОКАЗАТЬ ЕЩЕ",
             loading: "Загрузка...",
@@ -78,14 +78,14 @@ const LOCALIZED_TEXTS = {
             noItems: "Акции отсутствуют"
         },
         "complex-discounts": {
-            title: "КОМПЛЕКСНЫЕ СКИДКИ",
+            title: "Комплексные скидки",
             breadcrumbs: {
                 home: "Главная",
                 complexDiscounts: "Комплексные скидки"
             },
             tabs: {
-                promotions: "АКЦИИ",
-                complexDiscounts: "КОМПЛЕКСНЫЕ СКИДКИ"
+                promotions: "Акции",
+                complexDiscounts: "Комплексные скидки"
             },
             showBtn: "ПОКАЗАТЬ ЕЩЕ",
             loading: "Загрузка...",
@@ -251,7 +251,7 @@ export default function ActionsGrid({ initialItems, lang, pageType, initialHasMo
     return (
         <section className={s.section}>
             <HeroBanner
-                title={h1 || undefined}
+                title={h1 || texts.title}
                 image={`/images/promotions/${pageType}-banner.png`}
             />
 
