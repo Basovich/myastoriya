@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: ActionDetailPageProps): Promi
             canonicalUrl,
             lang,
             image: actionImage,
-            type: 'article',
+            type: 'website',
         }),
         twitter: {
             card: 'summary_large_image',

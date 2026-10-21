@@ -73,7 +73,7 @@ export async function generateMetadata({ params }: ComboDetailProps): Promise<Me
             canonicalUrl,
             lang,
             image: discountImage,
-            type: 'article',
+            type: 'website',
         }),
         twitter: {
             card: 'summary_large_image',

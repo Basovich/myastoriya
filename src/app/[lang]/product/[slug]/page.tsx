@@ -125,9 +125,6 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
             type: 'product',
             dynamicBaseUrl,
         }),
-        other: {
-            'og:type': 'product',
-        },
         twitter: {
             card: 'summary_large_image',
             title: finalTitle,
