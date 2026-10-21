@@ -10,7 +10,6 @@ import {
     generateProductJsonLd,
     getDynamicBaseUrl,
     getExplicitHreflangAlternates,
-    setRequestProductJsonLd
 } from '@/utils/seo';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
@@ -85,32 +84,6 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         dynamicBaseUrl,
     );
     const canonicalUrl = seoData.canonical || alternates.canonical;
-
-    let ratingData: { ratingValue?: number; ratingCount?: number } | undefined = undefined;
-    try {
-        const numericId = parseInt(productId, 10);
-        if (!isNaN(numericId)) {
-            const reviewsData = await getProductReviewsSsr(numericId, 5, lang as Locale);
-            const ratingCount = reviewsData?.data?.length ?? 0;
-            const ratingSum = reviewsData?.data?.reduce((acc, r) => acc + (r.rating || 0), 0) ?? 0;
-            const ratingValue = ratingCount > 0 ? ratingSum / ratingCount : (product.rating ?? undefined);
-            if (ratingValue && ratingCount > 0) {
-                ratingData = { ratingValue, ratingCount };
-            }
-        }
-    } catch {
-        // Non-critical rating fetch error
-    }
-
-    const productJsonLd = generateProductJsonLd({
-        product,
-        lang,
-        canonicalUrl,
-        dynamicBaseUrl,
-        imageUrl: productImage,
-        ratingData,
-    });
-    setRequestProductJsonLd(productJsonLd, relativeUrl);
 
     return {
         title: finalTitle,

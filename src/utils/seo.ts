@@ -27,10 +27,10 @@ export function setRequestBreadcrumbJsonLd(_data: object, _pathname?: string) {
     // BreadcrumbList JSON-LD is rendered universally by Breadcrumbs component.
 }
 
-export function setRequestProductJsonLd(data: object, pathname?: string) {
-    if (pathname) {
-        addRequestJsonLdScript(pathname, data);
-    }
+export function setRequestProductJsonLd(_data: object, _pathname?: string) {
+    void _data;
+    void _pathname;
+    // Product JSON-LD is rendered directly in ProductPage JSX.
 }
 
 export function getRequestJsonLdScripts(pathname?: string): object[] {
@@ -253,6 +253,7 @@ export interface ProductJsonLdParams {
         available?: number | boolean | null;
         images?: Array<{ url?: { main2x?: string | null; grid2x?: string | null; grid1x?: string | null; main1x?: string | null } | null }> | null;
         image?: { url?: { main2x?: string | null; grid2x?: string | null; grid1x?: string | null; main1x?: string | null } | null } | null;
+        specifications?: Array<{ name: string; values: string[] }> | null;
     };
     lang?: string;
     canonicalUrl: string;
@@ -262,6 +263,71 @@ export interface ProductJsonLdParams {
         ratingValue?: number | null;
         ratingCount?: number | null;
     };
+}
+
+/**
+ * Resolves product brand based on product specifications, product name, or fallback.
+ */
+export function resolveProductBrand(
+    product: {
+        name: string;
+        specifications?: Array<{ name: string; values: string[] }> | null;
+    },
+    lang: string = "ua"
+): string {
+    const isRu = lang.toLowerCase() === "ru";
+    const defaultBrand = isRu ? "Мястория" : "М'ясторія";
+
+    // 1. Check specifications for explicit brand / manufacturer / producer
+    if (product.specifications && product.specifications.length > 0) {
+        const brandSpec = product.specifications.find(s =>
+            /^(?:виробник|производитель|бренд|brand|торгов(?:а|ая)\s+марка|manufacturer|тм)$/i.test(s.name.trim())
+        );
+        if (brandSpec && brandSpec.values && brandSpec.values.length > 0) {
+            const val = brandSpec.values[0]?.trim();
+            if (val) {
+                if (/^м(?:'|`|ʼ)ястор(?:і|и)я$/i.test(val)) {
+                    return defaultBrand;
+                }
+                return val;
+            }
+        }
+    }
+
+    // 2. Check if product name explicitly mentions Myastoriya
+    if (/м(?:'|`|ʼ)ястор(?:і|и)я/i.test(product.name)) {
+        return defaultBrand;
+    }
+
+    // 3. Check for external partner brands commonly in title
+    const knownBrands = [
+        "Santa Maria", "Pozzy", "La Cerignola", "Oilala", "Jiva", "Berryland",
+        "Underwood", "Fritz-Kola", "Coca-Cola", "Sprite", "Fanta", "Schweppes",
+        "Tartufi", "Red Bull", "Corona", "Guinness", "Stella Artois", "Heineken",
+        "Warsteiner", "Volfas Engelman", "Leffe", "Hoegaarden", "Krombacher",
+        "Paulaner", "Pilsner Urquell", "Peroni", "Gerard Bertrand", "Raoul Clerget",
+        "Colterenzio", "770 Miles", "Feral Roots"
+    ];
+
+    for (const kb of knownBrands) {
+        const regex = new RegExp(`\\b${kb}\\b`, "i");
+        if (regex.test(product.name)) {
+            return kb;
+        }
+    }
+
+    // 4. Check if the title ends with a distinct Latin brand name (e.g. "Соус Beef", "Набір солей Legend")
+    const latinBrandMatch = product.name.match(/\b([A-Z][A-Za-z0-9&'-]+(?:\s+[A-Z][A-Za-z0-9&'-]+)?)$/);
+    if (latinBrandMatch) {
+        const candidate = latinBrandMatch[1].trim();
+        const genericWords = ["BBQ", "PRIME", "Dry-aged", "Black Angus", "Zero", "Light", "Classic"];
+        if (!genericWords.includes(candidate)) {
+            return candidate;
+        }
+    }
+
+    // 5. Default to Myastoriya for own meat production, steaks, ready dishes, etc.
+    return defaultBrand;
 }
 
 /**
@@ -296,7 +362,7 @@ export function generateProductJsonLd({
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock";
 
-    const brandName = lang.toLowerCase() === "ru" ? "Мястория" : "М'ясторія";
+    const brandName = resolveProductBrand(product, lang);
     const effectivePrice = (typeof product.purchaseCost === 'number' && product.purchaseCost > 0)
         ? product.purchaseCost
         : product.cost;
