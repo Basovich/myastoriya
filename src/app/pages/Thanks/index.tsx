@@ -13,7 +13,7 @@ const translations = {
     ua: {
         breadcrumbsHome: "Головна",
         breadcrumbsThanks: "Оформлення замовлення",
-        thankYou: "ДЯКУЄМО ЗА ВАШЕ ЗАМОВЛЕННЯ!",
+        thankYou: "Дякуємо за ваше замовлення!",
         managerNotice: "Ваше замовлення вже у нас - менеджер зв'яжеться тільки в разі необхідності уточнення.",
         orderLabel: "Замовлення",
         backToHome: "ПОВЕРНУТИСЬ НА ГОЛОВНУ",
@@ -24,7 +24,7 @@ const translations = {
     ru: {
         breadcrumbsHome: "Главная",
         breadcrumbsThanks: "Оформление заказа",
-        thankYou: "СПАСИБО ЗА ВАШ ЗАКАЗ!",
+        thankYou: "Спасибо за ваш заказ!",
         managerNotice: "Ваш заказ уже у нас - менеджер свяжется только в случае необходимости уточнения.",
         orderLabel: "Заказ",
         backToHome: "ВЕРНУТЬСЯ НА ГЛАВНЕЙШИЙ",

@@ -353,7 +353,10 @@ export function generateProductJsonLd({
         : `${baseUrl}/images/og-image.jpg`;
 
     const rawDescription = product.text || "";
-    const cleanDescription = decodeHtmlEntities(rawDescription.replace(/<[^>]*>/g, "").trim()) || product.name;
+    const cleanDescription = decodeHtmlEntities(rawDescription.replace(/<[^>]*>/g, " "))
+        .replace(/[\r\n\t]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim() || product.name;
 
     const isAvailable = typeof product.available === "boolean"
         ? product.available
@@ -469,7 +472,8 @@ export function getHreflangAlternates(
     }
 
     const normalizedLang = currentLang === "ru" ? "ru" : "uk";
-    const canonical = normalizedLang === "ru" ? ruUrl : ukUrl;
+    const enUrl = relativePath ? `${baseUrl}/en/${relativePath}/${pageSuffix}` : `${baseUrl}/en/${pageSuffix}`;
+    const canonical = currentLang === "en" ? enUrl : (normalizedLang === "ru" ? ruUrl : ukUrl);
 
     return {
         canonical,

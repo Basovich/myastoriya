@@ -14,14 +14,14 @@ export async function generateMetadata({ params }: SearchPageProps): Promise<Met
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
-    const pageTitle = lang === "ru" ? "Поиск" : "Пошук";
+    const pageTitle = lang === "ru" ? "Поиск по сайту" : "Пошук по сайту";
     const seo = getDefaultSeoData(pageTitle, lang);
     const alternates = getHreflangAlternates("/search/", lang, dynamicBaseUrl);
 
     const isRu = lang === "ru";
     const breadcrumbs = [
         { label: isRu ? "Главная" : "Головна", href: "/" },
-        { label: isRu ? "Поиск" : "Пошук" }
+        { label: pageTitle }
     ];
     const breadcrumbJsonLd = generateBreadcrumbJsonLd(breadcrumbs, lang, alternates.canonical, dynamicBaseUrl);
     setRequestBreadcrumbJsonLd(breadcrumbJsonLd);

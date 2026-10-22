@@ -1,10 +1,19 @@
 import s from "./AppPromo.module.scss";
 import Image from "next/image";
-import { homeData } from "./app-promo.content";
 
-export default function AppPromo() {
-    const { appPromo } = homeData;
+import { Locale } from "@/i18n/config";
 
+const TITLES: Record<string, { subtitle: string; main: string }> = {
+    ua: { subtitle: "ДОДАТОК", main: "“М'ЯСТОРІЯ”" },
+    ru: { subtitle: "ПРИЛОЖЕНИЕ", main: "“МЯСТОРИЯ”" },
+};
+
+interface Props {
+    lang: Locale;
+}
+
+export default function AppPromo({ lang }: Props) {
+    const titles = TITLES[lang] || TITLES.ua;
     return (
         <section className={s.section} id="apppromo">
             <div className={s.banner}>
@@ -31,8 +40,8 @@ export default function AppPromo() {
                             height={20}
                         />
                         <div className={s.titles}>
-                            <p className={s.subtitle}>ПРИЛОЖЕНИЕ</p>
-                            <p className={s.mainTitle}>“МЯСТОРИЯ”</p>
+                            <p className={s.subtitle}>{titles.subtitle}</p>
+                            <p className={s.mainTitle}>{titles.main}</p>
                         </div>
                     </div>
                     <div className={s.buttons}>

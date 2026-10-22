@@ -48,13 +48,13 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
     const token = await getAccessToken();
     const productId = await findProductIdBySlug(slug, lang as Locale).catch(() => null);
-    if (!productId) return {};
+    if (!productId) notFound();
 
     let product = await getProductByIdApi(productId, lang as Locale, token ?? undefined, true).catch(() => null);
     if (!product) {
         product = await getProductByIdApi(productId, lang as Locale, undefined, true).catch(() => null);
     }
-    if (!product) return {};
+    if (!product) notFound();
 
     const productSlugs = await getProductSlugsById(productId).catch(() => ({ uk: slug, ru: slug }));
 

@@ -109,10 +109,6 @@ export async function generateMetadata({
     appleWebApp: {
       title: "Myastoriya",
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
   };
 }
 

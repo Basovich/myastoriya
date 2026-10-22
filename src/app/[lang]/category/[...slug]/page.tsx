@@ -98,7 +98,9 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
         };
     }
 
-    return {};
+    return {
+        title: { absolute: lang === 'ru' ? 'Страница не найдена | Мястория' : "Сторінку не знайдено | М'ясторія" },
+    };
 }
 
 export default async function DynamicCategoryPage({ params, searchParams }: DynamicCategoryPageProps) {

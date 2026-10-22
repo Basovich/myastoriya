@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: ApplyProps): Promise<Metadata
   const headersList = await headers();
   const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
-  const pageTitle = lang === "ru" ? "Форма для соискателей" : "Форма для претендентів";
+  const pageTitle = lang === "ru" ? "Форма для претендентов" : "Форма для претендентів";
   const brandSuffix = lang === "ru" ? "Мястория" : "М'ясторія";
   const title = `${pageTitle} | ${brandSuffix}`;
   const seo = getDefaultSeoData(pageTitle, lang);

@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: ThanksProps): Promise<Metadat
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
-    const pageTitle = lang === "ru" ? "Спасибо за заказ" : "Дякуємо за замовлення";
+    const pageTitle = lang === "ru" ? "Спасибо за ваш заказ!" : "Дякуємо за ваше замовлення!";
     const seo = getDefaultSeoData(pageTitle, lang);
     const alternates = getHreflangAlternates("/thanks/", lang, dynamicBaseUrl);
 

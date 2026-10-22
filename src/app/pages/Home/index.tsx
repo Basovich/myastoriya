@@ -53,7 +53,7 @@ export default function HomePage({
             {sales && sales.length > 0 && (
                 <Actions dict={dict.home.actions} lang={lang} sales={sales} />
             )}
-            <AppPromo />
+            <AppPromo lang={lang} />
             {specials && specials.length > 0 && (
                 <ComplexDiscounts dict={dict.home.discounts} lang={lang} specials={specials} />
             )}
