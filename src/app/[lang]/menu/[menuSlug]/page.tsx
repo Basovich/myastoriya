@@ -12,11 +12,6 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-const NOT_FOUND_TITLE = {
-    ua: "Сторінку не знайдено | М'ясторія",
-    ru: "Страница не найдена | Мястория",
-};
-
 interface MenuPageProps {
     params: Promise<{ lang: string; menuSlug: string }>;
 }
@@ -38,7 +33,7 @@ export async function generateMetadata({ params }: MenuPageProps): Promise<Metad
         const shop = shopResponse?.shop;
 
         if (!shop || !shop.isCompanyStore) {
-            return { title: { absolute: NOT_FOUND_TITLE[lang === "ru" ? "ru" : "ua"] } };
+            return {};
         }
 
         const shopName = shop.siteName || shop.name || "";
@@ -80,7 +75,7 @@ export async function generateMetadata({ params }: MenuPageProps): Promise<Metad
             },
         };
     } catch {
-        return { title: { absolute: NOT_FOUND_TITLE[lang === "ru" ? "ru" : "ua"] } };
+        return {};
     }
 }
 

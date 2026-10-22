@@ -15,6 +15,7 @@ import StatusModals from "@/app/components/StatusModals/StatusModals";
 import NotFoundBlock from "@/app/components/NotFoundBlock/NotFoundBlock";
 import { type Locale } from "@/i18n/config";
 import clsx from "clsx";
+import { fetchSeoMetadataByUrl } from "@/utils/seo";
 
 const houschka = localFont({
     src: [
@@ -75,13 +76,13 @@ export default async function GlobalNotFound() {
     }
 
     const dict = await getDictionary(lang);
+    const seoTitle = (await fetchSeoMetadataByUrl(`/${lang}/404/`, lang).catch(() => null))?.title || "";
     const htmlLang = lang === 'ua' ? 'uk' : lang;
 
     return (
         <html lang={htmlLang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
             <head>
-                <title>{lang === 'ru' ? 'Страница не найдена | Мястория' : "Сторінку не знайдено | М'ясторія"}</title>
-                <meta name="robots" content="noindex, nofollow" />
+                <title>{seoTitle || (lang === 'ru' ? 'Страница не найдена | Мястория' : "Сторінку не знайдено | М'ясторія")}</title>
             </head>
             <body>
                 <ReduxProvider>
