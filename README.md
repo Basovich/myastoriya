@@ -1,310 +1,152 @@
 # MyAstoriya
 
-SPA-додаток на **Next.js 16** з **SCSS-модулями**, SEO-оптимізацією та контентом у JSON-файлах.
-
-## Стек технологій
-
-| Технологія       | Версія  |
-| ---------------- | ------- |
-| Next.js          | 16.1.6  |
-| React            | 19.2.3  |
-| TypeScript       | 5.x     |
-| Sass (embedded)  | 1.97.x  |
-| Node.js          | ≥ 20.9  |
-
-## Швидкий старт
-
-```bash
-# Переконайтеся, що використовуєте Node.js 20+
-node -v
-
-# Встановити залежності
-npm install
-
-# Запустити dev-сервер
-npm run dev        # → http://localhost:3000
-
-# Зібрати production-версію (static export → out/)
-npm run build
-
-# Перевірити код (ESLint)
-npm run lint
-```
-
-> Якщо на системі встановлено кілька версій Node.js через `n`:
-> ```bash
-> export PATH="/usr/local/n/versions/node/20.20.0/bin:$PATH"
-> ```
+Сучасна платформа електронної комерції та ресторанної доставки мережі **«М'ясторія»**, розроблена на базі **Next.js 16** (App Router, React 19) із серверним рендерингом (SSR/ISR), прямим підключенням до GraphQL API, Redux Toolkit, підтримкою багатомовності та розширеною SEO-оптимізацією.
 
 ---
 
-## Структура проекту
+## 🚀 Стек технологій
 
+| Категорія | Технологія | Версія | Примітки |
+|---|---|---|---|
+| **Фреймворк** | [Next.js](https://nextjs.org/) | `16.2.x` | App Router, SSR, ISR, Server Components, `--webpack` |
+| **UI-бібліотека** | [React](https://react.dev/) | `19.2.x` | React Server Components & Client Islands |
+| **Мова** | [TypeScript](https://www.typescriptlang.org/) | `5.x` | Строгий режим типізації, заборона `any` |
+| **Стилізація** | Sass (embedded) + SCSS Modules | `1.97.x` | Модульні стилі + CSS Custom Properties (`globals.css`) |
+| **Стейт-менеджмент** | [Redux Toolkit](https://redux-toolkit.js.org/) | `2.x` | + `redux-persist` з безпечним `noopStorage` для SSR |
+| **API / Дані** | GraphQL Client | — | Пряма взаємодія (`https://dev-api.myastoriya.com.ua/graphql`) |
+| **Форми та валідація** | Formik + Yup | `2.x` / `1.x` | Управління станом форм та валідація схем |
+| **Моніторинг** | [Sentry](https://sentry.io/) | `10.49.x` | Трейсинг, моніторинг помилок, сесійні реплеї |
+| **Локалізація (i18n)** | Власна реалізація | — | Маршрутизація через `[lang]` (`/` для UA, `/ru/` для RU) |
+
+---
+
+## 📦 Швидкий старт
+
+### Вимоги до оточення
+- **Node.js**: `≥ 20.9.0`
+- **npm**: `≥ 10.x`
+
+### Встановлення та запуск
+
+```bash
+# 1. Встановити залежності
+npm install
+
+# 2. Запустити локальний сервер розробки
+npm run dev
+# → Додаток буде доступний за адресою http://localhost:3000
 ```
-├── public/                     # Статичні файли (favicon, зображення)
+
+### Доступні NPM-скрипти
+
+| Команда | Опис |
+|---|---|
+| `npm run dev` | Запуск dev-сервера Next.js з Webpack (`next dev --webpack`) |
+| `npm run build` | Оптимізована production-збірка проекту з інтеграцією Sentry |
+| `npm run start` | Запуск зібраного production-додатку |
+| `npm run lint` | Перевірка коду лінтером (ESLint) |
+| `npm run check:hreflang` | Скрипт аудиту валідності hreflang-посилань |
+
+---
+
+## 📁 Структура проекту
+
+```text
+myastoriya/
+├── public/                 # Статичні ресурси (іконки, SVG, логотипи, зображення)
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx          # Кореневий layout (SEO metadata, шрифти)
-│   │   ├── page.tsx            # Головна сторінка — композиція компонентів
-│   │   ├── globals.css         # CSS custom properties, базові стилі
-│   │   ├── robots.ts           # Генерація robots.txt
-│   │   ├── sitemap.ts          # Генерація sitemap.xml
-│   │   └── components/         # UI-компоненти
-│   │       ├── Header/
-│   │       │   ├── Header.tsx
-│   │       │   └── Header.module.scss
-│   │       ├── Hero/
-│   │       │   ├── Hero.tsx
-│   │       │   └── Hero.module.scss
-│   │       ├── Sections/
-│   │       │   ├── Sections.tsx       # FeaturesSection, ServicesSection
-│   │       │   └── Sections.module.scss
-│   │       ├── Contact/
-│   │       │   ├── Contact.tsx
-│   │       │   └── Contact.module.scss
-│   │       └── Footer/
-│   │           ├── Footer.tsx
-│   │           └── Footer.module.scss
-│   └── content/                # Весь контент у JSON
-│       ├── site.json           # Глобальні дані: навігація, SEO, соцмережі, футер
-│       └── pages/
-│           └── home.json       # Контент головної сторінки
-├── next.config.ts              # output: 'export', images: unoptimized
-├── postcss.config.mjs          # PostCSS конфігурація
-├── tsconfig.json               # TypeScript конфігурація
-├── .nvmrc                      # Фіксована версія Node.js
+│   │   ├── [lang]/         # Локалізовані сторінки додатку (динамічний роутер Next.js)
+│   │   │   ├── catalog/    # Сторінка загального каталогу
+│   │   │   ├── category/   # Динамічні сторінки категорій товарів
+│   │   │   ├── product/    # Сторінки окремих карток товарів
+│   │   │   ├── checkout/   # Багатокрокове оформлення замовлення
+│   │   │   ├── blog/       # Блог (статті, поради, рецепти)
+│   │   │   ├── layout.tsx  # Головний кореневий лейаут (Header, Footer, Providers, SEO)
+│   │   │   └── page.tsx    # Головна сторінка
+│   │   ├── actions/        # Server Actions (Next.js серверні операції: auth, cookies тощо)
+│   │   ├── api/            # Внутрішні API роути Next.js
+│   │   ├── components/     # UI-компоненти (Header, Footer, Checkout, Modals тощо)
+│   │   │   └── ui/         # Атомарні повторно використовувані компоненти (Button, AppLink тощо)
+│   │   ├── pages/          # Специфічні комплексні сторінкові композиції (CatalogContent тощо)
+│   │   └── globals.css     # Дизайн-токени (CSS custom properties) та базові стилі
+│   ├── config/             # Конфігурація сайту, метаданих та контактів
+│   ├── fonts/              # Локальні типографічні шрифти
+│   ├── hooks/              # Кастомні React-хуки (useCart, useIsHydrated, useCategoryTree тощо)
+│   ├── i18n/               # Словники перекладів (ua.json, ru.json), конфігурація мов
+│   ├── lib/                # Бізнес-логіка, GraphQL запити, мутації та API-клієнти
+│   │   └── graphql/        # Схеми та запити до бекенду (products, auth, orders тощо)
+│   ├── store/              # Redux Toolkit store (слайси: auth, cart, locality, ui)
+│   └── utils/              # Хелпери (SEO, розрахунок цін, форматування, cookies)
+├── next.config.ts          # Конфігурація Next.js, Webpack loaders та Sentry
 └── package.json
 ```
 
 ---
 
-## Ключові файли та налаштування
+## 🏛️ Ключові архітектурні рішення
 
-### `next.config.ts` — конфігурація Next.js
+### 1. GraphQL API та мережева взаємодія
+- Всі GraphQL-запити (як серверні при SSR, так і клієнтські) надсилаються **напряму** на бекенд: `https://dev-api.myastoriya.com.ua/graphql`.
+- `gqlRequest` (у `src/lib/graphql/client.ts`) автоматично підставляє токен авторизації:
+  - На клієнті — з пам'яті Redux store (`state.auth.token`).
+  - На сервері — передається через опції з cookies (`access_token`).
+- При отриманні `401 Unauthorized` клієнтський інтерцептор автоматично ініціює refresh токена через Server Action `tryRefreshTokenAction`.
 
-```ts
-const nextConfig: NextConfig = {
-  output: "export",              // Static export → папка out/
-  images: { unoptimized: true }, // Обов'язково для static export
-};
-```
+### 2. Прив'язка міста та локальності (Критично для каталогу)
+- Бекенд фільтрує асортимент, ціни та наявність товарів залежно від обраного населеного пункту.
+- Обране місто зберігається у Redux store (`state.locality.selectedCity`) та фіксується у сесії на бекенді через мутацію `selectLocalityApi(cityId, lang)`.
+- **SSR-запити каталогу** обов'язково передають серверний токен сесії, щоб бекенд визначав актуальне місто та коректні залишки.
 
-- **`output: "export"`** — збирає SPA як набір статичних HTML-файлів.
-- Щоб вимкнути static export (наприклад, для серверного рендерингу), видаліть ці два рядки.
+### 3. Авторизація та безпека
+- `access_token` зберігається у `httpOnly` cookie та синхронізується з Redux store.
+- `refresh_token` зберігається виключно у захищених `httpOnly` cookie.
+- Кожен запит авторизації передає унікальний `deviceId` (UUID) через `getOrCreateDeviceId()`.
+- Якщо користувач не увійшов у профіль, автоматично створюється сесія гостя (`authAsGuestApi`).
 
-### `src/app/globals.css` — дизайн-система
+### 4. Доступність контенту без JavaScript та SEO
+- **Серверний рендеринг:** Каталог товарів, картки, хлібні крихти, описи та фільтри повністю рендеряться на сервері (SSR).
+- **Єдина навігація:** Посилання десктопного каталогу та мобільного бургер-меню присутні у початковому HTML-коді одразу (навіть коли меню візуально закриті), без штучного прихованого дублювання через `clip: rect`.
+- **Graceful Degradation:** Блок `<noscript>` у `layout.tsx` забезпечує коректне відображення галерей, списків магазинів та сайдбару фільтрів при відключеному JavaScript.
+- **Мікророзмітка Schema.org:**
+  - `Product` та `Offer` у форматі JSON-LD для всіх сторінок товарів.
+  - `BreadcrumbList` для навігаційних ланцюжків.
+  - `Organization` та `WebSite`.
 
-Тут налаштовуються всі дизайн-токени через CSS custom properties:
+### 5. Багатомовність (i18n) та навігація
+- **Українська мова (UA)** є основною та відкривається за кореневою адресою `/` (без префікса `/ua/`).
+- **Російська мова (RU)** доступна з префіксом `/ru/`.
+- Для внутрішніх посилань обов'язково використовується компонент `<AppLink href="...">` з `@/app/components/ui/AppLink/AppLink`, який автоматично враховує поточну мову користувача.
 
-```css
-:root {
-  --color-accent: #E30613;    /* Основний акцентний колір */
-  --color-bg: #000000;        /* Фон сторінки */
-  --color-bg-card: #1A1A1A;   /* Фон карток */
-  --radius-lg: 16px;          /* Радіус заокруглення */
-  /* ... інші змінні */
-}
-```
-
-**Щоб змінити кольорову схему** — відредагуйте змінні всередині `:root { }`.
-
-### `src/app/layout.tsx` — SEO та метадані
-
-Глобальні SEO-теги (title, description, Open Graph, Twitter Cards) тягнуться з `src/content/site.json`:
-
-```tsx
-export const metadata: Metadata = {
-  title: { default: siteData.seo.title, template: `%s | ${siteData.name}` },
-  description: siteData.seo.description,
-  openGraph: { ... },
-  twitter: { ... },
-};
-```
-
-**Щоб змінити SEO** — редагуйте поле `seo` у `src/content/site.json`.
-
-### `src/content/site.json` — глобальні дані сайту
-
-Містить: назва, опис, SEO, навігація, соцмережі, контакти, футер.
-
-```json
-{
-  "name": "MyAstoriya",
-  "seo": { "title": "...", "description": "...", "keywords": [...] },
-  "navigation": [
-    { "label": "Головна", "href": "#hero" }
-  ],
-  "socialLinks": [...],
-  "contact": { "email": "...", "phone": "..." },
-  "footer": { "copyright": "...", "links": [...] }
-}
-```
-
-### `src/content/pages/home.json` — контент сторінки
-
-Кожна секція (hero, about, services, contact) описана як окремий об'єкт. Компоненти читають дані з цього файлу через `import`.
+### 6. Гідрація та робота зі сховищем (SSR-safe)
+- Щоб запобігти проблемам доступу до `localStorage` під час серверного рендерингу, використовується обгортка `noopStorage` (`src/store/noopStorage.ts`).
+- Елементи інтерфейсу, стан яких залежить від збережених клієнтських даних (наприклад, лічильник товарів у кошику, бейджі списку бажань), огортаються хуком `useIsHydrated()`, що запобігає помилкам Hydration Mismatch у React 19.
 
 ---
 
-## Як додати новий компонент
+## 🎨 Правила стилізації
 
-1. Створіть папку `src/app/components/НазваКомпонента/`
-2. Створіть два файли:
-
-**`MyComponent.tsx`**
-```tsx
-import s from "./MyComponent.module.scss";
-
-export default function MyComponent() {
-  return (
-    <section className={s.wrapper} id="my-section">
-      <div className={s.inner}>
-        <h2 className={s.title}>Заголовок</h2>
-      </div>
-    </section>
-  );
-}
-```
-
-**`MyComponent.module.scss`**
-```scss
-.wrapper {
-  padding: 40px 16px;
-  background: var(--color-bg-secondary);
-}
-
-.inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.title {
-  font-size: 1.875rem;
-  font-weight: 800;
-}
-```
-
-3. Підключіть у `src/app/page.tsx`:
-
-```tsx
-import MyComponent from "./components/MyComponent/MyComponent";
-
-export default function Home() {
-  return (
-    <>
-      <Header />
-      {/* ... */}
-      <MyComponent />
-      <Footer />
-    </>
-  );
-}
-```
+- **Модульність:** Кожен компонент має власний ізольований SCSS-модуль (`[ComponentName].module.scss`).
+- **Дизайн-токени:** Кольори, відступи, радіуси та шрифти оголошені через CSS Custom Properties у `src/app/globals.css`.
+- **Media Queries:** Застосовується підхід Mobile-First (використання `min-width`). Медіа-запити розташовуються всередині відповідних селекторів.
+- **Hover:** Всі hover-ефекти обов'язково огортаються в `@media (any-hover: hover)` для коректної роботи на сенсорних пристроях.
 
 ---
 
-## Як додати нову сторінку
+## 🔄 Робота з Git (Синхронізація репозиторіїв)
 
-Next.js App Router використовує файлову маршрутизацію.
+Проект налаштовано для одночасної синхронізації з двома віддаленими репозиторіями (**GitHub** та **Bitbucket**).
 
-1. Створіть папку `src/app/назва-сторінки/`
-2. Додайте `page.tsx`:
-
-```tsx
-import type { Metadata } from "next";
-
-// SEO для цієї сторінки
-export const metadata: Metadata = {
-  title: "Назва сторінки",
-  description: "Опис для пошукових систем",
-};
-
-export default function НоваСторінка() {
-  return (
-    <main>
-      <h1>Нова сторінка</h1>
-    </main>
-  );
-}
+Команда `origin` містить два push-URL:
+```text
+origin  https://github.com/Basovich/myastoriya.git (push)
+origin  git@ssh.bitbucket.org:myastoriya-mob/myastoriya-web.git (push)
 ```
 
-3. Сторінка буде доступна за адресою `/назва-сторінки`.
-
-4. Щоб використовувати JSON контент — створіть `src/content/pages/назва-сторінки.json` і імпортуйте:
-
-```tsx
-import pageData from "@/content/pages/назва-сторінки.json";
-```
-
-5. Додайте сторінку в `sitemap.ts`:
-
-```ts
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    { url: "https://myastoriya.com", lastModified: new Date(), priority: 1 },
-    { url: "https://myastoriya.com/назва-сторінки", lastModified: new Date(), priority: 0.8 },
-  ];
-}
-```
-
----
-
-## Як працює стилізація
-
-У проекті використовуються **два підходи**:
-
-| Підхід | Де використовується | Приклад |
-| --- | --- | --- |
-| **SCSS modules** | Компонентні стилі | `className={s.card}` |
-| **CSS custom properties** | Дизайн-токени в `globals.css` | `var(--color-accent)` |
-
-### Правила для SCSS модулів
-
-- Ім'я файлу: `НазваКомпонента.module.scss`
-- CSS-змінні з `:root` доступні через `var(--color-*)` без додаткового імпорту
-
----
-
-## Деплой на Vercel
-
-Проект автоматично деплоїться на **Vercel** при кожному push/merge в гілку `main`.
-
-| Параметр | Значення |
-| --- | --- |
-| **Production URL** | [myastoriya-vadyms-projects-d450dffa.vercel.app](https://myastoriya-vadyms-projects-d450dffa.vercel.app) |
-| **GitHub Repo** | [Basovich/myastoriya](https://github.com/Basovich/myastoriya) |
-| **Trigger** | Push / Merge в `main` |
-| **Framework** | Next.js (auto-detected) |
-| **Build Command** | `npm run build` |
-| **Output** | Static Export (`out/`) |
-
-### Як це працює
-
-1. Ви пушите зміни в `main` → Vercel автоматично запускає білд
-2. Якщо білд успішний → нова версія сайту стає доступною через ~30 секунд
-3. При помилці білду → попередня версія залишається активною
-
-### Ручний деплой (за потреби)
-
+При виконанні команди:
 ```bash
-# Деплой у production
-npx vercel --prod
-
-# Превʼю-деплой (для тестування)
-npx vercel
+git push origin main
 ```
+код автоматично надсилається в обидва сховища одночасно.
 
-### Захист сайту паролем
-
-Сайт захищений клієнтським паролем. При першому відвідуванні зʼявляється промпт для введення пароля. Пароль зберігається в `sessionStorage` (діє до закриття вкладки).
-
-Щоб змінити пароль — відредагуйте `CORRECT_PASSWORD` у `src/app/components/PasswordGate/PasswordGate.tsx`.
-
----
-
-## Корисні посилання
-
-- [Next.js App Router](https://nextjs.org/docs/app)
-- [Next.js Metadata API](https://nextjs.org/docs/app/api-reference/functions/generate-metadata)
-- [CSS Modules](https://nextjs.org/docs/app/getting-started/css-and-styling#css-modules)
+> ⚠️ **Важливо:** Згідно з правилами проекту, операції `git commit` та `git push` завжди виконуються розробником вручну.
