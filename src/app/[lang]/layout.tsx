@@ -125,7 +125,6 @@ import { CategoryProvider } from "@/hooks/useCategoryTree";
 import NavigationProgress from "@/app/components/NavigationProgress/NavigationProgress";
 
 import StatusModals from "@/app/components/StatusModals/StatusModals";
-import CatalogMenuSsrLinks from "@/app/components/Header/DesktopHeader/MainBar/CatalogMenu/CatalogMenuSsrLinks";
 import { BaseUrlProvider } from "@/hooks/useBaseUrl";
 
 export default async function RootLayout({
@@ -271,6 +270,19 @@ export default async function RootLayout({
               height: auto !important;
               overflow: visible !important;
             }
+
+            /* Catalog Sidebar & Filters without JS */
+            html body [class*="CatalogContent_sidebar"],
+            [class*="CatalogContent_sidebar"] {
+              display: block !important;
+              width: 100% !important;
+              margin-bottom: 24px !important;
+            }
+
+            #filter-btn,
+            [class*="CatalogContent_filterBtn"] {
+              display: none !important;
+            }
           `}</style>
         </noscript>
       </head>
@@ -281,10 +293,6 @@ export default async function RootLayout({
               <NavigationProgress />
               {!isMenuPage && <AuthInitializer />}
               {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
-              {/* SSR-посилання категорій каталогу для SEO-павуків (приховані візуально) */}
-              {!isMenuPage && catalogTree.length > 0 && (
-                  <CatalogMenuSsrLinks categories={catalogTree} lang={lang as Locale} />
-              )}
               {children}
               {!isMenuPage && <Footer lang={lang as Locale} initialSocialLinks={socialLinks} />}
               <StatusModals lang={lang as Locale} />

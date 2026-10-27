@@ -66,6 +66,9 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
         }
     }, [isOpen, disableScroll, enableScroll]);
 
+    // Resolve effective category (defaults to first category for SSR and initial display)
+    const effectiveCategory = activeCategory || (displayCategories.length > 0 ? displayCategories[0] : null);
+
     // Resolve the ID of the category whose image should be shown based on priority/nesting fallback
     const currentVisibleImageCategoryId = useMemo(() => {
         if (hoveredThirdLevel && hoveredThirdLevel.image?.big2x) {
@@ -74,18 +77,16 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
         if (hoveredSubCategory && hoveredSubCategory.image?.big2x) {
             return hoveredSubCategory.id;
         }
-        if (activeCategory && activeCategory.image?.big2x) {
-            return activeCategory.id;
+        if (effectiveCategory && effectiveCategory.image?.big2x) {
+            return effectiveCategory.id;
         }
         return null;
-    }, [hoveredThirdLevel, hoveredSubCategory, activeCategory]);
-
-    if (!isOpen) return null;
+    }, [hoveredThirdLevel, hoveredSubCategory, effectiveCategory]);
 
     const hasThirdLevel = !!(hoveredSubCategory?.children && hoveredSubCategory.children.length > 0);
 
     return (
-        <div className={s.overlay} onClick={onClose}>
+        <div className={clsx(s.overlay, isOpen && s.open)} onClick={onClose}>
             <div className={s.menuWrapper} onClick={(e) => e.stopPropagation()}>
                 <div className={s.sidebar}>
                     <ul className={s.categoryList}>
@@ -96,7 +97,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                             return (
                                 <li
                                     key={cat.id}
-                                    className={clsx(s.categoryItem, activeCategory?.id === cat.id && s.active)}
+                                    className={clsx(s.categoryItem, effectiveCategory?.id === cat.id && s.active)}
                                     onMouseEnter={() => {
                                         setActiveCategory(cat);
                                         setHoveredSubCategory(null);
@@ -160,14 +161,14 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                         alt=""
                                         fill
                                         className={s.bgImage}
-                                        priority={activeCategory?.id === cat.id}
+                                        priority={effectiveCategory?.id === cat.id}
                                     />
                                 </div>
                             )
                         ))}
 
                         {/* L2 sub-category images */}
-                        {activeCategory?.children?.map((sub) => (
+                        {effectiveCategory?.children?.map((sub) => (
                             sub.image?.big2x && (
                                 <div
                                     key={sub.id}
@@ -207,9 +208,9 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                         ))}
                     </div>
 
-                    {activeCategory && (
+                    {effectiveCategory && (
                         <div className={s.subContent}>
-                            {activeCategory.children && activeCategory.children.length > 0 && (
+                            {effectiveCategory.children && effectiveCategory.children.length > 0 && (
                                 <div
                                     className={s.subColumns}
                                     onMouseLeave={() => {
@@ -219,7 +220,7 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
                                 >
                                     {/* ── Колонка L2 ── */}
                                     <ul className={clsx(s.subList, hasThirdLevel && s.subListNarrow)}>
-                                        {activeCategory.children.map((sub) => {
+                                        {effectiveCategory.children.map((sub) => {
                                             const canonicalHref = getCategoryHref(sub);
                                             const localizedHref = getLocalizedHref(canonicalHref, lang);
                                             const isCurrentL2 = pathname === localizedHref;

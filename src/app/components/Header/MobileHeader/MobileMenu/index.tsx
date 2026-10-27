@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
-import { useTransition, animated } from "react-spring";
+import clsx from "clsx";
 import s from "./MobileMenu.module.scss";
 import { type Locale } from "@/i18n/config";
 import { getLocalizedHref } from "@/utils/i18n-helpers";
@@ -32,13 +32,6 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
         { label: targetLang === "ru" ? "Контакти" : "Контакти", href: "/contacts" }
     ];
     const navItems = getMobileNavItems(lang);
-    // Menu Transition (Slide In/Out)
-    const menuTransition = useTransition(isOpen, {
-        from: { transform: "translateX(-100%)" },
-        enter: { transform: "translateX(0%)" },
-        leave: { transform: "translateX(-100%)" },
-        config: { tension: 280, friction: 30 }
-    });
 
     // Accordion Logic using Custom Hook
     const {
@@ -79,8 +72,8 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
         return query ? `${localized}?${query}` : localized;
     };
 
-    return menuTransition((style, item) => item ? (
-        <animated.div className={s.mobileMenu} style={style}>
+    return (
+        <div className={clsx(s.mobileMenu, isOpen && s.open)}>
             {/* Header */}
             <div className={s.menuHeader}>
                 <div className={s.topRow}>
@@ -207,6 +200,6 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
                     </nav>
                 </div>
             </div>
-        </animated.div>
-    ) : null);
+        </div>
+    );
 }
