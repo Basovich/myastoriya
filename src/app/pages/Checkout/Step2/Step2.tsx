@@ -1213,6 +1213,8 @@ export default function Step2() {
                             const isMethodShop = method.driver === 'shop';
                             const isMethodNP = method.driver === 'nova-poshta-postal';
                             const showNpIcon = isMethodNP || method.name?.toLowerCase().includes('нова пошта') || method.type?.toLowerCase().includes('nova');
+                            const isMethod500m = Boolean(method.name?.toLowerCase().includes('500'));
+                            const isFree = !method.deliveryCost || method.deliveryCost === 0;
 
                             return (
                                 <div key={method.id} className={s.methodContainer}>
@@ -1227,10 +1229,15 @@ export default function Step2() {
                                         />
                                         <span className={s.radioCircle} />
                                         <span className={s.methodLabel}>
-                                            {method.name} 
-                                            <span className={s.methodPrice}>
-                                                 ({method.deliveryCost} <span className={s.currency}>₴</span>)
-                                             </span>
+                                            {method.name}
+                                            {!isMethod500m && (
+                                                <span className={s.methodPrice}>
+                                                    {isFree 
+                                                        ? (lang === 'ua' ? '(Безкоштовно)' : '(Бесплатно)')
+                                                        : <>({method.deliveryCost} <span className={s.currency}>₴</span>)</>
+                                                    }
+                                                </span>
+                                            )}
                                             {showNpIcon && (
                                                 <span className={s.npIconContainer}>
                                                     <Image
