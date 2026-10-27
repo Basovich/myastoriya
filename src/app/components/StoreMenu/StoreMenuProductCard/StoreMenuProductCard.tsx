@@ -32,7 +32,6 @@ const StoreMenuProductCard: React.FC<StoreMenuProductCardProps> = ({ product }) 
     const params = useParams();
     const lang = (params?.lang as string) || 'ua';
     const t = translations[lang as keyof typeof translations] || translations.ua;
-
     const [isExpanded, setIsExpanded] = useState(false);
     const [showButton, setShowButton] = useState(false);
     const descRef = useRef<HTMLParagraphElement>(null);
