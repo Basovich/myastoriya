@@ -86,6 +86,7 @@ function parseDiscountFromTitle(title?: string | null): string | null {
 
 interface ProductClientProps {
     product: Product;
+    jsonLd?: Record<string, unknown>;
     costVariants: ProductCostVariant[];
     publications: BlogPost[];
     relatedProducts: Product[];
@@ -109,6 +110,7 @@ interface ProductClientProps {
 
 const ProductClient: React.FC<ProductClientProps> = ({
     product,
+    jsonLd,
     costVariants,
     publications,
     relatedProducts,
@@ -345,6 +347,15 @@ const ProductClient: React.FC<ProductClientProps> = ({
 
     return (
         <main className={s.productPage}>
+            {jsonLd && (
+                <script
+                    id="product-json-ld"
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+                    }}
+                />
+            )}
             <Breadcrumbs items={breadcrumbs} className={s.breadcrumbsWrapper} />
             <div className={s.mainGrid}>
                 <div className={s.leftColumn}>

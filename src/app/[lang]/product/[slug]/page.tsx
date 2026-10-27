@@ -326,14 +326,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <>
             <meta property="og:type" content="product" />
             <HreflangLinks canonical={hreflangCanonical} languages={alternates.languages} />
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify(productJsonLd).replace(/</g, '\\u003c'),
-                }}
-            />
             <ProductClient
                 product={product}
+                jsonLd={productJsonLd}
                 costVariants={[]}
                 publications={blogsResponse.data}
                 relatedProducts={finalRelatedProducts}
