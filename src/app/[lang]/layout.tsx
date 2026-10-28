@@ -123,6 +123,7 @@ import Footer from "@/app/components/Footer/FooterClient";
 import { getAccessToken } from "@/app/actions/authActions";
 import { CategoryProvider } from "@/hooks/useCategoryTree";
 import NavigationProgress from "@/app/components/NavigationProgress/NavigationProgress";
+import ScrollToTop from "@/app/components/ScrollToTop/ScrollToTop";
 
 import StatusModals from "@/app/components/StatusModals/StatusModals";
 import { BaseUrlProvider } from "@/hooks/useBaseUrl";
@@ -291,6 +292,7 @@ export default async function RootLayout({
           <BaseUrlProvider baseUrl={dynamicBaseUrl}>
             <CategoryProvider initialCategories={catalogTree}>
               <NavigationProgress />
+              <ScrollToTop />
               {!isMenuPage && <AuthInitializer />}
               {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
               {children}

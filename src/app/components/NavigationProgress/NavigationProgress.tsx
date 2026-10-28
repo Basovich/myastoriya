@@ -30,12 +30,18 @@ export default function NavigationProgress() {
     // Ховаємо loader після завершення навігації та відмалювання нової сторінки
     useEffect(() => {
         if (!isInitialMount.current && isLoadingRef.current) {
+            if (!window.location.hash) {
+                window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+            }
             const timer = setTimeout(() => {
                 setIsFadingOut(true);
                 const hideTimer = setTimeout(() => {
                     setIsLoading(false);
                     setIsFadingOut(false);
                     isLoadingRef.current = false;
+                    if (!window.location.hash) {
+                        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                    }
                 }, 300);
                 return () => clearTimeout(hideTimer);
             }, 200);
