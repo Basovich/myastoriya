@@ -64,31 +64,37 @@ nav.breadcrumbsWrapper {
 }
 
 .leftColumn {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    min-width: 0;
+    display: contents;
 
     @media (min-width: 1280px) {
+        display: flex;
+        flex-direction: column;
         grid-column: 1;
         grid-row: 1;
         gap: 32px;
+        min-width: 0;
     }
 }
 
 .gallery,
-.info {
+.info,
+.tabsWrapper,
+.reviewsSection {
     min-width: 0;
 }
 
 .gallery {
+    order: 1;
+
     @media (min-width: 1280px) {
+        order: unset;
         background-color: transparent;
         padding: 0;
     }
 }
 
 .info {
+    order: 2;
     border-radius: 14px;
     background: #FFF;
     padding: 18px 20px 30px;
@@ -98,6 +104,7 @@ nav.breadcrumbsWrapper {
     }
 
     @media (min-width: 1280px) {
+        order: unset;
         grid-column: 2;
         grid-row: 1;
         background-color: #FFF;
@@ -816,12 +823,13 @@ div.quantitySelector {
 
 /* Tabs */
 .tabsWrapper {
-    grid-area: tabs;
+    order: 3;
     background-color: #FFF;
     border-radius: 12px;
     padding: 24px;
 
     @media (min-width: 1280px) {
+        order: unset;
         margin-top: 0;
         padding: 50px;
     }
@@ -1109,7 +1117,11 @@ div.quantitySelector {
 
 /* Reviews Section Refinement */
 .reviewsSection {
-    grid-area: reviews;
+    order: 4;
+
+    @media (min-width: 1280px) {
+        order: unset;
+    }
 }
 
 .reviewsTitle {
