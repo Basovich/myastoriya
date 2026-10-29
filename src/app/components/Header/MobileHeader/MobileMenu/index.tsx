@@ -13,6 +13,7 @@ import { useToggleOpenWithAnimation } from "@/hooks/useToggleOpenWithAnimation";
 import CitySelector from "@/app/components/Header/DesktopHeader/MainBar/CitySelector";
 import { ProductCategory } from "@/lib/graphql/queries/products";
 import { getCategoryHref } from "@/utils/category-url";
+import { useAlternateUrls, resolveSwitchUrl } from "@/hooks/useAlternateUrls";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -60,16 +61,9 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
     // Language switcher logic
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const { alternateUrls } = useAlternateUrls();
     const getSwitchLangHref = (targetLang: Locale) => {
-        if (!pathname) return "/";
-        const segments = pathname.split('/').filter(Boolean);
-        if (segments.length > 0 && (segments[0] === 'ua' || segments[0] === 'ru')) {
-            segments.shift();
-        }
-        const cleanPath = '/' + segments.join('/');
-        const localized = getLocalizedHref(cleanPath, targetLang);
-        const query = searchParams ? searchParams.toString() : '';
-        return query ? `${localized}?${query}` : localized;
+        return resolveSwitchUrl(targetLang, pathname, searchParams, alternateUrls);
     };
 
     return (

@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import s from "./LanguageSwitch.module.scss";
 import { type Locale } from "@/i18n/config";
+import { useAlternateUrls, resolveSwitchUrl } from "@/hooks/useAlternateUrls";
 
 interface LanguageSwitchProps {
     lang: Locale;
@@ -13,28 +14,10 @@ interface LanguageSwitchProps {
 export default function LanguageSwitch({ lang }: LanguageSwitchProps) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const { alternateUrls } = useAlternateUrls();
 
     const getSwitchUrl = (targetLang: 'ua' | 'ru') => {
-        if (!pathname) return '/';
-        const segments = pathname.split('/').filter(Boolean);
-        const newSegments = [...segments];
-
-        // Process if current first segment is a known locale
-        if (segments[0] === 'ua' || segments[0] === 'ru') {
-            newSegments.shift();
-        }
-
-        let basePath: string;
-        // Home page special case: UA root is /
-        if (newSegments.length === 0) {
-            basePath = targetLang === 'ua' ? '/' : '/ru/';
-        } else {
-            // All internal pages have /ua/ or /ru/ prefix and trailing slash
-            basePath = `/${targetLang}/${newSegments.join('/')}/`;
-        }
-
-        const query = searchParams ? searchParams.toString() : '';
-        return query ? `${basePath}?${query}` : basePath;
+        return resolveSwitchUrl(targetLang, pathname, searchParams, alternateUrls);
     };
 
     return (

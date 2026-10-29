@@ -7,6 +7,18 @@ import { i18n, type Locale } from "@/i18n/config";
 import clsx from "clsx";
 import ReduxProvider from "@/store/ReduxProvider";
 import AuthInitializer from "@/app/components/AuthInitializer/AuthInitializerClient";
+import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, getRequestJsonLdScripts } from "@/utils/seo";
+import { getCatalogTreeApi, type ProductCategory } from "@/lib/graphql/queries/products";
+import { getSocialLinksApi, type SocialLink } from "@/lib/graphql/queries/settings";
+import Header from "@/app/components/Header/HeaderClient";
+import Footer from "@/app/components/Footer/FooterClient";
+import { getAccessToken } from "@/app/actions/authActions";
+import { CategoryProvider } from "@/hooks/useCategoryTree";
+import NavigationProgress from "@/app/components/NavigationProgress/NavigationProgress";
+import ScrollToTop from "@/app/components/ScrollToTop/ScrollToTop";
+import StatusModals from "@/app/components/StatusModals/StatusModals";
+import { BaseUrlProvider } from "@/hooks/useBaseUrl";
+import { AlternateUrlsProvider } from "@/hooks/useAlternateUrls";
 
 const houschka = localFont({
   src: [
@@ -39,8 +51,6 @@ const helios = localFont({
   ],
   variable: "--font-helios",
 });
-
-import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, getRequestJsonLdScripts } from "@/utils/seo";
 
 function JsonLdHeadScripts({ pathname }: { pathname: string }) {
   const scripts = getRequestJsonLdScripts(pathname);
@@ -115,18 +125,6 @@ export async function generateMetadata({
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }));
 }
-
-import { getCatalogTreeApi, type ProductCategory } from "@/lib/graphql/queries/products";
-import { getSocialLinksApi, type SocialLink } from "@/lib/graphql/queries/settings";
-import Header from "@/app/components/Header/HeaderClient";
-import Footer from "@/app/components/Footer/FooterClient";
-import { getAccessToken } from "@/app/actions/authActions";
-import { CategoryProvider } from "@/hooks/useCategoryTree";
-import NavigationProgress from "@/app/components/NavigationProgress/NavigationProgress";
-import ScrollToTop from "@/app/components/ScrollToTop/ScrollToTop";
-
-import StatusModals from "@/app/components/StatusModals/StatusModals";
-import { BaseUrlProvider } from "@/hooks/useBaseUrl";
 
 export default async function RootLayout({
   children,
@@ -290,15 +288,17 @@ export default async function RootLayout({
       <body>
         <ReduxProvider>
           <BaseUrlProvider baseUrl={dynamicBaseUrl}>
-            <CategoryProvider initialCategories={catalogTree}>
-              <NavigationProgress />
-              <ScrollToTop />
-              {!isMenuPage && <AuthInitializer />}
-              {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
-              {children}
-              {!isMenuPage && <Footer lang={lang as Locale} initialSocialLinks={socialLinks} />}
-              <StatusModals lang={lang as Locale} />
-            </CategoryProvider>
+            <AlternateUrlsProvider>
+              <CategoryProvider initialCategories={catalogTree}>
+                <NavigationProgress />
+                <ScrollToTop />
+                {!isMenuPage && <AuthInitializer />}
+                {!isMenuPage && <Header lang={lang as Locale} initialCategories={catalogTree} />}
+                {children}
+                {!isMenuPage && <Footer lang={lang as Locale} initialSocialLinks={socialLinks} />}
+                <StatusModals lang={lang as Locale} />
+              </CategoryProvider>
+            </AlternateUrlsProvider>
           </BaseUrlProvider>
         </ReduxProvider>
       </body>

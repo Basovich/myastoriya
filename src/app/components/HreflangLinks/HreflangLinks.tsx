@@ -5,6 +5,8 @@
  * (e.g. "https://domain/" → "https://domain") and renders the attribute as `hrefLang`.
  * SEO requires root URLs with "/" and a lowercase `hreflang` attribute.
  */
+import AlternateUrlsSync from "./AlternateUrlsSync";
+
 interface Props {
     canonical: string;
     languages: Record<string, string>;
@@ -18,6 +20,7 @@ export default function HreflangLinks({ canonical, languages }: Props) {
                 // Spread keeps the attribute lowercase (`hreflang`) in the rendered HTML
                 <link key={code} rel="alternate" {...{ hreflang: code }} href={href} />
             ))}
+            <AlternateUrlsSync languages={languages} />
         </>
     );
 }
