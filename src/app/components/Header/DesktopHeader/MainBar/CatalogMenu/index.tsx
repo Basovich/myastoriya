@@ -28,15 +28,12 @@ export default function CatalogMenu({ isOpen, onClose, categories }: CatalogMenu
     const pathname = usePathname();
     const lang = (params.lang as Locale) || "ua";
 
-    // Data Cleanup & Smart flattening memoized to prevent infinite updates in useEffect
+    // Smart flattening memoized to prevent infinite updates in useEffect
     const displayCategories = useMemo(() => {
-        const allChildIds = new Set(categories.flatMap(cat => (cat.children || []).map(child => child.id)));
-        const uniqueRootCategories = categories.filter(cat => !allChildIds.has(cat.id));
-
-        const isDeepRoot = uniqueRootCategories.length <= 3 && uniqueRootCategories.every(c => c.children && c.children.length > 0);
+        const isDeepRoot = categories.length <= 3 && categories.every(c => c.children && c.children.length > 0);
         return isDeepRoot
-            ? uniqueRootCategories.flatMap(cat => cat.children || [])
-            : uniqueRootCategories;
+            ? categories.flatMap(cat => cat.children || [])
+            : categories;
     }, [categories]);
 
     const [prevIsOpen, setPrevIsOpen] = useState(isOpen);

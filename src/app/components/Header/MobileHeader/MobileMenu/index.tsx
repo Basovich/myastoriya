@@ -127,10 +127,8 @@ export default function MobileMenu({ isOpen, onClose, lang, categories }: Mobile
                 <AnimatedDiv style={accordionStyle} className={s.catalogListWrapper}>
                     <div className={s.catalogList} ref={catalogListRef}>
                         {(() => {
-                            const allChildIds = new Set(categories.flatMap(cat => (cat.children || []).map(child => child.id)));
-                            const uniqueRoots = categories.filter(cat => !allChildIds.has(cat.id));
-                            const isDeep = uniqueRoots.length <= 3 && uniqueRoots.every(c => c.children && c.children.length > 0);
-                            const toRender = isDeep ? uniqueRoots.flatMap(cat => cat.children || []) : uniqueRoots;
+                            const isDeep = categories.length <= 3 && categories.every(c => c.children && c.children.length > 0);
+                            const toRender = isDeep ? categories.flatMap(cat => cat.children || []) : categories;
                             
                             return toRender.map((cat) => {
                                 const canonicalHref = getCategoryHref(cat);
