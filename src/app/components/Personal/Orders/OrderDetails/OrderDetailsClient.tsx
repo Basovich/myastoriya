@@ -23,6 +23,7 @@ import {
     repeatOrderApi,
     getProductsByIdsApi,
     resolveProductImageUrl,
+    getProductBadge,
     getOrderReviewsApi,
     Order,
     OrderStatus,
@@ -84,6 +85,22 @@ const detailsDict = {
     }
 };
 
+interface OrderProductDetails {
+    image: string;
+    slug?: string;
+    name: string;
+    modifierGroups?: ModifierGroup[] | null;
+    relatedProductGroups?: RelatedProductGroup[] | null;
+    portionSize?: string | null;
+    categoryId?: number | string | null;
+    purchaseCost?: number | null;
+    purchaseOldCost?: number | null;
+    is_new?: boolean | null;
+    isSale?: boolean | null;
+    cost?: number;
+    oldCost?: number | null;
+}
+
 const resolveOrderItemImageUrl = (
     itemId: string,
     image?: {
@@ -91,7 +108,7 @@ const resolveOrderItemImageUrl = (
         grid1x?: string | null;
         main1x?: string | null;
     } | null,
-    productDetailsMap?: Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null; relatedProductGroups?: RelatedProductGroup[] | null; portionSize?: string | null; categoryId?: number | string | null }>
+    productDetailsMap?: Record<number, OrderProductDetails>
 ): string => {
     const url = image?.list1x || image?.grid1x || image?.main1x || null;
     if (url) {
@@ -160,7 +177,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
     const { user } = useAppSelector((state) => state.auth);
 
     const [order, setOrder] = useState<Order | null>(null);
-    const [productDetailsMap, setProductDetailsMap] = useState<Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null; relatedProductGroups?: RelatedProductGroup[] | null; portionSize?: string | null; categoryId?: number | string | null; purchaseCost?: number | null; purchaseOldCost?: number | null }>>({});
+    const [productDetailsMap, setProductDetailsMap] = useState<Record<number, OrderProductDetails>>({});
     const [orderReview, setOrderReview] = useState<OrderReview | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -186,7 +203,7 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                     .filter(id => !isNaN(id) && id > 0)
             ));
 
-            const detailsMap: Record<number, { image: string; slug?: string; name: string; modifierGroups?: ModifierGroup[] | null; relatedProductGroups?: RelatedProductGroup[] | null; portionSize?: string | null; categoryId?: number | string | null; purchaseCost?: number | null; purchaseOldCost?: number | null }> = {};
+            const detailsMap: Record<number, OrderProductDetails> = {};
             if (productIds.length > 0) {
                 try {
                     const details = await getProductsByIdsApi(productIds, lang);
@@ -201,6 +218,10 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                             categoryId: prod.categoryId,
                             purchaseCost: prod.purchaseCost,
                             purchaseOldCost: prod.purchaseOldCost,
+                            is_new: prod.is_new,
+                            isSale: prod.isSale,
+                            cost: prod.cost,
+                            oldCost: prod.oldCost,
                         };
                     });
                 } catch (e) {
@@ -383,6 +404,26 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                     const purchaseCost = basePurchaseCost != null ? (basePurchaseCost + modifiersPrice) : undefined;
                                     const purchaseOldCost = basePurchaseOldCost != null ? (basePurchaseOldCost + modifiersPrice) : undefined;
 
+                                    const itemOldPrice = (product.totalOldCost && product.totalOldCost > product.totalCost)
+                                        ? (product.quantity > 0 ? Math.round(product.totalOldCost / product.quantity) : product.totalOldCost) + modifiersPrice
+                                        : (dbProduct?.oldCost && dbProduct.cost != null && dbProduct.oldCost > dbProduct.cost)
+                                            ? dbProduct.oldCost + modifiersPrice
+                                            : undefined;
+
+                                    const isActionItem = Boolean(
+                                        (product.totalOldCost && product.totalOldCost > product.totalCost) ||
+                                        (purchaseOldCost && purchaseCost && purchaseOldCost > purchaseCost) ||
+                                        (itemOldPrice && itemOldPrice > finalPrice) ||
+                                        dbProduct?.isSale
+                                    );
+
+                                    const badge = getProductBadge({
+                                        is_new: isActionItem ? false : dbProduct?.is_new,
+                                        isSale: isActionItem,
+                                        cost: finalPrice,
+                                        oldCost: itemOldPrice,
+                                    }, lang);
+
                                     // Resolve image/icon for each modifier or related product
                                     const renderedModifiers = modifiersList.map((m) => {
                                         let modifierImage: string | null = null;
@@ -425,11 +466,12 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                             title={product.name}
                                             weight={product.totalWeight || (lang === 'ru' ? '1 шт.' : '1 шт.')}
                                             price={finalPrice}
+                                            oldPrice={itemOldPrice}
                                             purchaseCost={purchaseCost}
                                             purchaseOldCost={purchaseOldCost}
                                             unit={product.unit || (lang === 'ru' ? 'шт.' : 'шт.')}
                                             image={resolvedImg}
-                                            badge={null}
+                                            badge={badge}
                                             lang={lang}
                                             portionSize={dbProduct?.portionSize}
                                         >
