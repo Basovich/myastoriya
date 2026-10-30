@@ -6,7 +6,6 @@ import Image from 'next/image';
 
 import CatalogSidebarWrapperClient from '@/app/pages/Catalog/CatalogSidebar/CatalogSidebarWrapperClient';
 import ProductCard from '../../../components/ui/ProductCard/ProductCard';
-import FaqAccordion from '@/app/components/ui/FaqAccordion/FaqAccordion';
 import clsx from 'clsx';
 import { Locale } from '@/i18n/config';
 import { Dictionary } from '@/i18n/types';
@@ -20,6 +19,7 @@ import CatalogToolbarClient from '../CatalogToolbarClient';
 import CatalogProductsClient from '../CatalogProductsClient';
 import CatalogRelatedSlidersClient from '../CatalogRelatedSlidersClient';
 import CatalogPopularSliderClient from '../CatalogPopularSliderClient';
+import CatalogFaqClient from '../CatalogFaqClient';
 
 interface CatalogContentProps {
     lang: Locale;
@@ -223,13 +223,7 @@ export default async function CatalogContent({
             )}
             <CatalogPopularSliderClient title={lang === 'ru' ? 'ЧАСТО ЗАКАЗЫВАЮТ' : 'ЧАСТО ЗАМОВЛЯЮТЬ'} initialProducts={popularProductsList} lang={lang} />
 
-            {faq && faq.length > 0 && (
-                <div className={s.faqSection}>
-                    <div className={s.relatedInner}>
-                        <FaqAccordion items={faq} />
-                    </div>
-                </div>
-            )}
+            <CatalogFaqClient initialFaq={faq} />
         </div>
     );
 }

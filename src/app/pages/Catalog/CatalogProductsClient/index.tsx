@@ -126,6 +126,7 @@ export default function CatalogProductsClient({
                 "",
                 `${window.location.pathname}?${params.toString()}`
             );
+            window.dispatchEvent(new CustomEvent('catalog-page-changed', { detail: { page: nextPage } }));
 
             // Restore scroll position to prevent browser scroll anchoring jumps
             requestAnimationFrame(() => {
@@ -170,6 +171,7 @@ export default function CatalogProductsClient({
                 "",
                 `${window.location.pathname}?${params.toString()}`
             );
+            window.dispatchEvent(new CustomEvent('catalog-page-changed', { detail: { page } }));
 
             // Scroll to top of the catalog page smoothly
             window.scrollTo({ top: 0, behavior: "smooth" });

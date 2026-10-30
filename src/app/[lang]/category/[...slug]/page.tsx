@@ -224,8 +224,14 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
             redirect(redirectUrl);
         }
 
+        const pageNum = parsePageNum(resolvedSearchParams?.page);
+        const hasPagination = pageNum > 1;
+        const hasSorting = Boolean(sort);
+        const hasFilters = activeFilters.length > 0 || rawParam !== undefined;
+        const isMainCategoryPage = !hasPagination && !hasSorting && !hasFilters;
+
         let faq = null;
-        if (categoryDetails?.faqGroups && categoryDetails.faqGroups.length > 0) {
+        if (isMainCategoryPage && categoryDetails?.faqGroups && categoryDetails.faqGroups.length > 0) {
             const firstGroupId = parseInt(categoryDetails.faqGroups[0].id);
             faq = await getFaqQuestionsApi(firstGroupId, lang).catch(() => null);
         }
