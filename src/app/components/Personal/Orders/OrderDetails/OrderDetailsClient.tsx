@@ -44,7 +44,11 @@ const detailsDict = {
         summary: {
             persons: "Кількість персон",
             total: "Вартість замовлення",
-            unit: "чол."
+            unit: "чол.",
+            discount: "Знижка",
+            bonusesUsed: "Використання балів",
+            cashback: "Кешбек балами",
+            bonusUnit: "Б"
         },
         statusHeading: "Статус замовлення",
         deliveryTime: "Час доставки",
@@ -64,7 +68,11 @@ const detailsDict = {
         summary: {
             persons: "Количество персон",
             total: "Стоимость заказа",
-            unit: "чел."
+            unit: "чел.",
+            discount: "Скидка",
+            bonusesUsed: "Использование баллов",
+            cashback: "Кэшбэк баллами",
+            bonusUnit: "Б"
         },
         statusHeading: "Статус заказа",
         deliveryTime: "Время доставки",
@@ -478,6 +486,34 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
 
                             const adjustedOrderTotal = uklonDeliveryRow ? Math.max(0, order.total - uklonDeliveryRow.amount) : order.total;
 
+                            const calculationDiscount = (order.calculation ?? []).reduce((acc, c) => {
+                                const name = (c.name || '').toLowerCase();
+                                if (c.amount < 0 && (name.includes('знижк') || name.includes('скидк') || name.includes('discount') || name.includes('промо') || name.includes('promo'))) {
+                                    return acc + Math.abs(c.amount);
+                                }
+                                return acc;
+                            }, 0);
+
+                            const itemLevelDiscount = (order.items ?? []).reduce((acc, item) => {
+                                if (item.totalOldCost && item.totalOldCost > item.totalCost) {
+                                    return acc + (item.totalOldCost - item.totalCost);
+                                }
+                                return acc;
+                            }, 0);
+
+                            const hasBonusesInCalculation = (order.calculation ?? []).some(calc => {
+                                const name = (calc.name || '').toLowerCase();
+                                return name.includes('бонус') || name.includes('бал');
+                            });
+
+                            const bonusesUsed = (order.receivedBonuses !== null && order.receivedBonuses !== undefined && order.receivedBonuses > 0 && !hasBonusesInCalculation)
+                                ? order.receivedBonuses
+                                : 0;
+
+                            const cashback = (order.willReceiveBonuses !== null && order.willReceiveBonuses !== undefined && order.willReceiveBonuses > 0)
+                                ? order.willReceiveBonuses
+                                : 0;
+
                             return (
                                 <div className={s.summaryGrid}>
                                     {order.personsCount !== null && order.personsCount !== undefined && order.personsCount > 0 && (
@@ -489,10 +525,17 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                     {(order.calculation ?? []).map((calc, i) => {
                                         const isDeliveryRow = (calc.name || '').toLowerCase().includes('доставк');
                                         const isThisUklonRow = isDeliveryRow && (isUklonOrder || calc.amount === 1);
+                                        const isBonusRow = (calc.name || '').toLowerCase().includes('бонус') || (calc.name || '').toLowerCase().includes('бал');
+                                        const isDiscountRow = (calc.name || '').toLowerCase().includes('знижк') || (calc.name || '').toLowerCase().includes('скидк') || (calc.name || '').toLowerCase().includes('discount');
+
+                                        let displayName = calc.name?.replace(/:$/, '').trim() || '';
+                                        if (isDiscountRow && (displayName.toLowerCase() === 'скидка' || displayName.toLowerCase() === 'знижка' || displayName.toLowerCase() === 'discount')) {
+                                            displayName = dict.summary.discount;
+                                        }
 
                                         return (
                                             <div key={i} className={s.summaryItem}>
-                                                <span className={s.summaryLabel}>{calc.name?.replace(/:$/, '')}</span>
+                                                <span className={s.summaryLabel}>{displayName}</span>
                                                 {isThisUklonRow ? (
                                                     <span className={s.summaryValue}>Uklon</span>
                                                 ) : (
@@ -502,16 +545,40 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                                     )}>
                                                         {calc.amount < 0
                                                             ? `-${Math.abs(calc.amount).toLocaleString('uk-UA')}`
-                                                            : calc.amount.toLocaleString('uk-UA')} <strong>₴</strong>
+                                                            : calc.amount.toLocaleString('uk-UA')} <strong>{isBonusRow ? dict.summary.bonusUnit : '₴'}</strong>
                                                     </span>
                                                 )}
                                             </div>
                                         );
                                     })}
+                                    {calculationDiscount === 0 && itemLevelDiscount > 0 && (
+                                        <div className={s.summaryItem}>
+                                            <span className={s.summaryLabel}>{dict.summary.discount}</span>
+                                            <span className={clsx(s.summaryValue, s.negative)}>
+                                                -{itemLevelDiscount.toLocaleString('uk-UA')} <strong>₴</strong>
+                                            </span>
+                                        </div>
+                                    )}
+                                    {bonusesUsed > 0 && (
+                                        <div className={s.summaryItem}>
+                                            <span className={s.summaryLabel}>{dict.summary.bonusesUsed}</span>
+                                            <span className={clsx(s.summaryValue, s.negative)}>
+                                                -{bonusesUsed.toLocaleString('uk-UA')} <strong>{dict.summary.bonusUnit}</strong>
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className={s.summaryItem}>
                                         <span className={s.summaryLabel}>{dict.summary.total}</span>
                                         <span className={s.summaryValue}>{adjustedOrderTotal.toLocaleString("uk-UA")} <strong>₴</strong></span>
                                     </div>
+                                    {cashback > 0 && (
+                                        <div className={s.summaryItem}>
+                                            <span className={s.summaryLabel}>{dict.summary.cashback}</span>
+                                            <span className={clsx(s.summaryValue, s.positive)}>
+                                                +{cashback.toLocaleString('uk-UA')} <strong>{dict.summary.bonusUnit}</strong>
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })()}
