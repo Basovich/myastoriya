@@ -128,6 +128,7 @@ export default function Step3({ lang }: Step3Props) {
     const [isCartModalOpen, setIsCartModalOpen] = useState(false);
 
     const [deliveryPrice, setDeliveryPrice] = useState<number | undefined>(undefined);
+    const [deliveryLabel, setDeliveryLabel] = useState<string | undefined>(undefined);
     // Promo functionality from Redux
     const promoCode = useAppSelector(state => state.cart.promoCode);
     const useBonuses = useAppSelector(state => state.cart.useBonuses);
@@ -197,8 +198,17 @@ export default function Step3({ lang }: Step3Props) {
         if (savedParams) {
             try {
                 const parsed = JSON.parse(savedParams);
-                if (typeof parsed.deliveryPrice === 'number') {
-                    setDeliveryPrice(parsed.deliveryPrice);
+                const isUklon = parsed.deliveryLabel === 'Uklon' || String(parsed.deliveryId) === '9';
+                if (isUklon) {
+                    setDeliveryLabel('Uklon');
+                    setDeliveryPrice(0);
+                } else {
+                    if (typeof parsed.deliveryPrice === 'number') {
+                        setDeliveryPrice(parsed.deliveryPrice);
+                    }
+                    if (parsed.deliveryLabel) {
+                        setDeliveryLabel(parsed.deliveryLabel);
+                    }
                 }
             } catch (e) {
                 console.error(e);
@@ -1090,6 +1100,7 @@ export default function Step3({ lang }: Step3Props) {
                     onEditCart={() => setIsCartModalOpen(true)} 
                     discountPercent={appliedPromo?.discount || 0}
                     deliveryPrice={deliveryPrice}
+                    deliveryLabel={deliveryLabel}
                 />
                 {hydrated && (
                     <PromoBlock 

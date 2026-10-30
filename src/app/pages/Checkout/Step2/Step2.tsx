@@ -769,7 +769,16 @@ export default function Step2() {
     const isShopCourierOrPickup = selectedDelivery && (selectedDelivery.driver === 'courier' || selectedDelivery.driver === 'shop');
     const showDeliveryTimeBlock = Boolean(isShopCourierOrPickup && selectedDelivery?.showDeliveryTime);
     const elapsedForFree = selectedDelivery?.elapsedForFree || 0;
-    const deliveryPrice = selectedDelivery ? (selectedDelivery.deliveryCost ?? 0) : undefined;
+    const isSelectedUklon = Boolean(
+        selectedDelivery && (
+            selectedDelivery.id === '9' ||
+            selectedDelivery.name?.toLowerCase().includes('за київ') ||
+            selectedDelivery.name?.toLowerCase().includes('за киев') ||
+            selectedDelivery.name?.toLowerCase().includes('uklon')
+        )
+    );
+    const deliveryPrice = selectedDelivery ? (isSelectedUklon ? 0 : (selectedDelivery.deliveryCost ?? 0)) : undefined;
+    const deliveryLabel = isSelectedUklon ? 'Uklon' : undefined;
 
     const isNextDisabled = isSubmitting || !deliveryMethod || !!selectedDelivery?.disabled;
 
@@ -914,6 +923,7 @@ export default function Step2() {
                 desiredDeliveryTime: deliveryTime || null,
                 userPickupPointId: finalPickupPointId,
                 deliveryPrice: deliveryPrice,
+                deliveryLabel: deliveryLabel,
             };
             localStorage.setItem('checkout_delivery_params', JSON.stringify(checkoutDeliveryParams));
 
@@ -1213,6 +1223,10 @@ export default function Step2() {
                             const isMethodNP = method.driver === 'nova-poshta-postal';
                             const showNpIcon = isMethodNP || method.name?.toLowerCase().includes('нова пошта') || method.type?.toLowerCase().includes('nova');
                             const isMethod500m = Boolean(method.name?.toLowerCase().includes('500'));
+                            const isMethodUklon = method.id === '9' || 
+                                Boolean(method.name?.toLowerCase().includes('за київ')) || 
+                                Boolean(method.name?.toLowerCase().includes('за киев')) || 
+                                Boolean(method.name?.toLowerCase().includes('uklon'));
                             const isFree = !method.deliveryCost || method.deliveryCost === 0;
 
                             return (
@@ -1231,9 +1245,11 @@ export default function Step2() {
                                             {method.name}
                                             {!isMethod500m && (
                                                 <span className={s.methodPrice}>
-                                                    {isFree 
-                                                        ? (lang === 'ua' ? '(Безкоштовно)' : '(Бесплатно)')
-                                                        : <>({method.deliveryCost} <span className={s.currency}>₴</span>)</>
+                                                    {isMethodUklon
+                                                        ? (lang === 'ru' ? '(по тарифу Uklon)' : '(за тарифом Uklon)')
+                                                        : isFree 
+                                                            ? (lang === 'ua' ? '(Безкоштовно)' : '(Бесплатно)')
+                                                            : <>({method.deliveryCost} <span className={s.currency}>₴</span>)</>
                                                     }
                                                 </span>
                                             )}
@@ -1377,6 +1393,7 @@ export default function Step2() {
                     onEditCart={() => setIsCartModalOpen(true)} 
                     discountPercent={appliedPromo?.discount || 0}
                     deliveryPrice={deliveryPrice}
+                    deliveryLabel={deliveryLabel}
                 />
                 {hydrated && (
                     <PromoBlock 

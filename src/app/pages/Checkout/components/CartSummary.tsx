@@ -35,9 +35,10 @@ interface CartSummaryProps {
     onEditCart: () => void;
     discountPercent?: number;
     deliveryPrice?: number;
+    deliveryLabel?: string;
 }
 
-export default function CartSummary({ onEditCart, discountPercent = 0, deliveryPrice }: CartSummaryProps) {
+export default function CartSummary({ onEditCart, discountPercent = 0, deliveryPrice, deliveryLabel }: CartSummaryProps) {
     const hydrated = useIsHydrated();
     const dispatch = useAppDispatch();
     const params = useParams();
@@ -86,7 +87,7 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
         );
     }
 
-    const delivery = deliveryPrice !== undefined ? deliveryPrice : 0;
+    const delivery = deliveryLabel ? 0 : (deliveryPrice !== undefined ? deliveryPrice : 0);
 
     const finalPrice = (backendTotal > 0 ? backendTotal : (totalSum - discountAmount)) + delivery;
     const originalPrice = originalTotalSum + delivery;
@@ -227,7 +228,15 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                                 </svg>
                                 Доставка:
                             </span>
-                            <span className={s.cartStatVal}>{deliveryPrice === undefined ? '---' : <>{deliveryPrice} <span className={s.currencyLG}>₴</span></>}</span>
+                            <span className={s.cartStatVal}>
+                                {deliveryLabel ? (
+                                    deliveryLabel
+                                ) : deliveryPrice === undefined ? (
+                                    '---'
+                                ) : (
+                                    <>{deliveryPrice} <span className={s.currencyLG}>₴</span></>
+                                )}
+                            </span>
                         </div>
 
                         <div className={s.cartStat}>
