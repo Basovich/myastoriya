@@ -464,31 +464,57 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                             </div>
                         </div>
 
-                        <div className={s.summaryGrid}>
-                            {order.personsCount !== null && order.personsCount !== undefined && order.personsCount > 0 && (
-                                <div className={s.summaryItem}>
-                                    <span className={s.summaryLabel}>{dict.summary.persons}</span>
-                                    <span className={s.summaryValue}>{order.personsCount} <strong>{dict.summary.unit}</strong></span>
+                        {(() => {
+                            const isUklonOrder = Boolean(
+                                order.delivery?.service?.toLowerCase().includes('за київ') ||
+                                order.delivery?.service?.toLowerCase().includes('за киев') ||
+                                order.delivery?.service?.toLowerCase().includes('uklon')
+                            );
+
+                            const uklonDeliveryRow = (order.calculation ?? []).find(calc => {
+                                const name = (calc.name || '').toLowerCase();
+                                return name.includes('доставк') && (isUklonOrder || calc.amount === 1);
+                            });
+
+                            const adjustedOrderTotal = uklonDeliveryRow ? Math.max(0, order.total - uklonDeliveryRow.amount) : order.total;
+
+                            return (
+                                <div className={s.summaryGrid}>
+                                    {order.personsCount !== null && order.personsCount !== undefined && order.personsCount > 0 && (
+                                        <div className={s.summaryItem}>
+                                            <span className={s.summaryLabel}>{dict.summary.persons}</span>
+                                            <span className={s.summaryValue}>{order.personsCount} <strong>{dict.summary.unit}</strong></span>
+                                        </div>
+                                    )}
+                                    {(order.calculation ?? []).map((calc, i) => {
+                                        const isDeliveryRow = (calc.name || '').toLowerCase().includes('доставк');
+                                        const isThisUklonRow = isDeliveryRow && (isUklonOrder || calc.amount === 1);
+
+                                        return (
+                                            <div key={i} className={s.summaryItem}>
+                                                <span className={s.summaryLabel}>{calc.name?.replace(/:$/, '')}</span>
+                                                {isThisUklonRow ? (
+                                                    <span className={s.summaryValue}>Uklon</span>
+                                                ) : (
+                                                    <span className={clsx(
+                                                        s.summaryValue,
+                                                        calc.amount < 0 && s.negative
+                                                    )}>
+                                                        {calc.amount < 0
+                                                            ? `-${Math.abs(calc.amount).toLocaleString('uk-UA')}`
+                                                            : calc.amount.toLocaleString('uk-UA')} <strong>₴</strong>
+                                                    </span>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                    <div className={s.summaryItem}>
+                                        <span className={s.summaryLabel}>{dict.summary.total}</span>
+                                        <span className={s.summaryValue}>{adjustedOrderTotal.toLocaleString("uk-UA")} <strong>₴</strong></span>
+                                    </div>
                                 </div>
-                            )}
-                            {(order.calculation ?? []).map((calc, i) => (
-                                <div key={i} className={s.summaryItem}>
-                                    <span className={s.summaryLabel}>{calc.name?.replace(/:$/, '')}</span>
-                                    <span className={clsx(
-                                        s.summaryValue,
-                                        calc.amount < 0 && s.negative
-                                    )}>
-                                        {calc.amount < 0
-                                            ? `-${Math.abs(calc.amount).toLocaleString('uk-UA')}`
-                                            : calc.amount.toLocaleString('uk-UA')} <strong>₴</strong>
-                                    </span>
-                                </div>
-                            ))}
-                            <div className={s.summaryItem}>
-                                <span className={s.summaryLabel}>{dict.summary.total}</span>
-                                <span className={s.summaryValue}>{order.total.toLocaleString("uk-UA")} <strong>₴</strong></span>
-                            </div>
-                        </div>
+                            );
+                        })()}
 
                         <div className={s.detailsGrid}>
                             <div className={s.statusCol}>

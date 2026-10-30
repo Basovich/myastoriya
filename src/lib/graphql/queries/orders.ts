@@ -92,6 +92,9 @@ const ORDERS_QUERY = /* GraphQL */ `
                     name
                     amount
                 }
+                delivery {
+                    service
+                }
                 items {
                     id
                     name

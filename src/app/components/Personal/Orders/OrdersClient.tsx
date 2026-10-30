@@ -439,7 +439,16 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                         {sortedOrders.map((order) => {
                             const { date, time } = formatOrderDateTime(order.createdAt);
                             const totalProductsCount = order.items?.reduce((acc, item) => acc + (item.quantity || 0), 0) || 0;
-                            const orderSum = order.total;
+                            const isUklonOrder = Boolean(
+                                order.delivery?.service?.toLowerCase().includes('за київ') ||
+                                order.delivery?.service?.toLowerCase().includes('за киев') ||
+                                order.delivery?.service?.toLowerCase().includes('uklon')
+                            );
+                            const uklonDeliveryRow = (order.calculation || []).find(c => {
+                                const name = (c.name || '').toLowerCase();
+                                return name.includes('доставк') && (isUklonOrder || c.amount === 1);
+                            });
+                            const orderSum = uklonDeliveryRow ? Math.max(0, order.total - uklonDeliveryRow.amount) : order.total;
 
                             const calculationDiscount = (order.calculation || []).reduce((acc, c) => {
                                 const name = (c.name || '').toLowerCase();
