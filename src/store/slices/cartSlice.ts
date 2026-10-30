@@ -119,7 +119,7 @@ const mergeCartItems = (currentItems: CartItem[], backendItems: CartItem[]): Car
 // Async Thunks
 export const fetchCartAsync = createAsyncThunk(
     'cart/fetch',
-    async (params: { deliveryId?: number; localityId?: number; paymentId?: number } | void, { getState, dispatch, rejectWithValue }) => {
+    async (params: { localityId?: number; paymentId?: number } | void, { getState, dispatch, rejectWithValue }) => {
         Sentry.addBreadcrumb({
             category: 'cart',
             message: 'Fetching cart',
@@ -131,7 +131,6 @@ export const fetchCartAsync = createAsyncThunk(
             const prevItems = state.cart.items;
             const response = await getCartApi({ 
                 useBonuses,
-                deliveryId: params?.deliveryId,
                 localityId: params?.localityId,
                 paymentId: params?.paymentId,
             });

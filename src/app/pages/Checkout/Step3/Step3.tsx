@@ -212,12 +212,9 @@ export default function Step3({ lang }: Step3Props) {
             }
         }
 
-        if (activeDeliveryId) {
-            void dispatch(fetchCartAsync({
-                deliveryId: activeDeliveryId,
-                localityId: activeLocalityId,
-            }));
-        }
+        void dispatch(fetchCartAsync({
+            localityId: activeLocalityId,
+        }));
 
         const fetchPayments = async () => {
             setIsLoadingPayments(true);

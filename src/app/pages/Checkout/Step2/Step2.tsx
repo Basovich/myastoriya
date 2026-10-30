@@ -917,9 +917,8 @@ export default function Step2() {
             };
             localStorage.setItem('checkout_delivery_params', JSON.stringify(checkoutDeliveryParams));
 
-            // Sync cart total with backend passing deliveryId and localityId for proper discount calculation
+            // Sync cart total with backend passing localityId for proper locality-based pricing/availability
             void dispatch(fetchCartAsync({
-                deliveryId: parseInt(deliveryMethod, 10),
                 localityId: checkoutCity?.id ? parseInt(String(checkoutCity.id), 10) : undefined,
             }));
             
