@@ -202,8 +202,16 @@ const ProductTabs: React.FC<ProductTabsProps> = ({ description, characteristics,
     const sanitizedDescription = useMemo(() => {
         if (!description) return '';
         return description
-            .replace(/<h1([\s>])/gi, '<h2$1')
-            .replace(/<\/h1>/gi, '</h2>');
+            .replace(/<h[1-6]\b([^>]*)>/gi, (_match, attrs) => {
+                const classMatch = attrs.match(/class=(["'])(.*?)\1/i);
+                if (classMatch) {
+                    const existingClasses = classMatch[2];
+                    const newAttrs = attrs.replace(classMatch[0], `class="${styles.descHeading} ${existingClasses}"`);
+                    return `<p${newAttrs}>`;
+                }
+                return `<p class="${styles.descHeading}"${attrs}>`;
+            })
+            .replace(/<\/h[1-6]>/gi, '</p>');
     }, [description]);
 
     return (

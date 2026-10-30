@@ -202,6 +202,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
     return (
         <div className={styles.reviewsSection} id="reviews">
             <SectionHeader
+                as="p"
                 title={`ВІДГУКИ НАШИХ КЛІЄНТІВ (${totalCount})`}
                 classNameWrapper={styles.reviewsTitle}
             />
