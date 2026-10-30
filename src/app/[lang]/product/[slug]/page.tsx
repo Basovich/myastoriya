@@ -11,6 +11,7 @@ import {
     getDynamicBaseUrl,
     getExplicitHreflangAlternates,
 } from '@/utils/seo';
+import { getProductDisplayName, enhanceSeoTextWithDisplayName } from '@/utils/product-title';
 import ProductClient from '@/app/pages/Product/ProductClient';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 import {
@@ -58,7 +59,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
     const productSlugs = await getProductSlugsById(productId).catch(() => ({ uk: slug, ru: slug }));
 
-    const productName = product.name;
+    const rawProductName = product.name;
+    const productName = getProductDisplayName(product);
     const productImage = resolveProductImageUrl(product);
     const effectivePrice = product.purchaseCost ?? product.cost;
     const relativeUrl = `/${lang}/product/${slug}/`;
@@ -66,13 +68,16 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
         h1: productName,
     });
 
-    const finalTitle = seoData.title || productName;
+    let finalTitle = seoData.title || productName;
+    finalTitle = enhanceSeoTextWithDisplayName(finalTitle, rawProductName, productName);
+
     let finalDescription = seoData.description;
     if (finalDescription) {
         if (effectivePrice) {
             finalDescription = finalDescription.replace(/(Ціна|Цена)\s+\d+[\s\d]*(?:\s*грн\.?)+/gi, `$1 ${Math.round(effectivePrice)} грн`);
         }
         finalDescription = finalDescription.replace(/(?:\s+грн\.?){2,}/gi, ' грн').trim();
+        finalDescription = enhanceSeoTextWithDisplayName(finalDescription, rawProductName, productName);
     }
 
     const alternates = getExplicitHreflangAlternates(
@@ -288,8 +293,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
     }
 
     // 7. Build breadcrumbs based on category hierarchy (independent of URL structure)
+    const rawProductName = product.name;
+    const productName = getProductDisplayName(product);
     const breadcrumbs = buildCategoryBreadcrumbs(product.categoryId, categoryIndex, lang);
-    breadcrumbs.push({ label: product.name });
+    breadcrumbs.push({ label: productName });
 
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
@@ -309,12 +316,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
         dynamicBaseUrl,
     );
     const seoData = await fetchSeoMetadataByUrl(`/${lang}/product/${slug}/`, lang, {
-        h1: product.name,
+        h1: productName,
     }).catch(() => null);
     const hreflangCanonical = seoData?.canonical || alternates.canonical;
 
+    let finalH1 = seoData?.h1 || productName;
+    finalH1 = enhanceSeoTextWithDisplayName(finalH1, rawProductName, productName);
+
     const productJsonLd = generateProductJsonLd({
-        product,
+        product: { ...product, name: productName },
         lang,
         canonicalUrl: hreflangCanonical,
         dynamicBaseUrl,
@@ -336,7 +346,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 categoryProducts={categoryProductsResponse.data}
                 lang={lang as Locale}
                 dict={dict}
-                h1={seoData?.h1 || product.name}
+                h1={finalH1}
                 breadcrumbs={breadcrumbs}
                 deliveryBlocks={deliveryBlocks}
                 initialReviews={initialReviewsData?.data ?? []}
