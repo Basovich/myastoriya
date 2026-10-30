@@ -11,8 +11,20 @@ interface AlternateUrlsContextType {
 
 const AlternateUrlsContext = createContext<AlternateUrlsContextType | null>(null);
 
-export function AlternateUrlsProvider({ children }: { children: React.ReactNode }) {
-    const [alternateUrls, setAlternateUrlsState] = useState<AlternateUrlsMap | null>(null);
+export function AlternateUrlsProvider({
+    children,
+    initialAlternateUrls = null,
+}: {
+    children: React.ReactNode;
+    initialAlternateUrls?: AlternateUrlsMap | null;
+}) {
+    const [alternateUrls, setAlternateUrlsState] = useState<AlternateUrlsMap | null>(initialAlternateUrls);
+
+    React.useEffect(() => {
+        if (initialAlternateUrls) {
+            setAlternateUrlsState(initialAlternateUrls);
+        }
+    }, [initialAlternateUrls]);
 
     const setAlternateUrls = useCallback((urls: AlternateUrlsMap | null) => {
         setAlternateUrlsState(urls);
@@ -84,7 +96,10 @@ export function resolveSwitchUrl(
     }
 
     if (customUrl) {
-        const relPath = getRelativePathFromUrl(customUrl);
+        let relPath = getRelativePathFromUrl(customUrl);
+        if (relPath && relPath !== '/' && !relPath.endsWith('/')) {
+            relPath = `${relPath}/`;
+        }
         const query = searchParams ? searchParams.toString() : '';
         if (query && !relPath.includes('?')) {
             return `${relPath}?${query}`;

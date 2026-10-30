@@ -1,4 +1,4 @@
-import { redirect, notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import BlogGrid from "@/app/components/BlogGrid/BlogGrid";
@@ -76,10 +76,10 @@ export default async function BlogCategoryPage({
 
     // Legacy redirects for old category slugs
     if (category === 'sovety' || category === 'stati') {
-        redirect(`/${lang}/blog/article`);
+        permanentRedirect(`/${lang}/blog/article/`);
     }
     if (category === 'recepty') {
-        redirect(`/${lang}/blog/recipe`);
+        permanentRedirect(`/${lang}/blog/recipe/`);
     }
 
     const apiTypeSlug = mapUrlCategoryToApiTypeSlug(category);
@@ -121,7 +121,7 @@ export default async function BlogCategoryPage({
     const legacyPost = await getBlogBySlugApi(category, lang, token ?? undefined).catch(() => null);
     if (legacyPost) {
         const canonicalCategory = getBlogCategorySegment(legacyPost);
-        redirect(`/${lang}/blog/${canonicalCategory}/${legacyPost.slug}`);
+        permanentRedirect(`/${lang}/blog/${canonicalCategory}/${legacyPost.slug}/`);
     }
 
     notFound();

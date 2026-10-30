@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect, notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { headers } from "next/headers";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
@@ -94,7 +94,7 @@ export default async function BlogSinglePostPage({
 
     const canonicalCategory = getBlogCategorySegment(post);
     if (category !== canonicalCategory) {
-        redirect(`/${lang}/blog/${canonicalCategory}/${slug}`);
+        permanentRedirect(`/${lang}/blog/${canonicalCategory}/${slug}/`);
     }
 
     // Filter out broken/non-existent recipes & related blogs that return errors

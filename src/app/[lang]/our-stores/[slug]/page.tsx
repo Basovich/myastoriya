@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect, notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import StoreDetailPage from "@/app/pages/OurStores/StoreDetailPage/StoreDetailPage";
@@ -88,10 +88,10 @@ export default async function StorePage({
 }) {
     const { lang, slug } = await params;
 
-    // Legacy redirect (e.g. /our-stores/shop-1 -> /our-stores/myastoriya-na-oboloni)
+    // Legacy redirect (e.g. /our-stores/shop-1 -> /our-stores/myastoriya-na-oboloni/)
     const redirectSlug = getLegacyStoreRedirectSlug(slug);
     if (redirectSlug) {
-        redirect(`/${lang}/our-stores/${redirectSlug}`);
+        permanentRedirect(`/${lang}/our-stores/${redirectSlug}/`);
     }
 
     const dict = await getDictionary(lang);

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import ActionDetail from '../../../components/ActionDetail/ActionDetail';
 import {
     getSalesApi,
@@ -111,7 +111,7 @@ export default async function ActionDetailPage({ params }: ActionDetailPageProps
 
     // 3. If requested slug is an old/transliterated slug, redirect to current localized slug
     if (sale.slug && slug !== sale.slug && !/^\d+$/.test(slug)) {
-        redirect(`/${lang}/actions/${sale.slug}`);
+        permanentRedirect(`/${lang}/actions/${sale.slug}/`);
     }
 
     let productsResponse = { data: [] as Product[], has_more_pages: false };

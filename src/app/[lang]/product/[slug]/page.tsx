@@ -1,6 +1,6 @@
 import type {Metadata} from 'next';
 import {headers} from 'next/headers';
-import {notFound, redirect} from 'next/navigation';
+import {notFound, redirect, permanentRedirect} from 'next/navigation';
 import {getDictionary} from '@/i18n/get-dictionary';
 import {Locale} from '@/i18n/config';
 import {getLocalizedHref} from '@/utils/i18n-helpers';
@@ -185,7 +185,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
     // Redirect to official current localized slug if requested slug was old/transliterated
     if (product.slug && slug !== product.slug && !/^\d+$/.test(slug)) {
-        redirect(`/${lang}/product/${product.slug}`);
+        permanentRedirect(`/${lang}/product/${product.slug}/`);
     }
 
 

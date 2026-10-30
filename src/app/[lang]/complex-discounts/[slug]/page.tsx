@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, redirect, permanentRedirect } from 'next/navigation';
 import ComplexDiscountDetail from '../../../components/ComplexDiscountDetail/ComplexDiscountDetail';
 import { findSpecialIdBySlug, getSpecialApi, getSpecialSlugsById } from '@/lib/graphql';
 import { getAccessToken } from '@/app/actions/authActions';
@@ -119,7 +119,7 @@ export default async function ComboDetail({ params }: ComboDetailProps) {
 
     // Redirect to official current localized slug if requested slug was old/transliterated
     if (publicSpecial.slug && slug !== publicSpecial.slug && isNaN(Number(slug))) {
-        redirect(`/${lang}/complex-discounts/${publicSpecial.slug}`);
+        permanentRedirect(`/${lang}/complex-discounts/${publicSpecial.slug}/`);
     }
 
     // Determine the expected count of products from the public catalog version
@@ -140,7 +140,7 @@ export default async function ComboDetail({ params }: ComboDetailProps) {
         special.products.some((product) => !product.available);
 
     if (hasUnavailableProduct || !special) {
-        redirect(`/${lang}/complex-discounts`);
+        redirect(`/${lang}/complex-discounts/`);
     }
 
     const relativeUrl = `/${lang}/complex-discounts/${slug}/`;

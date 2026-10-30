@@ -1,6 +1,14 @@
 import { cache } from "react";
 import { siteData } from "@/config/site";
-import { getSeoByUrlApi } from "@/lib/graphql";
+import {
+    getSeoByUrlApi,
+    findSpecialIdBySlug,
+    getSpecialSlugsById,
+    findProductIdBySlug,
+    getProductSlugsById,
+    findSaleIdBySlug,
+    getSaleSlugsById,
+} from "@/lib/graphql";
 
 // Dedupes seoByUrl within a single request (generateMetadata + page render both need it)
 const getSeoByUrlCached = cache((url: string, lang: string) => getSeoByUrlApi(url, lang));
@@ -517,6 +525,104 @@ export function getExplicitHreflangAlternates(
         },
     };
 }
+
+/**
+ * Resolves canonical localized relative URLs for the language switcher during SSR.
+ * Ensures the language switcher links directly to the corresponding localized slug
+ * without causing 307/308 redirects.
+ */
+export const resolveServerAlternateUrls = cache(async (
+    pathname: string,
+    lang: string = "ua"
+): Promise<Record<string, string> | null> => {
+    if (!pathname) return null;
+    const cleanPath = pathname.split(/[?#]/)[0].trim();
+
+    // 1. Root / homepage
+    if (cleanPath === '/' || cleanPath === '/ua' || cleanPath === '/ua/' || cleanPath === '/ru' || cleanPath === '/ru/') {
+        return {
+            uk: '/',
+            ru: '/ru/',
+        };
+    }
+
+    // 2. Complex Discounts: /(ua|ru)?/complex-discounts/:slug/?
+    const complexDiscountsMatch = cleanPath.match(/^(?:\/(ua|ru))?\/complex-discounts\/([^\/]+)\/?$/);
+    if (complexDiscountsMatch) {
+        const slug = complexDiscountsMatch[2];
+        try {
+            const specialId = await findSpecialIdBySlug(slug, lang);
+            if (specialId) {
+                const slugs = await getSpecialSlugsById(specialId);
+                return {
+                    uk: `/ua/complex-discounts/${slugs.uk}/`,
+                    ru: `/ru/complex-discounts/${slugs.ru}/`,
+                };
+            }
+        } catch (e) {
+            console.error('[resolveServerAlternateUrls] complex-discounts error:', e);
+        }
+        return null;
+    }
+
+    // 3. Products: /(ua|ru)?/product/:slug/?
+    const productMatch = cleanPath.match(/^(?:\/(ua|ru))?\/product\/([^\/]+)\/?$/);
+    if (productMatch) {
+        const slug = productMatch[2];
+        try {
+            const productId = await findProductIdBySlug(slug, lang).catch(() => null);
+            if (productId) {
+                const slugs = await getProductSlugsById(productId).catch(() => null);
+                if (slugs) {
+                    return {
+                        uk: `/ua/product/${slugs.uk}/`,
+                        ru: `/ru/product/${slugs.ru}/`,
+                    };
+                }
+            }
+        } catch (e) {
+            console.error('[resolveServerAlternateUrls] product error:', e);
+        }
+        return null;
+    }
+
+    // 4. Actions (Promotions): /(ua|ru)?/actions/:slug/?
+    const actionsMatch = cleanPath.match(/^(?:\/(ua|ru))?\/actions\/([^\/]+)\/?$/);
+    if (actionsMatch) {
+        const slug = actionsMatch[2];
+        try {
+            const saleId = await findSaleIdBySlug(slug, lang);
+            if (saleId) {
+                const slugs = await getSaleSlugsById(saleId);
+                return {
+                    uk: `/ua/actions/${slugs.uk}/`,
+                    ru: `/ru/actions/${slugs.ru}/`,
+                };
+            }
+        } catch (e) {
+            console.error('[resolveServerAlternateUrls] actions error:', e);
+        }
+        return null;
+    }
+
+    // 5. Standard subpages (static pages, blog, contacts, etc.)
+    const relativePath = cleanPath
+        .replace(/^\/(?:ua|ru|en)(?=\/|$)/, "")
+        .replace(/^\/+/, "")
+        .replace(/\/+$/, "");
+
+    if (!relativePath) {
+        return {
+            uk: '/',
+            ru: '/ru/',
+        };
+    }
+
+    return {
+        uk: `/ua/${relativePath}/`,
+        ru: `/ru/${relativePath}/`,
+    };
+});
 
 /**
  * Resolves canonical + hreflang links for a static page rendered via <HreflangLinks />.

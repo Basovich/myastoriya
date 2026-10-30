@@ -295,7 +295,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
     );
 
     if (globalCategoryEntry) {
-        redirect(`/${lang}/catalog`);
+        redirect(`/${lang}/catalog/`);
     }
 
     notFound();

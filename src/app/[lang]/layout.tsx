@@ -7,7 +7,7 @@ import { i18n, type Locale } from "@/i18n/config";
 import clsx from "clsx";
 import ReduxProvider from "@/store/ReduxProvider";
 import AuthInitializer from "@/app/components/AuthInitializer/AuthInitializerClient";
-import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, getRequestJsonLdScripts } from "@/utils/seo";
+import { getHreflangAlternates, getDynamicBaseUrl, buildOpenGraphMetadata, getRequestJsonLdScripts, resolveServerAlternateUrls } from "@/utils/seo";
 import { getCatalogTreeApi, type ProductCategory } from "@/lib/graphql/queries/products";
 import { getSocialLinksApi, type SocialLink } from "@/lib/graphql/queries/settings";
 import Header from "@/app/components/Header/HeaderClient";
@@ -140,6 +140,7 @@ export default async function RootLayout({
   const pathname = headersList.get("x-pathname") || "";
   const dynamicBaseUrl = getDynamicBaseUrl(headersList);
   const isMenuPage = /^\/(?:[a-z]{2}\/)?menu(?:\/.*)?$/.test(pathname);
+  const initialAlternateUrls = await resolveServerAlternateUrls(pathname, lang);
 
   let catalogTree: ProductCategory[] = [];
   let socialLinks: SocialLink[] = [];
@@ -288,7 +289,7 @@ export default async function RootLayout({
       <body>
         <ReduxProvider>
           <BaseUrlProvider baseUrl={dynamicBaseUrl}>
-            <AlternateUrlsProvider>
+            <AlternateUrlsProvider initialAlternateUrls={initialAlternateUrls}>
               <CategoryProvider initialCategories={catalogTree}>
                 <NavigationProgress />
                 <ScrollToTop />
