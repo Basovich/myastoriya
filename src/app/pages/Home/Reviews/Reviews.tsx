@@ -14,6 +14,7 @@ import type { Review } from "@/i18n/types";
 import type { HomeReview } from "@/lib/graphql";
 import { format } from "date-fns";
 import clsx from "clsx";
+import { stripHtml } from "@/utils/strip-html";
 
 interface ReviewsProps {
     dict: {
@@ -100,9 +101,10 @@ export default function Reviews({ dict, reviews }: ReviewsProps) {
                                     </div>
                                     <span className={s.date}>{date}</span>
                                     {(() => {
-                                        const isLong = review.text.length > 80;
+                                        const cleanText = stripHtml(review.text);
+                                        const isLong = cleanText.length > 80;
                                         const isExpanded = expanded[review.id];
-                                        const displayText = isExpanded ? review.text : (isLong ? review.text.slice(0, 80) + '...' : review.text);
+                                        const displayText = isExpanded ? cleanText : (isLong ? cleanText.slice(0, 80) + '...' : cleanText);
 
                                         return (
                                             <>

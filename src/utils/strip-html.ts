@@ -25,7 +25,16 @@ export function stripHtml(html?: string | null): string {
         .replace(/&bull;/gi, '•')
         .replace(/&reg;/gi, '®')
         .replace(/&copy;/gi, '©')
-        .replace(/&trade;/gi, '™');
+        .replace(/&trade;/gi, '™')
+        .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)))
+        .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+        .replace(/&amp;/gi, '&');
+
+    if (text.includes('&#')) {
+        text = text
+            .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)))
+            .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+    }
 
     return text.replace(/\s+/g, ' ').trim();
 }

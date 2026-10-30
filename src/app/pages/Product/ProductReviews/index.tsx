@@ -9,6 +9,7 @@ import Image from 'next/image';
 import ReviewModal from '@/app/components/ReviewModal';
 import { gqlRequest } from '@/lib/graphql';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
+import { stripHtml } from '@/utils/strip-html';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -276,7 +277,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                                         </div>
                                         {review.text && (
                                             <div className={styles.reviewText}>
-                                                <p>{review.text}</p>
+                                                <p>{stripHtml(review.text)}</p>
                                             </div>
                                         )}
                                     </div>
