@@ -179,16 +179,12 @@ export default function Step3({ lang }: Step3Props) {
 
     // Load saved delivery parameters, promo, and fetch payment methods
     useEffect(() => {
-        let activeDeliveryId: number | undefined;
         let activeLocalityId: number | undefined;
 
         const savedDeliveryData = localStorage.getItem('checkout_delivery_data');
         if (savedDeliveryData) {
             try {
                 const parsed = JSON.parse(savedDeliveryData);
-                if (parsed.deliveryMethod) {
-                    activeDeliveryId = parseInt(parsed.deliveryMethod, 10);
-                }
                 if (parsed.selectedCity?.id) {
                     activeLocalityId = parseInt(String(parsed.selectedCity.id), 10);
                 }
@@ -203,9 +199,6 @@ export default function Step3({ lang }: Step3Props) {
                 const parsed = JSON.parse(savedParams);
                 if (typeof parsed.deliveryPrice === 'number') {
                     setDeliveryPrice(parsed.deliveryPrice);
-                }
-                if (!activeDeliveryId && parsed.deliveryId) {
-                    activeDeliveryId = parseInt(String(parsed.deliveryId), 10);
                 }
             } catch (e) {
                 console.error(e);
