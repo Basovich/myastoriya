@@ -23,6 +23,7 @@ export interface OrderCardProps {
     totalProductsCount: number;
     sum: number;
     oldSum?: number;
+    cashback?: number | null;
     date: string;
     time: string;
     onRepeatOrder: () => void;
@@ -33,6 +34,8 @@ export interface OrderCardProps {
         orderPrefix: string;
         sourcePrefix: string;
         sumLabel: string;
+        cashbackLabel?: string;
+        bonusUnit?: string;
         reviewLink: string;
         editReviewLink?: string;
         repeatBtn: string;
@@ -64,7 +67,7 @@ function OrderProductThumb({ item, overlayText }: { item: OrderCardProductItem; 
 
 export default function OrderCard({
     orderNumber, status, statusVariant = 'success', source,
-    products, totalProductsCount, sum, oldSum, date, time,
+    products, totalProductsCount, sum, oldSum, cashback, date, time,
     onRepeatOrder, onDetails, onReview, reviewLabel, dict,
 }: OrderCardProps) {
     const displayCount = 6;
@@ -129,6 +132,11 @@ export default function OrderCard({
                             </span>
                         )}
                     </div>
+                    {cashback !== undefined && cashback !== null && cashback > 0 && (
+                        <div className={s.cashbackBadge}>
+                            +{cashback.toLocaleString('uk-UA')} {dict.bonusUnit || 'Б'}
+                        </div>
+                    )}
                 </div>
 
                 {/* Мета + кнопка "Повторити" в одному рядку */}
@@ -183,6 +191,11 @@ export default function OrderCard({
                             </span>
                         )}
                     </div>
+                    {cashback !== undefined && cashback !== null && cashback > 0 && (
+                        <div className={s.cashbackBadge}>
+                            +{cashback.toLocaleString('uk-UA')} {dict.bonusUnit || 'Б'}
+                        </div>
+                    )}
                 </div>
                 <Button variant="black" className={s.detailsBtn} onClick={onDetails}>
                     {dict.detailsBtn}

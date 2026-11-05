@@ -552,9 +552,11 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                 ? order.receivedBonuses
                                 : 0;
 
-                            const cashback = (order.willReceiveBonuses !== null && order.willReceiveBonuses !== undefined && order.willReceiveBonuses > 0)
-                                ? order.willReceiveBonuses
-                                : 0;
+                            const cashback = (order.cashback !== null && order.cashback !== undefined && order.cashback > 0)
+                                ? order.cashback
+                                : (order.willReceiveBonuses !== null && order.willReceiveBonuses !== undefined && order.willReceiveBonuses > 0)
+                                    ? order.willReceiveBonuses
+                                    : 0;
 
                             return (
                                 <div className={s.summaryGrid}>

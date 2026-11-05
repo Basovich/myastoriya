@@ -43,6 +43,8 @@ const ordersDict = {
             sourceSite: "з сайту",
             sourceApp: "з додатку",
             sumLabel: "Сума замовлення",
+            cashbackLabel: "Кешбек",
+            bonusUnit: "Б",
             reviewLink: "Залишити відгук",
             editReviewLink: "Змінити відгук",
             repeatBtn: "ПОВТОРИТИ ЗАМОВЛЕННЯ",
@@ -61,6 +63,8 @@ const ordersDict = {
             sourceSite: "с сайта",
             sourceApp: "из приложения",
             sumLabel: "Сумма заказа",
+            cashbackLabel: "Кэшбэк",
+            bonusUnit: "Б",
             reviewLink: "Оставить отзыв",
             editReviewLink: "Изменить отзыв",
             repeatBtn: "ПОВТОРИТЬ ЗАКАЗ",
@@ -505,6 +509,7 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                                     totalProductsCount={totalProductsCount}
                                     sum={orderSum}
                                     oldSum={oldSum}
+                                    cashback={order.cashback ?? order.willReceiveBonuses}
                                     date={date}
                                     time={time}
                                     dict={dict.card}

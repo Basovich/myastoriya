@@ -55,6 +55,7 @@ export interface Order {
     comment?: string | null;
     receivedBonuses?: number | null;
     willReceiveBonuses?: number | null;
+    cashback?: number | null;
     delivery?: OrderDeliveryInfo | null;
     calculation?: CalculationRow[] | null;
     source?: string | null;
@@ -88,6 +89,7 @@ const ORDERS_QUERY = /* GraphQL */ `
                 }
                 reviewId
                 source
+                cashback
                 calculation {
                     name
                     amount
@@ -159,6 +161,7 @@ const GET_ORDER_QUERY = /* GraphQL */ `
             total
             reviewId
             source
+            cashback
             receivedBonuses
             willReceiveBonuses
             calculation {
