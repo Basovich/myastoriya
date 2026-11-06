@@ -98,6 +98,26 @@ function isSameDay(d1: Date | null, d2: Date | null): boolean {
            d1.getDate() === d2.getDate();
 }
 
+/**
+ * Сортує методи доставки так, щоб «Кур'єр М'ясторія» завжди йшов першим.
+ */
+function sortDeliveries(deliveries: Delivery[]): Delivery[] {
+    return [...deliveries].sort((a, b) => {
+        const isMyastoriyaCourier = (d: Delivery) => {
+            const name = (d.name || '').toLowerCase();
+            return d.id === '5' || (name.includes('м\'ясторія') || name.includes('мястория')) && d.type === 'courier';
+        };
+
+        const aIsPrimary = isMyastoriyaCourier(a);
+        const bIsPrimary = isMyastoriyaCourier(b);
+
+        if (aIsPrimary && !bIsPrimary) return -1;
+        if (!aIsPrimary && bIsPrimary) return 1;
+
+        return 0;
+    });
+}
+
 const PAGE_SIZE = 50;
 
 export default function Step2() {
@@ -436,7 +456,7 @@ export default function Step2() {
                 if (isNaN(cityId)) return;
 
                 const res = await getDeliveriesApi(undefined, cityId, lang);
-                const safeDeliveries = Array.isArray(res) ? res.filter(Boolean) : [];
+                const safeDeliveries = sortDeliveries(Array.isArray(res) ? res.filter(Boolean) : []);
                 setDeliveries(safeDeliveries);
                 
                 // Завжди вибираємо перший метод (навіть якщо disabled), або відновлюємо збережений
