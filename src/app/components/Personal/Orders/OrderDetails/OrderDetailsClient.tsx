@@ -46,6 +46,8 @@ const detailsDict = {
             persons: "Кількість персон",
             total: "Вартість замовлення",
             unit: "чол.",
+            productsCount: "Кількість товарів",
+            productsUnit: "шт.",
             discount: "Знижка",
             bonusesUsed: "Використання балів",
             cashback: "Кешбек балами",
@@ -70,6 +72,8 @@ const detailsDict = {
             persons: "Количество персон",
             total: "Стоимость заказа",
             unit: "чел.",
+            productsCount: "Количество товаров",
+            productsUnit: "шт.",
             discount: "Скидка",
             bonusesUsed: "Использование баллов",
             cashback: "Кэшбэк баллами",
@@ -558,12 +562,20 @@ export default function OrderDetailsClient({ lang, orderId }: OrderDetailsClient
                                     ? order.willReceiveBonuses
                                     : 0;
 
+                            const totalProductsCount = (order.items ?? []).reduce((acc, item) => acc + (item.quantity || 1), 0);
+
                             return (
                                 <div className={s.summaryGrid}>
                                     {order.personsCount !== null && order.personsCount !== undefined && order.personsCount > 0 && (
                                         <div className={s.summaryItem}>
                                             <span className={s.summaryLabel}>{dict.summary.persons}</span>
                                             <span className={s.summaryValue}>{order.personsCount} <strong>{dict.summary.unit}</strong></span>
+                                        </div>
+                                    )}
+                                    {totalProductsCount > 0 && (
+                                        <div className={s.summaryItem}>
+                                            <span className={s.summaryLabel}>{dict.summary.productsCount}</span>
+                                            <span className={s.summaryValue}>{totalProductsCount} <strong>{dict.summary.productsUnit}</strong></span>
                                         </div>
                                     )}
                                     {(order.calculation ?? []).map((calc, i) => {
