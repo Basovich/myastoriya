@@ -322,7 +322,7 @@ export default function CatalogSidebar({
                 />
             )}
 
-            <div className={s.filtersWrapper}>
+            <div className={s.filtersWrapper} data-no-progress="true">
                 {/* Динамічні блоки фільтрів з API */}
                 {isLoadingFilters ? (
                     <Spinner centered={true} />
