@@ -83,39 +83,6 @@
     }
 }
 
-button.applyBtn {
-    width: 100%;
-    height: 48px;
-    background: #E3051B;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: opacity 0.2s;
-
-    @media (any-hover: hover) {
-        &:hover:not(:disabled) {
-            opacity: 0.88;
-        }
-    }
-
-    &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    &:focus-visible {
-        outline: 2px solid #E3051B;
-        outline-offset: 3px;
-    }
-}
-
-
-
 .sortOptions {
     display: flex;
     flex-direction: column;
@@ -170,52 +137,6 @@ button.applyBtn {
 }
 
 
-
-.floatingApply {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 36px;
-    position: absolute;
-    z-index: 200;
-    transform: translateY(-50%);
-    background: #E6000F;
-    padding: 10px 16px;
-    border-radius: 10px;
-    color: #FFF;
-    font-size: 10px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    text-transform: uppercase;
-    white-space: nowrap;
-    box-shadow: 0 4px 20px rgba(227, 5, 27, 0.35);
-    border: none;
-    cursor: pointer;
-    transition:  box-shadow 0.2s;
-
-    &::before {
-        content: '';
-        position: absolute;
-        left: -8px;
-        top: 50%;
-        transform: translateY(-50%);
-        border-top: 9px solid transparent;
-        border-bottom: 9px solid transparent;
-        border-right: 9px solid #E6000F;
-    }
-
-    @media (any-hover: hover) {
-        &:hover {
-            box-shadow: 0 6px 24px rgba(227, 5, 27, 0.5);
-        }
-    }
-
-    &:focus-visible {
-        outline: 2px solid #fff;
-        outline-offset: 2px;
-    }
-}
 
 .clearBottomBtn {
     display: block;

@@ -270,6 +270,8 @@ export function resolveCategoryImageUrl(category: ProductCategory): string {
 
 export interface FilterOption {
     key: string | null;
+    /** Транслітерований slug значення для URL (наприклад, `ribai`). */
+    slug?: string | null;
     label: string | null;
     selected: boolean | null;
     disabled: boolean | null;
@@ -280,6 +282,8 @@ export interface FilterBlock {
     type: string;
     label: string | null;
     key: string | null;
+    /** Транслітерований slug фільтра для URL (наприклад, `vyd-steika`). Відсутній у службових блоків (ціна, категорії). */
+    slug?: string | null;
     values: FilterOption[] | null;
     min: number | null;
     max: number | null;
@@ -824,12 +828,14 @@ const PRODUCTS_FILTER_QUERY = /* GraphQL */ `
                 type
                 label
                 key
+                slug
                 min
                 max
                 minValue
                 maxValue
                 values {
                     key
+                    slug
                     label
                     selected
                     disabled
@@ -991,6 +997,30 @@ export async function getProductsFilterApi(
     } catch {
         // API може не підтримувати productsFilter на dev-бекенді — повертаємо порожній стан
         return { blocks: [], productsCount: 0 };
+    }
+}
+
+/**
+ * Мінімальна ціна товарів категорії за вибраним станом фільтрів.
+ * Використовується для Description SEO-сторінок фільтрів. Повертає null, якщо товарів немає.
+ */
+export async function getMinPriceApi(
+    categoryId: number,
+    filter: FilterStateInput[],
+    lang?: string,
+    token?: string,
+    rawProduction?: boolean,
+): Promise<number | null> {
+    try {
+        const res = await getProductsApi(
+            { categoryId, limit: 1, page: 1, sort: 'За зростанням ціни', filter, rawProduction, silent: true },
+            lang,
+            token,
+        );
+        const price = res.data[0]?.cost;
+        return typeof price === 'number' && price > 0 ? Math.round(price) : null;
+    } catch {
+        return null;
     }
 }
 

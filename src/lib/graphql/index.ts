@@ -38,6 +38,7 @@ export {
     getProductCostVariantsApi,
     getPopularProductsApi,
     getProductsFilterApi,
+    getMinPriceApi,
     getSpecialsByProductApi,
     getBoughtTogetherProductsApi,
     addProductToAvailabilityTrackerApi,

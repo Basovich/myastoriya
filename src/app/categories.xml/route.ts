@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSitemapBaseUrl, formatDate, buildPairedUrlSetXml, PairedSitemapEntry } from "@/utils/sitemap-helpers";
-import { getCatalogTreeApi, ProductCategory } from "@/lib/graphql";
+import { getCatalogTreeApi, getProductsFilterApi, ProductCategory } from "@/lib/graphql";
+import type { FilterBlock } from "@/lib/graphql";
+import { SEO_CATEGORY_CONFIGS } from "@/config/seo-filters";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +24,49 @@ function collectCategories(categories: ProductCategory[]): Map<string, ProductCa
         traverse(cat);
     }
     return map;
+}
+
+/**
+ * Індексовані SEO-сторінки фільтрів (категорія + один SEO-фільтр з одним значенням).
+ * Сторінки з комбінаціями, кількома значеннями, не-SEO фільтрами та пагінацією noindex і сюди не потрапляють.
+ */
+async function collectSeoFilterEntries(
+    uaMap: Map<string, ProductCategory>,
+    ruMap: Map<string, ProductCategory>,
+): Promise<PairedSitemapEntry[]> {
+    const entries: PairedSitemapEntry[] = [];
+    const seen = new Set<string>();
+
+    for (const [id, uaCat] of uaMap) {
+        const config = SEO_CATEGORY_CONFIGS[uaCat.slug];
+        if (!config || uaCat.productsCount === 0) continue;
+        const ruCat = ruMap.get(id);
+        const ruSlug = ruCat?.slug || uaCat.slug;
+
+        const [uaData, ruData] = await Promise.all([
+            getProductsFilterApi(Number(id), "ua"),
+            getProductsFilterApi(Number(id), "ru"),
+        ]);
+        const ruBlocksByKey = new Map<string, FilterBlock>();
+        ruData.blocks.forEach(b => b.key && ruBlocksByKey.set(b.key, b));
+
+        for (const block of uaData.blocks) {
+            if (!block.slug || !block.key || !config.allowedFilterSlugs.includes(block.slug)) continue;
+            const ruBlock = ruBlocksByKey.get(block.key);
+
+            for (const option of block.values ?? []) {
+                if (!option.slug || !option.key || option.disabled) continue;
+                const ruOption = ruBlock?.values?.find(v => v.key === option.key);
+                const ukPath = `/category/${uaCat.slug}/${block.slug}=${option.slug}/`;
+                const ruPath = `/category/${ruSlug}/${ruBlock?.slug || block.slug}=${ruOption?.slug || option.slug}/`;
+                if (seen.has(ukPath)) continue;
+                seen.add(ukPath);
+                entries.push({ ukPath, ruPath, lastmod: null });
+            }
+        }
+    }
+
+    return entries;
 }
 
 export async function GET(req: Request) {
@@ -64,7 +109,12 @@ export async function GET(req: Request) {
             }
         }
 
-        const xml = buildPairedUrlSetXml(entries, baseUrl);
+        const seoFilterEntries = await collectSeoFilterEntries(uaMap, ruMap).catch(error => {
+            console.error("[categories.xml] Failed to collect SEO filter pages:", error);
+            return [] as PairedSitemapEntry[];
+        });
+
+        const xml = buildPairedUrlSetXml([...entries, ...seoFilterEntries], baseUrl);
 
         return new NextResponse(xml, {
             headers: {

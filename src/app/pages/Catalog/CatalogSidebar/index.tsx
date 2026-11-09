@@ -8,7 +8,6 @@ import FilterGroup from '@/app/components/ui/FilterGroup/FilterGroup';
 import FilterCheckbox from '@/app/components/ui/FilterCheckbox/FilterCheckbox';
 import FilterPill from '@/app/components/ui/FilterPill/FilterPill';
 import PriceRange from '@/app/components/ui/PriceRange/PriceRange';
-import Button from "@/app/components/ui/Button/Button";
 import CategorySwitcher from '@/app/components/ui/CategorySwitcher/CategorySwitcher';
 import clsx from 'clsx';
 import Spinner from '@/app/components/ui/Spinner/Spinner';
@@ -18,12 +17,14 @@ import {
     isRangeBlock,
     buildFilterParams,
     clearFilterParams,
-    countActiveFilterValues,
     getFilterForBlock,
     setFilterValue,
     removeFilter,
     hasActiveFilters,
 } from '@/utils/filter-params';
+import { buildCategoryFilterUrl, splitFiltersForUrl } from '@/utils/catalog-filter-url';
+import { getCategorySeoConfig } from '@/config/seo-filters';
+import { getLocalizedHref } from '@/utils/i18n-helpers';
 
 interface CatalogSidebarProps {
     onApply?: () => void;
@@ -96,11 +97,9 @@ function shouldExcludeBlock(block: FilterBlock): boolean {
 export default function CatalogSidebar({
     onApply,
     onClose,
-    sortBy,
     onClearAll,
     onModifiedChange,
     categoryId,
-    sortOptions,
     filterBlocks,
     activeFilters,
     isSubcategory,
@@ -112,18 +111,13 @@ export default function CatalogSidebar({
     const searchParams = useSearchParams();
 
     const lang = routeParams?.lang === 'ru' ? 'ru' : 'ua';
+
+    // На сторінках категорій фільтри живуть у шляху URL (`/category/<slug>/vyd-steika=ribai/`)
+    const routeSlug = routeParams?.slug;
+    const categorySlug = Array.isArray(routeSlug) ? routeSlug[0] : undefined;
+    const isCategoryRoute = Boolean(categorySlug) && pathname.includes('/category/');
+    const seoFilterSlugs = categorySlug ? (getCategorySeoConfig(categorySlug)?.allowedFilterSlugs ?? []) : [];
     const texts = LOCALIZED_SIDEBAR_TEXTS[lang];
-    const sidebarRef = useRef<HTMLDivElement>(null);
-    const [floatingButtonPos, setFloatingButtonPos] = useState<{ top: number; left: number } | null>(null);
-    const optionsToUse = sortOptions || texts.sortOptions;
-    const defaultSortOption = optionsToUse[0] || texts.defaultSortOption;
-
-    // Локальний стан фільтрів (pending до натискання «Застосувати») - тільки спискові фільтри
-    const [pendingFilters, setPendingFilters] = useState<FilterStateInput[]>(() =>
-        (activeFilters ?? []).filter(f => f.minValue === undefined && f.maxValue === undefined)
-    );
-
-    // Локальний стан «чернетки» ціни — не впливає на isPendingChanged
     const [pendingPrice, setPendingPrice] = useState<Record<string, { from: number; to: number }>>({});
 
     // Динамічні блоки фільтрів, отримані напряму через gqlRequest (getProductsFilterApi)
@@ -134,20 +128,6 @@ export default function CatalogSidebar({
         if (!categoryId) return false;
         return !filterBlocks || filterBlocks.length === 0;
     });
-
-    const renderedBlocks = dynamicBlocks.filter(block => {
-        if (!block.key || block.key === 'categories') return false;
-        if (isRangeBlock(block)) {
-            const blockMin = block.min ?? 0;
-            const blockMax = block.max ?? 10000;
-            return blockMin !== blockMax;
-        } else {
-            const options = block.values ?? [];
-            return options.length > 1 && Boolean(block.label);
-        }
-    });
-
-    const isOnlyPriceRange = renderedBlocks.length === 1 && isRangeBlock(renderedBlocks[0]);
 
     const isInitialMountRef = useRef(true);
 
@@ -173,55 +153,68 @@ export default function CatalogSidebar({
             .finally(() => setIsLoadingFilters(false));
     }, [categoryId, routeParams?.lang, filterBlocks]);
 
-    // Синхронізуємо з props при скиданні через key={clearTrigger}
     useEffect(() => {
-        setPendingFilters((activeFilters ?? []).filter(f => f.minValue === undefined && f.maxValue === undefined));
         setPendingPrice({});
-        setFloatingButtonPos(null);
     }, [activeFilters]);
 
     // --- Helpers ---
-
-    const toggleListOption = useCallback((blockKey: string, optionKey: string) => {
-        setPendingFilters(prev => {
-            const current = getFilterForBlock(prev, blockKey);
-            const currentValues = current?.values ?? [];
-            const newValues = currentValues.includes(optionKey)
-                ? currentValues.filter(v => v !== optionKey)
-                : [...currentValues, optionKey];
-
-            if (newValues.length === 0) {
-                return removeFilter(prev, blockKey);
-            }
-            return setFilterValue(prev, { key: blockKey, values: newValues });
-        });
-    }, []);
-
-    const handleOptionClick = useCallback((e: React.MouseEvent<HTMLButtonElement>, blockKey: string, optionKey: string) => {
-        toggleListOption(blockKey, optionKey);
-
-        if (typeof window !== 'undefined' && window.innerWidth >= 1280 && sidebarRef.current) {
-            const sidebarRect = sidebarRef.current.getBoundingClientRect();
-            const clickedRect = e.currentTarget.getBoundingClientRect();
-
-            // Вертикально — по центру клікнутого елемента відносно сайдбару
-            const top = clickedRect.top - sidebarRect.top + (clickedRect.height / 2);
-            // Горизонтально — завжди праворуч від сайдбару (ширина сайдбару + відступ)
-            const left = sidebarRect.width + 16;
-
-            setFloatingButtonPos({ top, left });
-        }
-    }, [toggleListOption]);
-
-    const handlePriceChange = useCallback((blockKey: string, from: number, to: number) => {
-        setPendingPrice(prev => ({ ...prev, [blockKey]: { from, to } }));
-    }, []);
 
     const startCatalogTransition = () => {
         if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('catalog-loading-start'));
         }
     };
+
+    /**
+     * Переходить на URL з новим набором фільтрів.
+     * Категорії: фільтри зі slug йдуть у шлях, діапазон ціни та блоки без slug — у GET.
+     * Інші сторінки: усі фільтри в GET (`filter_<id>`).
+     */
+    const navigateWithFilters = useCallback((filters: FilterStateInput[], clearOnly = false) => {
+        const currentParams = new URLSearchParams(searchParams.toString());
+        startCatalogTransition();
+        if (isCategoryRoute && categorySlug) {
+            const { pathFilters, queryFilters } = splitFiltersForUrl(filters, dynamicBlocks);
+            const params = clearOnly
+                ? clearFilterParams(currentParams)
+                : buildFilterParams(queryFilters, currentParams, dynamicBlocks);
+            const basePath = getLocalizedHref(
+                buildCategoryFilterUrl(categorySlug, clearOnly ? [] : pathFilters, dynamicBlocks),
+                lang,
+            );
+            router.push(`${basePath}?${params.toString()}`, { scroll: false });
+        } else {
+            const params = clearOnly
+                ? clearFilterParams(currentParams)
+                : buildFilterParams(filters, currentParams, dynamicBlocks);
+            router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        }
+    }, [searchParams, isCategoryRoute, categorySlug, dynamicBlocks, lang, router, pathname]);
+
+    /**
+     * Автоматично перемикає опцію та одразу переходить на новий URL.
+     */
+    const handleToggleOption = useCallback((blockKey: string, optionKey: string) => {
+        const currentListFilters = (activeFilters ?? []).filter(f => f.minValue === undefined && f.maxValue === undefined);
+        const current = getFilterForBlock(currentListFilters, blockKey);
+        const currentValues = current?.values ?? [];
+        const newValues = currentValues.includes(optionKey)
+            ? currentValues.filter(v => v !== optionKey)
+            : [...currentValues, optionKey];
+
+        const nextList = newValues.length === 0
+            ? removeFilter(currentListFilters, blockKey)
+            : setFilterValue(currentListFilters, { key: blockKey, values: newValues });
+
+        const rangeFilters = (activeFilters ?? []).filter(f => f.minValue !== undefined || f.maxValue !== undefined);
+        navigateWithFilters([...nextList, ...rangeFilters]);
+        onApply?.();
+        onClose?.();
+    }, [activeFilters, navigateWithFilters, onApply, onClose]);
+
+    const handlePriceChange = useCallback((blockKey: string, from: number, to: number) => {
+        setPendingPrice(prev => ({ ...prev, [blockKey]: { from, to } }));
+    }, []);
 
     const handlePriceOk = useCallback((blockKey: string, blockMin: number, blockMax: number) => {
         const draft = pendingPrice[blockKey];
@@ -235,91 +228,22 @@ export default function CatalogSidebar({
             newFilters = setFilterValue(currentActive, { key: blockKey, minValue: draft.from, maxValue: draft.to });
         }
 
-        const params = buildFilterParams(newFilters, new URLSearchParams(searchParams.toString()), dynamicBlocks);
-        startCatalogTransition();
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
-        setFloatingButtonPos(null);
+        navigateWithFilters(newFilters);
         onApply?.();
         onClose?.();
-    }, [pendingPrice, activeFilters, searchParams, dynamicBlocks, router, pathname, onApply, onClose]);
+    }, [pendingPrice, activeFilters, navigateWithFilters, onApply, onClose]);
 
-    // --- isModified & isPriceChanged ---
-
-    const activeListFilters = (activeFilters ?? []).filter(f => f.minValue === undefined && f.maxValue === undefined);
-    const isListFiltersChanged = JSON.stringify(pendingFilters) !== JSON.stringify(activeListFilters);
-
-    const isPriceChanged = dynamicBlocks.some(block => {
-        if (!isRangeBlock(block) || !block.key) return false;
-        const blockKey = block.key;
-        const blockMin = block.min ?? 0;
-        const blockMax = block.max ?? 10000;
-        const activeFilter = getFilterForBlock(activeFilters ?? [], blockKey);
-        const activeFrom = activeFilter?.minValue ?? blockMin;
-        const activeTo = activeFilter?.maxValue ?? blockMax;
-
-        const draft = pendingPrice[blockKey];
-        if (!draft) return false;
-        return draft.from !== activeFrom || draft.to !== activeTo;
-    });
-
-    const isPendingChanged = isListFiltersChanged || isPriceChanged;
-    const isSortChanged = sortBy !== undefined && sortBy !== defaultSortOption;
-    const isModified = isPendingChanged || isSortChanged || hasActiveFilters(pendingFilters);
+    const isModified = hasActiveFilters(activeFilters ?? []);
 
     useEffect(() => {
         onModifiedChange?.(isModified);
     }, [isModified, onModifiedChange]);
 
-    // --- Actions ---
-
-    const handleApply = () => {
-        if (!isPendingChanged && !isSortChanged) return;
-        
-        const rangeFiltersToApply: FilterStateInput[] = [];
-
-        // Для кожного range-блоку беремо чернетку pendingPrice або активний фільтр
-        dynamicBlocks.forEach(block => {
-            if (!isRangeBlock(block) || !block.key) return;
-            const blockKey = block.key;
-            const blockMin = block.min ?? 0;
-            const blockMax = block.max ?? 10000;
-
-            const activeFilter = getFilterForBlock(activeFilters ?? [], blockKey);
-            const draft = pendingPrice[blockKey];
-
-            const finalFrom = draft ? draft.from : (activeFilter?.minValue ?? blockMin);
-            const finalTo = draft ? draft.to : (activeFilter?.maxValue ?? blockMax);
-
-            if (finalFrom !== blockMin || finalTo !== blockMax) {
-                rangeFiltersToApply.push({
-                    key: blockKey,
-                    minValue: finalFrom,
-                    maxValue: finalTo,
-                });
-            }
-        });
-
-        const filtersToApply = [...pendingFilters, ...rangeFiltersToApply];
-
-        const params = buildFilterParams(filtersToApply, new URLSearchParams(searchParams.toString()), dynamicBlocks);
-        startCatalogTransition();
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
-        setFloatingButtonPos(null);
-        onApply?.();
-        onClose?.();
-    };
-
     const handleClear = () => {
-        setPendingFilters([]);
-        const params = clearFilterParams(new URLSearchParams(searchParams.toString()));
-        startCatalogTransition();
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
-        setFloatingButtonPos(null);
+        navigateWithFilters([], true);
         onClearAll?.();
         onClose?.();
     };
-
-    const selectedCount = countActiveFilterValues(pendingFilters);
 
     const renderToggleCard = () => {
         if (!hasMixedRawProduction) return null;
@@ -386,7 +310,7 @@ export default function CatalogSidebar({
     };
 
     return (
-        <div className={s.sidebar} ref={sidebarRef}>
+        <div className={s.sidebar}>
             {renderToggleCard()}
 
             {categoryId && (
@@ -440,7 +364,7 @@ export default function CatalogSidebar({
                         if (options.length <= 1) return null;
                         if (!block.label) return null;
 
-                        const currentFilter = getFilterForBlock(pendingFilters, blockKey);
+                        const currentFilter = getFilterForBlock(activeFilters ?? [], blockKey);
                         const selectedValues = currentFilter?.values ?? [];
 
                         // "buttons" → FilterPill, "list" → FilterCheckbox
@@ -452,13 +376,24 @@ export default function CatalogSidebar({
                                     if (!option.key) return null;
                                     const isActive = selectedValues.includes(option.key);
                                     const isDisabled = option.disabled === true;
+                                    const isSeoOption =
+                                        isCategoryRoute &&
+                                        Boolean(categorySlug && block.slug && option.slug) &&
+                                        seoFilterSlugs.includes(block.slug ?? '');
+                                    const seoHref = isSeoOption && !isDisabled && categorySlug
+                                        ? buildCategoryFilterUrl(categorySlug, [{ key: blockKey, values: [option.key] }], dynamicBlocks)
+                                        : undefined;
+                                    const handleClick = isDisabled
+                                        ? undefined
+                                        : () => handleToggleOption(blockKey, option.key!);
 
                                     if (usePill) {
                                         return (
                                             <FilterPill
                                                 key={option.key}
                                                 active={isActive}
-                                                onClick={isDisabled ? undefined : (e) => handleOptionClick(e, blockKey, option.key!)}
+                                                href={seoHref}
+                                                onClick={handleClick}
                                                 className={isDisabled ? s.disabledOption : undefined}
                                             >
                                                 {option.label ?? option.key}
@@ -470,7 +405,8 @@ export default function CatalogSidebar({
                                         <FilterCheckbox
                                             key={option.key}
                                             active={isActive}
-                                            onClick={isDisabled ? undefined : (e) => handleOptionClick(e, blockKey, option.key!)}
+                                            href={seoHref}
+                                            onClick={handleClick}
                                             className={isDisabled ? s.disabledOption : undefined}
                                         >
                                             {option.label ?? option.key}
@@ -483,20 +419,6 @@ export default function CatalogSidebar({
                 ) : null}
 
 
-                {!isOnlyPriceRange && (
-                    <Button
-                        variant="red"
-                        type="button"
-                        className={s.applyBtn}
-                        onClick={handleApply}
-                        disabled={!isPendingChanged && !isSortChanged}
-                    >
-                        {selectedCount > 0
-                            ? `${texts.apply} (${selectedCount})`
-                            : texts.applyFilter}
-                    </Button>
-                )}
-
                 {hasActiveFilters(activeFilters ?? []) && (
                     <button
                         type="button"
@@ -504,22 +426,6 @@ export default function CatalogSidebar({
                         onClick={handleClear}
                     >
                         {texts.clear}
-                    </button>
-                )}
-
-                {!isOnlyPriceRange && isPendingChanged && floatingButtonPos && (
-                    <button
-                        type="button"
-                        className={s.floatingApply}
-                        style={{
-                            top: `${floatingButtonPos.top}px`,
-                            left: `${floatingButtonPos.left}px`,
-                        }}
-                        onClick={handleApply}
-                    >
-                        {selectedCount > 0
-                            ? `${texts.apply} (${selectedCount})`
-                            : texts.apply}
                     </button>
                 )}
             </div>

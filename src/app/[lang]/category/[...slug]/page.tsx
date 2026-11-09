@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import { getDictionary } from '@/i18n/get-dictionary';
 import { Locale } from '@/i18n/config';
 import CatalogContent from '@/app/pages/Catalog/CatalogContent';
@@ -18,6 +18,8 @@ import {
 } from '@/lib/graphql';
 import { buildCategoryIndex, buildCategoryBreadcrumbs, getCategoryHref, shouldRedirectForLocality } from '@/utils/category-url';
 import { parseFilterParams, parseRawProductionParam } from '@/utils/filter-params';
+import { extractFilterSegment, getCategoryFilterContext, getCategoryFilterMinPrice, getCategoryRobots } from '@/utils/catalog-filter-seo';
+import { buildCatalogFilterSeoTexts } from '@/i18n/catalog-seo';
 import { getAccessToken } from '@/app/actions/authActions';
 import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, resolvePageHreflangLinks } from '@/utils/seo';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
@@ -37,7 +39,11 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
     const headersList = await headers();
     const dynamicBaseUrl = getDynamicBaseUrl(headersList);
 
-    const lastSegment = slug[slug.length - 1];
+    // Підтримуються лише `/category/<slug>/` та `/category/<slug>/<filters>/`
+    const filterSegment = extractFilterSegment(slug);
+    if (filterSegment === undefined) return {};
+
+    const lastSegment = slug[0];
     const catalogTree = await getCatalogTreeApi(lang as Locale, 768, undefined).catch(() => [] as ProductCategory[]);
     const categoryIndex = buildCategoryIndex(catalogTree);
 
@@ -59,16 +65,50 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
         const categoryName = categoryEntry.node.name;
         const categoryImage = resolveCategoryImageUrl(categoryEntry.node);
 
-        const relativeUrl = `/${lang}/category/${slug.join('/')}/`;
-        const seoData = await fetchSeoMetadataByUrl(relativeUrl, lang, {
+        const categoryId = parseInt(categoryEntry.node.id);
+        const filterCtx = filterSegment
+            ? await getCategoryFilterContext(categoryId, categoryEntry.node.slug, filterSegment, lang)
+            : null;
+        if (filterCtx && !filterCtx.parsed.isValid) return {};
+
+        const queryFilters = parseFilterParams(resolvedSearchParams as Record<string, string | string[] | undefined>);
+        const hasQueryListFilters = queryFilters.some(f => (f.values?.length ?? 0) > 0);
+        const hasFilters = Boolean(filterCtx?.parsed.hasFilters) || hasQueryListFilters;
+        const isSeoFilterPage = Boolean(filterCtx?.parsed.isSingleSeoFilter) && !hasQueryListFilters;
+
+        const categoryPath = `/category/${categoryEntry.node.slug}/`;
+        const pagePath = filterCtx?.parsed.hasFilters
+            ? `${categoryPath}${filterCtx.parsed.canonicalFilterPath}/`
+            : categoryPath;
+
+        const seoData = await fetchSeoMetadataByUrl(`/${lang}${categoryPath}`, lang, {
             h1: categoryName,
         });
 
-        const alternates = getHreflangAlternates(`/category/${slug.join('/')}/`, lang, dynamicBaseUrl, pageNum);
-        const finalTitle = formatTitleWithPage(seoData.title || categoryName, pageNum, lang);
-        const canonicalUrl = pageNum > 1 ? alternates.canonical : (seoData.canonical || alternates.canonical);
-        const isPageNoindex = pageNum > 1 || Boolean(seoData.noindex);
-        const pageRobots = isPageNoindex ? { index: false, follow: true } : undefined;
+        let pageTitleBase = seoData.title || categoryName;
+        let pageDescription = seoData.description;
+        const details = filterCtx?.parsed.singleSeoDetails;
+        if (isSeoFilterPage && details) {
+            const minPrice = await getCategoryFilterMinPrice(categoryId, categoryEntry.node.slug, filterSegment as string, lang, await getAccessToken() ?? undefined);
+            const seoTexts = buildCatalogFilterSeoTexts(
+                lang as Locale,
+                categoryName,
+                lang === 'ru' ? details.seoValueLabelRu : details.seoValueLabelUa,
+                minPrice,
+            );
+            pageTitleBase = seoTexts.title;
+            pageDescription = seoTexts.description;
+        }
+
+        const alternates = getHreflangAlternates(pagePath, lang, dynamicBaseUrl, pageNum);
+        const finalTitle = formatTitleWithPage(pageTitleBase, pageNum, lang);
+        const canonicalUrl = hasFilters || pageNum > 1 ? alternates.canonical : (seoData.canonical || alternates.canonical);
+        const pageRobots = getCategoryRobots({
+            pageNum,
+            hasFilters,
+            isSingleSeoFilter: isSeoFilterPage,
+            backendNoindex: Boolean(seoData.noindex),
+        });
 
         const breadcrumbItems = buildCategoryBreadcrumbs(categoryEntry.node.id, categoryIndex, lang);
         if (breadcrumbItems.length > 1) {
@@ -79,11 +119,11 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
 
         return {
             title: finalTitle,
-            description: seoData.description,
-            ...(pageRobots && { robots: pageRobots }),
+            description: pageDescription,
+            robots: pageRobots,
             openGraph: buildOpenGraphMetadata({
                 title: finalTitle,
-                description: seoData.description,
+                description: pageDescription,
                 canonicalUrl,
                 lang,
                 image: categoryImage,
@@ -92,7 +132,7 @@ export async function generateMetadata({ params, searchParams }: DynamicCategory
             twitter: {
                 card: 'summary_large_image',
                 title: finalTitle,
-                description: seoData.description,
+                description: pageDescription,
                 images: categoryImage ? [categoryImage] : undefined,
             },
         };
@@ -111,10 +151,12 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
         notFound();
     }
 
-    const lastSegment = slug[slug.length - 1];
+    // `/category/<slug>/` або `/category/<slug>/<filters>/`; інші багатосегментні URL
+    // (наприклад, /category/parent/child) редиректимо на плоский `/category/child/`
+    const filterSegment = extractFilterSegment(slug);
+    const lastSegment = filterSegment === undefined ? slug[slug.length - 1] : slug[0];
 
-    // If multi-segment URL accessed (e.g. /category/parent/child), redirect 301 to single-level flat URL (/category/child/)
-    if (slug.length > 1) {
+    if (filterSegment === undefined) {
         redirect(`/${lang}/category/${lastSegment}/`);
     }
 
@@ -174,14 +216,35 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
         const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page as string) : 1;
         const view = (resolvedSearchParams.view as 'list' | 'grid') || 'grid';
         const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : undefined;
-        const activeFilters = parseFilterParams(resolvedSearchParams as Record<string, string | string[] | undefined>);
         const categoryId = parseInt(categoryEntry.node.id);
+        const queryFilters = parseFilterParams(resolvedSearchParams as Record<string, string | string[] | undefined>);
+
+        // Фільтри зі шляху URL (slug → числові ключі бекенду). Невідомий фільтр або значення — 404
+        const filterCtx = filterSegment
+            ? await getCategoryFilterContext(categoryId, categoryEntry.node.slug, filterSegment, lang)
+            : null;
+        if (filterCtx && !filterCtx.parsed.isValid) {
+            notFound();
+        }
+        if (filterCtx && !filterCtx.parsed.isNormalized) {
+            // Той самий набір фільтрів в іншому порядку — переводимо на канонічний порядок
+            const search = new URLSearchParams();
+            Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+                if (typeof value === 'string') search.set(key, value);
+            });
+            const query = search.toString();
+            permanentRedirect(`/${lang}/category/${categoryEntry.node.slug}/${filterCtx.parsed.canonicalFilterPath}/${query ? `?${query}` : ''}`);
+        }
+        const pathFilters = filterCtx?.parsed.filterState ?? [];
+        const activeFilters = [...pathFilters, ...queryFilters];
+        const hasQueryListFilters = queryFilters.some(f => (f.values?.length ?? 0) > 0);
+        const isSeoFilterPage = Boolean(filterCtx?.parsed.isSingleSeoFilter) && !hasQueryListFilters;
         const rawParam = parseRawProductionParam(resolvedSearchParams as Record<string, string | string[] | undefined>);
 
         const categoryDetails = await getCategoryByIdApi(categoryId, lang, token ?? undefined).catch(() => null);
         const hasMixedRawProduction = Boolean(categoryDetails?.hasMixedRawProduction);
 
-        const isRawPath = slug.some(s => s.includes('siri') || s.includes('syry'));
+        const isRawPath = lastSegment.includes('siri') || lastSegment.includes('syry');
         const rawProduction = rawParam !== undefined
             ? rawParam
             : (hasMixedRawProduction ? isRawPath : undefined);
@@ -238,8 +301,22 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
 
         const currentCategoryName = categoryDetails?.name || categoryEntry.node.name;
 
+        // H1 / крихти SEO-сторінки фільтра: [Категорія] [Значення фільтра]
+        const filterDetails = filterCtx?.parsed.singleSeoDetails;
+        const seoTexts = isSeoFilterPage && filterDetails
+            ? buildCatalogFilterSeoTexts(
+                lang as Locale,
+                categoryEntry.node.name,
+                lang === 'ru' ? filterDetails.seoValueLabelRu : filterDetails.seoValueLabelUa,
+                null,
+            )
+            : null;
+
         const breadcrumbItems = buildCategoryBreadcrumbs(categoryEntry.node.id, categoryIndex, lang);
-        if (breadcrumbItems.length > 1) {
+        if (seoTexts) {
+            // Головна → ... → Категорія (посилання) → H1 поточної сторінки
+            breadcrumbItems.push({ label: seoTexts.h1 });
+        } else if (breadcrumbItems.length > 1) {
             breadcrumbItems[breadcrumbItems.length - 1] = { label: currentCategoryName };
         }
 
@@ -249,20 +326,26 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
             href: getCategoryHref(sub),
         }));
 
-        const relativeUrl = `/${lang}/category/${slug.join('/')}/`;
+        const categoryPath = `/category/${categoryEntry.node.slug}/`;
+        const pagePath = filterCtx?.parsed.hasFilters
+            ? `${categoryPath}${filterCtx.parsed.canonicalFilterPath}/`
+            : categoryPath;
+        const dynamicBaseUrl = getDynamicBaseUrl(await headers());
         const [seoData, hreflangLinks] = await Promise.all([
-            fetchSeoMetadataByUrl(relativeUrl, lang, {
+            fetchSeoMetadataByUrl(`/${lang}${categoryPath}`, lang, {
                 title: '',
                 description: '',
                 h1: currentCategoryName,
             }),
-            resolvePageHreflangLinks(
-                `/category/${slug.join('/')}/`,
-                lang,
-                { title: '', description: '', h1: '' },
-                getDynamicBaseUrl(await headers()),
-                parsePageNum(resolvedSearchParams?.page),
-            ),
+            filterCtx?.parsed.hasFilters || hasQueryListFilters
+                ? Promise.resolve(getHreflangAlternates(pagePath, lang, dynamicBaseUrl, pageNum))
+                : resolvePageHreflangLinks(
+                    categoryPath,
+                    lang,
+                    { title: '', description: '', h1: '' },
+                    dynamicBaseUrl,
+                    pageNum,
+                ),
         ]);
 
         return (
@@ -274,7 +357,7 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
                     initialProducts={productsResponse}
                     categoryId={categoryId}
                     categoryName={currentCategoryName}
-                    h1={seoData.h1 || currentCategoryName}
+                    h1={seoTexts?.h1 || seoData.h1 || currentCategoryName}
                     breadcrumbItems={breadcrumbItems}
                     subcategoryItems={subcategoryItems.length > 0 ? subcategoryItems : undefined}
                     view={view}
