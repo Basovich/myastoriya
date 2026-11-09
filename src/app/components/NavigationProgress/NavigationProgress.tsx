@@ -59,14 +59,35 @@ export default function NavigationProgress() {
         };
 
         const handleClick = (e: MouseEvent) => {
+            if (e.defaultPrevented) return;
             const anchor = (e.target as Element).closest('a[href]');
             if (!anchor) return;
+            if (
+                anchor.hasAttribute('data-no-progress') ||
+                anchor.closest('[data-no-progress="true"], [class*="sidebar"], [class*="Sidebar"], [class*="Filter"], [class*="filter"]')
+            ) {
+                return;
+            }
             const href = anchor.getAttribute('href') ?? '';
             // Пропускаємо зовнішні посилання, якорі, mailto, tel
             if (/^(https?:|\/\/|#|mailto:|tel:)/.test(href)) return;
             // Пропускаємо поточну сторінку
             const targetPath = href.split('?')[0];
             if (targetPath === pathnameRef.current) return;
+
+            // Пропускаємо переходи між фільтрами в межах тієї ж категорії
+            const currentParts = (pathnameRef.current || '').split('/').filter(Boolean);
+            const targetParts = targetPath.split('/').filter(Boolean);
+            const currentCatIdx = currentParts.indexOf('category');
+            const targetCatIdx = targetParts.indexOf('category');
+            if (
+                currentCatIdx !== -1 &&
+                targetCatIdx !== -1 &&
+                currentParts[currentCatIdx + 1] === targetParts[targetCatIdx + 1]
+            ) {
+                return;
+            }
+
             showLoader();
         };
 

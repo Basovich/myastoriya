@@ -45,6 +45,7 @@ export default function FilterCheckbox({
             <Link
                 href={getLocalizedHref(href, lang)}
                 className={clsx(s.checkboxLabel, className)}
+                data-no-progress="true"
                 onClick={(e) => {
                     e.preventDefault();
                     onClick?.(e);

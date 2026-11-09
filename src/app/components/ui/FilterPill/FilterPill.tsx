@@ -33,6 +33,7 @@ export default function FilterPill({
             <Link
                 href={getLocalizedHref(href, lang)}
                 className={classes}
+                data-no-progress="true"
                 onClick={(e) => {
                     e.preventDefault();
                     onClick?.(e);
