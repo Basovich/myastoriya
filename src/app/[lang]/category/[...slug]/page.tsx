@@ -22,6 +22,7 @@ import { extractFilterSegment, getCategoryFilterContext, getCategoryFilterMinPri
 import { buildCatalogFilterSeoTexts } from '@/i18n/catalog-seo';
 import { getAccessToken } from '@/app/actions/authActions';
 import { getHreflangAlternates, getDynamicBaseUrl, fetchSeoMetadataByUrl, parsePageNum, formatTitleWithPage, buildOpenGraphMetadata, generateBreadcrumbJsonLd, setRequestBreadcrumbJsonLd, resolvePageHreflangLinks } from '@/utils/seo';
+import { getRedirectByUrlApi } from '@/lib/graphql/queries/seo';
 import HreflangLinks from '@/app/components/HreflangLinks/HreflangLinks';
 
 interface DynamicCategoryPageProps {
@@ -385,6 +386,13 @@ export default async function DynamicCategoryPage({ params, searchParams }: Dyna
 
     if (globalCategoryEntry) {
         redirect(`/${lang}/catalog/`);
+    }
+
+    // Перевіряємо наявність 301 редиректу з бекенду за URL категорії
+    const currentPath = `/${lang}/category/${slug.join('/')}/`;
+    const redirectTarget = await getRedirectByUrlApi(currentPath, lang);
+    if (redirectTarget) {
+        permanentRedirect(redirectTarget);
     }
 
     notFound();

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { headers } from "next/headers";
+import { permanentRedirect } from "next/navigation";
 import localFont from "next/font/local";
 import "./globals.css";
 import { getDictionary } from "@/i18n/get-dictionary";
@@ -16,6 +17,7 @@ import NotFoundBlock from "@/app/components/NotFoundBlock/NotFoundBlock";
 import { type Locale } from "@/i18n/config";
 import clsx from "clsx";
 import { fetchSeoMetadataByUrl } from "@/utils/seo";
+import { getRedirectByUrlApi } from "@/lib/graphql/queries/seo";
 
 const houschka = localFont({
     src: [
@@ -51,14 +53,30 @@ const helios = localFont({
 
 export default async function GlobalNotFound() {
     let lang: Locale = "ua";
+    let pathname = "";
     try {
         const headersList = await headers();
-        const pathname = headersList.get("x-pathname") || "";
+        pathname = headersList.get("x-pathname") || "";
         if (pathname.startsWith("/ru/") || pathname === "/ru") {
             lang = "ru";
         }
     } catch {
         // Fallback to default locale
+    }
+
+    // Перевіряємо 301 редирект з бекенду (Wezom CMS) перед відображенням 404
+    if (pathname) {
+        try {
+            const redirectTarget = await getRedirectByUrlApi(pathname, lang);
+            if (redirectTarget) {
+                permanentRedirect(redirectTarget);
+            }
+        } catch (e) {
+            // Next.js permanentRedirect throws NEXT_REDIRECT, rethrow it
+            if (e && typeof e === 'object' && 'digest' in e) {
+                throw e;
+            }
+        }
     }
 
     let catalogTree: ProductCategory[] = [];
@@ -83,6 +101,7 @@ export default async function GlobalNotFound() {
         <html lang={htmlLang} className={clsx(houschka.variable, helios.variable)} suppressHydrationWarning>
             <head>
                 <title>{seoTitle || (lang === 'ru' ? 'Страница не найдена | Мястория' : "Сторінку не знайдено | М'ясторія")}</title>
+                <meta name="robots" content="noindex, nofollow" />
             </head>
             <body>
                 <ReduxProvider>
@@ -93,7 +112,7 @@ export default async function GlobalNotFound() {
                             <Header lang={lang} initialCategories={catalogTree} />
                         </Suspense>
                         <main>
-                            <NotFoundBlock dict={dict} />
+                            <NotFoundBlock dict={dict} lang={lang} />
                         </main>
                         <Footer lang={lang} initialSocialLinks={socialLinks} />
                         <Suspense fallback={null}>

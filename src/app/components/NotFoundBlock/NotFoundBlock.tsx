@@ -4,16 +4,20 @@ import s from "./NotFoundBlock.module.scss";
 import Breadcrumbs from "../ui/Breadcrumbs/Breadcrumbs";
 import Button from "../ui/Button/Button";
 import { type Dictionary } from "@/i18n/types";
+import { type Locale } from "@/i18n/config";
+import { getLocalizedHref } from "@/utils/i18n-helpers";
 
 interface NotFoundBlockProps {
     dict: Dictionary;
+    lang?: Locale;
 }
 
-export default function NotFoundBlock({ dict }: NotFoundBlockProps) {
+export default function NotFoundBlock({ dict, lang = "ua" }: NotFoundBlockProps) {
     const { notFoundPage } = dict.home;
+    const homeHref = getLocalizedHref("/", lang);
 
     const breadcrumbItems = [
-        { label: notFoundPage.breadcrumbs.home, href: "/" },
+        { label: notFoundPage.breadcrumbs.home, href: homeHref },
         { label: notFoundPage.breadcrumbs.notFound }
     ];
 
@@ -44,7 +48,7 @@ export default function NotFoundBlock({ dict }: NotFoundBlockProps) {
                     {notFoundPage.subtext}
                 </p>
 
-                <Button href="/" variant="red" className={s.button}>
+                <Button href={homeHref} variant="red" className={s.button}>
                     {notFoundPage.button}
                 </Button>
             </div>

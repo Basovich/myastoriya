@@ -37,6 +37,7 @@ import {
 import {getProductReviewsSsr, ProductReview} from '@/lib/graphql/queries/reviews';
 import {buildCategoryBreadcrumbs, buildCategoryIndex, getCategoryHref} from '@/utils/category-url';
 import {getAccessToken} from '@/app/actions/authActions';
+import {getRedirectByUrlApi} from '@/lib/graphql/queries/seo';
 
 interface ProductPageProps {
     params: Promise<{ lang: string; slug: string }>;
@@ -158,6 +159,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
     // 1. Resolve product ID by slug
     const productId = await findProductIdBySlug(slug, lang).catch(() => null);
     if (!productId) {
+        const currentPath = `/${lang}/product/${slug}/`;
+        const redirectTarget = await getRedirectByUrlApi(currentPath, lang);
+        if (redirectTarget) {
+            permanentRedirect(redirectTarget);
+        }
         notFound();
     }
 
@@ -183,6 +189,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
             }
 
             redirect(getLocalizedHref('/catalog', lang as Locale));
+        }
+
+        const currentPath = `/${lang}/product/${slug}/`;
+        const redirectTarget = await getRedirectByUrlApi(currentPath, lang);
+        if (redirectTarget) {
+            permanentRedirect(redirectTarget);
         }
 
         notFound();
