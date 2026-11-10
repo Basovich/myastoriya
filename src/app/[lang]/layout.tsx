@@ -270,19 +270,6 @@ export default async function RootLayout({
               height: auto !important;
               overflow: visible !important;
             }
-
-            /* Catalog Sidebar & Filters without JS */
-            html body [class*="CatalogContent_sidebar"],
-            [class*="CatalogContent_sidebar"] {
-              display: block !important;
-              width: 100% !important;
-              margin-bottom: 24px !important;
-            }
-
-            #filter-btn,
-            [class*="CatalogContent_filterBtn"] {
-              display: none !important;
-            }
           `}</style>
         </noscript>
       </head>
