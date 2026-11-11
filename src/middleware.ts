@@ -4,6 +4,80 @@ import type { NextRequest } from 'next/server';
 const locales = ['ua', 'ru', 'en'];
 
 const PROTECTED_PATHS = ['/personal'];
+const GQL_ENDPOINT = 'https://dev-api.myastoriya.com.ua/graphql';
+
+const KNOWN_LANG_SEGMENTS = new Set([
+    'catalog',
+    'category',
+    'product',
+    'actions',
+    'blog',
+    'careers',
+    'checkout',
+    'complex-discounts',
+    'contacts',
+    'delivery',
+    'loyalty-program-rules',
+    'menu',
+    'oferta',
+    'our-stores',
+    'personal',
+    'privacy-policy',
+    'search',
+    'thanks',
+]);
+
+async function checkBackendRedirect(url: string): Promise<string | null> {
+    try {
+        const cleanUrl = url.trim();
+        const res = await fetch(GQL_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                query: `query RedirectByUrl($url: String!) { redirectByUrl(url: $url) }`,
+                variables: { url: cleanUrl },
+            }),
+            cache: 'no-store',
+        });
+        if (!res.ok) return null;
+        const json = (await res.json()) as { data?: { redirectByUrl?: string | null } };
+        let target = json?.data?.redirectByUrl;
+
+        // If not found and url ends with slash, try without slash
+        if (!target && cleanUrl.endsWith('/') && cleanUrl.length > 1) {
+            const noSlash = cleanUrl.slice(0, -1);
+            const retryRes = await fetch(GQL_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: `query RedirectByUrl($url: String!) { redirectByUrl(url: $url) }`,
+                    variables: { url: noSlash },
+                }),
+                cache: 'no-store',
+            });
+            if (retryRes.ok) {
+                const retryJson = (await retryRes.json()) as { data?: { redirectByUrl?: string | null } };
+                target = retryJson?.data?.redirectByUrl;
+            }
+        }
+
+        if (target && typeof target === 'string') {
+            const cleanTarget = target.trim();
+            if (
+                cleanTarget &&
+                cleanTarget !== cleanUrl &&
+                cleanTarget.replace(/\/$/, '') !== cleanUrl.replace(/\/$/, '')
+            ) {
+                return cleanTarget;
+            }
+        }
+        return null;
+    } catch {
+        return null;
+    }
+}
 
 function isProtectedPath(pathname: string): boolean {
     return PROTECTED_PATHS.some(
@@ -11,7 +85,7 @@ function isProtectedPath(pathname: string): boolean {
     );
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
     const search = request.nextUrl.search;
 
@@ -70,13 +144,41 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(`${normalizedTarget}${search}`, request.url), 301);
     }
 
-    // If path does not start with /ua/ or /ru/ (and is not root /), redirect default locale to /ua/... per SEO specs
+    // If path does not start with /ua/ or /ru/ (and is not root /)
     const hasLocalePrefix = locales.some(locale => pathname.startsWith(`/${locale}/`));
     if (!hasLocalePrefix && pathname !== '/') {
+        // Check if the backend has a 301 redirect for this exact URL (e.g. legacy Russian or non-prefixed paths)
+        const redirectTarget = await checkBackendRedirect(pathname);
+        if (redirectTarget) {
+            const targetUrl = new URL(redirectTarget, request.url);
+            if (search && !targetUrl.search) {
+                targetUrl.search = search;
+            }
+            return NextResponse.redirect(targetUrl, 301);
+        }
+
+        // Default to Ukrainian locale /ua/... per SEO specs
         return NextResponse.redirect(
             new URL(`/ua${pathname}${search}`, request.url),
             301
         );
+    }
+
+    // Check legacy localized paths (e.g. /ua/syraya-produktsiya/..., /ru/gotovaya-produktsiya/...)
+    // If the top-level segment is NOT one of our application's known routes, check backend for a 301 redirect
+    const localizedMatch = pathname.match(/^\/(?:ua|ru|en)\/([^/]+)/);
+    if (localizedMatch) {
+        const firstSegment = localizedMatch[1];
+        if (!KNOWN_LANG_SEGMENTS.has(firstSegment)) {
+            const redirectTarget = await checkBackendRedirect(pathname);
+            if (redirectTarget) {
+                const targetUrl = new URL(redirectTarget, request.url);
+                if (search && !targetUrl.search) {
+                    targetUrl.search = search;
+                }
+                return NextResponse.redirect(targetUrl, 301);
+            }
+        }
     }
 
     // 4. Redirect /personal/ to /personal/profile/
