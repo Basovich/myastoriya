@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import clsx from 'clsx';
 import styles from '../Product.module.scss';
 
@@ -85,7 +86,13 @@ const ProductModifications: React.FC<ProductModificationsProps> = ({
                         >
                             {imgUrl && (
                                 <div className={styles.modTooltip}>
-                                    <img src={imgUrl} alt={item.name} className={styles.modTooltipImg} />
+                                    <Image
+                                        src={imgUrl}
+                                        alt={item.name}
+                                        width={120}
+                                        height={120}
+                                        className={styles.modTooltipImg}
+                                    />
                                 </div>
                             )}
                         <div className={styles.modCheck}>
