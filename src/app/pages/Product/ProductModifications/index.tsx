@@ -67,6 +67,10 @@ const ProductModifications: React.FC<ProductModificationsProps> = ({
     onToggle,
     className
 }) => {
+    if (!items || items.length === 0) {
+        return null;
+    }
+
     return (
         <div className={clsx(styles.modificationsSection, className)}>
             <p className={styles.modSectionTitle}>{title}</p>

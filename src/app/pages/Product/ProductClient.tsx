@@ -341,9 +341,16 @@ const ProductClient: React.FC<ProductClientProps> = ({
         ? getProductImageUrl(product.gift.images[0].url.grid2x)
         : null;
 
+    const activeRelatedProductGroups = (product.relatedProductGroups || []).filter(
+        (g) => (g.products?.length ?? 0) > 0
+    );
+    const activeModifierGroups = (product.modifierGroups || []).filter(
+        (g) => (g.modifiers?.length ?? 0) > 0
+    );
+
     const hasOptionsUnderCart = 
         (product.hasCostVariants && variants.length > 1) || 
-        (product.modifierGroups && product.modifierGroups.length > 0);
+        activeModifierGroups.length > 0;
 
     return (
         <main className={s.productPage}>
@@ -477,16 +484,16 @@ const ProductClient: React.FC<ProductClientProps> = ({
                             onChange={setSelectedCostVariantId}
                             options={variants}
                             lang={lang}
-                            noBorder={(!product.modifierGroups || product.modifierGroups.length === 0) && (!product.relatedProductGroups || product.relatedProductGroups.length === 0)}
+                            noBorder={activeModifierGroups.length === 0 && activeRelatedProductGroups.length === 0}
                         />
                     )}
 
                     {/* Related product groups (Додаткові товари) — виводяться над модифікаторами */}
-                    {product.relatedProductGroups?.map((group) => (
+                    {activeRelatedProductGroups.map((group, index) => (
                         <ProductModifications
                             key={`rel-${group.id}`}
                             title={group.name}
-                            items={(group.products || []).map(p => ({
+                            items={(group.products || []).map((p) => ({
                                 id: String(p.id),
                                 name: p.name,
                                 price: p.cost,
@@ -494,19 +501,27 @@ const ProductClient: React.FC<ProductClientProps> = ({
                             }))}
                             selectedItems={selectedModifierIds}
                             onToggle={toggleModifier}
-                            className={clsx(s.productModifications, (!product.modifierGroups || product.modifierGroups.length === 0) && s.noBorder)}
+                            className={clsx(
+                                s.productModifications,
+                                activeModifierGroups.length === 0 &&
+                                    index === activeRelatedProductGroups.length - 1 &&
+                                    s.noBorder
+                            )}
                         />
                     ))}
 
                     {/* Modifier groups (Соуси та добавки) */}
-                    {product.modifierGroups?.map((group, index, arr) => (
+                    {activeModifierGroups.map((group, index) => (
                         <ProductModifications
                             key={group.id}
                             title={group.name}
                             items={group.modifiers || []}
                             selectedItems={selectedModifierIds}
                             onToggle={toggleModifier}
-                            className={clsx(s.productModifications, index === arr.length - 1 && s.noBorder)}
+                            className={clsx(
+                                s.productModifications,
+                                index === activeModifierGroups.length - 1 && s.noBorder
+                            )}
                         />
                     ))}
                 </section>
