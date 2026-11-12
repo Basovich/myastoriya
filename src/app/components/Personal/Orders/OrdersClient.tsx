@@ -509,7 +509,6 @@ export default function OrdersClient({ lang }: OrdersClientProps) {
                                     totalProductsCount={totalProductsCount}
                                     sum={orderSum}
                                     oldSum={oldSum}
-                                    cashback={order.cashback ?? order.willReceiveBonuses}
                                     date={date}
                                     time={time}
                                     dict={dict.card}

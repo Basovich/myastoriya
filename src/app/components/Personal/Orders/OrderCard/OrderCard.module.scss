@@ -253,23 +253,6 @@
     }
 }
 
-.cashbackBadge {
-    display: inline-flex;
-    align-items: center;
-    font-size: 12px;
-    font-weight: 600;
-    color: #1BC573;
-    background: rgba(27, 197, 115, 0.1);
-    padding: 2px 8px;
-    border-radius: 6px;
-    margin-top: 4px;
-
-    @media (min-width: 1280px) {
-        font-size: 13px;
-        align-self: flex-start;
-    }
-}
-
 /* ======= МЕТА + КНОПКА "ПОВТОРИТИ" (один рядок на десктопі) ======= */
 .metaRepeatRow {
     display: flex;
