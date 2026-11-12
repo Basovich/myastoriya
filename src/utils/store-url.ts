@@ -22,12 +22,26 @@ export function resolveStoreBackendSlug(slug: string): string {
     return slug || '';
 }
 
+const LEGACY_STORE_REDIRECTS: Record<string, string> = {
+    'shop-334': 'meat-bar-vid-myastoriya-ivano-frankivsk',
+    'shop-880': 'meat-bar-vid-myastoriya-lavina',
+    'shop-314': 'meat-bar-vid-myastoriya-sofia',
+    'shop-1': 'myastoriya-obolon',
+    'shop-222': 'myastoriya-obolon',
+    'shop-326': 'myastoriya-park-avenue',
+    'shop-225': 'myastoriya-park-avenue',
+    'shop-2': 'myastoriya-poznyaki',
+    'shop-200': 'myastoriya-poznyaki',
+    'shop-4': 'myastoriya-teremky',
+    'shop-226': 'myastoriya-teremky',
+};
+
 /**
- * Legacy store redirect check (no-op since exact admin slugs are used).
+ * Legacy store redirect check (maps legacy shop-* slugs to actual store slugs).
  */
 export function getLegacyStoreRedirectSlug(slug?: string): string | null {
-    if (slug) return null;
-    return null;
+    if (!slug) return null;
+    return LEGACY_STORE_REDIRECTS[slug] || null;
 }
 
 import { getLocalizedHref } from './i18n-helpers';

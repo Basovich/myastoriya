@@ -4,6 +4,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import StoreDetailPage from "@/app/pages/OurStores/StoreDetailPage/StoreDetailPage";
 import { getShopBySlugApi, type Shop } from "@/lib/graphql/queries/shops";
+import { getRedirectByUrlApi } from "@/lib/graphql/queries/seo";
 import { resolveStoreBackendSlug, getLegacyStoreRedirectSlug } from "@/utils/store-url";
 import { headers } from "next/headers";
 import {
@@ -106,6 +107,11 @@ export default async function StorePage({
     }
 
     if (!shop) {
+        const currentPath = `/${lang}/our-stores/${slug}/`;
+        const redirectTarget = await getRedirectByUrlApi(currentPath, lang);
+        if (redirectTarget) {
+            permanentRedirect(redirectTarget);
+        }
         notFound();
     }
 

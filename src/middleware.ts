@@ -216,9 +216,36 @@ export async function middleware(request: NextRequest) {
         );
     }
 
+    // 2.7. Specific legacy route patterns that should check backend redirects
+    const isLegacyPattern =
+        /^(?:\/(?:ua|ru))?\/menu\/?$/.test(pathname) ||
+        pathname.includes('/our-stores/shop-') ||
+        /-\/?$/.test(pathname);
+
+    if (isLegacyPattern) {
+        const redirectTarget = await checkBackendRedirect(pathname);
+        if (redirectTarget) {
+            const targetUrl = new URL(redirectTarget, request.url);
+            if (search && !targetUrl.search) {
+                targetUrl.search = search;
+            }
+            return NextResponse.redirect(targetUrl, 301);
+        }
+    }
+
     // 3. SEO 301 Permanent Redirect for legacy /catalog/:slug category paths to /category/:slug/
     const catalogMatch = pathname.match(/^(?:\/(ua|ru))?\/catalog\/(.+)$/);
     if (catalogMatch) {
+        // Check backend redirect for legacy catalog path first before fallback rewrite
+        const redirectTarget = await checkBackendRedirect(pathname);
+        if (redirectTarget) {
+            const targetUrl = new URL(redirectTarget, request.url);
+            if (search && !targetUrl.search) {
+                targetUrl.search = search;
+            }
+            return NextResponse.redirect(targetUrl, 301);
+        }
+
         const langPrefix = catalogMatch[1] || 'ua';
         const subPath = catalogMatch[2];
         const targetPath = `/${langPrefix}/category/${subPath}`;

@@ -5,6 +5,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import BlogPostPage from "@/app/pages/BlogPost";
 import { getBlogBySlugApi, resolveBlogImageUrl } from "@/lib/graphql";
+import { getRedirectByUrlApi } from "@/lib/graphql/queries/seo";
 import { getAccessToken } from "@/app/actions/authActions";
 import { getBlogCategorySegment } from "@/utils/blog-url";
 import {
@@ -89,6 +90,11 @@ export default async function BlogSinglePostPage({
     const post = await getBlogBySlugApi(slug, lang, token ?? undefined).catch(() => null);
 
     if (!post) {
+        const currentPath = `/${lang}/blog/${category}/${slug}/`;
+        const redirectTarget = await getRedirectByUrlApi(currentPath, lang);
+        if (redirectTarget) {
+            permanentRedirect(redirectTarget);
+        }
         notFound();
     }
 
