@@ -5,7 +5,8 @@ import Image from 'next/image';
 import clsx from 'clsx';
 import { Locale } from '@/i18n/config';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
-import { useAppSelector } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { refreshUserAsync } from '@/store/slices/authSlice';
 import { getAccessToken } from '@/app/actions/authActions';
 import { personalDict } from '@/app/components/Personal/Shared/PersonalShared';
 import PersonalContentBlock from '@/app/components/Personal/Shared/PersonalContentBlock';
@@ -64,6 +65,7 @@ interface LoyaltyClientProps {
 }
 
 export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms, discountPageData }: LoyaltyClientProps) {
+    const dispatch = useAppDispatch();
     const hydrated = useIsHydrated();
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
     const dict = loyaltyDict[lang] || loyaltyDict.ua;
@@ -72,6 +74,12 @@ export default function LoyaltyClient({ lang, initialDiscountInfo, initialTerms,
     const [discountInfo, setDiscountInfo] = useState<UserDiscountInfo | null>(initialDiscountInfo || null);
     const [terms] = useState<string>(initialTerms || dict.terms);
     const [isExpanded, setIsExpanded] = useState(false);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            void dispatch(refreshUserAsync(lang));
+        }
+    }, [isAuthenticated, lang, dispatch]);
 
     useEffect(() => {
         if (!discountInfo && isAuthenticated) {

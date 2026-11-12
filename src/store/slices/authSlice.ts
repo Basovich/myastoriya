@@ -1,4 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { getMeApi } from '@/lib/graphql/queries/auth';
+import { getAccessToken } from '@/app/actions/authActions';
+import type { RootState } from '..';
 
 export interface UserAvatars {
     size1x?: string;
@@ -102,4 +105,25 @@ const authSlice = createSlice({
 });
 
 export const { login, loginAsGuest, logout, setUser, setToken, addAddress, setInitialized } = authSlice.actions;
+
+export const refreshUserAsync = createAsyncThunk<AuthUser | null, string | undefined, { state: RootState }>(
+    'auth/refreshUser',
+    async (lang, { dispatch, getState }) => {
+        try {
+            const state = getState();
+            const token = state.auth.token || (await getAccessToken());
+            if (!token) return null;
+            const freshUser = await getMeApi(token, lang);
+            if (freshUser && (freshUser.phone || freshUser.email)) {
+                dispatch(setUser(freshUser));
+                return freshUser;
+            }
+            return null;
+        } catch (e) {
+            console.error('[refreshUserAsync] Failed to refresh user:', e);
+            return null;
+        }
+    }
+);
+
 export default authSlice.reducer;

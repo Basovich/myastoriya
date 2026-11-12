@@ -27,12 +27,12 @@ function Actions() {
 
     const cartItems = useAppSelector((state) => state.cart.items);
     const wishlistItems = useAppSelector((state) => state.wishlist.items);
-    const { isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
-    const isReallyLoggedIn = isAuthenticated && !isGuest;
+    const { isAuthenticated, isGuest, isInitialized } = useAppSelector((state) => state.auth);
+    const hydrated = useIsHydrated();
+    const isReallyLoggedIn = hydrated && isInitialized && isAuthenticated && !isGuest;
 
     const totalCartItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
     const totalWishlistItems = wishlistItems.length;
-    const hydrated = useIsHydrated();
 
     const handleFavoritesClick = () => {
         if (isReallyLoggedIn) {

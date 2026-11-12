@@ -50,9 +50,10 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
     const promoCode = useAppSelector(state => state.cart.promoCode);
     const cashback = useAppSelector(state => state.cart.cashback);
     const useBonuses = useAppSelector(state => state.cart.useBonuses);
+    const availableBonuses = useAppSelector(state => state.cart.availableBonuses);
     const backendTotal = useAppSelector(state => state.cart.total);
     const cartLoading = useAppSelector(state => state.cart.loading);
-    const { user, isAuthenticated, isGuest } = useAppSelector(state => state.auth);
+    const { user, isAuthenticated, isGuest, isInitialized } = useAppSelector(state => state.auth);
 
     const totalSum = useMemo(() => {
         return populatedItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
@@ -259,12 +260,12 @@ export default function CartSummary({ onEditCart, discountPercent = 0, deliveryP
                         </div>
                     </div>
 
-                    {hydrated && isAuthenticated && !isGuest && (user?.bonuses ?? 0) > 0 && (
+                    {hydrated && isInitialized && isAuthenticated && !isGuest && (user?.bonuses ?? 0) > 0 && (availableBonuses > 0 || useBonuses) && (
                         <>
                             <div className={s.cartDivider} />
                             <div className={s.bonusesBlock}>
                                 <span className={s.bonusesLabel}>
-                                    {isRu ? 'Использовать бонусы' : 'Використати бонуси'} ({user?.bonuses})
+                                    {isRu ? 'Использовать бонусы' : 'Використати бонуси'} ({availableBonuses > 0 ? availableBonuses : (user?.bonuses ?? 0)})
                                 </span>
                                 <label className={s.toggleSwitch}>
                                     <input 

@@ -24,9 +24,9 @@ const getTopNavItems = (lang: Locale) => [
 import { useIsHydrated } from "@/hooks/useIsHydrated";
 
 export default function TopBar({ lang }: TopBarProps) {
-    const { isAuthenticated, isGuest, user } = useAppSelector((state) => state.auth);
+    const { isAuthenticated, isGuest, isInitialized, user } = useAppSelector((state) => state.auth);
     const hydrated = useIsHydrated();
-    const isReallyLoggedIn = hydrated && isAuthenticated && !isGuest;
+    const isReallyLoggedIn = hydrated && isInitialized && isAuthenticated && !isGuest;
     const navItems = getTopNavItems(lang);
 
     return (

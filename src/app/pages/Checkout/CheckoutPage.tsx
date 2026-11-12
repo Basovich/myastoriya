@@ -9,7 +9,8 @@ import Step2 from './Step2/Step2';
 import Step3 from './Step3/Step3';
 import s from './CheckoutPage.module.scss';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setUseBonuses } from '@/store/slices/cartSlice';
+import { setUseBonuses, toggleUseBonusesAsync } from '@/store/slices/cartSlice';
+import { refreshUserAsync } from '@/store/slices/authSlice';
 
 interface CheckoutPageProps {
     lang: Locale;
@@ -24,9 +25,15 @@ function CheckoutContent({ lang }: CheckoutPageProps) {
     const { isAuthenticated, isGuest, isInitialized } = useAppSelector(state => state.auth);
     const prevAuthRef = useRef({ isAuthenticated, isGuest });
 
+    // Always fetch fresh user bonus balance on checkout mount and enable bonuses by default
     useEffect(() => {
-        dispatch(setUseBonuses(false));
-    }, [dispatch]);
+        if (isAuthenticated && !isGuest) {
+            void dispatch(refreshUserAsync(lang));
+            void dispatch(toggleUseBonusesAsync(true));
+        } else {
+            dispatch(setUseBonuses(false));
+        }
+    }, [isAuthenticated, isGuest, lang, dispatch]);
 
     // Redirect to step 1 if logged out while on step 2 or 3
     useEffect(() => {

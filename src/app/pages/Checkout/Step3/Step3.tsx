@@ -19,6 +19,7 @@ import AddBankCardBtn from '@/app/components/Personal/Cards/AddBankCardBtn';
 
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { clearCart, fetchCartAsync } from '@/store/slices/cartSlice';
+import { refreshUserAsync } from '@/store/slices/authSlice';
 import { getAccessToken } from '@/app/actions/authActions';
 import { 
     getPaymentsApi, 
@@ -464,6 +465,7 @@ export default function Step3({ lang }: Step3Props) {
         const handleFinishAndRedirect = (orderId: string, successUrl?: string | null) => {
             dispatch(clearCart());
             void dispatch(fetchCartAsync());
+            void dispatch(refreshUserAsync(lang));
             localStorage.removeItem('checkout_delivery_data');
             localStorage.removeItem('checkout_delivery_params');
             localStorage.removeItem('checkout_user_data');

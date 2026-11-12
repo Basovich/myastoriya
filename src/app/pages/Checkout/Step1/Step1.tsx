@@ -77,7 +77,8 @@ export default function Step1() {
     const hydrated = useIsHydrated();
     const params = useParams();
     const locale = params?.lang as string;
-    const { user, isAuthenticated, isGuest } = useAppSelector(state => state.auth);
+    const { user, isAuthenticated, isGuest, isInitialized } = useAppSelector(state => state.auth);
+    const isReallyLoggedIn = Boolean(isAuthenticated && user && isInitialized);
     const dispatch = useAppDispatch();
     const [smsToken, setSmsToken] = useState('');
     const [smsSending, setSmsSending] = useState(false);
@@ -121,7 +122,7 @@ export default function Step1() {
     const router = useRouter();
 
     useEffect(() => {
-        if (isAuthenticated && user) {
+        if (isReallyLoggedIn && user) {
             const userFirstName = user.name?.split(' ')[0] || user.name || '';
             const userLastName = user.surname || user.name?.split(' ').slice(1).join(' ') || '';
             const normalizedPhone = normalizeTo38Phone(user.phone);
@@ -134,10 +135,15 @@ export default function Step1() {
                 email: user.email || prev.email,
             }));
 
-            setPhoneVerified(true);
             setSmsError('');
             setSubmitError('');
-        } else {
+        } else if (isInitialized) {
+            setSmsVerified(false);
+            setSmsRequested(false);
+            setCodeSent(false);
+            setCountdown(0);
+            if (timerRef.current) clearInterval(timerRef.current);
+
             const savedUserData = localStorage.getItem('checkout_user_data');
             if (savedUserData) {
                 try {
@@ -157,7 +163,7 @@ export default function Step1() {
                 }
             }
         }
-    }, [isAuthenticated, user]);
+    }, [isReallyLoggedIn, user, isInitialized]);
 
     // Auto-save Step 1 form data to localStorage whenever formData changes
     useEffect(() => {
@@ -186,7 +192,8 @@ export default function Step1() {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const [phoneVerified, setPhoneVerified] = useState(false);
+    const [smsVerified, setSmsVerified] = useState(false);
+    const phoneVerified = isReallyLoggedIn || smsVerified;
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [smsRequested, setSmsRequested] = useState(false);
     const [smsVerifying, setSmsVerifying] = useState(false);
@@ -194,7 +201,7 @@ export default function Step1() {
 
     const handlePhoneRawChange = (raw: string) => {
         handleChange('phone', raw);
-        setPhoneVerified(false);
+        setSmsVerified(false);
         setSmsRequested(false);
         setCodeSent(false);
         setCountdown(0);
@@ -236,7 +243,7 @@ export default function Step1() {
             errors.phone = "Обов'язкове поле";
         } else if (cleanPhone.length < 10) {
             errors.phone = "Некоректний номер телефону";
-        } else if ((submitAttempted || forceVerifyCheck) && !phoneVerified && !isAuthenticated) {
+        } else if ((submitAttempted || forceVerifyCheck) && !phoneVerified) {
             errors.phone = "Підтвердіть номер телефону через SMS";
         }
         
@@ -312,7 +319,7 @@ export default function Step1() {
         
         try {
             await smsVerifyApi(smsToken, formData.smsCode.trim(), locale);
-            setPhoneVerified(true);
+            setSmsVerified(true);
             setSmsRequested(false);
             setCodeSent(false);
             setCountdown(0);
@@ -366,7 +373,7 @@ export default function Step1() {
                 console.warn('[Step1] updateCheckoutUserDataApi non-critical error:', err);
             });
 
-            if (isAuthenticated && user) {
+            if (isReallyLoggedIn && user) {
                 dispatch(setUser({
                     ...user,
                     name: formData.firstName,
@@ -433,7 +440,7 @@ export default function Step1() {
             <div className={s.formCard}>
                 <StepIndicator current={1} />
 
-                {hydrated && (!isAuthenticated || isGuest) && (
+                {hydrated && !isReallyLoggedIn && (
                     <button
                         className={s.hasAccountBtn}
                         id="has-account-btn"

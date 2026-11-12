@@ -52,6 +52,7 @@ interface CartState {
     promoCode: CartPromoCode | null;
     cashback: number;
     useBonuses: boolean;
+    availableBonuses: number;
     total: number;
     isCartModalOpen: boolean;
     removedItems: RemovedCartItem[];
@@ -67,6 +68,7 @@ const initialState: CartState = {
     promoCode: null,
     cashback: 0,
     useBonuses: false,
+    availableBonuses: 0,
     total: 0,
     isCartModalOpen: false,
     removedItems: [],
@@ -136,6 +138,7 @@ export const fetchCartAsync = createAsyncThunk(
             });
             dispatch(setPromoCode(response.promoCode || null));
             dispatch(setCashback(response.cashback || 0));
+            dispatch(setAvailableBonuses(response.availableBonuses || 0));
             dispatch(setTotal(response.total || 0));
 
             const newItems = mapCartItems(response);
@@ -236,6 +239,7 @@ export const toggleUseBonusesAsync = createAsyncThunk(
             const response = await getCartApi({ useBonuses });
             dispatch(setPromoCode(response.promoCode || null));
             dispatch(setCashback(response.cashback || 0));
+            dispatch(setAvailableBonuses(response.availableBonuses || 0));
             dispatch(setTotal(response.total || 0));
             return mapCartItems(response, state.cart.productDetails);
         } catch (error: unknown) {
@@ -315,6 +319,7 @@ export const addToCartAsync = createAsyncThunk(
             }
             dispatch(setPromoCode(response.promoCode || null));
             dispatch(setCashback(response.cashback || 0));
+            dispatch(setAvailableBonuses(response.availableBonuses || 0));
             dispatch(setTotal(response.total || 0));
             return mapCartItems(response, (getState() as RootState).cart.productDetails);
         } catch (error: unknown) {
@@ -355,6 +360,7 @@ export const updateQuantityAsync = createAsyncThunk(
                 });
                 dispatch(setPromoCode(response.promoCode || null));
                 dispatch(setCashback(response.cashback || 0));
+                dispatch(setAvailableBonuses(response.availableBonuses || 0));
                 dispatch(setTotal(response.total || 0));
                 return mapCartItems(response);
             } else {
@@ -396,6 +402,7 @@ export const removeFromCartAsync = createAsyncThunk(
                 });
                 dispatch(setPromoCode(response.promoCode || null));
                 dispatch(setCashback(response.cashback || 0));
+                dispatch(setAvailableBonuses(response.availableBonuses || 0));
                 dispatch(setTotal(response.total || 0));
                 return mapCartItems(response);
             } else {
@@ -441,26 +448,25 @@ export const syncCartOnAuthAsync = createAsyncThunk(
                 );
 
                 if (uniqueItems.length > 0) {
-                    await Promise.all(
-                        uniqueItems.map(async (item) => {
-                            try {
-                                const modifierIds = item.modifiers ? item.modifiers.map(m => m.id) : undefined;
-                                return await addProductToCartApi({
-                                    productId: Number(item.id),
-                                    quantity: item.quantity,
-                                    costVariantId: item.costVariantId || undefined,
-                                    modifierIds,
-                                });
-                            } catch (error) {
-                                console.warn(`[Cart Sync] Failed to add product ${item.id}:`, error instanceof Error ? error.message : error);
-                                Sentry.captureException(error, {
-                                    tags: { category: 'cart', action: 'sync_item_failed' },
-                                    extra: { item },
-                                });
-                                return null;
-                            }
-                        })
-                    );
+                    for (const item of uniqueItems) {
+                        try {
+                            const modifierIds = item.modifiers ? item.modifiers.map(m => m.id) : undefined;
+                            await addProductToCartApi({
+                                productId: Number(item.id),
+                                quantity: item.quantity,
+                                costVariantId: item.costVariantId || undefined,
+                                modifierIds,
+                            });
+                            // Delay between mutations to prevent 504 Gateway Timeouts on dev-api
+                            await new Promise(resolve => setTimeout(resolve, 250));
+                        } catch (error) {
+                            console.warn(`[Cart Sync] Failed to add product ${item.id}:`, error instanceof Error ? error.message : error);
+                            Sentry.captureException(error, {
+                                tags: { category: 'cart', action: 'sync_item_failed' },
+                                extra: { item },
+                            });
+                        }
+                    }
                 }
 
                 // Fetch the combined result from the backend
@@ -524,6 +530,7 @@ const cartSlice = createSlice({
         clearCart: (state) => {
             state.items = [];
             state.useBonuses = false;
+            state.availableBonuses = 0;
             state.total = 0;
         },
         setPromoCode: (state, action: PayloadAction<CartPromoCode | null>) => {
@@ -534,6 +541,9 @@ const cartSlice = createSlice({
         },
         setUseBonuses: (state, action: PayloadAction<boolean>) => {
             state.useBonuses = action.payload;
+        },
+        setAvailableBonuses: (state, action: PayloadAction<number>) => {
+            state.availableBonuses = action.payload;
         },
         setTotal: (state, action: PayloadAction<number>) => {
             state.total = action.payload;
@@ -741,5 +751,5 @@ const cartSlice = createSlice({
     }
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart, setPromoCode, setCashback, setUseBonuses, setTotal, setCartModalOpen, saveProductDetails, clearRemovedItems } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQuantity, clearCart, setPromoCode, setCashback, setUseBonuses, setAvailableBonuses, setTotal, setCartModalOpen, saveProductDetails, clearRemovedItems } = cartSlice.actions;
 export default cartSlice.reducer;

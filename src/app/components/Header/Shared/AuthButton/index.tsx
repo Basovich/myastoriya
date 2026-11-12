@@ -18,10 +18,10 @@ function AuthButton() {
     const pathname = usePathname();
     const lang = (params?.lang as Locale) || 'ua';
 
-    const { isAuthenticated, isGuest } = useAppSelector((state) => state.auth);
+    const { isAuthenticated, isGuest, isInitialized } = useAppSelector((state) => state.auth);
     const hydrated = useIsHydrated();
 
-    const isReallyLoggedIn = hydrated && isAuthenticated && !isGuest;
+    const isReallyLoggedIn = hydrated && isInitialized && isAuthenticated && !isGuest;
 
     const isHomePage = pathname === '/' || pathname === '/ua' || pathname === '/ua/' || pathname === '/ru' || pathname === '/ru/';
 

@@ -173,10 +173,11 @@ export async function gqlRequest<T>(
                     if (!activeRefreshPromise) {
                         activeRefreshPromise = (async () => {
                             try {
-                                const { tryRefreshTokenAction, initializeGuestSessionAction } = await import('@/app/actions/authActions');
-                                let freshToken = await tryRefreshTokenAction();
+                                const { tryRefreshTokenDetailedAction, initializeGuestSessionAction } = await import('@/app/actions/authActions');
+                                const refreshResult = await tryRefreshTokenDetailedAction();
+                                let freshToken = refreshResult.accessToken;
                                 
-                                if (!freshToken) {
+                                if (!freshToken && (refreshResult.status === 'auth_error' || refreshResult.status === 'no_token')) {
                                     const deviceId = localStorage.getItem('mya_device_id');
                                     if (deviceId) {
                                         freshToken = await initializeGuestSessionAction(deviceId);
@@ -197,7 +198,11 @@ export async function gqlRequest<T>(
                                             store.dispatch(loginAsGuest({ token: freshToken }));
                                         }
                                     } catch {
-                                        store.dispatch(loginAsGuest({ token: freshToken }));
+                                        // Do not downgrade an existing logged-in user to guest if getMeApi failed due to network
+                                        const currentUser = store.getState().auth.user;
+                                        if (!currentUser) {
+                                            store.dispatch(loginAsGuest({ token: freshToken }));
+                                        }
                                     }
                                     store.dispatch(setToken(freshToken));
 

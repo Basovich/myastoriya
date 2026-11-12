@@ -8,7 +8,7 @@ import { syncViewedProductsOnAuthAsync } from '@/store/slices/viewedProductsSlic
 import { fetchCartAsync, syncCartOnAuthAsync } from '@/store/slices/cartSlice';
 import { authAsGuestApi, getMeApi } from '@/lib/graphql/queries/auth';
 import { selectLocalityApi } from '@/lib/graphql/queries/localities';
-import { setAuthCookies, getAccessToken, tryRefreshTokenAction } from '@/app/actions/authActions';
+import { setAuthCookies, getAccessToken, tryRefreshTokenDetailedAction } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
 import { store } from '@/store';
 import * as Sentry from "@sentry/nextjs";
@@ -109,7 +109,8 @@ async function initAuth(dispatch: ReturnType<typeof useAppDispatch>) {
         }
 
         // No token OR access token expired — attempt refresh
-        const freshToken = await tryRefreshTokenAction();
+        const refreshResult = await tryRefreshTokenDetailedAction();
+        const freshToken = refreshResult.accessToken;
 
         if (freshToken) {
             const user = await tryGetMe(freshToken, dispatch);
@@ -117,11 +118,16 @@ async function initAuth(dispatch: ReturnType<typeof useAppDispatch>) {
                 dispatch(setToken(freshToken));
                 return;
             }
-            // Refresh token also rejected by API — fall through to guest
         }
 
-        // No valid session — start as guest
-        await startGuestSession(dispatch);
+        // ONLY start guest session if there is genuinely no valid session (no_token or auth_error).
+        // If it was a network_error, DO NOT overwrite the user's cookies with guest cookies!
+        if (refreshResult.status === 'auth_error' || refreshResult.status === 'no_token') {
+            await startGuestSession(dispatch);
+        } else {
+            // Temporary network issue: mark initialized so UI doesn't hang, but preserve cookies
+            dispatch(setInitialized(true));
+        }
 
     } catch (err) {
         console.warn('[AuthInitializer] Unexpected error during auth init:', err);

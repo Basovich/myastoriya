@@ -4,7 +4,7 @@ import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logout } from '@/store/slices/authSlice';
-import { logoutApi, deleteUserApi } from '@/lib/graphql/queries/auth';
+import { logoutApi, deleteUserApi, getMeApi } from '@/lib/graphql/queries/auth';
 import { clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { Locale } from '@/i18n/config';
@@ -223,10 +223,15 @@ export default function ProfilePage() {
                     return;
                 }
 
-                const [discountRes, ordersRes] = await Promise.all([
+                const [freshUser, discountRes, ordersRes] = await Promise.all([
+                    getMeApi(token, lang).catch(() => null),
                     getUserDiscountInfoApi(token, lang),
                     getOrdersApi(token, { limit: 1 }, lang)
                 ]);
+
+                if (freshUser) {
+                    dispatch(setUser(freshUser));
+                }
 
                 if (discountRes) {
                     setDiscountInfo(discountRes);

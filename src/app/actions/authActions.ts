@@ -58,16 +58,62 @@ export async function getRefreshToken(): Promise<string | null> {
  */
 import * as Sentry from '@sentry/nextjs';
 
+// Module-level in-flight promise deduplication for concurrent refreshToken calls
+let inFlightRefreshPromise: Promise<{ accessToken: string; refreshToken: string } | null> | null = null;
+let inFlightRefreshTokenValue: string | null = null;
+
+export interface RefreshActionResult {
+    accessToken: string | null;
+    status: 'success' | 'no_token' | 'auth_error' | 'network_error';
+}
+
 export async function tryRefreshTokenAction(): Promise<string | null> {
+    const res = await tryRefreshTokenDetailedAction();
+    return res.accessToken;
+}
+
+export async function tryRefreshTokenDetailedAction(): Promise<RefreshActionResult> {
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get(REFRESH_TOKEN_KEY)?.value;
-    if (!refreshToken) return null;
+    if (!refreshToken) return { accessToken: null, status: 'no_token' };
 
     try {
-        const result = await refreshTokenApi(refreshToken);
-        await setAuthCookies(result.accessToken, result.refreshToken);
-        return result.accessToken;
+        let result: { accessToken: string; refreshToken: string } | null = null;
+
+        if (inFlightRefreshPromise && inFlightRefreshTokenValue === refreshToken) {
+            result = await inFlightRefreshPromise;
+        } else {
+            inFlightRefreshTokenValue = refreshToken;
+            inFlightRefreshPromise = (async () => {
+                try {
+                    return await refreshTokenApi(refreshToken);
+                } finally {
+                    inFlightRefreshPromise = null;
+                    inFlightRefreshTokenValue = null;
+                }
+            })();
+            result = await inFlightRefreshPromise;
+        }
+
+        if (result) {
+            await setAuthCookies(result.accessToken, result.refreshToken);
+            return { accessToken: result.accessToken, status: 'success' };
+        }
+        return { accessToken: null, status: 'network_error' };
     } catch (err) {
+        // Race condition guard: before deleting cookies on Unauthorized,
+        // check if a concurrent request already updated the refresh_token cookie
+        const currentCookieStore = await cookies();
+        const currentRefreshToken = currentCookieStore.get(REFRESH_TOKEN_KEY)?.value;
+        if (currentRefreshToken && currentRefreshToken !== refreshToken) {
+            // A concurrent request already successfully refreshed the token!
+            // Do NOT delete the new cookies; return the new access token.
+            return {
+                accessToken: currentCookieStore.get(ACCESS_TOKEN_KEY)?.value ?? null,
+                status: 'success',
+            };
+        }
+
         // Only delete cookies if we are sure the token is invalid/expired (logical Auth error from backend)
         const isAuthError = err instanceof GraphQLError && 
             (err.message === 'Unauthorized' || err.errors?.some(e => e.extensions?.category === 'authentication'));
@@ -75,13 +121,14 @@ export async function tryRefreshTokenAction(): Promise<string | null> {
         if (isAuthError) {
             cookieStore.delete(ACCESS_TOKEN_KEY);
             cookieStore.delete(REFRESH_TOKEN_KEY);
+            return { accessToken: null, status: 'auth_error' };
         } else {
             // Log unexpected refresh token failures to Sentry
             Sentry.captureException(err, {
                 tags: { category: 'auth', action: 'refresh_token_action' },
             });
+            return { accessToken: null, status: 'network_error' };
         }
-        return null;
     }
 }
 

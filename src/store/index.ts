@@ -68,7 +68,7 @@ const localityPersistConfig = {
 const authPersistConfig = {
     key: 'auth',
     storage,
-    blacklist: ['isInitialized'],
+    blacklist: ['isInitialized', 'token'],
     transforms: [authExpireTransform],
 };
 
@@ -77,7 +77,7 @@ const authPersistConfig = {
 const cartPersistConfig = {
     key: 'cart',
     storage,
-    blacklist: ['loading', 'deletingIds', 'useBonuses', 'total', 'isCartModalOpen', 'removedItems', 'isSyncing'],
+    blacklist: ['loading', 'deletingIds', 'useBonuses', 'availableBonuses', 'total', 'isCartModalOpen', 'removedItems', 'isSyncing'],
 };
 
 const wishlistPersistConfig = {

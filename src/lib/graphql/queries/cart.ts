@@ -32,6 +32,7 @@ export interface CartGql {
     hasRawFoods: boolean;
     total: number;
     cashback: number;
+    availableBonuses?: number;
     promoCode?: CartPromoCodeGql | null;
 }
 
@@ -57,6 +58,7 @@ const CART_FIELDS = `
     hasRawFoods
     total
     cashback
+    availableBonuses
     promoCode {
         isApplied
         code

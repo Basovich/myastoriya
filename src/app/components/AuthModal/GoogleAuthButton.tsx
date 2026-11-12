@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import clsx from 'clsx';
 import { AuthUser, loginAsGuest } from '@/store/slices/authSlice';
 import { socialAuthApi, authAsGuestApi } from '@/lib/graphql/queries/auth';
-import { setAuthCookies, clearAuthCookies } from '@/app/actions/authActions';
+import { setAuthCookies, clearAuthCookies, getAccessToken } from '@/app/actions/authActions';
 import { getOrCreateDeviceId } from '@/lib/utils/auth';
 import { GraphQLError } from '@/lib/graphql/client';
 import * as Sentry from '@sentry/nextjs';
@@ -34,7 +34,7 @@ export default function GoogleAuthButton({ onSuccess, onIncompleteProfile, text,
             setIsLoading(true);
             try {
                 const deviceId = getOrCreateDeviceId();
-                let currentToken: string | null = storeToken;
+                let currentToken: string | null = storeToken || (await getAccessToken());
 
                 if (!currentToken) {
                     try {
