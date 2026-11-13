@@ -144,6 +144,24 @@ async function checkBackendRedirect(url: string): Promise<string | null> {
             }
         }
 
+        // If not found and url starts with /ua/ or /ru/, try without locale prefix
+        if (!target && /^\/(?:ua|ru)(?:\/|$)/.test(cleanUrl)) {
+            const noLocale = cleanUrl.replace(/^\/(?:ua|ru)/, '') || '/';
+            const retryRes = await fetch(GQL_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: `query RedirectByUrl($url: String!) { redirectByUrl(url: $url) }`,
+                    variables: { url: noLocale },
+                }),
+                cache: 'no-store',
+            });
+            if (retryRes.ok) {
+                const retryJson = (await retryRes.json()) as { data?: { redirectByUrl?: string | null } };
+                target = retryJson?.data?.redirectByUrl;
+            }
+        }
+
         if (target && typeof target === 'string') {
             const cleanTarget = target.trim();
             if (
@@ -175,7 +193,7 @@ export async function middleware(request: NextRequest) {
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api') ||
-        pathname.includes('.') // All files with extensions (.ico, .png, .svg, .webmanifest, etc.)
+        (pathname.includes('.') && !pathname.endsWith('.html')) // All files with extensions (.ico, .png, .svg, .webmanifest, etc.), excluding legacy .html routes
     ) {
         return NextResponse.next();
     }
@@ -208,8 +226,8 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(`/${search}`, request.url), 301);
     }
 
-    // Ensure trailing slash for all non-root paths (301 Permanent Redirect for SEO)
-    if (pathname !== '/' && !pathname.endsWith('/')) {
+    // Ensure trailing slash for all non-root paths (301 Permanent Redirect for SEO), excluding .html legacy files
+    if (pathname !== '/' && !pathname.endsWith('/') && !pathname.endsWith('.html')) {
         return NextResponse.redirect(
             new URL(`${pathname}/${search}`, request.url),
             301
@@ -218,6 +236,7 @@ export async function middleware(request: NextRequest) {
 
     // 2.7. Specific legacy route patterns that should check backend redirects
     const isLegacyPattern =
+        pathname.endsWith('.html') ||
         /^(?:\/(?:ua|ru))?\/menu\/?$/.test(pathname) ||
         pathname.includes('/our-stores/shop-') ||
         /-\/?$/.test(pathname);
