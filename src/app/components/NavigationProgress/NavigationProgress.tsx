@@ -70,9 +70,20 @@ export default function NavigationProgress() {
             const href = anchor.getAttribute('href') ?? '';
             // Пропускаємо зовнішні посилання, якорі, mailto, tel
             if (/^(https?:|\/\/|#|mailto:|tel:)/.test(href)) return;
-            // Пропускаємо поточну сторінку
-            const targetPath = href.split('?')[0];
-            if (targetPath === pathnameRef.current) return;
+
+            // Пропускаємо поточну сторінку (відсікаємо ?search та #hash)
+            const cleanHref = href.split('?')[0].split('#')[0];
+            const cleanPathname = (pathnameRef.current || '').replace(/\/$/, '') || '/';
+            const normalizedTarget = cleanHref.replace(/\/$/, '') || '/';
+
+            // Якщо шлях збігається з поточним (або /ua і /) — це та сама сторінка
+            if (
+                normalizedTarget === cleanPathname ||
+                (normalizedTarget === '/' && cleanPathname === '/ua') ||
+                (normalizedTarget === '/ua' && cleanPathname === '/')
+            ) {
+                return;
+            }
 
             showLoader();
         };

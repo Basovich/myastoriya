@@ -2,6 +2,7 @@
 
 import s from "./FooterClient.module.scss";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { siteData } from "@/config/site";
 import AppLink from "@/app/components/ui/AppLink/AppLink";
 import Image from "next/image";
@@ -83,6 +84,22 @@ export default function FooterClient({ lang, initialSocialLinks }: FooterProps) 
         .filter(link => ALLOWED_SOCIAL_ICONS.includes(link.icon));
 
     const t = footerTranslations[lang] || footerTranslations.ua;
+    const reviewsHref = lang === 'ru' ? '/ru#reviews' : '/#reviews';
+    const isHomePage = /^\/(?:ua|ru)?\/?$/.test(pathname || "");
+
+    const handleReviewBannerClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (!isHomePage) return;
+
+        const reviewsEl = document.getElementById('reviews');
+        if (reviewsEl) {
+            e.preventDefault();
+            e.stopPropagation();
+            reviewsEl.scrollIntoView({ behavior: 'smooth' });
+            if (window.location.hash !== '#reviews') {
+                window.history.pushState(null, '', reviewsHref);
+            }
+        }
+    };
 
     const allLinks = footer.siteLinks.map(link => ({
         ...link,
@@ -193,22 +210,28 @@ export default function FooterClient({ lang, initialSocialLinks }: FooterProps) 
                     <Logo lang={lang} className={s.footerLogo} />
                 </div>
 
-                <a href="#" className={s.reviewBannerLink}>
+                <Link
+                    href={reviewsHref}
+                    onClick={handleReviewBannerClick}
+                    className={s.reviewBannerLink}
+                    aria-label="Відгуки"
+                    data-no-progress={isHomePage ? "true" : undefined}
+                >
                     <picture>
                         <source
-                            srcSet="/images/footer/footer_banner_desktop.png"
+                            srcSet="/images/footer/footer_banner_desktop.webp"
                             media="(min-width: 768px)"
                         />
                         <Image
-                            src="/images/footer/footer_banner_mobile.png"
-                            alt=""
+                            src="/images/footer/footer_banner_desktop.webp"
+                            alt="Відгуки клієнтів"
                             width={320}
                             height={234}
                             className={s.reviewImage}
                             loading="lazy"
                         />
                     </picture>
-                </a>
+                </Link>
 
                 <div className={s.rightBottomRow}>
                     <div className={s.contactSection}>
